@@ -1,6 +1,11 @@
 /* LAYOUT */
 /* begin custom navbar */
 
+nav.navbar {
+    border-bottom: 0;
+    border-image-width: 0;
+    min-height: 40px;
+}
 .navbar-inverse .navbar-inner {
     background-image: none;
     border: 2px solid #eeeeee;
@@ -46,6 +51,8 @@
 .navbar .nav li.dropdown.open.active > .dropdown-toggle {
   color: #ffff00;
   background-color: #777777;
+  text-transform: none;
+  font-size: medium;
 }
 
 .navbar .nav > li > a {
@@ -54,6 +61,11 @@
     padding: 10px 15px;
     text-decoration: none;
     text-shadow: 0 0px 0 #444444;
+    text-transform: none;
+    font-size: medium;
+}
+.collapse.navbar-collapse:before,.collapse.navbar-collapse:after {
+    content: none;
 }
 
 .navbar .brand {
@@ -65,6 +77,8 @@
   font-weight: 200;
   color: #000000;
   text-shadow: 0 0px 0 #444444;
+  text-transform: none;
+  font-size: medium;
 }
 
 .navbar .nav > li > a:focus,
@@ -72,12 +86,25 @@
   color: #ffff00;
   text-decoration: none;
   background-color: #777777;
+  text-transform: none;
+  font-size: medium;
 }
 
 .navbar-text {
   margin-bottom: 0;
-  line-height: 40px;
+  /*line-height: 40px;*/
   color: #000000;
+  font-size: medium;
+  text-transform: none;
+}
+
+.dropdown-menu > li > a:focus,
+.dropdown-menu > li > a:hover {
+  color: #ffff00;
+  text-decoration: none;
+  background-color: #777777;
+  text-transform: none;
+  font-size: medium;
 }
 
 .dropdown-menu li > a {
@@ -88,6 +115,8 @@
   line-height: 20px;
   color: #000000;
   white-space: nowrap;
+  text-transform: none;
+  font-size: medium;
 }
 
 .navbar-link {
@@ -98,22 +127,32 @@
   color: #ffff00;
 }
 
-/* end custom navbar */
-
-.navbar-inverse .navbar-prod {
-    color: #000000;
+nav.navbar,nav .container-fluid, footer.footer, footer.footer div {
     background-color: #cccccc;
 }
 
-.navbar-inverse .navbar-devel {
-    color: #000000;
-    background-color: #ffff00;
+nav .container-fluid:before,nav .container-fluid:after {
+    content: none;
 }
-.navbar-inverse .navbar-local {
-    color: #000000;
-    background-color: #00ffff;
+nav.navbar:before,nav.navbar:after {
+    content: none;
 }
 
+a.brand img {
+    vertical-align: top;
+    height: 50px;
+}
+
+/* end custom navbar */
+
+a {
+    color: #d45510;
+    text-decoration: none;
+}
+a:active, a:hover: {
+    color: #d45510;
+    text-decoration: underline;
+}
 .page-header {
     margin: 20pt 0 10pt 0;
 }
