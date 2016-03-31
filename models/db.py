@@ -15,6 +15,16 @@ db = DAL('mysql://{}:{}@{}/{}'.format(
         config['inkind_host'],
         'inkind_web',
     ),
+    migrate_enabled=False, # if session table already exists
+    #migrate=False, # if session table does not yet exist
+)
+
+dbd = DAL('mysql://{}:{}@{}/{}'.format(
+        config['inkind_user'],
+        config['inkind_passwd'],
+        config['inkind_host'],
+        'inkind_data',
+    ),
     #migrate_enabled=False, # if session table already exists
     migrate=False, # if session table does not yet exist
 )
