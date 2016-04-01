@@ -1,0 +1,19 @@
+{{ left_sidebar_enabled = True }}
+{{ right_sidebar_enabled = True }}
+{{ extend 'layout.html' }}
+
+{{if 'message' in globals():}}
+<h3>{{=message}}</h3>
+{{pass}}
+
+<div>
+<h1>{{=len(titles)}} contributions</h1>
+<table>
+{{for t in titles:}}
+<tr>
+    <td class="cc">{{=t[2]}}</td><td class="cn">{{=t[3]}}</td>
+    <td><a href="{{=URL('assess', 'contribution', vars=dict(id=t[0]))}}">{{=t[1]}}</a></td>
+</tr>
+{{pass}}
+</table>
+</div>
