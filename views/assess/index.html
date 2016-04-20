@@ -1,0 +1,29 @@
+{{ left_sidebar_enabled = True }}
+{{ right_sidebar_enabled = True }}
+{{ extend 'layout.html' }}
+
+{{ block head }}
+<script type="text/javascript">
+var url_tpl = "{{=XML(URL('_c_', '_f_', host=False))}}"
+</script>
+{{ end }}
+
+<div id="msg_page"></div>
+<p><a href="#" title="clear messages"><span id="trash_msg_page" class="ctrl ir fa fa-trash fa-lg"></span></a></p>
+
+<div id="msg_material"></div>
+<p><a href="#" title="clear messages"><span id="trash_msg_material" class="ctrl ir fa fa-trash fa-lg"></span></a></p>
+<div id="material"></div>
+
+{{ block left_sidebar }}
+<div id="msg_sidebar_l"></div>
+<p><a href="#" title="clear messages"><span id="trash_msg_sidebar_l" class="ctrl ir fa fa-trash fa-lg"></span></a></p>
+<div id="sidebar_l"></div>
+{{ end }}
+
+{{ block right_sidebar }}
+<div id="msg_sidebar_r"></div>
+<p><a href="#" title="clear messages"><span id="trash_msg_sidebar_r" class="ctrl ir fa fa-trash fa-lg"></span></a></p>
+<div id="sidebar_r">Sidebar right</div>
+{{ end }}
+

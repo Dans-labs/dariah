@@ -185,6 +185,24 @@ ol.text {
     height: 60px;
 }
 
+/* CONTROLS */
+
+.ctrl {
+    border-radius: 6pt;
+    border: 1pt solid #dde6dd;
+    background-color: #fafffa;
+    padding: 2pt;
+}
+.radio.ison {
+    font-weight: normal;
+    background-color: #888888;
+    color: #ffff00;
+}
+.radio {
+    font-weight: normal;
+    background-color: #fafffa;
+    color: #aaaaaa;
+}
 /* GENERIC */
 
 .left_ {
@@ -237,6 +255,9 @@ div.msg_error {
     background-color: #ffaaaa;
     font-weight: bold;
     font-size: large;
+}
+span.ir {
+    float: right;
 }
 /* DIALOGS */
 .pnll .ui-dialog-titlebar-close {

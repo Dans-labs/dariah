@@ -31,7 +31,7 @@ dbd = DAL('mysql://{}:{}@{}/{}'.format(
 
 # Indeed, we store sessions in the database:
 session.connect(request, response, db=db)
-response.generic_patterns = ['*'] if request.is_local else []
+response.generic_patterns = ['*'] if request.is_local else ['*.json']
 
 from gluon.tools import Auth, Crud, Service, PluginManager, prettydate
 auth = Auth(db, secure=True) # secure=True should enforce https for auth

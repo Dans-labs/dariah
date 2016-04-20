@@ -47,6 +47,7 @@
     <!-- include stylesheets -->
     <link rel="stylesheet" href="{{=URL('static','css/bootstrap.min.css')}}"/>
     <link rel="stylesheet" href="{{=URL('static','css/web2py-bootstrap3.css')}}"/>
+    <link rel="stylesheet" href="{{=URL('static','css/font-awesome.min.css')}}"/>
     <link rel="stylesheet" href="{{=URL('static','css/inkind.css')}}"/>
     <!-- All JavaScript at the bottom, except for Modernizr which enables
          HTML5 elements & feature detects -->
@@ -149,6 +150,10 @@
       });
     </script>
     {{pass}}
+    <script src="{{=URL('static','js/jquery.storageapi.min.js')}}"></script>
+    <script src="{{=URL('static', 'js/history.js/scripts/bundled/html4+html5/native.history.js')}}"></script>
+    <script src="{{=URL('static','js/markdown.min.js')}}"></script>
+    <script src="{{=URL('static', 'js/inkind.js')}}"></script>
     <!-- Share ============================y============ -->
     <script src="{{=URL('static','js/share.js',vars=dict(static=URL('static','images')))}}"></script>
     </body>
