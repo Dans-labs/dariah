@@ -30,9 +30,9 @@ var Request = {
 // TOP LEVEL: PAGE
 
 function Page() { // the one and only page object
-    this.msg = new Msg('msg_page')
+    this.msg = new Msg(`msg_page`)
     this.vs = new ViewState(this.msg)
-    History.Adapter.bind(window,'statechange', this.vs.goback)
+    History.Adapter.bind(window,`statechange`, this.vs.goback)
 
     this.init = function() { // dress up the skeleton, initialize state variables
         this.material = new Material(this)
@@ -49,22 +49,20 @@ function Page() { // the one and only page object
 
 function Material(page) { // Object corresponding to everything that controls the material in the main part (not in the side bars)
     var that = this
-    this.name = 'material'
-    this.container = $('#'+this.name)
+    this.name = `material`
+    this.container = $(`#${this.name}`)
     this.page = page
     this.state = this.page.vs.data
     this.specs = this.page.vs.specs
-    this.msg = new Msg('msg_'+this.name)
+    this.msg = new Msg(`msg_${this.name}`)
     this.loaded = {}
     for (var ls in this.specs.list.values) {
         this.loaded[ls] = false
     }
     this.apply = function() { // apply viewsettings to current material
         for (var ls in this.specs.list.values) {
-            var tb = $('#table_'+ls)
+            var tb = $(`#table_${ls}`)
             if (ls == this.state.list) {
-                console.log('show '+ls)
-                console.log(tb)
                 tb.show()
                 if (!this.loaded[ls]) {
                     this.fetch()
@@ -76,8 +74,8 @@ function Material(page) { // Object corresponding to everything that controls th
         }
     }
     this.fetch = function() { // get the material by AJAX if needed, and process the material afterward
-        this.msg.msg('fetching data ...')
-        var fetch_url = url_tpl.replace(/_c_/, 'data').replace(/_f_/, this.state.list)+'.json'
+        this.msg.msg(`fetching data ...`)
+        var fetch_url = url_tpl.replace(/_c_/, `data`).replace(/_f_/, this.state.list)+`.json`
         $.post(fetch_url, {}, function(json) {
             that.loaded[that.state.list] = true
             that.msg.clear()
@@ -88,32 +86,30 @@ function Material(page) { // Object corresponding to everything that controls th
                 that.data = json.data
                 that.process()
             }
-        }, 'json')
+        }, `json`)
     }
     this.process = function() { // process new material obtained by an AJAX call
         this.genhtml()
     }
     this.genhtml = function() {
-        var h = []
-        h.push('<table id="table_'+this.state.list+'">')
-        if (this.state.list == 'contribs') {
+        var h = ``
+        h += `<table id="table_${this.state.list}">`
+        if (this.state.list == `contribs`) {
             for (var i in this.data) {
                 r = this.data[i]
-                rh = '<tr><td class="cc">'+r[2]+'<td><td class="cn">'+r[3]+'<td><td><a href="#" cid="'+r[0]+'">'+r[1]+'</a></td></tr>'
-                h.push(rh)
+                h += `<tr><td class="cc">${r[2]}<td><td class="cn">${r[3]}<td><td><a href="#" cid="${r[0]}">${r[1]}</a></td></tr>`
             }
         }
-        else if (this.state.list == 'countries') {
+        else if (this.state.list == `countries`) {
             for (var i in this.data) {
                 r = this.data[i]
-                rh = '<tr><td class="cc">'+r[0]+'<td><td class="cn">'+r[1]+'<td></tr>'
-                h.push(rh)
+                h += `<tr><td class="cc">${r[0]}<td><td class="cn">${r[1]}<td></tr>`
             }
         }
-        h.push('</table>')
-        this.container.append(h.join(''))
+        h += `</table>`
+        this.container.append(h)
     }
-    this.msg.msg('Select something in the left sidebar')
+    this.msg.msg(`Select something in the left sidebar`)
 }
 
 
@@ -122,7 +118,7 @@ function Material(page) { // Object corresponding to everything that controls th
 function Sidebars(page) { // TOP LEVEL: all four kinds of sidebars
     this.sidebar = {}
     for (var s in {l:1, r:1}) {
-        this.sidebar[s] = (s == 'l')?(new Sidebar_l(page)):(new Sidebar_r(page))
+        this.sidebar[s] = (s == `l`)?(new Sidebar_l(page)):(new Sidebar_r(page))
     }
     this.apply = function() { // apply viewsettings to current material
         for (var s in {l:1, r:1}) {
@@ -135,16 +131,16 @@ function Sidebars(page) { // TOP LEVEL: all four kinds of sidebars
 
 function Sidebar_l(page) { // the left sidebar, meant for selection/navigation
     var that = this
-    this.name = 'sidebar_l'
-    this.container = $('#'+this.name)
+    this.name = `sidebar_l`
+    this.container = $(`#${this.name}`)
     this.page = page
     this.state = this.page.vs.data
     this.specs = this.page.vs.specs
-    this.msg = new Msg('msg_'+this.name)
+    this.msg = new Msg(`msg_${this.name}`)
     this.apply = function() { // apply viewsettings to current material
         var ls = this.state.list
-        this.container.find('.radio').removeClass('ison')
-        this.container.find('a[ls="'+ls+'"]').addClass('ison')
+        this.container.find(`.radio`).removeClass(`ison`)
+        this.container.find(`a[ls="${ls}"]`).addClass(`ison`)
         this.page.material.apply()
     }
     this.init = function() {
@@ -152,16 +148,16 @@ function Sidebar_l(page) { // the left sidebar, meant for selection/navigation
         this.dressup()
     }
     this.genhtml = function() {
-        var h = []
+        var h = ``
         for (var ls in this.specs.list.values) {
-            h.push('<a class="ctrl radio" href="#" ls="'+ls+'">'+ls+'</a> ')
+            h += `<a class="ctrl radio" href="#" ls="${ls}">${ls}</a> `
         }
-        this.container.html(h.join(''))
+        this.container.html(h)
     }
     this.dressup = function() {
-        this.container.find('.radio').each(function() {
+        this.container.find(`.radio`).each(function() {
             $(this).click(function(e) {e.preventDefault();
-                that.state.list = $(this).attr('ls')
+                that.state.list = $(this).attr(`ls`)
                 that.apply() 
             })
         })
@@ -171,11 +167,11 @@ function Sidebar_l(page) { // the left sidebar, meant for selection/navigation
 
 function Sidebar_r(page) { // the right sidebar, meant for item views
     var that = this
-    this.name = 'sidebar_r'
-    this.container = $('#'+this.name)
+    this.name = `sidebar_r`
+    this.container = $(`#${this.name}`)
     this.page = page
     this.state = this.page.vs.data
-    this.msg = new Msg('msg_'+this.name)
+    this.msg = new Msg(`msg_${this.name}`)
     this.loaded = false
     this.apply = function() { // apply viewsettings to current material
         iid = this.state.id
@@ -190,8 +186,8 @@ function Sidebar_r(page) { // the right sidebar, meant for item views
         }
     }
     this.fetch = function() { // get the material by AJAX if needed, and process the material afterward
-        this.msg.msg('fetching data ...')
-        var fetch_url = url_tpl.replace(/_c_/, 'data').replace(/_f_/, 'item')+'.json'
+        this.msg.msg(`fetching data ...`)
+        var fetch_url = url_tpl.replace(/_c_/, `data`).replace(/_f_/, `item`)+`.json`
         $.post(fetch_url, {}, function(json) {
             that.loaded = true
             that.msg.clear()
@@ -202,7 +198,7 @@ function Sidebar_r(page) { // the right sidebar, meant for item views
                 that.data = json.data
                 that.process()
             }
-        }, 'json')
+        }, `json`)
     }
     this.process = function() { // process new material obtained by an AJAX call
         this.genhtml()
@@ -215,11 +211,11 @@ function Sidebar_r(page) { // the right sidebar, meant for item views
 
 function Msg(destination, on_clear) {
     var that = this
-    this.destination = $('#'+destination)
-    this.trashc = $('#trash_'+destination)
-    this.trashp = this.trashc.closest('p')
+    this.destination = $(`#${destination}`)
+    this.trashc = $(`#trash_${destination}`)
+    this.trashp = this.trashc.closest(`p`)
     this.clear = function() {
-        this.destination.html('')
+        this.destination.html(``)
         if (on_clear != undefined) {
             on_clear()
         }
@@ -232,7 +228,7 @@ function Msg(destination, on_clear) {
     }
     this.show = function() {
         this.destination.show()
-        if (this.destination.html() != '') {
+        if (this.destination.html() != ``) {
             this.trashp.show()
         }
     }
@@ -241,10 +237,10 @@ function Msg(destination, on_clear) {
     })
     this.msg = function(text, kind) {
         if (kind == undefined) {
-            kind = 'info'
+            kind = `info`
         }
         var mtext = this.destination.html()
-        this.destination.html(mtext+'<p class="'+kind+'">'+text+'</p>')
+        this.destination.html(`${mtext}<p class="${kind}">${text}</p>`)
         this.destination.show()
         this.trashp.show()
     }
@@ -261,62 +257,62 @@ function ViewState(page) {
     this.data = {}
     this.from_push = false
     this.specs = {
-        list: {type: 'string', values: {contribs: 1, countries: 1}, def: 'contribs'},
-        greet: {type: 'string', values: null, def: 'hallo'},
-        id: {type: 'integer', values: {min: -1, max: 1000000}, def: 0},
-        sort: {type: 'boolean', values: {v: true, x: false}, def: true}, 
+        list: {type: `string`, values: {contribs: 1, countries: 1}, def: `contribs`},
+        greet: {type: `string`, values: null, def: `hallo`},
+        id: {type: `integer`, values: {min: -1, max: 1000000}, def: 0},
+        sort: {type: `boolean`, values: {v: true, x: false}, def: true}, 
     }
     this.validate = function(name, val) {
         var newval, message;
         if (name in this.specs) {
             var s = this.specs[name]
-            if (s.type == 'string') {
+            if (s.type == `string`) {
                 if (s.values) {
                     if (val in s.values) {
                         newval = val
                     }
                     else {
                         newval = s.def
-                        this.msg.msg('illegal string value for '+name+': "'+val+'" is replaced by "'+s.def+'"', 'warning')
+                        this.msg.msg(`illegal string value for ${name}: "${val}" is replaced by "${s.def}"`, `warning`)
                     }
                 }
                 else {
                     newval = val
                 }
             }
-            else if (s.type == 'integer') {
+            else if (s.type == `integer`) {
                 if (/^(\-|\+)?[0-9]+$/.test(val)) {
                     newval = Number(val)
                 }
                 else {
                     newval = s.def
-                    this.msg.msg('not a number value for '+name+': "'+val+'" is replaced by "'+s.def+'"', 'warning')
+                    this.msg.msg(`not a number value for ${name}: "${val}" is replaced by "${s.def}"`, `warning`)
                 }
             }
-            else if (s.type == 'boolean') {
+            else if (s.type == `boolean`) {
                 if (val in s.values) {
                     newval = s.values[val]
                 }
                 else {
                     newval = s.def
-                    this.msg.msg('illegal boolean value for '+name+': "'+val+'" is replaced by "'+s.def+'"', 'warning')
+                    this.msg.msg(`illegal boolean value for ${name}: "${val}" is replaced by "${s.def}"`, `warning`)
                 }
             }
         }
         else {
             newval = null
-            this.msg.msg('unknown parameter: '+name+'='+val, 'warning')
+            this.msg.msg(`unknown parameter: ${name}=${val}`, `warning`)
         }
         return newval
     }
 
     this.getinitstate = function() {
         var rvars = Request.parameters()
-        var nslvars = $.initNamespaceStorage('req')
+        var nslvars = $.initNamespaceStorage(`req`)
         var lvars = nslvars.localStorage
         for (var name in rvars) {
             if (!(name in this.specs)) {
-                this.msg.msg('unknown parameter: '+name+'='+val, 'Warning')
+                this.msg.msg(`unknown parameter: ${name}=${val}`, `warning`)
             }
         }
         for (var name in this.specs) {
@@ -360,9 +356,9 @@ function ViewState(page) {
 // GENERIC
 
 var escapeHTML = (function () {
-    'use strict';
+    `use strict`;
     var chr = {
-        '&': '&amp;', '<': '&lt;',  '>': '&gt;'
+        '&': `&amp;`, '<': `&lt;`,  '>': `&gt;`
     };
     return function (text) {
         return text.replace(/[&<>]/g, function (a) { return chr[a]; });
@@ -373,6 +369,6 @@ var escapeHTML = (function () {
 
 $(function() {
     wb = new Page();
-    wb.sidebars.sidebar['l'].apply()
+    wb.sidebars.sidebar[`l`].apply()
 })
 
