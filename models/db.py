@@ -5,28 +5,28 @@ request.requires_https()
 
 from get_db_config import config
 
-dc_u = config['inkind_user']
-dc_p = config['inkind_passwd']
-dc_h = config['inkind_host']
+dc_u = config['dariah_user']
+dc_p = config['dariah_passwd']
+dc_h = config['dariah_host']
 
 db = DAL('mysql://{}:{}@{}/{}'.format(
-        config['inkind_user'],
-        config['inkind_passwd'],
-        config['inkind_host'],
-        'inkind_web',
+        config['dariah_user'],
+        config['dariah_passwd'],
+        config['dariah_host'],
+        'dariah_web',
     ),
     migrate_enabled=False, # if session table already exists
     #migrate=False, # if session table does not yet exist
 )
 
 dbd = DAL('mysql://{}:{}@{}/{}'.format(
-        config['inkind_user'],
-        config['inkind_passwd'],
-        config['inkind_host'],
-        'inkind_data',
+        config['dariah_user'],
+        config['dariah_passwd'],
+        config['dariah_host'],
+        'dariah_data',
     ),
-    #migrate_enabled=False, # if session table already exists
-    migrate=False, # if session table does not yet exist
+    migrate_enabled=False, # if session table already exists
+    #migrate=False, # if session table does not yet exist
 )
 
 # Indeed, we store sessions in the database:

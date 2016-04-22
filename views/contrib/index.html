@@ -1,0 +1,22 @@
+{{ left_sidebar_enabled = True }}
+{{ right_sidebar_enabled = True }}
+{{ extend 'layout.html' }}
+
+{{ block head }}
+    <script type="text/javascript">
+        var url_tpl = "{{=XML(URL('_c_', '_f_', host=False))}}";
+        var app_url = "{{=XML(URL(host=False))}}";
+    </script>
+{{ end }}
+
+<div id="msg_page"></div>
+<div id="middle"></div>
+
+{{ block left_sidebar }}
+    <div id="left"></div>
+{{ end }}
+
+{{ block right_sidebar }}
+    <div id="right">Sidebar right</div>
+{{ end }}
+

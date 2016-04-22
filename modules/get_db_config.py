@@ -1,7 +1,7 @@
-config = dict(inkind_user='inkind')
-config_path = '/opt/inkind/pwd.cfg'
+config = dict(dariah_user='dariah')
+config_path = '/opt/dariah/pwd.cfg'
 with open(config_path) as p:
-    config['inkind_passwd'] = p.read().rstrip('\n')
-config_path = '/opt/inkind/host.cfg'
+    config['dariah_passwd'] = p.read().rstrip('\n')
+config_path = '/opt/dariah/host.cfg'
 with open(config_path) as p:
-    config['inkind_host'] = p.read().rstrip('\n')
+    config['dariah_host'] = p.read().rstrip('\n')

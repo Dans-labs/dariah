@@ -6,11 +6,10 @@
 <h3>{{=message}}</h3>
 {{pass}}
 
-<div class="section" id="shebanq">
+<div class="section" id="dariah">
 <p><img src="{{=URL('static', 'images/inkind_logo.png')}}" width="50%" align="right"/></p>
-<h4>What is Inkind?</h4>
-<p><b>DARIAH Inkind Assessment Tool</b></p>
-<p>This is a system to assess the tools that have been contributed to the DARIAH infrastructure by its national members.
+<h4>What is the DARIAH contribution tool?</h4>
+<p>This is a <a href="{{=URL('contrib', 'index')}}">system to assess the tools that have been contributed to the DARIAH infrastructure</a> by its national members.
 These tools constitute the in-kind contributions of the member states to the European DARIAH ERIC.
 The purpose of the assessment is to establish the quality and value of the contributed tools.
 It is important to know how much effort has gone into the creation, maintenance and delivery of the tool.
@@ -18,8 +17,8 @@ But also the satisfaction of the parties that use the tool are an important indi
 </div>
 
 <div class="section" id="get_started">
-<h4>Browse Inkinds</h4>
-<p>The first step is to know what inkinds are there, to oversee the landscape of contributions.</p>
+<h4>Browse Contributions</h4>
+<p>The first step is to know what contributions are there, to oversee the landscape of contributions.</p>
 </div>
 
 <div class="section" id="next_step">
@@ -59,12 +58,12 @@ Here are your opportunities to mine that information, analyse it and visualize i
 <div id="sections">
 <dl>
 
-<dt class="exp"><a href="#" class="sectionc" tid="shebanq">What is Inkind?</a></dt>
-<dd class="exp"><p><b>DARIAH Inkind Assessment Tool</b></p></dd>
+<dt class="exp"><a href="#" class="sectionc" tid="dariah">What is a Contribution?</a></dt>
+<dd class="exp"><p><b>DARIAH Contribution Assessment Tool</b></p></dd>
 <hr/>
 
 <dt class="exp"><a href="#" class="sectionc" tid="get_started">Get started</a></dt>
-<dd class="exp"><p>Browse Inkinds</p></dd>
+<dd class="exp"><p>Browse Contributions</p></dd>
 <hr/>
 
 <dt class="exp"><a href="#" class="sectionc" tid="next_step">Next step</a></dt>
@@ -80,7 +79,7 @@ Here are your opportunities to mine that information, analyse it and visualize i
 <hr/>
 
 <dt class="exp"><a href="#" class="sectionc" tid="contact">Contact</a></dt>
-<dd class="exp"><p><a href="mailto:shebanq@ancient-data.org">dirk.roorda@dans.knaw.nl</a></p></dd>
+<dd class="exp"><p><a href="mailto:dirk.roorda@dans.knaw.nl">dirk.roorda@dans.knaw.nl</a></p></dd>
 <hr/>
 
 </dl>
@@ -116,7 +115,7 @@ var Request = {
 
 function sections_init() {
     var gotosection = Request.parameter('goto');
-    $('a[tid="shebanq"]').click()
+    $('a[tid="dariah"]').click()
     $('a[tid="'+gotosection+'"]').click()
 }
 

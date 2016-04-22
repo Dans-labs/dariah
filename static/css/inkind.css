@@ -56,7 +56,7 @@ nav.navbar {
 }
 
 .navbar .nav > li > a {
-    color: #000000;
+    color: #1A3D6F;
     float: none;
     padding: 10px 15px;
     text-decoration: none;
@@ -75,7 +75,7 @@ nav.navbar {
   margin-left: -20px;
   font-size: 20px;
   font-weight: 200;
-  color: #000000;
+  color: #1A3D6F;
   text-shadow: 0 0px 0 #444444;
   text-transform: none;
   font-size: medium;
@@ -93,7 +93,7 @@ nav.navbar {
 .navbar-text {
   margin-bottom: 0;
   /*line-height: 40px;*/
-  color: #000000;
+  color: #1A3D6F;
   font-size: medium;
   text-transform: none;
 }
@@ -113,14 +113,14 @@ nav.navbar {
   clear: both;
   font-weight: normal;
   line-height: 20px;
-  color: #000000;
+  color: #1A3D6F;
   white-space: nowrap;
   text-transform: none;
   font-size: medium;
 }
 
 .navbar-link {
-  color: #000000;
+  color: #1A3D6F;
 }
 
 .navbar-link:hover {
@@ -195,8 +195,9 @@ ol.text {
 }
 .radio.ison {
     font-weight: normal;
-    background-color: #888888;
-    color: #ffff00;
+    color: #1A3D6F;
+    background-color: #ffffff;
+    border: 2pt solid #d3550f;
 }
 .radio {
     font-weight: normal;

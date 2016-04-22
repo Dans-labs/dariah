@@ -12,9 +12,9 @@ response.subtitle = ''
 
 ## read more at http://dev.w3.org/html5/markup/meta.name.html
 response.meta.author = 'Dirk Roorda <dirk.roorda@dans.knaw.nl>'
-response.meta.description = 'DARIAH-HaS Inkind Assessment'
+response.meta.description = 'DARIAH-HaS Contribution Assessment'
 response.meta.keywords = 'Digital Humanities, Quality Assessment, Research Infrastructures'
-response.meta.generator = 'DARIAH Inkind Registry'
+response.meta.generator = 'DARIAH Contribution Registry'
 
 ## your http://google.com/analytics id
 response.google_analytics_id = None
@@ -24,7 +24,7 @@ response.google_analytics_id = None
 #########################################################################
 
 response.menu = [
-    (T('Inkind'), False, URL('default', 'index'), [])
+    (T('DARIAH-contrib'), False, URL('default', 'index'), [])
 ]
 
 if "auth" in locals(): auth.wikimenu() 
