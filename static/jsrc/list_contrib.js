@@ -6,7 +6,7 @@ function List_contrib(comp) {this.comp = comp};
 
 List_contrib.prototype = {
     show: function() {
-        return this.comp.page.state.data.list == this.comp.name;
+        return this.comp.page.state.getstate('list') == this.comp.name;
     },
     genhtml: function() {
         var h = ``;

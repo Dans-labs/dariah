@@ -13,15 +13,6 @@
  * In turn, the specific functions can access their associated generic components by this.comp
  */
 
-/* COLLECTION of List COMPONENTS
- * This is an array of all the main list components
- */
-
-var List = {
-    contrib: List_contrib,
-    country: List_country,
-};
-
 /* GENERIC COMPONENT
  * Here is the generic functionality of each component
  */

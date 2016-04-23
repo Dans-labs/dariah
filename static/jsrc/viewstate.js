@@ -85,6 +85,9 @@ ViewState.prototype = {
         lvars.set(name, val);
         this.addHist();
     },
+    getstate: function(name) {
+        return this.data[name];
+    },
     getinitstate: function() {
         for (var name in rvars) {
             if (!(name in this.specs)) {

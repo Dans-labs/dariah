@@ -3,6 +3,15 @@
  * Clicking on a control shows the corresponding list and hides all others.
  */
 
+/* COLLECTION of List COMPONENTS
+ * This is an array of all the main list components
+ */
+
+var List = {
+    contrib: List_contrib,
+    country: List_country,
+};
+
 function Lists(comp) {this.comp = comp};
 
 Lists.prototype = {
