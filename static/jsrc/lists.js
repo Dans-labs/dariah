@@ -15,33 +15,31 @@ var List = {
 function Lists(comp) {this.comp = comp};
 
 Lists.prototype = {
-    show: function() {
-        return true;
-    },
-    genhtml: function() {
-        var showas = this.comp.page.state.showas;
+    _html: function() {
         var h = ``;
         for (var itm in this.comp.data) {
-            var show_itm = (itm in showas)? showas[itm].pl : itm;
-            h += `<a class="ctrl radio" href="#" itm="${itm}">${show_itm}</a> `;
+            h += `<a class="ctrl radio" href="#" itm="${itm}">${this.comp.state.showstate('list', itm, 'sg')}</a> `;
         }
         this.comp.container.html(h);
     },
-    dressup: function() {
+    _dressup: function() {
         var that = this;
         this.comp.container.find(`.radio`).each(function() {
             $(this).click(function(e) {e.preventDefault();
-                that.comp.page.state.setstate(`list`, $(this).attr(`itm`));
+                that.comp.state.setstate(`list`, $(this).attr(`itm`));
             })
         })
     },
+    show: function() {
+        return true;
+    },
     process: function() {
-        this.genhtml();
-        this.dressup();
+        this._html();
+        this._dressup();
     },
     apply: function() {
         this.comp.container.find(`.radio`).removeClass(`ison`);
-        this.comp.container.find(`a[itm="${this.comp.page.state.data.list}"]`).addClass(`ison`);
+        this.comp.container.find(`a[itm="${this.comp.state.getstate('list')}"]`).addClass(`ison`);
     }
 };
 

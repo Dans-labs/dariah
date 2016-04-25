@@ -6,27 +6,29 @@
  */
 
 function ViewState(page) {
+    this._data = {};
+    this._init();
     this.page = page;
     this.msg = page.msg;
-    this.data = {};
-    this.init();
 };
 
 ViewState.prototype = {
-    specs: {
+    _specs: {
         list: {type: `string`, values: {contrib: 1, country: 1}, def: `contrib`},
         greet: {type: `string`, values: null, def: `hallo`},
         id: {type: `integer`, values: {min: -1, max: 1000000}, def: 0},
         sort: {type: `boolean`, values: {v: true, x: false}, def: true}, 
     },
-    showas: {
-        contrib: {sg: 'contribution', pl: 'contributions'},
-        country: {sg: 'country', pl: 'countries'},
+    _showas: {
+        list: {
+            contrib: {sg: 'contribution', pl: 'contributions'},
+            country: {sg: 'country', pl: 'countries'},
+        },
     },
-    validate: function(name, val) {
+    _validate: function(name, val) {
         var newval, message;
-        if (name in this.specs) {
-            var s = this.specs[name];
+        if (name in this._specs) {
+            var s = this._specs[name];
             if (s.type == `string`) {
                 if (s.values) {
                     if (val in s.values) {
@@ -66,11 +68,11 @@ ViewState.prototype = {
         }
         return newval;
     },
-    getvars: function() {
+    _getvars: function() {
         vars = [];
-        for (var name in this.data) {
-            var val = this.data[name];
-            var spec = this.specs[name];
+        for (var name in this._data) {
+            var val = this._data[name];
+            var spec = this._specs[name];
             if (spec.type == `string` || spec.type == `integer`) {vars.push(`${name}=${val}`)}
             else if (spec.type == `boolean`) {
                 for (z in spec.values) {
@@ -80,59 +82,65 @@ ViewState.prototype = {
         }
         return vars.join('&')
     },
-    setstate: function(name, val) {
-        this.data[name] = val;
-        lvars.set(name, val);
-        this.addHist();
-    },
-    getstate: function(name) {
-        return this.data[name];
-    },
-    getinitstate: function() {
+    _getinitstate: function() {
         for (var name in rvars) {
-            if (!(name in this.specs)) {
+            if (!(name in this._specs)) {
                 this.msg.msg(`unknown parameter: ${name}=${val}`, `warning`);
             }
         }
-        for (var name in this.specs) {
+        for (var name in this._specs) {
             var val = null;
             if (name in rvars) {
                 var raw_val = rvars[name];
-                val = this.validate(name, raw_val);
+                val = this._validate(name, raw_val);
                 lvars.set(name, val);
             }
             else if (lvars.isSet(name)) {
                 val = lvars.get(name);
             }
             else {
-                val = this.specs[name].def;
+                val = this._specs[name].def;
                 lvars.set(name, val);
             }
-            this.data[name] = val;
+            this._data[name] = val;
         }
+    },
+    _addHist: function(title, view_url) {
+        var tit = `DARIAH contribution tool`;
+        var this_url = `${app_url}?${this._getvars()}`;
+        History.pushState(this._data, tit, this_url);
+    },
+    _init: function() {
+        this._getinitstate();
+        this._addHist();
+    },
+    setstate: function(name, val) {
+        this._data[name] = val;
+        lvars.set(name, val);
+        this._addHist();
+    },
+    getstate: function(name) {
+        return this._data[name];
+    },
+    getvalues: function(name) {
+        return this._specs[name].values;
+    },
+    showstate: function(name, val, mode) {
+        var result = val;
+        var md = (mode == undefined)?`sg`:mode;
+        if (this._showas[name] != undefined && this._showas[name][val] != undefined) {
+            result = this._showas[name][val][mode];
+        }
+        return result;
     },
     adapt: function(ob) {
         return function () {
             var state = History.getState();
             if (state && state.data) {
-                ob.apply(state);
+                ob._data = state.data;
+                ob.page.apply();
             }
         }
-    },
-    addHist: function(title, view_url) {
-        var tit = `DARIAH contribution tool`;
-        var this_url = `${app_url}?${this.getvars()}`;
-        History.pushState(this.data, tit, this_url);
-    },
-    apply: function(state) {
-        if (state.data != undefined) {
-            this.data = state.data;
-        }
-        this.page.apply();
-    },
-    init: function() {
-        this.getinitstate();
-        this.addHist();
     },
 };
 

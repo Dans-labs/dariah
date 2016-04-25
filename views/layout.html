@@ -146,12 +146,12 @@
     {{block page_js}}{{end page_js}}
     {{if response.google_analytics_id:}}
     <!-- Analytics ==================================== -->
-    <script src="{{=URL('static','js/analytics.min.js')}}"></script>
+    <!--<script src="{{=URL('static','js/analytics.min.js')}}"></script>
     <script type="text/javascript">
       analytics.initialize({
       'Google Analytics':{trackingId:'{{=response.google_analytics_id}}'}
       });
-    </script>
+    </script>-->
     {{pass}}
     <script src="{{=URL('static','js/jquery-ui.min.js')}}"></script>
     <script src="{{=URL('static','js/jquery.storageapi.min.js')}}"></script>

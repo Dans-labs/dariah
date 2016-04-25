@@ -5,10 +5,7 @@
 function List_country(comp) {this.comp = comp};
 
 List_country.prototype = {
-    show: function() {
-        return this.comp.page.state.getstate('list') == this.comp.name;
-    },
-    genhtml: function() {
+    _html: function() {
         var h = ``;
         h += `<table id="table_${this.comp.name}">`;
         for (var i in this.comp.data) {
@@ -18,8 +15,11 @@ List_country.prototype = {
         h += `</table>`;
         this.comp.container.html(h);
     },
+    show: function() {
+        return this.comp.state.getstate('list') == this.comp.name;
+    },
     process: function() {
-        this.genhtml();
+        this._html();
     },
     apply: function() {},
 };

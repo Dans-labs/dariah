@@ -1,7 +1,7 @@
 /* COMPONENTS 
  * The Page function specifies and builds a list of components
  * Every component on the page corresponds to a function (with a prototype)
- * This function is stored in a generic Component function in a field called methods.
+ * This function is stored in a generic Component function in a field called specific.
  * The generic functions of a component take care of:
  * - generating an HTML container div under a specified destination element if it does not already exist
  * - showing and hiding the component, and in general, apply the current state data to the component 
@@ -17,68 +17,75 @@
  * Here is the generic functionality of each component
  */
 
-function Component(dest, name, source, methods, page) {
-    this.dest = $(`#${dest}`);
+function Component(dst, name, fetch, source, specific, page) {
+    this._dst = $(`#${dst}`);
+    this._loaded = false;
     this.name = name;
     this.page = page;
-    if (typeof source == 'string') {
-        this.fetch_url = url_tpl.replace(/_c_/, `data`).replace(/_f_/, source)+`.json`;
+    this.state = page.state;
+    if (fetch != null) {
+        this._fetch_url = url_tpl.replace(/_c_/, `data`).replace(/_f_/, fetch)+`.json`;
         this.data = null;
     }
     else {
-        this.fetch_url = null;
+        this._fetch_url = null;
         this.data = source;
     }
-    this.loaded = false;
-    this.methods = new methods(this);
+    this.specific = new specific(this);
 };
 
 Component.prototype = {
-    loaded: null,
-    init: function() { // make the component
-        this.container = $(`#${this.name}`);
-        if (this.container.length == 0) {
-            this.dest.append(`<div id="msg_${this.name}"></div>`);
-            this.dest.append(`<div id="${this.name}"></div>`);
-            this.container = $(`#${this.name}`);
-        }
-        this.msg = new Msg(`msg_${this.name}`);
-        this.loaded = false;
-    },
-    apply: function() { // apply (changed) state to current material
-        if (this.methods.show()) {
-            this.container.show();
-            if (!this.loaded) {
-                this.fetch();
-            }
-        }
-        else {
-            this.container.hide();
-        }
-        this.methods.apply();
-    },
-    fetch: function() { // get the material by AJAX if needed, and process the material afterward
+    _loaded: null,
+    _fetch: function() { // get the material by AJAX if needed, and process the material afterward
         var that = this;
-        if (this.fetch_url != null) {
+        if (this._fetch_url != null) {
             this.msg.msg(`fetching data ...`);
-            $.post(this.fetch_url, {}, function(json) {
-                that.loaded = true;
+            $.post(this._fetch_url, {}, function(json) {
+                that._loaded = true;
                 that.msg.clear();
                 json.msgs.forEach(function(m) {
                     that.msg.msg(m);
                 });
                 if (json.good) {
                     that.data = json.data;
-                    that.process();
+                    that._process();
                 }
             }, `json`);
         }
         else {
-            this.process();
+            this._process();
         }
     },
-    process: function() { // process new material obtained by an AJAX call
-        this.methods.process();
+    _process: function() { // process new material obtained by an AJAX call
+        this.specific.process();
+        this.specific.apply(); // perform apply actions that are specific to this component
+        this.page.apply(this.name); // apply other components, dependent on the routing information of the page
+    },
+    init: function() { // make the component
+        this.container = $(`#${this.name}`);
+        if (this.container.length == 0) {
+            this._dst.append(`<div id="msg_${this.name}"></div>`);
+            this._dst.append(`<div id="${this.name}"></div>`);
+            this.container = $(`#${this.name}`);
+        }
+        this.msg = new Msg(`msg_${this.name}`);
+        this._loaded = false;
+    },
+    apply: function() { // apply (changed) state to current material
+        // show/hide depending on the specific condition
+        if (this.specific.show()) {
+            this.container.show();
+            if (!this._loaded) { // and fetch data if needed
+                this._fetch();
+            }
+            else {
+                this.specific.apply(); // perform apply actions that are specific to this component
+                this.page.apply(this.name); // apply other components, dependent on the routing information of the page
+            }
+        }
+        else {
+            this.container.hide();
+        }
     },
 };
 
