@@ -111,7 +111,7 @@ ViewState.prototype = {
             this.data[name] = val;
         }
     },
-    goback: function(ob) {
+    adapt: function(ob) {
         return function () {
             var state = History.getState();
             if (state && state.data) {

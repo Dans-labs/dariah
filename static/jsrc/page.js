@@ -35,7 +35,7 @@ Page.prototype = {
             this.compindex[c[1]] = co;
             co.init();
         }
-        History.Adapter.bind(window,`statechange`, this.state.goback(this.state));
+        History.Adapter.bind(window,`statechange`, this.state.adapt(this.state));
     },
     apply: function() { // apply the viewstate: hide and show material as prescribed by the viewstate
         for (var i in this.compobjects) {
