@@ -40,7 +40,9 @@ python -m compileall models modules
 cd $ADIR/$APP
 python -m compileall models modules
 if [ $ON_CLARIN ]; then
-    chown apache:apache $ADIR/web2py/web2py.log
+    if [ -e $ADIR/web2py/web2py.log ]; then
+        chown apache:apache $ADIR/web2py/web2py.log
+    fi
     chown apache:apache $ADIR/web2py/welcome.w2p
 fi
 sleep 1
