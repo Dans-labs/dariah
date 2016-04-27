@@ -193,7 +193,7 @@ ol.text {
     background-color: #fafffa;
     padding: 2pt;
 }
-.radio.ison {
+.ison {
     font-weight: normal;
     color: #1A3D6F;
     background-color: #ffffff;
@@ -210,11 +210,24 @@ ol.text {
 div.flt {
     font-size: medium;
 }
-div.flt label, div.flt input {
+div.flt input {
     font-weight: normal;
     font-size: small;
 }
-
+.fbox {
+    font-size: small;
+}
+.fbox span {
+    display: inline;
+}
+.stats {
+    color: #aaaaaa;
+    font-size: small;
+    float: right;
+}
+.filtc {
+    float: right;
+}
 /* GENERIC */
 
 .left_ {

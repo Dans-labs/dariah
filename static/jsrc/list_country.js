@@ -10,7 +10,7 @@ List_country.prototype = {
         h += `<table id="table_${this.comp.name}">`;
         for (var i in this.comp.data) {
             r = this.comp.data[i];
-            h += `<tr><td class="cc">${r[0]}<td><td class="cn">${r[1]}<td></tr>`;
+            h += `<tr id="r${r[0]}"><td class="cc">${r[0]}<td><td class="cn">${r[1]}<td></tr>`;
         }
         h += `</table>`;
         this.comp.container.html(h);

@@ -10,7 +10,7 @@ List_contrib.prototype = {
         h += `<table id="table_${this.comp.name}">`;
         for (var i in this.comp.data) {
             r = this.comp.data[i];
-            h += `<tr><td class="cc">${r[2]}<td><td class="cn">${r[3]}<td><td><a href="#" cid="${r[0]}">${r[1]}</a></td></tr>`;
+            h += `<tr id="r${r[0]}"><td class="cc">${r[2]}<td><td class="cn">${r[3]}<td><td><a href="#" rid="${r[0]}">${r[1]}</a></td></tr>`;
         }
         h += `</table>`;
         this.comp.container.html(h);
