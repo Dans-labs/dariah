@@ -7,6 +7,8 @@
         var url_tpl = "{{=XML(URL('_c_', '_f_', host=False))}}";
         var app_url = "{{=XML(URL(host=False))}}";
     </script>
+    <script type="text/javascript" src="{{=URL('static', 'js/jquery.cssmap.min.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{=URL('static', 'css/cssmap-europe/cssmap-europe.css')}}" media="screen" />
 {{ end }}
 
 <div id="msg_page"></div>

@@ -7,7 +7,6 @@ function Filter(comp) {
     this.comp = comp;
     this._loaded = {};
     this.tags = {};
-    this.widget = {};
     this.fltc = {};
     this.boxf = {};
     this.autoc = {};
@@ -27,9 +26,10 @@ Filter.prototype = {
         h += `</p>`;
         h += `<div id="autoc_${sc}" style="display: none;">here ${sc}</div>`;
         h += `</div>`;
-        this.comp.container[sc].append(h);
+        this.comp.container[sc].html(h);
     },
     _set_flt: function(sc, textf) {
+        this.comp.container[sc].addClass(`flt`);
         this.fltc[sc].val(textf);
         this.fltc[sc].autocomplete(`search`, textf);
         if (this.comp.state.getstate(`f_${sc}`) != textf) {
@@ -74,7 +74,7 @@ Filter.prototype = {
     init: function(sc) {
         this._html(sc);
         this._loaded[sc] = false;
-        this.widget[sc] = $(`#fltw_${sc}`);
+        this.comp.container[sc] = $(`#fltw_${sc}`);
         this.fltc[sc] = $(`#flt_${sc}`);
         this.boxf[sc] = $(`#fbox_${sc}`);
         this.autoc[sc] = $(`#autoc_${sc}`);
@@ -110,10 +110,10 @@ Filter.prototype = {
                 });
                 this._loaded[sc] = true;
             }
-            this.widget[sc].show();
+            this.comp.container[sc].show();
         }
         else {
-            this.widget[sc].hide();
+            this.comp.container[sc].hide();
         }
     },
 };

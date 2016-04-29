@@ -32,6 +32,7 @@ function Page() { // the one and only page object
     this._components = [
         ['left', 'control', main_lists, false, Control], 
         ['control', 'filter', main_lists, false, Filter], 
+        ['filter', 'eumap', main_lists, false, EUmap],
         ['middle', 'list', main_lists, true, List], 
     ];
     this.compindex = {};
@@ -39,6 +40,7 @@ function Page() { // the one and only page object
         page: ['control'],
         control: ['list'],
         list: ['filter'],
+        filter: ['eumap'],
     };
     this.init();
 };

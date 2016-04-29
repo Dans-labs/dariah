@@ -242,6 +242,18 @@ div.flt input {
 .filtc {
     float: right;
 }
+.cssmap-visible-list {
+    font-size: small;
+}
+.cssmap-search-link {
+    display: none;
+}
+.devel {
+    font-size: small;
+    font-weight: bold;
+    color: #0000bb;
+    background-color: #ffff55;
+}
 /* GENERIC */
 
 .left_ {
