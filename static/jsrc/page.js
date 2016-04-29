@@ -7,8 +7,9 @@
  * A component is specfied by the following fields
  * - destination: left => left sidebar; right => right sidebar; middle => middle column
  * - name: a string that can be used to refer to the component later on, via method getcomp
- * - fetch name: part of the url to retrieve this component's data from the server. null if no data from the server is needed.
- * - data: data structure, not coming from the server. This will be the component's data.
+ * - subcomponents: a list of names for which a subcomponent will be made. The html will be generated per subcomponent.
+ *   If null, there are no subcomponents, and the html will go to one place.
+ * - fetch: boolean which says whether this component needs data from the server
  * - specific: an object that holds the specific functionality of this component.
  * The _routing dictionary specifies when the apply methods of components should be triggered.
  * Its keys are the labels of components, and for every component a list of other component keys is given.
@@ -29,42 +30,51 @@ function Page() { // the one and only page object
     this.state = new ViewState(this);
     var main_lists = this.state.getvalues('list');
     this._components = [
-        ['left', 'lists', null, main_lists, Lists], 
-        ['left', 'filters', null, main_lists, Filters], 
+        ['left', 'control', main_lists, false, Control], 
+        ['control', 'filter', main_lists, false, Filter], 
+        ['middle', 'list', main_lists, true, List], 
     ];
-    this._compindex = {};
+    this.compindex = {};
     this._routing = {
-        page: ['lists'],
+        page: ['control'],
+        control: ['list'],
+        list: ['filter'],
     };
-    for (ml in main_lists) {
-        this._components.push(['middle', ml, ml, null, List[ml]]);
-        this._routing['page'].push(ml);    // individual lists should be applied on a page apply
-        this._routing[ml] = [];
-        this._routing[ml].push('filters'); // filters should be applied after the lists have been fetched
-    }
-    this._init();
+    this.init();
 };
 
 Page.prototype = {
-    _init: function() { // dress up the skeleton, initialize state variables
-        this._compindex = {};
+    _set_height(subtract) { // the heights of the sidebars are set, depending on the height of the window
+        var wh = `${window.innerHeight - subtract}px`;
+        for (var w in {middle: 1, left: 1, right: 1}) {
+            $(`#${w}`).css(`height`, wh);
+        }
+    },
+    getcomp: function(name) {
+        return this.compindex[name];
+    },
+    init: function() { // dress up the skeleton, initialize state variables
+        this.compindex = {};
         for (var i in this._components) {
             var c = this._components[i];
             var co = new Component(c[0], c[1], c[2], c[3], c[4], this);
-            this._compindex[c[1]] = co;
+            this.compindex[c[1]] = co;
             co.init();
         }
-        History.Adapter.bind(window,`statechange`, this.state.adapt(this.state));
+        this._set_height(80);
+        History.Adapter.bind(window,`statechange`, this.state.apply());
     },
-    getcomp: function(name) {
-        return this._compindex[name];
-    },
-    apply: function(cname) { // apply the viewstate: hide and show material as prescribed by the viewstate
-        var comp = (cname == undefined)?'page':cname;
+    apply: function(comp, sc) { 
+/* apply selected components of the page. comp is looked up in routing, which gives a list of other components
+ * and these are the components that will be applied. This will be done recursively, see _apply in Components.
+ * But the recursive calls are per subcomponent. 
+ * 'page' is also in the routing table.
+ */
+
         if (this._routing[comp] != undefined) {
             for (var i in this._routing[comp]) {
                 var oname = this._routing[comp][i];
-                this._compindex[oname].apply();
+                this.compindex[oname].apply(sc);
             }
         }
     },

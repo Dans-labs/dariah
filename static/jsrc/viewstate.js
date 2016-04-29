@@ -7,7 +7,7 @@
 
 function ViewState(page) {
     this._data = {};
-    this._init();
+    this.init();
     this.page = page;
     this.msg = page.msg;
 };
@@ -15,7 +15,8 @@ function ViewState(page) {
 ViewState.prototype = {
     _specs: {
         list: {type: `string`, values: {contrib: 1, country: 1}, def: `contrib`},
-        greet: {type: `string`, values: null, def: `hallo`},
+        f_contrib: {type: `string`, values: null, def: ``},
+        f_country: {type: `string`, values: null, def: ``},
         id: {type: `integer`, values: {min: -1, max: 1000000}, def: 0},
         sort: {type: `boolean`, values: {v: true, x: false}, def: true}, 
     },
@@ -110,10 +111,6 @@ ViewState.prototype = {
         var this_url = `${app_url}?${this._getvars()}`;
         History.pushState(this._data, tit, this_url);
     },
-    _init: function() {
-        this._getinitstate();
-        this._addHist();
-    },
     setstate: function(name, val) {
         this._data[name] = val;
         lvars.set(name, val);
@@ -133,12 +130,17 @@ ViewState.prototype = {
         }
         return result;
     },
-    adapt: function(ob) {
+    init: function() {
+        this._getinitstate();
+        this._addHist();
+    },
+    apply: function() {
+        var that = this;
         return function () {
             var state = History.getState();
             if (state && state.data) {
-                ob._data = state.data;
-                ob.page.apply();
+                that._data = state.data;
+                that.page.apply('page');
             }
         }
     },

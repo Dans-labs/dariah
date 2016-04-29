@@ -185,6 +185,13 @@ ol.text {
     height: 60px;
 }
 
+/* PAGE LAYOUT */
+
+#middle, #left, #right {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 /* CONTROLS */
 
 .ctrl {
@@ -193,11 +200,16 @@ ol.text {
     background-color: #fafffa;
     padding: 2pt;
 }
-.ison {
-    font-weight: normal;
+.radio.ison {
+    font-weight: bold;
     color: #1A3D6F;
-    background-color: #ffffff;
+    background-color: #ffffdd;
     border: 2pt solid #d3550f;
+}
+.isonn {
+    border-radius: 6pt;
+    background-color: #ffffdd;
+    border: 2pt solid #ffffdd;
 }
 .radio {
     font-weight: normal;
@@ -216,6 +228,8 @@ div.flt input {
 }
 .fbox {
     font-size: small;
+    background-color: #ffffdd;
+    padding-left: 1em;
 }
 .fbox span {
     display: inline;

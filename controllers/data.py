@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-def contrib():
+def list_contrib():
     records = dbd.executesql('''
 select
     contrib.id, contrib.title,
@@ -11,7 +11,7 @@ on country.id = contrib.country_id
 ''')
     return dict(data=records, msgs=[], good=True)
 
-def country():
+def list_country():
     records = dbd.executesql('''
 select
     countrycode, countryname
