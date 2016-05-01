@@ -191,6 +191,9 @@ ol.text {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
+#middle td {
+    vertical-align: top;
+}
 
 /* CONTROLS */
 
@@ -225,6 +228,7 @@ div.flt {
 div.flt input {
     font-weight: normal;
     font-size: small;
+    width: 40%;
 }
 .fbox {
     font-size: small;
@@ -243,11 +247,11 @@ div.flt input {
     float: right;
 }
 .cssmap-visible-list {
-    font-size: small;
+    font-size: x-small;
 }
-.cssmap-search-link {
+/*.cssmap-search-link {
     display: none;
-}
+}*/
 .devel {
     font-size: small;
     font-weight: bold;

@@ -19,6 +19,7 @@ def string_back(match):
 
 comment1 = re.compile('/\*.*?\*/', re.S)
 comment2 = re.compile('//.*')
+comment3 = re.compile('<!--.*?-->', re.S)
 trim1 = re.compile('\s+', re.S)
 trim2 = re.compile('\s*([{};=,:\[\]()])\s*')
 
@@ -28,6 +29,7 @@ text = sys.stdin.read()
 sys.stderr.write('{} chars\n'.format(len(text)))
 text = comment1.sub('', text.strip())
 text = comment2.sub('', text.strip())
+text = comment3.sub('', text.strip())
 sys.stderr.write('{} chars\n'.format(len(text)))
 
 text = escape_strings.sub(string_away, text.strip())
