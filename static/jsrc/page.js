@@ -25,22 +25,26 @@
  */
 
 function Page() { // the one and only page object
-    this.name = 'page';
+    this.name = `page`;
     this.msg = new Msg(`msg_${this.name}`);
     this.state = new ViewState(this);
-    var main_lists = this.state.getvalues('list');
+    var main_lists = this.state.getvalues(`list`);
     this._components = [
-        ['left', 'control', main_lists, false, Control], 
-        ['control', 'filter', main_lists, false, Filter], 
-        ['filter', 'eumap', main_lists, false, EUmap],
-        ['middle', 'list', main_lists, true, List], 
+        [`left`, `control`, main_lists, false, Control], 
+        [`control`, `facet`, main_lists, false, Facet], 
+        [`facet`, `filter`, main_lists, false, Filter], 
+//        [`facet`, `eumap`, main_lists, false, EUmap],
+        [`middle`, `list`, main_lists, true, List], 
     ];
     this.compindex = {};
     this._routing = {
-        page: ['control'],
-        control: ['list'],
-        list: ['filter'],
-        filter: ['eumap'],
+        page: [`control`],
+        control: [`list`],
+        list: [`facet`],
+        facet: [
+            `filter`,
+//            `eumap`,
+        ],
     };
     this.init();
 };

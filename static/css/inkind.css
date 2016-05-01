@@ -220,9 +220,14 @@ ol.text {
     color: #aaaaaa;
 }
 
+/* FACETS */
+div.facet {
+    font-size: medium;
+}
+
 /* FILTERS */
 
-div.flt {
+div.flt{
     font-size: medium;
 }
 div.flt input {
@@ -234,6 +239,9 @@ div.flt input {
     font-size: small;
     background-color: #ffffdd;
     padding-left: 1em;
+}
+.fbox.ison {
+    background-color: #ffff44;
 }
 .fbox span {
     display: inline;

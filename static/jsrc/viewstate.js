@@ -22,8 +22,8 @@ ViewState.prototype = {
     },
     _showas: {
         list: {
-            contrib: {sg: 'contribution', pl: 'contributions'},
-            country: {sg: 'country', pl: 'countries'},
+            contrib: {sg: `contribution`, pl: `contributions`},
+            country: {sg: `country`, pl: `countries`},
         },
     },
     _validate: function(name, val) {
@@ -81,7 +81,7 @@ ViewState.prototype = {
                 }
             }
         }
-        return vars.join('&')
+        return vars.join(`&`)
     },
     _getinitstate: function() {
         for (var name in rvars) {
@@ -140,7 +140,7 @@ ViewState.prototype = {
             var state = History.getState();
             if (state && state.data) {
                 that._data = state.data;
-                that.page.apply('page');
+                that.page.apply(`page`);
             }
         }
     },

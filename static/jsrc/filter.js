@@ -5,14 +5,15 @@
 
 function Filter(comp) {
     this.comp = comp;
-    this._loaded = {};
+    this.facet = this.comp.page.getcomp(`facet`).delg;
     this.tags = {};
     this.fltc = {};
     this.boxf = {};
     this.autoc = {};
     this.statsf = {};
     this.clearf = {};
-    this.table = {};
+    this._flted = {};
+    this.data = {};
 };
 
 Filter.prototype = {
@@ -37,29 +38,26 @@ Filter.prototype = {
         }
     },
     _adapt_flt: function(sc, ui) {
-        var tln = this.tags[sc].length;
         var textf = this.fltc[sc].val();
-        if (textf == '') {
-            this.boxf[sc].removeClass('ison');
+        if (textf == ``) {
+            this.boxf[sc].removeClass(`ison`);
             this.clearf[sc].hide();
-            this.statsf[sc].html(`${tln}`);
         }
         else {
             var ln = ui.content.length;
-            this.boxf[sc].addClass('ison');
+            this.boxf[sc].addClass(`ison`);
             this.clearf[sc].show();
-            this.statsf[sc].html(`${ln} of ${tln}`);
         }
     },
     _response: function(sc) {
         var that = this;
-        var tln = that.tags[sc].length;
         return function(event, ui) {
-            that.table[sc].find(`tr[id]`).hide();
+            that._flted[sc] = [];
             for (var i in ui.content) {
-                that.table[sc].find(`tr[id="r${ui.content[i].value}"]`).show();
+                that._flted[sc][ui.content[i].value] = 1;
             }
             that._adapt_flt(sc, ui);
+            that.facet.adapt_flt(sc);
         };
     },
     _setclear: function(sc) {
@@ -68,33 +66,41 @@ Filter.prototype = {
             that._set_flt(sc, ``);
         });
     },
+    v: function(sc, i) {
+        return (i in this._flted[sc]);
+    },
+    stats: function(sc) {
+        console.log(`FILTER STATS ${sc} = ${this.data[sc].length}`);
+        this.statsf[sc].html(this.data[sc].length);
+    },
     show: function(sc) {
-        return this.comp.state.getstate('list') == sc;
+        return this.comp.state.getstate(`list`) == sc;
     },
     init: function(sc) {
+        this.facet.add_facet(sc, this);
         this._html(sc);
-        this._loaded[sc] = false;
         this.comp.container[sc] = $(`#fltw_${sc}`);
         this.fltc[sc] = $(`#flt_${sc}`);
         this.boxf[sc] = $(`#fbox_${sc}`);
         this.autoc[sc] = $(`#autoc_${sc}`);
         this.statsf[sc] = $(`#stats_${sc}`);
         this.clearf[sc] = $(`#clearf_${sc}`);
+        this._flted[sc] = {};
+        this.data[sc] = [];
     },
     process: function(sc) {
     },
     apply: function(sc) {
         var that = this;
-        this.table[sc] =  $(`#table_${sc}`);
         if (this.show(sc)) {
-            if (!this._loaded[sc]) {
-                var data = this.comp.page.getcomp('list').data[sc];
+            if (!this.facet._loaded[sc]) {
+                var data = this.comp.page.getcomp(`list`).data[sc];
                 this.tags[sc] = [];
                 for (var i in data) {
                     var term = data[i][1];
-                    if (term != null && term != '') {
+                    if (true || (term != null && term != ``)) {
                         var line = data[i];
-                        this.tags[sc].push({label: line[1], value: line[0]});
+                        this.tags[sc].push({label: line[1], value: i});
                     }
                 }
                 this._setclear(sc);
@@ -108,7 +114,6 @@ Filter.prototype = {
                 this.fltc[sc].change(function() {
                     that.comp.state.setstate(`f_${sc}`, $(this).val());
                 });
-                this._loaded[sc] = true;
             }
             this.comp.container[sc].show();
         }
