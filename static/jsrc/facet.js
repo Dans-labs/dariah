@@ -35,21 +35,21 @@ Facet.prototype = {
     show: function(sc) {
         return this.comp.state.getstate(`list`) == sc;
     },
-    init: function(sc) {
+    weld: function(sc) {
         this._html(sc);
         this._loaded[sc] = false;
         this._facets[sc] = [];
         this._stats[sc] = $(`#fstats_${sc}`);
     },
-    process: function(sc) {
+    wire: function(sc) {
         this.table[sc] =  $(`#table_${sc}`);
         if (!this._loaded[sc]) {
             this.data[sc] = this.comp.page.getcomp(`list`).data[sc];
-            this._do_all(`process`, sc);
+            this._do_all(`wire`, sc);
             this._loaded[sc] = true;
         }
     },
-    apply: function(sc) {
+    work: function(sc) {
         if (this.show(sc)) {
             this.comp.container[sc].show();
         }

@@ -23,14 +23,15 @@ Filter.prototype = {
         h += `<div class="flt" id="fltw_${sc}">`;
         h += `<p id="fbox_${sc}" class="fbox ui-widget">`;
         h += `filter <input id="flt_${sc}" class="flt"/>`;
-        h += `<span class="ctrl fa fa-close filtc" id="clearf_${sc}"></span>`;
+        h += `<a href="#" class="ctrl fa fa-close filtc" id="clearf_${sc}"></a>`;
         h += `<span class="stats" id="stats_${sc}"></span>&nbsp;`;
         h += `</p>`;
         h += `<div id="autoc_${sc}" style="display: none;">here ${sc}</div>`;
         h += `</div>`;
         this.comp.container[sc].html(h);
     },
-    _set_flt: function(sc, textf) {
+    _set_flt: function(sc) {
+        var textf = this.comp.state.getstate(`f_${sc}`);
         this.comp.container[sc].addClass(`flt`);
         this.fltc[sc].val(textf);
         this.fltc[sc].autocomplete(`search`, textf);
@@ -60,7 +61,9 @@ Filter.prototype = {
     },
     _setclear: function(sc) {
         var that = this;
+        //console.log(this.clearf[sc]);
         this.clearf[sc].click(function(e) {e.preventDefault();
+            //console.log(`click clear ${sc}`);
             that.comp.state.setstate(`f_${sc}`, ``);
         });
     },
@@ -73,7 +76,7 @@ Filter.prototype = {
     show: function(sc) {
         return this.comp.state.getstate(`list`) == sc;
     },
-    init: function(sc) {
+    weld: function(sc) {
         this.facet.add_facet(sc, this);
         this._html(sc);
         this.comp.container[sc] = $(`#fltw_${sc}`);
@@ -85,8 +88,8 @@ Filter.prototype = {
         this._flted[sc] = {};
         this.data[sc] = [];
     },
-    process: function(sc) {
-        //console.log(`FILTER process ${sc}`);
+    wire: function(sc) {
+        //console.log(`FILTER wire ${sc}`);
         var that = this;
         if (!this.facet._loaded[sc]) {
             var data = this.comp.page.getcomp(`list`).data[sc];
@@ -106,14 +109,15 @@ Filter.prototype = {
                 response: this._response(sc),
                 minLength: 0,
             });
-            this._set_flt(sc, this.comp.state.getstate(`f_${sc}`));
+            this._set_flt(sc);
             this.fltc[sc].change(function() {
                 that.comp.state.setstate(`f_${sc}`, $(this).val());
             });
         }
     },
-    apply: function(sc) {
+    work: function(sc) {
         if (this.show(sc)) {
+            this._set_flt(sc);
             this.comp.container[sc].show();
         }
         else {

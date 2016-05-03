@@ -158,7 +158,7 @@ EUmap.prototype = {
         });
     },
     _set_flt: function(sc, rgs) {
-        if (rgs == null || rgs == undefined || rgs == '') {rgs = {}}
+        if (rgs == null || rgs == undefined || rgs == '') {rgs = this._from_str(``)}
         //console.log(`set filt 1`);
         this.changeState = false;
         //Cyprus is not on the map, we delete its key if present and reinsert it afterwards
@@ -201,10 +201,11 @@ EUmap.prototype = {
     },
     _from_str: function(st) {
         var ob = {};
-        if (st == null || st == undefined || st == '') {return {}}
-        var ar = st.split(',');
-        for (var i in ar) {
-            ob[ar[i]] = true;
+        if (st !== null && st != undefined && st != '') {
+            var ar = st.split(',');
+            for (var i in ar) {
+                ob[ar[i]] = true;
+            }
         }
         for (var cd in this.country) {
             if (!(cd in ob)) {
@@ -221,23 +222,23 @@ EUmap.prototype = {
     show: function(sc) {
         return this.comp.state.getstate(`list`) == sc && sc in this.enabled;
     },
-    init: function(sc) {
+    weld: function(sc) {
         if (sc in this.enabled) {
             this.facet.add_facet(sc, this);
             this._html(sc);
             this._dressup(sc);
         }
     },
-    process: function(sc) {
+    wire: function(sc) {
     },
-    apply: function(sc) {
+    work: function(sc) {
         if (sc in this.enabled) {
             //console.log(`APPLY eumap ${sc}`);
             if (this.show(sc)) {
                 this.comp.container[sc].show();
-                //console.log(`eumap apply 1`);
+                //console.log(`eumap work 1`);
                 this._set_flt(sc, this._from_str(this.comp.state.getstate(`m_${sc}`)));
-                //console.log(`eumap apply 2`);
+                //console.log(`eumap work 2`);
             }
             else {
                 this.comp.container[sc].hide();

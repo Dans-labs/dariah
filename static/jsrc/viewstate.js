@@ -7,7 +7,7 @@
 
 function ViewState(page) {
     this._data = {};
-    this.init();
+    this.weld();
     this.page = page;
     this.msg = page.msg;
 };
@@ -132,18 +132,18 @@ ViewState.prototype = {
         }
         return result;
     },
-    init: function() {
+    weld: function() {
         this._getinitstate();
         this._addHist();
     },
-    apply: function() {
+    work: function() {
         var that = this;
         return function () {
             var state = History.getState();
             //console.log(`VIEWSTATE APPLY`, state);
             if (state && state.data) {
                 that._data = state.data;
-                that.page.apply(`page`);
+                that.page.work(`page`);
             }
         }
     },

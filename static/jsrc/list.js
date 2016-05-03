@@ -28,10 +28,10 @@ List.prototype = {
     show: function(sc) {
         return this.comp.state.getstate(`list`) == sc;
     },
-    init: function(sc) {},
-    process: function(sc) {
+    weld: function(sc) {},
+    wire: function(sc) {
         this._html(sc);
     },
-    apply: function(sc) {},
+    work: function(sc) {},
 };
 

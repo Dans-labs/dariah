@@ -25,15 +25,15 @@ Control.prototype = {
     show: function(sc) {
         return true;
     },
-    init: function(sc) {
+    weld: function(sc) {
         this._html(sc);
         this.widget[sc] =  this.comp.container[sc];
         this.ctl[sc] =  this.comp.container[sc].find(`a`);
         this._dressup(sc);
     },
-    process: function(sc) {
+    wire: function(sc) {
     },
-    apply: function(sc) {
+    work: function(sc) {
         if (this._is_active(sc)) {
             this.ctl[sc].addClass(`ison`);
             this.widget[sc].addClass(`isonn`);
