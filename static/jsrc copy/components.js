@@ -49,7 +49,6 @@ Component.prototype = {
         }
     },
     _apply: function(sc) {
-        //console.log(`APPLY ${this.name} ${sc} delg`);
         this.delg.apply(sc); // perform apply actions that are specific to this component
         this.page.apply(this.name, sc); // apply other components, dependent on the routing information of the page
     },
@@ -95,9 +94,8 @@ Component.prototype = {
     },
     process: function(sc) { // process new material obtained by an AJAX call
         this._loaded[sc] = true;
-        //console.log(`PROCESS ${this.name} ${sc} delg`);
         this.delg.process(sc); // perform process actions that are specific to this component
-        this._apply(sc);
+        this._apply(sc)
     },
     apply: function(sc) { // apply (changed) state to current material
         var scomps = {}; 
@@ -108,7 +106,6 @@ Component.prototype = {
             scomps[sc] = 1;
         }
         for (var s in scomps) {
-            //console.log(`COMP APPLY ${this.name} ${s}`);
             if (this.delg.show(s)) { // show/hide depending on the specific condition
                 this.container[s].show();
                 if (!this._loaded[s]) { // and fetch data if needed

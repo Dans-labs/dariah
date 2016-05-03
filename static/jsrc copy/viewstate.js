@@ -17,8 +17,6 @@ ViewState.prototype = {
         list: {type: `string`, values: {contrib: 1, country: 1}, def: `contrib`},
         f_contrib: {type: `string`, values: null, def: ``},
         f_country: {type: `string`, values: null, def: ``},
-        m_contrib: {type: `string`, values: null, def: ``},
-        m_country: {type: `string`, values: null, def: ``},
         id: {type: `integer`, values: {min: -1, max: 1000000}, def: 0},
         sort: {type: `boolean`, values: {v: true, x: false}, def: true}, 
     },
@@ -140,7 +138,6 @@ ViewState.prototype = {
         var that = this;
         return function () {
             var state = History.getState();
-            //console.log(`VIEWSTATE APPLY`, state);
             if (state && state.data) {
                 that._data = state.data;
                 that.page.apply(`page`);

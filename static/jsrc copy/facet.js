@@ -21,9 +21,7 @@ Facet.prototype = {
     _do_all: function(mth, sc) {
         for (var i in this._facets[sc]) {
             var fct = this._facets[sc][i];
-            //console.log(`FCT ${fct.name} ${sc} ${mth} 1`);
             fct[mth](sc);
-            //console.log(`FCT ${fct.name} ${sc} ${mth} 2`);
         }
     },
     add_facet: function(sc, fct) {
@@ -42,15 +40,16 @@ Facet.prototype = {
         this._stats[sc] = $(`#fstats_${sc}`);
     },
     process: function(sc) {
-        this.table[sc] =  $(`#table_${sc}`);
-        if (!this._loaded[sc]) {
-            this.data[sc] = this.comp.page.getcomp(`list`).data[sc];
-            this._do_all(`process`, sc);
-            this._loaded[sc] = true;
-        }
     },
     apply: function(sc) {
+        var that = this;
+        this.table[sc] =  $(`#table_${sc}`);
         if (this.show(sc)) {
+            if (!this._loaded[sc]) {
+                this.data[sc] = this.comp.page.getcomp(`list`).data[sc];
+                this._do_all(`apply`, sc);
+                this._loaded[sc] = true;
+            }
             this.comp.container[sc].show();
         }
         else {

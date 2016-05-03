@@ -203,11 +203,21 @@ ol.text {
     background-color: #fafffa;
     padding: 2pt;
 }
+.ctrls {
+    border-radius: 2pt;
+    background-color: #fafffa;
+    padding: 0pt;
+}
 .radio.ison {
     font-weight: bold;
     color: #1A3D6F;
     background-color: #ffffdd;
     border: 2pt solid #d3550f;
+}
+.ctrls.ison {
+    font-weight: bold;
+    background-color: #dd8844;
+    color: #ffff00;
 }
 .isonn {
     border-radius: 6pt;
@@ -254,12 +264,9 @@ div.flt input {
 .filtc {
     float: right;
 }
-.cssmap-visible-list {
+.clist {
     font-size: x-small;
 }
-/*.cssmap-search-link {
-    display: none;
-}*/
 .devel {
     font-size: small;
     font-weight: bold;

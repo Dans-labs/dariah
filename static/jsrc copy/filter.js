@@ -5,7 +5,6 @@
 
 function Filter(comp) {
     this.comp = comp;
-    this.name = `filter`;
     this.facet = this.comp.page.getcomp(`facet`).delg;
     this.tags = {};
     this.fltc = {};
@@ -34,6 +33,9 @@ Filter.prototype = {
         this.comp.container[sc].addClass(`flt`);
         this.fltc[sc].val(textf);
         this.fltc[sc].autocomplete(`search`, textf);
+        if (this.comp.state.getstate(`f_${sc}`) != textf) {
+            this.comp.state.setstate(`f_${sc}`, textf);
+        }
     },
     _adapt_flt: function(sc, ui) {
         var textf = this.fltc[sc].val();
@@ -61,7 +63,7 @@ Filter.prototype = {
     _setclear: function(sc) {
         var that = this;
         this.clearf[sc].click(function(e) {e.preventDefault();
-            that.comp.state.setstate(`f_${sc}`, ``);
+            that._set_flt(sc, ``);
         });
     },
     v: function(sc, i) {
@@ -86,34 +88,32 @@ Filter.prototype = {
         this.data[sc] = [];
     },
     process: function(sc) {
-        //console.log(`FILTER process ${sc}`);
-        var that = this;
-        if (!this.facet._loaded[sc]) {
-            var data = this.comp.page.getcomp(`list`).data[sc];
-            this.tags[sc] = [];
-            for (var i in data) {
-                var term = data[i][1];
-                if (true || (term != null && term != ``)) {
-                    var line = data[i];
-                    this.tags[sc].push({label: line[1], value: i});
-                }
-            }
-            this._setclear(sc);
-            //console.log(`FILTER autocomplete ${sc}`);
-            this.fltc[sc].autocomplete({
-                appendTo: this.autoc[sc],
-                source: this.tags[sc],
-                response: this._response(sc),
-                minLength: 0,
-            });
-            this._set_flt(sc, this.comp.state.getstate(`f_${sc}`));
-            this.fltc[sc].change(function() {
-                that.comp.state.setstate(`f_${sc}`, $(this).val());
-            });
-        }
     },
     apply: function(sc) {
+        var that = this;
         if (this.show(sc)) {
+            if (!this.facet._loaded[sc]) {
+                var data = this.comp.page.getcomp(`list`).data[sc];
+                this.tags[sc] = [];
+                for (var i in data) {
+                    var term = data[i][1];
+                    if (true || (term != null && term != ``)) {
+                        var line = data[i];
+                        this.tags[sc].push({label: line[1], value: i});
+                    }
+                }
+                this._setclear(sc);
+                this.fltc[sc].autocomplete({
+                    appendTo: this.autoc[sc],
+                    source: this.tags[sc],
+                    response: this._response(sc),
+                    minLength: 0,
+                });
+                this._set_flt(sc, this.comp.state.getstate(`f_${sc}`));
+                this.fltc[sc].change(function() {
+                    that.comp.state.setstate(`f_${sc}`, $(this).val());
+                });
+            }
             this.comp.container[sc].show();
         }
         else {

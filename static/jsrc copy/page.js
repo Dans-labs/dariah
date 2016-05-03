@@ -68,7 +68,7 @@ Page.prototype = {
             co.init();
         }
         this._set_height(80);
-        History.Adapter.bind(window, `statechange`, this.state.apply());
+        History.Adapter.bind(window,`statechange`, this.state.apply());
     },
     apply: function(comp, sc) { 
 /* apply selected components of the page. comp is looked up in routing, which gives a list of other components
@@ -77,7 +77,6 @@ Page.prototype = {
  * 'page' is also in the routing table.
  */
 
-        //console.log(`PAGE APPLY ${comp} ${sc}`);
         if (this._routing[comp] != undefined) {
             for (var i in this._routing[comp]) {
                 var oname = this._routing[comp][i];
