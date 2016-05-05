@@ -40,7 +40,10 @@ Filter.prototype = {
     },
     _work_ctl: function(sc) {
         var textf = this.fltc[sc].val();
+        //var textf = that.comp.state.getstate(`f_${sc}`);
+        //console.log(`textf="${textf}"`);
         if (textf == ``) {
+            //console.log(`A`);
             this.boxf[sc].removeClass(`ison`);
             this.clearf[sc].hide();
         }
@@ -56,6 +59,7 @@ Filter.prototype = {
             for (var i in ui.content) {
                 that._flted[sc][ui.content[i].value] = 1;
             }
+            //console.log(`D`);
             if (!(that.wire_mode[sc])) {
                 that.comp.state.setstate(`f_${sc}`, that.fltc[sc].val());
             }
@@ -66,7 +70,10 @@ Filter.prototype = {
         //console.log(this.clearf[sc]);
         this.clearf[sc].click(function(e) {e.preventDefault();
             //console.log(`click clear ${sc}`);
-            that.comp.state.setstate(`f_${sc}`, ``);
+            //console.log(`B`);
+            that.fltc[sc].val(``);
+            that.fltc[sc].autocomplete(`search`, ``);
+            //that.comp.state.setstate(`f_${sc}`, ``);
         });
     },
     stats: function(sc) {
@@ -124,6 +131,7 @@ Filter.prototype = {
         }
     },
     work_flt: function(sc) {
+        //console.log(`C`);
         this._work_ctl(sc);
     },
 };
