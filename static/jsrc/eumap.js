@@ -10,7 +10,9 @@ function EUmap(comp) {
     this._map = {};
     this._mapc = {};
     this._list = {};
-    this.data = {};
+    this.fltd = {};
+    this.mstate = {};
+    this._data = {};
     this._all_countries = { // the boolean tells whether the country is in DARIAH
         AT: [`Austria`, true],
         BE: [`Belgium`, true],
@@ -79,7 +81,7 @@ function EUmap(comp) {
 
 EUmap.prototype = {
     _html: function(sc) {
-        var cols = 3;
+        var cols = 2;
         var h = ``;
         h += `<div id="map-europe_${sc}"></div><table class="clist" id="list-europe_${sc}"><tr>`;
         for (var i in this.countries) {
@@ -88,7 +90,7 @@ EUmap.prototype = {
             }
             var cd = this.countries[i];
             var cn = this.country[cd];
-            h += `<td cd="${cd}"><a href="#" class="ctrls">${cn}</a> <span class="stats"></span></td>`;
+            h += `<td><span cd="${cd}" class="stats"></span></td><td><a cd="${cd}" href="#" class="ctrls">${cn}</a></td>`;
         }
         h += `</tr></table>`;
         this.comp.container[sc].html(h);
@@ -149,7 +151,7 @@ EUmap.prototype = {
         this._map[sc].setFocus({regions: this.countries});
         this._map[sc].setFocus({regions: [`GB`, `GR`]});
         this._list[sc].find(`.ctrls`).click(function(e) {e.preventDefault();
-            var cd = $(this).closest(`td`).attr(`cd`);
+            var cd = $(this).attr(`cd`);
             var ison = $(this).hasClass(`ison`);
             var sel = that._from_str(that.comp.state.getstate(`m_${sc}`));
             sel[cd] = !ison;
@@ -176,7 +178,7 @@ EUmap.prototype = {
         //console.log(`set filt 2`);
         //console.log(`SETFLT ${sc}`, rgs);
         for (var cd in this.country) {
-            var ccell = this._list[sc].find(`td[cd="${cd}"] .ctrls`);
+            var ccell = this._list[sc].find(`a[cd="${cd}"]`);
             //console.log(cd, ccell);
             if (cd in rgs && rgs[cd]) {
                 ccell.addClass(`ison`);
@@ -214,13 +216,30 @@ EUmap.prototype = {
         }
         return ob;
     },
-    v: function(sc, i) {
-        return true;
-    },
     stats: function(sc) {
+        var sts = {};
+        for (var cd in this.country) {
+            sts[cd] = 0;
+        } 
+        //console.log(this.fltd[sc]);
+        for (var x in this.fltd[sc]) {
+            var i = this.fltd[sc][x];
+            var cd = this._data[sc][i][2];
+            //console.log(`${sc} ${cd} ${this._data[sc][i][1]}`);
+            sts[cd] += 1;
+        }
+        for (var cd in sts) {
+            this.comp.container[sc].find(`span[cd="${cd}"].stats`).html(sts[cd]);
+        }
+    },
+    v: function(sc, i) {
+        var cd =  this._data[sc][i][2];
+        var mstate = this._from_str(this.mstate[sc]);
+        return (cd in mstate) && mstate[cd];
+        //return true;
     },
     show: function(sc) {
-        return this.comp.state.getstate(`list`) == sc && sc in this.enabled;
+        return (this.comp.state.getstate(`list`) == sc) && (sc in this.enabled);
     },
     weld: function(sc) {
         if (sc in this.enabled) {
@@ -230,19 +249,22 @@ EUmap.prototype = {
         }
     },
     wire: function(sc) {
+        this._data[sc] = this.comp.page.getcomp(`list`).data[sc];
     },
     work: function(sc) {
         if (sc in this.enabled) {
             //console.log(`APPLY eumap ${sc}`);
             if (this.show(sc)) {
+                //console.log(`${this.mstate[sc]}`);
                 this.comp.container[sc].show();
-                //console.log(`eumap work 1`);
-                this._set_flt(sc, this._from_str(this.comp.state.getstate(`m_${sc}`)));
-                //console.log(`eumap work 2`);
             }
             else {
                 this.comp.container[sc].hide();
             }
         }
-    }
+    },
+    work_flt: function(sc) {
+        this.mstate[sc] = this.comp.state.getstate(`m_${sc}`);
+        this._set_flt(sc, this._from_str(this.mstate[sc]));
+    },
 };

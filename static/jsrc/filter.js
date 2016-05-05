@@ -14,7 +14,9 @@ function Filter(comp) {
     this.statsf = {};
     this.clearf = {};
     this._flted = {};
-    this.data = {};
+    this._data = {};
+    this.fltd = {};
+    this.wire_mode = {};
 };
 
 Filter.prototype = {
@@ -36,14 +38,13 @@ Filter.prototype = {
         this.fltc[sc].val(textf);
         this.fltc[sc].autocomplete(`search`, textf);
     },
-    _adapt_flt: function(sc, ui) {
+    _work_ctl: function(sc) {
         var textf = this.fltc[sc].val();
         if (textf == ``) {
             this.boxf[sc].removeClass(`ison`);
             this.clearf[sc].hide();
         }
         else {
-            var ln = ui.content.length;
             this.boxf[sc].addClass(`ison`);
             this.clearf[sc].show();
         }
@@ -55,8 +56,9 @@ Filter.prototype = {
             for (var i in ui.content) {
                 that._flted[sc][ui.content[i].value] = 1;
             }
-            that._adapt_flt(sc, ui);
-            that.facet.adapt_flt(sc);
+            if (!(that.wire_mode[sc])) {
+                that.comp.state.setstate(`f_${sc}`, that.fltc[sc].val());
+            }
         };
     },
     _setclear: function(sc) {
@@ -67,11 +69,12 @@ Filter.prototype = {
             that.comp.state.setstate(`f_${sc}`, ``);
         });
     },
+    stats: function(sc) {
+        //console.log(2, this.statsf[sc]);
+        this.statsf[sc].html(this.fltd[sc].length);
+    },
     v: function(sc, i) {
         return (i in this._flted[sc]);
-    },
-    stats: function(sc) {
-        this.statsf[sc].html(this.data[sc].length);
     },
     show: function(sc) {
         return this.comp.state.getstate(`list`) == sc;
@@ -79,27 +82,25 @@ Filter.prototype = {
     weld: function(sc) {
         this.facet.add_facet(sc, this);
         this._html(sc);
-        this.comp.container[sc] = $(`#fltw_${sc}`);
-        this.fltc[sc] = $(`#flt_${sc}`);
-        this.boxf[sc] = $(`#fbox_${sc}`);
-        this.autoc[sc] = $(`#autoc_${sc}`);
-        this.statsf[sc] = $(`#stats_${sc}`);
-        this.clearf[sc] = $(`#clearf_${sc}`);
+        var cc = $(`#fltw_${sc}`);
+        this.comp.container[sc] = cc;
+        this.fltc[sc] = cc.find(`#flt_${sc}`);
+        this.boxf[sc] = cc.find(`#fbox_${sc}`);
+        this.autoc[sc] = cc.find(`#autoc_${sc}`);
+        this.statsf[sc] = cc.find(`#stats_${sc}`);
+        this.clearf[sc] = cc.find(`#clearf_${sc}`);
         this._flted[sc] = {};
-        this.data[sc] = [];
+        this.fltd[sc] = [];
     },
     wire: function(sc) {
         //console.log(`FILTER wire ${sc}`);
         var that = this;
         if (!this.facet._loaded[sc]) {
             var data = this.comp.page.getcomp(`list`).data[sc];
+            this._data[sc] = data;
             this.tags[sc] = [];
             for (var i in data) {
-                var term = data[i][1];
-                if (true || (term != null && term != ``)) {
-                    var line = data[i];
-                    this.tags[sc].push({label: line[1], value: i});
-                }
+                this.tags[sc].push({label: data[i][1], value: i});
             }
             this._setclear(sc);
             //console.log(`FILTER autocomplete ${sc}`);
@@ -109,20 +110,21 @@ Filter.prototype = {
                 response: this._response(sc),
                 minLength: 0,
             });
+            this.wire_mode[sc] = true;
             this._set_flt(sc);
-            this.fltc[sc].change(function() {
-                that.comp.state.setstate(`f_${sc}`, $(this).val());
-            });
+            this.wire_mode[sc] = false;
         }
     },
     work: function(sc) {
         if (this.show(sc)) {
-            this._set_flt(sc);
             this.comp.container[sc].show();
         }
         else {
             this.comp.container[sc].hide();
         }
+    },
+    work_flt: function(sc) {
+        this._work_ctl(sc);
     },
 };
 
