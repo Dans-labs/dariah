@@ -204,6 +204,7 @@ ol.text {
     padding: 2pt;
 }
 .ctrls {
+    font-size: x-small;
     border-radius: 2pt;
     background-color: #fafffa;
     padding: 0pt;
@@ -256,12 +257,13 @@ div.flt input {
 .fbox span {
     display: inline;
 }
-.stats {
+#stats_contrib {
     color: #aaaaaa;
-    font-size: small;
+    font-size: x-small;
     float: right;
 }
-.stats {
+td .stats,p .stats {
+    color: #aaaaaa;
     font-size: x-small;
     padding-right: 1ex;
 }

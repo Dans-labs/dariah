@@ -131,7 +131,7 @@ Filter.prototype = {
         }
     },
     work_flt: function(sc) {
-        //console.log(`C`);
+        //console.log(`C ${sc}`);
         this._work_ctl(sc);
     },
 };

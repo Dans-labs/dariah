@@ -13,6 +13,7 @@ function EUmap(comp) {
     this.fltd = {};
     this.mstate = {};
     this._data = {};
+    this._allc = {};
     this._all_countries = { // the boolean tells whether the country is in DARIAH
         AT: [`Austria`, true],
         BE: [`Belgium`, true],
@@ -62,12 +63,17 @@ function EUmap(comp) {
         TR: [`Turkey`, false],
         UA: [`Ukraine`, false],
     };
+    this.not_mapped = {CY: true, MT: true};
     this.countries = [];
     this.country = {};
+    this.country_off = {};
+    this.country_on = {};
     this.colorvalues = {};
     for (var cd in this._all_countries) {
         var cprop = this._all_countries[cd];
         if (cprop[1]) {
+            this.country_off[cd] = false;
+            this.country_on[cd] = true;
             this.countries.push(cd);
             this.country[cd] = cprop[0];
             this.colorvalues[cd] = `indariah`;
@@ -83,7 +89,9 @@ EUmap.prototype = {
     _html: function(sc) {
         var cols = 2;
         var h = ``;
-        h += `<div id="map-europe_${sc}"></div><table class="clist" id="list-europe_${sc}"><tr>`;
+        h += `<div id="map-europe_${sc}"></div>
+<p><span cd="_all" class="stats"></span>&nbsp;<a id="m_all_${sc}" href="#" class="ctrls">all DARIAH</a></p>
+<table class="clist" id="list-europe_${sc}"><tr>`;
         for (var i in this.countries) {
             if ((i % cols == 0) && (i > 0) && (i < this.countries.length)) {
                 h += `</tr><tr>`;
@@ -158,25 +166,41 @@ EUmap.prototype = {
             //console.log(that._to_str(sel));
             that.comp.state.setstate(`m_${sc}`, that._to_str(sel));
         });
+        this._allc[sc] = this.comp.container[sc].find(`#m_all_${sc}`);
+        this._allc[sc].click(function(e) {e.preventDefault();
+            var ison = $(this).hasClass(`ison`);
+            if (ison) {
+                //console.log(that.country_off);
+                that.comp.state.setstate(`m_${sc}`, that._to_str(that.country_off));
+            }
+            else {
+                //console.log(that.country_on);
+                that.comp.state.setstate(`m_${sc}`, that._to_str(that.country_on));
+            }
+        });
     },
     _set_flt: function(sc, rgs) {
+        //console.log(`_set_filt ${sc}`, rgs);
         if (rgs == null || rgs == undefined || rgs == '') {rgs = this._from_str(``)}
         //console.log(`set filt 1`);
         this.changeState = false;
         //Cyprus is not on the map, we delete its key if present and reinsert it afterwards
         //We do show Cyprus in the list
-        var sv;
-        if ('CY' in rgs) {
-            sv = rgs.CY;
-            delete rgs.CY;
+        var sv = {};
+        for (var cnm in this.not_mapped) {
+            if (cnm in rgs) {
+                sv[cnm] = rgs[cnm];
+                delete rgs[cnm];
+            }
         }
         this._map[sc].setSelectedRegions(rgs);
-        if (sv != undefined) {
-            rgs.CY = sv;
+        for (var cnm in sv) {
+            rgs[cnm] = sv[cnm];
         }
         this.changeState = true;
         //console.log(`set filt 2`);
         //console.log(`SETFLT ${sc}`, rgs);
+        var all_sel = true;
         for (var cd in this.country) {
             var ccell = this._list[sc].find(`a[cd="${cd}"]`);
             //console.log(cd, ccell);
@@ -185,7 +209,14 @@ EUmap.prototype = {
             }
             else {
                 ccell.removeClass(`ison`);
+                all_sel = false;
             }
+        }
+        if (all_sel) {
+            this._allc[sc].addClass(`ison`);
+        }
+        else {
+            this._allc[sc].removeClass(`ison`);
         }
 
     },
@@ -231,6 +262,7 @@ EUmap.prototype = {
         for (var cd in sts) {
             this.comp.container[sc].find(`span[cd="${cd}"].stats`).html(sts[cd]);
         }
+        this.comp.container[sc].find(`span[cd="_all"].stats`).html(this.fltd[sc].length);
     },
     v: function(sc, i) {
         var cd =  this._data[sc][i][2];
@@ -264,7 +296,10 @@ EUmap.prototype = {
         }
     },
     work_flt: function(sc) {
+        //console.log(`D ${sc}`);
         this.mstate[sc] = this.comp.state.getstate(`m_${sc}`);
+        //console.log(`E ${sc}`);
         this._set_flt(sc, this._from_str(this.mstate[sc]));
+        //console.log(`F ${sc}`);
     },
 };
