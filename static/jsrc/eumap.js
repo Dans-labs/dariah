@@ -1,5 +1,6 @@
 /* INDIVIDUAL COMPONENT: EUmap
  * This manages a clickable map of the EU countries
+ * See http://jvectormap.com/documentation/javascript-api/jvm-map/
  */
 
 function EUmap(comp) {
@@ -14,32 +15,33 @@ function EUmap(comp) {
     this.mstate = {};
     this._data = {};
     this._allc = {};
+    this._sts = {};
     this._all_countries = { // the boolean tells whether the country is in DARIAH
-        AT: [`Austria`, true],
-        BE: [`Belgium`, true],
-        HR: [`Croatia`, true],
-        CY: [`Cyprus`, true],
-        CZ: [`Czech Republic`, true],
-        DK: [`Denmark`, true],
-        EE: [`Estonia`, true],
-        FR: [`France`, true],
-        DE: [`Germany`, true],
-        GR: [`Greece`, true],
-        HU: [`Hungary`, true],
-        IE: [`Ireland`, true],
-        IT: [`Italy`, true],
-        LV: [`Latvia`, true],
-        LT: [`Lithuania`, true],
-        LU: [`Luxembourg`, true],
-        MT: [`Malta`, true],
-        NL: [`Netherlands`, true],
-        PL: [`Poland`, true],
-        PT: [`Portugal`, true],
-        RS: [`Serbia`, true],
-        SK: [`Slovakia`, true],
-        SI: [`Slovenia`, true],
-        CH: [`Switzerland`, true],
-        GB: [`United Kingdom`, true],
+        AT: [`Austria`, true, 47.7, 15.11],
+        BE: [`Belgium`, true, 51.3, 3.1],
+        HR: [`Croatia`, true, 44.7, 15.6],
+        CY: [`Cyprus`, true, 35.0, 32.8],
+        CZ: [`Czech Republic`, true, 49.8, 15.2],
+        DK: [`Denmark`, true, 55.6, 11.0],
+        EE: [`Estonia`, true, 59.0, 25.0],
+        FR: [`France`, true, 46.5, 1.9],
+        DE: [`Germany`, true, 51.0, 10.4],
+        GR: [`Greece`, true, 38.0, 23.8],
+        HU: [`Hungary`, true, 46.9, 19.8],
+        IE: [`Ireland`, true, 53.1, -8.4],
+        IT: [`Italy`, true, 41.6, 13.0],
+        LV: [`Latvia`, true, 56.9, 26.8],
+        LT: [`Lithuania`, true, 55.2, 24.9],
+        LU: [`Luxembourg`, true, 49.6, 6.1],
+        MT: [`Malta`, true, 35.9, 14.4],
+        NL: [`Netherlands`, true, 52.8, 5.8],
+        PL: [`Poland`, true, 52.3, 19.8],
+        PT: [`Portugal`, true, 38.7, -9.0],
+        RS: [`Serbia`, true, 44.0, 20.8],
+        SK: [`Slovakia`, true, 48.8, 19.9],
+        SI: [`Slovenia`, true, 46.2, 14.4],
+        CH: [`Switzerland`, true, 46.9, 8.3],
+        GB: [`United Kingdom`, true, 52.9, -1.8],
         AL: [`Albania`, false],
         AD: [`Andorra`, false],
         BY: [`Belarus`, false],
@@ -63,12 +65,15 @@ function EUmap(comp) {
         TR: [`Turkey`, false],
         UA: [`Ukraine`, false],
     };
-    this.not_mapped = {CY: true, MT: true};
+    this.not_mapped = {
+        CY: true,
+    };
     this.countries = [];
     this.country = {};
+    this.marker = {};
     this.country_off = {};
     this.country_on = {};
-    this.colorvalues = {};
+    this.setvalues = {};
     for (var cd in this._all_countries) {
         var cprop = this._all_countries[cd];
         if (cprop[1]) {
@@ -76,10 +81,13 @@ function EUmap(comp) {
             this.country_on[cd] = true;
             this.countries.push(cd);
             this.country[cd] = cprop[0];
-            this.colorvalues[cd] = `indariah`;
+            if (cprop.length > 3) {
+                this.marker[cd] = {latLng: [cprop[2], cprop[3]], name: cprop[0]};
+            }
+            this.setvalues[cd] = `indariah`;
         }
         else {
-            this.colorvalues[cd] = `outdariah`;
+            this.setvalues[cd] = `outdariah`;
         }
     }
     this.countries.sort();
@@ -88,9 +96,9 @@ function EUmap(comp) {
 EUmap.prototype = {
     _html: function(sc) {
         var cols = 2;
-        var h = ``;
+        var h = `<div><p class="dctrl">By country</p>`;
         h += `<div id="map-europe_${sc}"></div>
-<p><span cd="_all" class="stats"></span>&nbsp;<a id="m_all_${sc}" href="#" class="ctrls">all DARIAH</a></p>
+<p class="all"><span cd="_all" class="stats"></span> <a id="m_all_${sc}" href="#" class="ctrls">all DARIAH</a></p>
 <table class="clist" id="list-europe_${sc}"><tr>`;
         for (var i in this.countries) {
             if ((i % cols == 0) && (i > 0) && (i < this.countries.length)) {
@@ -100,7 +108,7 @@ EUmap.prototype = {
             var cn = this.country[cd];
             h += `<td><span cd="${cd}" class="stats"></span></td><td><a cd="${cd}" href="#" class="ctrls">${cn}</a></td>`;
         }
-        h += `</tr></table>`;
+        h += `</tr></table></div>`;
         this.comp.container[sc].html(h);
     },
     _dressup: function(sc) {
@@ -114,33 +122,70 @@ EUmap.prototype = {
             backgroundColor: `#ccccff`,
             regionsSelectable: true,
             regionsSelectableOne: false,
+            markerStyle: {
+                initial: {
+                    fill: `#448844`,
+                    'fill-opacity': 1,
+                    stroke: `none`,
+                    'stroke-width': 0,
+                    'stroke-opacity': 1,
+                    'r': 1,
+                },
+                hover: {
+                    'fill-opacity': 0.8,
+                    cursor: `pointer`,
+                    stroke: `#000000`,
+                    'stroke-width': 0,
+                    'stroke-opacity': 1,
+                },
+                selected: {
+                },
+                selectedHover: {
+                },
+            },
             regionStyle: {
                 initial: {
                     fill: `#bbbbbb`,
                     'fill-opacity': 1,
                     stroke: `none`,
                     'stroke-width': 0,
-                    'stroke-opacity': 1
+                    'stroke-opacity': 1,
                 },
                 hover: {
                     'fill-opacity': 0.8,
-                    cursor: `pointer`
+                    cursor: `pointer`,
+                    stroke: `#ffff44`,
+                    'stroke-width': 3,
+                    'stroke-opacity': 1,
                 },
                 selected: {
+                    'fill-opacity': 1,
                     fill: `#dd8844`,
                 },
-                    selectedHover: {
+                selectedHover: {
                 },
             },
+            markers: this.marker,
             series: {
-                regions: [{
-                    scale: {
-                        indariah: `#ffddaa`,
-                        outdariah: `#ffffff`,
-                    },
-                    attributes: `fill`,
-                    values: that.colorvalues,
+                markers: [{
+                    values: {},
+                        scale: [0,15],
+                        normalizeFunction: `linear`,
+                        attribute: `r`,
+                        min: 0,
+                        max: 100,
                 }],
+                regions: [{
+                        scale: {
+                            outdariah: `#ffffff`,
+                            indariah: `#ffeedd`,
+                        },
+                        attribute: `fill`,
+                        values: that.setvalues,
+                }],
+            },
+            onRegionTipShow: function(e, el, cd) {
+                el.html(`${cd}: ${(cd in that._sts[sc])?that._sts[sc][cd]:'not in DARIAH'}`);
             },
             onRegionClick: function(e, c) {
                 if (!(c in that.country)) {
@@ -148,11 +193,9 @@ EUmap.prototype = {
                 }
             },
             onRegionSelected: function(e, c, i, sel) {
-                //console.log(`OnRegionSelected 1`, sel);
                 if (that.changeState) {
                     that.comp.state.setstate(`m_${sc}`, that._a_to_str(sel));
                 }
-                //console.log(`OnRegionSelected 2`, sel);
             },
         });
         this._map[sc] = this._mapc[sc].vectorMap('get', 'mapObject');
@@ -163,26 +206,22 @@ EUmap.prototype = {
             var ison = $(this).hasClass(`ison`);
             var sel = that._from_str(that.comp.state.getstate(`m_${sc}`));
             sel[cd] = !ison;
-            //console.log(that._to_str(sel));
             that.comp.state.setstate(`m_${sc}`, that._to_str(sel));
         });
         this._allc[sc] = this.comp.container[sc].find(`#m_all_${sc}`);
         this._allc[sc].click(function(e) {e.preventDefault();
             var ison = $(this).hasClass(`ison`);
             if (ison) {
-                //console.log(that.country_off);
                 that.comp.state.setstate(`m_${sc}`, that._to_str(that.country_off));
             }
             else {
-                //console.log(that.country_on);
                 that.comp.state.setstate(`m_${sc}`, that._to_str(that.country_on));
             }
         });
     },
     _set_flt: function(sc, rgs) {
-        //console.log(`_set_filt ${sc}`, rgs);
+        var that = this;
         if (rgs == null || rgs == undefined || rgs == '') {rgs = this._from_str(``)}
-        //console.log(`set filt 1`);
         this.changeState = false;
         //Cyprus is not on the map, we delete its key if present and reinsert it afterwards
         //We do show Cyprus in the list
@@ -198,12 +237,9 @@ EUmap.prototype = {
             rgs[cnm] = sv[cnm];
         }
         this.changeState = true;
-        //console.log(`set filt 2`);
-        //console.log(`SETFLT ${sc}`, rgs);
         var all_sel = true;
         for (var cd in this.country) {
             var ccell = this._list[sc].find(`a[cd="${cd}"]`);
-            //console.log(cd, ccell);
             if (cd in rgs && rgs[cd]) {
                 ccell.addClass(`ison`);
             }
@@ -248,27 +284,33 @@ EUmap.prototype = {
         return ob;
     },
     stats: function(sc) {
-        var sts = {};
+        var that = this;
+        this._sts[sc] = {};
         for (var cd in this.country) {
-            sts[cd] = 0;
+            this._sts[sc][cd] = 0;
         } 
-        //console.log(this.fltd[sc]);
         for (var x in this.fltd[sc]) {
             var i = this.fltd[sc][x];
             var cd = this._data[sc][i][2];
-            //console.log(`${sc} ${cd} ${this._data[sc][i][1]}`);
-            sts[cd] += 1;
+            this._sts[sc][cd] += 1;
         }
-        for (var cd in sts) {
-            this.comp.container[sc].find(`span[cd="${cd}"].stats`).html(sts[cd]);
+        var total = this.fltd[sc].length;
+        if (total == 0) {total = 1}
+        for (var cd in this._sts[sc]) {
+            this.comp.container[sc].find(`span[cd="${cd}"].stats`).html(this._sts[sc][cd]);
         }
+        var wsts = {};
+        for (var cd in this._sts[sc]) {
+            var pr = 100 * this._sts[sc][cd] / total;
+            wsts[cd] = (total < 10)?pr:(10*Math.sqrt(pr));
+        }
+        this._map[sc].series.markers[0].setValues(wsts);
         this.comp.container[sc].find(`span[cd="_all"].stats`).html(this.fltd[sc].length);
     },
     v: function(sc, i) {
         var cd =  this._data[sc][i][2];
         var mstate = this._from_str(this.mstate[sc]);
         return (cd in mstate) && mstate[cd];
-        //return true;
     },
     show: function(sc) {
         return (this.comp.state.getstate(`list`) == sc) && (sc in this.enabled);
@@ -281,13 +323,14 @@ EUmap.prototype = {
         }
     },
     wire: function(sc) {
-        this._data[sc] = this.comp.page.getcomp(`list`).data[sc];
+        if (!this.comp._loaded[sc]) {
+            this.comp._loaded[sc] = true;
+            this._data[sc] = this.comp.page.getcomp(`list`).data[sc];
+        }
     },
     work: function(sc) {
         if (sc in this.enabled) {
-            //console.log(`APPLY eumap ${sc}`);
             if (this.show(sc)) {
-                //console.log(`${this.mstate[sc]}`);
                 this.comp.container[sc].show();
             }
             else {
@@ -296,10 +339,7 @@ EUmap.prototype = {
         }
     },
     work_flt: function(sc) {
-        //console.log(`D ${sc}`);
         this.mstate[sc] = this.comp.state.getstate(`m_${sc}`);
-        //console.log(`E ${sc}`);
         this._set_flt(sc, this._from_str(this.mstate[sc]));
-        //console.log(`F ${sc}`);
     },
 };

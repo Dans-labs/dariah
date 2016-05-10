@@ -191,7 +191,7 @@ ol.text {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
-#middle td {
+#middle, .clist td {
     vertical-align: top;
 }
 
@@ -234,6 +234,9 @@ ol.text {
 /* FACETS */
 div.facet {
     font-size: medium;
+}
+.dctrl,.all {
+    margin-bottom: 0pt;
 }
 
 /* FILTERS */

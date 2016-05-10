@@ -22,9 +22,7 @@ Facet.prototype = {
     _do_all: function(mth, sc) {
         for (var i in this._facets[sc]) {
             var fct = this._facets[sc][i];
-            //console.log(`FCT ${fct.name} ${sc} ${mth} 1`);
             fct[mth](sc);
-            //console.log(`FCT ${fct.name} ${sc} ${mth} 2`);
         }
     },
     _work_flt: function(sc) {
@@ -81,7 +79,6 @@ Facet.prototype = {
         for (var j in this._facets[sc]) {
             var fct = this._facets[sc][j];
             fct.stats(sc);
-            //console.log(`${fct.name}: ${fct.fltd[sc].length}`);
         }
         this._stats[sc].html(`${this.fltd[sc].length} of ${data.length}`);
     },
@@ -106,6 +103,28 @@ Facet.prototype = {
             this.data[sc] = this.comp.page.getcomp(`list`).data[sc];
             this._do_all(`wire`, sc);
             this._loaded[sc] = true;
+            var detailcontrols = `<a class="showc fa fa-chevron-right" href="#" title="Show details"></a><a class="hidec fa fa-chevron-down" href="#" title="Hide details"></a>`;
+            $(`p.dctrl`).each(function() {
+                var orig = $(this).html();
+                $(this).html(`${detailcontrols}&nbsp;${orig}`);
+            });
+            $(`p.dctrl`).closest(`div`).find(`table,.flt`).show();
+            $(`.hidec`).show();
+            $(`.showc`).hide();
+            $(`.hidec`).click(function(e) {e.preventDefault();
+                var dt = $(this).closest(`p`);
+                var dd = $(this).closest(`div`).find(`table,.flt`);
+                dd.hide();
+                dt.find(`.hidec`).hide();
+                dt.find(`.showc`).show();
+            });
+            $(`.showc`).click(function(e) {e.preventDefault();
+                var dt = $(this).closest(`p`);
+                var dd = $(this).closest(`div`).find(`table,.flt`);
+                dd.show();
+                dt.find(`.hidec`).show();
+                dt.find(`.showc`).hide();
+            });
         }
     },
     work: function(sc) {
@@ -115,7 +134,6 @@ Facet.prototype = {
                 var fct = this._facets[sc][j];
                 fct.work_flt(sc);
             }
-            //console.log(1, this._facets[sc][0].statsf[sc]);
             this._work_flt(sc);
         }
         else {

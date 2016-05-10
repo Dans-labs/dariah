@@ -41,6 +41,7 @@ Component.prototype = {
                 });
                 if (json.good) {
                     that.data[sc] = json.data;
+                    that.relvals[sc] = json.relvals;
                     that.wire(sc);
                 }
             }, `json`);
@@ -50,7 +51,6 @@ Component.prototype = {
         }
     },
     _work: function(sc) {
-        //console.log(`APPLY ${this.name} ${sc} delg`);
         this.delg.work(sc); // perform work actions that are specific to this component
         this.page.work(this.name, sc); // work other components, dependent on the routing information of the page
     },
@@ -61,6 +61,7 @@ Component.prototype = {
         this.container = {};
         this.state = this.page.state;
         this.data = {};
+        this.relvals = {};
         this._fetch_url = {};
         for (var sc in this.scomps) {
             this._loaded[sc] = false;
@@ -95,9 +96,10 @@ Component.prototype = {
         }
     },
     wire: function(sc) { // wire new material obtained by an AJAX call
-        this._loaded[sc] = true;
-        //console.log(`PROCESS ${this.name} ${sc} delg`);
-        this.delg.wire(sc); // perform wire actions that are specific to this component
+        if (!this._loaded[sc]) {
+            this._loaded[sc] = true;
+            this.delg.wire(sc); // perform wire actions that are specific to this component
+        }
         this._work(sc);
     },
     work: function(sc) { // work (changed) state to current material
@@ -109,7 +111,6 @@ Component.prototype = {
             scomps[sc] = 1;
         }
         for (var s in scomps) {
-            //console.log(`COMP APPLY ${this.name} ${s}`);
             if (this.delg.show(s)) { // show/hide depending on the specific condition
                 this.container[s].show();
                 if (!this._loaded[s]) { // and fetch data if needed

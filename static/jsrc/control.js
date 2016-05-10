@@ -29,9 +29,9 @@ Control.prototype = {
         this._html(sc);
         this.widget[sc] =  this.comp.container[sc];
         this.ctl[sc] =  this.comp.container[sc].find(`a`);
-        this._dressup(sc);
     },
     wire: function(sc) {
+        this._dressup(sc);
     },
     work: function(sc) {
         if (this._is_active(sc)) {

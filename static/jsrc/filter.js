@@ -21,10 +21,10 @@ function Filter(comp) {
 
 Filter.prototype = {
     _html: function(sc) {
-        var h = ``;
+        var h = `<div><p class="dctrl">By full text search</p>`;
         h += `<div class="flt" id="fltw_${sc}">`;
         h += `<p id="fbox_${sc}" class="fbox ui-widget">`;
-        h += `filter <input id="flt_${sc}" class="flt"/>`;
+        h += `<input id="flt_${sc}" class="flt"/>`;
         h += `<a href="#" class="ctrl fa fa-close filtc" id="clearf_${sc}"></a>`;
         h += `<span class="stats" id="stats_${sc}"></span>&nbsp;`;
         h += `</p>`;
@@ -40,10 +40,7 @@ Filter.prototype = {
     },
     _work_ctl: function(sc) {
         var textf = this.fltc[sc].val();
-        //var textf = that.comp.state.getstate(`f_${sc}`);
-        //console.log(`textf="${textf}"`);
         if (textf == ``) {
-            //console.log(`A`);
             this.boxf[sc].removeClass(`ison`);
             this.clearf[sc].hide();
         }
@@ -55,11 +52,10 @@ Filter.prototype = {
     _response: function(sc) {
         var that = this;
         return function(event, ui) {
-            that._flted[sc] = [];
+            that._flted[sc] = {};
             for (var i in ui.content) {
                 that._flted[sc][ui.content[i].value] = 1;
             }
-            //console.log(`D`);
             if (!(that.wire_mode[sc])) {
                 that.comp.state.setstate(`f_${sc}`, that.fltc[sc].val());
             }
@@ -67,18 +63,14 @@ Filter.prototype = {
     },
     _setclear: function(sc) {
         var that = this;
-        //console.log(this.clearf[sc]);
         this.clearf[sc].click(function(e) {e.preventDefault();
-            //console.log(`click clear ${sc}`);
-            //console.log(`B`);
             that.fltc[sc].val(``);
             that.fltc[sc].autocomplete(`search`, ``);
-            //that.comp.state.setstate(`f_${sc}`, ``);
         });
     },
     stats: function(sc) {
-        //console.log(2, this.statsf[sc]);
-        this.statsf[sc].html(this.fltd[sc].length);
+        var prf = (this.fltc[sc].val() != ``)?`${this.facet.fltd[sc].length} of `:``;
+        this.statsf[sc].html(`${prf}${this.fltd[sc].length}`);
     },
     v: function(sc, i) {
         return (i in this._flted[sc]);
@@ -100,9 +92,9 @@ Filter.prototype = {
         this.fltd[sc] = [];
     },
     wire: function(sc) {
-        //console.log(`FILTER wire ${sc}`);
         var that = this;
-        if (!this.facet._loaded[sc]) {
+        if (!this.facet._loaded[sc] && !this.comp._loaded[sc]) {
+            this.comp._loaded[sc] = true;
             var data = this.comp.page.getcomp(`list`).data[sc];
             this._data[sc] = data;
             this.tags[sc] = [];
@@ -110,7 +102,6 @@ Filter.prototype = {
                 this.tags[sc].push({label: data[i][1], value: i});
             }
             this._setclear(sc);
-            //console.log(`FILTER autocomplete ${sc}`);
             this.fltc[sc].autocomplete({
                 appendTo: this.autoc[sc],
                 source: this.tags[sc],
@@ -131,7 +122,6 @@ Filter.prototype = {
         }
     },
     work_flt: function(sc) {
-        //console.log(`C ${sc}`);
         this._work_ctl(sc);
     },
 };

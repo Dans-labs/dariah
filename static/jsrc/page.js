@@ -34,6 +34,7 @@ function Page() { // the one and only page object
         [`control`, `facet`, main_lists, false, Facet], 
         [`facet`, `filter`, main_lists, false, Filter], 
         [`facet`, `eumap`, main_lists, false, EUmap],
+        [`facet`, `ctype`, main_lists, false, CType],
         [`middle`, `list`, main_lists, true, List], 
     ];
     this.compindex = {};
@@ -44,6 +45,7 @@ function Page() { // the one and only page object
         facet: [
             `filter`,
             `eumap`,
+            `ctype`,
         ],
     };
     this.weld();
@@ -70,14 +72,12 @@ Page.prototype = {
         this._set_height(80);
         History.Adapter.bind(window, `statechange`, this.state.work());
     },
-    work: function(comp, sc) { 
 /* work selected components of the page. comp is looked up in routing, which gives a list of other components
  * and these are the components that will be applied. This will be done recursively, see _work in Components.
  * But the recursive calls are per subcomponent. 
  * 'page' is also in the routing table.
  */
-
-        //console.log(`PAGE APPLY ${comp} ${sc}`);
+    work: function(comp, sc) { 
         if (this._routing[comp] != undefined) {
             for (var i in this._routing[comp]) {
                 var oname = this._routing[comp][i];
