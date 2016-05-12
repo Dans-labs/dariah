@@ -1,46 +1,46 @@
-/* INDIVIDUAL COMPONENT: Control
- * This manages the controls that correspond to lists of records to be displayed in the middle column
+/* INDIVIDUAL COMPONENT: ºControl
+ * This manages the controls ºthat correspond to lists of records to be displayed in the middle column
  * Clicking on a control shows the corresponding list and hides all others.
  */
 
-function Control(comp) {
-    this.comp = comp;
-    this.widget = {};
-    this.ctl = {};
+function ºControl(ºcomp) {
+    this.ºcomp = ºcomp;
+    this.ºwidget = {};
+    this.ºctl = {};
 };
 
-Control.prototype = {
-    _html: function(sc) {
-        this.comp.container[sc].html(`<a class="ctrl radio" href="#">${this.comp.state.showstate('list', sc, 'sg')}</a> `);
+ºControl.prototype = {
+    º_html: function(ºsc) {
+        this.ºcomp.ºcontainer[ºsc].html(`<a class="ctrl radio" href="#">${this.ºcomp.ºstate.ºshowstate('list', ºsc, 'ºsg')}</a> `);
     },
-    _dressup: function(sc) {
-        var that = this;
-        this.ctl[sc].click(function(e) {e.preventDefault();
-            that.comp.state.setstate(`list`, sc);
+    º_dressup: function(ºsc) {
+        var ºthat = this;
+        this.ºctl[ºsc].click(function(ºe) {ºe.preventDefault();
+            ºthat.ºcomp.ºstate.ºsetstate(`list`, ºsc);
         })
     },
-    _is_active: function(sc) {
-        return this.comp.state.getstate(`list`) == sc;
+    º_is_active: function(ºsc) {
+        return this.ºcomp.ºstate.ºgetstate(`list`) == ºsc;
     },
-    show: function(sc) {
+    ºshow: function(ºsc) {
         return true;
     },
-    weld: function(sc) {
-        this._html(sc);
-        this.widget[sc] =  this.comp.container[sc];
-        this.ctl[sc] =  this.comp.container[sc].find(`a`);
+    ºweld: function(ºsc) {
+        this.º_html(ºsc);
+        this.ºwidget[ºsc] =  this.ºcomp.ºcontainer[ºsc];
+        this.ºctl[ºsc] =  this.ºcomp.ºcontainer[ºsc].find(`a`);
     },
-    wire: function(sc) {
-        this._dressup(sc);
+    ºwire: function(ºsc) {
+        this.º_dressup(ºsc);
     },
-    work: function(sc) {
-        if (this._is_active(sc)) {
-            this.ctl[sc].addClass(`ison`);
-            this.widget[sc].addClass(`isonn`);
+    ºwork: function(ºsc) {
+        if (this.º_is_active(ºsc)) {
+            this.ºctl[ºsc].addClass(`ison`);
+            this.ºwidget[ºsc].addClass(`isonn`);
         }
         else {
-            this.ctl[sc].removeClass(`ison`);
-            this.widget[sc].removeClass(`isonn`);
+            this.ºctl[ºsc].removeClass(`ison`);
+            this.ºwidget[ºsc].removeClass(`isonn`);
         }
     }
 };

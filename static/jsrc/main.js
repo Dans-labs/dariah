@@ -2,5 +2,9 @@
  * The dynamic construction of the page starts here
  */
 
-$(function() {(new Page()).work(`page`)});
+var ºwp;
+$(function() {
+    ºwp = new ºPage();
+    ºwp.ºwork();
+});
 

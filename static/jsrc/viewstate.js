@@ -1,150 +1,147 @@
 /* VIEW STATE
  * Contains the current state, based on request variables and local storage.
  * Request variables have precedence over local storage.
- * Request variables are checked and validated and translated, translated values go to local storage.
- * There is a list of recognized request variables, with their types and allowable values.
+ * Request variables are checked and validated and translated, translated ºvalues go to local storage.
+ * There is a list of recognized request variables, with their ºtypes and allowable ºvalues.
  */
 
-function ViewState(page) {
-    this._data = {};
-    this.weld();
-    this.page = page;
-    this.msg = page.msg;
+function ºViewState(ºpage) {
+    this.º_data = {};
+    this.ºpage = ºpage;
+    this.ºmsg = ºpage.ºmsg;
+    this.º_getinitstate();
+    this.º_addHist();
 };
 
-ViewState.prototype = {
-    _specs: {
-        list: {type: `string`, values: {contrib: 1, country: 1}, def: `contrib`},
-        f_contrib: {type: `string`, values: null, def: ``},
-        f_country: {type: `string`, values: null, def: ``},
-        m_contrib: {type: `string`, values: null, def: ``},
-        m_country: {type: `string`, values: null, def: ``},
-        t_contrib: {type: `string`, values: null, def: ``},
-        t_country: {type: `string`, values: null, def: ``},
-        id: {type: `integer`, values: {min: -1, max: 1000000}, def: 0},
-        sort: {type: `boolean`, values: {v: true, x: false}, def: true}, 
+ºViewState.prototype = {
+    º_specs: {
+        list: {ºtype: `string`, ºvalues: {contrib: 1, country: 1}, ºdef: `contrib`},
+        f_contrib: {ºtype: `string`, ºvalues: null, ºdef: ``},
+        f_country: {ºtype: `string`, ºvalues: null, ºdef: ``},
+        m_contrib: {ºtype: `string`, ºvalues: null, ºdef: ``},
+        m_country: {ºtype: `string`, ºvalues: null, ºdef: ``},
+        t_contrib: {ºtype: `string`, ºvalues: null, ºdef: ``},
+        t_country: {ºtype: `string`, ºvalues: null, ºdef: ``},
+        id: {ºtype: `integer`, ºvalues: {ºmin: -1, ºmax: 1000000}, ºdef: 0},
+        sort: {ºtype: `boolean`, ºvalues: {v: true, x: false}, ºdef: true}, 
     },
-    _showas: {
+    º_showas: {
         list: {
-            contrib: {sg: `contribution`, pl: `contributions`},
-            country: {sg: `country`, pl: `countries`},
+            contrib: {ºsg: `contribution`, ºpl: `contributions`},
+            country: {ºsg: `country`, ºpl: `countries`},
         },
     },
-    _validate: function(name, val) {
-        var newval, message;
-        if (name in this._specs) {
-            var s = this._specs[name];
-            if (s.type == `string`) {
-                if (s.values) {
-                    if (val in s.values) {
-                        newval = val;
+    º_validate: function(ºname, ºval) {
+        var ºnewval, ºmessage;
+        if (ºname in this.º_specs) {
+            var ºs = this.º_specs[ºname];
+            if (ºs.ºtype == `string`) {
+                if (ºs.ºvalues) {
+                    if (ºval in ºs.ºvalues) {
+                        ºnewval = ºval;
                     }
                     else {
-                        newval = s.def;
-                        this.msg.msg(`illegal string value for ${name}: "${val}" is replaced by "${s.def}"`, `warning`);
+                        ºnewval = ºs.ºdef;
+                        this.ºmsg.ºmsg(`illegal string value for ${ºname}: "${ºval}" is replaced by "${ºs.ºdef}"`, `warning`);
                     }
                 }
                 else {
-                    newval = val;
+                    ºnewval = ºval;
                 }
             }
-            else if (s.type == `integer`) {
-                if (/^(\-|\+)?[0-9]+$/.test(val)) {
-                    newval = Number(val);
+            else if (ºs.ºtype == `integer`) {
+                if (/^(\-|\+)?[0-9]+$/.test(ºval)) {
+                    ºnewval = Number(ºval);
                 }
                 else {
-                    newval = s.def;
-                    this.msg.msg(`not a number value for ${name}: "${val}" is replaced by "${s.def}"`, `warning`);
+                    ºnewval = ºs.ºdef;
+                    this.ºmsg.ºmsg(`not a number value for ${ºname}: "${ºval}" is replaced by "${ºs.ºdef}"`, `warning`);
                 }
             }
-            else if (s.type == `boolean`) {
-                if (val in s.values) {
-                    newval = s.values[val];
+            else if (ºs.ºtype == `boolean`) {
+                if (ºval in ºs.ºvalues) {
+                    ºnewval = ºs.ºvalues[ºval];
                 }
                 else {
-                    newval = s.def;
-                    this.msg.msg(`illegal boolean value for ${name}: "${val}" is replaced by "${s.def}"`, `warning`);
+                    ºnewval = ºs.ºdef;
+                    this.ºmsg.ºmsg(`illegal boolean value for ${ºname}: "${ºval}" is replaced by "${ºs.ºdef}"`, `warning`);
                 }
             }
         }
         else {
-            newval = null;
-            this.msg.msg(`unknown parameter: ${name}=${val}`, `warning`);
+            ºnewval = null;
+            this.ºmsg.ºmsg(`unknown parameter: ${ºname}=${ºval}`, `warning`);
         }
-        return newval;
+        return ºnewval;
     },
-    _getvars: function() {
-        vars = [];
-        for (var name in this._data) {
-            var val = this._data[name];
-            var spec = this._specs[name];
-            if (spec.type == `string` || spec.type == `integer`) {vars.push(`${name}=${val}`)}
-            else if (spec.type == `boolean`) {
-                for (z in spec.values) {
-                    if (spec.values[z] == val) {vars.push(`${name}=${z}`)}
+    º_getvars: function() {
+        ºvars = [];
+        for (var ºname in this.º_data) {
+            var ºval = this.º_data[ºname];
+            var ºspec = this.º_specs[ºname];
+            if (ºspec.ºtype == `string` || ºspec.ºtype == `integer`) {ºvars.push(`${ºname}=${ºval}`)}
+            else if (ºspec.ºtype == `boolean`) {
+                for (ºz in ºspec.ºvalues) {
+                    if (ºspec.ºvalues[ºz] == ºval) {ºvars.push(`${ºname}=${ºz}`)}
                 }
             }
         }
-        return vars.join(`&`)
+        return ºvars.join(`&`)
     },
-    _getinitstate: function() {
-        for (var name in rvars) {
-            if (!(name in this._specs)) {
-                this.msg.msg(`unknown parameter: ${name}=${val}`, `warning`);
+    º_getinitstate: function() {
+        for (var ºname in ºrvars) {
+            if (!(ºname in this.º_specs)) {
+                this.ºmsg.ºmsg(`unknown parameter: ${ºname}=${ºval}`, `warning`);
             }
         }
-        for (var name in this._specs) {
-            var val = null;
-            if (name in rvars) {
-                var raw_val = rvars[name];
-                val = this._validate(name, raw_val);
-                lvars.set(name, val);
+        for (var ºname in this.º_specs) {
+            var ºval = null;
+            if (ºname in ºrvars) {
+                var ºraw_val = ºrvars[ºname];
+                ºval = this.º_validate(ºname, ºraw_val);
+                ºlvars.set(ºname, ºval);
             }
-            else if (lvars.isSet(name)) {
-                val = lvars.get(name);
+            else if (ºlvars.isSet(ºname)) {
+                ºval = ºlvars.get(ºname);
             }
             else {
-                val = this._specs[name].def;
-                lvars.set(name, val);
+                ºval = this.º_specs[ºname].ºdef;
+                ºlvars.set(ºname, ºval);
             }
-            this._data[name] = val;
+            this.º_data[ºname] = ºval;
         }
     },
-    _addHist: function(title, view_url) {
-        var tit = `DARIAH contribution tool`;
-        var this_url = `${app_url}?${this._getvars()}`;
-        History.pushState(this._data, tit, this_url);
+    º_addHist: function(ºtitle, ºview_url) {
+        var ºtit = `DARIAH contribution tool`;
+        var ºthis_url = `${app_url}?${this.º_getvars()}`;
+        History.pushState(this.º_data, ºtit, ºthis_url);
     },
-    setstate: function(name, val) {
-        this._data[name] = val;
-        lvars.set(name, val);
-        this._addHist();
+    ºsetstate: function(ºname, ºval) {
+        this.º_data[ºname] = ºval;
+        ºlvars.set(ºname, ºval);
+        this.º_addHist();
     },
-    getstate: function(name) {
-        return this._data[name];
+    ºgetstate: function(ºname) {
+        return this.º_data[ºname];
     },
-    getvalues: function(name) {
-        return this._specs[name].values;
+    ºgetvalues: function(ºname) {
+        return this.º_specs[ºname].ºvalues;
     },
-    showstate: function(name, val, mode) {
-        var result = val;
-        var md = (mode == undefined)?`sg`:mode;
-        if (this._showas[name] != undefined && this._showas[name][val] != undefined) {
-            result = this._showas[name][val][mode];
+    ºshowstate: function(ºname, ºval, ºmode) {
+        var ºresult = ºval;
+        var ºmd = (ºmode == undefined)?`ºsg`:ºmode;
+        if (this.º_showas[ºname] != undefined && this.º_showas[ºname][ºval] != undefined) {
+            ºresult = this.º_showas[ºname][ºval][ºmode];
         }
-        return result;
+        return ºresult;
     },
-    weld: function() {
-        this._getinitstate();
-        this._addHist();
-    },
-    work: function() {
-        var that = this;
+    ºwork: function() {
+        var ºthat = this;
         return function () {
-            var state = History.getState();
-            if (state && state.data) {
-                that._data = state.data;
-                that.page.work(`page`);
+            var ºstate = History.getState();
+            if (ºstate && ºstate.data) {
+                ºthat.º_data = ºstate.data;
+                ºthat.ºpage.ºwork();
             }
         }
     },

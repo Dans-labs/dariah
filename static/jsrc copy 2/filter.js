@@ -6,7 +6,7 @@
 function Filter(comp) {
     this.comp = comp;
     this.name = `filter`;
-    this.facet = this.comp.page.getcomp(`facet`).delg;
+    this.facet = this.comp.µpage.getcomp(`facet`).delg;
     this.tags = {};
     this.fltc = {};
     this.boxf = {};
@@ -14,7 +14,7 @@ function Filter(comp) {
     this.statsf = {};
     this.clearf = {};
     this._flted = {};
-    this._data = {};
+    this._µdata = {};
     this.fltd = {};
     this.wire_mode = {};
 };
@@ -79,48 +79,43 @@ Filter.prototype = {
         return this.comp.state.getstate(`list`) == sc;
     },
     weld: function(sc) {
-        this.facet.add_facet(sc, this);
         this._html(sc);
-        var cc = $(`#fltw_${sc}`);
-        this.comp.container[sc] = cc;
-        this.fltc[sc] = cc.find(`#flt_${sc}`);
-        this.boxf[sc] = cc.find(`#fbox_${sc}`);
-        this.autoc[sc] = cc.find(`#autoc_${sc}`);
-        this.statsf[sc] = cc.find(`#stats_${sc}`);
-        this.clearf[sc] = cc.find(`#clearf_${sc}`);
-        this._flted[sc] = {};
-        this.fltd[sc] = [];
     },
     wire: function(sc) {
+        console.log(`BEGIN WIRE ${sc}`);
+        this._setclear(sc);
+        this.fltc[sc].autocomplete({
+            appendTo: this.autoc[sc],
+            source: this.tags[sc],
+            response: this._response(sc),
+            minLength: 0,
+        });
+        this.wire_mode[sc] = true;
+        this._set_flt(sc);
+        this.wire_mode[sc] = false;
+        console.log(`END   WIRE ${sc}`);
+    },
+    wire_flt: function(sc) {
+        console.log(`BEGIN WIRE_FLT ${sc}`);
         var that = this;
-        if (!this.facet._loaded[sc] && !this.comp._loaded[sc]) {
-            this.comp._loaded[sc] = true;
-            var data = this.comp.page.getcomp(`list`).data[sc];
-            this._data[sc] = data;
-            this.tags[sc] = [];
-            for (var i in data) {
-                this.tags[sc].push({label: data[i][1], value: i});
-            }
-            this._setclear(sc);
-            this.fltc[sc].autocomplete({
-                appendTo: this.autoc[sc],
-                source: this.tags[sc],
-                response: this._response(sc),
-                minLength: 0,
-            });
-            this.wire_mode[sc] = true;
-            this._set_flt(sc);
-            this.wire_mode[sc] = false;
+        var cc = this.comp.container[sc];
+        var cf = cc.find(`#fltw_${sc}`);
+        this.fltc[sc] = cf.find(`#flt_${sc}`);
+        this.boxf[sc] = cf.find(`#fbox_${sc}`);
+        this.autoc[sc] = cf.find(`#autoc_${sc}`);
+        this.statsf[sc] = cf.find(`#stats_${sc}`);
+        this.clearf[sc] = cf.find(`#clearf_${sc}`);
+        this._flted[sc] = {};
+        this.fltd[sc] = [];
+        var data = this.comp.µpage.getcomp(`list`).data[sc];
+        this._µdata[sc] = data;
+        this.tags[sc] = [];
+        for (var i in data) {
+            this.tags[sc].push({label: data[i][1], value: i});
         }
+        console.log(`END   WIRE_FLT ${sc}`);
     },
-    work: function(sc) {
-        if (this.show(sc)) {
-            this.comp.container[sc].show();
-        }
-        else {
-            this.comp.container[sc].hide();
-        }
-    },
+    work: function(sc) {},
     work_flt: function(sc) {
         this._work_ctl(sc);
     },

@@ -1,37 +1,37 @@
-/* INDIVIDUAL COMPONENT: List
+/* INDIVIDUAL COMPONENT: ºList
  * This manages the actual lists of records to be displayed in the middle column.
  * The subcomponents corresponds to the individual lists, such as country, countribution
- * All functionality (except show) is delegated to specific functions
+ * All functionality (except ºshow) is delegated to ºspecific functions
  */
 
-function List(comp) {this.comp = comp};
+function ºList(ºcomp) {this.ºcomp = ºcomp};
 
-List.prototype = {
-    _html: function(sc) {
-        var h = ``;
-        h += `<table id="table_${sc}">`;
-        if (sc == `contrib`) {
-            for (var i in this.comp.data[sc]) {
-                r = this.comp.data[sc][i];
-                h += `<tr id="r${r[0]}"><td class="cc">${r[2]}<td><td class="cn">${r[3]}<td><td><a href="#" rid="${r[0]}">${r[1]}</a></td></tr>`;
+ºList.prototype = {
+    º_html: function(ºsc) {
+        var ºh = ``;
+        ºh += `<table id="table_${ºsc}">`;
+        if (ºsc == `contrib`) {
+            for (var ºi in this.ºcomp.ºdata[ºsc]) {
+                ºr = this.ºcomp.ºdata[ºsc][ºi];
+                ºh += `<tr id="r${ºr[0]}"><td class="cc">${ºr[2]}<td><td class="cn">${ºr[3]}<td><td><a href="#" rid="${ºr[0]}">${ºr[1]}</a></td></tr>`;
             }
         }
-        else if (sc == `country`) {
-            for (var i in this.comp.data[sc]) {
-                r = this.comp.data[sc][i];
-                h += `<tr id="r${r[0]}"><td class="cc">${r[0]}<td><td class="cn">${r[1]}<td></tr>`;
+        else if (ºsc == `country`) {
+            for (var ºi in this.ºcomp.ºdata[ºsc]) {
+                ºr = this.ºcomp.ºdata[ºsc][ºi];
+                ºh += `<tr id="r${ºr[0]}"><td class="cc">${ºr[0]}<td><td class="cn">${ºr[1]}<td></tr>`;
             }
         }
-        h += `</table>`;
-        this.comp.container[sc].html(h);
+        ºh += `</table>`;
+        this.ºcomp.ºcontainer[ºsc].html(ºh);
     },
-    show: function(sc) {
-        return this.comp.state.getstate(`list`) == sc;
+    ºshow: function(ºsc) {
+        return this.ºcomp.ºstate.ºgetstate(`list`) == ºsc;
     },
-    weld: function(sc) {},
-    wire: function(sc) {
-        this._html(sc);
+    ºweld: function(ºsc) {},
+    ºwire: function(ºsc) {
+        this.º_html(ºsc);
     },
-    work: function(sc) {},
+    ºwork: function(ºsc) {},
 };
 

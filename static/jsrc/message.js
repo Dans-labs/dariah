@@ -1,44 +1,44 @@
 /* MESSAGES
- * Msg is a function that issues messages to a specified element.
+ * ºMsg is a function ºthat issues messages to a specified element.
  * It has also controls for clearing and hiding the messages.
  */
 
-function Msg(dst, on_clear) {
-    var that = this;
-    this._dst = $(`#${dst}`);
-    this._trashc = $(`#trash_${dst}`);
-    this._trashp = this._trashc.closest(`p`);
-    this._trashc.click(function(e) {e.preventDefault();
-        that.clear();
+function ºMsg(ºdst, ºon_clear) {
+    var ºthat = this;
+    this.º_dst = $(`#${ºdst}`);
+    this.º_trashc = $(`#trash_${ºdst}`);
+    this.º_trashp = this.º_trashc.closest(`p`);
+    this.º_trashc.click(function(ºe) {ºe.preventDefault();
+        ºthat.ºclear();
     });
-    this._hide();
-    this._on_clear = on_clear;
+    this.º_hide();
+    this.º_on_clear = ºon_clear;
 };
 
-Msg.prototype = {
-    _hide: function() {
-        this._dst.hide();
-        this._trashp.hide();
+ºMsg.prototype = {
+    º_hide: function() {
+        this.º_dst.hide();
+        this.º_trashp.hide();
     },
     _show: function() {
-        this._dst.show();
-        if (this._dst.html() != ``) {
-            this._trashp.show();
+        this.º_dst.show();
+        if (this.º_dst.html() != ``) {
+            this.º_trashp.show();
         }
     },
-    clear: function() {
-        this._dst.html(``);
-        if (this._on_clear != undefined) {
-            this._on_clear();
+    ºclear: function() {
+        this.º_dst.html(``);
+        if (this.º_on_clear != undefined) {
+            this.º_on_clear();
         }
-        this._hide();
+        this.º_hide();
     },
-    msg: function(text, kind) {
-        if (kind == undefined) {
-            kind = `info`;
+    ºmsg: function(ºtext, ºkind) {
+        if (ºkind == undefined) {
+            ºkind = `info`;
         }
-        var mtext = this._dst.html();
-        this._dst.html(`${mtext}<p class="${kind}">${text}</p>`);
+        var ºmtext = this.º_dst.html();
+        this.º_dst.html(`${ºmtext}<p class="${ºkind}">${ºtext}</p>`);
         this._show();
     },
 };

@@ -6,12 +6,13 @@
  * for the list of contributions, and a subcomponent 'country' for the list of countries.
  * The generic functions of a component take care of:
  * - generating HTML container divs for the subcomponents under specified destination elements if they does not already exist
- * - showing and hiding the subcomponents, and in general, apply the current state data to the subcomponents 
+ * - showing and hiding the subcomponents, and in general, work the current state data to the subcomponents 
  * - fetching the subcomponent's data from the server, if needed
  * This *specific* functionality of the components are defined in separate files.
  * Of this specific functionality, the following will be called from the generic component function:
  * - show(sc): inspect the current state and determine whether the subcomponent should be shown or hidden
- * - process(sc): after the data has been fetched, process the data into the desired HTML content of the subcomponent
+ * - wire(sc): after the data has been fetched, wrap the data into the desired HTML content of the subcomponent
+ *   and add the wiring (click events, change events)
  * In turn, the specific functions can access their associated generic components by this.comp
  */
 
@@ -29,7 +30,7 @@ function Component(dst, name, scomps, fetch, specific, page) {
 };
 
 Component.prototype = {
-    _fetch: function(sc) { // get the material by AJAX if needed, and process the material afterward
+    _fetch: function(sc) { // get the material by AJAX if needed, and wire the material afterward
         var that = this;
         if (this.fetch) {
             this.msg[sc].msg(`fetching data ...`);
@@ -40,25 +41,27 @@ Component.prototype = {
                 });
                 if (json.good) {
                     that.data[sc] = json.data;
-                    that.process(sc);
+                    that.relvals[sc] = json.relvals;
+                    that.wire(sc);
                 }
             }, `json`);
         }
         else {
-            this.process(sc);
+            this.wire(sc);
         }
     },
-    _apply: function(sc) {
-        this.delg.apply(sc); // perform apply actions that are specific to this component
-        this.page.apply(this.name, sc); // apply other components, dependent on the routing information of the page
+    _work: function(sc) {
+        this.delg.work(sc); // perform work actions that are specific to this component
+        this.page.work(this.name, sc); // work other components, dependent on the routing information of the page
     },
-    init: function() { // make the component
+    weld: function() { // make the component
         this._dst = {};
         this._loaded = {};
         this.msg = {};
         this.container = {};
         this.state = this.page.state;
         this.data = {};
+        this.relvals = {};
         this._fetch_url = {};
         for (var sc in this.scomps) {
             this._loaded[sc] = false;
@@ -89,15 +92,17 @@ Component.prototype = {
             }
             this.msg[sc] = new Msg(`msg_${this.name}_${sc}`);
             this._loaded[sc] = false;
-            this.delg.init(sc);
+            this.delg.weld(sc);
         }
     },
-    process: function(sc) { // process new material obtained by an AJAX call
-        this._loaded[sc] = true;
-        this.delg.process(sc); // perform process actions that are specific to this component
-        this._apply(sc)
+    wire: function(sc) { // wire new material obtained by an AJAX call
+        if (!this._loaded[sc]) {
+            this._loaded[sc] = true;
+            this.delg.wire(sc); // perform wire actions that are specific to this component
+        }
+        this._work(sc);
     },
-    apply: function(sc) { // apply (changed) state to current material
+    work: function(sc) { // work (changed) state to current material
         var scomps = {}; 
         if (sc == undefined) {
             scomps = this.scomps;
@@ -112,12 +117,12 @@ Component.prototype = {
                     this._fetch(s);
                 }
                 else {
-                    this._apply(s);
+                    this._work(s);
                 }
             }
             else {
                 this.container[s].hide();
-                this._apply(s);
+                this._work(s);
             }
         }
     },

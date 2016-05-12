@@ -1,22 +1,21 @@
-/* INDIVIDUAL COMPONENT: EUmap
- * This manages a clickable map of the EU countries
+/* INDIVIDUAL COMPONENT: ºEUmap
+ * This manages a clickable map of the EU ºcountries
  * See http://jvectormap.com/documentation/javascript-api/jvm-map/
  */
 
-function EUmap(comp) {
-    this.comp = comp;
-    this.name = `eumap`;
-    this.facet = this.comp.page.getcomp(`facet`).delg;
-    this.enabled = {contrib: 1};
-    this._map = {};
-    this._mapc = {};
-    this._list = {};
-    this.fltd = {};
-    this.mstate = {};
-    this._data = {};
-    this._allc = {};
-    this._sts = {};
-    this._all_countries = { // the boolean tells whether the country is in DARIAH
+function ºEUmap(ºcomp) {
+    this.ºcomp = ºcomp;
+    this.ºname = `eumap`;
+    this.ºfacet = this.ºcomp.ºpage.ºgetcomp(`facet`).ºdelg;
+    this.º_map = {};
+    this.º_mapc = {};
+    this.º_list = {};
+    this.ºfltd = {};
+    this.ºmstate = {};
+    this.º_data = {};
+    this.º_allc = {};
+    this.º_sts = {};
+    this.º_all_countries = { // the boolean tells whether the country is in DARIAH
         AT: [`Austria`, true, 47.7, 15.11],
         BE: [`Belgium`, true, 51.3, 3.1],
         HR: [`Croatia`, true, 44.7, 15.6],
@@ -65,59 +64,61 @@ function EUmap(comp) {
         TR: [`Turkey`, false],
         UA: [`Ukraine`, false],
     };
-    this.not_mapped = {
+    this.ºnot_mapped = {
         CY: true,
     };
-    this.countries = [];
-    this.country = {};
-    this.marker = {};
-    this.country_off = {};
-    this.country_on = {};
-    this.setvalues = {};
-    for (var cd in this._all_countries) {
-        var cprop = this._all_countries[cd];
-        if (cprop[1]) {
-            this.country_off[cd] = false;
-            this.country_on[cd] = true;
-            this.countries.push(cd);
-            this.country[cd] = cprop[0];
-            if (cprop.length > 3) {
-                this.marker[cd] = {latLng: [cprop[2], cprop[3]], name: cprop[0]};
+    this.ºcountries = [];
+    this.ºcountry = {};
+    this.ºmarker = {};
+    this.ºcountry_off = {};
+    this.ºcountry_on = {};
+    this.ºsetvalues = {};
+    for (var ºcd in this.º_all_countries) {
+        var ºcprop = this.º_all_countries[ºcd];
+        if (ºcprop[1]) {
+            this.ºcountry_off[ºcd] = false;
+            this.ºcountry_on[ºcd] = true;
+            this.ºcountries.push(ºcd);
+            this.ºcountry[ºcd] = ºcprop[0];
+            if (ºcprop.length > 3) {
+                this.ºmarker[ºcd] = {latLng: [ºcprop[2], ºcprop[3]], ºname: ºcprop[0]};
             }
-            this.setvalues[cd] = `indariah`;
+            this.ºsetvalues[ºcd] = `indariah`;
         }
         else {
-            this.setvalues[cd] = `outdariah`;
+            this.ºsetvalues[ºcd] = `outdariah`;
         }
     }
-    this.countries.sort();
+    this.ºcountries.sort();
 };
 
-EUmap.prototype = {
-    _html: function(sc) {
-        var cols = 2;
-        var h = `<div><p class="dctrl">By country</p>`;
-        h += `<div id="map-europe_${sc}"></div>
-<p class="all"><span cd="_all" class="stats"></span> <a id="m_all_${sc}" href="#" class="ctrls">all DARIAH</a></p>
-<table class="clist" id="list-europe_${sc}"><tr>`;
-        for (var i in this.countries) {
-            if ((i % cols == 0) && (i > 0) && (i < this.countries.length)) {
-                h += `</tr><tr>`;
+ºEUmap.prototype = {
+    º_html: function(ºsc) {
+        var ºcols = 2;
+        var ºh = `<div><p class="dctrl">By country</p>`;
+        ºh += `<div id="map-europe_${ºsc}"></div>
+<p class="all"><span cd="_all" class="stats"></span> <a id="m_all_${ºsc}" href="#" class="ctrls">all DARIAH</a></p>
+<table class="clist" id="list-europe_${ºsc}"><tr>`;
+        for (var ºi in this.ºcountries) {
+            if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < this.ºcountries.length)) {
+                ºh += `</tr><tr>`;
             }
-            var cd = this.countries[i];
-            var cn = this.country[cd];
-            h += `<td><span cd="${cd}" class="stats"></span></td><td><a cd="${cd}" href="#" class="ctrls">${cn}</a></td>`;
+            var ºcd = this.ºcountries[ºi];
+            var ºcn = this.ºcountry[ºcd];
+            ºh += `<td><span cd="${ºcd}" class="stats"></span></td><td><a cd="${ºcd}" href="#" class="ctrls">${ºcn}</a></td>`;
         }
-        h += `</tr></table></div>`;
-        this.comp.container[sc].html(h);
+        ºh += `</tr></table></div>`;
+        this.ºcomp.ºcontainer[ºsc].html(ºh);
+        console.log(`HTML eumap ${ºsc}`, this.ºcomp.ºcontainer[ºsc]);
     },
-    _dressup: function(sc) {
-        var that = this;
-        this._mapc[sc] = $(`#map-europe_${sc}`);
-        this._list[sc] = $(`#list-europe_${sc}`);
-        this._mapc[sc].width(`100%`);
-        this._mapc[sc].height(this._mapc[sc].width()*0.6);
-        this._mapc[sc].vectorMap({
+    º_dressup: function(ºsc) {
+        var ºthat = this;
+        var ºcc = this.ºcomp.ºcontainer[ºsc];
+        this.º_mapc[ºsc] = ºcc.find(`#map-europe_${ºsc}`);
+        this.º_list[ºsc] = ºcc.find(`#list-europe_${ºsc}`);
+        this.º_mapc[ºsc].width(`100%`);
+        this.º_mapc[ºsc].height(this.º_mapc[ºsc].width()*0.6);
+        this.º_mapc[ºsc].vectorMap({
             map: `europe_mill`,
             backgroundColor: `#ccccff`,
             regionsSelectable: true,
@@ -165,11 +166,11 @@ EUmap.prototype = {
                 selectedHover: {
                 },
             },
-            markers: this.marker,
+            markers: this.ºmarker,
             series: {
                 markers: [{
                     values: {},
-                        scale: [0,15],
+                        scale: [0,25],
                         normalizeFunction: `linear`,
                         attribute: `r`,
                         min: 0,
@@ -181,165 +182,150 @@ EUmap.prototype = {
                             indariah: `#ffeedd`,
                         },
                         attribute: `fill`,
-                        values: that.setvalues,
+                        values: ºthat.ºsetvalues,
                 }],
             },
-            onRegionTipShow: function(e, el, cd) {
-                el.html(`${cd}: ${(cd in that._sts[sc])?that._sts[sc][cd]:'not in DARIAH'}`);
+            onRegionTipShow: function(ºe, ºel, ºcd) {
+                ºel.html(`${ºcd}: ${(ºcd in ºthat.º_sts[ºsc])?ºthat.º_sts[ºsc][ºcd]:'not in DARIAH'}`);
             },
-            onRegionClick: function(e, c) {
-                if (!(c in that.country)) {
-                    e.preventDefault();
+            onRegionClick: function(ºe, ºc) {
+                if (!(ºc in ºthat.ºcountry)) {
+                    ºe.preventDefault();
                 }
             },
-            onRegionSelected: function(e, c, i, sel) {
-                if (that.changeState) {
-                    that.comp.state.setstate(`m_${sc}`, that._a_to_str(sel));
+            onRegionSelected: function(ºe, ºc, ºi, ºsel) {
+                if (ºthat.ºchangeState) {
+                    ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_a_to_str(ºsel));
                 }
             },
         });
-        this._map[sc] = this._mapc[sc].vectorMap('get', 'mapObject');
-        this._map[sc].setFocus({regions: this.countries});
-        this._map[sc].setFocus({regions: [`GB`, `GR`]});
-        this._list[sc].find(`.ctrls`).click(function(e) {e.preventDefault();
-            var cd = $(this).attr(`cd`);
-            var ison = $(this).hasClass(`ison`);
-            var sel = that._from_str(that.comp.state.getstate(`m_${sc}`));
-            sel[cd] = !ison;
-            that.comp.state.setstate(`m_${sc}`, that._to_str(sel));
+        this.º_map[ºsc] = this.º_mapc[ºsc].vectorMap('get', 'mapObject');
+        this.º_map[ºsc].setFocus({regions: [`GB`, `GR`]});
+        this.º_list[ºsc].find(`.ctrls`).click(function(ºe) {ºe.preventDefault();
+            var ºcd = $(this).attr(`cd`);
+            var ºison = $(this).hasClass(`ison`);
+            var ºsel = ºthat.º_from_str(ºthat.ºcomp.ºstate.ºgetstate(`m_${ºsc}`));
+            ºsel[ºcd] = !ºison;
+            ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºsel));
         });
-        this._allc[sc] = this.comp.container[sc].find(`#m_all_${sc}`);
-        this._allc[sc].click(function(e) {e.preventDefault();
-            var ison = $(this).hasClass(`ison`);
-            if (ison) {
-                that.comp.state.setstate(`m_${sc}`, that._to_str(that.country_off));
+        this.º_allc[ºsc] = this.ºcomp.ºcontainer[ºsc].find(`#m_all_${ºsc}`);
+        this.º_allc[ºsc].click(function(ºe) {ºe.preventDefault();
+            var ºison = $(this).hasClass(`ison`);
+            if (ºison) {
+                ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºthat.ºcountry_off));
             }
             else {
-                that.comp.state.setstate(`m_${sc}`, that._to_str(that.country_on));
+                ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºthat.ºcountry_on));
             }
         });
     },
-    _set_flt: function(sc, rgs) {
-        var that = this;
-        if (rgs == null || rgs == undefined || rgs == '') {rgs = this._from_str(``)}
-        this.changeState = false;
+    º_set_flt: function(ºsc, ºrgs) {
+        var ºthat = this;
+        if (ºrgs == null || ºrgs == undefined || ºrgs == '') {ºrgs = this.º_from_str(``)}
+        this.ºchangeState = false;
         //Cyprus is not on the map, we delete its key if present and reinsert it afterwards
-        //We do show Cyprus in the list
-        var sv = {};
-        for (var cnm in this.not_mapped) {
-            if (cnm in rgs) {
-                sv[cnm] = rgs[cnm];
-                delete rgs[cnm];
+        //We do ºshow Cyprus in the list
+        var ºsv = {};
+        for (var ºcnm in this.ºnot_mapped) {
+            if (ºcnm in ºrgs) {
+                ºsv[ºcnm] = ºrgs[ºcnm];
+                delete ºrgs[ºcnm];
             }
         }
-        this._map[sc].setSelectedRegions(rgs);
-        for (var cnm in sv) {
-            rgs[cnm] = sv[cnm];
+        this.º_map[ºsc].setSelectedRegions(ºrgs);
+        for (var ºcnm in ºsv) {
+            ºrgs[ºcnm] = ºsv[ºcnm];
         }
-        this.changeState = true;
-        var all_sel = true;
-        for (var cd in this.country) {
-            var ccell = this._list[sc].find(`a[cd="${cd}"]`);
-            if (cd in rgs && rgs[cd]) {
-                ccell.addClass(`ison`);
+        this.ºchangeState = true;
+        var ºall_sel = true;
+        for (var ºcd in this.ºcountry) {
+            var ºccell = this.º_list[ºsc].find(`a[cd="${ºcd}"]`);
+            if (ºcd in ºrgs && ºrgs[ºcd]) {
+                ºccell.addClass(`ison`);
             }
             else {
-                ccell.removeClass(`ison`);
-                all_sel = false;
+                ºccell.removeClass(`ison`);
+                ºall_sel = false;
             }
         }
-        if (all_sel) {
-            this._allc[sc].addClass(`ison`);
+        if (ºall_sel) {
+            this.º_allc[ºsc].addClass(`ison`);
         }
         else {
-            this._allc[sc].removeClass(`ison`);
+            this.º_allc[ºsc].removeClass(`ison`);
         }
-
     },
-    _a_to_str: function(ar) {
-        return ar.join(',');
+    º_a_to_str: function(ºar) {
+        return ºar.join(',');
     },
-    _to_str: function(ob) {
-        var ar = [];
-        for (var x in ob) {
-            if (ob[x]) {
-                ar.push(x);
+    º_to_str: function(ºob) {
+        var ºar = [];
+        for (var ºx in ºob) {
+            if (ºob[ºx]) {
+                ºar.push(ºx);
             }
         }
-        return ar.join(',');
+        return ºar.join(',');
     },
-    _from_str: function(st) {
-        var ob = {};
-        if (st !== null && st != undefined && st != '') {
-            var ar = st.split(',');
-            for (var i in ar) {
-                ob[ar[i]] = true;
+    º_from_str: function(ºst) {
+        var ºob = {};
+        if (ºst !== null && ºst != undefined && ºst != '') {
+            var ºar = ºst.split(',');
+            for (var ºi in ºar) {
+                ºob[ºar[ºi]] = true;
             }
         }
-        for (var cd in this.country) {
-            if (!(cd in ob)) {
-                ob[cd] = false;
+        for (var ºcd in this.ºcountry) {
+            if (!(ºcd in ºob)) {
+                ºob[ºcd] = false;
             }
         }
-        return ob;
+        return ºob;
     },
-    stats: function(sc) {
-        var that = this;
-        this._sts[sc] = {};
-        for (var cd in this.country) {
-            this._sts[sc][cd] = 0;
+    ºstats: function(ºsc) {
+        var ºthat = this;
+        this.º_sts[ºsc] = {};
+        for (var ºcd in this.ºcountry) {
+            this.º_sts[ºsc][ºcd] = 0;
         } 
-        for (var x in this.fltd[sc]) {
-            var i = this.fltd[sc][x];
-            var cd = this._data[sc][i][2];
-            this._sts[sc][cd] += 1;
+        for (var ºx in this.ºfltd[ºsc]) {
+            var ºi = this.ºfltd[ºsc][ºx];
+            var ºcd = this.º_data[ºsc][ºi][2];
+            this.º_sts[ºsc][ºcd] += 1;
         }
-        var total = this.fltd[sc].length;
-        if (total == 0) {total = 1}
-        for (var cd in this._sts[sc]) {
-            this.comp.container[sc].find(`span[cd="${cd}"].stats`).html(this._sts[sc][cd]);
+        var ºtotal = this.ºfltd[ºsc].length;
+        if (ºtotal == 0) {ºtotal = 1}
+        for (var ºcd in this.º_sts[ºsc]) {
+            this.ºcomp.ºcontainer[ºsc].find(`span[cd="${ºcd}"].stats`).html(this.º_sts[ºsc][ºcd]);
         }
-        var wsts = {};
-        for (var cd in this._sts[sc]) {
-            var pr = 100 * this._sts[sc][cd] / total;
-            wsts[cd] = (total < 10)?pr:(10*Math.sqrt(pr));
+        var ºwsts = {};
+        for (var ºcd in this.º_sts[ºsc]) {
+            var ºpr = 100 * this.º_sts[ºsc][ºcd] / ºtotal;
+            ºwsts[ºcd] = (ºtotal < 10)?ºpr:(10*Math.sqrt(ºpr));
         }
-        this._map[sc].series.markers[0].setValues(wsts);
-        this.comp.container[sc].find(`span[cd="_all"].stats`).html(this.fltd[sc].length);
+        this.º_map[ºsc].series.markers[0].setValues(ºwsts);
+        this.ºcomp.ºcontainer[ºsc].find(`span[cd="_all"].stats`).html(this.ºfltd[ºsc].length);
     },
-    v: function(sc, i) {
-        var cd =  this._data[sc][i][2];
-        var mstate = this._from_str(this.mstate[sc]);
-        return (cd in mstate) && mstate[cd];
+    ºv: function(ºsc, ºi) {
+        var ºcd =  this.º_data[ºsc][ºi][2];
+        var ºmstate = this.º_from_str(this.ºmstate[ºsc]);
+        return (ºcd in ºmstate) && ºmstate[ºcd];
     },
-    show: function(sc) {
-        return (this.comp.state.getstate(`list`) == sc) && (sc in this.enabled);
+    ºshow: function(ºsc) {
+        return (this.ºcomp.ºstate.ºgetstate(`list`) == ºsc);
     },
-    weld: function(sc) {
-        if (sc in this.enabled) {
-            this.facet.add_facet(sc, this);
-            this._html(sc);
-            this._dressup(sc);
-        }
+    ºweld: function(ºsc) {
+        this.º_html(ºsc);
     },
-    wire: function(sc) {
-        if (!this.comp._loaded[sc]) {
-            this.comp._loaded[sc] = true;
-            this._data[sc] = this.comp.page.getcomp(`list`).data[sc];
-        }
+    ºwire: function(ºsc) {
+        this.º_dressup(ºsc);
     },
-    work: function(sc) {
-        if (sc in this.enabled) {
-            if (this.show(sc)) {
-                this.comp.container[sc].show();
-            }
-            else {
-                this.comp.container[sc].hide();
-            }
-        }
+    ºwire_flt: function(ºsc) {
+        this.º_data[ºsc] = this.ºcomp.ºpage.ºgetcomp(`list`).ºdata[ºsc];
     },
-    work_flt: function(sc) {
-        this.mstate[sc] = this.comp.state.getstate(`m_${sc}`);
-        this._set_flt(sc, this._from_str(this.mstate[sc]));
+    ºwork: function(ºsc) {},
+    ºwork_flt: function(ºsc) {
+        this.ºmstate[ºsc] = this.ºcomp.ºstate.ºgetstate(`m_${ºsc}`);
+        this.º_set_flt(ºsc, this.º_from_str(this.ºmstate[ºsc]));
     },
 };

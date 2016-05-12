@@ -5,8 +5,6 @@
 
 function Facet(comp) {
     this.comp = comp;
-    this._loaded = {};
-    this._facets = {};
     this._stats = {};
     this.data = {};
     this.table = {};
@@ -19,18 +17,41 @@ Facet.prototype = {
         h += `<p class="facet">Filtering <span id="fstats_${sc}"></span></p>`;
         this.comp.container[sc].html(h);
     },
-    _do_all: function(mth, sc) {
-        for (var i in this._facets[sc]) {
-            var fct = this._facets[sc][i];
-            fct[mth](sc);
-        }
+    _wire_flt: function(sc) {
+        var cc = this.comp.container[sc];
+        var lc = this.comp.µpage.getcomp(`list`).container[sc];
+        this._stats[sc] = cc.find(`#fstats_${sc}`);
+        this.table[sc] =  lc.find(`#table_${sc}`);
+        var detailcontrols = `<a class="showc fa fa-chevron-right" href="#" title="Show details"></a><a class="hidec fa fa-chevron-down" href="#" title="Hide details"></a>`;
+        cc.find(`p.dctrl`).each(function() {
+            var orig = $(this).html();
+            $(this).html(`${detailcontrols}&nbsp;${orig}`);
+        });
+        cc.find(`p.dctrl`).closest(`div`).find(`table,.flt`).show();
+        cc.find(`.hidec`).show();
+        cc.find(`.showc`).hide();
+        cc.find(`.hidec`).click(function(e) {e.preventDefault();
+            var dt = $(this).closest(`p`);
+            var dd = $(this).closest(`div`).find(`table,.flt`);
+            dd.hide();
+            dt.find(`.hidec`).hide();
+            dt.find(`.showc`).show();
+        });
+        cc.find(`.showc`).click(function(e) {e.preventDefault();
+            var dt = $(this).closest(`p`);
+            var dd = $(this).closest(`div`).find(`table,.flt`);
+            dd.show();
+            dt.find(`.hidec`).show();
+            dt.find(`.showc`).hide();
+        });
     },
     _work_flt: function(sc) {
+        console.log(this.table[sc].find(`tr[id]`));
         this.table[sc].find(`tr[id]`).hide();
-        var data = this.comp.page.getcomp(`list`).data[sc];
+        var data = this.comp.µpage.getcomp(`list`).data[sc];
         this.fltd[sc] = [];
-        for (var j in this._facets[sc]) {
-            var fct = this._facets[sc][j];
+        for (var fn in this.children) {
+            var fct = this.children[fn].delg;
             fct.fltd[sc] = [];
         }
         for (var i in data) {
@@ -44,14 +65,14 @@ Facet.prototype = {
  */
             var the_false = null; // which facet has yielded false (if there are more than one we'll discard the row
             var discard = false; // becomes true when we have encounterd 2 facets that yield false
-            for (var j in this._facets[sc]) {
+            for (var fn in this.children) {
                 if (!discard) {
-                    var fct = this._facets[sc][j];
-                    var tv = fct.v(sc, i); // tv: whether the row passes this facet
+                    var fc = this.children[fn];
+                    var tv = fc.delg.v(sc, i); // tv: whether the row passes this facet
                     if (!tv) {
                         v = false;
                         if (the_false == null) { // this is the first failure, we store the facet number in the_false
-                            the_false = j;
+                            the_false = fc;
                         } // else we discard the row altogether
                         else {
                             discard = true;
@@ -65,79 +86,48 @@ Facet.prototype = {
                     this.table[sc].find(`tr[id="r${data[i][0]}"]`).show();
                 }
                 if (the_false != null) {
-                    var fct = this._facets[sc][the_false];
+                    var fct = the_false.delg;
                     fct.fltd[sc].push(i);
                 }
                 else {
-                    for (var j in this._facets[sc]) {
-                        var fct = this._facets[sc][j];
+                    for (var fn in this.children) {
+                        var fct = this.children[fn].delg;
                         fct.fltd[sc].push(i);
                     }
                 }
             }
         }
-        for (var j in this._facets[sc]) {
-            var fct = this._facets[sc][j];
+        for (var fn in this.children) {
+            var fct = this.children[fn].delg;
             fct.stats(sc);
         }
         this._stats[sc].html(`${this.fltd[sc].length} of ${data.length}`);
-    },
-    add_facet: function(sc, fct) {
-        if (this._facets[sc] == undefined) {
-            this._facets[sc] = [];
-        }
-        this._facets[sc].push(fct);
     },
     show: function(sc) {
         return this.comp.state.getstate(`list`) == sc;
     },
     weld: function(sc) {
+        this.children = this.comp.children;
         this._html(sc);
-        this._loaded[sc] = false;
-        this._facets[sc] = [];
-        this._stats[sc] = $(`#fstats_${sc}`);
     },
     wire: function(sc) {
-        this.table[sc] =  $(`#table_${sc}`);
-        if (!this._loaded[sc]) {
-            this.data[sc] = this.comp.page.getcomp(`list`).data[sc];
-            this._do_all(`wire`, sc);
-            this._loaded[sc] = true;
-            var detailcontrols = `<a class="showc fa fa-chevron-right" href="#" title="Show details"></a><a class="hidec fa fa-chevron-down" href="#" title="Hide details"></a>`;
-            $(`p.dctrl`).each(function() {
-                var orig = $(this).html();
-                $(this).html(`${detailcontrols}&nbsp;${orig}`);
-            });
-            $(`p.dctrl`).closest(`div`).find(`table,.flt`).show();
-            $(`.hidec`).show();
-            $(`.showc`).hide();
-            $(`.hidec`).click(function(e) {e.preventDefault();
-                var dt = $(this).closest(`p`);
-                var dd = $(this).closest(`div`).find(`table,.flt`);
-                dd.hide();
-                dt.find(`.hidec`).hide();
-                dt.find(`.showc`).show();
-            });
-            $(`.showc`).click(function(e) {e.preventDefault();
-                var dt = $(this).closest(`p`);
-                var dd = $(this).closest(`div`).find(`table,.flt`);
-                dd.show();
-                dt.find(`.hidec`).show();
-                dt.find(`.showc`).hide();
-            });
+        console.log(`IN WIRE FACET DELG SHOW = ${this.show(sc)}`)
+        if (this.show(sc)) {
+            console.log(this.children);
+            for (var fn in this.children) {
+                var fct = this.children[fn].delg;
+                fct.wire_flt(sc);
+            }
+            this._wire_flt(sc);
         }
     },
     work: function(sc) {
         if (this.show(sc)) {
-            this.comp.container[sc].show();
-            for (var j in this._facets[sc]) {
-                var fct = this._facets[sc][j];
+            for (var fn in this.children) {
+                var fct = this.children[fn].delg;
                 fct.work_flt(sc);
             }
             this._work_flt(sc);
-        }
-        else {
-            this.comp.container[sc].hide();
         }
     },
 };

@@ -6,14 +6,14 @@
 function EUmap(comp) {
     this.comp = comp;
     this.name = `eumap`;
-    this.facet = this.comp.page.getcomp(`facet`).delg;
-    this.enabled = {contrib: 1};
+    this.facet = this.comp.µpage.getcomp(`facet`).delg;
+    this.disabled = {country: true};
     this._map = {};
     this._mapc = {};
     this._list = {};
     this.fltd = {};
     this.mstate = {};
-    this._data = {};
+    this._µdata = {};
     this._allc = {};
     this._sts = {};
     this._all_countries = { // the boolean tells whether the country is in DARIAH
@@ -109,12 +109,14 @@ EUmap.prototype = {
             h += `<td><span cd="${cd}" class="stats"></span></td><td><a cd="${cd}" href="#" class="ctrls">${cn}</a></td>`;
         }
         h += `</tr></table></div>`;
+        console.log(`HTML eumap ${sc}`, this.comp.container);
         this.comp.container[sc].html(h);
     },
     _dressup: function(sc) {
         var that = this;
-        this._mapc[sc] = $(`#map-europe_${sc}`);
-        this._list[sc] = $(`#list-europe_${sc}`);
+        var cc = this.comp.container[sc];
+        this._mapc[sc] = cc.find(`#map-europe_${sc}`);
+        this._list[sc] = cc.find(`#list-europe_${sc}`);
         this._mapc[sc].width(`100%`);
         this._mapc[sc].height(this._mapc[sc].width()*0.6);
         this._mapc[sc].vectorMap({
@@ -254,7 +256,6 @@ EUmap.prototype = {
         else {
             this._allc[sc].removeClass(`ison`);
         }
-
     },
     _a_to_str: function(ar) {
         return ar.join(',');
@@ -291,7 +292,7 @@ EUmap.prototype = {
         } 
         for (var x in this.fltd[sc]) {
             var i = this.fltd[sc][x];
-            var cd = this._data[sc][i][2];
+            var cd = this._µdata[sc][i][2];
             this._sts[sc][cd] += 1;
         }
         var total = this.fltd[sc].length;
@@ -308,36 +309,23 @@ EUmap.prototype = {
         this.comp.container[sc].find(`span[cd="_all"].stats`).html(this.fltd[sc].length);
     },
     v: function(sc, i) {
-        var cd =  this._data[sc][i][2];
+        var cd =  this._µdata[sc][i][2];
         var mstate = this._from_str(this.mstate[sc]);
         return (cd in mstate) && mstate[cd];
     },
     show: function(sc) {
-        return (this.comp.state.getstate(`list`) == sc) && (sc in this.enabled);
+        return (this.comp.state.getstate(`list`) == sc) && (!((sc in this.disabled) && this.disabled[sc]));
     },
     weld: function(sc) {
-        if (sc in this.enabled) {
-            this.facet.add_facet(sc, this);
-            this._html(sc);
-            this._dressup(sc);
-        }
+        this._html(sc);
     },
     wire: function(sc) {
-        if (!this.comp._loaded[sc]) {
-            this.comp._loaded[sc] = true;
-            this._data[sc] = this.comp.page.getcomp(`list`).data[sc];
-        }
+        this._dressup(sc);
     },
-    work: function(sc) {
-        if (sc in this.enabled) {
-            if (this.show(sc)) {
-                this.comp.container[sc].show();
-            }
-            else {
-                this.comp.container[sc].hide();
-            }
-        }
+    wire_flt: function(sc) {
+        this._µdata[sc] = this.comp.µpage.getcomp(`list`).data[sc];
     },
+    work: function(sc) {},
     work_flt: function(sc) {
         this.mstate[sc] = this.comp.state.getstate(`m_${sc}`);
         this._set_flt(sc, this._from_str(this.mstate[sc]));

@@ -2,42 +2,42 @@
  * Some function for very generic purposes
  */
 
-var escapeHTML = (function () {
+var ºescapeHTML = (function () {
     `use strict`;
-    var chr = {
+    var ºchr = {
         '&': `&amp;`, '<': `&lt;`,  '>': `&gt;`
     };
-    return function (text) {
-        return text.replace(/[&<>]/g, function (a) { return chr[a]; });
+    return function (ºtext) {
+        return ºtext.replace(/[&<>]/g, function (ºa) { return ºchr[ºa]; });
     };
 }());
 
 var Request = {
-    parameter: function(name) {
-        return this.parameters()[name];
+    ºparameter: function(ºname) {
+        return this.ºparameters()[ºname];
     },
-    parameters: function(uri) {
-        var i, parameter, params, query, result;
-        result = {};
-        if (!uri) {
-            uri = window.location.search;
+    ºparameters: function(ºuri) {
+        var ºi, ºparameter, ºparams, ºquery, ºresult;
+        ºresult = {};
+        if (!ºuri) {
+            ºuri = window.location.search;
         }
-        if (uri.indexOf("?") === -1) {
+        if (ºuri.indexOf("?") === -1) {
             return {};
         }
-        query = uri.slice(1);
-        params = query.split("&");
-        i = 0;
-        while (i < params.length) {
-            parameter = params[i].split("=");
-            result[parameter[0]] = parameter[1];
-            i++;
+        ºquery = ºuri.slice(1);
+        ºparams = ºquery.split("&");
+        ºi = 0;
+        while (ºi < ºparams.length) {
+            ºparameter = ºparams[ºi].split("=");
+            ºresult[ºparameter[0]] = ºparameter[1];
+            ºi++;
         }
-        return result;
+        return ºresult;
     }
 };
 
-var rvars = Request.parameters();
-var nslvars = $.initNamespaceStorage(`req`);
-var lvars = nslvars.localStorage;
+var ºrvars = Request.ºparameters();
+var ºnslvars = $.initNamespaceStorage(`req`);
+var ºlvars = ºnslvars.localStorage;
 
