@@ -83,10 +83,10 @@ function ºEUmap(ºcomp) {
             if (ºcprop.length > 3) {
                 this.ºmarker[ºcd] = {latLng: [ºcprop[2], ºcprop[3]], ºname: ºcprop[0]};
             }
-            this.ºsetvalues[ºcd] = `indariah`;
+            this.ºsetvalues[ºcd] = 'ºindariah';
         }
         else {
-            this.ºsetvalues[ºcd] = `outdariah`;
+            this.ºsetvalues[ºcd] = 'ºoutdariah';
         }
     }
     this.ºcountries.sort();
@@ -97,7 +97,7 @@ function ºEUmap(ºcomp) {
         var ºcols = 2;
         var ºh = `<div><p class="dctrl">By country</p>`;
         ºh += `<div id="map-europe_${ºsc}"></div>
-<p class="all"><span cd="_all" class="stats"></span> <a id="m_all_${ºsc}" href="#" class="ctrls">all DARIAH</a></p>
+<p class="all"><span cd="_all" class="stats"></span> <a id="m_all_${ºsc}" href="#" class="•control_small">all DARIAH</a></p>
 <table class="clist" id="list-europe_${ºsc}"><tr>`;
         for (var ºi in this.ºcountries) {
             if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < this.ºcountries.length)) {
@@ -105,7 +105,7 @@ function ºEUmap(ºcomp) {
             }
             var ºcd = this.ºcountries[ºi];
             var ºcn = this.ºcountry[ºcd];
-            ºh += `<td><span cd="${ºcd}" class="stats"></span></td><td><a cd="${ºcd}" href="#" class="ctrls">${ºcn}</a></td>`;
+            ºh += `<td><span cd="${ºcd}" class="stats"></span></td><td><a cd="${ºcd}" href="#" class="•control_small">${ºcn}</a></td>`;
         }
         ºh += `</tr></table></div>`;
         this.ºcomp.ºcontainer[ºsc].html(ºh);
@@ -119,7 +119,7 @@ function ºEUmap(ºcomp) {
         this.º_mapc[ºsc].width(`100%`);
         this.º_mapc[ºsc].height(this.º_mapc[ºsc].width()*0.6);
         this.º_mapc[ºsc].vectorMap({
-            map: `europe_mill`,
+            'map': `europe_mill`,
             backgroundColor: `#ccccff`,
             regionsSelectable: true,
             regionsSelectableOne: false,
@@ -178,8 +178,8 @@ function ºEUmap(ºcomp) {
                 }],
                 regions: [{
                         scale: {
-                            outdariah: `#ffffff`,
-                            indariah: `#ffeedd`,
+                            'ºoutdariah': `#ffffff`,
+                            'ºindariah': `#ffeedd`,
                         },
                         attribute: `fill`,
                         values: ºthat.ºsetvalues,
@@ -201,16 +201,16 @@ function ºEUmap(ºcomp) {
         });
         this.º_map[ºsc] = this.º_mapc[ºsc].vectorMap('get', 'mapObject');
         this.º_map[ºsc].setFocus({regions: [`GB`, `GR`]});
-        this.º_list[ºsc].find(`.ctrls`).click(function(ºe) {ºe.preventDefault();
+        this.º_list[ºsc].find(`.•control_small`).click(function(ºe) {ºe.preventDefault();
             var ºcd = $(this).attr(`cd`);
-            var ºison = $(this).hasClass(`ison`);
+            var ºison = $(this).hasClass(`•ison`);
             var ºsel = ºthat.º_from_str(ºthat.ºcomp.ºstate.ºgetstate(`m_${ºsc}`));
             ºsel[ºcd] = !ºison;
             ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºsel));
         });
         this.º_allc[ºsc] = this.ºcomp.ºcontainer[ºsc].find(`#m_all_${ºsc}`);
         this.º_allc[ºsc].click(function(ºe) {ºe.preventDefault();
-            var ºison = $(this).hasClass(`ison`);
+            var ºison = $(this).hasClass(`•ison`);
             if (ºison) {
                 ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºthat.ºcountry_off));
             }
@@ -241,18 +241,18 @@ function ºEUmap(ºcomp) {
         for (var ºcd in this.ºcountry) {
             var ºccell = this.º_list[ºsc].find(`a[cd="${ºcd}"]`);
             if (ºcd in ºrgs && ºrgs[ºcd]) {
-                ºccell.addClass(`ison`);
+                ºccell.addClass(`•ison`);
             }
             else {
-                ºccell.removeClass(`ison`);
+                ºccell.removeClass(`•ison`);
                 ºall_sel = false;
             }
         }
         if (ºall_sel) {
-            this.º_allc[ºsc].addClass(`ison`);
+            this.º_allc[ºsc].addClass(`•ison`);
         }
         else {
-            this.º_allc[ºsc].removeClass(`ison`);
+            this.º_allc[ºsc].removeClass(`•ison`);
         }
     },
     º_a_to_str: function(ºar) {

@@ -1,0 +1,50 @@
+/* PAGE LAYOUT */
+
+a {
+    color: #d45510;
+    text-decoration: none;
+}
+a:active, a:hover: {
+    color: #d45510;
+    text-decoration: underline;
+}
+.page-header {
+    margin: 20pt 0 10pt 0;
+}
+.mastheader {
+    display: none;
+}
+.github img {
+    margin: 0 10pt 0 0;
+}
+.github:last-child img {
+    margin: 0;
+}
+a.github {
+    text-decoration: none;
+}
+.logos {
+    text-align: center;
+    margin-bottom: -100pt;
+    margin-top: 12pt;
+}
+ul.text {
+    list-style-type: disc;
+}
+
+ol.text {
+    list-style-type: decimal;
+}
+
+.lbar {
+    height: 60px;
+}
+
+#middle, #left, #right {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+#middle, .clist td {
+    vertical-align: top;
+}
+

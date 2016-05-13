@@ -11,7 +11,7 @@ function ºControl(ºcomp) {
 
 ºControl.prototype = {
     º_html: function(ºsc) {
-        this.ºcomp.ºcontainer[ºsc].html(`<a class="ctrl radio" href="#">${this.ºcomp.ºstate.ºshowstate('list', ºsc, 'ºsg')}</a> `);
+        this.ºcomp.ºcontainer[ºsc].html(`<a class="•control radio" href="#">${this.ºcomp.ºstate.ºshowstate('list', ºsc, 'ºsg')}</a> `);
     },
     º_dressup: function(ºsc) {
         var ºthat = this;
@@ -35,11 +35,11 @@ function ºControl(ºcomp) {
     },
     ºwork: function(ºsc) {
         if (this.º_is_active(ºsc)) {
-            this.ºctl[ºsc].addClass(`ison`);
+            this.ºctl[ºsc].addClass(`•ison`);
             this.ºwidget[ºsc].addClass(`isonn`);
         }
         else {
-            this.ºctl[ºsc].removeClass(`ison`);
+            this.ºctl[ºsc].removeClass(`•ison`);
             this.ºwidget[ºsc].removeClass(`isonn`);
         }
     }

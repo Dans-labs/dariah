@@ -12,7 +12,7 @@ var ºescapeHTML = (function () {
     };
 }());
 
-var Request = {
+var ºRequest = {
     ºparameter: function(ºname) {
         return this.ºparameters()[ºname];
     },
@@ -27,8 +27,7 @@ var Request = {
         }
         ºquery = ºuri.slice(1);
         ºparams = ºquery.split("&");
-        ºi = 0;
-        while (ºi < ºparams.length) {
+        for (var ºi in ºparams) {
             ºparameter = ºparams[ºi].split("=");
             ºresult[ºparameter[0]] = ºparameter[1];
             ºi++;
@@ -37,7 +36,7 @@ var Request = {
     }
 };
 
-var ºrvars = Request.ºparameters();
+var ºrvars = ºRequest.ºparameters();
 var ºnslvars = $.initNamespaceStorage(`req`);
 var ºlvars = ºnslvars.localStorage;
 

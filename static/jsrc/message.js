@@ -20,7 +20,7 @@ function ºMsg(ºdst, ºon_clear) {
         this.º_dst.hide();
         this.º_trashp.hide();
     },
-    _show: function() {
+    º_show: function() {
         this.º_dst.show();
         if (this.º_dst.html() != ``) {
             this.º_trashp.show();
@@ -39,7 +39,7 @@ function ºMsg(ºdst, ºon_clear) {
         }
         var ºmtext = this.º_dst.html();
         this.º_dst.html(`${ºmtext}<p class="${ºkind}">${ºtext}</p>`);
-        this._show();
+        this.º_show();
     },
 };
 

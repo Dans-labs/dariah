@@ -23,7 +23,7 @@ function ºCType(ºcomp) {
     º_html: function(ºsc) {
         var ºcols = 2;
         var ºh = `<div><p class="dctrl">By type</p>`;
-        ºh += `<p class="all"><span ti="_all" class="stats"></span> <a id="t_all_${ºsc}" href="#" class="ctrls">all types</a></p>
+        ºh += `<p class="all"><span ti="_all" class="stats"></span> <a id="t_all_${ºsc}" href="#" class="•control_small">all types</a></p>
 <table class="clist" id="list-ctype_${ºsc}"><tr>`;
         for (var ºi in this.ºtypes[ºsc]) {
             if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < this.ºtypes[ºsc].length)) {
@@ -31,7 +31,7 @@ function ºCType(ºcomp) {
             }
             var ºti = this.ºtypes[ºsc][ºi];
             var ºtv = this.ºtype[ºsc][ºti];
-            ºh += `<td><span ti="${ºti}" class="stats"></span></td><td><a ti="${ºti}" href="#" class="ctrls">${ºtv}</a></td>`;
+            ºh += `<td><span ti="${ºti}" class="stats"></span></td><td><a ti="${ºti}" href="#" class="•control_small">${ºtv}</a></td>`;
         }
         ºh += `</tr></table></div>`;
         this.ºcomp.ºcontainer[ºsc].html(ºh);
@@ -39,16 +39,16 @@ function ºCType(ºcomp) {
     º_dressup: function(ºsc) {
         var ºthat = this;
         this.º_list[ºsc] = $(`#list-ctype_${ºsc}`);
-        this.º_list[ºsc].find(`.ctrls`).click(function(ºe) {ºe.preventDefault();
+        this.º_list[ºsc].find(`.•control_small`).click(function(ºe) {ºe.preventDefault();
             var ºti = $(this).attr(`ti`);
-            var ºison = $(this).hasClass(`ison`);
+            var ºison = $(this).hasClass(`•ison`);
             var ºsel = ºthat.º_from_str(ºthat.ºcomp.ºstate.ºgetstate(`t_${ºsc}`));
             ºsel[ºti] = !ºison;
             ºthat.ºcomp.ºstate.ºsetstate(`t_${ºsc}`, ºthat.º_to_str(ºsel));
         });
         this.º_allc[ºsc] = this.ºcomp.ºcontainer[ºsc].find(`#t_all_${ºsc}`);
         this.º_allc[ºsc].click(function(ºe) {ºe.preventDefault();
-            var ºison = $(this).hasClass(`ison`);
+            var ºison = $(this).hasClass(`•ison`);
             if (ºison) {
                 ºthat.ºcomp.ºstate.ºsetstate(`t_${ºsc}`, ºthat.º_to_str(ºthat.ºtype_off[ºsc]));
             }
@@ -64,25 +64,25 @@ function ºCType(ºcomp) {
         for (var ºti in this.ºtype[ºsc]) {
             var ºccell = this.º_list[ºsc].find(`a[ti="${ºti}"]`);
             if (ºti in ºrgs && ºrgs[ºti]) {
-                ºccell.addClass(`ison`);
+                ºccell.addClass(`•ison`);
             }
             else {
-                ºccell.removeClass(`ison`, ºccell);
+                ºccell.removeClass(`•ison`, ºccell);
                 ºall_sel = false;
             }
         }
         if (ºall_sel) {
-            this.º_allc[ºsc].addClass(`ison`);
+            this.º_allc[ºsc].addClass(`•ison`);
         }
         else {
-            this.º_allc[ºsc].removeClass(`ison`);
+            this.º_allc[ºsc].removeClass(`•ison`);
         }
     },
     º_to_str: function(ºob) {
         var ºar = [];
-        for (var x in ºob) {
-            if (ºob[x]) {
-                ºar.push(x);
+        for (var ºx in ºob) {
+            if (ºob[ºx]) {
+                ºar.push(ºx);
             }
         }
         return ºar.join(',');
@@ -103,8 +103,8 @@ function ºCType(ºcomp) {
         for (var ºti in this.ºtype[ºsc]) {
             this.º_sts[ºsc][ºti] = 0;
         } 
-        for (var x in this.ºfltd[ºsc]) {
-            var ºi = this.ºfltd[ºsc][x];
+        for (var ºx in this.ºfltd[ºsc]) {
+            var ºi = this.ºfltd[ºsc][ºx];
             var ºtis = this.º_data[ºsc][ºi][3];
             for (var ºti in ºtis) {
                 this.º_sts[ºsc][ºti] += 1;

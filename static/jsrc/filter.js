@@ -25,7 +25,7 @@ function ºFilter(ºcomp) {
         ºh += `<div class="flt" id="fltw_${ºsc}">`;
         ºh += `<p id="fbox_${ºsc}" class="fbox ui-ºwidget">`;
         ºh += `<input id="flt_${ºsc}" class="flt"/>`;
-        ºh += `<a href="#" class="ctrl fa fa-close filtc" id="clearf_${ºsc}"></a>`;
+        ºh += `<a href="#" class="•control fa fa-close filtc" id="clearf_${ºsc}"></a>`;
         ºh += `<span class="stats" id="stats_${ºsc}"></span>&nbsp;`;
         ºh += `</p>`;
         ºh += `<div id="autoc_${ºsc}" style="display: none;">here ${ºsc}</div>`;
@@ -41,15 +41,15 @@ function ºFilter(ºcomp) {
     º_work_ctl: function(ºsc) {
         var ºtextf = this.ºfltc[ºsc].val();
         if (ºtextf == ``) {
-            this.ºboxf[ºsc].removeClass(`ison`);
+            this.ºboxf[ºsc].removeClass(`•ison`);
             this.ºclearf[ºsc].hide();
         }
         else {
-            this.ºboxf[ºsc].addClass(`ison`);
+            this.ºboxf[ºsc].addClass(`•ison`);
             this.ºclearf[ºsc].show();
         }
     },
-    _response: function(ºsc) {
+    º_response: function(ºsc) {
         var ºthat = this;
         return function(ºevent, ºui) {
             ºthat.º_flted[ºsc] = {};
@@ -87,7 +87,7 @@ function ºFilter(ºcomp) {
         this.ºfltc[ºsc].autocomplete({
             appendTo: this.ºautoc[ºsc],
             source: this.ºtags[ºsc],
-            response: this._response(ºsc),
+            response: this.º_response(ºsc),
             minLength: 0,
         });
         this.ºwire_mode[ºsc] = true;

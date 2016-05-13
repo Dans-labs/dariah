@@ -38,7 +38,7 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
     this.ºwork_first = ºwork_first;
     this.ºspecific = ºspecific;
     this.º_stage = {};
-    this.º_stages = {fetch: true, ºwire: true, ºwork: false}; // true means: once only, ºwork means: my be repeated
+    this.º_stages = {ºfetch: true, ºwire: true, ºwork: false}; // true means: once only, ºwork means: my be repeated
     this.ºpage = ºpage;
     /* after creation, the creator is responsible to add ºparent and ºchildren fields
      * ºthat specify the ºparent-child relations based on the routing table.
@@ -184,7 +184,7 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
     ºwire: function(ºsc) { // ºwire after fetching
         if (this.ºhas_scomp(ºsc) && this.ºdelg.ºshow(ºsc)) { // ºshow/hide depending on the ºspecific condition
             ºnow(
-                this.ºensure(ºsc, `fetch`, `º_fetch`)
+                this.ºensure(ºsc, `ºfetch`, `º_fetch`)
             ).then(
                 this.ºensure(ºsc, `ºwire`, `º_wire`)
             );
@@ -194,7 +194,7 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
         var ºthat = this;
         if (this.ºhas_scomp(ºsc) && this.ºdelg.ºshow(ºsc)) { // ºshow/hide depending on the ºspecific condition
             ºnow(
-                this.ºensure(ºsc, `fetch`, `º_fetch`)
+                this.ºensure(ºsc, `ºfetch`, `º_fetch`)
             ).then(
                 this.ºensure(ºsc, `ºwire`, `º_wire`)
             ).then(

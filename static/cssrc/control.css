@@ -1,0 +1,37 @@
+/* CONTROL */
+
+.•control {
+    border-radius: 6pt;
+    border: 1pt solid #dde6dd;
+    background-color: #fafffa;
+    padding: 2pt;
+}
+.•control_small {
+    font-size: x-small;
+    border-radius: 2pt;
+    background-color: #fafffa;
+    padding: 0pt;
+}
+.radio.•ison {
+    font-weight: bold;
+    color: #1A3D6F;
+    background-color: #ffffdd;
+    border: 2pt solid #d3550f;
+}
+.•control_small.•ison {
+    font-weight: bold;
+    background-color: #dd8844;
+    color: #ffff00;
+}
+.isonn {
+    border-radius: 6pt;
+    background-color: #ffffdd;
+    border: 2pt solid #ffffdd;
+}
+.radio {
+    font-weight: normal;
+    background-color: #fafffa;
+    color: #aaaaaa;
+}
+
+
