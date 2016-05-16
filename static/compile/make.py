@@ -18,7 +18,7 @@ names = re.compile(r'([•º])([A-Za-z0-9_]+)')
 is_name = re.compile(r'^[A-Za-z0-9_]+$')
 nmspec = re.compile(r'^\s*«([^«]*)«([^»]*)»([^»]*)»\s*$')
 escape_strings = re.compile(r'`([^`]*)`')
-insert_strings = re.compile(r'•')
+insert_strings = re.compile(r'∞')
 code_in_strings = re.compile(r'\$\{([^}]*)\}')
 removestr = re.compile(r'''([`'"])(.*?)(\1)''')
 
@@ -126,11 +126,16 @@ x_lib_names_spec = '''
     «.«mabObject»x»
     «.«markers»x»
     «x«markers»:»
+    «x«markersSelectable»:»
+    «x«markersSelectableOne»:»
     «x«markerStyle»:»
     «x«max»:»
     «x«min»:»
     «x«minLength»:»
     «x«normalizeFunction»:»
+    «x«onMarkerClick»:»
+    «x«onMarkerSelected»:»
+    «x«onMarkerTipShow»:»
     «x«onRegionClick»:»
     «x«onRegionSelected»:»
     «x«onRegionTipShow»:»
@@ -151,6 +156,7 @@ x_lib_names_spec = '''
     «.«series».»
     «.«set»(»
     «x«setFocus»(»
+    «x«setSelectedMarkers»(»
     «x«setSelectedRegions»(»
     «x«setValues»(»
     «.«show»(»
@@ -177,6 +183,7 @@ x_app_names_spec = '''
     «x«contrib»:»
     «x«control»:»
     «x«country»:»
+    «.«country»x»
     «.«data»x»
     «x«f_contrib»:»
     «x«f_country»:»
@@ -320,7 +327,6 @@ def name_warn(txt, strings):
             namewarns.extend(collect_warn(cd))
 
     if len(namewarns):
-        msg('WARNING: Unprotected names:')
         nws_context = collections.defaultdict(lambda: collections.Counter())
         nws = collections.Counter()
         nws_c = collections.defaultdict(lambda: collections.Counter())
@@ -331,8 +337,8 @@ def name_warn(txt, strings):
         for (b, nw, e) in namewarns:
             all_b.add(b)
             all_e.add(e)
-            x = (b, nw, e) in x_names or ('x', nw, e) in x_names or (b, nw, 'x') in x_names or ('x', nw, 'x') in x_names or (b, '•', e) in x_names
-            i = (b, nw, e) in i_names or ('x', nw, e) in i_names or (b, nw, 'x') in i_names or ('x', nw, 'x') in i_names or (b, '•', e) in i_names
+            x = (b, nw, e) in x_names or ('x', nw, e) in x_names or (b, nw, 'x') in x_names or ('x', nw, 'x') in x_names
+            i = (b, nw, e) in i_names or ('x', nw, e) in i_names or (b, nw, 'x') in i_names or ('x', nw, 'x') in i_names
             if x and not i: continue
             match_pats = False
             for p in x_app_pats_c:
@@ -343,7 +349,7 @@ def name_warn(txt, strings):
             nws[nw] += 1
             nws_c[nw]['{}{}{}'.format(b,nw,e)] += 1
         for nw in sorted(nws):
-            msg('\t{:>3}x {}'.format(nws[nw], nw))
+            msg('WARNING: UNPROTECTED NAME\t{:>3}x {}'.format(nws[nw], nw))
             for c in sorted(nws_c[nw]):
                 msg('\t\t{:>3}x {}'.format(nws_c[nw][c], c))
         msg('{} WARNINGS'.format(len(nws)))
@@ -355,7 +361,7 @@ def dojs(txt, nmmap):
     i = -1
     def string_away(match):
         strings.append(match.group(1))
-        return '•'
+        return '∞'
 
     def string_back(match):
         nonlocal i
@@ -388,6 +394,9 @@ def dojs(txt, nmmap):
     return txt
 
 def docss(txt, nmmap):
+
+# in CSS files we allow «name» ≤value≥ definitions.
+# We remove all definitions, and replace in the remaining text every «name» by its defined value.
     defitems = {}
     def defs_repl(match):
         (name, value) = match.group(1,2)

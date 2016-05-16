@@ -11,85 +11,14 @@ function ºEUmap(ºcomp) {
     this.º_mapc = {};
     this.º_list = {};
     this.ºfltd = {};
-    this.ºmstate = {};
+    this.ºrstate = {};
     this.º_data = {};
+    this.º_relvals = {};
     this.º_allc = {};
     this.º_sts = {};
-    this.º_all_countries = { // the boolean tells whether the country is in DARIAH
-        AT: [`Austria`, true, 47.7, 15.11],
-        BE: [`Belgium`, true, 51.3, 3.1],
-        HR: [`Croatia`, true, 44.7, 15.6],
-        CY: [`Cyprus`, true, 35.0, 32.8],
-        CZ: [`Czech Republic`, true, 49.8, 15.2],
-        DK: [`Denmark`, true, 55.6, 11.0],
-        EE: [`Estonia`, true, 59.0, 25.0],
-        FR: [`France`, true, 46.5, 1.9],
-        DE: [`Germany`, true, 51.0, 10.4],
-        GR: [`Greece`, true, 38.0, 23.8],
-        HU: [`Hungary`, true, 46.9, 19.8],
-        IE: [`Ireland`, true, 53.1, -8.4],
-        IT: [`Italy`, true, 41.6, 13.0],
-        LV: [`Latvia`, true, 56.9, 26.8],
-        LT: [`Lithuania`, true, 55.2, 24.9],
-        LU: [`Luxembourg`, true, 49.6, 6.1],
-        MT: [`Malta`, true, 35.9, 14.4],
-        NL: [`Netherlands`, true, 52.8, 5.8],
-        PL: [`Poland`, true, 52.3, 19.8],
-        PT: [`Portugal`, true, 38.7, -9.0],
-        RS: [`Serbia`, true, 44.0, 20.8],
-        SK: [`Slovakia`, true, 48.8, 19.9],
-        SI: [`Slovenia`, true, 46.2, 14.4],
-        CH: [`Switzerland`, true, 46.9, 8.3],
-        GB: [`United Kingdom`, true, 52.9, -1.8],
-        AL: [`Albania`, false],
-        AD: [`Andorra`, false],
-        BY: [`Belarus`, false],
-        BA: [`Bosnia and Herzegovina`, false],
-        BG: [`Bulgaria`, false],
-        FI: [`Finland`, false],
-        GE: [`Georgia`, false],
-        IS: [`Iceland`, false],
-        SM: [`San Marino`, false],
-        KS: [`Kosovo`, false],
-        LI: [`Liechtenstein`, false],
-        MK: [`Macedonia`, false],
-        MD: [`Moldova`, false],
-        MC: [`Monaco`, false],
-        ME: [`Montenegro`, false],
-        NO: [`Norway`, false],
-        RO: [`Romania`, false],
-        RU: [`Russian Federation`, false],
-        ES: [`Spain`, false],
-        SE: [`Sweden`, false],
-        TR: [`Turkey`, false],
-        UA: [`Ukraine`, false],
-    };
     this.ºnot_mapped = {
         CY: true,
     };
-    this.ºcountries = [];
-    this.ºcountry = {};
-    this.ºmarker = {};
-    this.ºcountry_off = {};
-    this.ºcountry_on = {};
-    this.ºsetvalues = {};
-    for (var ºcd in this.º_all_countries) {
-        var ºcprop = this.º_all_countries[ºcd];
-        if (ºcprop[1]) {
-            this.ºcountry_off[ºcd] = false;
-            this.ºcountry_on[ºcd] = true;
-            this.ºcountries.push(ºcd);
-            this.ºcountry[ºcd] = ºcprop[0];
-            if (ºcprop.length > 3) {
-                this.ºmarker[ºcd] = {latLng: [ºcprop[2], ºcprop[3]], ºname: ºcprop[0]};
-            }
-            this.ºsetvalues[ºcd] = 'ºindariah';
-        }
-        else {
-            this.ºsetvalues[ºcd] = 'ºoutdariah';
-        }
-    }
-    this.ºcountries.sort();
 };
 
 ºEUmap.prototype = {
@@ -97,19 +26,18 @@ function ºEUmap(ºcomp) {
         var ºcols = 2;
         var ºh = `<div><p class="•dctrl">By country</p>`;
         ºh += `<div id="map-europe_${ºsc}"></div>
-<p class="all"><span cd="_all" class="•stats"></span> <a cd="_all" href="#" class="•control_med">all DARIAH</a></p>
-<table class="clist" id="list-europe_${ºsc}"><tr>`;
-        for (var ºi in this.ºcountries) {
-            if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < this.ºcountries.length)) {
+<p class="•all"><span rv="_all" class="•stats"></span> <a rv="_all" href="#" class="•control_med">all DARIAH</a></p>
+<table class="•value_list" id="list-europe_${ºsc}"><tr>`;
+        for (var ºi in this.ºrvalues) {
+            if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < this.ºrvalues.length)) {
                 ºh += `</tr><tr>`;
             }
-            var ºcd = this.ºcountries[ºi];
-            var ºcn = this.ºcountry[ºcd];
-            ºh += `<td><span cd="${ºcd}" class="•stats"></span></td><td><a cd="${ºcd}" href="#" class="•control_small">${ºcn}</a></td>`;
+            var ºrv = this.ºrvalues[ºi];
+            var ºcn = this.ºrvalue[ºrv];
+            ºh += `<td><span rv="${ºrv}" class="•stats"></span></td><td><a rv="${ºrv}" href="#" class="•control_small">${ºcn}</a></td>`;
         }
         ºh += `</tr></table></div>`;
         this.ºcomp.ºcontainer[ºsc].html(ºh);
-        console.log(`HTML eumap ${ºsc}`, this.ºcomp.ºcontainer[ºsc]);
     },
     º_dressup: function(ºsc) {
         var ºthat = this;
@@ -122,24 +50,27 @@ function ºEUmap(ºcomp) {
             'map': `europe_mill`,
             backgroundColor: `#ccccff`,
             regionsSelectable: true,
+            markersSelectable: true,
             regionsSelectableOne: false,
+            markersSelectableOne: false,
             markerStyle: {
                 initial: {
-                    fill: `#448844`,
-                    'fill-opacity': 1,
+                    fill: `#008800`,
+                    'fill-opacity': 0.2,
                     stroke: `none`,
                     'stroke-width': 0,
-                    'stroke-opacity': 1,
+                    'stroke-opacity': 0.2,
                     'r': 1,
                 },
                 hover: {
-                    'fill-opacity': 0.8,
                     cursor: `pointer`,
-                    stroke: `#000000`,
-                    'stroke-width': 0,
+                    stroke: `#ffff44`,
+                    'stroke-width': 1,
                     'stroke-opacity': 1,
                 },
                 selected: {
+                    fill: `#008800`,
+                    'fill-opacity': 1,
                 },
                 selectedHover: {
                 },
@@ -153,15 +84,14 @@ function ºEUmap(ºcomp) {
                     'stroke-opacity': 1,
                 },
                 hover: {
-                    'fill-opacity': 0.8,
                     cursor: `pointer`,
                     stroke: `#ffff44`,
                     'stroke-width': 3,
                     'stroke-opacity': 1,
                 },
                 selected: {
-                    'fill-opacity': 1,
                     fill: `#dd8844`,
+                    'fill-opacity': 1,
                 },
                 selectedHover: {
                 },
@@ -170,7 +100,7 @@ function ºEUmap(ºcomp) {
             series: {
                 markers: [{
                     values: {},
-                        scale: [0,25],
+                        scale: [0,20],
                         normalizeFunction: `linear`,
                         attribute: `r`,
                         min: 0,
@@ -185,11 +115,19 @@ function ºEUmap(ºcomp) {
                         values: ºthat.ºsetvalues,
                 }],
             },
-            onRegionTipShow: function(ºe, ºel, ºcd) {
-                ºel.html(`${ºcd}: ${(ºcd in ºthat.º_sts[ºsc])?ºthat.º_sts[ºsc][ºcd]:'not in DARIAH'}`);
+            onRegionTipShow: function(ºe, ºel, ºrv) {
+                ºel.html(`${ºrv}: ${(ºrv in ºthat.º_sts[ºsc])?ºthat.º_sts[ºsc][ºrv]:'not in DARIAH'}`);
+            },
+            onMarkerTipShow: function(ºe, ºel, ºrv) {
+                ºel.html(`${ºrv}: ${(ºrv in ºthat.º_sts[ºsc])?ºthat.º_sts[ºsc][ºrv]:'not in DARIAH'}`);
             },
             onRegionClick: function(ºe, ºc) {
-                if (!(ºc in ºthat.ºcountry)) {
+                if (!(ºc in ºthat.ºrvalue)) {
+                    ºe.preventDefault();
+                }
+            },
+            onMarkerClick: function(ºe, ºc) {
+                if (!(ºc in ºthat.ºrvalue)) {
                     ºe.preventDefault();
                 }
             },
@@ -198,23 +136,28 @@ function ºEUmap(ºcomp) {
                     ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_a_to_str(ºsel));
                 }
             },
+            onMarkerSelected: function(ºe, ºc, ºi, ºsel) {
+                if (ºthat.ºchangeState) {
+                    ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_a_to_str(ºsel));
+                }
+            },
         });
         this.º_map[ºsc] = this.º_mapc[ºsc].vectorMap('get', 'mapObject');
         this.º_map[ºsc].setFocus({regions: [`GB`, `GR`]});
         this.º_list[ºsc].find(`.•control_small`).click(function(ºe) {ºe.preventDefault();
-            var ºcd = $(this).attr(`cd`);
+            var ºrv = $(this).attr(`rv`);
             var ºsel = ºthat.º_from_str(ºthat.ºcomp.ºstate.ºgetstate(`m_${ºsc}`));
-            ºsel[ºcd] = (ºcd in ºsel)?!ºsel[ºcd]:true;
+            ºsel[ºrv] = (ºrv in ºsel)?!ºsel[ºrv]:true;
             ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºsel));
         });
-        this.º_allc[ºsc] = this.ºcomp.ºcontainer[ºsc].find(`[cd="_all"]`);
+        this.º_allc[ºsc] = this.ºcomp.ºcontainer[ºsc].find(`[rv="_all"]`);
         this.º_allc[ºsc].click(function(ºe) {ºe.preventDefault();
             var ºison = $(this).hasClass(`•ison`);
             if (ºison) {
-                ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºthat.ºcountry_off));
+                ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºthat.ºrvalues_off));
             }
             else {
-                ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºthat.ºcountry_on));
+                ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºthat.ºrvalues_on));
             }
         });
     },
@@ -232,14 +175,15 @@ function ºEUmap(ºcomp) {
             }
         }
         this.º_map[ºsc].setSelectedRegions(ºrgs);
+        this.º_map[ºsc].setSelectedMarkers(ºrgs);
         for (var ºcnm in ºsv) {
             ºrgs[ºcnm] = ºsv[ºcnm];
         }
         this.ºchangeState = true;
         var ºall_sel = true;
-        for (var ºcd in this.ºcountry) {
-            var ºccell = this.º_list[ºsc].find(`[cd="${ºcd}"]`);
-            if (ºcd in ºrgs && ºrgs[ºcd]) {
+        for (var ºrv in this.ºrvalue) {
+            var ºccell = this.º_list[ºsc].find(`[rv="${ºrv}"]`);
+            if (ºrv in ºrgs && ºrgs[ºrv]) {
                 ºccell.addClass(`•ison`);
             }
             else {
@@ -274,9 +218,9 @@ function ºEUmap(ºcomp) {
                 ºob[ºar[ºi]] = true;
             }
         }
-        for (var ºcd in this.ºcountry) {
-            if (!(ºcd in ºob)) {
-                ºob[ºcd] = false;
+        for (var ºrv in this.ºrvalue) {
+            if (!(ºrv in ºob)) {
+                ºob[ºrv] = false;
             }
         }
         return ºob;
@@ -284,47 +228,81 @@ function ºEUmap(ºcomp) {
     ºstats: function(ºsc) {
         var ºthat = this;
         this.º_sts[ºsc] = {};
-        for (var ºcd in this.ºcountry) {
-            this.º_sts[ºsc][ºcd] = 0;
+        for (var ºrv in this.ºrvalue) {
+            this.º_sts[ºsc][ºrv] = 0;
         } 
         for (var ºx in this.ºfltd[ºsc]) {
             var ºi = this.ºfltd[ºsc][ºx];
-            var ºcd = this.º_data[ºsc][ºi][2];
-            this.º_sts[ºsc][ºcd] += 1;
+            var ºrvs = this.º_data[ºsc][ºi][2];
+            for (var ºrv in ºrvs) {
+                this.º_sts[ºsc][ºrv] += 1;
+            }
         }
         var ºtotal = this.ºfltd[ºsc].length;
         if (ºtotal == 0) {ºtotal = 1}
-        for (var ºcd in this.º_sts[ºsc]) {
-            this.ºcomp.ºcontainer[ºsc].find(`span[cd="${ºcd}"].•stats`).html(this.º_sts[ºsc][ºcd]);
+        for (var ºrv in this.º_sts[ºsc]) {
+            this.ºcomp.ºcontainer[ºsc].find(`span[rv="${ºrv}"].•stats`).html(this.º_sts[ºsc][ºrv]);
         }
         var ºwsts = {};
-        for (var ºcd in this.º_sts[ºsc]) {
-            var ºpr = 100 * this.º_sts[ºsc][ºcd] / ºtotal;
-            ºwsts[ºcd] = (ºtotal < 10)?ºpr:(10*Math.sqrt(ºpr));
+        for (var ºrv in this.º_sts[ºsc]) {
+            var ºpr = 100 * this.º_sts[ºsc][ºrv] / ºtotal;
+            ºwsts[ºrv] = (ºtotal < 10)?ºpr:(10*Math.sqrt(ºpr));
         }
         this.º_map[ºsc].series.markers[0].setValues(ºwsts);
-        this.ºcomp.ºcontainer[ºsc].find(`span[cd="_all"].•stats`).html(this.ºfltd[ºsc].length);
+        this.ºcomp.ºcontainer[ºsc].find(`span[rv="_all"].•stats`).html(this.ºfltd[ºsc].length);
     },
     ºv: function(ºsc, ºi) {
-        var ºcd =  this.º_data[ºsc][ºi][2];
-        var ºmstate = this.º_from_str(this.ºmstate[ºsc]);
-        return (ºcd in ºmstate) && ºmstate[ºcd];
+        var ºrvs =  this.º_data[ºsc][ºi][2];
+        var ºrstate = this.º_from_str(this.ºrstate[ºsc]);
+        if (Object.keys(ºrvs).length != 0) {
+            for (var ºrv in ºrvs) {
+                if ((ºrv in ºrstate) && ºrstate[ºrv]) {
+                    return true;
+                }
+            }
+        }
+        return false;
     },
     ºshow: function(ºsc) {
         return (this.ºcomp.ºstate.ºgetstate(`list`) == ºsc);
     },
     ºweld: function(ºsc) {
-        this.º_html(ºsc);
     },
     ºwire: function(ºsc) {
-        this.º_dressup(ºsc);
     },
     ºwire_flt: function(ºsc) {
-        this.º_data[ºsc] = this.ºcomp.ºpage.ºgetcomp(`list`).ºdata[ºsc];
+        this.º_listc = this.ºcomp.ºpage.ºgetcomp(`list`);
+        this.º_data[ºsc] = this.º_listc.ºdata[ºsc];
+        this.º_relvals[ºsc] = this.º_listc.ºrelvals[ºsc];
+        this.ºrvalues = [];
+        this.ºrvalue = {};
+        this.ºmarker = {};
+        this.ºrvalues_off = {};
+        this.ºrvalues_on = {};
+        this.ºsetvalues = {};
+        for (var ºrv in this.º_relvals[ºsc].country) {
+            var ºcprop = this.º_relvals[ºsc].country[ºrv];
+            if (ºcprop[1]) {
+                this.ºrvalues_off[ºrv] = false;
+                this.ºrvalues_on[ºrv] = true;
+                this.ºrvalues.push(ºrv);
+                this.ºrvalue[ºrv] = ºcprop[0];
+                if (ºcprop.length > 3) {
+                    this.ºmarker[ºrv] = {latLng: [ºcprop[2], ºcprop[3]], ºname: ºcprop[0]};
+                }
+                this.ºsetvalues[ºrv] = 'ºindariah';
+            }
+            else {
+                this.ºsetvalues[ºrv] = 'ºoutdariah';
+            }
+        }
+        this.ºrvalues.sort();
+        this.º_html(ºsc);
+        this.º_dressup(ºsc);
     },
     ºwork: function(ºsc) {},
     ºwork_flt: function(ºsc) {
-        this.ºmstate[ºsc] = this.ºcomp.ºstate.ºgetstate(`m_${ºsc}`);
-        this.º_set_flt(ºsc, this.º_from_str(this.ºmstate[ºsc]));
+        this.ºrstate[ºsc] = this.ºcomp.ºstate.ºgetstate(`m_${ºsc}`);
+        this.º_set_flt(ºsc, this.º_from_str(this.ºrstate[ºsc]));
     },
 };

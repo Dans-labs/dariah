@@ -13,7 +13,11 @@ function ºList(ºcomp) {this.ºcomp = ºcomp};
         if (ºsc == `contrib`) {
             for (var ºi in this.ºcomp.ºdata[ºsc]) {
                 ºr = this.ºcomp.ºdata[ºsc][ºi];
-                ºh += `<tr id="r${ºr[0]}"><td class="•country_code">${ºr[2]}<td><td class="•country_name">${ºr[3]}<td><td><a href="#" rid="${ºr[0]}">${ºr[1]}</a></td></tr>`;
+                var ºccy = [];
+                for (var ºc in ºr[2]) {
+                    if (ºr[2][ºc]) {ºccy.push(ºc)}
+                } 
+                ºh += `<tr id="r${ºr[0]}"><td title="${ºr[3]}" class="•country_code">${ºccy.join(`,`)}<td><td><a href="#" rid="${ºr[0]}">${ºr[1]}</a></td></tr>`;
             }
         }
         else if (ºsc == `country`) {

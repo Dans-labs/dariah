@@ -88,7 +88,6 @@ function ºFilter(ºcomp) {
         this.º_html(ºsc);
     },
     ºwire: function(ºsc) {
-        console.log(`BEGIN WIRE ${ºsc}`);
         this.º_setclear(ºsc);
         this.ºfltc[ºsc].autocomplete({
             appendTo: this.ºautoc[ºsc],
@@ -99,10 +98,8 @@ function ºFilter(ºcomp) {
         this.ºwire_mode[ºsc] = true;
         this.º_set_flt(ºsc);
         this.ºwire_mode[ºsc] = false;
-        console.log(`END   WIRE ${ºsc}`);
     },
     ºwire_flt: function(ºsc) {
-        console.log(`BEGIN WIRE_FLT ${ºsc}`);
         var ºthat = this;
         var ºcc = this.ºcomp.ºcontainer[ºsc];
         var ºcf = ºcc.find(`#fltw_${ºsc}`);
@@ -119,7 +116,6 @@ function ºFilter(ºcomp) {
         for (var ºi in ºdata) {
             this.ºtags[ºsc].push({label: ºdata[ºi][1], value: ºi});
         }
-        console.log(`END   WIRE_FLT ${ºsc}`);
     },
     ºwork: function(ºsc) {},
     ºwork_flt: function(ºsc) {

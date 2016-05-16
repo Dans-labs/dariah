@@ -116,9 +116,7 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
         }
     },
     º_wire: function(ºsc) {
-        console.log(`>---${this.ºname}-${ºsc}`);
         this.ºdelg.ºwire(ºsc); // perform ºwire actions ºthat are ºspecific to this component
-        console.log(`<---${this.ºname}-${ºsc}`);
         if (!this.ºwork_first) {
             for (var ºc in this.ºchildren) {
                 this.ºchildren[ºc].ºwire(ºsc);
@@ -126,9 +124,7 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
         }
     },
     º_work: function(ºsc) {
-        console.log(`>===${this.ºname}-${ºsc}`);
         this.ºdelg.ºwork(ºsc); // perform ºwork actions ºthat are ºspecific to this component
-        console.log(`<===${this.ºname}-${ºsc}`);
         for (var ºc in this.ºchildren) {
             this.ºchildren[ºc].ºwork(ºsc);
         }
@@ -139,11 +135,9 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
     ºshow: function(ºsc) {
         if (this.ºhas_scomp(ºsc)) {
             if (this.ºdelg.ºshow(ºsc)) { // ºshow/hide depending on the ºspecific condition
-                console.log(`SHOW ${this.ºname}-${ºsc}`);
                 this.ºcontainer[ºsc].show();
             }
             else {
-                console.log(`HIDE ${this.ºname}-${ºsc}`);
                 if (this.ºcontainer[ºsc] != undefined) {
                     this.ºcontainer[ºsc].hide();
                 }
@@ -165,7 +159,6 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
             }
         }
         for (var ºsc in this.ºscomps) {
-            console.log(`>...${this.ºname}-${ºsc}`);
             if (this.ºmust_fetch) {
                 this.º_fetch_url[ºsc] = url_tpl.replace(/_c_/, `data`).replace(/_f_/, `${this.ºname}_${ºsc}`)+`.json`;
             }
@@ -178,7 +171,6 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
             }
             this.ºmsg[ºsc] = new ºMsg(`msg_${this.ºname}_${ºsc}`);
             this.ºdelg.ºweld(ºsc);
-            console.log(`<...${this.ºname}-${ºsc}`);
         }
     },
     ºwire: function(ºsc) { // ºwire after fetching

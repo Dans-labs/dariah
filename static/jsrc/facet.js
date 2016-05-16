@@ -48,7 +48,6 @@ function ºFacet(ºcomp) {
         });
     },
     º_work_flt: function(ºsc) {
-        console.log(this.ºtable[ºsc].find(`tr[id]`));
         this.ºtable[ºsc].find(`tr[id]`).hide();
         var ºdata = this.ºcomp.ºpage.ºgetcomp(`list`).ºdata[ºsc];
         var ºfcts = this.ºenabled_facets[ºsc];
@@ -120,7 +119,6 @@ function ºFacet(ºcomp) {
         this.º_html(ºsc);
     },
     ºwire: function(ºsc) {
-        console.log(`IN WIRE FACET DELG SHOW = ${this.ºshow(ºsc)}`)
         if (this.ºshow(ºsc)) {
             var ºfcts = this.ºenabled_facets[ºsc];
             for (var ºfn in ºfcts) {

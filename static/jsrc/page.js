@@ -84,7 +84,7 @@ function ºPage() { // the one and only page object
 ºPage.prototype = {
     º_set_height(ºsubtract) { // the heights of the sidebars are set, depending on the height of the window
         var ºwh = `${window.innerHeight - ºsubtract}px`;
-        for (var ºw in {middle: 1, left: 1, right: 1}) {
+        for (var ºw in {'middle': 1, 'left': 1, 'right': 1}) {
             $(`#${ºw}`).css(`height`, ºwh);
         }
     },
