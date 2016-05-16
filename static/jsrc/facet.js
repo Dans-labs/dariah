@@ -15,7 +15,7 @@ function ºFacet(ºcomp) {
 ºFacet.prototype = {
     º_html: function(ºsc) {
         var ºh = ``;
-        ºh += `<p class="facet">Filtering <span id="fstats_${ºsc}"></span></p>`;
+        ºh += `<p>Filtering <span id="fstats_${ºsc}"></span></p>`;
         this.ºcomp.ºcontainer[ºsc].html(ºh);
     },
     º_wire_flt: function(ºsc) {
@@ -24,23 +24,24 @@ function ºFacet(ºcomp) {
         this.º_stats[ºsc] = ºcc.find(`#fstats_${ºsc}`);
         this.ºtable[ºsc] =  ºlc.find(`#table_${ºsc}`);
         var ºdetailcontrols = `<a class="showc fa fa-chevron-right" href="#" title="Show details"></a><a class="hidec fa fa-chevron-down" href="#" title="Hide details"></a>`;
-        ºcc.find(`p.dctrl`).each(function() {
+        ºcc.addClass(`•facet`);
+        ºcc.find(`p.•dctrl`).each(function() {
             var ºorig = $(this).html();
             $(this).html(`${ºdetailcontrols}&nbsp;${ºorig}`);
         });
-        ºcc.find(`p.dctrl`).closest(`div`).find(`table,.flt`).show();
+        ºcc.find(`p.•dctrl`).closest(`div`).find(`table,.•flt`).show();
         ºcc.find(`.hidec`).show();
         ºcc.find(`.showc`).hide();
         ºcc.find(`.hidec`).click(function(ºe) {ºe.preventDefault();
             var ºdt = $(this).closest(`p`);
-            var ºdd = $(this).closest(`div`).find(`table,.flt`);
+            var ºdd = $(this).closest(`div`).find(`table,.•flt`);
             ºdd.hide();
             ºdt.find(`.hidec`).hide();
             ºdt.find(`.showc`).show();
         });
         ºcc.find(`.showc`).click(function(ºe) {ºe.preventDefault();
             var ºdt = $(this).closest(`p`);
-            var ºdd = $(this).closest(`div`).find(`table,.flt`);
+            var ºdd = $(this).closest(`div`).find(`table,.•flt`);
             ºdd.show();
             ºdt.find(`.hidec`).show();
             ºdt.find(`.showc`).hide();

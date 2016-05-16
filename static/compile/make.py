@@ -3,6 +3,8 @@
 
 import sys, collections, re
 
+defs = re.compile(r'«([^\n»]+)»[\s\n]*≤([^≥]*)≥')
+defname = re.compile(r'«([^\n»]+)»')
 comment1 = re.compile(r'/\*.*?\*/', re.S)
 comment2 = re.compile(r'//.*')
 comment3 = re.compile(r'<!--.*?-->', re.S)
@@ -347,6 +349,8 @@ def name_warn(txt, strings):
         msg('{} WARNINGS'.format(len(nws)))
 
 def dojs(txt, nmmap):
+    if settings['dev_mode']: return txt
+
     strings = []
     i = -1
     def string_away(match):
@@ -384,6 +388,30 @@ def dojs(txt, nmmap):
     return txt
 
 def docss(txt, nmmap):
+    defitems = {}
+    def defs_repl(match):
+        (name, value) = match.group(1,2)
+        if name in defitems: msg('WARNING: multiple definitions of «{}»'.format(name))
+        others = defname.findall(value)
+        if others:
+            msg('WARNING: definition «{}» contains other definition calls: «{}»', format(name, '»,«'.join(others)))
+        defitems[name] = value
+        return ''
+
+    txt = defs.sub(defs_repl, txt)
+    msg(msgfmtd.format('DEFINITIONS', len(defitems), unit='definitions'))
+    for name in sorted(defitems):
+        value = defitems[name]
+        pat = '«{}»'.format(name)
+        if pat not in txt: msg('WARNING: definition {} not used.'.format(pat))
+        else: txt = txt.replace(pat, value)
+    others = defname.findall(txt)
+    if others:
+        msg('WARNING: no definition found for: «{}»'.format('»,«'.join(others)))
+    msg(msgfmt.format('DEFINITIONS', len(txt)))
+
+    if settings['dev_mode']: return txt
+
     if settings['do_names'] != 1:
 
         txt = comment1.sub('', txt.strip())
@@ -401,7 +429,7 @@ def docss(txt, nmmap):
     return txt
 
 def main():
-    global msgfmt
+    global msgfmt, msgfmtd
 
     (csstxt, jstxt) = intake()
 
@@ -411,8 +439,9 @@ def main():
 
     for (lab, txt, do) in (('CSS', csstxt, docss), ('JS', jstxt, dojs)):
         msgfmt = '{:<3} '.format(lab)+'{:<20}: {:>5} chars'
+        msgfmtd = '{:<3} '.format(lab)+'{:<20}: {:>5} definitions'
         msg(msgfmt.format('SOURCE', len(txt)))
-        if not settings['dev_mode']: txt = do(txt, nmmap)
+        txt = do(txt, nmmap)
         with open('../{lab}/inkind.min.{lab}'.format(lab=lab.lower()), 'w') as f: f.write(txt)
         msg(msgfmt.format('RESULT', len(txt)))
 

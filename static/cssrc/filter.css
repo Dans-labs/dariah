@@ -1,35 +1,23 @@
 /* FILTER */
 
-div.flt{
+div.•flt{
     font-size: medium;
 }
-div.flt input {
+div.•flt input {
     font-weight: normal;
     font-size: small;
     width: 40%;
 }
-.fbox {
-    font-size: small;
-    background-color: #ffffdd;
+.•fbox {
     padding-left: 1em;
 }
-.fbox.•ison {
-    background-color: #ffff44;
-}
-.fbox span {
+.•fbox span {
     display: inline;
 }
-#stats_contrib {
-    color: #aaaaaa;
-    font-size: x-small;
+.•fbox .•stats {
     float: right;
 }
-td .stats,p .stats {
-    color: #aaaaaa;
-    font-size: x-small;
-    padding-right: 1ex;
-}
-.filtc {
+.•filtc {
     float: right;
 }
 .clist {

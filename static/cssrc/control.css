@@ -1,37 +1,186 @@
 /* CONTROL */
 
-.•control {
+«control:big.highlight.colors» ≤
+    color: #000000;
+    background-color: #ffffee;
+≥
+«control:big.highlight.shape» ≤
     border-radius: 6pt;
-    border: 1pt solid #dde6dd;
-    background-color: #fafffa;
+    border: 2pt solid #ffff44;
     padding: 2pt;
+≥
+«control:big.highlight.text» ≤
+    font-size: medium;
+    font-weight: bold;
+    font-style: normal;
+≥
+«control:big.normal.colors» ≤
+    color: #0000aa;
+    background-color: #eeeeee;
+≥
+«control:big.normal.shape» ≤
+    border-radius: 6pt;
+    border: 1pt solid #dddddd;
+    padding: 2pt;
+≥
+«control:big.normal.text» ≤
+    font-size: medium;
+    font-weight: normal;
+    font-style: normal;
+≥
+«control:big.disabled.colors» ≤
+    color: #aaaaaa;
+    background-color: #eeeeee;
+≥
+«control:big.disabled.shape» ≤
+    border-radius: 6pt;
+    border: 1pt solid #aaaaaa;
+    padding: 2pt;
+≥
+«control:big.disabled.text» ≤
+    font-size: medium;
+    font-weight: normal;
+    font-style: italic;
+≥
+
+«control:med.highlight.colors» ≤
+    color: #000000;
+    background-color: #f8ffcc;
+≥
+«control:med.highlight.shape» ≤
+    border-radius: 2pt;
+    border: 1pt solid #ffdd44;
+    padding: 0pt;
+≥
+«control:med.highlight.text» ≤
+    font-size: small;
+    font-weight: bold;
+    font-style: normal;
+≥
+«control:med.normal.colors» ≤
+    color: #000044;
+    background-color: #ffffff;
+≥
+«control:med.normal.shape» ≤
+    border-radius: 2pt;
+    border: 1pt solid #eeeeee;
+    padding: 0pt;
+≥
+«control:med.normal.text» ≤
+    font-size: small;
+    font-weight: normal;
+    font-style: normal;
+≥
+«control:med.disabled.colors» ≤
+    color: #aaaaaa;
+    background-color: #cccccc;
+≥
+«control:med.disabled.shape» ≤
+    border-radius: 2pt;
+    border: 1pt solid #cccccc;
+    padding: 0pt;
+≥
+«control:med.disabled.text» ≤
+    font-size: small;
+    font-weight: normal;
+    font-style: italic;
+≥
+
+«control:small.highlight.colors» ≤
+    color: #000000;
+    background-color: #f8ffcc;
+≥
+«control:small.highlight.shape» ≤
+    border-radius: 1pt;
+    border: 0pt;
+    padding: 0pt;
+≥
+«control:small.highlight.text» ≤
+    font-size: x-small;
+    font-weight: bold;
+    font-style: normal;
+≥
+«control:small.normal.colors» ≤
+    color: #000044;
+    background-color: #ffffff;
+≥
+«control:small.normal.shape» ≤
+    border-radius: 1pt;
+    border: 0pt;
+    padding: 0pt;
+≥
+«control:small.normal.text» ≤
+    font-size: x-small;
+    font-weight: normal;
+    font-style: normal;
+≥
+«control:small.disabled.colors» ≤
+    color: #aaaaaa;
+    background-color: #cccccc;
+≥
+«control:small.disabled.shape» ≤
+    border-radius: 1pt;
+    border: 1pt solid #cccccc;
+    padding: 0pt;
+≥
+«control:small.disabled.text» ≤
+    font-size: x-small;
+    font-weight: normal;
+    font-style: italic;
+≥
+
+.•control_title {
+    «control:big.normal.colors»
+    «control:big.normal.text»
+}
+.•control_title.•ison {
+    «control:big.highlight.colors»
+    «control:big.highlight.text»
+}
+.•control_title.•disabled {
+    «control:big.disabled.colors»
+    «control:big.disabled.text»
+}
+.•control_big {
+    «control:big.normal.colors»
+    «control:big.normal.shape»
+}
+.•control_big.•ison {
+    «control:big.highlight.colors»
+    «control:big.highlight.shape»
+}
+.•control_big.•disabled {
+    «control:big.disabled.colors»
+    «control:big.disabled.shape»
+}
+.•control_med {
+    «control:med.normal.colors»
+    «control:med.normal.shape»
+    «control:med.normal.text»
+}
+.•control_med.•ison {
+    «control:med.highlight.colors»
+    «control:med.highlight.shape»
+    «control:med.highlight.text»
+}
+.•control_med.•disabled {
+    «control:med.disabled.colors»
+    «control:med.disabled.shape»
+    «control:med.disabled.text»
 }
 .•control_small {
-    font-size: x-small;
-    border-radius: 2pt;
-    background-color: #fafffa;
-    padding: 0pt;
-}
-.radio.•ison {
-    font-weight: bold;
-    color: #1A3D6F;
-    background-color: #ffffdd;
-    border: 2pt solid #d3550f;
+    «control:small.normal.colors»
+    «control:small.normal.shape»
+    «control:small.normal.text»
 }
 .•control_small.•ison {
-    font-weight: bold;
-    background-color: #dd8844;
-    color: #ffff00;
+    «control:small.highlight.colors»
+    «control:small.highlight.shape»
+    «control:small.highlight.text»
 }
-.isonn {
-    border-radius: 6pt;
-    background-color: #ffffdd;
-    border: 2pt solid #ffffdd;
+.•control_small.•disabled {
+    «control:small.disabled.colors»
+    «control:small.disabled.shape»
+    «control:small.disabled.text»
 }
-.radio {
-    font-weight: normal;
-    background-color: #fafffa;
-    color: #aaaaaa;
-}
-
 

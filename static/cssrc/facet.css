@@ -1,8 +1,36 @@
 /* FACETS */
-div.facet {
-    font-size: medium;
+
+«facet:highlight.colors» ≤
+    color: #000000;
+    background-color: #f8ffcc;
+≥
+«facet:highlight.text» ≤
+    font-size: x-small;
+    font-weight: bold;
+    font-style: normal;
+≥
+«facet:normal.colors» ≤
+    color: #aaaaaa;
+    background-color: #ffffff;
+≥
+«facet:normal.text» ≤
+    font-size: x-small;
+    font-weight: normal;
+    font-style: normal;
+≥
+
+div.•facet {
+    font-size: small;
 }
-.dctrl,.all {
+div.•facet .•stats {
+    «facet:normal.colors»
+    «facet:normal.text»
+}
+div.•facet .•stats.•ison {
+    «facet:highlight.colors»
+    «facet:highlight.text»
+}
+.•dctrl,.all {
     margin-bottom: 0pt;
 }
 

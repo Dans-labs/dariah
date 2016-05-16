@@ -22,8 +22,8 @@ function ºCType(ºcomp) {
 ºCType.prototype = {
     º_html: function(ºsc) {
         var ºcols = 2;
-        var ºh = `<div><p class="dctrl">By type</p>`;
-        ºh += `<p class="all"><span ti="_all" class="stats"></span> <a id="t_all_${ºsc}" href="#" class="•control_small">all types</a></p>
+        var ºh = `<div><p class="•dctrl">By type</p>`;
+        ºh += `<p class="all"><span ti="_all" class="•stats"></span> <a ti="_all" href="#" class="•control_med">all types</a></p>
 <table class="clist" id="list-ctype_${ºsc}"><tr>`;
         for (var ºi in this.ºtypes[ºsc]) {
             if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < this.ºtypes[ºsc].length)) {
@@ -31,7 +31,7 @@ function ºCType(ºcomp) {
             }
             var ºti = this.ºtypes[ºsc][ºi];
             var ºtv = this.ºtype[ºsc][ºti];
-            ºh += `<td><span ti="${ºti}" class="stats"></span></td><td><a ti="${ºti}" href="#" class="•control_small">${ºtv}</a></td>`;
+            ºh += `<td><span ti="${ºti}" class="•stats"></span></td><td><a ti="${ºti}" href="#" class="•control_small">${ºtv}</a></td>`;
         }
         ºh += `</tr></table></div>`;
         this.ºcomp.ºcontainer[ºsc].html(ºh);
@@ -41,12 +41,11 @@ function ºCType(ºcomp) {
         this.º_list[ºsc] = $(`#list-ctype_${ºsc}`);
         this.º_list[ºsc].find(`.•control_small`).click(function(ºe) {ºe.preventDefault();
             var ºti = $(this).attr(`ti`);
-            var ºison = $(this).hasClass(`•ison`);
             var ºsel = ºthat.º_from_str(ºthat.ºcomp.ºstate.ºgetstate(`t_${ºsc}`));
-            ºsel[ºti] = !ºison;
+            ºsel[ºti] = (ºti in ºsel)?!ºsel[ºti]:true;
             ºthat.ºcomp.ºstate.ºsetstate(`t_${ºsc}`, ºthat.º_to_str(ºsel));
         });
-        this.º_allc[ºsc] = this.ºcomp.ºcontainer[ºsc].find(`#t_all_${ºsc}`);
+        this.º_allc[ºsc] = this.ºcomp.ºcontainer[ºsc].find(`[ti="_all"]`);
         this.º_allc[ºsc].click(function(ºe) {ºe.preventDefault();
             var ºison = $(this).hasClass(`•ison`);
             if (ºison) {
@@ -62,7 +61,7 @@ function ºCType(ºcomp) {
         if (ºrgs == null || ºrgs == undefined || ºrgs == '') {ºrgs = this.º_from_str(``)}
         var ºall_sel = true;
         for (var ºti in this.ºtype[ºsc]) {
-            var ºccell = this.º_list[ºsc].find(`a[ti="${ºti}"]`);
+            var ºccell = this.º_list[ºsc].find(`[ti="${ºti}"]`);
             if (ºti in ºrgs && ºrgs[ºti]) {
                 ºccell.addClass(`•ison`);
             }
@@ -111,9 +110,9 @@ function ºCType(ºcomp) {
             }
         }
         for (var ºti in this.º_sts[ºsc]) {
-            this.ºcomp.ºcontainer[ºsc].find(`span[ti="${ºti}"].stats`).html(this.º_sts[ºsc][ºti]);
+            this.ºcomp.ºcontainer[ºsc].find(`span[ti="${ºti}"].•stats`).html(this.º_sts[ºsc][ºti]);
         }
-        this.ºcomp.ºcontainer[ºsc].find(`span[ti="_all"].stats`).html(this.ºfltd[ºsc].length);
+        this.ºcomp.ºcontainer[ºsc].find(`span[ti="_all"].•stats`).html(this.ºfltd[ºsc].length);
     },
     ºv: function(ºsc, ºi) {
         var ºtis =  this.º_data[ºsc][ºi][3];

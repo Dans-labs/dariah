@@ -95,9 +95,9 @@ function ºEUmap(ºcomp) {
 ºEUmap.prototype = {
     º_html: function(ºsc) {
         var ºcols = 2;
-        var ºh = `<div><p class="dctrl">By country</p>`;
+        var ºh = `<div><p class="•dctrl">By country</p>`;
         ºh += `<div id="map-europe_${ºsc}"></div>
-<p class="all"><span cd="_all" class="stats"></span> <a id="m_all_${ºsc}" href="#" class="•control_small">all DARIAH</a></p>
+<p class="all"><span cd="_all" class="•stats"></span> <a cd="_all" href="#" class="•control_med">all DARIAH</a></p>
 <table class="clist" id="list-europe_${ºsc}"><tr>`;
         for (var ºi in this.ºcountries) {
             if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < this.ºcountries.length)) {
@@ -105,7 +105,7 @@ function ºEUmap(ºcomp) {
             }
             var ºcd = this.ºcountries[ºi];
             var ºcn = this.ºcountry[ºcd];
-            ºh += `<td><span cd="${ºcd}" class="stats"></span></td><td><a cd="${ºcd}" href="#" class="•control_small">${ºcn}</a></td>`;
+            ºh += `<td><span cd="${ºcd}" class="•stats"></span></td><td><a cd="${ºcd}" href="#" class="•control_small">${ºcn}</a></td>`;
         }
         ºh += `</tr></table></div>`;
         this.ºcomp.ºcontainer[ºsc].html(ºh);
@@ -203,12 +203,11 @@ function ºEUmap(ºcomp) {
         this.º_map[ºsc].setFocus({regions: [`GB`, `GR`]});
         this.º_list[ºsc].find(`.•control_small`).click(function(ºe) {ºe.preventDefault();
             var ºcd = $(this).attr(`cd`);
-            var ºison = $(this).hasClass(`•ison`);
             var ºsel = ºthat.º_from_str(ºthat.ºcomp.ºstate.ºgetstate(`m_${ºsc}`));
-            ºsel[ºcd] = !ºison;
+            ºsel[ºcd] = (ºcd in ºsel)?!ºsel[ºcd]:true;
             ºthat.ºcomp.ºstate.ºsetstate(`m_${ºsc}`, ºthat.º_to_str(ºsel));
         });
-        this.º_allc[ºsc] = this.ºcomp.ºcontainer[ºsc].find(`#m_all_${ºsc}`);
+        this.º_allc[ºsc] = this.ºcomp.ºcontainer[ºsc].find(`[cd="_all"]`);
         this.º_allc[ºsc].click(function(ºe) {ºe.preventDefault();
             var ºison = $(this).hasClass(`•ison`);
             if (ºison) {
@@ -239,7 +238,7 @@ function ºEUmap(ºcomp) {
         this.ºchangeState = true;
         var ºall_sel = true;
         for (var ºcd in this.ºcountry) {
-            var ºccell = this.º_list[ºsc].find(`a[cd="${ºcd}"]`);
+            var ºccell = this.º_list[ºsc].find(`[cd="${ºcd}"]`);
             if (ºcd in ºrgs && ºrgs[ºcd]) {
                 ºccell.addClass(`•ison`);
             }
@@ -296,7 +295,7 @@ function ºEUmap(ºcomp) {
         var ºtotal = this.ºfltd[ºsc].length;
         if (ºtotal == 0) {ºtotal = 1}
         for (var ºcd in this.º_sts[ºsc]) {
-            this.ºcomp.ºcontainer[ºsc].find(`span[cd="${ºcd}"].stats`).html(this.º_sts[ºsc][ºcd]);
+            this.ºcomp.ºcontainer[ºsc].find(`span[cd="${ºcd}"].•stats`).html(this.º_sts[ºsc][ºcd]);
         }
         var ºwsts = {};
         for (var ºcd in this.º_sts[ºsc]) {
@@ -304,7 +303,7 @@ function ºEUmap(ºcomp) {
             ºwsts[ºcd] = (ºtotal < 10)?ºpr:(10*Math.sqrt(ºpr));
         }
         this.º_map[ºsc].series.markers[0].setValues(ºwsts);
-        this.ºcomp.ºcontainer[ºsc].find(`span[cd="_all"].stats`).html(this.ºfltd[ºsc].length);
+        this.ºcomp.ºcontainer[ºsc].find(`span[cd="_all"].•stats`).html(this.ºfltd[ºsc].length);
     },
     ºv: function(ºsc, ºi) {
         var ºcd =  this.º_data[ºsc][ºi][2];
