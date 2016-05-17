@@ -45,6 +45,7 @@ x_js_names_spec = '''
     «.«initNamespaceStorage»(»
     «.«isSet»(»
     «.«join»(»
+    «.«keys»(»
     «.«length»x»
     «.«localStorage»x»
     «.«location»x»
@@ -52,6 +53,7 @@ x_js_names_spec = '''
     «x«null»x»
     «x«Math».»
     «x«Number»(»
+    «x«Object».»
     «.«prototype»=»
     «.«push»(»
     «.«replace»(»
@@ -110,6 +112,7 @@ x_lib_names_spec = '''
     «x«cursor»:»
     «x«dataType»:»
     «x«Deferred»(»
+    «.«done»(»
     «.«each»(»
     «x«fill»:»
     «.«find»(»
@@ -170,6 +173,7 @@ x_lib_names_spec = '''
     «.«value»x»
     «x«values»:»
     «.«vectorMap»(»
+    «.«when»(»
 '''.strip().split('\n')
 
 i_lib_names_spec = '''

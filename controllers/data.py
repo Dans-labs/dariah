@@ -68,7 +68,6 @@ inner join type_of_inkind on
     for r in reldata:
         relinfo['type'].setdefault(r[0], {})[r[1]] = True
         relvals['type'][r[1]] = r[2]
-    relvals['type']['-'] = '-none-'
     for r in country:
         relvals['country'][r] = country[r]
 
@@ -85,7 +84,7 @@ on country.id = contrib.country_id
     for mr in main_records:
         main_id = mr[0]
         relinfo['country'].setdefault(main_id, {})[mr[2]] = True
-        records.append(mr[0:2]+tuple(relinfo[knd].get(main_id, {'-': True}) for knd in relinfo_order))
+        records.append(mr[0:2]+tuple(relinfo[knd].get(main_id, {}) for knd in relinfo_order))
     return dict(data=records, relvals=relvals, msgs=[], good=True)
 
 def list_country():

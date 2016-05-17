@@ -88,6 +88,16 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
         }
         return function() {º_as_prom(true)};
     },
+    º_state_children: function(ºsc, ºact) {
+        var ºpromises = [];
+        for (var ºc in this.ºchildren) {
+            var ºcc = this.ºchildren[ºc];
+            if ((ºsc in ºcc.º_stage) && (ºact in ºcc.º_stage[ºsc])) {
+                ºpromises.push(ºcc.º_stage[ºsc][ºact]);
+            }
+        }
+        return ºpromises;
+    },
     /* here are the implementations of the functions ºthat are to be wrapped as promises
      * They can focus on the ºwork, may or may not yield a promise
      */    
@@ -116,18 +126,22 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
         }
     },
     º_wire: function(ºsc) {
+        var ºthat = this;
         this.ºdelg.ºwire(ºsc); // perform ºwire actions ºthat are ºspecific to this component
         if (!this.ºwork_first) {
             for (var ºc in this.ºchildren) {
                 this.ºchildren[ºc].ºwire(ºsc);
             }
+            //return $.when(this.º_state_children(ºsc, `wire`)).done(function() {});
         }
     },
     º_work: function(ºsc) {
+        var ºthat = this;
         this.ºdelg.ºwork(ºsc); // perform ºwork actions ºthat are ºspecific to this component
         for (var ºc in this.ºchildren) {
             this.ºchildren[ºc].ºwork(ºsc);
         }
+        //return $.when(this.º_state_children(ºsc, `work`)).done(function() {});
     },
     ºhas_scomp: function(ºsc) {
         return (ºsc in this.ºscomps);
@@ -183,7 +197,6 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
         }
     },
     ºwork: function(ºsc) { // ºwork (changed) state to current material
-        var ºthat = this;
         if (this.ºhas_scomp(ºsc) && this.ºdelg.ºshow(ºsc)) { // ºshow/hide depending on the ºspecific condition
             ºnow(
                 this.ºensure(ºsc, `ºfetch`, `º_fetch`)

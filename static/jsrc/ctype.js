@@ -105,10 +105,16 @@ function ºCType(ºcomp) {
         for (var ºx in this.ºfltd[ºsc]) {
             var ºi = this.ºfltd[ºsc][ºx];
             var ºrvs = this.º_data[ºsc][ºi][3];
+            var ºhas_rv = false;
             for (var ºrv in ºrvs) {
                 this.º_sts[ºsc][ºrv] += 1;
+                ºhas_rv = true;
+            }
+            if (!ºhas_rv) {
+                this.º_sts[ºsc][`-`] += 1;
             }
         }
+        console.log(this.º_sts[ºsc]);
         for (var ºrv in this.º_sts[ºsc]) {
             this.ºcomp.ºcontainer[ºsc].find(`span[rv="${ºrv}"].•stats`).html(this.º_sts[ºsc][ºrv]);
         }
@@ -125,7 +131,7 @@ function ºCType(ºcomp) {
             }
         }
         else {
-            if (this.ºrstate[ºsc] == '-') {
+            if (`-` in ºrstate) {
                 return true;
             }
         }
@@ -151,6 +157,10 @@ function ºCType(ºcomp) {
             this.ºrvalues[ºsc].push(ºrv);
             this.ºrvalue[ºsc][ºrv] = ºvv;
         }
+        this.ºrvalues[ºsc].push(`-`);
+        this.ºrvalue[ºsc][`-`] = `-none-`;
+        this.ºrvalues_off[ºsc][`-`] = false;
+        this.ºrvalues_on[ºsc][`-`] = true;
         this.ºrvalues[ºsc].sort();
         this.º_html(ºsc);
         this.º_dressup(ºsc);
