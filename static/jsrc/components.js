@@ -132,7 +132,7 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
             for (var ºc in this.ºchildren) {
                 this.ºchildren[ºc].ºwire(ºsc);
             }
-            //return $.when(this.º_state_children(ºsc, `wire`)).done(function() {});
+            return $.when(this.º_state_children(ºsc, `wire`)).done(function() {});
         }
     },
     º_work: function(ºsc) {
@@ -141,7 +141,7 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
         for (var ºc in this.ºchildren) {
             this.ºchildren[ºc].ºwork(ºsc);
         }
-        //return $.when(this.º_state_children(ºsc, `work`)).done(function() {});
+        return $.when(this.º_state_children(ºsc, `work`)).done(function() {});
     },
     ºhas_scomp: function(ºsc) {
         return (ºsc in this.ºscomps);
