@@ -37,45 +37,47 @@ function ºPage() { // the one and only page object
     this.ºstate = new ºViewState(this);
     var ºmain_lists = this.ºstate.ºgetvalues(`list`);
     var ºcontrib_list = {contrib: 1};
-    this.º_components = [
-        [`left`, `control`, ºmain_lists, false, true, ºControl], 
-        [`control`, `facet`, ºmain_lists, false, false, ºFacet], 
-        [`facet`, `filter`, ºmain_lists, false, false, ºFilter], 
-        [`facet`, `eumap`, ºcontrib_list, false, false, ºEUmap],
-        [`facet`, `ctype`, ºcontrib_list, false, false, ºCType],
-        [`middle`, `list`, ºmain_lists, true, false, ºList], 
-    ];
-    this.ºcompindex = {};
-    this.º_routing = {
-        page: [`control`],
-        control: [`list`],
-        list: [`facet`],
-        facet: [
-            `filter`,
-            `eumap`,
-            `ctype`,
-        ],
+    this.º_component_specs = {
+        ºcontrol: {ºdest: `left`, ºsubcomps: ºmain_lists, ºfetch_url: null, ºspecific: ºControl}, 
+        ºlist: {ºdest: `middle`, ºsubcomps: ºmain_lists, ºfetch_url: `list`, ºspecific: ºList}, 
+//        ºfacet: {ºdest: `ºcontrol`, ºsubcomps: ºmain_lists, ºfetch_url: null, ºspecific: ºFacet}, 
+//        ºfilter: {ºdest: `ºfacet`, ºsubcomps: ºmain_lists, ºfetch_url: null, ºspecific: ºFilter}, 
+//        ºeumap: {ºdest: `ºfacet`, ºsubcomps: ºcontrib_list, ºfetch_url: `country`, ºspecific: ºEUmap}, 
+//        ºctype: {ºdest: `ºfacet`, ºsubcomps: ºcontrib_list, ºfetch_url: `type`, ºspecific: ºCType}, 
+    },
+    this.º_before = {
+        ºweld: {
+//            ºfacet: {ºcontrol: 1},
+//            ºfilter: {ºfacet: 1},
+//            ºeumap: {ºfacet: 1, ºfilter: 1},
+//            ºctype: {ºfacet: 1, ºeumap: 1},
+        },
+        ºwire: {
+//            ºfacet: {ºfilter: 1, ºeumap: 1, ºctype: 1},
+//            ºfilter: {ºlist: 1},
+//            ºeumap: {ºlist: 1},
+//            ºctype: {ºlist: 1},
+        },
+        ºwork: {
+//            ºfacet: {ºfilter: 1, ºeumap: 1, ºctype: 1},
+        },
     };
-    this.ºcompindex = {};
-    for (var ºi in this.º_components) {
-        var ºc = this.º_components[ºi];
-        var ºco = new ºComponent(ºc[0], ºc[1], ºc[2], ºc[3], ºc[4], ºc[5], this);
-        this.ºcompindex[ºc[1]] = ºco;
+    this.ºcomponents = {};
+    for (var ºname in this.º_component_specs) {
+        this.ºcomponents[ºname] = new ºComponent(ºname, this.º_component_specs[ºname], this);
     }
-    for (var ºpn in this.º_routing) {
-        var ºpo = (ºpn in this.ºcompindex)?this.ºcompindex[ºpn]:this;
-        ºpo.ºchildren = {};
-        for (var ºi in this.º_routing[ºpn]) {
-            var ºc = this.º_routing[ºpn][ºi];
-            var ºco = this.ºcompindex[ºc];
-            ºpo.ºchildren[ºc] = ºco;
-            ºco.ºparent = ºpo;
+    for (var ºname in this.ºcomponents) {
+        var ºcomp = this.ºcomponents[ºname];
+        ºcomp.ºbefore = {};
+        for (var ºstage in this.º_before) {
+            var ºconstraints = this.º_before[ºstage];
+            ºcomp.ºbefore[ºstage] = {};
+            if (ºname in ºconstraints) {
+                for (var ºbefore_name in ºconstraints[ºname]) {
+                   ºcomp.ºbefore[ºstage][ºbefore_name] = 1;
+                } 
+            }
         }
-    }
-    for (var ºi in this.º_components) {
-        var ºc = this.º_components[ºi];
-        var ºco = this.ºcompindex[ºc[1]];
-        ºco.ºweld();
     }
     this.º_set_height(80);
     History.Adapter.bind(window, `statechange`, this.ºstate.ºwork());
@@ -88,23 +90,26 @@ function ºPage() { // the one and only page object
             $(`#${ºw}`).css(`height`, ºwh);
         }
     },
-    ºshow: function() {
-        for (var ºc in this.ºchildren) {
-            var ºco = this.ºchildren[ºc];
-            for (var ºsc in ºco.ºscomps) {
-                ºco.ºshow(ºsc);
+    ºgetcomp: function(ºname) {
+        return this.ºcomponents[ºname];
+    },
+    ºget_container: function(ºname, ºsubcomps) {
+        var ºcontainer = {}
+        if (ºname in this.ºcomponents) {
+            ºcontainer = this.ºcomponents.ºname.ºcontainer;
+        }
+        else {
+            for (var ºsc in ºsubcomps) {
+                ºcontainer[ºsc] = $(`#${ºname}`);
             }
         }
-    },
-    ºgetcomp: function(ºname) {
-        return this.ºcompindex[ºname];
+        return ºcontainer;
     },
     ºwork: function() { 
-        this.ºshow();
-        for (var ºc in this.ºchildren) {
-            var ºco = this.ºchildren[ºc];
-            for (var ºsc in ºco.ºscomps) {
-                ºco.ºwork(ºsc);
+        for (var ºname in this.ºcomponents) {
+            var ºcomp = this.ºcomponents[ºname];
+            for (var ºsc in ºcomp.ºsubcomps) {
+                ºcomp.ºwork(ºsc);
             }
         }
     },

@@ -18,7 +18,21 @@ function ºFacet(ºcomp) {
         ºh += `<p>Filtering <span id="fstats_${ºsc}"></span></p>`;
         this.ºcomp.ºcontainer[ºsc].html(ºh);
     },
-    º_wire_flt: function(ºsc) {
+    ºshow: function(ºsc) {
+        return this.ºcomp.ºstate.ºgetstate(`list`) == ºsc;
+    },
+    ºweld: function(ºsc) {
+        this.ºchildren = this.ºcomp.ºchildren;
+        this.ºenabled_facets[ºsc] = {};
+        for (var ºfn in this.ºchildren) {
+            var ºfct = this.ºchildren[ºfn];
+            if (ºfct.ºhas_scomp(ºsc)) {
+                this.ºenabled_facets[ºsc][ºfn] = ºfct;
+            }
+        }
+        this.º_html(ºsc);
+    },
+    ºwire: function(ºsc) {
         var ºcc = this.ºcomp.ºcontainer[ºsc];
         var ºlc = this.ºcomp.ºpage.ºgetcomp(`list`).ºcontainer[ºsc];
         this.º_stats[ºsc] = ºcc.find(`#fstats_${ºsc}`);
@@ -47,7 +61,7 @@ function ºFacet(ºcomp) {
             ºdt.find(`.showc`).hide();
         });
     },
-    º_work_flt: function(ºsc) {
+    ºwork: function(ºsc) {
         this.ºtable[ºsc].find(`tr[id]`).hide();
         var ºdata = this.ºcomp.ºpage.ºgetcomp(`list`).ºdata[ºsc];
         var ºfcts = this.ºenabled_facets[ºsc];
@@ -103,38 +117,6 @@ function ºFacet(ºcomp) {
             ºfct.ºstats(ºsc);
         }
         this.º_stats[ºsc].html(`${this.ºfltd[ºsc].length} of ${ºdata.length}`);
-    },
-    ºshow: function(ºsc) {
-        return this.ºcomp.ºstate.ºgetstate(`list`) == ºsc;
-    },
-    ºweld: function(ºsc) {
-        this.ºchildren = this.ºcomp.ºchildren;
-        this.ºenabled_facets[ºsc] = {};
-        for (var ºfn in this.ºchildren) {
-            var ºfct = this.ºchildren[ºfn];
-            if (ºfct.ºhas_scomp(ºsc)) {
-                this.ºenabled_facets[ºsc][ºfn] = ºfct;
-            }
-        }
-        this.º_html(ºsc);
-    },
-    ºwire: function(ºsc) {
-        if (this.ºshow(ºsc)) {
-            var ºfcts = this.ºenabled_facets[ºsc];
-            for (var ºfn in ºfcts) {
-                ºfcts[ºfn].ºdelg.ºwire_flt(ºsc);
-            }
-            this.º_wire_flt(ºsc);
-        }
-    },
-    ºwork: function(ºsc) {
-        if (this.ºshow(ºsc)) {
-            var ºfcts = this.ºenabled_facets[ºsc];
-            for (var ºfn in ºfcts) {
-                ºfcts[ºfn].ºdelg.ºwork_flt(ºsc);
-            }
-            this.º_work_flt(ºsc);
-        }
     },
 };
 

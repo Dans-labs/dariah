@@ -30,26 +30,22 @@ function ºnow(ºfun) { // make a promise by applying function ºfun, and yield 
  * Here is the generic functionality of each component
  */
 
-function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspecific, ºpage) {
-    this.ºdst = ºdst;
+var tc;
+
+function ºComponent(ºname, ºcomp_info, ºpage) {
     this.ºname = ºname;
-    this.ºscomps = ºscomps;
-    this.ºmust_fetch = ºmust_fetch;
-    this.ºwork_first = ºwork_first;
-    this.ºspecific = ºspecific;
-    this.º_stage = {};
-    this.º_stages = {ºfetch: true, ºwire: true, ºwork: false}; // true means: once only, ºwork means: my be repeated
     this.ºpage = ºpage;
-    /* after creation, the creator is responsible to add ºparent and ºchildren fields
-     * ºthat specify the ºparent-child relations based on the routing table.
-     */
-    this.º_dst = {};
+    this.ºcomp_info = ºcomp_info;
+    this.ºsubcomps = ºcomp_info.ºsubcomps;
+    this.º_stage = {};
+    this.º_stages = {ºweld: true, ºwire: true, ºwork: false}; // true means: once only, false means: my be repeated
     this.ºmsg = {};
     this.ºcontainer = {};
     this.ºstate = this.ºpage.ºstate;
     this.ºdata = {};
     this.ºrelvals = {};
-    this.º_fetch_url = {};
+    this.ºdelg = new ºcomp_info.ºspecific(this);
+    tc = this;
 };
 
 ºComponent.prototype = {
@@ -72,79 +68,33 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
         if (!(ºsc in this.º_stage)) {
             this.º_stage[ºsc] = {};
         }
-        var ºprm = º_as_prom(this[ºmth](ºsc));
+        var ºbefore = this.ºbefore[ºact];
+        var ºbefore_promises = [];
+        for (ºb in ºbefore) {
+            ºbefore_promises.push(this.ºpage.ºgetcomp(ºb).º_stage[ºsc][ºact]);
+        }
+        var ºprm = º_as_prom($.when(ºbefore_promises).then(this[ºmth](ºsc)));
         this.º_stage[ºsc][ºact] = ºprm;
         return ºprm;
     },
-    ºensure: function(ºsc, ºact, ºmth) { // function to promise ºthat method ºfun will be executed once and once only
+    ºensure: function(ºsc, ºact, ºmth) {
+        /* function to promise ºthat method ºfun will be executed once and once only or multiple times,
+         * but only if the before actions have been completed
+         */
         var ºthat = this;
         if (ºact in this.º_stages) {
             if (this.º_stages[ºact]) { 
-                return function() {
-                    return ºthat.ºneed(ºsc, ºact)?ºthat.º_deed(ºsc, ºact, ºmth):º_as_prom(true);
-                };
+                return ºthat.ºneed(ºsc, ºact)?ºthat.º_deed(ºsc, ºact, ºmth):º_as_prom(true);
             }
-            return function() {ºthat.º_deed(ºsc, ºact, ºmth)};
+            return ºthat.º_deed(ºsc, ºact, ºmth);
         }
-        return function() {º_as_prom(true)};
-    },
-    º_state_children: function(ºsc, ºact) {
-        var ºpromises = [];
-        for (var ºc in this.ºchildren) {
-            var ºcc = this.ºchildren[ºc];
-            if ((ºsc in ºcc.º_stage) && (ºact in ºcc.º_stage[ºsc])) {
-                ºpromises.push(ºcc.º_stage[ºsc][ºact]);
-            }
-        }
-        return ºpromises;
+        return º_as_prom(true);
     },
     /* here are the implementations of the functions ºthat are to be wrapped as promises
      * They can focus on the ºwork, may or may not yield a promise
      */    
-    º_fetch: function(ºsc) { // get the material by AJAX if needed
-        var ºthat = this;
-        if (this.ºmust_fetch) {
-            this.ºmsg[ºsc].ºmsg(`fetching data ...`);
-            return $.ajax({
-                type: `POST`,
-                url: this.º_fetch_url[ºsc],
-                contentType: `application/json; charset=utf-8`,
-                dataType: `json`,
-            }).then(function(ºjson) {
-                ºthat.º_post_fetch(ºsc, ºjson);
-            });
-        }
-    },
-    º_post_fetch: function(ºsc, ºjson) { // receive material after AJAX call
-        this.ºmsg[ºsc].ºclear();
-        ºjson.msgs.forEach(function(ºm) {
-            this.ºmsg[ºsc].ºmsg(ºm);
-        });
-        if (ºjson.good) {
-            this.ºdata[ºsc] = ºjson.data;
-            this.ºrelvals[ºsc] = ºjson.relvals;
-        }
-    },
-    º_wire: function(ºsc) {
-        var ºthat = this;
-        this.ºdelg.ºwire(ºsc); // perform ºwire actions ºthat are ºspecific to this component
-        if (!this.ºwork_first) {
-            for (var ºc in this.ºchildren) {
-                this.ºchildren[ºc].ºwire(ºsc);
-            }
-            return $.when(this.º_state_children(ºsc, `wire`)).done(function() {});
-        }
-    },
-    º_work: function(ºsc) {
-        var ºthat = this;
-        this.ºdelg.ºwork(ºsc); // perform ºwork actions ºthat are ºspecific to this component
-        for (var ºc in this.ºchildren) {
-            this.ºchildren[ºc].ºwork(ºsc);
-        }
-        return $.when(this.º_state_children(ºsc, `work`)).done(function() {});
-    },
     ºhas_scomp: function(ºsc) {
-        return (ºsc in this.ºscomps);
+        return (ºsc in this.ºsubcomps);
     },
     ºshow: function(ºsc) {
         if (this.ºhas_scomp(ºsc)) {
@@ -161,49 +111,65 @@ function ºComponent(ºdst, ºname, ºscomps, ºmust_fetch, ºwork_first, ºspec
             this.ºchildren[ºc].ºshow(ºsc);
         }
     },
-    ºweld: function() {
-        this.ºdelg = new this.ºspecific(this);
-        if (this.ºdst in this.ºpage.ºcompindex) {
-            var ºdstcontainer = this.ºpage.ºcompindex[this.ºdst].ºcontainer;
-            this.º_dst = ºdstcontainer;
-        }
-        else {
-            for (var ºsc in this.ºscomps) {
-                this.º_dst[ºsc] = $(`#${this.ºdst}`);
+    º_fetch: function(ºsc) { // get the material by AJAX if needed
+        var ºthat = this;
+        var ºfetch_url = url_tpl.replace(/_c_/, `data`).replace(/_f_/, `${this.ºcomp_info.ºfetch_url}_${ºsc}`)+`.json`;
+        this.ºmsg[ºsc].ºmsg(`fetching data ...`);
+        return $.ajax({
+            type: `POST`,
+            url: ºfetch_url[ºsc],
+            contentType: `application/json; charset=utf-8`,
+            dataType: `json`,
+        }).then(function(ºjson) {
+            console.log(`postfetch`);
+            ºthat.º_post_fetch(ºsc, ºjson);
+        });
+    },
+    º_post_fetch: function(ºsc, ºjson) { // receive material after AJAX call
+        this.ºmsg[ºsc].ºclear();
+        ºjson.msgs.forEach(function(ºm) {
+            this.ºmsg[ºsc].ºmsg(ºm);
+        });
+        if (ºjson.good) {
+            this.ºdata[ºsc] = ºjson.data;
+            if (`relvals` in ºjson) {
+                this.ºrelvals[ºsc] = ºjson.relvals;
             }
-        }
-        for (var ºsc in this.ºscomps) {
-            if (this.ºmust_fetch) {
-                this.º_fetch_url[ºsc] = url_tpl.replace(/_c_/, `data`).replace(/_f_/, `${this.ºname}_${ºsc}`)+`.json`;
-            }
-            this.ºcontainer[ºsc] = $(`#${this.ºname}_${ºsc}`);
-            if (this.ºcontainer[ºsc].length == 0) {
-                var ºd = this.º_dst[ºsc];
-                ºd.append(`<div id="msg_${this.ºname}_${ºsc}"></div>`);
-                ºd.append(`<div id="${this.ºname}_${ºsc}"></div>`);
-                this.ºcontainer[ºsc] = $(`#${this.ºname}_${ºsc}`);
-            }
-            this.ºmsg[ºsc] = new ºMsg(`msg_${this.ºname}_${ºsc}`);
-            this.ºdelg.ºweld(ºsc);
         }
     },
-    ºwire: function(ºsc) { // ºwire after fetching
-        if (this.ºhas_scomp(ºsc) && this.ºdelg.ºshow(ºsc)) { // ºshow/hide depending on the ºspecific condition
-            ºnow(
-                this.ºensure(ºsc, `ºfetch`, `º_fetch`)
-            ).then(
-                this.ºensure(ºsc, `ºwire`, `º_wire`)
-            );
+    º_weld: function(ºsc) {
+        console.log(`WELD ${this.ºname}-${ºsc}`);
+        this.º_dst = this.ºpage.ºget_container(this.ºcomp_info.ºdest, this.ºsubcomps);
+        this.ºcontainer[ºsc] = $(`#${this.ºname}_${ºsc}`);
+        if (this.ºcontainer[ºsc].length == 0) {
+            var ºd = this.º_dst[ºsc];
+            ºd.append(`<div id="msg_${this.ºname}_${ºsc}"></div>`);
+            ºd.append(`<div id="${this.ºname}_${ºsc}"></div>`);
+            this.ºcontainer[ºsc] = $(`#${this.ºname}_${ºsc}`);
         }
+        this.ºmsg[ºsc] = new ºMsg(`msg_${this.ºname}_${ºsc}`);
+        this.ºdelg.ºweld(ºsc);
+        if (this.ºcomp_info.ºfetch_url != null) {
+            return this.º_fetch(ºsc);
+        }
+    },
+    º_wire: function(ºsc) {
+        console.log(`WIRE ${this.ºname}-${ºsc}`);
+        this.ºdelg.ºwire(ºsc); // perform ºwire actions ºthat are ºspecific to this component
+    },
+    º_work: function(ºsc) {
+        console.log(`WORK ${this.ºname}-${ºsc}`);
+        this.ºdelg.ºwork(ºsc); // perform ºwork actions ºthat are ºspecific to this component
     },
     ºwork: function(ºsc) { // ºwork (changed) state to current material
+        var ºthat = this;
         if (this.ºhas_scomp(ºsc) && this.ºdelg.ºshow(ºsc)) { // ºshow/hide depending on the ºspecific condition
             ºnow(
-                this.ºensure(ºsc, `ºfetch`, `º_fetch`)
+                function() {ºthat.ºensure(ºsc, `ºweld`, `º_weld`)}
             ).then(
-                this.ºensure(ºsc, `ºwire`, `º_wire`)
+                function() {ºthat.ºensure(ºsc, `ºwire`, `º_wire`)}
             ).then(
-                this.ºensure(ºsc, `ºwork`, `º_work`)
+                function() {ºthat.ºensure(ºsc, `ºwork`, `º_work`)}
             );
         }
     },

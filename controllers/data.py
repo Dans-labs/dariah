@@ -51,9 +51,17 @@ country = dict (
     )
 
 def list_contrib():
-    relinfo_order = ('country', 'type')
-    relinfo = dict((x, {}) for x in relinfo_order)
-    relvals = dict((x, {}) for x in relinfo_order)
+    records = dbd.executesql('''
+select
+    contrib.id, contrib.title
+from contrib
+;
+''')
+    return dict(data=records, msgs=[], good=True)
+
+def type_contrib():
+    relinfo = {}
+    relvals = {}
     reldata = dbd.executesql('''
 select
     contrib_type_of_inkind.contrib_id as id,
@@ -66,26 +74,28 @@ inner join type_of_inkind on
 ;
 ''')
     for r in reldata:
-        relinfo['type'].setdefault(r[0], {})[r[1]] = True
-        relvals['type'][r[1]] = r[2]
-    for r in country:
-        relvals['country'][r] = country[r]
+        relinfo.setdefault(r[0], {})[r[1]] = True
+        relvals[r[1]] = r[2]
+    return dict(data=relinfo, relvals=relvals, msgs=[], good=True)
 
-    main_records = dbd.executesql('''
+def country_contrib():
+    relinfo = {}
+    relvals = {}
+    reldata = dbd.executesql('''
 select
-    contrib.id, contrib.title,
-    country.countrycode
-from contrib
-inner join country
-on country.id = contrib.country_id
+    contrib.id, country.countrycode
+from
+    contrib
+inner join country on
+    contrib.country_id = country.id
 ;
 ''')
-    records = []
-    for mr in main_records:
-        main_id = mr[0]
-        relinfo['country'].setdefault(main_id, {})[mr[2]] = True
-        records.append(mr[0:2]+tuple(relinfo[knd].get(main_id, {}) for knd in relinfo_order))
-    return dict(data=records, relvals=relvals, msgs=[], good=True)
+    for r in country:
+        relvals[r] = country[r]
+
+    for r in reldata:
+        relinfo.setdefault(r[0], {})[r[1]] = True
+    return dict(data=relinfo, relvals=relvals, msgs=[], good=True)
 
 def list_country():
     return dict(data=tuple((c,)+country(c) for c in country), relvals={}, msgs=[], good=True)

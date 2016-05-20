@@ -8,7 +8,6 @@ function ºCType(ºcomp) {
     this.ºfacet = this.ºcomp.ºpage.ºgetcomp(`facet`).ºdelg;
     this.ºfltd = {};
     this.º_data = {};
-    this.º_relvals = {};
     this.º_list = {};
     this.º_allc = {};
     this.º_sts = {};
@@ -140,22 +139,18 @@ function ºCType(ºcomp) {
     ºshow: function(ºsc) {
         return (this.ºcomp.ºstate.ºgetstate(`list`) == ºsc);
     },
-    ºweld: function(ºsc) {},
-    ºwire: function(ºsc) {},
-    ºwire_flt: function(ºsc) {
-        this.º_listc = this.ºcomp.ºpage.ºgetcomp(`list`);
-        this.º_data[ºsc] = this.º_listc.ºdata[ºsc];
-        this.º_relvals[ºsc] = this.º_listc.ºrelvals[ºsc];
+    ºweld: function(ºsc) {
         this.ºrvalues[ºsc] = [];
         this.ºrvalue[ºsc] = {};
         this.ºrvalues_off[ºsc] = {};
         this.ºrvalues_on[ºsc] = {};
-        for (var ºrv in this.º_relvals[ºsc].type) {
-            var ºvv = this.º_relvals[ºsc].type[ºrv];
-            this.ºrvalues_off[ºsc][ºrv] = false;
-            this.ºrvalues_on[ºsc][ºrv] = true;
-            this.ºrvalues[ºsc].push(ºrv);
-            this.ºrvalue[ºsc][ºrv] = ºvv;
+        var ºrelvals = this.ºcomp.ºrelvals[ºsc];
+        for (var ºi in ºrelvals) {
+            var ºrv = ºrelvals[ºi];
+            this.ºrvalues_off[ºsc][ºi] = false;
+            this.ºrvalues_on[ºsc][ºi] = true;
+            this.ºrvalues[ºsc].push(ºi);
+            this.ºrvalue[ºsc][ºi] = ºv;
         }
         this.ºrvalues[ºsc].push(`-`);
         this.ºrvalue[ºsc][`-`] = `-none-`;
@@ -163,10 +158,13 @@ function ºCType(ºcomp) {
         this.ºrvalues_on[ºsc][`-`] = true;
         this.ºrvalues[ºsc].sort();
         this.º_html(ºsc);
+    },
+    ºwire: function(ºsc) {
+        this.º_listc = this.ºcomp.ºpage.ºgetcomp(`list`);
+        this.º_data[ºsc] = this.º_listc.ºdata[ºsc];
         this.º_dressup(ºsc);
     },
-    ºwork: function(ºsc) {},
-    ºwork_flt: function(ºsc) {
+    ºwork: function(ºsc) {
         this.ºrstate[ºsc] = this.ºcomp.ºstate.ºgetstate(`t_${ºsc}`);
         this.º_set_flt(ºsc, this.º_from_str(this.ºrstate[ºsc]));
     },

@@ -267,12 +267,6 @@ function ºEUmap(ºcomp) {
         return (this.ºcomp.ºstate.ºgetstate(`list`) == ºsc);
     },
     ºweld: function(ºsc) {
-    },
-    ºwire: function(ºsc) {
-    },
-    ºwire_flt: function(ºsc) {
-        this.º_listc = this.ºcomp.ºpage.ºgetcomp(`list`);
-        this.º_data[ºsc] = this.º_listc.ºdata[ºsc];
         this.º_relvals[ºsc] = this.º_listc.ºrelvals[ºsc];
         this.ºrvalues = [];
         this.ºrvalue = {};
@@ -298,10 +292,13 @@ function ºEUmap(ºcomp) {
         }
         this.ºrvalues.sort();
         this.º_html(ºsc);
+    },
+    ºwire: function(ºsc) {
+        this.º_listc = this.ºcomp.ºpage.ºgetcomp(`list`);
+        this.º_data[ºsc] = this.º_listc.ºdata[ºsc];
         this.º_dressup(ºsc);
     },
-    ºwork: function(ºsc) {},
-    ºwork_flt: function(ºsc) {
+    ºwork: function(ºsc) {
         this.ºrstate[ºsc] = this.ºcomp.ºstate.ºgetstate(`m_${ºsc}`);
         this.º_set_flt(ºsc, this.º_from_str(this.ºrstate[ºsc]));
     },

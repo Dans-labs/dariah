@@ -13,11 +13,7 @@ function ºList(ºcomp) {this.ºcomp = ºcomp};
         if (ºsc == `contrib`) {
             for (var ºi in this.ºcomp.ºdata[ºsc]) {
                 ºr = this.ºcomp.ºdata[ºsc][ºi];
-                var ºccy = [];
-                for (var ºc in ºr[2]) {
-                    if (ºr[2][ºc]) {ºccy.push(ºc)}
-                } 
-                ºh += `<tr id="r${ºr[0]}"><td title="${ºr[3]}" class="•country_code">${ºccy.join(`,`)}<td><td><a href="#" rid="${ºr[0]}">${ºr[1]}</a></td></tr>`;
+                ºh += `<tr id="r${ºr[0]}"><td><a href="#" rid="${ºr[0]}">${ºr[1]}</a></td></tr>`;
             }
         }
         else if (ºsc == `country`) {
@@ -32,9 +28,10 @@ function ºList(ºcomp) {this.ºcomp = ºcomp};
     ºshow: function(ºsc) {
         return this.ºcomp.ºstate.ºgetstate(`list`) == ºsc;
     },
-    ºweld: function(ºsc) {},
-    ºwire: function(ºsc) {
+    ºweld: function(ºsc) {
         this.º_html(ºsc);
+    },
+    ºwire: function(ºsc) {
     },
     ºwork: function(ºsc) {},
 };
