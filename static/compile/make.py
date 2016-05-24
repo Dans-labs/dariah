@@ -27,13 +27,15 @@ def t2a_repl(match): return match.group(1)
 def t3_repl(match): return match.group(1)
 
 x_js_names_spec = '''
-    «/«g»x»
+    «.«apply»(»
+    «x«break»x»
     «x«delete»x»
     «x«else»x»
     «x«false»x»
     «x«for»(»
     «.«forEach»(»
     «x«function»x»
+    «/«g»x»
     «.«height»(»
     «x«if»(»
     « «in» »
@@ -69,11 +71,15 @@ x_js_names_spec = '''
     «x«typeof»(»
     «=«undefined»x»
     «x«var» »
+    «x«while»(»
+    «.«when»(»
+    «.«when».»
     «.«width»(»
     «x«window»x»
 '''.strip().split('\n')
 
 i_js_names_spec = '''
+    «.«break»x»
     «.«delete»x»
     «.«else»x»
     «.«false»x»
@@ -88,6 +94,7 @@ i_js_names_spec = '''
     «.«true»x»
     «.«typeof»x»
     «.«var»x»
+    «.«while»x»
     «.«window»x»
 '''.strip().split('\n')
 
@@ -204,6 +211,7 @@ x_app_names_spec = '''
     «.«relvals»x»
     «x«right»:»
     «x«sort»:»
+    «.«state»x»
     «x«t_contrib»:»
     «x«t_country»:»
     «x«type»:»

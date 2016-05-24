@@ -98,4 +98,4 @@ inner join country on
     return dict(data=relinfo, relvals=relvals, msgs=[], good=True)
 
 def list_country():
-    return dict(data=tuple((c,)+country(c) for c in country), relvals={}, msgs=[], good=True)
+    return dict(data=tuple((c,)+country[c] for c in country), relvals={}, msgs=[], good=True)

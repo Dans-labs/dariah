@@ -8,7 +8,7 @@ function ºFacet(ºcomp) {
     this.º_stats = {};
     this.ºdata = {};
     this.ºtable = {};
-    this.ºfltd = {};
+    this.ºdistilled = {};
     this.ºenabled_facets = {};
 };
 
@@ -22,19 +22,19 @@ function ºFacet(ºcomp) {
         return this.ºcomp.ºstate.ºgetstate(`list`) == ºsc;
     },
     ºweld: function(ºsc) {
-        this.ºchildren = this.ºcomp.ºchildren;
+        var ºchildren = this.ºcomp.ºchildren;
         this.ºenabled_facets[ºsc] = {};
-        for (var ºfn in this.ºchildren) {
-            var ºfct = this.ºchildren[ºfn];
-            if (ºfct.ºhas_scomp(ºsc)) {
-                this.ºenabled_facets[ºsc][ºfn] = ºfct;
+        for (var ºfacet_name in ºchildren) {
+            var ºfacet_comp = ºchildren[ºfacet_name];
+            if (ºfacet_comp.ºhas_scomp(ºsc)) {
+                this.ºenabled_facets[ºsc][ºfacet_name] = ºchildren[ºfacet_name];
             }
         }
         this.º_html(ºsc);
     },
     ºwire: function(ºsc) {
         var ºcc = this.ºcomp.ºcontainer[ºsc];
-        var ºlc = this.ºcomp.ºpage.ºgetcomp(`list`).ºcontainer[ºsc];
+        var ºlc = this.ºcomp.ºpage.ºget_component(`ºlist`).ºcontainer[ºsc];
         this.º_stats[ºsc] = ºcc.find(`#fstats_${ºsc}`);
         this.ºtable[ºsc] =  ºlc.find(`#table_${ºsc}`);
         var ºdetailcontrols = `<a class="showc fa fa-chevron-right" href="#" title="Show details"></a><a class="hidec fa fa-chevron-down" href="#" title="Hide details"></a>`;
@@ -63,29 +63,30 @@ function ºFacet(ºcomp) {
     },
     ºwork: function(ºsc) {
         this.ºtable[ºsc].find(`tr[id]`).hide();
-        var ºdata = this.ºcomp.ºpage.ºgetcomp(`list`).ºdata[ºsc];
-        var ºfcts = this.ºenabled_facets[ºsc];
-        this.ºfltd[ºsc] = [];
-        for (var ºfn in ºfcts) {
-            var ºfct = ºfcts[ºfn].ºdelg;
-            ºfct.ºfltd[ºsc] = [];
+        var ºmother_list = this.ºcomp.ºpage.ºget_component(`ºlist`);
+        var ºdata = ºmother_list.ºdata[ºsc];
+        var ºfacets = this.ºenabled_facets[ºsc];
+        this.ºdistilled[ºsc] = [];
+        for (var ºfacet_name in ºfacets) {
+            var ºfacet= ºfacets[ºfacet_name].ºdelg;
+            ºfacet.ºdistilled[ºsc] = [];
         }
-        for (var ºi in ºdata) {
+        ºdata.forEach(function(ºd, ºi) {
             var ºv = true; // will hold whether this row passes all facets
-/* We collect in the ºfltd member of this facet object the collective results of all individual facets,
- * Moreover, for each facet, we collect in its ºfltd member the results when all facets are applied except the facet in question
+/* We collect in the ºdistilled member of this facet object the collective results of all individual facets,
+ * Moreover, for each facet, we collect in its ºdistilled member the results when all facets are applied except the facet in question
  * so: 
  * 1. rows with a failure for 2 or more facets are discarded
- * 2. rows with a failure for exactly one facet are added to the data for ºthat facet
+ * 2. rows with a failure for exactly one facet are added to the data for that facet
  * 3. rows which pass all facets are added to all facets, and also to the final filtered set
  */
             var ºthe_false = null; // which facet has yielded false (if there are more than one we'll ºdiscard the row
-            var ºdiscard = false; // becomes true when we have encounterd 2 facets ºthat yield false
-            for (var ºfn in ºfcts) {
+            var ºdiscard = false; // becomes true when we have encounterd 2 facets that yield false
+            for (var ºfacet_name in ºfacets) {
                 if (!ºdiscard) {
-                    var ºfct = ºfcts[ºfn].ºdelg;
-                    var ºtv = ºfct.ºv(ºsc, ºi); // ºtv: whether the row passes this facet
-                    if (!ºtv) {
+                    var ºfct = ºfacets[ºfacet_name].ºdelg;
+                    var ºthis_v = ºfct.ºv(ºsc, ºi); // ºthis_v: whether the row passes this facet
+                    if (!ºthis_v) {
                         ºv = false;
                         if (ºthe_false == null) { // this is the first failure, we store the facet number in ºthe_false
                             ºthe_false = ºfct;
@@ -98,25 +99,25 @@ function ºFacet(ºcomp) {
             }
             if (!ºdiscard) {
                 if (ºv) {
-                    this.ºfltd[ºsc].push(ºi);
-                    this.ºtable[ºsc].find(`tr[id="r${ºdata[ºi][0]}"]`).show();
+                    this.ºdistilled[ºsc].push(ºi);
+                    this.ºtable[ºsc].find(`tr[id="r${ºd[0]}"]`).show();
                 }
                 if (ºthe_false != null) {
-                    ºthe_false.ºfltd[ºsc].push(ºi);
+                    ºthe_false.ºdistilled[ºsc].push(ºi);
                 }
                 else {
-                    for (var ºfn in ºfcts) {
-                        var ºfct = ºfcts[ºfn].ºdelg;
-                        ºfct.ºfltd[ºsc].push(ºi);
+                    for (var ºfacet_name in ºfacets) {
+                        var ºfct = ºfacets[ºfacet_name].ºdelg;
+                        ºfct.ºdistilled[ºsc].push(ºi);
                     }
                 }
             }
-        }
-        for (var ºfn in ºfcts) {
-            var ºfct = ºfcts[ºfn].ºdelg;
+        }, this);
+        for (var ºfacet_name in ºfacets) {
+            var ºfct = ºfacets[ºfacet_name].ºdelg;
             ºfct.ºstats(ºsc);
         }
-        this.º_stats[ºsc].html(`${this.ºfltd[ºsc].length} of ${ºdata.length}`);
+        this.º_stats[ºsc].html(`${this.ºdistilled[ºsc].length} of ${ºdata.length}`);
     },
 };
 

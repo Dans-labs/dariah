@@ -27,11 +27,10 @@ var ºRequest = {
         }
         ºquery = ºuri.slice(1);
         ºparams = ºquery.split("&");
-        for (var ºi in ºparams) {
-            ºparameter = ºparams[ºi].split("=");
+        ºparams.forEach(function(ºp, ºi) {
+            ºparameter = ºp.split("=");
             ºresult[ºparameter[0]] = ºparameter[1];
-            ºi++;
-        }
+        });
         return ºresult;
     }
 };

@@ -4,10 +4,9 @@
 
 function ºCType(ºcomp) {
     this.ºcomp = ºcomp;
-    this.ºname = `ctype`;
-    this.ºfacet = this.ºcomp.ºpage.ºgetcomp(`facet`).ºdelg;
-    this.ºfltd = {};
-    this.º_data = {};
+    this.ºfacet = this.ºcomp.ºpage.ºget_component(`ºfacet`).ºdelg;
+    this.ºdistilled = {};
+    this.ºrelated_state = {};
     this.º_list = {};
     this.º_allc = {};
     this.º_sts = {};
@@ -16,6 +15,7 @@ function ºCType(ºcomp) {
     this.ºrvalue = {};
     this.ºrvalues_on = {};
     this.ºrvalues_off = {};
+    this.ºall_category = {ºvalue: `-`, ºname: `-none`};
 };
 
 ºCType.prototype = {
@@ -24,14 +24,12 @@ function ºCType(ºcomp) {
         var ºh = `<div><p class="•dctrl">By type</p>`;
         ºh += `<p class="•all"><span rv="_all" class="•stats"></span> <a rv="_all" href="#" class="•control_med">all types</a></p>
 <table class="•value_list" id="list-ctype_${ºsc}"><tr>`;
-        for (var ºi in this.ºrvalues[ºsc]) {
-            if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < this.ºrvalues[ºsc].length)) {
+        this.ºrvalues[ºsc].forEach(function(ºrel_val, ºi, ºar) {
+            if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < ºar.length)) {
                 ºh += `</tr><tr>`;
             }
-            var ºrv = this.ºrvalues[ºsc][ºi];
-            var ºvv = this.ºrvalue[ºsc][ºrv];
-            ºh += `<td><span rv="${ºrv}" class="•stats"></span></td><td><a rv="${ºrv}" href="#" class="•control_small">${ºvv}</a></td>`;
-        }
+            ºh += `<td><span rv="${ºrel_val}" class="•stats"></span></td><td><a rv="${ºrel_val}" href="#" class="•control_small">${this.ºrvalue[ºsc][ºrel_val]}</a></td>`;
+        }, this);
         ºh += `</tr></table></div>`;
         this.ºcomp.ºcontainer[ºsc].html(ºh);
     },
@@ -39,9 +37,9 @@ function ºCType(ºcomp) {
         var ºthat = this;
         this.º_list[ºsc] = $(`#list-ctype_${ºsc}`);
         this.º_list[ºsc].find(`.•control_small`).click(function(ºe) {ºe.preventDefault();
-            var ºrv = $(this).attr(`rv`);
-            var ºsel = ºthat.º_from_str(ºthat.ºcomp.ºstate.ºgetstate(`t_${ºsc}`));
-            ºsel[ºrv] = (ºrv in ºsel)?!ºsel[ºrv]:true;
+            var ºrel_val = $(this).attr(`rv`);
+            var ºsel = ºthat.º_from_str(ºsc, ºthat.ºcomp.ºstate.ºgetstate(`t_${ºsc}`));
+            ºsel[ºrel_val] = (ºrel_val in ºsel)?!ºsel[ºrel_val]:true;
             ºthat.ºcomp.ºstate.ºsetstate(`t_${ºsc}`, ºthat.º_to_str(ºsel));
         });
         this.º_allc[ºsc] = this.ºcomp.ºcontainer[ºsc].find(`[rv="_all"]`);
@@ -55,13 +53,11 @@ function ºCType(ºcomp) {
             }
         });
     },
-    º_set_flt: function(ºsc, ºrgs) {
-        var ºthat = this;
-        if (ºrgs == null || ºrgs == undefined || ºrgs == '') {ºrgs = this.º_from_str(``)}
+    º_set_flt: function(ºsc, ºrel_vals) {
         var ºall_sel = true;
-        for (var ºrv in this.ºrvalue[ºsc]) {
-            var ºccell = this.º_list[ºsc].find(`[rv="${ºrv}"]`);
-            if (ºrv in ºrgs && ºrgs[ºrv]) {
+        for (var ºrel_val in this.ºrvalue[ºsc]) {
+            var ºccell = this.º_list[ºsc].find(`[rv="${ºrel_val}"]`);
+            if (ºrel_val in ºrel_vals && ºrel_vals[ºrel_val]) {
                 ºccell.addClass(`•ison`);
             }
             else {
@@ -85,52 +81,55 @@ function ºCType(ºcomp) {
         }
         return ºar.join(',');
     },
-    º_from_str: function(ºst) {
+    º_from_str: function(ºsc, ºst) {
         var ºob = {};
         if (ºst !== null && ºst != undefined && ºst != '') {
             var ºar = ºst.split(',');
-            for (var ºi in ºar) {
-                ºob[ºar[ºi]] = true;
+            ºar.forEach(function(ºv) {
+                ºob[ºv] = true;
+            });
+        }
+        for (var ºrel_val in this.ºrvalue[ºsc]) {
+            if (!(ºrel_val in ºob)) {
+                ºob[ºrel_val] = false;
             }
         }
         return ºob;
     },
     ºstats: function(ºsc) {
-        var ºthat = this;
         this.º_sts[ºsc] = {};
-        for (var ºrv in this.ºrvalue[ºsc]) {
-            this.º_sts[ºsc][ºrv] = 0;
+        for (var ºrel_val in this.ºrvalue[ºsc]) {
+            this.º_sts[ºsc][ºrel_val] = 0;
         } 
-        for (var ºx in this.ºfltd[ºsc]) {
-            var ºi = this.ºfltd[ºsc][ºx];
-            var ºrvs = this.º_data[ºsc][ºi][3];
+        var ºrelated_data = this.ºcomp.ºdata[ºsc];
+        for (var ºx in this.ºdistilled[ºsc]) {
+            var ºi = this.ºdistilled[ºsc][ºx];
             var ºhas_rv = false;
-            for (var ºrv in ºrvs) {
-                this.º_sts[ºsc][ºrv] += 1;
+            for (var ºrel_val in ºrelated_data[ºi]) {
+                this.º_sts[ºsc][ºrel_val] += 1;
                 ºhas_rv = true;
             }
             if (!ºhas_rv) {
-                this.º_sts[ºsc][`-`] += 1;
+                this.º_sts[ºsc][this.ºall_category.ºvalue] += 1;
             }
         }
-        console.log(this.º_sts[ºsc]);
-        for (var ºrv in this.º_sts[ºsc]) {
-            this.ºcomp.ºcontainer[ºsc].find(`span[rv="${ºrv}"].•stats`).html(this.º_sts[ºsc][ºrv]);
+        for (var ºrel_val in this.º_sts[ºsc]) {
+            this.ºcomp.ºcontainer[ºsc].find(`span[rv="${ºrel_val}"].•stats`).html(this.º_sts[ºsc][ºrel_val]);
         }
-        this.ºcomp.ºcontainer[ºsc].find(`span[rv="_all"].•stats`).html(this.ºfltd[ºsc].length);
+        this.ºcomp.ºcontainer[ºsc].find(`span[rv="_all"].•stats`).html(this.ºdistilled[ºsc].length);
     },
     ºv: function(ºsc, ºi) {
-        var ºrvs =  this.º_data[ºsc][ºi][3];
-        var ºrstate = this.º_from_str(this.ºrstate[ºsc]);
-        if (Object.keys(ºrvs).length != 0) {
-            for (var ºrv in ºrvs) {
-                if ((ºrv in ºrstate) && ºrstate[ºrv]) {
+        var ºrelated_data =  this.ºcomp.ºdata[ºsc];
+        var ºrelated_state = this.º_from_str(ºsc, this.ºrelated_state[ºsc]);
+        if ((ºi in ºrelated_data) && (Object.keys(ºrelated_data[ºi]).length != 0)) {
+            for (var ºrel_val in ºrelated_data[ºi]) {
+                if ((ºrel_val in ºrelated_state) && ºrelated_state[ºrel_val]) {
                     return true;
                 }
             }
         }
         else {
-            if (`-` in ºrstate) {
+            if ((this.ºall_category.ºvalue in ºrelated_state) && (ºrelated_state[this.ºall_category.ºvalue])) {
                 return true;
             }
         }
@@ -146,26 +145,27 @@ function ºCType(ºcomp) {
         this.ºrvalues_on[ºsc] = {};
         var ºrelvals = this.ºcomp.ºrelvals[ºsc];
         for (var ºi in ºrelvals) {
-            var ºrv = ºrelvals[ºi];
+            var ºrel_val = ºrelvals[ºi];
             this.ºrvalues_off[ºsc][ºi] = false;
             this.ºrvalues_on[ºsc][ºi] = true;
             this.ºrvalues[ºsc].push(ºi);
-            this.ºrvalue[ºsc][ºi] = ºv;
+            this.ºrvalue[ºsc][ºi] = ºrel_val;
         }
-        this.ºrvalues[ºsc].push(`-`);
-        this.ºrvalue[ºsc][`-`] = `-none-`;
-        this.ºrvalues_off[ºsc][`-`] = false;
-        this.ºrvalues_on[ºsc][`-`] = true;
+        this.ºrvalues[ºsc].push(this.ºall_category.ºvalue);
+        this.ºrvalue[ºsc][this.ºall_category.ºvalue] = this.ºall_category.ºname;
+        this.ºrvalues_off[ºsc][this.ºall_category.ºvalue] = false;
+        this.ºrvalues_on[ºsc][this.ºall_category.ºvalue] = true;
         this.ºrvalues[ºsc].sort();
         this.º_html(ºsc);
     },
     ºwire: function(ºsc) {
-        this.º_listc = this.ºcomp.ºpage.ºgetcomp(`list`);
-        this.º_data[ºsc] = this.º_listc.ºdata[ºsc];
+        if (!this.ºfacet) {
+            this.ºfacet = this.ºcomp.ºpage.ºget_component(`ºfacet`).ºdelg;
+        }
         this.º_dressup(ºsc);
     },
     ºwork: function(ºsc) {
-        this.ºrstate[ºsc] = this.ºcomp.ºstate.ºgetstate(`t_${ºsc}`);
-        this.º_set_flt(ºsc, this.º_from_str(this.ºrstate[ºsc]));
+        this.ºrelated_state[ºsc] = this.ºcomp.ºstate.ºgetstate(`t_${ºsc}`);
+        this.º_set_flt(ºsc, this.º_from_str(ºsc, this.ºrelated_state[ºsc]));
     },
 };

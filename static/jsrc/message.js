@@ -1,16 +1,15 @@
 /* MESSAGES
- * ºMsg is a function ºthat issues messages to a specified element.
+ * ºMsg is a function that issues messages to a specified element.
  * It has also controls for clearing and hiding the messages.
  */
 
 function ºMsg(ºdst, ºon_clear) {
-    var ºthat = this;
     this.º_dst = $(`#${ºdst}`);
     this.º_trashc = $(`#trash_${ºdst}`);
     this.º_trashp = this.º_trashc.closest(`p`);
     this.º_trashc.click(function(ºe) {ºe.preventDefault();
-        ºthat.ºclear();
-    });
+        this.ºclear();
+    }.bind(this));
     this.º_hide();
     this.º_on_clear = ºon_clear;
 };

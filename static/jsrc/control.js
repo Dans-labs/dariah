@@ -1,5 +1,5 @@
 /* INDIVIDUAL COMPONENT: ºControl
- * This manages the controls ºthat correspond to lists of records to be displayed in the middle column
+ * This manages the controls that correspond to lists of records to be displayed in the middle column
  * Clicking on a control shows the corresponding list and hides all others.
  */
 
@@ -14,10 +14,9 @@ function ºControl(ºcomp) {
         this.ºcomp.ºcontainer[ºsc].html(`<a class="•control_title" href="#">${this.ºcomp.ºstate.ºshowstate('list', ºsc, 'ºsg')}</a> `);
     },
     º_dressup: function(ºsc) {
-        var ºthat = this;
         this.ºctl[ºsc].click(function(ºe) {ºe.preventDefault();
-            ºthat.ºcomp.ºstate.ºsetstate(`list`, ºsc);
-        })
+            this.ºcomp.ºstate.ºsetstate(`list`, ºsc);
+        }.bind(this))
     },
     º_is_active: function(ºsc) {
         return this.ºcomp.ºstate.ºgetstate(`list`) == ºsc;

@@ -81,7 +81,7 @@ function ºViewState(ºpage) {
             var ºspec = this.º_specs[ºname];
             if (ºspec.ºtype == `string` || ºspec.ºtype == `integer`) {ºvars.push(`${ºname}=${ºval}`)}
             else if (ºspec.ºtype == `boolean`) {
-                for (ºz in ºspec.ºvalues) {
+                for (var ºz in ºspec.ºvalues) {
                     if (ºspec.ºvalues[ºz] == ºval) {ºvars.push(`${ºname}=${ºz}`)}
                 }
             }
@@ -136,14 +136,13 @@ function ºViewState(ºpage) {
         return ºresult;
     },
     ºwork: function() {
-        var ºthat = this;
         return function () {
             var ºstate = History.getState();
             if (ºstate && ºstate.data) {
-                ºthat.º_data = ºstate.data;
-                ºthat.ºpage.ºwork();
+                this.º_data = ºstate.data;
+                this.ºpage.ºwork();
             }
-        }
+        }.bind(this)
     },
 };
 
