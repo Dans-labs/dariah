@@ -1,8 +1,8 @@
-/* INDIVIDUAL COMPONENT: ctype
- * This manages the facet "contribution type"
+/* INDIVIDUAL COMPONENT: generic facet based on related values
+ * CType and EUmap inherit from this.
  */
 
-function ºCType(ºcomponent) {
+function ºRelative(ºcomponent, ºtype) {
     this.ºcomponent = ºcomponent;
     this.ºdistilled = {};
     this.º_list = {};
@@ -14,16 +14,16 @@ function ºCType(ºcomponent) {
     this.º_related_values_on = {};
     this.º_related_values_off = {};
     this.º_no_values = {ºvalue: `-`, ºname: `-none`};
-    this.º_type = `type`;
+    this.º_type = ºtype;
 };
 
-ºCType.prototype = {
+ºRelative.prototype = {
     º_html: function(ºsc) {
         var ºcols = 2;
         var ºtype_sg = this.ºcomponent.ºstate.ºshowState(`ºlist`, this.º_type, `ºsg`);
         var ºtype_pl = this.ºcomponent.ºstate.ºshowState(`ºlist`, this.º_type, `ºpl`);
-        var ºh = `<div><p class="•dctrl">By ${ºtype_sg}</p>`;
-        ºh += `<p class="•all"><span rv="_all" class="•stats"></span> <a rv="_all" href="#" class="•control_med">all ${ºtype_pl}</a></p>
+        var ºh = `<div><p class="•dctrl">By ${this.º_type}</p>`;
+        ºh += `<p class="•all"><span rv="_all" class="•stats"></span> <a rv="_all" href="#" class="•control_med">all ${this.º_type}s</a></p>
 <table class="•value_list" id="list-ctype_${ºsc}"><tr>`;
         this.º_related_values_list[ºsc].forEach(function(ºrelated_value, ºi, ºar) {
             if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < ºar.length)) {

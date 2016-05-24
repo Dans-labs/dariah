@@ -3,9 +3,4 @@
  */
 
 
-var ºwp;
-$(function() {
-    ºwp = new ºPage();
-    ºwp.ºwork();
-});
-
+$(function() {new ºPage().ºwork()});

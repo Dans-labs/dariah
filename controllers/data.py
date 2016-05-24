@@ -50,11 +50,23 @@ country = dict (
         UA=('Ukraine', False, None, None),
     )
 
+def list_country():
+    return dict(data=tuple((c,)+country[c] for c in country), relvals={}, msgs=[], good=True)
+
 def list_contrib():
     records = dbd.executesql('''
 select
-    contrib.id, contrib.title
+    id, title
 from contrib
+;
+''')
+    return dict(data=records, msgs=[], good=True)
+
+def list_type():
+    records = dbd.executesql('''
+select
+    id, val
+from type_of_inkind
 ;
 ''')
     return dict(data=records, msgs=[], good=True)
@@ -96,6 +108,3 @@ inner join country on
     for r in reldata:
         relinfo.setdefault(r[0], {})[r[1]] = True
     return dict(data=relinfo, relvals=relvals, msgs=[], good=True)
-
-def list_country():
-    return dict(data=tuple((c,)+country[c] for c in country), relvals={}, msgs=[], good=True)

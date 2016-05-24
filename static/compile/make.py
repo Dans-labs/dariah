@@ -51,7 +51,7 @@ x_js_names_spec = '''
     «.«length»x»
     «.«localStorage»x»
     «.«location»x»
-    «=«new» »
+    «x«new» »
     «x«null»x»
     «x«Math».»
     «x«Number»(»
@@ -86,6 +86,7 @@ i_js_names_spec = '''
     «.«for»x»
     «.«function»x»
     «.«if»x»
+    «.«new»x»
     «.«null»x»
     «.«Math»x»
     «.«Number»x»

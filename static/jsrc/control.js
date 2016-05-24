@@ -3,38 +3,38 @@
  * Clicking on a control shows the corresponding list and hides all others.
  */
 
-function ºControl(ºcomp) {
-    this.ºcomp = ºcomp;
+function ºControl(ºcomponent) {
+    this.ºcomponent = ºcomponent;
     this.ºwidget = {};
     this.ºctl = {};
 };
 
 ºControl.prototype = {
     º_html: function(ºsc) {
-        this.ºcomp.ºcontainer[ºsc].html(`<a class="•control_title" href="#">${this.ºcomp.ºstate.ºshowstate('list', ºsc, 'ºsg')}</a> `);
+        this.ºcomponent.ºcontainer[ºsc].html(`<a class="•control_title" href="#">${this.ºcomponent.ºstate.ºshowState('list', ºsc, 'ºsg')}</a> `);
     },
     º_dressup: function(ºsc) {
         this.ºctl[ºsc].click(function(ºe) {ºe.preventDefault();
-            this.ºcomp.ºstate.ºsetstate(`list`, ºsc);
+            this.ºcomponent.ºstate.ºsetState(`list`, ºsc);
         }.bind(this))
     },
-    º_is_active: function(ºsc) {
-        return this.ºcomp.ºstate.ºgetstate(`list`) == ºsc;
+    º_isActive: function(ºsc) {
+        return this.ºcomponent.ºstate.ºgetState(`list`) == ºsc;
     },
     ºshow: function(ºsc) {
         return true;
     },
     ºweld: function(ºsc) {
         this.º_html(ºsc);
-        this.ºwidget[ºsc] =  this.ºcomp.ºcontainer[ºsc];
+        this.ºwidget[ºsc] =  this.ºcomponent.ºcontainer[ºsc];
         this.ºwidget[ºsc].addClass(`•control_big`);
-        this.ºctl[ºsc] =  this.ºcomp.ºcontainer[ºsc].find(`a`);
+        this.ºctl[ºsc] =  this.ºcomponent.ºcontainer[ºsc].find(`a`);
     },
     ºwire: function(ºsc) {
         this.º_dressup(ºsc);
     },
     ºwork: function(ºsc) {
-        if (this.º_is_active(ºsc)) {
+        if (this.º_isActive(ºsc)) {
             this.ºctl[ºsc].addClass(`•ison`);
             this.ºwidget[ºsc].addClass(`•ison`);
         }

@@ -3,8 +3,8 @@
  * It will host individual facets
  */
 
-function ºFacet(ºcomp) {
-    this.ºcomp = ºcomp;
+function ºFacet(ºcomponent) {
+    this.ºcomponent = ºcomponent;
     this.º_stats = {};
     this.ºdata = {};
     this.ºtable = {};
@@ -16,25 +16,25 @@ function ºFacet(ºcomp) {
     º_html: function(ºsc) {
         var ºh = ``;
         ºh += `<p>Filtering <span id="fstats_${ºsc}"></span></p>`;
-        this.ºcomp.ºcontainer[ºsc].html(ºh);
+        this.ºcomponent.ºcontainer[ºsc].html(ºh);
     },
     ºshow: function(ºsc) {
-        return this.ºcomp.ºstate.ºgetstate(`list`) == ºsc;
+        return this.ºcomponent.ºstate.ºgetState(`list`) == ºsc;
     },
     ºweld: function(ºsc) {
-        var ºchildren = this.ºcomp.ºchildren;
+        var ºchildren = this.ºcomponent.ºchildren;
         this.ºenabled_facets[ºsc] = {};
         for (var ºfacet_name in ºchildren) {
-            var ºfacet_comp = ºchildren[ºfacet_name];
-            if (ºfacet_comp.ºhas_scomp(ºsc)) {
+            var ºfacet_component = ºchildren[ºfacet_name];
+            if (ºfacet_component.ºhasSubcomponent(ºsc)) {
                 this.ºenabled_facets[ºsc][ºfacet_name] = ºchildren[ºfacet_name];
             }
         }
         this.º_html(ºsc);
     },
     ºwire: function(ºsc) {
-        var ºcc = this.ºcomp.ºcontainer[ºsc];
-        var ºlc = this.ºcomp.ºpage.ºget_component(`ºlist`).ºcontainer[ºsc];
+        var ºcc = this.ºcomponent.ºcontainer[ºsc];
+        var ºlc = this.ºcomponent.ºpage.ºgetComponent(`ºlist`).ºcontainer[ºsc];
         this.º_stats[ºsc] = ºcc.find(`#fstats_${ºsc}`);
         this.ºtable[ºsc] =  ºlc.find(`#table_${ºsc}`);
         var ºdetailcontrols = `<a class="showc fa fa-chevron-right" href="#" title="Show details"></a><a class="hidec fa fa-chevron-down" href="#" title="Hide details"></a>`;
@@ -63,12 +63,12 @@ function ºFacet(ºcomp) {
     },
     ºwork: function(ºsc) {
         this.ºtable[ºsc].find(`tr[id]`).hide();
-        var ºmother_list = this.ºcomp.ºpage.ºget_component(`ºlist`);
+        var ºmother_list = this.ºcomponent.ºpage.ºgetComponent(`ºlist`);
         var ºdata = ºmother_list.ºdata[ºsc];
         var ºfacets = this.ºenabled_facets[ºsc];
         this.ºdistilled[ºsc] = [];
         for (var ºfacet_name in ºfacets) {
-            var ºfacet= ºfacets[ºfacet_name].ºdelg;
+            var ºfacet= ºfacets[ºfacet_name].ºimplementation;
             ºfacet.ºdistilled[ºsc] = [];
         }
         ºdata.forEach(function(ºd, ºi) {
@@ -84,12 +84,12 @@ function ºFacet(ºcomp) {
             var ºdiscard = false; // becomes true when we have encounterd 2 facets that yield false
             for (var ºfacet_name in ºfacets) {
                 if (!ºdiscard) {
-                    var ºfct = ºfacets[ºfacet_name].ºdelg;
-                    var ºthis_v = ºfct.ºv(ºsc, ºi); // ºthis_v: whether the row passes this facet
+                    var ºfacet = ºfacets[ºfacet_name].ºimplementation;
+                    var ºthis_v = ºfacet.ºv(ºsc, ºi); // ºthis_v: whether the row passes this facet
                     if (!ºthis_v) {
                         ºv = false;
                         if (ºthe_false == null) { // this is the first failure, we store the facet number in ºthe_false
-                            ºthe_false = ºfct;
+                            ºthe_false = ºfacet;
                         } // else we ºdiscard the row altogether
                         else {
                             ºdiscard = true;
@@ -107,15 +107,15 @@ function ºFacet(ºcomp) {
                 }
                 else {
                     for (var ºfacet_name in ºfacets) {
-                        var ºfct = ºfacets[ºfacet_name].ºdelg;
-                        ºfct.ºdistilled[ºsc].push(ºi);
+                        var ºfacet = ºfacets[ºfacet_name].ºimplementation;
+                        ºfacet.ºdistilled[ºsc].push(ºi);
                     }
                 }
             }
         }, this);
         for (var ºfacet_name in ºfacets) {
-            var ºfct = ºfacets[ºfacet_name].ºdelg;
-            ºfct.ºstats(ºsc);
+            var ºfacet = ºfacets[ºfacet_name].ºimplementation;
+            ºfacet.ºstats(ºsc);
         }
         this.º_stats[ºsc].html(`${this.ºdistilled[ºsc].length} of ${ºdata.length}`);
     },

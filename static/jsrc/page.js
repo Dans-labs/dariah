@@ -6,7 +6,7 @@
  * The page specifies all components and initializes them.
  * A component is specfied by the following fields
  * - destination: left => left sidebar; right => right sidebar; middle => middle column
- * - ºname: a string that can be used to refer to the component later on, via method ºget_component
+ * - ºname: a string that can be used to refer to the component later on, via method ºgetComponent
  * - subcomponents: a list of names for which a subcomponent will be made. The html will be generated per subcomponent.
  * - fetch: boolean which says whether this component needs data from the server
  * - ºwork first: boolean which says that child components can only be wired after ºwork of the ºparent component.
@@ -37,15 +37,15 @@ function ºPage() { // the one and only page object
     this.ºstate = new ºViewState(this);
     this.ºstages = {ºweld: true, ºwire: true, ºwork: false}; // true means: once only, false means: my be repeated
     this.ºstages_prev = {ºwire: `ºweld`, ºwork: `ºwire`};
-    var ºmain_lists = this.ºstate.ºgetvalues(`list`);
+    var ºmain_lists = this.ºstate.ºgetValues(`list`);
     var ºcontrib_list = {contrib: 1};
     this.º_component_specs = {
-        ºcontrol: {ºdest: `left`, ºsubcomps: ºmain_lists, ºfetch_url: null, ºspecific: ºControl}, 
-        ºlist: {ºdest: `middle`, ºsubcomps: ºmain_lists, ºfetch_url: `list`, ºspecific: ºList}, 
-        ºfacet: {ºdest: `ºcontrol`, ºsubcomps: ºmain_lists, ºfetch_url: null, ºspecific: ºFacet}, 
-        ºfilter: {ºdest: `ºfacet`, ºsubcomps: ºmain_lists, ºfetch_url: null, ºspecific: ºFilter}, 
-        ºeumap: {ºdest: `ºfacet`, ºsubcomps: ºcontrib_list, ºfetch_url: `country`, ºspecific: ºEUmap}, 
-        ºctype: {ºdest: `ºfacet`, ºsubcomps: ºcontrib_list, ºfetch_url: `type`, ºspecific: ºCType}, 
+        ºcontrol: {ºdest: `left`, ºsubcomponents: ºmain_lists, ºfetch_url: null, ºspecific: ºControl}, 
+        ºlist: {ºdest: `middle`, ºsubcomponents: ºmain_lists, ºfetch_url: `list`, ºspecific: ºList}, 
+        ºfacet: {ºdest: `ºcontrol`, ºsubcomponents: ºmain_lists, ºfetch_url: null, ºspecific: ºFacet}, 
+        ºfilter: {ºdest: `ºfacet`, ºsubcomponents: ºmain_lists, ºfetch_url: null, ºspecific: ºFilter}, 
+        ºeumap: {ºdest: `ºfacet`, ºsubcomponents: ºcontrib_list, ºfetch_url: `country`, ºspecific: ºEUmap}, 
+        ºctype: {ºdest: `ºfacet`, ºsubcomponents: ºcontrib_list, ºfetch_url: `type`, ºspecific: ºCType}, 
     },
     this.º_before = {
         ºweld: {
@@ -66,44 +66,44 @@ function ºPage() { // the one and only page object
     };
     this.ºcomponents = {};
     for (var ºname in this.º_component_specs) {
-        var ºcomp = new ºComponent(ºname, this.º_component_specs[ºname], this);
-        ºcomp.ºchildren = {};
-        this.ºcomponents[ºname] = ºcomp;
+        var ºcomponent = new ºComponent(ºname, this.º_component_specs[ºname], this);
+        ºcomponent.ºchildren = {};
+        this.ºcomponents[ºname] = ºcomponent;
     }
     for (var ºname in this.º_component_specs) {
-        var ºchild_comp = this.ºcomponents[ºname];
+        var ºchild_component = this.ºcomponents[ºname];
         var ºdest_name = this.º_component_specs[ºname].ºdest;
         if (ºdest_name in this.ºcomponents) {
-            var ºparent_comp = this.ºcomponents[ºdest_name];
-            ºparent_comp.ºchildren[ºname] = ºchild_comp;
+            var ºparent_component = this.ºcomponents[ºdest_name];
+            ºparent_component.ºchildren[ºname] = ºchild_component;
         }
     }
     for (var ºname in this.ºcomponents) {
-        var ºcomp = this.ºcomponents[ºname];
-        ºcomp.ºbefore = {};
+        var ºcomponent = this.ºcomponents[ºname];
+        ºcomponent.ºbefore = {};
         for (var ºstage in this.º_before) {
             var ºconstraints = this.º_before[ºstage];
-            ºcomp.ºbefore[ºstage] = {};
+            ºcomponent.ºbefore[ºstage] = {};
             if (ºname in ºconstraints) {
                 for (var ºbefore_name in ºconstraints[ºname]) {
-                   ºcomp.ºbefore[ºstage][ºbefore_name] = 1;
+                   ºcomponent.ºbefore[ºstage][ºbefore_name] = 1;
                 } 
             }
         }
     }
-    this.º_resolve_timing();
-    this.º_set_height(80);
+    this.º_resolveTiming();
+    this.º_setHeight(80);
     History.Adapter.bind(window, `statechange`, this.ºstate.ºwork());
 };
 
 ºPage.prototype = {
-    º_set_height(ºsubtract) { // the heights of the sidebars are set, depending on the height of the window
+    º_setHeight(ºsubtract) { // the heights of the sidebars are set, depending on the height of the window
         var ºwh = `${window.innerHeight - ºsubtract}px`;
         for (var ºw in {'middle': 1, 'left': 1, 'right': 1}) {
             $(`#${ºw}`).css(`height`, ºwh);
         }
     },
-    º_resolve_timing() {
+    º_resolveTiming() {
         /* the time constraints must form a directed acyclic graph.
          * If that is the case, we need a linear order in which we can make the promises
          * This function will calculate that order (of course, several orders are possible)
@@ -136,7 +136,7 @@ function ºPage() { // the one and only page object
             }
         }
         // collect the edges (we need to store every edge both ways)
-        function ºadd_edge(ºprev_node, ºnext_node) {
+        function ºaddEdge(ºprev_node, ºnext_node) {
             if (!(ºprev_node in ºtiming_edges)) {
                 ºtiming_edges[ºprev_node] = {};
             }
@@ -150,14 +150,14 @@ function ºPage() { // the one and only page object
         for (var ºnext_stage in this.ºstages_prev) {
             var ºprev_stage = this.ºstages_prev[ºnext_stage];
             for (var ºname in this.º_component_specs) {
-                ºadd_edge(`${ºname}-${ºprev_stage}`, `${ºname}-${ºnext_stage}`);
+                ºaddEdge(`${ºname}-${ºprev_stage}`, `${ºname}-${ºnext_stage}`);
             }
         }
         // 2. add the specific constraints from this.º_before
         for (var ºstage in this.º_before) {
             for (var ºnext_name in this.º_before[ºstage]) {
                 for (var ºprev_name in this.º_before[ºstage][ºnext_name]) {
-                    ºadd_edge(`${ºprev_name}-${ºstage}`, `${ºnext_name}-${ºstage}`);
+                    ºaddEdge(`${ºprev_name}-${ºstage}`, `${ºnext_name}-${ºstage}`);
                 }
             }
         }
@@ -223,22 +223,22 @@ function ºPage() { // the one and only page object
             console.log(`Timing resolved`, this.º_tasks);
         }
     },
-    ºget_component: function(ºname) {
+    ºgetComponent: function(ºname) {
         return this.ºcomponents[ºname];
     },
-    ºget_container: function(ºname, ºsubcomps) {
+    ºgetContainer: function(ºname, ºsubcomponents) {
         var ºcontainer = {};
         if (ºname in this.ºcomponents) {
             ºcontainer = this.ºcomponents[ºname].ºcontainer;
         }
         else {
-            for (var ºsc in ºsubcomps) {
+            for (var ºsc in ºsubcomponents) {
                 ºcontainer[ºsc] = $(`#${ºname}`);
             }
         }
         return ºcontainer;
     },
-    ºget_before: function(ºname, ºstage) {
+    ºgetBefore: function(ºname, ºstage) {
         var ºprev_nodes = [];
         var ºnext_node = `${ºname}-${ºstage}`;
         for (var ºprev_node in (this.º_timing[ºnext_node] || {})) {
@@ -251,9 +251,9 @@ function ºPage() { // the one and only page object
             var ºtask_comps = ºtask.split(`-`);
             var ºname = ºtask_comps[0];
             var ºstage = ºtask_comps[1];
-            var ºcomp = this.ºget_component(ºname);
-            for (var ºsc in ºcomp.ºsubcomps) {
-                ºcomp[ºstage](ºsc);
+            var ºcomponent = this.ºgetComponent(ºname);
+            for (var ºsc in ºcomponent.ºsubcomponents) {
+                ºcomponent[ºstage](ºsc);
             }
         }, this);
     },

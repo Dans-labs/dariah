@@ -35,7 +35,7 @@ var ºRequest = {
     }
 };
 
-var ºrvars = ºRequest.ºparameters();
-var ºnslvars = $.initNamespaceStorage(`req`);
-var ºlvars = ºnslvars.localStorage;
+var ºrequest_vars = ºRequest.ºparameters();
+var ºlocalstorage = $.initNamespaceStorage(`req`);
+var ºlocalstorage_vars = ºlocalstorage.localStorage;
 
