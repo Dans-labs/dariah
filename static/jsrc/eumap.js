@@ -30,25 +30,24 @@ function ºEUmap(ºcomponent) {
 ºEUmap.prototype = {
     º_html: function(ºsc) {
         var ºcols = 2;
-        var ºtype_sg = this.ºcomponent.ºstate.ºshowState(`ºlist`, this.º_type, `ºsg`);
-        var ºtype_pl = this.ºcomponent.ºstate.ºshowState(`ºlist`, this.º_type, `ºpl`);
+        var ºtype_sg = this.ºcomponent.ºstate.ºshowState(`list`, this.º_type, `ºsg`);
+        var ºtype_pl = this.ºcomponent.ºstate.ºshowState(`list`, this.º_type, `ºpl`);
         var ºh = `<div><p class="•dctrl">By ${ºtype_sg}</p>`;
         ºh += `<div id="map-europe_${ºsc}"></div>`;
         ºh += `<p class="•all"><span rv="_all" class="•stats"></span> <a rv="_all" href="#" class="•control_med">all ${ºtype_pl}</a></p>
-<table class="•value_list" id="list-europe_${ºsc}"><tr>`;
+<table class="•value_list" id="list-${this.º_type}-vals_${ºsc}"><tr>`;
         this.º_related_values_list[ºsc].forEach(function(ºrelated_value, ºi, ºar) {
             if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < ºar.length)) {
                 ºh += `</tr><tr>`;
             }
-            var ºcountry_name = this.º_related_values_index[ºsc][ºrelated_value];
-            ºh += `<td><span rv="${ºrelated_value}" class="•stats"></span></td><td><a rv="${ºrelated_value}" href="#" class="•control_small">${ºcountry_name}</a></td>`;
+            ºh += `<td><span rv="${ºrelated_value}" class="•stats"></span></td><td><a rv="${ºrelated_value}" href="#" class="•control_small">${this.º_related_values_index[ºsc][ºrelated_value]}</a></td>`;
         }, this);
         ºh += `</tr></table></div>`;
         this.ºcomponent.ºcontainer[ºsc].html(ºh);
     },
     º_dressup: function(ºsc) {
         var ºcc = this.ºcomponent.ºcontainer[ºsc];
-        this.º_list[ºsc] = ºcc.find(`#list-europe_${ºsc}`);
+        this.º_list[ºsc] = ºcc.find(`#list-${this.º_type}-vals_${ºsc}`);
         this.º_map_container[ºsc] = ºcc.find(`#map-europe_${ºsc}`);
         this.º_map_container[ºsc].width(`100%`);
         this.º_map_container[ºsc].height(this.º_map_container[ºsc].width()*0.6);
@@ -139,12 +138,12 @@ function ºEUmap(ºcomponent) {
             }.bind(this),
             onRegionSelected: function(ºe, ºrelated_value, ºi, ºselected) {
                 if (this.ºchange_state) {
-                    this.ºcomponent.ºstate.ºsetState(`map_${ºsc}`, this.º_a_to_str(ºselected));
+                    this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºsc}`, this.º_a_to_str(ºselected));
                 }
             }.bind(this),
             onMarkerSelected: function(ºe, ºrelated_value, ºi, ºselected) {
                 if (this.ºchange_state) {
-                    this.ºcomponent.ºstate.ºsetState(`map_${ºsc}`, this.º_a_to_str(ºselected));
+                    this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºsc}`, this.º_a_to_str(ºselected));
                 }
             }.bind(this),
         });
@@ -153,18 +152,18 @@ function ºEUmap(ºcomponent) {
         var ºthat = this;
         this.º_list[ºsc].find(`.•control_small`).click(function(ºe) {ºe.preventDefault();
             var ºrelated_value = $(this).attr(`rv`);
-            var ºselected = ºthat.º_from_str(ºsc, ºthat.ºcomponent.ºstate.ºgetState(`map_${ºsc}`));
+            var ºselected = ºthat.º_from_str(ºsc, ºthat.ºcomponent.ºstate.ºgetState(`rel_${ºthat.º_type}_${ºsc}`));
             ºselected[ºrelated_value] = (ºrelated_value in ºselected)?!ºselected[ºrelated_value]:true;
-            ºthat.ºcomponent.ºstate.ºsetState(`map_${ºsc}`, ºthat.º_to_str(ºselected));
+            ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºsc}`, ºthat.º_to_str(ºselected));
         });
         this.º_all_values_control[ºsc] = this.ºcomponent.ºcontainer[ºsc].find(`[rv="_all"]`);
         this.º_all_values_control[ºsc].click(function(ºe) {ºe.preventDefault();
             var ºison = $(this).hasClass(`•ison`);
             if (ºison) {
-                ºthat.ºcomponent.ºstate.ºsetState(`map_${ºsc}`, ºthat.º_to_str(ºthat.º_related_values_off[ºsc]));
+                ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºsc}`, ºthat.º_to_str(ºthat.º_related_values_off[ºsc]));
             }
             else {
-                ºthat.ºcomponent.ºstate.ºsetState(`map_${ºsc}`, ºthat.º_to_str(ºthat.º_related_values_on[ºsc]));
+                ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºsc}`, ºthat.º_to_str(ºthat.º_related_values_on[ºsc]));
             }
         });
     },
@@ -314,7 +313,7 @@ function ºEUmap(ºcomponent) {
         this.º_dressup(ºsc);
     },
     ºwork: function(ºsc) {
-        this.º_related_state[ºsc] = this.ºcomponent.ºstate.ºgetState(`map_${ºsc}`);
+        this.º_related_state[ºsc] = this.ºcomponent.ºstate.ºgetState(`rel_${this.º_type}_${ºsc}`);
         this.º_setFacet(ºsc, this.º_from_str(ºsc, this.º_related_state[ºsc]));
     },
 };

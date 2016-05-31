@@ -197,8 +197,9 @@ x_app_names_spec = '''
     «x«country»:»
     «.«country»x»
     «.«data»x»
-    «x«f_contrib»:»
-    «x«f_country»:»
+    «x«flt_contrib»:»
+    «x«flt_country»:»
+    «x«flt_type»:»
     «x«facet»:»
     «.«good»x»
     «x«id»:»
@@ -213,8 +214,8 @@ x_app_names_spec = '''
     «x«right»:»
     «x«sort»:»
     «.«state»x»
-    «x«t_contrib»:»
-    «x«t_country»:»
+    «x«rel_country_contrib»:»
+    «x«rel_type_contrib»:»
     «x«type»:»
     «.«type»x»
     «.«then»)»

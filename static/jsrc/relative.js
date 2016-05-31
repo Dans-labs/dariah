@@ -20,11 +20,12 @@ function ºRelative(ºcomponent, ºtype) {
 ºRelative.prototype = {
     º_html: function(ºsc) {
         var ºcols = 2;
-        var ºtype_sg = this.ºcomponent.ºstate.ºshowState(`ºlist`, this.º_type, `ºsg`);
-        var ºtype_pl = this.ºcomponent.ºstate.ºshowState(`ºlist`, this.º_type, `ºpl`);
-        var ºh = `<div><p class="•dctrl">By ${this.º_type}</p>`;
+        var ºtype_sg = this.ºcomponent.ºstate.ºshowState(`list`, this.º_type, `ºsg`);
+        var ºtype_pl = this.ºcomponent.ºstate.ºshowState(`list`, this.º_type, `ºpl`);
+        var ºh = `<div><p class="•dctrl">By ${ºtype_sg}</p>`;
+        //ºh += `<div id="map-europe_${ºsc}"></div>`;
         ºh += `<p class="•all"><span rv="_all" class="•stats"></span> <a rv="_all" href="#" class="•control_med">all ${this.º_type}s</a></p>
-<table class="•value_list" id="list-ctype_${ºsc}"><tr>`;
+<table class="•value_list" id="list-${this.º_type}-vals_${ºsc}"><tr>`;
         this.º_related_values_list[ºsc].forEach(function(ºrelated_value, ºi, ºar) {
             if ((ºi % ºcols == 0) && (ºi > 0) && (ºi < ºar.length)) {
                 ºh += `</tr><tr>`;
@@ -35,22 +36,23 @@ function ºRelative(ºcomponent, ºtype) {
         this.ºcomponent.ºcontainer[ºsc].html(ºh);
     },
     º_dressup: function(ºsc) {
-        this.º_list[ºsc] = $(`#list-ctype_${ºsc}`);
+        var ºcc = this.ºcomponent.ºcontainer[ºsc];
+        this.º_list[ºsc] = ºcc.find(`#list-${this.º_type}-vals_${ºsc}`);
         var ºthat = this;
         this.º_list[ºsc].find(`.•control_small`).click(function(ºe) {ºe.preventDefault();
             var ºrelated_value = $(this).attr(`rv`);
-            var ºselected = ºthat.º_from_str(ºsc, ºthat.ºcomponent.ºstate.ºgetState(`type_${ºsc}`));
+            var ºselected = ºthat.º_from_str(ºsc, ºthat.ºcomponent.ºstate.ºgetState(`rel_${ºthat.º_type}_${ºsc}`));
             ºselected[ºrelated_value] = (ºrelated_value in ºselected)?!ºselected[ºrelated_value]:true;
-            ºthat.ºcomponent.ºstate.ºsetState(`type_${ºsc}`, ºthat.º_to_str(ºselected));
+            ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºsc}`, ºthat.º_to_str(ºselected));
         });
         this.º_all_values_control[ºsc] = this.ºcomponent.ºcontainer[ºsc].find(`[rv="_all"]`);
         this.º_all_values_control[ºsc].click(function(ºe) {ºe.preventDefault();
             var ºison = $(this).hasClass(`•ison`);
             if (ºison) {
-                ºthat.ºcomponent.ºstate.ºsetState(`type_${ºsc}`, ºthat.º_to_str(ºthat.º_related_values_off[ºsc]));
+                ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºsc}`, ºthat.º_to_str(ºthat.º_related_values_off[ºsc]));
             }
             else {
-                ºthat.ºcomponent.ºstate.ºsetState(`type_${ºsc}`, ºthat.º_to_str(ºthat.º_related_values_on[ºsc]));
+                ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºsc}`, ºthat.º_to_str(ºthat.º_related_values_on[ºsc]));
             }
         });
     },
@@ -163,7 +165,7 @@ function ºRelative(ºcomponent, ºtype) {
         this.º_dressup(ºsc);
     },
     ºwork: function(ºsc) {
-        this.º_related_state[ºsc] = this.ºcomponent.ºstate.ºgetState(`type_${ºsc}`);
+        this.º_related_state[ºsc] = this.ºcomponent.ºstate.ºgetState(`rel_${this.º_type}_${ºsc}`);
         this.º_setFacet(ºsc, this.º_from_str(ºsc, this.º_related_state[ºsc]));
     },
 };
