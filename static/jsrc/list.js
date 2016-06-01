@@ -21,7 +21,7 @@ function ºList(ºcomponent) {this.ºcomponent = ºcomponent};
                 ºh += `<tr id="r${ºr[0]}"><td class="•country_code">${ºr[1]}<td><td class="•country_name">${ºr[2]}<td><td class="•in_dariah">${ºin_dariah}</td><td class="•latlng">${ºr[4]}</td><td class="•latlng">${ºr[5]}</td></tr>`;
             });
         }
-        else if (ºvar == `type` || ºvar == `tadiraho`) {
+        else if (ºvar == `type` || ºvar == `tadiraha` || ºvar == `tadiraho` || ºvar == `tadiraht`) {
             this.ºcomponent.ºdata[ºvar].forEach(function(ºr) {
                 ºh += `<tr id="r${ºr[0]}"><td class="•value">${ºr[1]}<td></tr>`;
             });
