@@ -15,12 +15,18 @@ function ºViewState(ºpage) {
 
 ºViewState.prototype = {
     º_specs: {
-        list: {ºtype: `string`, ºvalues: {contrib: 1, country: 1, type: 1}, ºdefault_value: `contrib`},
+        list: {ºtype: `string`, ºvalues: {contrib: 1, country: 1, type: 1, tadiraha: 1, tadiraho: 1, tadiraht: 1}, ºdefault_value: `contrib`},
         flt_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
         flt_country: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
         flt_type: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        flt_tadiraha: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        flt_tadiraho: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        flt_tadiraht: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
         rel_country_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
         rel_type_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        rel_tadiraha_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        rel_tadiraho_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        rel_tadiraht_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
         id: {ºtype: `integer`, ºlimits: {ºmin: -1, ºmax: 1000000}, ºdefault_value: 0},
         sort: {ºtype: `boolean`, ºvalues: {v: true, x: false}, ºdefault_value: true}, 
     },
@@ -29,6 +35,9 @@ function ºViewState(ºpage) {
             contrib: {ºsg: `contribution`, ºpl: `contributions`},
             country: {ºsg: `country`, ºpl: `countries`},
             type: {ºsg: `type`, ºpl: `types`},
+            tadiraha: {ºsg: `tadirah activity`, ºpl: `tadirah activities`},
+            tadiraho: {ºsg: `tadirah object`, ºpl: `tadirah objects`},
+            tadiraht: {ºsg: `tadirah technique`, ºpl: `tadirah techniques`},
         },
     },
     º_validate: function(ºname, ºval) {

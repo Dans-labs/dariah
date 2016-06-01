@@ -1,7 +1,7 @@
 # my own minifier for css and js
 # before aggressively removing whitespace, I escape all `` strings; I put them back later.
 
-import sys, collections, re
+import sys, collections, re, glob, os
 
 defs = re.compile(r'«([^\n»]+)»[\s\n]*≤([^≥]*)≥')
 defname = re.compile(r'«([^\n»]+)»')
@@ -28,7 +28,11 @@ def t3_repl(match): return match.group(1)
 
 x_js_names_spec = '''
     «.«apply»(»
+    «.«bind»(»
     «x«break»x»
+    «.«call»(»
+    «.«create»(»
+    «.«constructor»x»
     «x«delete»x»
     «x«else»x»
     «x«false»x»
@@ -56,7 +60,7 @@ x_js_names_spec = '''
     «x«Math».»
     «x«Number»(»
     «x«Object».»
-    «.«prototype»=»
+    «.«prototype»x»
     «.«push»(»
     «.«replace»(»
     «x«return»x»
@@ -111,7 +115,6 @@ x_lib_names_spec = '''
     «.«autocomplete»(»
     «.«backgroundColor»(»
     «x«backgroundColor»:»
-    «.«bind»(»
     «.«click»(»
     «.«closest»(»
     «.«content»x»
@@ -199,6 +202,9 @@ x_app_names_spec = '''
     «.«data»x»
     «x«flt_contrib»:»
     «x«flt_country»:»
+    «x«flt_tadiraha»:»
+    «x«flt_tadiraho»:»
+    «x«flt_tadiraht»:»
     «x«flt_type»:»
     «x«facet»:»
     «.«good»x»
@@ -215,7 +221,16 @@ x_app_names_spec = '''
     «x«sort»:»
     «.«state»x»
     «x«rel_country_contrib»:»
+    «x«rel_tadiraha_contrib»:»
+    «x«rel_tadiraho_contrib»:»
+    «x«rel_tadiraht_contrib»:»
     «x«rel_type_contrib»:»
+    «x«tadiraha»:»
+    «.«tadiraha»x»
+    «x«tadiraho»:»
+    «.«tadiraho»x»
+    «x«tadiraht»:»
+    «.«tadiraht»x»
     «x«type»:»
     «.«type»x»
     «.«then»)»
@@ -242,6 +257,28 @@ settings = dict(
     do_names=0,
     names_from='lower',
 )
+
+# the order of the javascript modules is not completely arbitrary
+
+jsorder = tuple('''
+    generic
+    message
+    viewstate
+    relative
+    ctype
+    tadiraho
+    tadiraha
+    tadiraht
+    eumap
+    filter
+    facet
+    list
+    control
+    components
+    page
+    main
+'''.strip().split())
+jsset = set(jsorder)
 
 unichars = []
 base = 0
@@ -293,9 +330,26 @@ def intake():
 
     msg(banner)
 
-    with open('all.txt') as f: txt = f.read()
+    txts = []
+    for fl in glob.glob('../cssrc/*.css'):
+        with open(fl) as f: txts.append(f.read())
+    csstxt = '\n'.join(txts)
+    txts = []
+    seen = set()
+    for fl in glob.glob('../jsrc/*.js'):
+        jsitem = os.path.splitext(os.path.basename(fl))[0]
+        if jsitem not in jsset:
+            msg('WARNING: found and ignored unkown file {}.js'.format(jsitem))
+            continue
+        seen.add(jsitem)
+    missing = jsset - seen
+    if len(missing):
+        msg('WARNING: missing files {}'.format(', '.join(sorted(missing))))
+    for jsitem in jsorder:
+        if jsitem in seen:
+            with open('{}/{}.js'.format('../jsrc', jsitem)) as f: txts.append(f.read())
+    jstxt = '\n'.join(txts)
 
-    (csstxt, jstxt) = txt.split('\nXXXXXXXXXX\n', 1)
     return (csstxt, jstxt)
 
 def make_name_map(txt):

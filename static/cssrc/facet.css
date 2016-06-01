@@ -1,8 +1,12 @@
 /* FACETS */
 
-«facet:highlight.colors» ≤
-    color: #66aa66;
-    background-color: #f8ffcc;
+«facet:shape» ≤
+    padding-top: 0.5ex;
+    padding-bottom: 0.5ex;
+    margin-top: 0.5ex;
+    margin-bottom: 0.5ex;
+    border-radius: 3px;
+    border: 2px solid #eeee77;
 ≥
 «facet:highlight.text» ≤
     font-size: x-small;
@@ -10,21 +14,34 @@
     font-style: normal;
 ≥
 «facet:normal.colors» ≤
-    color: #aaaaaa;
+    color: #000000;
     background-color: #ffffff;
 ≥
 «facet:normal.text» ≤
+    font-size: small;
+    font-weight: normal;
+    font-style: normal;
+≥
+«facet:stats.colors» ≤
+    color: #aaaaaa;
+    background-color: #ffffff;
+≥
+«facet:stats.text» ≤
     font-size: x-small;
     font-weight: normal;
     font-style: normal;
 ≥
 
-div.•facet {
+
+div.•facet>div {
     font-size: small;
-}
-div.•facet .•stats {
     «facet:normal.colors»
     «facet:normal.text»
+    «facet:shape»
+}
+div.•facet .•stats {
+    «facet:stats.colors»
+    «facet:stats.text»
 }
 div.•facet .•stats.•ison {
     «facet:highlight.colors»

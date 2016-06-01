@@ -7,35 +7,36 @@
 function ºList(ºcomponent) {this.ºcomponent = ºcomponent};
 
 ºList.prototype = {
-    º_html: function(ºsc) {
+    º_html: function(ºvar) {
         var ºh = ``;
-        ºh += `<table id="table_${ºsc}">`;
-        if (ºsc == `contrib`) {
-            this.ºcomponent.ºdata[ºsc].forEach(function(ºr) {
+        ºh += `<table id="table_${ºvar}">`;
+        if (ºvar == `contrib`) {
+            this.ºcomponent.ºdata[ºvar].forEach(function(ºr) {
                 ºh += `<tr id="r${ºr[0]}"><td><a href="#" rid="${ºr[0]}">${ºr[1]}</a></td></tr>`;
             });
         }
-        else if (ºsc == `country`) {
-            this.ºcomponent.ºdata[ºsc].forEach(function(ºr) {
-                ºh += `<tr id="r${ºr[0]}"><td class="•country_code">${ºr[0]}<td><td class="•country_name">${ºr[1]}<td></tr>`;
+        else if (ºvar == `country`) {
+            this.ºcomponent.ºdata[ºvar].forEach(function(ºr) {
+                ºin_dariah = (ºr[3] == 1)?`dariah`:``;
+                ºh += `<tr id="r${ºr[0]}"><td class="•country_code">${ºr[1]}<td><td class="•country_name">${ºr[2]}<td><td class="•in_dariah">${ºin_dariah}</td><td class="•latlng">${ºr[4]}</td><td class="•latlng">${ºr[5]}</td></tr>`;
             });
         }
-        else if (ºsc == `type`) {
-            this.ºcomponent.ºdata[ºsc].forEach(function(ºr) {
-                ºh += `<tr id="r${ºr[0]}"><td class="•country_code">${ºr[0]}<td><td class="•country_name">${ºr[1]}<td></tr>`;
+        else if (ºvar == `type` || ºvar == `tadiraho`) {
+            this.ºcomponent.ºdata[ºvar].forEach(function(ºr) {
+                ºh += `<tr id="r${ºr[0]}"><td class="•value">${ºr[1]}<td></tr>`;
             });
         }
         ºh += `</table>`;
-        this.ºcomponent.ºcontainer[ºsc].html(ºh);
+        this.ºcomponent.ºcontainer[ºvar].html(ºh);
     },
-    ºshow: function(ºsc) {
-        return this.ºcomponent.ºstate.ºgetState(`list`) == ºsc;
+    ºshow: function(ºvar) {
+        return this.ºcomponent.ºstate.ºgetState(`list`) == ºvar;
     },
-    ºweld: function(ºsc) {
-        this.º_html(ºsc);
+    ºweld: function(ºvar) {
+        this.º_html(ºvar);
     },
-    ºwire: function(ºsc) {
+    ºwire: function(ºvar) {
     },
-    ºwork: function(ºsc) {},
+    ºwork: function(ºvar) {},
 };
 

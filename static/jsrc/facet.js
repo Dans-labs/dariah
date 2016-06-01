@@ -13,30 +13,30 @@ function ºFacet(ºcomponent) {
 };
 
 ºFacet.prototype = {
-    º_html: function(ºsc) {
+    º_html: function(ºvar) {
         var ºh = ``;
-        ºh += `<p>Filtering <span id="fstats_${ºsc}"></span></p>`;
-        this.ºcomponent.ºcontainer[ºsc].html(ºh);
+        ºh += `<p>Filtering <span id="fstats_${ºvar}"></span></p>`;
+        this.ºcomponent.ºcontainer[ºvar].html(ºh);
     },
-    ºshow: function(ºsc) {
-        return this.ºcomponent.ºstate.ºgetState(`list`) == ºsc;
+    ºshow: function(ºvar) {
+        return this.ºcomponent.ºstate.ºgetState(`list`) == ºvar;
     },
-    ºweld: function(ºsc) {
+    ºweld: function(ºvar) {
         var ºchildren = this.ºcomponent.ºchildren;
-        this.ºenabled_facets[ºsc] = {};
+        this.ºenabled_facets[ºvar] = {};
         for (var ºfacet_name in ºchildren) {
             var ºfacet_component = ºchildren[ºfacet_name];
-            if (ºfacet_component.ºhasSubcomponent(ºsc)) {
-                this.ºenabled_facets[ºsc][ºfacet_name] = ºchildren[ºfacet_name];
+            if (ºfacet_component.ºhasVariant(ºvar)) {
+                this.ºenabled_facets[ºvar][ºfacet_name] = ºchildren[ºfacet_name];
             }
         }
-        this.º_html(ºsc);
+        this.º_html(ºvar);
     },
-    ºwire: function(ºsc) {
-        var ºcc = this.ºcomponent.ºcontainer[ºsc];
-        var ºlc = this.ºcomponent.ºpage.ºgetComponent(`ºlist`).ºcontainer[ºsc];
-        this.º_stats[ºsc] = ºcc.find(`#fstats_${ºsc}`);
-        this.ºtable[ºsc] =  ºlc.find(`#table_${ºsc}`);
+    ºwire: function(ºvar) {
+        var ºcc = this.ºcomponent.ºcontainer[ºvar];
+        var ºlc = this.ºcomponent.ºpage.ºgetComponent(`ºlist`).ºcontainer[ºvar];
+        this.º_stats[ºvar] = ºcc.find(`#fstats_${ºvar}`);
+        this.ºtable[ºvar] =  ºlc.find(`#table_${ºvar}`);
         var ºdetailcontrols = `<a class="showc fa fa-chevron-right" href="#" title="Show details"></a><a class="hidec fa fa-chevron-down" href="#" title="Hide details"></a>`;
         ºcc.addClass(`•facet`);
         ºcc.find(`p.•dctrl`).each(function() {
@@ -61,15 +61,15 @@ function ºFacet(ºcomponent) {
             ºdt.find(`.showc`).hide();
         });
     },
-    ºwork: function(ºsc) {
-        this.ºtable[ºsc].find(`tr[id]`).hide();
+    ºwork: function(ºvar) {
+        this.ºtable[ºvar].find(`tr[id]`).hide();
         var ºmother_list = this.ºcomponent.ºpage.ºgetComponent(`ºlist`);
-        var ºdata = ºmother_list.ºdata[ºsc];
-        var ºfacets = this.ºenabled_facets[ºsc];
-        this.ºdistilled[ºsc] = [];
+        var ºdata = ºmother_list.ºdata[ºvar];
+        var ºfacets = this.ºenabled_facets[ºvar];
+        this.ºdistilled[ºvar] = [];
         for (var ºfacet_name in ºfacets) {
             var ºfacet= ºfacets[ºfacet_name].ºimplementation;
-            ºfacet.ºdistilled[ºsc] = [];
+            ºfacet.ºdistilled[ºvar] = [];
         }
         ºdata.forEach(function(ºd, ºi) {
             var ºv = true; // will hold whether this row passes all facets
@@ -85,7 +85,7 @@ function ºFacet(ºcomponent) {
             for (var ºfacet_name in ºfacets) {
                 if (!ºdiscard) {
                     var ºfacet = ºfacets[ºfacet_name].ºimplementation;
-                    var ºthis_v = ºfacet.ºv(ºsc, ºi); // ºthis_v: whether the row passes this facet
+                    var ºthis_v = ºfacet.ºv(ºvar, ºi); // ºthis_v: whether the row passes this facet
                     if (!ºthis_v) {
                         ºv = false;
                         if (ºthe_false == null) { // this is the first failure, we store the facet number in ºthe_false
@@ -99,25 +99,25 @@ function ºFacet(ºcomponent) {
             }
             if (!ºdiscard) {
                 if (ºv) {
-                    this.ºdistilled[ºsc].push(ºi);
-                    this.ºtable[ºsc].find(`tr[id="r${ºd[0]}"]`).show();
+                    this.ºdistilled[ºvar].push(ºi);
+                    this.ºtable[ºvar].find(`tr[id="r${ºd[0]}"]`).show();
                 }
                 if (ºthe_false != null) {
-                    ºthe_false.ºdistilled[ºsc].push(ºi);
+                    ºthe_false.ºdistilled[ºvar].push(ºi);
                 }
                 else {
                     for (var ºfacet_name in ºfacets) {
                         var ºfacet = ºfacets[ºfacet_name].ºimplementation;
-                        ºfacet.ºdistilled[ºsc].push(ºi);
+                        ºfacet.ºdistilled[ºvar].push(ºi);
                     }
                 }
             }
         }, this);
         for (var ºfacet_name in ºfacets) {
             var ºfacet = ºfacets[ºfacet_name].ºimplementation;
-            ºfacet.ºstats(ºsc);
+            ºfacet.ºstats(ºvar);
         }
-        this.º_stats[ºsc].html(`${this.ºdistilled[ºsc].length} of ${ºdata.length}`);
+        this.º_stats[ºvar].html(`${this.ºdistilled[ºvar].length} of ${ºdata.length}`);
     },
 };
 

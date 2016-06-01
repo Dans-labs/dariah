@@ -10,8 +10,8 @@
  * - fetching the subcomponent's data from the server, if needed
  * This *ºspecific* functionality of the components are defined in separate files.
  * Of this ºspecific functionality, the following will be called from the generic component function:
- * - ºshow(ºsc): inspect the current state and determine whether the subcomponent should be shown or hidden
- * - ºwire(ºsc): after the data has been fetched, wrap the data into the desired HTML content of the subcomponent
+ * - ºshow(ºvar): inspect the current state and determine whether the subcomponent should be shown or hidden
+ * - ºwire(ºvar): after the data has been fetched, wrap the data into the desired HTML content of the subcomponent
  *   and add the wiring (click events, change events)
  * In turn, the ºspecific functions can access their associated generic components by this.ºcomponent
  */
@@ -24,12 +24,12 @@ function ºComponent(ºname, ºspecs, ºpage) {
     this.ºname = ºname;
     this.ºpage = ºpage;
     this.ºspecs = ºspecs;
-    this.ºsubcomponents = ºspecs.ºsubcomponents;
+    this.ºvariants = ºspecs.ºvariants;
     this.º_stage = {};
-    for (var ºsc in this.ºsubcomponents) {
-        this.º_stage[ºsc] = {};
+    for (var ºvar in this.ºvariants) {
+        this.º_stage[ºvar] = {};
         for (var ºst in this.ºpage.ºstages) {
-            this.º_stage[ºsc][ºst] = true;
+            this.º_stage[ºvar][ºst] = true;
         }
     }
     this.ºmsg = {};
@@ -52,10 +52,10 @@ function ºComponent(ºname, ºspecs, ºpage) {
      * So the ºresult of ºensure can be put inside the .then() of an other promise.
      * Now is a function that calls a function and returns the ºresult as promise.
      */
-    ºneed: function(ºsc, ºstage) { // check whether there is a promise and whether it has been fulfilled
-        return !this.º_stage[ºsc][ºstage].state || (this.º_stage[ºsc][ºstage].state() == `rejected`);
+    ºneed: function(ºvar, ºstage) { // check whether there is a promise and whether it has been fulfilled
+        return !this.º_stage[ºvar][ºstage].state || (this.º_stage[ºvar][ºstage].state() == `rejected`);
     },
-    º_deed: function(ºsc, ºstage, ºmethod) { // register a promise to perform the method associated with ºstage by entering it in the book keeping of stages
+    º_deed: function(ºvar, ºstage, ºmethod) { // register a promise to perform the method associated with ºstage by entering it in the book keeping of stages
             /* we want to pass a method call to a .then() later on.
              * If we pass it straight, like this.method, .then() will call this function and supplies its own promise object as the this.
              * That is not our purpose: we want to call the method with the current component object as the this.
@@ -63,51 +63,51 @@ function ºComponent(ºname, ºspecs, ºpage) {
              * Whoever calls this new function ºmethodCall, will perform a true method call of method ºmethod on object that.
              * This is crucial, otherwise all the careful time logic gets mangled, because the promises are stored in the component object.
              */
-        var ºmethodCall = this[ºmethod].bind(this, ºsc);
+        var ºmethodCall = this[ºmethod].bind(this, ºvar);
         var ºtiming = this.ºpage.ºgetBefore(this.ºname, ºstage);
         var ºpromises = [];
         ºtiming.forEach(function(ºtask) {
             var ºprev_name = ºtask[0];
             var ºprev_stage = ºtask[1];
             var ºprev_component = this.ºpage.ºgetComponent(ºprev_name);
-            if (ºprev_component.ºhasSubcomponent(ºsc)) {
-                ºpromises.push(ºprev_component.º_stage[ºsc][ºprev_stage]);
+            if (ºprev_component.ºhasVariant(ºvar)) {
+                ºpromises.push(ºprev_component.º_stage[ºvar][ºprev_stage]);
             }
         }, this);
-        this.º_stage[ºsc][ºstage] = $.when.apply($, ºpromises).then(ºmethodCall);
+        this.º_stage[ºvar][ºstage] = $.when.apply($, ºpromises).then(ºmethodCall);
     },
-    ºensure: function(ºsc, ºstage, ºmethod) {
+    ºensure: function(ºvar, ºstage, ºmethod) {
         /* function to promise that method ºfun will be executed once and once only or multiple times,
          * but only if the before actions have been completed
          */
         if (ºstage in this.ºpage.ºstages) {
-            if (!this.ºpage.ºstages[ºstage] || this.ºneed(ºsc, ºstage)) {
-                this.º_deed(ºsc, ºstage, ºmethod);
+            if (!this.ºpage.ºstages[ºstage] || this.ºneed(ºvar, ºstage)) {
+                this.º_deed(ºvar, ºstage, ºmethod);
             }
         }
     },
     /* here are the implementations of the functions that are to be wrapped as promises
      * They can focus on the ºwork, may or may not yield a promise
      */    
-    ºhasSubcomponent: function(ºsc) {
-        return (ºsc in this.ºsubcomponents);
+    ºhasVariant: function(ºvar) {
+        return (ºvar in this.ºvariants);
     },
-    º_visibility: function(ºsc, ºon) {
-        if (this.ºhasSubcomponent(ºsc)) {
-            if (ºsc in this.ºcontainer) {
+    º_visibility: function(ºvar, ºon) {
+        if (this.ºhasVariant(ºvar)) {
+            if (ºvar in this.ºcontainer) {
                 if (ºon) {
-                    this.ºcontainer[ºsc].show();
+                    this.ºcontainer[ºvar].show();
                 }
                 else {
-                    this.ºcontainer[ºsc].hide();
+                    this.ºcontainer[ºvar].hide();
                 }
             }
         }
     },
-    º_fetch: function(ºsc) { // get the material by AJAX if needed
-        var ºfetch_url = url_tpl.replace(/_c_/, `data`).replace(/_f_/, `${this.ºspecs.ºfetch_url}_${ºsc}`)+`.json`;
-        this.ºmsg[ºsc].ºmsg(`fetching data ...`);
-        var ºpostFetch = this.º_postFetch.bind(this, ºsc);
+    º_fetch: function(ºvar) { // get the material by AJAX if needed
+        var ºfetch_url = url_tpl.replace(/_c_/, `data`).replace(/_f_/, `${this.ºspecs.ºfetch_url}_${ºvar}`)+`.json`;
+        this.ºmsg[ºvar].ºmsg(`fetching data ...`);
+        var ºpostFetch = this.º_postFetch.bind(this, ºvar);
         return $.ajax({
             type: `POST`,
             url: ºfetch_url,
@@ -117,74 +117,74 @@ function ºComponent(ºname, ºspecs, ºpage) {
             ºpostFetch(ºjson);
         });
     },
-    º_postFetch: function(ºsc, ºjson) { // receive material after AJAX call
-        this.ºmsg[ºsc].ºclear();
+    º_postFetch: function(ºvar, ºjson) { // receive material after AJAX call
+        this.ºmsg[ºvar].ºclear();
         ºjson.msgs.forEach(function(ºm) {
-            this.ºmsg[ºsc].ºmsg(ºm);
+            this.ºmsg[ºvar].ºmsg(ºm);
         }, this);
         if (ºjson.good) {
-            this.ºdata[ºsc] = ºjson.data;
+            this.ºdata[ºvar] = ºjson.data;
             if (`relvals` in ºjson) {
-                this.ºrelated_values[ºsc] = ºjson.relvals;
+                this.ºrelated_values[ºvar] = ºjson.relvals;
             }
         }
-        this.ºimplementation.ºweld(ºsc);
-        console.log(`_WELD END ${this.ºname}-${ºsc}`);
+        this.ºimplementation.ºweld(ºvar);
+        console.log(`_WELD END ${this.ºname}-${ºvar}`);
     },
-    º_weld: function(ºsc) {
-        console.log(`_WELD BEGIN ${this.ºname}-${ºsc}`);
-        this.º_dst = this.ºpage.ºgetContainer(this.ºspecs.ºdest, this.ºsubcomponents);
-        this.ºcontainer[ºsc] = $(`#${this.ºname}_${ºsc}`);
-        if (this.ºcontainer[ºsc].length == 0) {
-            var ºdestination = this.º_dst[ºsc];
-            ºdestination.append(`<div id="msg_${this.ºname}_${ºsc}"></div>`);
-            ºdestination.append(`<div id="${this.ºname}_${ºsc}"></div>`);
-            this.ºcontainer[ºsc] = $(`#${this.ºname}_${ºsc}`);
+    º_weld: function(ºvar) {
+        console.log(`_WELD BEGIN ${this.ºname}-${ºvar}`);
+        this.º_dst = this.ºpage.ºgetContainer(this.ºspecs.ºdest, this.ºvariants);
+        this.ºcontainer[ºvar] = $(`#${this.ºname}_${ºvar}`);
+        if (this.ºcontainer[ºvar].length == 0) {
+            var ºdestination = this.º_dst[ºvar];
+            ºdestination.append(`<div id="msg_${this.ºname}_${ºvar}"></div>`);
+            ºdestination.append(`<div id="${this.ºname}_${ºvar}"></div>`);
+            this.ºcontainer[ºvar] = $(`#${this.ºname}_${ºvar}`);
         }
-        this.ºmsg[ºsc] = new ºMsg(`msg_${this.ºname}_${ºsc}`);
+        this.ºmsg[ºvar] = new ºMsg(`msg_${this.ºname}_${ºvar}`);
         if (this.ºspecs.ºfetch_url != null) {
-            return this.º_fetch(ºsc);
+            return this.º_fetch(ºvar);
         }
         else {
-            this.ºimplementation.ºweld(ºsc);
-            console.log(`_WELD END ${this.ºname}-${ºsc}`);
+            this.ºimplementation.ºweld(ºvar);
+            console.log(`_WELD END ${this.ºname}-${ºvar}`);
         }
     },
-    º_wire: function(ºsc) {
-        console.log(`_WIRE ${this.ºname}-${ºsc}`);
-        this.ºimplementation.ºwire(ºsc); // perform ºwire actions that are ºspecific to this component
+    º_wire: function(ºvar) {
+        console.log(`_WIRE ${this.ºname}-${ºvar}`);
+        this.ºimplementation.ºwire(ºvar); // perform ºwire actions that are ºspecific to this component
     },
-    º_work: function(ºsc) {
-        console.log(`_WORK ${this.ºname}-${ºsc}`);
-        this.º_visibility(ºsc, true);
-        this.ºimplementation.ºwork(ºsc); // perform ºwork actions that are ºspecific to this component
+    º_work: function(ºvar) {
+        console.log(`_WORK ${this.ºname}-${ºvar}`);
+        this.º_visibility(ºvar, true);
+        this.ºimplementation.ºwork(ºvar); // perform ºwork actions that are ºspecific to this component
     },
-    ºwork: function(ºsc) { // ºwork (changed) state to current material
-        if (this.ºhasSubcomponent(ºsc) && this.ºimplementation.ºshow(ºsc)) { // ºshow/hide depending on the ºspecific condition
-            this.ºensure(ºsc, `ºweld`, `º_weld`);
-            this.ºensure(ºsc, `ºwire`, `º_wire`);
-            this.ºensure(ºsc, `ºwork`, `º_work`);
-        }
-        else {
-            this.º_visibility(ºsc, false);
-        }
-    },
-    ºweld: function(ºsc) {
-        if (this.ºhasSubcomponent(ºsc) && this.ºimplementation.ºshow(ºsc)) {
-            this.ºensure(ºsc, `ºweld`, `º_weld`);
-        }
-    },
-    ºwire: function(ºsc) {
-        if (this.ºhasSubcomponent(ºsc) && this.ºimplementation.ºshow(ºsc)) {
-            this.ºensure(ºsc, `ºwire`, `º_wire`);
-        }
-    },
-    ºwork: function(ºsc) { // ºwork (changed) state to current material
-        if (this.ºhasSubcomponent(ºsc) && this.ºimplementation.ºshow(ºsc)) { // ºshow/hide depending on the ºspecific condition
-            this.ºensure(ºsc, `ºwork`, `º_work`);
+    ºwork: function(ºvar) { // ºwork (changed) state to current material
+        if (this.ºhasVariant(ºvar) && this.ºimplementation.ºshow(ºvar)) { // ºshow/hide depending on the ºspecific condition
+            this.ºensure(ºvar, `ºweld`, `º_weld`);
+            this.ºensure(ºvar, `ºwire`, `º_wire`);
+            this.ºensure(ºvar, `ºwork`, `º_work`);
         }
         else {
-            this.º_visibility(ºsc, false);
+            this.º_visibility(ºvar, false);
+        }
+    },
+    ºweld: function(ºvar) {
+        if (this.ºhasVariant(ºvar) && this.ºimplementation.ºshow(ºvar)) {
+            this.ºensure(ºvar, `ºweld`, `º_weld`);
+        }
+    },
+    ºwire: function(ºvar) {
+        if (this.ºhasVariant(ºvar) && this.ºimplementation.ºshow(ºvar)) {
+            this.ºensure(ºvar, `ºwire`, `º_wire`);
+        }
+    },
+    ºwork: function(ºvar) { // ºwork (changed) state to current material
+        if (this.ºhasVariant(ºvar) && this.ºimplementation.ºshow(ºvar)) { // ºshow/hide depending on the ºspecific condition
+            this.ºensure(ºvar, `ºwork`, `º_work`);
+        }
+        else {
+            this.º_visibility(ºvar, false);
         }
     },
 };

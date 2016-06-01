@@ -1,5 +1,17 @@
 /* List */
 
+.•value {
+    color: #000000;
+}
 .•country_code {
     font-weight: bold;
+}
+.•in_dariah {
+    color: #8888ff;
+    padding-right: 0.5ex;
+}
+.•latlng {
+    color: #22aa22;
+    padding-right: 0.5ex;
+    padding-left: 0.5ex;
 }

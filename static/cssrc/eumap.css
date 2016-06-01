@@ -1,0 +1,12 @@
+.•position {
+    position: relative;
+}
+p.•zoom {
+    position: absolute;
+    z-index: 100;
+}
+p.•zoom a {
+    font-size: small;
+    color: #ffffff;
+    background-color: #000000;
+}

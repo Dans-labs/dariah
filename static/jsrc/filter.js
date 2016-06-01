@@ -17,99 +17,99 @@ function ºFilter(ºcomponent) {
 };
 
 ºFilter.prototype = {
-    º_html: function(ºsc) {
+    º_html: function(ºvar) {
         var ºh = `<div><p class="•dctrl">By full text search</p>`;
-        ºh += `<div id="fltw_${ºsc}">`;
-        ºh += `<p id="•fbox_${ºsc}" class="•flt •control_med •fbox ui-ºwidget">`;
-        ºh += `<input id="flt_${ºsc}" class="flt"/>`;
-        ºh += `<a href="#" class="•control_med fa fa-close •filtc" id="clearf_${ºsc}"></a>`;
-        ºh += `<span •fbox class="•stats" id="stats_${ºsc}"></span>&nbsp;`;
+        ºh += `<div id="fltw_${ºvar}">`;
+        ºh += `<p id="•fbox_${ºvar}" class="•flt •control_med •fbox ui-ºwidget">`;
+        ºh += `<input id="flt_${ºvar}" class="flt"/>`;
+        ºh += `<a href="#" class="•control_med fa fa-close •filtc" id="clearf_${ºvar}"></a>`;
+        ºh += `<span •fbox class="•stats" id="stats_${ºvar}"></span>&nbsp;`;
         ºh += `</p>`;
-        ºh += `<div id="autoc_${ºsc}" style="display: none;">here ${ºsc}</div>`;
+        ºh += `<div id="autoc_${ºvar}" style="display: none;">here ${ºvar}</div>`;
         ºh += `</div>`;
-        this.ºcomponent.ºcontainer[ºsc].html(ºh);
+        this.ºcomponent.ºcontainer[ºvar].html(ºh);
     },
-    º_setFacet: function(ºsc) {
-        var ºtextf = this.ºcomponent.ºstate.ºgetState(`flt_${ºsc}`);
-        this.º_filter_control[ºsc].val(ºtextf);
-        this.º_filter_control[ºsc].autocomplete(`search`, ºtextf);
+    º_setFacet: function(ºvar) {
+        var ºtextf = this.ºcomponent.ºstate.ºgetState(`flt_${ºvar}`);
+        this.º_filter_control[ºvar].val(ºtextf);
+        this.º_filter_control[ºvar].autocomplete(`search`, ºtextf);
     },
-    º_response: function(ºsc) {
+    º_response: function(ºvar) {
         return function(ºevent, ºui) {
-            this.º_distilled[ºsc] = {};
+            this.º_distilled[ºvar] = {};
             ºui.content.forEach(function(ºu, ºi) {
-                this.º_distilled[ºsc][ºu.value] = 1;
+                this.º_distilled[ºvar][ºu.value] = 1;
             }, this);
-            if (!(this.º_wire_mode[ºsc])) {
-                this.ºcomponent.ºstate.ºsetState(`flt_${ºsc}`, this.º_filter_control[ºsc].val());
+            if (!(this.º_wire_mode[ºvar])) {
+                this.ºcomponent.ºstate.ºsetState(`flt_${ºvar}`, this.º_filter_control[ºvar].val());
             }
         }.bind(this);
     },
-    º_setClear: function(ºsc) {
-        this.º_clear_filter_control[ºsc].click(function(ºe) {ºe.preventDefault();
-            this.º_filter_control[ºsc].val(``);
-            this.º_filter_control[ºsc].autocomplete(`search`, ``);
+    º_setClear: function(ºvar) {
+        this.º_clear_filter_control[ºvar].click(function(ºe) {ºe.preventDefault();
+            this.º_filter_control[ºvar].val(``);
+            this.º_filter_control[ºvar].autocomplete(`search`, ``);
         }.bind(this));
     },
-    ºstats: function(ºsc) {
+    ºstats: function(ºvar) {
         var ºstat_prefix;
-        if (this.º_filter_control[ºsc].val() == ``) {
+        if (this.º_filter_control[ºvar].val() == ``) {
             ºstat_prefix = ``;
-            this.º_stats_dst[ºsc].removeClass(`•ison`);
+            this.º_stats_dst[ºvar].removeClass(`•ison`);
         }
         else {
-            ºstat_prefix = `${this.ºfacet.ºdistilled[ºsc].length} of `;
-            this.º_stats_dst[ºsc].addClass(`•ison`);
+            ºstat_prefix = `${this.ºfacet.ºdistilled[ºvar].length} of `;
+            this.º_stats_dst[ºvar].addClass(`•ison`);
         }
-        this.º_stats_dst[ºsc].html(`${ºstat_prefix}${this.ºdistilled[ºsc].length}`);
+        this.º_stats_dst[ºvar].html(`${ºstat_prefix}${this.ºdistilled[ºvar].length}`);
     },
-    ºv: function(ºsc, ºi) {
-        return (ºi in this.º_distilled[ºsc]);
+    ºv: function(ºvar, ºi) {
+        return (ºi in this.º_distilled[ºvar]);
     },
-    ºshow: function(ºsc) {
-        return (this.ºcomponent.ºstate.ºgetState(`list`) == ºsc);
+    ºshow: function(ºvar) {
+        return (this.ºcomponent.ºstate.ºgetState(`list`) == ºvar);
     },
-    ºweld: function(ºsc) {
-        this.º_html(ºsc);
+    ºweld: function(ºvar) {
+        this.º_html(ºvar);
     },
-    ºwire: function(ºsc) {
+    ºwire: function(ºvar) {
         if (!this.ºfacet) {
             this.ºfacet = this.ºcomponent.ºpage.ºgetComponent(`ºfacet`).ºimplementation;
         }
-        var ºdata = this.ºcomponent.ºpage.ºgetComponent(`ºlist`).ºdata[ºsc];
-        this.º_tags[ºsc] = [];
+        var ºdata = this.ºcomponent.ºpage.ºgetComponent(`ºlist`).ºdata[ºvar];
+        this.º_tags[ºvar] = [];
         ºdata.forEach(function(ºd, ºi) {
-            this.º_tags[ºsc].push({label: ºd[1], value: `${ºi}`});
+            this.º_tags[ºvar].push({label: ºd[1], value: `${ºi}`});
         }, this);
-        this.º_distilled[ºsc] = {};
-        this.ºdistilled[ºsc] = [];
-        var ºcc = this.ºcomponent.ºcontainer[ºsc];
-        var ºcf = ºcc.find(`#fltw_${ºsc}`);
-        this.º_filter_control[ºsc] = ºcf.find(`#flt_${ºsc}`);
-        this.º_box[ºsc] = ºcf.find(`#•fbox_${ºsc}`);
-        this.º_completions_dst[ºsc] = ºcf.find(`#autoc_${ºsc}`);
-        this.º_stats_dst[ºsc] = ºcf.find(`#stats_${ºsc}`);
-        this.º_clear_filter_control[ºsc] = ºcf.find(`#clearf_${ºsc}`);
-        this.º_filter_control[ºsc].autocomplete({
-            appendTo: this.º_completions_dst[ºsc],
-            source: this.º_tags[ºsc],
-            response: this.º_response(ºsc),
+        this.º_distilled[ºvar] = {};
+        this.ºdistilled[ºvar] = [];
+        var ºcc = this.ºcomponent.ºcontainer[ºvar];
+        var ºcf = ºcc.find(`#fltw_${ºvar}`);
+        this.º_filter_control[ºvar] = ºcf.find(`#flt_${ºvar}`);
+        this.º_box[ºvar] = ºcf.find(`#•fbox_${ºvar}`);
+        this.º_completions_dst[ºvar] = ºcf.find(`#autoc_${ºvar}`);
+        this.º_stats_dst[ºvar] = ºcf.find(`#stats_${ºvar}`);
+        this.º_clear_filter_control[ºvar] = ºcf.find(`#clearf_${ºvar}`);
+        this.º_filter_control[ºvar].autocomplete({
+            appendTo: this.º_completions_dst[ºvar],
+            source: this.º_tags[ºvar],
+            response: this.º_response(ºvar),
             minLength: 0,
         });
-        this.º_setClear(ºsc);
-        this.º_wire_mode[ºsc] = true;
-        this.º_setFacet(ºsc);
-        this.º_wire_mode[ºsc] = false;
+        this.º_setClear(ºvar);
+        this.º_wire_mode[ºvar] = true;
+        this.º_setFacet(ºvar);
+        this.º_wire_mode[ºvar] = false;
     },
-    ºwork: function(ºsc) {
-        var ºtextf = this.º_filter_control[ºsc].val();
+    ºwork: function(ºvar) {
+        var ºtextf = this.º_filter_control[ºvar].val();
         if (ºtextf == ``) {
-            this.º_box[ºsc].removeClass(`•ison`);
-            this.º_clear_filter_control[ºsc].hide();
+            this.º_box[ºvar].removeClass(`•ison`);
+            this.º_clear_filter_control[ºvar].hide();
         }
         else {
-            this.º_box[ºsc].addClass(`•ison`);
-            this.º_clear_filter_control[ºsc].show();
+            this.º_box[ºvar].addClass(`•ison`);
+            this.º_clear_filter_control[ºvar].show();
         }
     },
 };

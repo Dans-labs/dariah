@@ -10,37 +10,37 @@ function ºControl(ºcomponent) {
 };
 
 ºControl.prototype = {
-    º_html: function(ºsc) {
-        this.ºcomponent.ºcontainer[ºsc].html(`<a class="•control_title" href="#">${this.ºcomponent.ºstate.ºshowState('list', ºsc, 'ºsg')}</a> `);
+    º_html: function(ºvar) {
+        this.ºcomponent.ºcontainer[ºvar].html(`<a class="•control_title" href="#">${this.ºcomponent.ºstate.ºshowState('list', ºvar, 'ºsg')}</a> `);
     },
-    º_dressup: function(ºsc) {
-        this.ºctl[ºsc].click(function(ºe) {ºe.preventDefault();
-            this.ºcomponent.ºstate.ºsetState(`list`, ºsc);
+    º_dressup: function(ºvar) {
+        this.ºctl[ºvar].click(function(ºe) {ºe.preventDefault();
+            this.ºcomponent.ºstate.ºsetState(`list`, ºvar);
         }.bind(this))
     },
-    º_isActive: function(ºsc) {
-        return this.ºcomponent.ºstate.ºgetState(`list`) == ºsc;
+    º_isActive: function(ºvar) {
+        return this.ºcomponent.ºstate.ºgetState(`list`) == ºvar;
     },
-    ºshow: function(ºsc) {
+    ºshow: function(ºvar) {
         return true;
     },
-    ºweld: function(ºsc) {
-        this.º_html(ºsc);
-        this.ºwidget[ºsc] =  this.ºcomponent.ºcontainer[ºsc];
-        this.ºwidget[ºsc].addClass(`•control_big`);
-        this.ºctl[ºsc] =  this.ºcomponent.ºcontainer[ºsc].find(`a`);
+    ºweld: function(ºvar) {
+        this.º_html(ºvar);
+        this.ºwidget[ºvar] =  this.ºcomponent.ºcontainer[ºvar];
+        this.ºwidget[ºvar].addClass(`•control_big`);
+        this.ºctl[ºvar] =  this.ºcomponent.ºcontainer[ºvar].find(`a`);
     },
-    ºwire: function(ºsc) {
-        this.º_dressup(ºsc);
+    ºwire: function(ºvar) {
+        this.º_dressup(ºvar);
     },
-    ºwork: function(ºsc) {
-        if (this.º_isActive(ºsc)) {
-            this.ºctl[ºsc].addClass(`•ison`);
-            this.ºwidget[ºsc].addClass(`•ison`);
+    ºwork: function(ºvar) {
+        if (this.º_isActive(ºvar)) {
+            this.ºctl[ºvar].addClass(`•ison`);
+            this.ºwidget[ºvar].addClass(`•ison`);
         }
         else {
-            this.ºctl[ºsc].removeClass(`•ison`);
-            this.ºwidget[ºsc].removeClass(`•ison`);
+            this.ºctl[ºvar].removeClass(`•ison`);
+            this.ºwidget[ºvar].removeClass(`•ison`);
         }
     }
 };

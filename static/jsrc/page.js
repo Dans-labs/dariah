@@ -40,12 +40,15 @@ function ºPage() { // the one and only page object
     var ºmain_lists = this.ºstate.ºgetValues(`list`);
     var ºcontrib_list = {contrib: 1};
     this.º_component_specs = {
-        ºcontrol: {ºdest: `left`, ºsubcomponents: ºmain_lists, ºfetch_url: null, ºspecific: ºControl}, 
-        ºlist: {ºdest: `middle`, ºsubcomponents: ºmain_lists, ºfetch_url: `list`, ºspecific: ºList}, 
-        ºfacet: {ºdest: `ºcontrol`, ºsubcomponents: ºmain_lists, ºfetch_url: null, ºspecific: ºFacet}, 
-        ºfilter: {ºdest: `ºfacet`, ºsubcomponents: ºmain_lists, ºfetch_url: null, ºspecific: ºFilter}, 
-        ºeumap: {ºdest: `ºfacet`, ºsubcomponents: ºcontrib_list, ºfetch_url: `country`, ºspecific: ºEUmap}, 
-        ºctype: {ºdest: `ºfacet`, ºsubcomponents: ºcontrib_list, ºfetch_url: `type`, ºspecific: ºCType}, 
+        ºcontrol: {ºdest: `left`, ºvariants: ºmain_lists, ºfetch_url: null, ºspecific: ºControl}, 
+        ºlist: {ºdest: `middle`, ºvariants: ºmain_lists, ºfetch_url: `list`, ºspecific: ºList}, 
+        ºfacet: {ºdest: `ºcontrol`, ºvariants: ºmain_lists, ºfetch_url: null, ºspecific: ºFacet}, 
+        ºfilter: {ºdest: `ºfacet`, ºvariants: ºmain_lists, ºfetch_url: null, ºspecific: ºFilter}, 
+        ºeumap: {ºdest: `ºfacet`, ºvariants: ºcontrib_list, ºfetch_url: `country`, ºspecific: ºEUmap}, 
+        ºctype: {ºdest: `ºfacet`, ºvariants: ºcontrib_list, ºfetch_url: `type`, ºspecific: ºCType}, 
+        ºtadiraha: {ºdest: `ºfacet`, ºvariants: ºcontrib_list, ºfetch_url: `tadiraha`, ºspecific: ºTadirahA}, 
+        ºtadiraho: {ºdest: `ºfacet`, ºvariants: ºcontrib_list, ºfetch_url: `tadiraho`, ºspecific: ºTadirahO}, 
+        ºtadiraht: {ºdest: `ºfacet`, ºvariants: ºcontrib_list, ºfetch_url: `tadiraht`, ºspecific: ºTadirahT}, 
     },
     this.º_before = {
         ºweld: {
@@ -53,15 +56,21 @@ function ºPage() { // the one and only page object
             ºfilter: {ºfacet: 1},
             ºeumap: {ºfacet: 1, ºfilter: 1},
             ºctype: {ºfacet: 1, ºeumap: 1},
+            ºtadiraha: {ºfacet: 1, ºctype: 1},
+            ºtadiraho: {ºfacet: 1, ºtadiraha: 1},
+            ºtadiraht: {ºfacet: 1, ºtadiraho: 1},
         },
         ºwire: {
-            ºfacet: {ºfilter: 1, ºeumap: 1, ºctype: 1},
+            ºfacet: {ºfilter: 1, ºeumap: 1, ºctype: 1, ºtadiraha: 1, ºtadiraho: 1, ºtadiraht: 1},
             ºfilter: {ºlist: 1},
             ºeumap: {ºlist: 1},
             ºctype: {ºlist: 1},
+            ºtadiraha: {ºlist: 1},
+            ºtadiraho: {ºlist: 1},
+            ºtadiraht: {ºlist: 1},
         },
         ºwork: {
-            ºfacet: {ºfilter: 1, ºeumap: 1, ºctype: 1},
+            ºfacet: {ºfilter: 1, ºeumap: 1, ºctype: 1, ºtadiraha: 1, ºtadiraho: 1, ºtadiraht: 1},
         },
     };
     this.ºcomponents = {};
@@ -226,14 +235,14 @@ function ºPage() { // the one and only page object
     ºgetComponent: function(ºname) {
         return this.ºcomponents[ºname];
     },
-    ºgetContainer: function(ºname, ºsubcomponents) {
+    ºgetContainer: function(ºname, ºvariants) {
         var ºcontainer = {};
         if (ºname in this.ºcomponents) {
             ºcontainer = this.ºcomponents[ºname].ºcontainer;
         }
         else {
-            for (var ºsc in ºsubcomponents) {
-                ºcontainer[ºsc] = $(`#${ºname}`);
+            for (var ºvar in ºvariants) {
+                ºcontainer[ºvar] = $(`#${ºname}`);
             }
         }
         return ºcontainer;
@@ -252,8 +261,8 @@ function ºPage() { // the one and only page object
             var ºname = ºtask_comps[0];
             var ºstage = ºtask_comps[1];
             var ºcomponent = this.ºgetComponent(ºname);
-            for (var ºsc in ºcomponent.ºsubcomponents) {
-                ºcomponent[ºstage](ºsc);
+            for (var ºvar in ºcomponent.ºvariants) {
+                ºcomponent[ºstage](ºvar);
             }
         }, this);
     },
