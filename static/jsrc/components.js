@@ -138,7 +138,7 @@ function ºComponent(ºname, ºspecs, ºpage) {
         if (this.ºcontainer[ºvar].length == 0) {
             var ºdestination = this.º_dst[ºvar];
             ºdestination.append(`<div id="msg_${this.ºname}_${ºvar}"></div>`);
-            ºdestination.append(`<div id="${this.ºname}_${ºvar}"></div>`);
+            ºdestination.append(`<div id="${this.ºname}_${ºvar}" class="•component"></div>`);
             this.ºcontainer[ºvar] = $(`#${this.ºname}_${ºvar}`);
         }
         this.ºmsg[ºvar] = new ºMsg(`msg_${this.ºname}_${ºvar}`);

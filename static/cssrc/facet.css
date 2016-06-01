@@ -44,7 +44,13 @@ div.•facet .•stats {
     «facet:stats.text»
 }
 div.•facet .•stats.•ison {
-    «facet:highlight.colors»
+    «facet:highlight.text»
+}
+.•passive_small {
+    display: none;
+}
+.•passive_small.•ison,.•flt_compact {
+    display: inline;
     «facet:highlight.text»
 }
 .•dctrl,.•all {

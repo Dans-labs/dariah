@@ -15,20 +15,20 @@ function ºViewState(ºpage) {
 
 ºViewState.prototype = {
     º_specs: {
-        list: {ºtype: `string`, ºvalues: {contrib: 1, country: 1, type: 1, tadiraha: 1, tadiraho: 1, tadiraht: 1}, ºdefault_value: `contrib`},
-        flt_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        flt_country: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        flt_type: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        flt_tadiraha: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        flt_tadiraho: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        flt_tadiraht: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        rel_country_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        rel_type_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        rel_tadiraha_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        rel_tadiraho_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        rel_tadiraht_contrib: {ºtype: `string`, ºvalues: null, ºdefault_value: ``},
-        id: {ºtype: `integer`, ºlimits: {ºmin: -1, ºmax: 1000000}, ºdefault_value: 0},
-        sort: {ºtype: `boolean`, ºvalues: {v: true, x: false}, ºdefault_value: true}, 
+        list: {ºurl: true, ºtype: `string`, ºvalues: {contrib: 1, country: 1, type: 1, tadiraha: 1, tadiraho: 1, tadiraht: 1}, ºdefault_value: `contrib`},
+        flt_contrib: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        flt_country: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        flt_type: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        flt_tadiraha: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        flt_tadiraho: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        flt_tadiraht: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        rel_country_contrib: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        rel_type_contrib: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        rel_tadiraha_contrib: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        rel_tadiraho_contrib: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        rel_tadiraht_contrib: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        id: {ºurl: true, ºtype: `integer`, ºlimits: {ºmin: -1, ºmax: 1000000}, ºdefault_value: 0},
+        sort: {ºurl: false, ºtype: `boolean`, ºvalues: {v: true, x: false}, ºdefault_value: true}, 
     },
     º_showas: {
         list: {
@@ -94,10 +94,12 @@ function ºViewState(ºpage) {
         for (var ºname in this.º_data) {
             var ºval = this.º_data[ºname];
             var ºspec = this.º_specs[ºname];
-            if (ºspec.ºtype == `string` || ºspec.ºtype == `integer`) {ºvars.push(`${ºname}=${ºval}`)}
-            else if (ºspec.ºtype == `boolean`) {
-                for (var ºvalid_val in ºspec.ºvalues) {
-                    if (ºspec.ºvalues[ºvalid_val] == ºval) {ºvars.push(`${ºname}=${ºvalid_val}`)}
+            if (ºspec.ºurl) {
+                if (ºspec.ºtype == `string` || ºspec.ºtype == `integer`) {ºvars.push(`${ºname}=${ºval}`)}
+                else if (ºspec.ºtype == `boolean`) {
+                    for (var ºvalid_val in ºspec.ºvalues) {
+                        if (ºspec.ºvalues[ºvalid_val] == ºval) {ºvars.push(`${ºname}=${ºvalid_val}`)}
+                    }
                 }
             }
         }

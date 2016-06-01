@@ -18,6 +18,8 @@ function ºFacet(ºcomponent) {
         ºh += `<p>Filtering <span id="fstats_${ºvar}"></span></p>`;
         this.ºcomponent.ºcontainer[ºvar].html(ºh);
     },
+    º_display: function(ºvar, ºmode) {
+    },
     ºshow: function(ºvar) {
         return this.ºcomponent.ºstate.ºgetState(`list`) == ºvar;
     },
@@ -37,27 +39,42 @@ function ºFacet(ºcomponent) {
         var ºlc = this.ºcomponent.ºpage.ºgetComponent(`ºlist`).ºcontainer[ºvar];
         this.º_stats[ºvar] = ºcc.find(`#fstats_${ºvar}`);
         this.ºtable[ºvar] =  ºlc.find(`#table_${ºvar}`);
-        var ºdetailcontrols = `<a class="showc fa fa-chevron-right" href="#" title="Show details"></a><a class="hidec fa fa-chevron-down" href="#" title="Hide details"></a>`;
+        var ºdetailcontrols = `<a class="showc fa fa-chevron-right" href="#" title="Show details"></a><a class="morec fa fa-chevron-down" href="#" title="Less details"></a><a class="hidec fa fa-chevron-up" href="#" title="Hide details"></a>`;
         ºcc.addClass(`•facet`);
         ºcc.find(`p.•dctrl`).each(function() {
             var ºorig = $(this).html();
             $(this).html(`${ºdetailcontrols}&nbsp;${ºorig}`);
         });
-        ºcc.find(`p.•dctrl`).closest(`div`).find(`table,.•flt`).show();
+        ºcc.find(`p.•dctrl`).closest(`div`).find(`table,.•flt`).hide();
+        ºcc.find(`p.•dctrl`).closest(`div`).find(`.•value_list2,.•flt_compact`).show();
         ºcc.find(`.hidec`).show();
+        ºcc.find(`.morec`).hide();
         ºcc.find(`.showc`).hide();
         ºcc.find(`.hidec`).click(function(ºe) {ºe.preventDefault();
             var ºdt = $(this).closest(`p`);
-            var ºdd = $(this).closest(`div`).find(`table,.•flt`);
-            ºdd.hide();
+            var ºkey = $(this).closest(`div.•component`).attr(`id`);
+            $(this).closest(`div`).find(`table,.•flt`).hide();
+            $(this).closest(`div`).find(`.•value_list2,.•flt_compact`).hide();
             ºdt.find(`.hidec`).hide();
+            ºdt.find(`.morec`).hide();
             ºdt.find(`.showc`).show();
+        });
+        ºcc.find(`.morec`).click(function(ºe) {ºe.preventDefault();
+            var ºdt = $(this).closest(`p`);
+            var ºkey = $(this).closest(`div.•component`).attr(`id`);
+            $(this).closest(`div`).find(`table,.•flt`).hide();
+            $(this).closest(`div`).find(`.•value_list2,.•flt_compact`).show();
+            ºdt.find(`.hidec`).show();
+            ºdt.find(`.morec`).hide();
+            ºdt.find(`.showc`).hide();
         });
         ºcc.find(`.showc`).click(function(ºe) {ºe.preventDefault();
             var ºdt = $(this).closest(`p`);
-            var ºdd = $(this).closest(`div`).find(`table,.•flt`);
-            ºdd.show();
-            ºdt.find(`.hidec`).show();
+            var ºkey = $(this).closest(`div.•component`).attr(`id`);
+            $(this).closest(`div`).find(`table,.•flt`).show();
+            $(this).closest(`div`).find(`.•value_list2,.•flt_compact`).hide();
+            ºdt.find(`.hidec`).hide();
+            ºdt.find(`.morec`).show();
             ºdt.find(`.showc`).hide();
         });
     },
@@ -100,7 +117,6 @@ function ºFacet(ºcomponent) {
             if (!ºdiscard) {
                 if (ºv) {
                     this.ºdistilled[ºvar].push(ºd[0]);
-                    console.log(`cid = ${ºd[0]} push i = ${ºi} title=${ºd[1]}`);
                     this.ºtable[ºvar].find(`tr[id="r${ºd[0]}"]`).show();
                 }
                 if (ºthe_false != null) {

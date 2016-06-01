@@ -6,6 +6,7 @@ function ºRelative(ºcomponent, ºtype) {
     this.ºcomponent = ºcomponent;
     this.ºdistilled = {};
     this.º_list = {};
+    this.º_list2 = {};
     this.º_related_state = {};
     this.º_all_values_control = {};
     this.º_statistics = {};
@@ -32,12 +33,19 @@ function ºRelative(ºcomponent, ºtype) {
             }
             ºh += `<td><span rv="${ºrelated_value}" class="•stats"></span></td><td><a rv="${ºrelated_value}" href="#" class="•control_small">${this.º_related_values_index[ºvar][ºrelated_value]}</a></td>`;
         }, this);
-        ºh += `</tr></table></div>`;
+        ºh += `</tr></table>`;
+        ºh += `<p class="•value_list2" id="list2-${this.º_type}-vals_${ºvar}">`;
+        this.º_related_values_list[ºvar].forEach(function(ºrelated_value, ºi, ºar) {
+            ºh += `<span rv="${ºrelated_value}" class="•passive_small">${this.º_related_values_index[ºvar][ºrelated_value]}</span> `;
+        }, this);
+        ºh += `</p>`;
+        ºh += `</div>`;
         this.ºcomponent.ºcontainer[ºvar].html(ºh);
     },
     º_dressup: function(ºvar) {
         var ºcc = this.ºcomponent.ºcontainer[ºvar];
         this.º_list[ºvar] = ºcc.find(`#list-${this.º_type}-vals_${ºvar}`);
+        this.º_list2[ºvar] = ºcc.find(`#list2-${this.º_type}-vals_${ºvar}`);
         var ºthat = this;
         this.º_list[ºvar].find(`.•control_small`).click(function(ºe) {ºe.preventDefault();
             var ºrelated_value = $(this).attr(`rv`);
@@ -60,11 +68,14 @@ function ºRelative(ºcomponent, ºtype) {
         var ºall_selected = true;
         for (var ºrelated_value in this.º_related_values_index[ºvar]) {
             var ºfacet_cell = this.º_list[ºvar].find(`[rv="${ºrelated_value}"]`);
+            var ºfacet_cell2 = this.º_list2[ºvar].find(`[rv="${ºrelated_value}"]`);
             if (ºrelated_value in ºrelated_values && ºrelated_values[ºrelated_value]) {
                 ºfacet_cell.addClass(`•ison`);
+                ºfacet_cell2.addClass(`•ison`);
             }
             else {
                 ºfacet_cell.removeClass(`•ison`);
+                ºfacet_cell2.removeClass(`•ison`);
                 ºall_selected = false;
             }
         }

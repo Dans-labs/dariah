@@ -7,6 +7,7 @@ function ºFilter(ºcomponent) {
     this.ºcomponent = ºcomponent;
     this.º_tags = {};
     this.º_filter_control = {};
+    this.º_filter_control2 = {};
     this.º_box = {};
     this.º_completions_dst = {};
     this.º_stats_dst = {};
@@ -18,9 +19,9 @@ function ºFilter(ºcomponent) {
 
 ºFilter.prototype = {
     º_html: function(ºvar) {
-        var ºh = `<div><p class="•dctrl">By full text search</p>`;
+        var ºh = `<div><p class="•dctrl">By full text search <span id="flt2_${ºvar}" class="•flt_compact"></span></p>`;
         ºh += `<div id="fltw_${ºvar}">`;
-        ºh += `<p id="•fbox_${ºvar}" class="•flt •control_med •fbox ui-ºwidget">`;
+        ºh += `<p id="•fbox_${ºvar}" class="•flt •control_med •fbox ui-widget">`;
         ºh += `<input id="flt_${ºvar}" class="flt"/>`;
         ºh += `<a href="#" class="•control_med fa fa-close •filtc" id="clearf_${ºvar}"></a>`;
         ºh += `<span •fbox class="•stats" id="stats_${ºvar}"></span>&nbsp;`;
@@ -31,6 +32,8 @@ function ºFilter(ºcomponent) {
     },
     º_setFacet: function(ºvar) {
         var ºtextf = this.ºcomponent.ºstate.ºgetState(`flt_${ºvar}`);
+        this.º_filter_control2[ºvar].html(ºtextf);
+        console.log(this.º_filter_control2[ºvar]);
         this.º_filter_control[ºvar].val(ºtextf);
         this.º_filter_control[ºvar].autocomplete(`search`, ºtextf);
     },
@@ -86,6 +89,7 @@ function ºFilter(ºcomponent) {
         var ºcc = this.ºcomponent.ºcontainer[ºvar];
         var ºcf = ºcc.find(`#fltw_${ºvar}`);
         this.º_filter_control[ºvar] = ºcf.find(`#flt_${ºvar}`);
+        this.º_filter_control2[ºvar] = ºcc.find(`#flt2_${ºvar}`);
         this.º_box[ºvar] = ºcf.find(`#•fbox_${ºvar}`);
         this.º_completions_dst[ºvar] = ºcf.find(`#autoc_${ºvar}`);
         this.º_stats_dst[ºvar] = ºcf.find(`#stats_${ºvar}`);
