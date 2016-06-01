@@ -85,7 +85,7 @@ function ºFacet(ºcomponent) {
             for (var ºfacet_name in ºfacets) {
                 if (!ºdiscard) {
                     var ºfacet = ºfacets[ºfacet_name].ºimplementation;
-                    var ºthis_v = ºfacet.ºv(ºvar, ºi); // ºthis_v: whether the row passes this facet
+                    var ºthis_v = ºfacet.ºv(ºvar, ºd[0]); // ºthis_v: whether the row passes this facet
                     if (!ºthis_v) {
                         ºv = false;
                         if (ºthe_false == null) { // this is the first failure, we store the facet number in ºthe_false
@@ -99,16 +99,17 @@ function ºFacet(ºcomponent) {
             }
             if (!ºdiscard) {
                 if (ºv) {
-                    this.ºdistilled[ºvar].push(ºi);
+                    this.ºdistilled[ºvar].push(ºd[0]);
+                    console.log(`cid = ${ºd[0]} push i = ${ºi} title=${ºd[1]}`);
                     this.ºtable[ºvar].find(`tr[id="r${ºd[0]}"]`).show();
                 }
                 if (ºthe_false != null) {
-                    ºthe_false.ºdistilled[ºvar].push(ºi);
+                    ºthe_false.ºdistilled[ºvar].push(ºd[0]);
                 }
                 else {
                     for (var ºfacet_name in ºfacets) {
                         var ºfacet = ºfacets[ºfacet_name].ºimplementation;
-                        ºfacet.ºdistilled[ºvar].push(ºi);
+                        ºfacet.ºdistilled[ºvar].push(ºd[0]);
                     }
                 }
             }

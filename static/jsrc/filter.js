@@ -79,7 +79,7 @@ function ºFilter(ºcomponent) {
         var ºdata = this.ºcomponent.ºpage.ºgetComponent(`ºlist`).ºdata[ºvar];
         this.º_tags[ºvar] = [];
         ºdata.forEach(function(ºd, ºi) {
-            this.º_tags[ºvar].push({label: ºd[1], value: `${ºi}`});
+            this.º_tags[ºvar].push({label: ºd[1], value: `${ºd[0]}`});
         }, this);
         this.º_distilled[ºvar] = {};
         this.ºdistilled[ºvar] = [];
