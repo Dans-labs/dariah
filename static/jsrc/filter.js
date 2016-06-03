@@ -19,7 +19,8 @@ function ºFilter(ºcomponent) {
 
 ºFilter.prototype = {
     º_html: function(ºvar) {
-        var ºh = `<div><p class="•dctrl"><span fct="${this.ºcomponent.ºname}-${ºvar}"></span> By full text search <span id="flt2_${ºvar}" class="•flt_compact"></span></p>`;
+        var ºh = `<div><p class="•dctrl"><span fct="${this.ºcomponent.ºname}-${ºvar}"></span> By full text search
+    <a href="#" title="modify full text filter" id="flt2_${ºvar}" class="•flt_compact"></a></p>`;
         ºh += `<div id="fltw_${ºvar}">`;
         ºh += `<p id="•fbox_${ºvar}" class="•flt •control_med •fbox ui-widget">`;
         ºh += `<input id="flt_${ºvar}" class="flt"/>`;
@@ -88,8 +89,10 @@ function ºFilter(ºcomponent) {
         this.ºdistilled[ºvar] = [];
         var ºcc = this.ºcomponent.ºcontainer[ºvar];
         var ºcf = ºcc.find(`#fltw_${ºvar}`);
-        this.º_filter_control[ºvar] = $(`#flt_${ºvar}`);
-        this.º_filter_control2[ºvar] = $(`#flt2_${ºvar}`);
+        var ºflt = $(`#flt_${ºvar}`);
+        this.º_filter_control[ºvar] = ºflt;
+        var ºflt2 = $(`#flt2_${ºvar}`);
+        this.º_filter_control2[ºvar] = ºflt2;
         this.º_box[ºvar] = ºcf.find(`#•fbox_${ºvar}`);
         this.º_completions_dst[ºvar] = ºcf.find(`#autoc_${ºvar}`);
         this.º_stats_dst[ºvar] = ºcf.find(`#stats_${ºvar}`);
@@ -99,6 +102,10 @@ function ºFilter(ºcomponent) {
             source: this.º_tags[ºvar],
             response: this.º_response(ºvar),
             minLength: 0,
+        });
+        ºflt2.click(function(ºe) {ºe.preventDefault();
+            $(this).closest(`div`).find(`.morec`).click();
+            ºflt[0].focus();
         });
         this.º_wire_mode[ºvar] = true;
         this.º_setClear(ºvar);

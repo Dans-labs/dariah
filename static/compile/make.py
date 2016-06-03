@@ -43,6 +43,7 @@ x_js_names_spec = '''
     «x«else»x»
     «.«empty»(»
     «x«false»x»
+    «.«focus»(»
     «x«for»(»
     «.«forEach»(»
     «x«function»x»
