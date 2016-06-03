@@ -13,16 +13,25 @@
     font-weight: normal;
     font-style: normal;
 ≥
-«facet:highlight.colors» ≤
+«facet:normal.colors» ≤
     color: #000000;
-    background-color: #eeeeff;
+    background-color: #ffffff;
+≥
+«facet:highlight.colors» ≤
+    color: #000066;
+    background-color: #bbffaa;
+≥
+«facet:off.colors» ≤
+    color: #886666;
+    background-color: #ffffff;
 ≥
 «facet:single.shape» ≤
     border-radius: 3px;
 ≥
-«facet:normal.colors» ≤
-    color: #000000;
-    background-color: #ffffff;
+«facet:heading.text» ≤
+    font-size: medium;
+    font-weight: bold;
+    font-style: italic;
 ≥
 «facet:normal.text» ≤
     font-size: small;
@@ -38,8 +47,6 @@
     font-weight: normal;
     font-style: normal;
 ≥
-
-
 div.•facet>div {
     font-size: small;
     «facet:normal.colors»
@@ -47,7 +54,7 @@ div.•facet>div {
     «facet:shape»
 }
 .•facet_single,.•facet_single_all {
-    «facet:normal.colors»
+    «facet:off.colors»
     «facet:normal.text»
     «facet:single.shape»
 }
@@ -75,6 +82,11 @@ div.•facet .•stats.•ison {
 }
 .•dctrl,.•all {
     margin-bottom: 0pt;
+    «facet:heading.text»
+    «facet:normal.colors»
+}
+.•last_handled {
+    background-color: #ffff88;
 }
 
 

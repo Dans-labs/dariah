@@ -56,6 +56,8 @@ function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff) {
             var ºselected = ºthat.º_from_str(ºvar, ºthat.ºcomponent.ºstate.ºgetState(`rel_${ºthat.º_type}_${ºvar}`));
             ºselected[ºrelated_value] = (ºrelated_value in ºselected)?!ºselected[ºrelated_value]:true;
             ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, ºthat.º_to_str(ºselected));
+            ºcc.find(`.•last_handled`).removeClass(`•last_handled`);
+            $(this).addClass(`•last_handled`);
         });
         this.º_list2[ºvar].find(`.•passive_small`).click(function(ºe) {ºe.preventDefault();
             var ºrelated_value = $(this).attr(`rv`);
@@ -63,6 +65,14 @@ function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff) {
             ºselected[ºrelated_value] = (ºrelated_value in ºselected)?!ºselected[ºrelated_value]:true;
             ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, ºthat.º_to_str(ºselected));
             $(this).closest(`div`).find(`.morec`).click();
+            var ºlast_handled = ºthat.º_list[ºvar].find(`a[rv="${ºrelated_value}"]`);
+            ºcc.find(`.•last_handled`).removeClass(`•last_handled`);
+            ºlast_handled.addClass(`•last_handled`);
+            $(`#left`)[0].scrollTop = 50;
+            ºlast_handled[0].scrollIntoView({
+                behavior: `smooth`,
+                alignToTop: `true`,
+            });
         });
         this.º_all_values_control[ºvar] = this.ºcomponent.ºcontainer[ºvar].find(`[rv="_all"]`);
         this.º_all_values_control[ºvar].click(function(ºe) {ºe.preventDefault();
