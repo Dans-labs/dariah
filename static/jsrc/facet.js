@@ -15,10 +15,8 @@ function ºFacet(ºcomponent) {
 ºFacet.prototype = {
     º_html: function(ºvar) {
         var ºh = ``;
-        ºh += `<p>Filtering <span id="fstats_${ºvar}"></span></p>`;
+        ºh += `<p><span fct="all"></span>Filtering <span id="fstats_${ºvar}"></span></p>`;
         this.ºcomponent.ºcontainer[ºvar].html(ºh);
-    },
-    º_display: function(ºvar, ºmode) {
     },
     ºshow: function(ºvar) {
         return this.ºcomponent.ºstate.ºgetState(`list`) == ºvar;
@@ -35,14 +33,16 @@ function ºFacet(ºcomponent) {
         this.º_html(ºvar);
     },
     º_display: function(ºfacet_expand_control, ºmode) {
-        var ºkey = `fctx_${ºfacet_expand_control.closest('span').attr('fct')}`;
+        var ºthat = this;
         var ºdt = ºfacet_expand_control.closest(`p`);
-        var ºexpanded_material = ºfacet_expand_control.closest(`div`).find(`table,.•flt`);
-        var ºcondensed_material = ºfacet_expand_control.closest(`div`).find(`.•value_list2,.•flt_compact`);
         var ºhidec = ºdt.find(`.hidec`);
         var ºmorec = ºdt.find(`.morec`);
         var ºshowc = ºdt.find(`.showc`);
-        if (ºmode == undefined) {
+        var ºexpanded_material = ºfacet_expand_control.closest(`div`).find(`table,.•flt`);
+        var ºcondensed_material = ºfacet_expand_control.closest(`div`).find(`.•value_list2,.•flt_compact`);
+        var ºkey = `fctx_${ºfacet_expand_control.closest('span').attr('fct')}`;
+        var ºmode_undef = ºmode == undefined;
+        if (ºmode_undef) {
             if (ºlocalstorage_vars.isSet(ºkey)) {
                 ºmode = ºlocalstorage_vars.get(ºkey);
             }
@@ -50,27 +50,39 @@ function ºFacet(ºcomponent) {
                 ºmode = 1;
             }
         }
+        var ºall_facets = ºkey == `fctx_all`;
+        if (ºall_facets && !ºmode_undef) {
+            ºfacet_expand_control.closest(`div`).find(`div.•component span[fct]`).each(function() {
+                ºthat.º_display($(this), ºmode);
+            });
+        }
         ºlocalstorage_vars.set(ºkey, ºmode);
         if (ºmode == 0) {
             ºhidec.show();
             ºmorec.hide();
             ºshowc.hide();
-            ºexpanded_material.hide();
-            ºcondensed_material.hide();
+            if (!ºall_facets) {
+                ºexpanded_material.hide();
+                ºcondensed_material.hide();
+            }
         }
         else if (ºmode == 1) {
             ºhidec.hide();
             ºmorec.show();
             ºshowc.hide();
-            ºexpanded_material.hide();
-            ºcondensed_material.show();
+            if (!ºall_facets) {
+                ºexpanded_material.hide();
+                ºcondensed_material.show();
+            }
         }
         else {
             ºhidec.hide();
             ºmorec.hide();
             ºshowc.show();
-            ºexpanded_material.show();
-            ºcondensed_material.hide();
+            if (!ºall_facets) {
+                ºexpanded_material.show();
+                ºcondensed_material.hide();
+            }
         }
     },
     ºwire: function(ºvar) {
