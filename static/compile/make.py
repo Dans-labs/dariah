@@ -28,8 +28,10 @@ def t3_repl(match): return match.group(1)
 
 x_js_names_spec = '''
     «.«addRange»(»
+    «x«alignToTop»:»
     «.«animate»(»
     «.«apply»(»
+    «x«behavior»:»
     «.«bind»(»
     «x«break»x»
     «.«call»(»
@@ -77,6 +79,8 @@ x_js_names_spec = '''
     «.«removeAllRanges»(»
     «.«replace»(»
     «x«return»x»
+    «.«scrollIntoView»(»
+    «.«scrollTop»x»
     «.«search»x»
     «.«select»(»
     «.«selectNode»(»
