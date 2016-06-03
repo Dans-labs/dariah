@@ -16,10 +16,11 @@ function ºEUmap(ºcomponent) {
         MC: true,
         GE: true,
     };
-}
+};
+
 ºEUmap.prototype = Object.create(ºRelative.prototype);
 ºEUmap.prototype.constructor = ºEUmap;
-ºEUmap.prototype.º_myHtml = function(ºvar) {
+ºEUmap.prototype.º_preHtml = function(ºvar) {
     return `<div id="map-europe_${ºvar}" class="•position"><p class="•zoom"><a class="fa fa-arrows" href="#" title="zoom to fit all countries"/></p></div>`;
 };
 ºEUmap.prototype.º_myDressup = function(ºvar) {

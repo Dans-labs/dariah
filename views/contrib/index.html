@@ -6,6 +6,7 @@
     <script type="text/javascript">
         var url_tpl = "{{=XML(URL('_c_', '_f_', host=False))}}";
         var app_url = "{{=XML(URL(host=False))}}";
+        var app_url_cite = "{{=XML(URL(host=True))}}";
     </script>
     <script type="text/javascript" src="{{=URL('static', 'js/jquery-jvectormap-2.0.3.min.js')}}"></script>
     <script type="text/javascript" src="{{=URL('static', 'js/jquery-jvectormap-europe-mill.js')}}"></script>
@@ -13,7 +14,9 @@
 {{ end }}
 
 <div id="msg_page"></div>
-<div id="middle"></div>
+<div id="middle">
+<a id="self_link" title="to the online version of this page" href="#">See this page on DARIAH</a>
+</div>
 
 {{ block left_sidebar }}
     <div id="left"></div>

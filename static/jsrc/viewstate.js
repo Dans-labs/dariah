@@ -89,12 +89,12 @@ function ºViewState(ºpage) {
         }
         return ºnewval;
     },
-    º_getVars: function() {
+    ºgetVars: function(ºcomprehensive) {
         ºvars = [];
         for (var ºname in this.º_data) {
             var ºval = this.º_data[ºname];
             var ºspec = this.º_specs[ºname];
-            if (ºspec.ºurl) {
+            if (ºcomprehensive || ºspec.ºurl) {
                 if (ºspec.ºtype == `string` || ºspec.ºtype == `integer`) {ºvars.push(`${ºname}=${ºval}`)}
                 else if (ºspec.ºtype == `boolean`) {
                     for (var ºvalid_val in ºspec.ºvalues) {
@@ -130,7 +130,7 @@ function ºViewState(ºpage) {
     },
     º_addHistory: function(ºtitle, ºview_url) {
         var ºtit = `DARIAH contribution tool`;
-        var ºthis_url = `${app_url}?${this.º_getVars()}`;
+        var ºthis_url = `${app_url}?${this.ºgetVars(false)}`;
         History.pushState(this.º_data, ºtit, ºthis_url);
     },
     ºsetState: function(ºname, ºval) {

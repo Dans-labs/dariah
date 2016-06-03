@@ -27,19 +27,28 @@ def t2a_repl(match): return match.group(1)
 def t3_repl(match): return match.group(1)
 
 x_js_names_spec = '''
+    «.«addRange»(»
+    «.«animate»(»
     «.«apply»(»
     «.«bind»(»
     «x«break»x»
     «.«call»(»
     «.«create»(»
+    «.«createRange»(»
+    «.«createTextRange»(»
     «.«constructor»x»
     «x«delete»x»
     «x«else»x»
+    «.«empty»(»
     «x«false»x»
     «x«for»(»
     «.«forEach»(»
     «x«function»x»
     «/«g»x»
+    «.«getElementById»(»
+    «.«getSelection»(»
+    «.«getSelection»)»
+    «x«height»:»
     «.«height»(»
     «x«if»(»
     « «in» »
@@ -55,20 +64,28 @@ x_js_names_spec = '''
     «.«length»x»
     «.«localStorage»x»
     «.«location»x»
+    «.«moveToElementText»(»
     «x«new» »
     «x«null»x»
+    «.«prompt»(»
     «x«Math».»
     «x«Number»(»
     «x«Object».»
+    «x«opacity»:»
     «.«prototype»x»
     «.«push»(»
+    «.«removeAllRanges»(»
     «.«replace»(»
     «x«return»x»
     «.«search»x»
+    «.«select»(»
+    «.«selectNode»(»
+    «.«selection»x»
     «.«slice»(»
     «.«sort»(»
     «.«split»(»
     «.«sqrt»(»
+    «.«substr»(»
     «.«test»(»
     «x«this»x»
     «x«true»x»
@@ -78,8 +95,10 @@ x_js_names_spec = '''
     «x«while»(»
     «.«when»(»
     «.«when».»
+    «x«width»:»
     «.«width»(»
     «x«window»x»
+    «x«document»x»
 '''.strip().split('\n')
 
 i_js_names_spec = '''
@@ -146,6 +165,7 @@ x_lib_names_spec = '''
     «x«max»:»
     «x«min»:»
     «x«minLength»:»
+    «.«mouseleave»(»
     «x«normalizeFunction»:»
     «x«onMarkerClick»:»
     «x«onMarkerSelected»:»
@@ -177,7 +197,9 @@ x_lib_names_spec = '''
     «x«source»:»
     «x«stroke»:»
     «.«state»(»
+    «.«text»(»
     «.«then»(»
+    «.«toggle»(»
     «x«url»:»
     «.«val»(»
     «x«value»:»
@@ -195,6 +217,8 @@ x_app_names_spec = '''
     «/«_c_»/»
     «/«_f_»/»
     «x«app_url»x»
+    «x«app_url_cite»x»
+    «x«body»x»
     «x«contrib»:»
     «x«control»:»
     «x«country»:»
@@ -274,6 +298,7 @@ jsorder = tuple('''
     facet
     list
     control
+    share
     components
     page
     main

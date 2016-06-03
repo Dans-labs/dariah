@@ -39,7 +39,9 @@ function ºPage() { // the one and only page object
     this.ºstages_prev = {ºwire: `ºweld`, ºwork: `ºwire`};
     var ºmain_lists = this.ºstate.ºgetValues(`list`);
     var ºcontrib_list = {contrib: 1};
+    var ºempty_list = {'': 1};
     this.º_component_specs = {
+        ºshare: {ºdest: `body`, ºvariants: ºempty_list, ºfetch_url: null, ºspecific: ºShare}, 
         ºcontrol: {ºdest: `left`, ºvariants: ºmain_lists, ºfetch_url: null, ºspecific: ºControl}, 
         ºlist: {ºdest: `middle`, ºvariants: ºmain_lists, ºfetch_url: `list`, ºspecific: ºList}, 
         ºfacet: {ºdest: `ºcontrol`, ºvariants: ºmain_lists, ºfetch_url: null, ºspecific: ºFacet}, 
@@ -59,6 +61,7 @@ function ºPage() { // the one and only page object
             ºtadiraha: {ºfacet: 1, ºctype: 1},
             ºtadiraho: {ºfacet: 1, ºtadiraha: 1},
             ºtadiraht: {ºfacet: 1, ºtadiraho: 1},
+            ºshare: {ºfacet: 1, ºlist: 1},
         },
         ºwire: {
             ºfacet: {ºfilter: 1, ºeumap: 1, ºctype: 1, ºtadiraha: 1, ºtadiraho: 1, ºtadiraht: 1},
@@ -241,8 +244,9 @@ function ºPage() { // the one and only page object
             ºcontainer = this.ºcomponents[ºname].ºcontainer;
         }
         else {
+            var ºaddto = (ºname == `body`)?$(`body`):$(`#${ºname}`);
             for (var ºvar in ºvariants) {
-                ºcontainer[ºvar] = $(`#${ºname}`);
+                ºcontainer[ºvar] = ºaddto;
             }
         }
         return ºcontainer;

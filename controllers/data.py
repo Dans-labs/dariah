@@ -142,7 +142,7 @@ inner join tadirah_research_techniques on
     relvaldata = dbd.executesql('''
 select
     id, val
-from tadirah_research_objects
+from tadirah_research_techniques
 ''')
     for r in reldata: relinfo.setdefault(r[0], {})[r[1]] = True
     for r in relvaldata: relvals[r[0]] = r[1]

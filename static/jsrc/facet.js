@@ -34,48 +34,66 @@ function ºFacet(ºcomponent) {
         }
         this.º_html(ºvar);
     },
+    º_display: function(ºfacet_expand_control, ºmode) {
+        var ºkey = `fctx_${ºfacet_expand_control.closest('span').attr('fct')}`;
+        var ºdt = ºfacet_expand_control.closest(`p`);
+        var ºexpanded_material = ºfacet_expand_control.closest(`div`).find(`table,.•flt`);
+        var ºcondensed_material = ºfacet_expand_control.closest(`div`).find(`.•value_list2,.•flt_compact`);
+        var ºhidec = ºdt.find(`.hidec`);
+        var ºmorec = ºdt.find(`.morec`);
+        var ºshowc = ºdt.find(`.showc`);
+        if (ºmode == undefined) {
+            if (ºlocalstorage_vars.isSet(ºkey)) {
+                ºmode = ºlocalstorage_vars.get(ºkey);
+            }
+            else {
+                ºmode = 1;
+            }
+        }
+        ºlocalstorage_vars.set(ºkey, ºmode);
+        if (ºmode == 0) {
+            ºhidec.show();
+            ºmorec.hide();
+            ºshowc.hide();
+            ºexpanded_material.hide();
+            ºcondensed_material.hide();
+        }
+        else if (ºmode == 1) {
+            ºhidec.hide();
+            ºmorec.show();
+            ºshowc.hide();
+            ºexpanded_material.hide();
+            ºcondensed_material.show();
+        }
+        else {
+            ºhidec.hide();
+            ºmorec.hide();
+            ºshowc.show();
+            ºexpanded_material.show();
+            ºcondensed_material.hide();
+        }
+    },
     ºwire: function(ºvar) {
+        var ºthat = this;
         var ºcc = this.ºcomponent.ºcontainer[ºvar];
         var ºlc = this.ºcomponent.ºpage.ºgetComponent(`ºlist`).ºcontainer[ºvar];
         this.º_stats[ºvar] = ºcc.find(`#fstats_${ºvar}`);
         this.ºtable[ºvar] =  ºlc.find(`#table_${ºvar}`);
-        var ºdetailcontrols = `<a class="showc fa fa-chevron-right" href="#" title="Show details"></a><a class="morec fa fa-chevron-down" href="#" title="Less details"></a><a class="hidec fa fa-chevron-up" href="#" title="Hide details"></a>`;
+        var ºinfo = ` details; click to change level of details`;
+        var ºdetailcontrols = `<a class="showc fa fa-reorder" href="#" title="full${ºinfo}"></a><a class="morec fa fa-ellipsis-h" href="#" title="condensed${ºinfo}"></a><a class="hidec fa fa-minus" href="#" title="hidden${ºinfo}"></a>`;
         ºcc.addClass(`•facet`);
-        ºcc.find(`p.•dctrl`).each(function() {
-            var ºorig = $(this).html();
-            $(this).html(`${ºdetailcontrols}&nbsp;${ºorig}`);
+        ºcc.find(`span[fct]`).each(function() {
+            $(this).html(`${ºdetailcontrols}&nbsp`);
+            ºthat.º_display($(this));
         });
-        ºcc.find(`p.•dctrl`).closest(`div`).find(`table,.•flt`).hide();
-        ºcc.find(`p.•dctrl`).closest(`div`).find(`.•value_list2,.•flt_compact`).show();
-        ºcc.find(`.hidec`).show();
-        ºcc.find(`.morec`).hide();
-        ºcc.find(`.showc`).hide();
         ºcc.find(`.hidec`).click(function(ºe) {ºe.preventDefault();
-            var ºdt = $(this).closest(`p`);
-            var ºkey = $(this).closest(`div.•component`).attr(`id`);
-            $(this).closest(`div`).find(`table,.•flt`).hide();
-            $(this).closest(`div`).find(`.•value_list2,.•flt_compact`).hide();
-            ºdt.find(`.hidec`).hide();
-            ºdt.find(`.morec`).hide();
-            ºdt.find(`.showc`).show();
+            ºthat.º_display($(this), 1);
         });
         ºcc.find(`.morec`).click(function(ºe) {ºe.preventDefault();
-            var ºdt = $(this).closest(`p`);
-            var ºkey = $(this).closest(`div.•component`).attr(`id`);
-            $(this).closest(`div`).find(`table,.•flt`).hide();
-            $(this).closest(`div`).find(`.•value_list2,.•flt_compact`).show();
-            ºdt.find(`.hidec`).show();
-            ºdt.find(`.morec`).hide();
-            ºdt.find(`.showc`).hide();
+            ºthat.º_display($(this), 2);
         });
         ºcc.find(`.showc`).click(function(ºe) {ºe.preventDefault();
-            var ºdt = $(this).closest(`p`);
-            var ºkey = $(this).closest(`div.•component`).attr(`id`);
-            $(this).closest(`div`).find(`table,.•flt`).show();
-            $(this).closest(`div`).find(`.•value_list2,.•flt_compact`).hide();
-            ºdt.find(`.hidec`).hide();
-            ºdt.find(`.morec`).show();
-            ºdt.find(`.showc`).hide();
+            ºthat.º_display($(this), 0);
         });
     },
     ºwork: function(ºvar) {

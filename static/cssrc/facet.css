@@ -9,9 +9,16 @@
     border: 2px solid #eeee77;
 ≥
 «facet:highlight.text» ≤
-    font-size: x-small;
-    font-weight: bold;
+    font-size: small;
+    font-weight: normal;
     font-style: normal;
+≥
+«facet:highlight.colors» ≤
+    color: #000000;
+    background-color: #eeeeff;
+≥
+«facet:single.shape» ≤
+    border-radius: 3px;
 ≥
 «facet:normal.colors» ≤
     color: #000000;
@@ -39,12 +46,23 @@ div.•facet>div {
     «facet:normal.text»
     «facet:shape»
 }
+.•facet_single,.•facet_single_all {
+    «facet:normal.colors»
+    «facet:normal.text»
+    «facet:single.shape»
+}
+.•facet_single.•ison,.•facet_single_all.•ison {
+    «facet:highlight.text»
+    «facet:highlight.colors»
+    «facet:single.shape»
+}
 div.•facet .•stats {
     «facet:stats.colors»
     «facet:stats.text»
 }
 div.•facet .•stats.•ison {
-    «facet:highlight.text»
+    «facet:stats.colors»
+    «facet:stats.text»
 }
 .•passive_small {
     display: none;
@@ -52,6 +70,8 @@ div.•facet .•stats.•ison {
 .•passive_small.•ison,.•flt_compact {
     display: inline;
     «facet:highlight.text»
+    «facet:highlight.colors»
+    «facet:single.shape»
 }
 .•dctrl,.•all {
     margin-bottom: 0pt;
