@@ -129,10 +129,8 @@ function ºComponent(ºname, ºspecs, ºpage) {
             }
         }
         this.ºimplementation.ºweld(ºvar);
-        console.log(`_WELD END ${this.ºname}-${ºvar}`);
     },
     º_weld: function(ºvar) {
-        console.log(`_WELD BEGIN ${this.ºname}-${ºvar}`);
         this.º_dst = this.ºpage.ºgetContainer(this.ºspecs.ºdest, this.ºvariants);
         this.ºcontainer[ºvar] = $(`#${this.ºname}_${ºvar}`);
         if (this.ºcontainer[ºvar].length == 0) {
@@ -147,27 +145,14 @@ function ºComponent(ºname, ºspecs, ºpage) {
         }
         else {
             this.ºimplementation.ºweld(ºvar);
-            console.log(`_WELD END ${this.ºname}-${ºvar}`);
         }
     },
     º_wire: function(ºvar) {
-        console.log(`_WIRE ${this.ºname}-${ºvar}`);
         this.ºimplementation.ºwire(ºvar); // perform ºwire actions that are ºspecific to this component
     },
     º_work: function(ºvar) {
-        console.log(`_WORK ${this.ºname}-${ºvar}`);
         this.º_visibility(ºvar, true);
         this.ºimplementation.ºwork(ºvar); // perform ºwork actions that are ºspecific to this component
-    },
-    ºwork: function(ºvar) { // ºwork (changed) state to current material
-        if (this.ºhasVariant(ºvar) && this.ºimplementation.ºshow(ºvar)) { // ºshow/hide depending on the ºspecific condition
-            this.ºensure(ºvar, `ºweld`, `º_weld`);
-            this.ºensure(ºvar, `ºwire`, `º_wire`);
-            this.ºensure(ºvar, `ºwork`, `º_work`);
-        }
-        else {
-            this.º_visibility(ºvar, false);
-        }
     },
     ºweld: function(ºvar) {
         if (this.ºhasVariant(ºvar) && this.ºimplementation.ºshow(ºvar)) {
