@@ -39,3 +39,13 @@ html .ui-autocomplete {
     /* prevent horizontal scrollbar */
     overflow-x: hidden;
 }
+.•flt_pat {
+    font-weight: normal;
+    font-style: normal;
+}
+input.•flt_pat {
+    font-family: Menlo, Courier New, Courier, monospace;
+    font-weight: normal;
+    font-style: normal;
+}
+

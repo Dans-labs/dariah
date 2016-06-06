@@ -74,7 +74,7 @@ div.•facet .•stats.•ison {
 .•passive_small {
     display: none;
 }
-.•passive_small.•ison,.•flt_compact {
+.•passive_small.•ison {
     display: inline;
     «facet:highlight.text»
     «facet:highlight.colors»
@@ -88,5 +88,4 @@ div.•facet .•stats.•ison {
 .•last_handled {
     background-color: #ffff88;
 }
-
 

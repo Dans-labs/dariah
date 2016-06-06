@@ -19,16 +19,20 @@ function ºFilter(ºcomponent) {
 
 ºFilter.prototype = {
     º_html: function(ºvar) {
-        var ºh = `<div><p class="•dctrl"><span fct="${this.ºcomponent.ºname}-${ºvar}"></span> By full text search
-    <a href="#" title="modify full text filter" id="flt2_${ºvar}" class="•flt_compact"></a></p>`;
-        ºh += `<div id="fltw_${ºvar}">`;
-        ºh += `<p id="•fbox_${ºvar}" class="•flt •control_med •fbox ui-widget">`;
-        ºh += `<input id="flt_${ºvar}" class="flt"/>`;
-        ºh += `<a href="#" class="•control_med fa fa-close •filtc" id="clearf_${ºvar}"></a>`;
-        ºh += `<span •fbox class="•stats" id="stats_${ºvar}"></span>&nbsp;`;
-        ºh += `</p>`;
-        ºh += `<div id="autoc_${ºvar}" style="display: none;">here ${ºvar}</div>`;
-        ºh += `</div>`;
+        var ºh = `
+<div>
+    <p class="•dctrl"><span fct="${this.ºcomponent.ºname}-${ºvar}"></span> By full text search
+        <a href="#" title="modify full text filter" id="flt2_${ºvar}" class="•flt_not_expanded •facet_single •ison •flt_pat"></a>
+        <a href="#" class="•control_med fa fa-close •filtc" id="clearf_${ºvar}"></a>
+    </p>
+    <div id="fltw_${ºvar}">
+        <p id="•fbox_${ºvar}" class="•flt •control_med •fbox ui-widget">
+            <input id="flt_${ºvar}" class="•flt •flt_pat"/>
+            <span •fbox class="•stats" id="stats_${ºvar}"></span>
+        </p>
+        <div id="autoc_${ºvar}" style="display: none;">here ${ºvar}</div>
+    </div>
+</div>`;
         this.ºcomponent.ºcontainer[ºvar].html(ºh);
     },
     º_setFilter: function(ºvar) {
@@ -96,7 +100,7 @@ function ºFilter(ºcomponent) {
         this.º_box[ºvar] = ºcf.find(`#•fbox_${ºvar}`);
         this.º_completions_dst[ºvar] = ºcf.find(`#autoc_${ºvar}`);
         this.º_stats_dst[ºvar] = ºcf.find(`#stats_${ºvar}`);
-        this.º_clear_filter_control[ºvar] = ºcf.find(`#clearf_${ºvar}`);
+        this.º_clear_filter_control[ºvar] = ºcc.find(`#clearf_${ºvar}`);
         this.º_filter_control[ºvar].autocomplete({
             appendTo: this.º_completions_dst[ºvar],
             source: this.º_tags[ºvar],

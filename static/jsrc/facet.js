@@ -40,6 +40,7 @@ function ºFacet(ºcomponent) {
         var ºshowc = ºdt.find(`.showc`);
         var ºexpanded_material = ºfacet_expand_control.closest(`div`).find(`table,.•flt`);
         var ºcondensed_material = ºfacet_expand_control.closest(`div`).find(`.•value_list2,.•flt_compact`);
+        var ºnot_expanded_material = ºfacet_expand_control.closest(`div`).find(`.•flt_not_expanded`);
         var ºkey = `fctx_${ºfacet_expand_control.closest('span').attr('fct')}`;
         var ºmode_undef = ºmode == undefined;
         if (ºmode_undef) {
@@ -62,6 +63,7 @@ function ºFacet(ºcomponent) {
             ºmorec.hide();
             ºshowc.hide();
             if (!ºall_facets) {
+                ºnot_expanded_material.show();
                 ºexpanded_material.hide();
                 ºcondensed_material.hide();
             }
@@ -71,6 +73,7 @@ function ºFacet(ºcomponent) {
             ºmorec.show();
             ºshowc.hide();
             if (!ºall_facets) {
+                ºnot_expanded_material.show();
                 ºexpanded_material.hide();
                 ºcondensed_material.show();
             }
@@ -80,6 +83,7 @@ function ºFacet(ºcomponent) {
             ºmorec.hide();
             ºshowc.show();
             if (!ºall_facets) {
+                ºnot_expanded_material.hide();
                 ºexpanded_material.show();
                 ºcondensed_material.hide();
             }

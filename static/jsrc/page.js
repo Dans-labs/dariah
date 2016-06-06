@@ -206,7 +206,7 @@ function ºPage() { // the one and only page object
                     }
                 }
             }
-            if (!Object.keys(ºsubset[ºn]).length) {                                    // if there are no new nodes, the next rounds will also not yield new nodes,
+            if (!Object.keys(ºsubset[ºn]).length) {                       // if there are no new nodes, the next rounds will also not yield new nodes,
                 break;                                                    //  so we are done
             }
             for (var ºnode in ºsubset[ºn]) {                              // after each round we add the saved next_nodes to the visited nodes

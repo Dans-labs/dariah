@@ -10,6 +10,7 @@ function ºEUmap(ºcomponent) {
     this.º_marker = {};
     this.º_setvalues = {};
     this.º_not_mapped = {
+        '-': true,
         CY: true,
         KS: true,
         TR: true,
@@ -117,12 +118,12 @@ function ºEUmap(ºcomponent) {
         }.bind(this),
         onRegionSelected: function(ºe, ºrelated_value, ºi, ºselected) {
             if (this.ºchange_state) {
-                this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºvar}`, this.º_a_to_str(ºselected));
+                this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºvar}`, this.º_a_to_str(ºselected)+this.º_unmapped_selected(ºvar));
             }
         }.bind(this),
         onMarkerSelected: function(ºe, ºrelated_value, ºi, ºselected) {
             if (this.ºchange_state) {
-                this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºvar}`, this.º_a_to_str(ºselected));
+                this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºvar}`, this.º_a_to_str(ºselected)+this.º_unmapped_selected(ºvar));
             }
         }.bind(this),
     });
@@ -135,6 +136,18 @@ function ºEUmap(ºcomponent) {
     });
     this.º_map_object[ºvar] = this.º_map_container[ºvar].vectorMap('get', 'mapObject');
     this.º_map_object[ºvar].setFocus({regions: [`GB`, `GR`]});
+};
+ºEUmap.prototype.º_unmapped_selected = function(ºvar) {
+    var ºresult = [];
+    var ºthis_state = this.º_from_str(ºvar, this.ºcomponent.ºstate.ºgetState(`rel_${this.º_type}_${ºvar}`));
+    var ºempty = true;
+    for (var ºrelated_value in this.º_not_mapped) {
+        if (ºrelated_value in ºthis_state && ºthis_state[ºrelated_value]) {
+            ºresult.push(ºrelated_value);
+            ºempty = false;
+        }
+    }
+    return ºempty?``:(`,`+ºresult.join(','));
 };
 ºEUmap.prototype.º_mySetFacet = function(ºvar, ºrelated_values) {
     this.ºchange_state = false;
