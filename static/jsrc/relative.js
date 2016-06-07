@@ -2,7 +2,7 @@
  * CType, Tadiraho and EUmap inherit from this.
  */
 
-function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff) {
+function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff, ºshortsize) {
     this.ºcomponent = ºcomponent;
     this.ºdistilled = {};
     this.º_list = {};
@@ -18,6 +18,7 @@ function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff) {
     this.º_type = ºtype;
     this.º_cols = ºcols || 2;
     this.º_cutoff = ºcutoff || 14;
+    this.º_shortsize = ºshortsize || 6;
 };
 
 ºRelative.prototype = {
@@ -38,7 +39,11 @@ function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff) {
                 ºh += `</tr><tr>`;
             }
             var ºraw_value = this.º_related_values_index[ºvar][ºrelated_value];
-            ºh += `<td><span rv="${ºrelated_value}" class="•stats"></span></td><td><a rv="${ºrelated_value}" href="#" class="•facet_single •title">${ºescapeHTML(ºraw_value)}</a></td>`;
+            var ºcompact_value = ºescapeHTML(ºcompact(this.º_cutoff, this.º_shortsize, ºraw_value));
+            ºh += `
+            <td><span rv="${ºrelated_value}" class="•stats"></span></td>
+            <td><a rv="${ºrelated_value}" href="#" class="•facet_single"><abbr title="${ºescapeHTML(ºraw_value)}">${ºcompact_value}</abbr></a></td>
+            `;
             //ºh += `<td><span rv="${ºrelated_value}" class="•stats"></span></td><td><a rv="${ºrelated_value}" title="${ºescapeHTML(ºraw_value)}" href="#" class="•facet_single">${ºescapeHTML(ºcompact(this.º_cutoff, 6,ºraw_value))}</a></td>`;
         }, this);
         ºh += `
@@ -48,7 +53,8 @@ function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff) {
 `;
         this.º_related_values_list[ºvar].forEach(function(ºrelated_value, ºi, ºar) {
             var ºraw_value = this.º_related_values_index[ºvar][ºrelated_value];
-            ºh += `<a href="#" rv="${ºrelated_value}" class="•passive_small •titlei">${ºescapeHTML(ºraw_value)}</a> `;
+            var ºcompact_value = ºescapeHTML(ºcompact(this.º_cutoff, this.º_shortsize, ºraw_value));
+            ºh += `<a href="#" rv="${ºrelated_value}" class="•passive_small"><abbr title="${ºescapeHTML(ºraw_value)}">${ºcompact_value}</abbr></a> `;
             //ºh += `<a href="#" rv="${ºrelated_value}" title="${ºescapeHTML(ºraw_value)}" class="•passive_small">${ºescapeHTML(ºcompact(this.º_cutoff, 5,ºraw_value))}</a> `;
         }, this);
         ºh += `

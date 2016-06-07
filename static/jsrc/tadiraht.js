@@ -3,7 +3,7 @@
  */
 
 function ºTadirahT(ºcomponent) {
-    ºRelative.call(this, ºcomponent, `tadiraht`, 1, 30);
+    ºRelative.call(this, ºcomponent, `tadiraht`, 1, 30, 10);
 };
 
 ºTadirahT.prototype = Object.create(ºRelative.prototype);

@@ -240,7 +240,6 @@ div.•facet>div {
 
 }
 .•facet_single,.•facet_single_all {
-    display: block;
     
     color: #886666;
     background-color: #ffffff;
@@ -255,7 +254,6 @@ div.•facet>div {
 
 }
 .•facet_single.•ison,.•facet_single_all.•ison {
-    display: block;
     
     font-size: small;
     font-weight: normal;
@@ -295,7 +293,7 @@ div.•facet .•stats.•ison {
     display: none;
 }
 .•passive_small.•ison {
-    display: inline-block;
+    display: inline;
     
     font-size: small;
     font-weight: normal;
@@ -629,24 +627,6 @@ td {
 
 
 /* RELATIVE */
-
-.•title {
-    width: 100px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-a.•titlei {
-    width: 75px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.•title:hover,.•titlei:hover {
-    overflow: visible;
-}
 
 
 .•socialdrawer {

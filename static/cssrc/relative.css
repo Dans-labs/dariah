@@ -1,20 +1,2 @@
 /* RELATIVE */
 
-.•title {
-    width: 100px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-a.•titlei {
-    width: 75px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.•title:hover,.•titlei:hover {
-    overflow: visible;
-}
-
