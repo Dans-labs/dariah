@@ -76,31 +76,25 @@ function ºPage() { // the one and only page object
             ºfacet: {ºfilter: 1, ºeumap: 1, ºctype: 1, ºtadiraha: 1, ºtadiraho: 1, ºtadiraht: 1},
         },
     };
+    this.º_ignore = {
+        ºtadiraht: 1,
+        ºtadiraho: 1,
+        ºeumap: 1,
+        ºfilter: 1,
+    },
     this.ºcomponents = {};
     for (var ºname in this.º_component_specs) {
+        if (ºname in this.º_ignore) {continue}
         var ºcomponent = new ºComponent(ºname, this.º_component_specs[ºname], this);
         ºcomponent.ºchildren = {};
         this.ºcomponents[ºname] = ºcomponent;
     }
-    for (var ºname in this.º_component_specs) {
+    for (var ºname in this.ºcomponents) {
         var ºchild_component = this.ºcomponents[ºname];
         var ºdest_name = this.º_component_specs[ºname].ºdest;
         if (ºdest_name in this.ºcomponents) {
             var ºparent_component = this.ºcomponents[ºdest_name];
             ºparent_component.ºchildren[ºname] = ºchild_component;
-        }
-    }
-    for (var ºname in this.ºcomponents) {
-        var ºcomponent = this.ºcomponents[ºname];
-        ºcomponent.ºbefore = {};
-        for (var ºstage in this.º_before) {
-            var ºconstraints = this.º_before[ºstage];
-            ºcomponent.ºbefore[ºstage] = {};
-            if (ºname in ºconstraints) {
-                for (var ºbefore_name in ºconstraints[ºname]) {
-                   ºcomponent.ºbefore[ºstage][ºbefore_name] = 1;
-                } 
-            }
         }
     }
     this.º_resolveTiming();
@@ -142,7 +136,7 @@ function ºPage() { // the one and only page object
         var ºtiming_edges = {}; // keys are nodes that must come before other nodes
         var ºtiming_edges_inv = {}; // keys are nodes that must come after other nodes
         // A: collect the nodes: pairs of component name and stage
-        for (var ºname in this.º_component_specs) {
+        for (var ºname in this.ºcomponents) {
             for (var ºstage in this.ºstages) {
                 ºtiming_nodes.push(`${ºname}-${ºstage}`);
             }
@@ -161,14 +155,16 @@ function ºPage() { // the one and only page object
         // 1. per component, the stages are ordered
         for (var ºnext_stage in this.ºstages_prev) {
             var ºprev_stage = this.ºstages_prev[ºnext_stage];
-            for (var ºname in this.º_component_specs) {
+            for (var ºname in this.ºcomponents) {
                 ºaddEdge(`${ºname}-${ºprev_stage}`, `${ºname}-${ºnext_stage}`);
             }
         }
         // 2. add the specific constraints from this.º_before
         for (var ºstage in this.º_before) {
             for (var ºnext_name in this.º_before[ºstage]) {
+                if (ºnext_name in this.º_ignore) {continue}
                 for (var ºprev_name in this.º_before[ºstage][ºnext_name]) {
+                    if (ºprev_name in this.º_ignore) {continue}
                     ºaddEdge(`${ºprev_name}-${ºstage}`, `${ºnext_name}-${ºstage}`);
                 }
             }

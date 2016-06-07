@@ -26,24 +26,34 @@ function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff) {
         var ºtype_pl = this.ºcomponent.ºstate.ºshowState(`list`, this.º_type, `ºpl`);
         var ºh = ``;
         ºh += this.º_preHtml(ºvar);
-        ºh += `<div><p class="•dctrl"><span fct="${this.ºcomponent.ºname}-${ºvar}"></span> By ${ºtype_sg}</p>`;
-        ºh += `<p class="•all"><span rv="_all" class="•stats"></span> <a rv="_all" href="#" class="•facet_single_all">all ${ºtype_pl}</a></p>
-<table class="•value_list" id="list-${this.º_type}-vals_${ºvar}"><tr>`;
+        ºh += `
+<div>
+    <p class="•dctrl"><span fct="${this.ºcomponent.ºname}-${ºvar}"></span> By ${ºtype_sg}</p>
+    <p class="•all"><span rv="_all" class="•stats"></span> <a rv="_all" href="#" class="•facet_single_all">all ${ºtype_pl}</a></p>
+    <table class="•value_list" id="list-${this.º_type}-vals_${ºvar}">
+        <tr>
+`;
         this.º_related_values_list[ºvar].forEach(function(ºrelated_value, ºi, ºar) {
             if ((ºi % this.º_cols == 0) && (ºi > 0) && (ºi < ºar.length)) {
                 ºh += `</tr><tr>`;
             }
             var ºraw_value = this.º_related_values_index[ºvar][ºrelated_value];
-            ºh += `<td><span rv="${ºrelated_value}" class="•stats"></span></td><td><a rv="${ºrelated_value}" title="${ºescapeHTML(ºraw_value)}" href="#" class="•facet_single">${ºescapeHTML(ºcompact(this.º_cutoff, 6,ºraw_value))}</a></td>`;
+            ºh += `<td><span rv="${ºrelated_value}" class="•stats"></span></td><td><a rv="${ºrelated_value}" href="#" class="•facet_single •title">${ºescapeHTML(ºraw_value)}</a></td>`;
+            //ºh += `<td><span rv="${ºrelated_value}" class="•stats"></span></td><td><a rv="${ºrelated_value}" title="${ºescapeHTML(ºraw_value)}" href="#" class="•facet_single">${ºescapeHTML(ºcompact(this.º_cutoff, 6,ºraw_value))}</a></td>`;
         }, this);
-        ºh += `</tr></table>`;
-        ºh += `<p class="•value_list2" id="list2-${this.º_type}-vals_${ºvar}">`;
+        ºh += `
+        </tr>
+    </table>
+    <p class="•value_list2" id="list2-${this.º_type}-vals_${ºvar}">
+`;
         this.º_related_values_list[ºvar].forEach(function(ºrelated_value, ºi, ºar) {
             var ºraw_value = this.º_related_values_index[ºvar][ºrelated_value];
-            ºh += `<a href="#" rv="${ºrelated_value}" title="${ºescapeHTML(ºraw_value)}" class="•passive_small">${ºescapeHTML(ºcompact(this.º_cutoff, 5,ºraw_value))}</a> `;
+            ºh += `<a href="#" rv="${ºrelated_value}" class="•passive_small •titlei">${ºescapeHTML(ºraw_value)}</a> `;
+            //ºh += `<a href="#" rv="${ºrelated_value}" title="${ºescapeHTML(ºraw_value)}" class="•passive_small">${ºescapeHTML(ºcompact(this.º_cutoff, 5,ºraw_value))}</a> `;
         }, this);
-        ºh += `</p>`;
-        ºh += `</div>`;
+        ºh += `
+    </p>
+</div>`;
         this.ºcomponent.ºcontainer[ºvar].html(ºh);
     },
     º_dressup: function(ºvar) {

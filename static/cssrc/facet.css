@@ -54,11 +54,13 @@ div.•facet>div {
     «facet:shape»
 }
 .•facet_single,.•facet_single_all {
+    display: block;
     «facet:off.colors»
     «facet:normal.text»
     «facet:single.shape»
 }
 .•facet_single.•ison,.•facet_single_all.•ison {
+    display: block;
     «facet:highlight.text»
     «facet:highlight.colors»
     «facet:single.shape»
@@ -75,12 +77,13 @@ div.•facet .•stats.•ison {
     display: none;
 }
 .•passive_small.•ison {
-    display: inline;
+    display: inline-block;
     «facet:highlight.text»
     «facet:highlight.colors»
     «facet:single.shape»
 }
 .•dctrl,.•all {
+    clear: both;
     margin-bottom: 0pt;
     «facet:heading.text»
     «facet:normal.colors»
