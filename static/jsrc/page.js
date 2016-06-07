@@ -77,10 +77,10 @@ function ºPage() { // the one and only page object
         },
     };
     this.º_ignore = {
-        ºtadiraht: 1,
-        ºtadiraho: 1,
-        ºeumap: 1,
-        ºfilter: 1,
+        //ºtadiraht: 1,
+        //ºtadiraho: 1,
+        //ºeumap: 1,
+        //ºfilter: 1,
     },
     this.ºcomponents = {};
     for (var ºname in this.º_component_specs) {
