@@ -239,6 +239,7 @@ x_app_names_spec = '''
     «x«facet»:»
     «.«good»x»
     «x«id»:»
+    «x«ids»:»
     «x«left»:»
     «x«list»:»
     «x«m_contrib»:»
