@@ -35,6 +35,7 @@ x_js_names_spec = '''
     «.«bind»(»
     «x«break»x»
     «.«call»(»
+    «x«continue»x»
     «.«create»(»
     «.«createRange»(»
     «.«createTextRange»(»
@@ -302,6 +303,7 @@ jsorder = tuple('''
     filter
     facet
     list
+    item
     control
     share
     components

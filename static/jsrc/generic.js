@@ -84,3 +84,16 @@ function ºtoggle_detail(ºwidget, ºdetail, ºextra) {
 function ºcompact(ºcutoff, ºsize, ºtext) {
     return (ºtext.length > ºcutoff)?ºtext.replace(/[^ -]+/g, function(ºx){return ºx.substr(0,ºsize)}):ºtext;
 };
+
+function º_a_to_str(ºar) {
+    return ºar.join(',');
+};
+function º_to_str(ºob) {
+    var ºar = [];
+    for (var ºx in ºob) {
+        if (ºob[ºx]) {
+            ºar.push(ºx);
+        }
+    }
+    return ºar.join(',');
+};

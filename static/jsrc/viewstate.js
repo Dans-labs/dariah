@@ -27,6 +27,7 @@ function ºViewState(ºpage) {
         rel_tadiraha_contrib: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
         rel_tadiraho_contrib: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
         rel_tadiraht_contrib: {ºurl: false, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
+        ids: {ºurl: true, ºtype: `string`, ºvalues: null, ºdefault_value: ``},
         id: {ºurl: true, ºtype: `integer`, ºlimits: {ºmin: -1, ºmax: 1000000}, ºdefault_value: 0},
         sort: {ºurl: false, ºtype: `boolean`, ºvalues: {v: true, x: false}, ºdefault_value: true}, 
     },

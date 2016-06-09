@@ -68,7 +68,7 @@ function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff, ºshortsize) {
             var ºrelated_value = $(this).attr(`rv`);
             var ºselected = ºthat.º_from_str(ºvar, ºthat.ºcomponent.ºstate.ºgetState(`rel_${ºthat.º_type}_${ºvar}`));
             ºselected[ºrelated_value] = (ºrelated_value in ºselected)?!ºselected[ºrelated_value]:true;
-            ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, ºthat.º_to_str(ºselected));
+            ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, º_to_str(ºselected));
             ºcc.find(`.•last_handled`).removeClass(`•last_handled`);
             $(this).addClass(`•last_handled`);
         });
@@ -76,7 +76,7 @@ function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff, ºshortsize) {
             var ºrelated_value = $(this).attr(`rv`);
             var ºselected = ºthat.º_from_str(ºvar, ºthat.ºcomponent.ºstate.ºgetState(`rel_${ºthat.º_type}_${ºvar}`));
             ºselected[ºrelated_value] = (ºrelated_value in ºselected)?!ºselected[ºrelated_value]:true;
-            ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, ºthat.º_to_str(ºselected));
+            ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, º_to_str(ºselected));
             $(this).closest(`div`).find(`.morec`).click();
             var ºlast_handled = ºthat.º_list[ºvar].find(`a[rv="${ºrelated_value}"]`);
             ºcc.find(`.•last_handled`).removeClass(`•last_handled`);
@@ -91,10 +91,10 @@ function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff, ºshortsize) {
         this.º_all_values_control[ºvar].click(function(ºe) {ºe.preventDefault();
             var ºison = $(this).hasClass(`•ison`);
             if (ºison) {
-                ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, ºthat.º_to_str(ºthat.º_related_values_off[ºvar]));
+                ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, º_to_str(ºthat.º_related_values_off[ºvar]));
             }
             else {
-                ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, ºthat.º_to_str(ºthat.º_related_values_on[ºvar]));
+                ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, º_to_str(ºthat.º_related_values_on[ºvar]));
             }
         });
     },
@@ -119,18 +119,6 @@ function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff, ºshortsize) {
         else {
             this.º_all_values_control[ºvar].removeClass(`•ison`);
         }
-    },
-    º_a_to_str: function(ºar) {
-        return ºar.join(',');
-    },
-    º_to_str: function(ºob) {
-        var ºar = [];
-        for (var ºx in ºob) {
-            if (ºob[ºx]) {
-                ºar.push(ºx);
-            }
-        }
-        return ºar.join(',');
     },
     º_from_str: function(ºvar, ºst) {
         var ºob = {};

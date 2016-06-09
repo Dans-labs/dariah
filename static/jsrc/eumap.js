@@ -118,12 +118,12 @@ function ºEUmap(ºcomponent) {
         }.bind(this),
         onRegionSelected: function(ºe, ºrelated_value, ºi, ºselected) {
             if (this.ºchange_state) {
-                this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºvar}`, this.º_a_to_str(ºselected)+this.º_unmapped_selected(ºvar));
+                this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºvar}`, º_a_to_str(ºselected)+this.º_unmapped_selected(ºvar));
             }
         }.bind(this),
         onMarkerSelected: function(ºe, ºrelated_value, ºi, ºselected) {
             if (this.ºchange_state) {
-                this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºvar}`, this.º_a_to_str(ºselected)+this.º_unmapped_selected(ºvar));
+                this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºvar}`, º_a_to_str(ºselected)+this.º_unmapped_selected(ºvar));
             }
         }.bind(this),
     });
