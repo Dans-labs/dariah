@@ -96,7 +96,7 @@ function ºFacet(ºcomponent) {
         this.º_stats[ºvar] = ºcc.find(`#fstats_${ºvar}`);
         this.ºtable[ºvar] =  ºlc.find(`#table_${ºvar}`);
         var ºinfo = ` details; click to change level of details`;
-        var ºdetailcontrols = `<a class="showc fa fa-list-ul" href="#" title="full${ºinfo}"></a><a class="morec fa fa-align-left" href="#" title="condensed${ºinfo}"></a><a class="hidec fa fa-minus" href="#" title="hidden${ºinfo}"></a>`;
+        var ºdetailcontrols = `<a class="showc fa fa-fw fa-list-ul" href="#" title="full${ºinfo}"></a><a class="morec fa fa-fw fa-align-left" href="#" title="condensed${ºinfo}"></a><a class="hidec fa fa-fw fa-minus" href="#" title="hidden${ºinfo}"></a>`;
         ºcc.addClass(`•facet`);
         ºcc.find(`span[fct]`).each(function() {
             $(this).html(`${ºdetailcontrols}&nbsp`);
