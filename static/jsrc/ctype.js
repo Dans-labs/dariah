@@ -2,9 +2,13 @@
  * This manages the facet "contribution type"
  */
 
-function ºCType(ºcomponent) {
-    ºRelative.call(this, ºcomponent, `type`);
+var Relative = require('./relative.js');
+
+function CType(component) {
+    Relative.call(this, component, `type`);
 };
 
-ºCType.prototype = Object.create(ºRelative.prototype);
-ºCType.prototype.constructor = ºCType;
+CType.prototype = Object.create(Relative.prototype);
+CType.prototype.constructor = CType;
+
+module.exports = CType;

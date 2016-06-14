@@ -1,15 +1,18 @@
-/* INDIVIDUAL COMPONENT: ºEUmap
- * This manages a clickable map of the EU ºcountries
+/* INDIVIDUAL COMPONENT: EUmap
+ * This manages a clickable map of the EU countries
  * See http://jvectormap.com/documentation/javascript-api/jvm-map/
  */
 
-function ºEUmap(ºcomponent) {
-    ºRelative.call(this, ºcomponent, `country`);
-    this.º_map_object = {};
-    this.º_map_container = {};
-    this.º_marker = {};
-    this.º_setvalues = {};
-    this.º_not_mapped = {
+var g = require('./generic.js');
+var Relative = require('./relative.js');
+
+function EUmap(component) {
+    Relative.call(this, component, `country`);
+    this._map_object = {};
+    this._map_container = {};
+    this._marker = {};
+    this._setvalues = {};
+    this._not_mapped = {
         '-': true,
         CY: true,
         KS: true,
@@ -19,19 +22,19 @@ function ºEUmap(ºcomponent) {
     };
 };
 
-ºEUmap.prototype = Object.create(ºRelative.prototype);
-ºEUmap.prototype.constructor = ºEUmap;
-ºEUmap.prototype.º_preHtml = function(ºvar) {
-    return `<div id="map-europe_${ºvar}" class="•position"><p class="•zoom"><a class="fa fa-arrows" href="#" title="zoom to fit all countries"/></p></div>`;
+EUmap.prototype = Object.create(Relative.prototype);
+EUmap.prototype.constructor = EUmap;
+EUmap.prototype._preHtml = function(vr) {
+    return `<div id="map-europe_${vr}" class="position"><p class="zoom"><a class="fa fa-arrows" href="#" title="zoom to fit all countries"/></p></div>`;
 };
-ºEUmap.prototype.º_myDressup = function(ºvar) {
-    var ºthat = this;
-    var ºcc = this.ºcomponent.ºcontainer[ºvar];
-    this.º_map_container[ºvar] = ºcc.find(`#map-europe_${ºvar}`);
-    var ºheight = this.º_map_container[ºvar].width()*0.6;
-    this.º_map_container[ºvar].width(`100%`);
-    this.º_map_container[ºvar].height(ºheight);
-    this.º_map_container[ºvar].vectorMap({
+EUmap.prototype._myDressup = function(vr) {
+    var that = this;
+    var cc = this.component.container[vr];
+    this._map_container[vr] = cc.find(`#map-europe_${vr}`);
+    var height = this._map_container[vr].width()*0.6;
+    this._map_container[vr].width(`100%`);
+    this._map_container[vr].height(height);
+    this._map_container[vr].vectorMap({
         'map': `europe_mill`,
         backgroundColor: `#ccccff`,
         regionsSelectable: true,
@@ -81,7 +84,7 @@ function ºEUmap(ºcomponent) {
             selectedHover: {
             },
         },
-        markers: this.º_marker[ºvar],
+        markers: this._marker[vr],
         series: {
             markers: [{
                 values: {},
@@ -93,111 +96,113 @@ function ºEUmap(ºcomponent) {
             }],
             regions: [{
                     scale: {
-                        'ºoutdariah': `#ffffff`,
-                        'ºindariah': `#ffddbb`,
+                        'outdariah': `#ffffff`,
+                        'indariah': `#ffddbb`,
                     },
                     attribute: `fill`,
-                    values: this.º_setvalues[ºvar],
+                    values: this._setvalues[vr],
             }],
         },
-        onRegionTipShow: function(ºe, ºel, ºrelated_value) {
-            ºel.html(`${ºrelated_value}: ${(ºrelated_value in this.º_statistics[ºvar])?this.º_statistics[ºvar][ºrelated_value]:'not in DARIAH'}`);
+        onRegionTipShow: function(e, el, related_value) {
+            el.html(`${related_value}: ${(related_value in this._statistics[vr])?this._statistics[vr][related_value]:'not in DARIAH'}`);
         }.bind(this),
-        onMarkerTipShow: function(ºe, ºel, ºrelated_value) {
-            ºel.html(`${ºrelated_value}: ${(ºrelated_value in this.º_statistics[ºvar])?this.º_statistics[ºvar][ºrelated_value]:'not in DARIAH'}`);
+        onMarkerTipShow: function(e, el, related_value) {
+            el.html(`${related_value}: ${(related_value in this._statistics[vr])?this._statistics[vr][related_value]:'not in DARIAH'}`);
         }.bind(this),
-        onRegionClick: function(ºe, ºrelated_value) {
-            if (!(ºrelated_value in this.º_related_values_index[ºvar])) {
-                ºe.preventDefault();
+        onRegionClick: function(e, related_value) {
+            if (!(related_value in this._related_values_index[vr])) {
+                e.preventDefault();
             }
         }.bind(this),
-        onMarkerClick: function(ºe, ºrelated_value) {
-            if (!(ºrelated_value in this.º_related_values_index[ºvar])) {
-                ºe.preventDefault();
+        onMarkerClick: function(e, related_value) {
+            if (!(related_value in this._related_values_index[vr])) {
+                e.preventDefault();
             }
         }.bind(this),
-        onRegionSelected: function(ºe, ºrelated_value, ºi, ºselected) {
-            if (this.ºchange_state) {
-                this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºvar}`, º_a_to_str(ºselected)+this.º_unmapped_selected(ºvar));
+        onRegionSelected: function(e, related_value, i, selected) {
+            if (this.change_state) {
+                this.component.state.setState(`rel_${this._type}_${vr}`, g.a_to_str(selected)+this._unmapped_selected(vr));
             }
         }.bind(this),
-        onMarkerSelected: function(ºe, ºrelated_value, ºi, ºselected) {
-            if (this.ºchange_state) {
-                this.ºcomponent.ºstate.ºsetState(`rel_${this.º_type}_${ºvar}`, º_a_to_str(ºselected)+this.º_unmapped_selected(ºvar));
+        onMarkerSelected: function(e, related_value, i, selected) {
+            if (this.change_state) {
+                this.component.state.setState(`rel_${this._type}_${vr}`, g.a_to_str(selected)+this._unmapped_selected(vr));
             }
         }.bind(this),
     });
-    var ºzoom_p = ºcc.find(`p.•zoom`);
-    ºzoom_p.css(`top`, `${ºheight-20}px`);
-    ºzoom_p.css(`left`, `10px`);
-    var ºzoom_control = ºcc.find(`p.•zoom a`);
-    ºzoom_control.click(function(ºe) {ºe.preventDefault();
-        ºthat.º_map_object[ºvar].setFocus({regions: [`GB`, `GR`]});
+    var zoom_p = cc.find(`p.zoom`);
+    zoom_p.css(`top`, `${height-20}px`);
+    zoom_p.css(`left`, `10px`);
+    var zoom_control = cc.find(`p.zoom a`);
+    zoom_control.click(function(e) {e.preventDefault();
+        that._map_object[vr].setFocus({regions: [`GB`, `GR`]});
     });
-    this.º_map_object[ºvar] = this.º_map_container[ºvar].vectorMap('get', 'mapObject');
-    this.º_map_object[ºvar].setFocus({regions: [`GB`, `GR`]});
+    this._map_object[vr] = this._map_container[vr].vectorMap('get', 'mapObject');
+    this._map_object[vr].setFocus({regions: [`GB`, `GR`]});
 };
-ºEUmap.prototype.º_unmapped_selected = function(ºvar) {
-    var ºresult = [];
-    var ºthis_state = this.º_from_str(ºvar, this.ºcomponent.ºstate.ºgetState(`rel_${this.º_type}_${ºvar}`));
-    var ºempty = true;
-    for (var ºrelated_value in this.º_not_mapped) {
-        if (ºrelated_value in ºthis_state && ºthis_state[ºrelated_value]) {
-            ºresult.push(ºrelated_value);
-            ºempty = false;
+EUmap.prototype._unmapped_selected = function(vr) {
+    var result = [];
+    var this_state = this._from_str(vr, this.component.state.getState(`rel_${this._type}_${vr}`));
+    var empty = true;
+    for (var related_value in this._not_mapped) {
+        if (related_value in this_state && this_state[related_value]) {
+            result.push(related_value);
+            empty = false;
         }
     }
-    return ºempty?``:(`,`+ºresult.join(','));
+    return empty?``:(`,`+result.join(','));
 };
-ºEUmap.prototype.º_mySetFacet = function(ºvar, ºrelated_values) {
-    this.ºchange_state = false;
-    /* some countries are not on the map, we do ºshow those countries in the list but not on the map.
+EUmap.prototype._mySetFacet = function(vr, related_values) {
+    this.change_state = false;
+    /* some countries are not on the map, we do show those countries in the list but not on the map.
      * Same for -, the key that denotes ALL countries
      */
-    var ºmap_regions = {};
-    for (var ºrelated_value in ºrelated_values) {
-        if (!(ºrelated_value in this.º_not_mapped) && ºrelated_value != this.º_no_values.ºvalue) {
-            ºmap_regions[ºrelated_value] = ºrelated_values[ºrelated_value];
+    var map_regions = {};
+    for (var related_value in related_values) {
+        if (!(related_value in this._not_mapped) && related_value != this._no_values.value) {
+            map_regions[related_value] = related_values[related_value];
         }
     }
-    this.º_map_object[ºvar].setSelectedRegions(ºmap_regions);
-    this.º_map_object[ºvar].setSelectedMarkers(ºmap_regions);
-    this.ºchange_state = true;
+    this._map_object[vr].setSelectedRegions(map_regions);
+    this._map_object[vr].setSelectedMarkers(map_regions);
+    this.change_state = true;
 };
-ºEUmap.prototype.º_myStats = function(ºvar) {
-    var ºtotal = this.ºdistilled[ºvar].length;
-    if (ºtotal == 0) {ºtotal = 1}
-    var ºweighted_statistics = {};
-    for (var ºrelated_value in this.º_statistics[ºvar]) {
-        if (ºrelated_value != this.º_no_values.ºvalue) {
-            var ºpr = 100 * this.º_statistics[ºvar][ºrelated_value] / ºtotal;
-            ºweighted_statistics[ºrelated_value] = (ºtotal < 10)?ºpr:(10*Math.sqrt(ºpr));
+EUmap.prototype._myStats = function(vr) {
+    var total = this.distilled[vr].length;
+    if (total == 0) {total = 1}
+    var weighted_statistics = {};
+    for (var related_value in this._statistics[vr]) {
+        if (related_value != this._no_values.value) {
+            var pr = 100 * this._statistics[vr][related_value] / total;
+            weighted_statistics[related_value] = (total < 10)?pr:(10*Math.sqrt(pr));
         }
     }
-    this.º_map_object[ºvar].series.markers[0].setValues(ºweighted_statistics);
+    this._map_object[vr].series.markers[0].setValues(weighted_statistics);
 };
-ºEUmap.prototype.º_plainWeld = function(ºvar) {};
-ºEUmap.prototype.º_myWeld = function(ºvar) {
-    this.º_marker[ºvar] = {};
-    this.º_setvalues[ºvar] = {};
-    var ºrelated_values = this.ºcomponent.ºrelated_values[ºvar];
-    for (var ºi in ºrelated_values) {
-        var ºrelated_value = ºrelated_values[ºi];
-        if (ºrelated_value[1]) {
-            this.º_related_values_off[ºvar][ºi] = false;
-            this.º_related_values_on[ºvar][ºi] = true;
-            this.º_related_values_list[ºvar].push(ºi);
-            this.º_related_values_index[ºvar][ºi] = ºrelated_value[0];
-            if (ºrelated_value.length > 3) {
-                this.º_marker[ºvar][ºi] = {latLng: [ºrelated_value[2], ºrelated_value[3]], ºname: ºrelated_value[0]};
+EUmap.prototype._plainWeld = function(vr) {};
+EUmap.prototype._myWeld = function(vr) {
+    this._marker[vr] = {};
+    this._setvalues[vr] = {};
+    var related_values = this.component.related_values[vr];
+    for (var i in related_values) {
+        var related_value = related_values[i];
+        if (related_value[1]) {
+            this._related_values_off[vr][i] = false;
+            this._related_values_on[vr][i] = true;
+            this._related_values_list[vr].push(i);
+            this._related_values_index[vr][i] = related_value[0];
+            if (related_value.length > 3) {
+                this._marker[vr][i] = {latLng: [related_value[2], related_value[3]], name: related_value[0]};
             }
-            this.º_setvalues[ºvar][ºi] = 'ºindariah';
+            this._setvalues[vr][i] = 'indariah';
         }
         else {
-            this.º_setvalues[ºvar][ºi] = 'ºoutdariah';
+            this._setvalues[vr][i] = 'outdariah';
         }
     }
-    this.º_related_values_list[ºvar].sort(function(ºa,ºb) {
-        return (ºrelated_values[ºa] < ºrelated_values[ºb])?-1:(ºrelated_values[ºa][0] > ºrelated_values[ºb][0])?1:0; 
+    this._related_values_list[vr].sort(function(a,b) {
+        return (related_values[a] < related_values[b])?-1:(related_values[a][0] > related_values[b][0])?1:0; 
     });
 };
+
+module.exports = EUmap;

@@ -2,44 +2,44 @@
  * Some function for very generic purposes
  */
 
-var ºescapeHTML = (function () {
+var escapeHTML = (function () {
     `use strict`;
-    var ºchr = {
+    var chr = {
         '&': `&amp;`, '<': `&lt;`,  '>': `&gt;`
     };
-    return function (ºtext) {
-        return ºtext.replace(/[&<>]/g, function (ºa) { return ºchr[ºa]; });
+    return function (text) {
+        return text.replace(/[&<>]/g, function (a) { return chr[a]; });
     };
 }());
 
-var ºRequest = {
-    ºparameter: function(ºname) {
-        return this.ºparameters()[ºname];
+var _Request = {
+    parameter: function(name) {
+        return this.parameters()[name];
     },
-    ºparameters: function(ºuri) {
-        var ºi, ºparameter, ºparams, ºquery, ºresult;
-        ºresult = {};
-        if (!ºuri) {
-            ºuri = window.location.search;
+    parameters: function(uri) {
+        var i, parameter, params, query, result;
+        result = {};
+        if (!uri) {
+            uri = window.location.search;
         }
-        if (ºuri.indexOf("?") === -1) {
+        if (uri.indexOf("?") === -1) {
             return {};
         }
-        ºquery = ºuri.slice(1);
-        ºparams = ºquery.split("&");
-        ºparams.forEach(function(ºp, ºi) {
-            ºparameter = ºp.split("=");
-            ºresult[ºparameter[0]] = ºparameter[1];
+        query = uri.slice(1);
+        params = query.split("&");
+        params.forEach(function(p, i) {
+            parameter = p.split("=");
+            result[parameter[0]] = parameter[1];
         });
-        return ºresult;
+        return result;
     }
 };
 
-var ºrequest_vars = ºRequest.ºparameters();
-var ºlocalstorage = $.initNamespaceStorage(`req`);
-var ºlocalstorage_vars = ºlocalstorage.localStorage;
+var request_vars = _Request.parameters();
+var _localstorage = $.initNamespaceStorage(`req`);
+var localstorage_vars = _localstorage.localStorage;
 
-function ºdeselectText() {
+function deselectText() {
     if (document.selection) {
         document.selection.empty();
     }
@@ -48,52 +48,73 @@ function ºdeselectText() {
     }
 };
 
-function ºselectText(ºcontainerid) {
-    ºdeselectText();
+function selectText(containerid) {
+    deselectText();
     if (document.selection) {
-        var ºrange = document.body.createTextRange();
-        ºrange.moveToElementText(document.getElementById(ºcontainerid));
-        ºrange.select();
+        var range = document.body.createTextRange();
+        range.moveToElementText(document.getElementById(containerid));
+        range.select();
     }
     else if (window.getSelection) {
-        var ºrange = document.createRange();
-        ºrange.selectNode(document.getElementById(ºcontainerid));
-        window.getSelection().addRange(ºrange);
+        var range = document.createRange();
+        range.selectNode(document.getElementById(containerid));
+        window.getSelection().addRange(range);
     }
 };
 
-function ºtoggle_detail(ºwidget, ºdetail, ºextra) {
-    var ºthedetail = (ºdetail == undefined)?ºwidget.closest('div').find('.•detail'):ºdetail;
-    ºthedetail.toggle();
-    if (ºextra != undefined) {
-        ºextra(ºwidget);
+function toggleDetail(widget, detail, extra) {
+    var thedetail = (detail == undefined)?widget.closest('div').find('.detail'):detail;
+    thedetail.toggle();
+    if (extra != undefined) {
+        extra(widget);
     }
-    var ºthiscl, ºothercl;
-    if (ºwidget.hasClass('fa-chevron-right')) {
-        ºthiscl = 'fa-chevron-right';
-        ºothercl = 'fa-chevron-down';
+    var thiscl, othercl;
+    if (widget.hasClass('fa-chevron-right')) {
+        thiscl = 'fa-chevron-right';
+        othercl = 'fa-chevron-down';
     }
     else {
-        ºthiscl = 'fa-chevron-down';
-        ºothercl = 'fa-chevron-right';
+        thiscl = 'fa-chevron-down';
+        othercl = 'fa-chevron-right';
     }
-    ºwidget.removeClass(ºthiscl);
-    ºwidget.addClass(ºothercl);
+    widget.removeClass(thiscl);
+    widget.addClass(othercl);
 };
 
-function ºcompact(ºcutoff, ºsize, ºtext) {
-    return (ºtext.length > ºcutoff)?ºtext.replace(/[^ -]+/g, function(ºx){return ºx.substr(0,ºsize)}):ºtext;
+function compact(cutoff, size, text) {
+    return (text.length > cutoff)?text.replace(/[^ -]+/g, function(x){return x.substr(0,size)}):text;
 };
 
-function º_a_to_str(ºar) {
-    return ºar.join(',');
+function from_str(st) {
+    var ob = {};
+    if (st !== null && st != undefined && st != '') {
+        var ar = st.split(',');
+        ar.forEach(function(v) {
+            ob[v] = true;
+        });
+    }
+    return ob;
 };
-function º_to_str(ºob) {
-    var ºar = [];
-    for (var ºx in ºob) {
-        if (ºob[ºx]) {
-            ºar.push(ºx);
+function a_to_str(ar) {
+    return ar.join(',');
+};
+function to_str(ob) {
+    var ar = [];
+    for (var x in ob) {
+        if (ob[x]) {
+            ar.push(x);
         }
     }
-    return ºar.join(',');
+    return ar.join(',');
 };
+
+module.exports.escapeHTML = escapeHTML;
+module.exports.request_vars = request_vars;
+module.exports.localstorage_vars = localstorage_vars;
+module.exports.selectText = selectText;
+module.exports.deselectText = deselectText;
+module.exports.toggleDetail = toggleDetail;
+module.exports.compact = compact;
+module.exports.from_str = from_str;
+module.exports.to_str = to_str;
+module.exports.a_to_str = a_to_str;

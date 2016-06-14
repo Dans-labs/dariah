@@ -2,221 +2,225 @@
  * CType, Tadiraho and EUmap inherit from this.
  */
 
-function ºRelative(ºcomponent, ºtype, ºcols, ºcutoff, ºshortsize) {
-    this.ºcomponent = ºcomponent;
-    this.ºdistilled = {};
-    this.º_list = {};
-    this.º_list2 = {};
-    this.º_related_state = {};
-    this.º_all_values_control = {};
-    this.º_statistics = {};
-    this.º_related_values_list = {};
-    this.º_related_values_index = {};
-    this.º_related_values_on = {};
-    this.º_related_values_off = {};
-    this.º_no_values = {ºvalue: `-`, ºname: `-none`};
-    this.º_type = ºtype;
-    this.º_cols = ºcols || 2;
-    this.º_cutoff = ºcutoff || 14;
-    this.º_shortsize = ºshortsize || 6;
+var g = require('./generic.js');
+
+function Relative(component, rtype, cols, cutoff, shortsize) {
+    this.component = component;
+    this.distilled = {};
+    this._list = {};
+    this._list2 = {};
+    this._related_state = {};
+    this._all_values_control = {};
+    this._statistics = {};
+    this._related_values_list = {};
+    this._related_values_index = {};
+    this._related_values_on = {};
+    this._related_values_off = {};
+    this._no_values = {value: `-`, name: `-none`};
+    this._type = rtype;
+    this._cols = cols || 2;
+    this._cutoff = cutoff || 14;
+    this._shortsize = shortsize || 6;
 };
 
-ºRelative.prototype = {
-    º_html: function(ºvar) {
-        var ºtype_sg = this.ºcomponent.ºstate.ºshowState(`list`, this.º_type, `ºsg`);
-        var ºtype_pl = this.ºcomponent.ºstate.ºshowState(`list`, this.º_type, `ºpl`);
-        var ºh = ``;
-        ºh += this.º_preHtml(ºvar);
-        ºh += `
+Relative.prototype = {
+    _html: function(vr) {
+        var type_sg = this.component.state.showState(`list`, this._type, `sg`);
+        var type_pl = this.component.state.showState(`list`, this._type, `pl`);
+        var h = ``;
+        h += this._preHtml(vr);
+        h += `
 <div>
-    <p class="•dctrl"><span fct="${this.ºcomponent.ºname}-${ºvar}"></span> By ${ºtype_sg}</p>
-    <p class="•all"><span rv="_all" class="•stats"></span> <a rv="_all" href="#" class="•facet_single_all">all ${ºtype_pl}</a></p>
-    <table class="•value_list" id="list-${this.º_type}-vals_${ºvar}">
+    <p class="dctrl"><span fct="${this.component.name}-${vr}"></span> By ${type_sg}</p>
+    <p class="all"><span rv="_all" class="stats"></span> <a rv="_all" href="#" class="facet_single_all">all ${type_pl}</a></p>
+    <table class="value_list" id="list-${this._type}-vals_${vr}">
         <tr>
 `;
-        this.º_related_values_list[ºvar].forEach(function(ºrelated_value, ºi, ºar) {
-            if ((ºi % this.º_cols == 0) && (ºi > 0) && (ºi < ºar.length)) {
-                ºh += `</tr><tr>`;
+        this._related_values_list[vr].forEach(function(related_value, i, ar) {
+            if ((i % this._cols == 0) && (i > 0) && (i < ar.length)) {
+                h += `</tr><tr>`;
             }
-            var ºraw_value = this.º_related_values_index[ºvar][ºrelated_value];
-            ºh += `
-            <td><span rv="${ºrelated_value}" class="•stats"></span></td>
-            <td><a rv="${ºrelated_value}" href="#" class="•facet_single">${ºescapeHTML(ºraw_value)}</a></td>
+            var raw_value = this._related_values_index[vr][related_value];
+            h += `
+            <td><span rv="${related_value}" class="stats"></span></td>
+            <td><a rv="${related_value}" href="#" class="facet_single">${g.escapeHTML(raw_value)}</a></td>
             `;
         }, this);
-        ºh += `
+        h += `
         </tr>
     </table>
-    <p class="•value_list2" id="list2-${this.º_type}-vals_${ºvar}">
+    <p class="value_list2" id="list2-${this._type}-vals_${vr}">
 `;
-        this.º_related_values_list[ºvar].forEach(function(ºrelated_value, ºi, ºar) {
-            var ºraw_value = this.º_related_values_index[ºvar][ºrelated_value];
-            var ºcompact_value = ºescapeHTML(ºcompact(this.º_cutoff, this.º_shortsize, ºraw_value));
-            ºh += `<a href="#" rv="${ºrelated_value}" class="•passive_small" title="${ºescapeHTML(ºraw_value)}">${ºcompact_value}</a> `;
+        this._related_values_list[vr].forEach(function(related_value, i, ar) {
+            var raw_value = this._related_values_index[vr][related_value];
+            var compact_value = g.escapeHTML(g.compact(this._cutoff, this._shortsize, raw_value));
+            h += `<a href="#" rv="${related_value}" class="passive_small" title="${g.escapeHTML(raw_value)}">${compact_value}</a> `;
         }, this);
-        ºh += `
+        h += `
     </p>
 </div>`;
-        this.ºcomponent.ºcontainer[ºvar].html(ºh);
+        this.component.container[vr].html(h);
     },
-    º_dressup: function(ºvar) {
-        var ºcc = this.ºcomponent.ºcontainer[ºvar];
-        this.º_list[ºvar] = ºcc.find(`#list-${this.º_type}-vals_${ºvar}`);
-        this.º_list2[ºvar] = ºcc.find(`#list2-${this.º_type}-vals_${ºvar}`);
-        var ºthat = this;
-        this.º_list[ºvar].find(`.•facet_single`).click(function(ºe) {ºe.preventDefault();
-            var ºrelated_value = $(this).attr(`rv`);
-            var ºselected = ºthat.º_from_str(ºvar, ºthat.ºcomponent.ºstate.ºgetState(`rel_${ºthat.º_type}_${ºvar}`));
-            ºselected[ºrelated_value] = (ºrelated_value in ºselected)?!ºselected[ºrelated_value]:true;
-            ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, º_to_str(ºselected));
-            ºcc.find(`.•last_handled`).removeClass(`•last_handled`);
-            $(this).addClass(`•last_handled`);
+    _dressup: function(vr) {
+        var cc = this.component.container[vr];
+        this._list[vr] = cc.find(`#list-${this._type}-vals_${vr}`);
+        this._list2[vr] = cc.find(`#list2-${this._type}-vals_${vr}`);
+        var that = this;
+        this._list[vr].find(`.facet_single`).click(function(e) {e.preventDefault();
+            var related_value = $(this).attr(`rv`);
+            var selected = that._from_str(vr, that.component.state.getState(`rel_${that._type}_${vr}`));
+            selected[related_value] = (related_value in selected)?!selected[related_value]:true;
+            that.component.state.setState(`rel_${that._type}_${vr}`, g.to_str(selected));
+            cc.find(`.last_handled`).removeClass(`last_handled`);
+            $(this).addClass(`last_handled`);
         });
-        this.º_list2[ºvar].find(`.•passive_small`).click(function(ºe) {ºe.preventDefault();
-            var ºrelated_value = $(this).attr(`rv`);
-            var ºselected = ºthat.º_from_str(ºvar, ºthat.ºcomponent.ºstate.ºgetState(`rel_${ºthat.º_type}_${ºvar}`));
-            ºselected[ºrelated_value] = (ºrelated_value in ºselected)?!ºselected[ºrelated_value]:true;
-            ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, º_to_str(ºselected));
+        this._list2[vr].find(`.passive_small`).click(function(e) {e.preventDefault();
+            var related_value = $(this).attr(`rv`);
+            var selected = that._from_str(vr, that.component.state.getState(`rel_${that._type}_${vr}`));
+            selected[related_value] = (related_value in selected)?!selected[related_value]:true;
+            that.component.state.setState(`rel_${that._type}_${vr}`, g.to_str(selected));
             $(this).closest(`div`).find(`.morec`).click();
-            var ºlast_handled = ºthat.º_list[ºvar].find(`a[rv="${ºrelated_value}"]`);
-            ºcc.find(`.•last_handled`).removeClass(`•last_handled`);
-            ºlast_handled.addClass(`•last_handled`);
+            var last_handled = that._list[vr].find(`a[rv="${related_value}"]`);
+            cc.find(`.last_handled`).removeClass(`last_handled`);
+            last_handled.addClass(`last_handled`);
             $(`#left`)[0].scrollTop = 50;
-            ºlast_handled[0].scrollIntoView({
+            last_handled[0].scrollIntoView({
                 behavior: `smooth`,
                 alignToTop: `true`,
             });
         });
-        this.º_all_values_control[ºvar] = this.ºcomponent.ºcontainer[ºvar].find(`[rv="_all"]`);
-        this.º_all_values_control[ºvar].click(function(ºe) {ºe.preventDefault();
-            var ºison = $(this).hasClass(`•ison`);
-            if (ºison) {
-                ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, º_to_str(ºthat.º_related_values_off[ºvar]));
+        this._all_values_control[vr] = this.component.container[vr].find(`[rv="_all"]`);
+        this._all_values_control[vr].click(function(e) {e.preventDefault();
+            var ison = $(this).hasClass(`ison`);
+            if (ison) {
+                that.component.state.setState(`rel_${that._type}_${vr}`, g.to_str(that._related_values_off[vr]));
             }
             else {
-                ºthat.ºcomponent.ºstate.ºsetState(`rel_${ºthat.º_type}_${ºvar}`, º_to_str(ºthat.º_related_values_on[ºvar]));
+                that.component.state.setState(`rel_${that._type}_${vr}`, g.to_str(that._related_values_on[vr]));
             }
         });
     },
-    º_setFacet: function(ºvar, ºrelated_values) {
-        var ºall_selected = true;
-        for (var ºrelated_value in this.º_related_values_index[ºvar]) {
-            var ºfacet_cell = this.º_list[ºvar].find(`[rv="${ºrelated_value}"]`);
-            var ºfacet_cell2 = this.º_list2[ºvar].find(`[rv="${ºrelated_value}"]`);
-            if (ºrelated_value in ºrelated_values && ºrelated_values[ºrelated_value]) {
-                ºfacet_cell.addClass(`•ison`);
-                ºfacet_cell2.addClass(`•ison`);
+    _setFacet: function(vr, related_values) {
+        var all_selected = true;
+        for (var related_value in this._related_values_index[vr]) {
+            var facet_cell = this._list[vr].find(`[rv="${related_value}"]`);
+            var facet_cell2 = this._list2[vr].find(`[rv="${related_value}"]`);
+            if (related_value in related_values && related_values[related_value]) {
+                facet_cell.addClass(`ison`);
+                facet_cell2.addClass(`ison`);
             }
             else {
-                ºfacet_cell.removeClass(`•ison`);
-                ºfacet_cell2.removeClass(`•ison`);
-                ºall_selected = false;
+                facet_cell.removeClass(`ison`);
+                facet_cell2.removeClass(`ison`);
+                all_selected = false;
             }
         }
-        if (ºall_selected) {
-            this.º_all_values_control[ºvar].addClass(`•ison`);
+        if (all_selected) {
+            this._all_values_control[vr].addClass(`ison`);
         }
         else {
-            this.º_all_values_control[ºvar].removeClass(`•ison`);
+            this._all_values_control[vr].removeClass(`ison`);
         }
     },
-    º_from_str: function(ºvar, ºst) {
-        var ºob = {};
-        if (ºst !== null && ºst != undefined && ºst != '') {
-            var ºar = ºst.split(',');
-            ºar.forEach(function(ºv) {
-                ºob[ºv] = true;
+    _from_str: function(vr, st) {
+        var ob = {};
+        if (st !== null && st != undefined && st != '') {
+            var ar = st.split(',');
+            ar.forEach(function(v) {
+                ob[v] = true;
             });
         }
-        for (var ºrelated_value in this.º_related_values_index[ºvar]) {
-            if (!(ºrelated_value in ºob)) {
-                ºob[ºrelated_value] = false;
+        for (var related_value in this._related_values_index[vr]) {
+            if (!(related_value in ob)) {
+                ob[related_value] = false;
             }
         }
-        return ºob;
+        return ob;
     },
-    ºstats: function(ºvar) {
-        this.º_statistics[ºvar] = {};
-        for (var ºrelated_value in this.º_related_values_index[ºvar]) {
-            this.º_statistics[ºvar][ºrelated_value] = 0;
+    stats: function(vr) {
+        this._statistics[vr] = {};
+        for (var related_value in this._related_values_index[vr]) {
+            this._statistics[vr][related_value] = 0;
         } 
-        var ºrelated_data = this.ºcomponent.ºdata[ºvar];
-        for (var ºx in this.ºdistilled[ºvar]) {
-            var ºi = this.ºdistilled[ºvar][ºx];
-            var ºhas_related_value = false;
-            for (var ºrelated_value in ºrelated_data[ºi]) {
-                this.º_statistics[ºvar][ºrelated_value] += 1;
-                ºhas_related_value = true;
+        var related_data = this.component.data[vr];
+        for (var x in this.distilled[vr]) {
+            var i = this.distilled[vr][x];
+            var has_related_value = false;
+            for (var related_value in related_data[i]) {
+                this._statistics[vr][related_value] += 1;
+                has_related_value = true;
             }
-            if (!ºhas_related_value) {
-                this.º_statistics[ºvar][this.º_no_values.ºvalue] += 1;
+            if (!has_related_value) {
+                this._statistics[vr][this._no_values.value] += 1;
             }
         }
-        for (var ºrelated_value in this.º_statistics[ºvar]) {
-            this.ºcomponent.ºcontainer[ºvar].find(`span[rv="${ºrelated_value}"].•stats`).html(this.º_statistics[ºvar][ºrelated_value]);
+        for (var related_value in this._statistics[vr]) {
+            this.component.container[vr].find(`span[rv="${related_value}"].stats`).html(this._statistics[vr][related_value]);
         }
-        this.ºcomponent.ºcontainer[ºvar].find(`span[rv="_all"].•stats`).html(this.ºdistilled[ºvar].length);
-        this.º_myStats(ºvar);
+        this.component.container[vr].find(`span[rv="_all"].stats`).html(this.distilled[vr].length);
+        this._myStats(vr);
     },
-    ºv: function(ºvar, ºi) {
-        var ºrelated_data =  this.ºcomponent.ºdata[ºvar];
-        var ºrelated_state = this.º_from_str(ºvar, this.º_related_state[ºvar]);
-        if ((ºi in ºrelated_data) && (Object.keys(ºrelated_data[ºi]).length != 0)) {
-            for (var ºrelated_value in ºrelated_data[ºi]) {
-                if ((ºrelated_value in ºrelated_state) && ºrelated_state[ºrelated_value]) {
+    v: function(vr, i) {
+        var related_data =  this.component.data[vr];
+        var related_state = this._from_str(vr, this._related_state[vr]);
+        if ((i in related_data) && (Object.keys(related_data[i]).length != 0)) {
+            for (var related_value in related_data[i]) {
+                if ((related_value in related_state) && related_state[related_value]) {
                     return true;
                 }
             }
         }
         else {
-            if ((this.º_no_values.ºvalue in ºrelated_state) && (ºrelated_state[this.º_no_values.ºvalue])) {
+            if ((this._no_values.value in related_state) && (related_state[this._no_values.value])) {
                 return true;
             }
         }
         return false;
     },
-    ºshow: function(ºvar) {
-        return (this.ºcomponent.ºstate.ºgetState(`list`) == ºvar);
+    show: function(vr) {
+        return (this.component.state.getState(`list`) == vr);
     },
-    ºweld: function(ºvar) {
-        this.º_related_values_list[ºvar] = [];
-        this.º_related_values_index[ºvar] = {};
-        this.º_related_values_off[ºvar] = {};
-        this.º_related_values_on[ºvar] = {};
-        this.º_plainWeld(ºvar);
-        this.º_myWeld(ºvar);
-        this.º_related_values_list[ºvar].push(this.º_no_values.ºvalue);
-        this.º_related_values_index[ºvar][this.º_no_values.ºvalue] = this.º_no_values.ºname;
-        this.º_related_values_off[ºvar][this.º_no_values.ºvalue] = false;
-        this.º_related_values_on[ºvar][this.º_no_values.ºvalue] = true;
-        this.º_html(ºvar);
+    weld: function(vr) {
+        this._related_values_list[vr] = [];
+        this._related_values_index[vr] = {};
+        this._related_values_off[vr] = {};
+        this._related_values_on[vr] = {};
+        this._plainWeld(vr);
+        this._myWeld(vr);
+        this._related_values_list[vr].push(this._no_values.value);
+        this._related_values_index[vr][this._no_values.value] = this._no_values.name;
+        this._related_values_off[vr][this._no_values.value] = false;
+        this._related_values_on[vr][this._no_values.value] = true;
+        this._html(vr);
     },
-    ºwire: function(ºvar) {
-        this.º_myDressup(ºvar);
-        this.º_dressup(ºvar);
+    wire: function(vr) {
+        this._myDressup(vr);
+        this._dressup(vr);
     },
-    ºwork: function(ºvar) {
-        this.º_related_state[ºvar] = this.ºcomponent.ºstate.ºgetState(`rel_${this.º_type}_${ºvar}`);
-        var ºrelated_values =  this.º_from_str(ºvar, this.º_related_state[ºvar]);
-        this.º_mySetFacet(ºvar, ºrelated_values);
-        this.º_setFacet(ºvar, ºrelated_values);
+    work: function(vr) {
+        this._related_state[vr] = this.component.state.getState(`rel_${this._type}_${vr}`);
+        var related_values =  this._from_str(vr, this._related_state[vr]);
+        this._mySetFacet(vr, related_values);
+        this._setFacet(vr, related_values);
     },
-    º_plainWeld: function(ºvar) {
-        var ºrelated_values = this.ºcomponent.ºrelated_values[ºvar];
-        for (var ºi in ºrelated_values) {
-            var ºrelated_value = ºrelated_values[ºi];
-            this.º_related_values_off[ºvar][ºi] = false;
-            this.º_related_values_on[ºvar][ºi] = true;
-            this.º_related_values_list[ºvar].push(ºi);
-            this.º_related_values_index[ºvar][ºi] = ºrelated_value;
+    _plainWeld: function(vr) {
+        var related_values = this.component.related_values[vr];
+        for (var i in related_values) {
+            var related_value = related_values[i];
+            this._related_values_off[vr][i] = false;
+            this._related_values_on[vr][i] = true;
+            this._related_values_list[vr].push(i);
+            this._related_values_index[vr][i] = related_value;
         }
-        this.º_related_values_list[ºvar].sort(function(ºa,ºb) {
-            return (ºrelated_values[ºa] < ºrelated_values[ºb])?-1:(ºrelated_values[ºa] > ºrelated_values[ºb])?1:0; 
+        this._related_values_list[vr].sort(function(a,b) {
+            return (related_values[a] < related_values[b])?-1:(related_values[a] > related_values[b])?1:0; 
         });
     },
-    º_myWeld: function(ºvar) {},
-    º_preHtml: function(ºvar) {return ``},
-    º_myDressup: function(ºvar) {},
-    º_mySetFacet: function(ºvar) {},
-    º_myStats: function(ºvar) {},
+    _myWeld: function(vr) {},
+    _preHtml: function(vr) {return ``},
+    _myDressup: function(vr) {},
+    _mySetFacet: function(vr) {},
+    _myStats: function(vr) {},
 };
+
+module.exports = Relative;

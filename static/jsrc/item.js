@@ -1,43 +1,58 @@
-/* INDIVIDUAL COMPONENT: ºItem
+/* INDIVIDUAL COMPONENT: Item
  * This manages the actual records to be displayed inside the list in the middle column.
  * The subcomponents corresponds to the individual lists, such as country, countribution
  * There is an extra argument that specifies the ids of the items that should be displayed.
- * All functionality (except ºshow) is delegated to ºspecific functions
+ * All functionality (except show) is delegated to specific functions
  */
 
-function ºItem(ºcomponent) {this.ºcomponent = ºcomponent};
+function Item(component) {this.component = component};
 
-ºItem.prototype = {
-    º_html: function(ºvar, ºids) {
-        var ºh = ``;
-        ºh += `<div id="table_${ºvar}">`;
-        if (ºvar == `contrib`) {
-            this.ºcomponent.ºdata[ºvar].forEach(function(ºr) {
-                ºh += `<tr id="r${ºr[0]}"><td><a href="#" rid="${ºr[0]}">${ºr[1]}</a></td></tr>`;
+Item.prototype = {
+    _html: function(vr, it) {
+        var destination = this.component._dst[vr];
+        var dest_row = destination.find(`tr[id="r${it[0]}"]`);
+        console.log(`Finding ${vr} row r${it[0]}:`, dest_row);
+        var h = `<tr iid="${it[0]}">`;
+
+        if (vr == `contrib`) {
+            var types = [];
+            it[5].forEach(function(tp) {
+                types.push(`<a href="#" tid="${tp[0]}">${tp[1]}</a>`);
+            });
+            h += `
+<td>
+<b>Contact person:</b> ${it[2]}<br/>
+<b>Country:</b> ${it[3]} = ${it[4]}<br/>
+<b>Types:</b> ${types.join(`, `)}</br>
+</td>
+`;
+        }
+        else if (vr == `country`) {
+            this.component.data[vr].forEach(function(r) {
+                in_dariah = (r[3] == 1)?`dariah`:``;
+                h += `<tr id="r${r[0]}"><td class="country_code">${r[1]}<td><td class="country_name">${r[2]}<td><td class="in_dariah">${in_dariah}</td><td class="latlng">${r[4]}</td><td class="latlng">${r[5]}</td></tr>`;
             });
         }
-        else if (ºvar == `country`) {
-            this.ºcomponent.ºdata[ºvar].forEach(function(ºr) {
-                ºin_dariah = (ºr[3] == 1)?`dariah`:``;
-                ºh += `<tr id="r${ºr[0]}"><td class="•country_code">${ºr[1]}<td><td class="•country_name">${ºr[2]}<td><td class="•in_dariah">${ºin_dariah}</td><td class="•latlng">${ºr[4]}</td><td class="•latlng">${ºr[5]}</td></tr>`;
+        else if (vr == `type` || vr == `tadiraha` || vr == `tadiraho` || vr == `tadiraht`) {
+            this.component.data[vr].forEach(function(r) {
+                h += `<tr id="r${r[0]}"><td class="value">${r[1]}<td></tr>`;
             });
         }
-        else if (ºvar == `type` || ºvar == `tadiraha` || ºvar == `tadiraho` || ºvar == `tadiraht`) {
-            this.ºcomponent.ºdata[ºvar].forEach(function(ºr) {
-                ºh += `<tr id="r${ºr[0]}"><td class="•value">${ºr[1]}<td></tr>`;
-            });
-        }
-        ºh += `</table>`;
-        this.ºcomponent.ºcontainer[ºvar].html(ºh);
+        h += `</tr>`;
+        console.log(h);
+        dest_row.after(h);
     },
-    ºshow: function(ºvar) {
-        return this.ºcomponent.ºstate.ºgetState(`item`) == ºvar;
+    show: function(vr) {
+        return this.component.state.getState(`list`) == vr;
     },
-    ºweld: function(ºvar) {
-        this.º_html(ºvar);
+    weld: function(vr) {
+        this.component.data[vr].forEach(function(it) {
+            this._html(vr, it);
+        }, this);
     },
-    ºwire: function(ºvar) {
+    wire: function(vr) {
     },
-    ºwork: function(ºvar) {},
+    work: function(vr) {},
 };
 
+module.exports = Item;

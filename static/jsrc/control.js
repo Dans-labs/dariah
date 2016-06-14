@@ -1,46 +1,48 @@
-/* INDIVIDUAL COMPONENT: ºControl
+/* INDIVIDUAL COMPONENT: Control
  * This manages the controls that correspond to lists of records to be displayed in the middle column
  * Clicking on a control shows the corresponding list and hides all others.
  */
 
-function ºControl(ºcomponent) {
-    this.ºcomponent = ºcomponent;
-    this.ºwidget = {};
-    this.ºctl = {};
+function Control(component) {
+    this.component = component;
+    this.widget = {};
+    this.ctl = {};
 };
 
-ºControl.prototype = {
-    º_html: function(ºvar) {
-        this.ºcomponent.ºcontainer[ºvar].html(`<a class="•control_title" href="#">${this.ºcomponent.ºstate.ºshowState('list', ºvar, 'ºsg')}</a> `);
+Control.prototype = {
+    _html: function(vr) {
+        this.component.container[vr].html(`<a class="control_title" href="#">${this.component.state.showState('list', vr, 'sg')}</a> `);
     },
-    º_dressup: function(ºvar) {
-        this.ºctl[ºvar].click(function(ºe) {ºe.preventDefault();
-            this.ºcomponent.ºstate.ºsetState(`list`, ºvar);
+    _dressup: function(vr) {
+        this.ctl[vr].click(function(e) {e.preventDefault();
+            this.component.state.setState(`list`, vr);
         }.bind(this))
     },
-    º_isActive: function(ºvar) {
-        return this.ºcomponent.ºstate.ºgetState(`list`) == ºvar;
+    _isActive: function(vr) {
+        return this.component.state.getState(`list`) == vr;
     },
-    ºshow: function(ºvar) {
+    show: function(vr) {
         return true;
     },
-    ºweld: function(ºvar) {
-        this.º_html(ºvar);
-        this.ºwidget[ºvar] =  this.ºcomponent.ºcontainer[ºvar];
-        this.ºwidget[ºvar].addClass(`•control_big`);
-        this.ºctl[ºvar] =  this.ºcomponent.ºcontainer[ºvar].find(`a`);
+    weld: function(vr) {
+        this._html(vr);
+        this.widget[vr] =  this.component.container[vr];
+        this.widget[vr].addClass(`control_big`);
+        this.ctl[vr] =  this.component.container[vr].find(`a`);
     },
-    ºwire: function(ºvar) {
-        this.º_dressup(ºvar);
+    wire: function(vr) {
+        this._dressup(vr);
     },
-    ºwork: function(ºvar) {
-        if (this.º_isActive(ºvar)) {
-            this.ºctl[ºvar].addClass(`•ison`);
-            this.ºwidget[ºvar].addClass(`•ison`);
+    work: function(vr) {
+        if (this._isActive(vr)) {
+            this.ctl[vr].addClass(`ison`);
+            this.widget[vr].addClass(`ison`);
         }
         else {
-            this.ºctl[ºvar].removeClass(`•ison`);
-            this.ºwidget[ºvar].removeClass(`•ison`);
+            this.ctl[vr].removeClass(`ison`);
+            this.widget[vr].removeClass(`ison`);
         }
     }
 };
+
+module.exports = Control;

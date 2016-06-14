@@ -47,46 +47,46 @@
     font-weight: normal;
     font-style: normal;
 ≥
-div.•facet>div {
+div.facet>div {
     font-size: small;
     «facet:normal.colors»
     «facet:normal.text»
     «facet:shape»
 }
-.•facet_single,.•facet_single_all {
+.facet_single,.facet_single_all {
     «facet:off.colors»
     «facet:normal.text»
     «facet:single.shape»
 }
-.•facet_single.•ison,.•facet_single_all.•ison {
+.facet_single.ison,.facet_single_all.ison {
     «facet:highlight.text»
     «facet:highlight.colors»
     «facet:single.shape»
 }
-div.•facet .•stats {
+div.facet .stats {
     «facet:stats.colors»
     «facet:stats.text»
 }
-div.•facet .•stats.•ison {
+div.facet .stats.ison {
     «facet:stats.colors»
     «facet:stats.text»
 }
-.•passive_small {
+.passive_small {
     display: none;
 }
-.•passive_small.•ison {
+.passive_small.ison {
     display: inline;
     «facet:highlight.text»
     «facet:highlight.colors»
     «facet:single.shape»
 }
-.•dctrl,.•all {
+.dctrl,.all {
     clear: both;
     margin-bottom: 0pt;
     «facet:heading.text»
     «facet:normal.colors»
 }
-.•last_handled {
+.last_handled {
     background-color: #ffff88;
 }
 

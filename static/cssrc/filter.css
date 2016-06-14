@@ -1,26 +1,26 @@
 /* FILTER */
 
-div.•flt{
+div.flt{
     font-size: medium;
 }
-div.•flt input {
+div.flt input {
     font-weight: normal;
     font-size: small;
     width: 40%;
 }
-.•fbox {
+.fbox {
     padding-left: 1em;
 }
-.•fbox span {
+.fbox span {
     display: inline;
 }
-.•fbox .•stats {
+.fbox .stats {
     float: right;
 }
-.•filtc {
+.filtc {
     float: right;
 }
-.•value_list {
+.value_list {
     width: 100%;
     font-size: x-small;
 }
@@ -39,11 +39,11 @@ html .ui-autocomplete {
     /* prevent horizontal scrollbar */
     overflow-x: hidden;
 }
-.•flt_pat {
+.flt_pat {
     font-weight: normal;
     font-style: normal;
 }
-input.•flt_pat {
+input.flt_pat {
     font-family: Menlo, Courier New, Courier, monospace;
     font-weight: normal;
     font-style: normal;

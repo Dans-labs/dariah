@@ -1,44 +1,45 @@
 /* MESSAGES
- * ºMsg is a function that issues messages to a specified element.
+ * Msg is a function that issues messages to a specified element.
  * It has also controls for clearing and hiding the messages.
  */
 
-function ºMsg(ºdestination, ºon_clear) {
-    this.º_destination = $(`#${ºdestination}`);
-    this.º_trash_control = $(`#trash_${ºdestination}`);
-    this.º_trash_control_para = this.º_trash_control.closest(`p`);
-    this.º_trash_control.click(function(ºe) {ºe.preventDefault();
-        this.ºclear();
+function Msg(destination, on_clear) {
+    this._destination = $(`#${destination}`);
+    this._trash_control = $(`#trash_${destination}`);
+    this._trash_control_para = this._trash_control.closest(`p`);
+    this._trash_control.click(function(e) {e.preventDefault();
+        this.clear();
     }.bind(this));
-    this.º_hide();
-    this.º_on_clear = ºon_clear;
+    this._hide();
+    this._on_clear = on_clear;
 };
 
-ºMsg.prototype = {
-    º_hide: function() {
-        this.º_destination.hide();
-        this.º_trash_control_para.hide();
+Msg.prototype = {
+    _hide: function() {
+        this._destination.hide();
+        this._trash_control_para.hide();
     },
-    º_show: function() {
-        this.º_destination.show();
-        if (this.º_destination.html() != ``) {
-            this.º_trash_control_para.show();
+    _show: function() {
+        this._destination.show();
+        if (this._destination.html() != ``) {
+            this._trash_control_para.show();
         }
     },
-    ºclear: function() {
-        this.º_destination.html(``);
-        if (this.º_on_clear != undefined) {
-            this.º_on_clear();
+    clear: function() {
+        this._destination.html(``);
+        if (this._on_clear != undefined) {
+            this._on_clear();
         }
-        this.º_hide();
+        this._hide();
     },
-    ºmsg: function(ºtext, ºkind) {
-        if (ºkind == undefined) {
-            ºkind = `info`;
+    msg: function(text, kind) {
+        if (kind == undefined) {
+            kind = `info`;
         }
-        var ºmessage_text = this.º_destination.html();
-        this.º_destination.html(`${ºmessage_text}<p class="${ºkind}">${ºtext}</p>`);
-        this.º_show();
+        var message_text = this._destination.html();
+        this._destination.html(`${message_text}<p class="${kind}">${text}</p>`);
+        this._show();
     },
 };
 
+module.exports = Msg;

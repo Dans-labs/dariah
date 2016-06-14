@@ -2,9 +2,13 @@
  * This manages the facet "contribution type"
  */
 
-function ºTadirahA(ºcomponent) {
-    ºRelative.call(this, ºcomponent, `tadiraha`);
+var Relative = require('./relative.js');
+
+function TadirahA(component) {
+    Relative.call(this, component, `tadiraha`);
 };
 
-ºTadirahA.prototype = Object.create(ºRelative.prototype);
-ºTadirahA.prototype.constructor = ºTadirahA;
+TadirahA.prototype = Object.create(Relative.prototype);
+TadirahA.prototype.constructor = TadirahA;
+
+module.exports = TadirahA;

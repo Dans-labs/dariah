@@ -3,172 +3,175 @@
  * It will host individual facets
  */
 
-function ºFacet(ºcomponent) {
-    this.ºcomponent = ºcomponent;
-    this.º_stats = {};
-    this.ºdata = {};
-    this.ºtable = {};
-    this.ºdistilled = {};
-    this.ºenabled_facets = {};
+var g = require('./generic.js');
+
+function Facet(component) {
+    this.component = component;
+    this._stats = {};
+    this.data = {};
+    this.table = {};
+    this.distilled = {};
+    this.enabled_facets = {};
 };
 
-ºFacet.prototype = {
-    º_html: function(ºvar) {
-        var ºh = ``;
-        ºh += `<p><span fct="all"></span>Filtering <span id="fstats_${ºvar}"></span></p>`;
-        this.ºcomponent.ºcontainer[ºvar].html(ºh);
+Facet.prototype = {
+    _html: function(vr) {
+        var h = ``;
+        h += `<p><span fct="all"></span>Filtering <span id="fstats_${vr}"></span></p>`;
+        this.component.container[vr].html(h);
     },
-    ºshow: function(ºvar) {
-        return this.ºcomponent.ºstate.ºgetState(`list`) == ºvar;
+    show: function(vr) {
+        return this.component.state.getState(`list`) == vr;
     },
-    ºweld: function(ºvar) {
-        var ºchildren = this.ºcomponent.ºchildren;
-        this.ºenabled_facets[ºvar] = {};
-        for (var ºfacet_name in ºchildren) {
-            var ºfacet_component = ºchildren[ºfacet_name];
-            if (ºfacet_component.ºhasVariant(ºvar)) {
-                this.ºenabled_facets[ºvar][ºfacet_name] = ºchildren[ºfacet_name];
+    weld: function(vr) {
+        var children = this.component.children;
+        this.enabled_facets[vr] = {};
+        for (var facet_name in children) {
+            var facet_component = children[facet_name];
+            if (facet_component.hasVariant(vr)) {
+                this.enabled_facets[vr][facet_name] = children[facet_name];
             }
         }
-        this.º_html(ºvar);
+        this._html(vr);
     },
-    º_display: function(ºfacet_expand_control, ºmode) {
-        var ºthat = this;
-        var ºdt = ºfacet_expand_control.closest(`p`);
-        var ºhidec = ºdt.find(`.hidec`);
-        var ºmorec = ºdt.find(`.morec`);
-        var ºshowc = ºdt.find(`.showc`);
-        var ºexpanded_material = ºfacet_expand_control.closest(`div`).find(`table,.•flt`);
-        var ºcondensed_material = ºfacet_expand_control.closest(`div`).find(`.•value_list2,.•flt_compact`);
-        var ºnot_expanded_material = ºfacet_expand_control.closest(`div`).find(`.•flt_not_expanded`);
-        var ºkey = `fctx_${ºfacet_expand_control.closest('span').attr('fct')}`;
-        var ºmode_undef = ºmode == undefined;
-        if (ºmode_undef) {
-            if (ºlocalstorage_vars.isSet(ºkey)) {
-                ºmode = ºlocalstorage_vars.get(ºkey);
+    _display: function(expand_control, mode) {
+        var that = this;
+        var dt = expand_control.closest(`p`);
+        var hidec = dt.find(`.hidec`);
+        var morec = dt.find(`.morec`);
+        var showc = dt.find(`.showc`);
+        var expanded_material = expand_control.closest(`div`).find(`table,.flt`);
+        var condensed_material = expand_control.closest(`div`).find(`.value_list2,.flt_compact`);
+        var not_expanded_material = expand_control.closest(`div`).find(`.flt_not_expanded`);
+        var key = `fctx_${expand_control.closest('span').attr('fct')}`;
+        var mode_undef = mode == undefined;
+        if (mode_undef) {
+            if (g.localstorage_vars.isSet(key)) {
+                mode = g.localstorage_vars.get(key);
             }
             else {
-                ºmode = 1;
+                mode = 1;
             }
         }
-        var ºall_facets = ºkey == `fctx_all`;
-        if (ºall_facets && !ºmode_undef) {
-            ºfacet_expand_control.closest(`div`).find(`div.•component span[fct]`).each(function() {
-                ºthat.º_display($(this), ºmode);
+        var all_facets = key == `fctx_all`;
+        if (all_facets && !mode_undef) {
+            expand_control.closest(`div`).find(`div.component span[fct]`).each(function() {
+                that._display($(this), mode);
             });
         }
-        ºlocalstorage_vars.set(ºkey, ºmode);
-        if (ºmode == 0) {
-            ºhidec.show();
-            ºmorec.hide();
-            ºshowc.hide();
-            if (!ºall_facets) {
-                ºnot_expanded_material.show();
-                ºexpanded_material.hide();
-                ºcondensed_material.hide();
+        g.localstorage_vars.set(key, mode);
+        if (mode == 0) {
+            hidec.show();
+            morec.hide();
+            showc.hide();
+            if (!all_facets) {
+                not_expanded_material.show();
+                expanded_material.hide();
+                condensed_material.hide();
             }
         }
-        else if (ºmode == 1) {
-            ºhidec.hide();
-            ºmorec.show();
-            ºshowc.hide();
-            if (!ºall_facets) {
-                ºnot_expanded_material.show();
-                ºexpanded_material.hide();
-                ºcondensed_material.show();
+        else if (mode == 1) {
+            hidec.hide();
+            morec.show();
+            showc.hide();
+            if (!all_facets) {
+                not_expanded_material.show();
+                expanded_material.hide();
+                condensed_material.show();
             }
         }
         else {
-            ºhidec.hide();
-            ºmorec.hide();
-            ºshowc.show();
-            if (!ºall_facets) {
-                ºnot_expanded_material.hide();
-                ºexpanded_material.show();
-                ºcondensed_material.hide();
+            hidec.hide();
+            morec.hide();
+            showc.show();
+            if (!all_facets) {
+                not_expanded_material.hide();
+                expanded_material.show();
+                condensed_material.hide();
             }
         }
     },
-    ºwire: function(ºvar) {
-        var ºthat = this;
-        var ºcc = this.ºcomponent.ºcontainer[ºvar];
-        var ºlc = this.ºcomponent.ºpage.ºgetComponent(`ºlist`).ºcontainer[ºvar];
-        this.º_stats[ºvar] = ºcc.find(`#fstats_${ºvar}`);
-        this.ºtable[ºvar] =  ºlc.find(`#table_${ºvar}`);
-        var ºinfo = ` details; click to change level of details`;
-        var ºdetailcontrols = `<a class="showc fa fa-fw fa-list-ul" href="#" title="full${ºinfo}"></a><a class="morec fa fa-fw fa-align-left" href="#" title="condensed${ºinfo}"></a><a class="hidec fa fa-fw fa-minus" href="#" title="hidden${ºinfo}"></a>`;
-        ºcc.addClass(`•facet`);
-        ºcc.find(`span[fct]`).each(function() {
-            $(this).html(`${ºdetailcontrols}&nbsp`);
-            ºthat.º_display($(this));
+    wire: function(vr) {
+        var that = this;
+        var cc = this.component.container[vr];
+        var lc = this.component.page.getComponent(`list`).container[vr];
+        this._stats[vr] = cc.find(`#fstats_${vr}`);
+        this.table[vr] =  lc.find(`#table_${vr}`);
+        var info = ` details; click to change level of details`;
+        var detailcontrols = `<a class="showc fa fa-fw fa-list-ul" href="#" title="full${info}"></a><a class="morec fa fa-fw fa-align-left" href="#" title="condensed${info}"></a><a class="hidec fa fa-fw fa-minus" href="#" title="hidden${info}"></a>`;
+        cc.addClass(`facet`);
+        cc.find(`span[fct]`).each(function() {
+            $(this).html(`${detailcontrols}&nbsp`);
+            that._display($(this));
         });
-        ºcc.find(`.hidec`).click(function(ºe) {ºe.preventDefault();
-            ºthat.º_display($(this), 1);
+        cc.find(`.hidec`).click(function(e) {e.preventDefault();
+            that._display($(this), 1);
         });
-        ºcc.find(`.morec`).click(function(ºe) {ºe.preventDefault();
-            ºthat.º_display($(this), 2);
+        cc.find(`.morec`).click(function(e) {e.preventDefault();
+            that._display($(this), 2);
         });
-        ºcc.find(`.showc`).click(function(ºe) {ºe.preventDefault();
-            ºthat.º_display($(this), 0);
+        cc.find(`.showc`).click(function(e) {e.preventDefault();
+            that._display($(this), 0);
         });
     },
-    ºwork: function(ºvar) {
-        this.ºtable[ºvar].find(`tr[id]`).hide();
-        var ºmother_list = this.ºcomponent.ºpage.ºgetComponent(`ºlist`);
-        var ºdata = ºmother_list.ºdata[ºvar];
-        var ºfacets = this.ºenabled_facets[ºvar];
-        this.ºdistilled[ºvar] = [];
-        for (var ºfacet_name in ºfacets) {
-            var ºfacet= ºfacets[ºfacet_name].ºimplementation;
-            ºfacet.ºdistilled[ºvar] = [];
+    work: function(vr) {
+        this.table[vr].find(`tr[id]`).hide();
+        var mother_list = this.component.page.getComponent(`list`);
+        var data = mother_list.data[vr];
+        var facets = this.enabled_facets[vr];
+        this.distilled[vr] = [];
+        for (var facet_name in facets) {
+            var facet= facets[facet_name].implementation;
+            facet.distilled[vr] = [];
         }
-        ºdata.forEach(function(ºd, ºi) {
-            var ºv = true; // will hold whether this row passes all facets
-/* We collect in the ºdistilled member of this facet object the collective results of all individual facets,
- * Moreover, for each facet, we collect in its ºdistilled member the results when all facets are applied except the facet in question
+        data.forEach(function(d, i) {
+            var v = true; // will hold whether this row passes all facets
+/* We collect in the distilled member of this facet object the collective results of all individual facets,
+ * Moreover, for each facet, we collect in its distilled member the results when all facets are applied except the facet in question
  * so: 
  * 1. rows with a failure for 2 or more facets are discarded
  * 2. rows with a failure for exactly one facet are added to the data for that facet
  * 3. rows which pass all facets are added to all facets, and also to the final filtered set
  */
-            var ºthe_false = null; // which facet has yielded false (if there are more than one we'll ºdiscard the row
-            var ºdiscard = false; // becomes true when we have encounterd 2 facets that yield false
-            for (var ºfacet_name in ºfacets) {
-                if (!ºdiscard) {
-                    var ºfacet = ºfacets[ºfacet_name].ºimplementation;
-                    var ºthis_v = ºfacet.ºv(ºvar, ºd[0]); // ºthis_v: whether the row passes this facet
-                    if (!ºthis_v) {
-                        ºv = false;
-                        if (ºthe_false == null) { // this is the first failure, we store the facet number in ºthe_false
-                            ºthe_false = ºfacet;
-                        } // else we ºdiscard the row altogether
+            var the_false = null; // which facet has yielded false (if there are more than one we'll discard the row
+            var discard = false; // becomes true when we have encounterd 2 facets that yield false
+            for (var facet_name in facets) {
+                if (!discard) {
+                    var facet = facets[facet_name].implementation;
+                    var this_v = facet.v(vr, d[0]); // this_v: whether the row passes this facet
+                    if (!this_v) {
+                        v = false;
+                        if (the_false == null) { // this is the first failure, we store the facet number in the_false
+                            the_false = facet;
+                        } // else we discard the row altogether
                         else {
-                            ºdiscard = true;
+                            discard = true;
                         }
                     }
                 }
             }
-            if (!ºdiscard) {
-                if (ºv) {
-                    this.ºdistilled[ºvar].push(ºd[0]);
-                    this.ºtable[ºvar].find(`tr[id="r${ºd[0]}"]`).show();
+            if (!discard) {
+                if (v) {
+                    this.distilled[vr].push(d[0]);
+                    this.table[vr].find(`tr[id="r${d[0]}"]`).show();
                 }
-                if (ºthe_false != null) {
-                    ºthe_false.ºdistilled[ºvar].push(ºd[0]);
+                if (the_false != null) {
+                    the_false.distilled[vr].push(d[0]);
                 }
                 else {
-                    for (var ºfacet_name in ºfacets) {
-                        var ºfacet = ºfacets[ºfacet_name].ºimplementation;
-                        ºfacet.ºdistilled[ºvar].push(ºd[0]);
+                    for (var facet_name in facets) {
+                        var facet = facets[facet_name].implementation;
+                        facet.distilled[vr].push(d[0]);
                     }
                 }
             }
         }, this);
-        for (var ºfacet_name in ºfacets) {
-            var ºfacet = ºfacets[ºfacet_name].ºimplementation;
-            ºfacet.ºstats(ºvar);
+        for (var facet_name in facets) {
+            var facet = facets[facet_name].implementation;
+            facet.stats(vr);
         }
-        this.º_stats[ºvar].html(`${this.ºdistilled[ºvar].length} of ${ºdata.length}`);
+        this._stats[vr].html(`${this.distilled[vr].length} of ${data.length}`);
     },
 };
 
+module.exports = Facet;

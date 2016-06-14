@@ -20,6 +20,54 @@ order by title
 ''')
     return dict(data=records, msgs=[], good=True)
 
+def item_contrib():
+    mainrecords = dbd.executesql('''
+select
+    contrib.id,
+    contrib.title,
+    contrib.contact_person_name,
+    country.countrycode,
+    country.name 
+from
+    contrib
+inner join
+    country
+on
+    contrib.country_id = country.id
+where contrib.id in ({})
+;
+'''.format(request.vars.ids))
+    
+    relrecords = dbd.executesql('''
+select
+    contrib.id as id, 
+    type_of_inkind.id as tid,
+    type_of_inkind.val as tval
+from
+    contrib
+inner join
+    contrib_type_of_inkind
+on
+    contrib.id = contrib_type_of_inkind.contrib_id
+inner join 
+    type_of_inkind
+on
+    type_of_inkind.id = contrib_type_of_inkind.type_of_inkind_id
+where 
+    contrib.id in ({})
+;
+'''.format(request.vars.ids))
+
+    relrecordsi = {}
+    for rr in relrecords:
+        mid = rr[0]
+        relrecordsi.setdefault(mid, []).append((rr[1], rr[2]))
+    records = []
+    for mr in mainrecords:
+        mid = mr[0]
+        records.append(mr+(tuple(relrecordsi.get(mid, [])),))
+    return dict(data=records, msgs=[], good=True)
+
 def list_type():
     records = dbd.executesql('''
 select

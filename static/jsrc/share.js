@@ -1,13 +1,15 @@
-function ºShare(ºcomponent) { // the SHARE component
-    this.ºcomponent = ºcomponent;
+var g = require('./generic.js');
+
+function Share(component) { // the SHARE component
+    this.component = component;
 };
 
-ºShare.prototype = {
-    ºshow: function(ºvar) {
+Share.prototype = {
+    show: function(vr) {
         return true;
     },
-    ºweld: function(ºvar) {
-	    var ºh = `
+    weld: function(vr) {
+	    var h = `
 <p id="•citeh">Cite</p>
 <table align="center">
     <tr>
@@ -28,48 +30,50 @@ function ºShare(ºcomponent) { // the SHARE component
 <p id="•cdiagpub"></p>
 <p id="•cdiagsts"></p>
 `;	
-        this.ºcomponent.ºcontainer[ºvar].html(ºh);
+        this.component.container[vr].html(h);
     },
-    ºwire: function(ºvar) {
-        var ºthat = this;
-        var ºcc = this.ºcomponent.ºcontainer[ºvar];
-        var ºslink = $(`#self_link`);
-        ºslink.hide();
-        ºcc.addClass(`•socialdrawer`);
-        ºcc.find(`.•detail`).hide();
-        ºcc.find(`#•clip_pv_md,#•clip_pv_ht,#•clip_pv_htc,#•clip_pv_nl`).click(function(ºe) {ºe.preventDefault();
+    wire: function(vr) {
+        var that = this;
+        var cc = this.component.container[vr];
+        var slink = $(`#self_link`);
+        slink.hide();
+        cc.addClass(`•socialdrawer`);
+        cc.find(`.•detail`).hide();
+        cc.find(`#•clip_pv_md,#•clip_pv_ht,#•clip_pv_htc,#•clip_pv_nl`).click(function(e) {e.preventDefault();
             window.prompt(`Press <Cmd-C> and then <Enter> to copy link on clipboard`, $(this).attr(`lnk`));
         });
-        ºcc.find(`#•clip_pv_cn`).click(function(ºe) {ºe.preventDefault();
-            var ºcontainerid = `middle`;
-            var ºapp_url_raw = app_url_cite+ºthat.ºcomponent.ºstate.ºgetVars(true);
-            ºslink.show();
-            ºslink.attr(`href`, ºapp_url_raw);
-            ºselectText(ºcontainerid);
+        cc.find(`#•clip_pv_cn`).click(function(e) {e.preventDefault();
+            var containerid = `middle`;
+            var app_url_raw = app_url_cite+that.component.state.getVars(true);
+            slink.show();
+            slink.attr(`href`, app_url_raw);
+            g.selectText(containerid);
         });
-        ºcc.find(`#•xc_pv`).click(function(ºe){ºe.preventDefault(); ºtoggle_detail($(this), $(`#•x_pv`))});
-        ºcc.click(function(ºe){ºe.preventDefault();
-            var ºapp_url_raw = app_url_cite+ºthat.ºcomponent.ºstate.ºgetVars(true);
-            var ºapp_url_rawc = app_url_cite+ºthat.ºcomponent.ºstate.ºgetVars(false);
+        cc.find(`#•xc_pv`).click(function(e){e.preventDefault(); g.toggleDetail($(this), $(`#•x_pv`))});
+        cc.click(function(e){e.preventDefault();
+            var app_url_raw = app_url_cite+that.component.state.getVars(true);
+            var app_url_rawc = app_url_cite+that.component.state.getVars(false);
             $(`#•citeh`).hide();
             $(`#•cdiagpub`).html(``);
             $(`#•cdiagsts`).html(``);
             $(`.•clip_pv.clr,#•cdiagpub,#•cdiagsts`).removeClass(`error warning good special`);
-            var ºpvtitle = ºescapeHTML($(`title`).text());
-            $(`#•clip_pv_md`).attr(`lnk`, `[${ºpvtitle}](${ºapp_url_raw})`);
-            $(`#•clip_pv_ht`).attr(`lnk`, ºapp_url_raw);
-            $(`#•clip_pv_htc`).attr(`lnk`, ºapp_url_rawc);
-            $(`#•clip_pv_cn`).attr(`lnk`, ºapp_url_raw);
-            $(`#•clip_pv_cn`).attr(`tit`, ºpvtitle);
+            var pvtitle = g.escapeHTML($(`title`).text());
+            $(`#•clip_pv_md`).attr(`lnk`, `[${pvtitle}](${app_url_raw})`);
+            $(`#•clip_pv_ht`).attr(`lnk`, app_url_raw);
+            $(`#•clip_pv_htc`).attr(`lnk`, app_url_rawc);
+            $(`#•clip_pv_cn`).attr(`lnk`, app_url_raw);
+            $(`#•clip_pv_cn`).attr(`tit`, pvtitle);
             $(this).animate({height:`100px`, width:`200px`, opacity: 0.95}, 300);
         });
-        ºcc.mouseleave(function(){ 
-            ºslink.hide();
-            //ºdeselectText();
+        cc.mouseleave(function(){ 
+            slink.hide();
+            //g.deselectText();
             $(`#•citeh`).show();
-            ºcc.animate({height:`20px`, width: `40px`, opacity: .7}, 300); 
+            cc.animate({height:`20px`, width: `40px`, opacity: .7}, 300); 
             return false;
         });
     },
-    ºwork: function(ºvar) {},
+    work: function(vr) {},
 };
+
+module.exports = Share;

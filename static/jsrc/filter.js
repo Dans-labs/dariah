@@ -3,130 +3,131 @@
  * Setting a filter control filters the associated list.
  */
 
-function ºFilter(ºcomponent) {
-    this.ºcomponent = ºcomponent;
-    this.º_tags = {};
-    this.º_filter_control = {};
-    this.º_filter_control2 = {};
-    this.º_box = {};
-    this.º_completions_dst = {};
-    this.º_stats_dst = {};
-    this.º_clear_filter_control = {};
-    this.º_wire_mode = {};
-    this.º_distilled = {};
-    this.ºdistilled = {};
+function Filter(component) {
+    this.component = component;
+    this._tags = {};
+    this._filter_control = {};
+    this._filter_control2 = {};
+    this._box = {};
+    this._completions_dst = {};
+    this._stats_dst = {};
+    this._clear_filter_control = {};
+    this._wire_mode = {};
+    this._distilled = {};
+    this.distilled = {};
 };
 
-ºFilter.prototype = {
-    º_html: function(ºvar) {
-        var ºh = `
+Filter.prototype = {
+    _html: function(vr) {
+        var h = `
 <div>
-    <p class="•dctrl"><span fct="${this.ºcomponent.ºname}-${ºvar}"></span> By full text search
-        <a href="#" title="modify full text filter" id="flt2_${ºvar}" class="•flt_not_expanded •facet_single •ison •flt_pat"></a>
-        <a href="#" class="•control_med fa fa-close •filtc" id="clearf_${ºvar}"></a>
+    <p class="dctrl"><span fct="${this.component.name}-${vr}"></span> By full text search
+        <a href="#" title="modify full text filter" id="flt2_${vr}" class="flt_not_expanded facet_single ison flt_pat"></a>
+        <a href="#" class="control_med fa fa-close filtc" id="clearf_${vr}"></a>
     </p>
-    <div id="fltw_${ºvar}">
-        <p id="•fbox_${ºvar}" class="•flt •control_med •fbox ui-widget">
-            <input id="flt_${ºvar}" class="•flt •flt_pat"/>
-            <span •fbox class="•stats" id="stats_${ºvar}"></span>
+    <div id="fltw_${vr}">
+        <p id="fbox_${vr}" class="flt control_med fbox ui-widget">
+            <input id="flt_${vr}" class="flt flt_pat"/>
+            <span fbox class="stats" id="stats_${vr}"></span>
         </p>
-        <div id="autoc_${ºvar}" style="display: none;">here ${ºvar}</div>
+        <div id="autoc_${vr}" style="display: none;">here ${vr}</div>
     </div>
 </div>`;
-        this.ºcomponent.ºcontainer[ºvar].html(ºh);
+        this.component.container[vr].html(h);
     },
-    º_setFilter: function(ºvar) {
-        var ºtextf = this.ºcomponent.ºstate.ºgetState(`flt_${ºvar}`);
-        this.º_filter_control2[ºvar].html(ºtextf);
-        this.º_filter_control[ºvar].val(ºtextf);
-        this.º_filter_control[ºvar].autocomplete(`search`, ºtextf);
+    _setFilter: function(vr) {
+        var textf = this.component.state.getState(`flt_${vr}`);
+        this._filter_control2[vr].html(textf);
+        this._filter_control[vr].val(textf);
+        this._filter_control[vr].autocomplete(`search`, textf);
     },
-    º_response: function(ºvar) {
-        return function(ºevent, ºui) {
-            this.º_distilled[ºvar] = {};
-            ºui.content.forEach(function(ºu, ºi) {
-                this.º_distilled[ºvar][ºu.value] = 1;
+    _response: function(vr) {
+        return function(event, ui) {
+            this._distilled[vr] = {};
+            ui.content.forEach(function(u, i) {
+                this._distilled[vr][u.value] = 1;
             }, this);
-            if (!(this.º_wire_mode[ºvar])) {
-                var ºtextf = this.º_filter_control[ºvar].val();
-                this.ºcomponent.ºstate.ºsetState(`flt_${ºvar}`, ºtextf);
+            if (!(this._wire_mode[vr])) {
+                var textf = this._filter_control[vr].val();
+                this.component.state.setState(`flt_${vr}`, textf);
             }
         }.bind(this);
     },
-    º_setClear: function(ºvar) {
-        this.º_clear_filter_control[ºvar].click(function(ºe) {ºe.preventDefault();
-            this.º_filter_control[ºvar].val(``);
-            this.º_filter_control[ºvar].autocomplete(`search`, ``);
+    _setClear: function(vr) {
+        this._clear_filter_control[vr].click(function(e) {e.preventDefault();
+            this._filter_control[vr].val(``);
+            this._filter_control[vr].autocomplete(`search`, ``);
         }.bind(this));
     },
-    ºstats: function(ºvar) {
-        var ºstat_prefix;
-        if (this.º_filter_control[ºvar].val() == ``) {
-            ºstat_prefix = ``;
-            this.º_stats_dst[ºvar].removeClass(`•ison`);
+    stats: function(vr) {
+        var stat_prefix;
+        if (this._filter_control[vr].val() == ``) {
+            stat_prefix = ``;
+            this._stats_dst[vr].removeClass(`ison`);
         }
         else {
-            ºstat_prefix = `${this.ºfacet.ºdistilled[ºvar].length} of `;
-            this.º_stats_dst[ºvar].addClass(`•ison`);
+            stat_prefix = `${this.facet.distilled[vr].length} of `;
+            this._stats_dst[vr].addClass(`ison`);
         }
-        this.º_stats_dst[ºvar].html(`${ºstat_prefix}${this.ºdistilled[ºvar].length}`);
+        this._stats_dst[vr].html(`${stat_prefix}${this.distilled[vr].length}`);
     },
-    ºv: function(ºvar, ºi) {
-        return (ºi in this.º_distilled[ºvar]);
+    v: function(vr, i) {
+        return (i in this._distilled[vr]);
     },
-    ºshow: function(ºvar) {
-        return (this.ºcomponent.ºstate.ºgetState(`list`) == ºvar);
+    show: function(vr) {
+        return (this.component.state.getState(`list`) == vr);
     },
-    ºweld: function(ºvar) {
-        this.º_html(ºvar);
+    weld: function(vr) {
+        this._html(vr);
     },
-    ºwire: function(ºvar) {
-        if (!this.ºfacet) {
-            this.ºfacet = this.ºcomponent.ºpage.ºgetComponent(`ºfacet`).ºimplementation;
+    wire: function(vr) {
+        if (!this.facet) {
+            this.facet = this.component.page.getComponent(`facet`).implementation;
         }
-        var ºdata = this.ºcomponent.ºpage.ºgetComponent(`ºlist`).ºdata[ºvar];
-        this.º_tags[ºvar] = [];
-        ºdata.forEach(function(ºd, ºi) {
-            this.º_tags[ºvar].push({label: ºd[1], value: `${ºd[0]}`});
+        var data = this.component.page.getComponent(`list`).data[vr];
+        this._tags[vr] = [];
+        data.forEach(function(d, i) {
+            this._tags[vr].push({label: d[1], value: `${d[0]}`});
         }, this);
-        this.º_distilled[ºvar] = {};
-        this.ºdistilled[ºvar] = [];
-        var ºcc = this.ºcomponent.ºcontainer[ºvar];
-        var ºcf = ºcc.find(`#fltw_${ºvar}`);
-        var ºflt = $(`#flt_${ºvar}`);
-        this.º_filter_control[ºvar] = ºflt;
-        var ºflt2 = $(`#flt2_${ºvar}`);
-        this.º_filter_control2[ºvar] = ºflt2;
-        this.º_box[ºvar] = ºcf.find(`#•fbox_${ºvar}`);
-        this.º_completions_dst[ºvar] = ºcf.find(`#autoc_${ºvar}`);
-        this.º_stats_dst[ºvar] = ºcf.find(`#stats_${ºvar}`);
-        this.º_clear_filter_control[ºvar] = ºcc.find(`#clearf_${ºvar}`);
-        this.º_filter_control[ºvar].autocomplete({
-            appendTo: this.º_completions_dst[ºvar],
-            source: this.º_tags[ºvar],
-            response: this.º_response(ºvar),
+        this._distilled[vr] = {};
+        this.distilled[vr] = [];
+        var cc = this.component.container[vr];
+        var cf = cc.find(`#fltw_${vr}`);
+        var flt = $(`#flt_${vr}`);
+        this._filter_control[vr] = flt;
+        var flt2 = $(`#flt2_${vr}`);
+        this._filter_control2[vr] = flt2;
+        this._box[vr] = cf.find(`#fbox_${vr}`);
+        this._completions_dst[vr] = cf.find(`#autoc_${vr}`);
+        this._stats_dst[vr] = cf.find(`#stats_${vr}`);
+        this._clear_filter_control[vr] = cc.find(`#clearf_${vr}`);
+        this._filter_control[vr].autocomplete({
+            appendTo: this._completions_dst[vr],
+            source: this._tags[vr],
+            response: this._response(vr),
             minLength: 0,
         });
-        ºflt2.click(function(ºe) {ºe.preventDefault();
+        flt2.click(function(e) {e.preventDefault();
             $(this).closest(`div`).find(`.morec`).click();
-            ºflt[0].focus();
+            flt[0].focus();
         });
-        this.º_wire_mode[ºvar] = true;
-        this.º_setClear(ºvar);
-        this.º_setFilter(ºvar);
-        this.º_wire_mode[ºvar] = false;
+        this._wire_mode[vr] = true;
+        this._setClear(vr);
+        this._setFilter(vr);
+        this._wire_mode[vr] = false;
     },
-    ºwork: function(ºvar) {
-        var ºtextf = this.ºcomponent.ºstate.ºgetState(`flt_${ºvar}`);
-        if (ºtextf == ``) {
-            this.º_box[ºvar].removeClass(`•ison`);
-            this.º_clear_filter_control[ºvar].hide();
+    work: function(vr) {
+        var textf = this.component.state.getState(`flt_${vr}`);
+        if (textf == ``) {
+            this._box[vr].removeClass(`ison`);
+            this._clear_filter_control[vr].hide();
         }
         else {
-            this.º_box[ºvar].addClass(`•ison`);
-            this.º_clear_filter_control[ºvar].show();
+            this._box[vr].addClass(`ison`);
+            this._clear_filter_control[vr].show();
         }
-        this.º_filter_control2[ºvar].html(ºtextf);
+        this._filter_control2[vr].html(textf);
     },
 };
 
+module.exports = Filter;

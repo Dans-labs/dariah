@@ -2,4 +2,6 @@
  * The dynamic construction of the page starts here
  */
 
-$(function() {new ºPage().ºwork()});
+var Page = require('./page.js');
+
+$(function() {new Page().work()});

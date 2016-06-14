@@ -1,4 +1,4 @@
-.•socialdrawer {
+.socialdrawer {
     opacity:.7;
     z-index:3000;
     background:#FFF;
@@ -18,14 +18,14 @@
     -webkit-box-shadow: -3px -3px 3px rgba(0,0,0,0.5);
     box-shadow: -3px -3px 3px rgba(0,0,0,0.5);
 }
-#•citeh {
+#citeh {
     margin:2px 3px;
     text-shadow: 1px 1px 1px #FFF;
     color:#444;
     font-size:12px;
     line-height:1em;
 }
-.•socialdrawer td,.•socialdrawer th {
+.socialdrawer td,.socialdrawer th {
     width: 120px;
     text-align: center;
     border-left: 2px solid #888888;
