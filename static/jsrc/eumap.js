@@ -137,8 +137,8 @@ EUmap.prototype._myDressup = function(vr) {
     zoom_p.css('top', `${height-20}px`);
     zoom_p.css('left', '10px');
     let zoom_control = cc.find('p.zoom a');
-    zoom_control.click(function(e) {e.preventDefault();
-        that._map_object.get(vr).setFocus({regions: ['GB', 'GR']});
+    zoom_control.click(e => {e.preventDefault();
+        this._map_object.get(vr).setFocus({regions: ['GB', 'GR']});
     });
     this._map_object.set(vr, mapc.vectorMap('get', 'mapObject'));
     this._map_object.get(vr).setFocus({regions: ['GB', 'GR']});
@@ -208,7 +208,7 @@ EUmap.prototype._myWeld = function(vr) {
             setv[i] = 'outdariah';
         }
     }
-    this._related_values_list.get(vr).sort(function(a,b) {
+    this._related_values_list.get(vr).sort((a,b) => {
         return (related_values.get(a) < related_values.get(b))?-1:(related_values.get(a)[0] > related_values.get(b)[0])?1:0; 
     });
 };

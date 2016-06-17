@@ -46,7 +46,7 @@ Share.prototype = {
         cc.find('#clip_pv_md,#clip_pv_ht,#clip_pv_htc,#clip_pv_nl').click(function(e) {e.preventDefault();
             window.prompt('Press <Cmd-C> and then <Enter> to copy link on clipboard', $(this).attr('lnk'));
         });
-        cc.find('#clip_pv_cn').click(function(e) {e.preventDefault();
+        cc.find('#clip_pv_cn').click(e => {e.preventDefault();
             let containerid = 'middle';
             let app_url_raw = app_url_cite+that.component.state.getVars(true);
             slink.show();
@@ -69,7 +69,7 @@ Share.prototype = {
             $('#clip_pv_cn').attr('tit', pvtitle);
             $(this).animate({height:'100px', width:'200px', opacity: 0.95}, 300);
         });
-        cc.mouseleave(function(){ 
+        cc.mouseleave(() => { 
             slink.hide();
             //g.deselectText();
             $('#citeh').show();

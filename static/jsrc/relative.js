@@ -35,7 +35,7 @@ Relative.prototype = {
     <table class="value_list" id="list-${this._type}-vals_${vr}">
         <tr>
 `;
-        this._related_values_list.get(vr).forEach(function(related_value, i, ar) {
+        this._related_values_list.get(vr).forEach((related_value, i, ar) => {
             if ((i % this._cols == 0) && (i > 0) && (i < ar.length)) {
                 h += '</tr><tr>';
             }
@@ -44,17 +44,17 @@ Relative.prototype = {
             <td><span rv="${related_value}" class="stats"></span></td>
             <td><a rv="${related_value}" href="#" class="facet_single">${g.escapeHTML(raw_value)}</a></td>
             `;
-        }, this);
+        });
         h += `
         </tr>
     </table>
     <p class="value_list2" id="list2-${this._type}-vals_${vr}">
 `;
-        this._related_values_list.get(vr).forEach(function(related_value, i, ar) {
+        this._related_values_list.get(vr).forEach((related_value, i, ar) => {
             let raw_value = this._related_values_index.get(vr).get(related_value);
             let compact_value = g.escapeHTML(g.compact(this._cutoff, this._shortsize, raw_value));
             h += `<a href="#" rv="${related_value}" class="passive_small" title="${g.escapeHTML(raw_value)}">${compact_value}</a> `;
-        }, this);
+        });
         h += `
     </p>
 </div>`;
@@ -204,7 +204,7 @@ Relative.prototype = {
             this._related_values_index.get(vr).set(i, related_value);
             this._related_values_all.get(vr).add(i);
         }
-        this._related_values_list.get(vr).sort(function(a,b) {
+        this._related_values_list.get(vr).sort((a,b) => {
             return (related_values.get(a) < related_values.get(b))?-1:(related_values.get(a) > related_values.get(b))?1:0; 
         });
     },

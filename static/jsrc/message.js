@@ -7,9 +7,9 @@ function Msg(destination, on_clear) {
     this._destination = $(`#${destination}`);
     this._trash_control = $(`#trash_${destination}`);
     this._trash_control_para = this._trash_control.closest('p');
-    this._trash_control.click(function(e) {e.preventDefault();
+    this._trash_control.click(e => {e.preventDefault();
         this.clear();
-    }.bind(this));
+    });
     this._hide();
     this._on_clear = on_clear;
 };

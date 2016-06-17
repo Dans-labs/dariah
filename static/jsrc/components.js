@@ -126,7 +126,7 @@ Component.prototype = {
             url: fetch_url,
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
-        }).then(function(json) {
+        }).then(json => {
             postFetch(json, ids_to_fetch);
         });
     },
@@ -141,7 +141,7 @@ Component.prototype = {
             }
             if ('relinfo' in json) {
                 let r = new Map();
-                json.relinfo.forEach(function(x) {
+                json.relinfo.forEach(x => {
                     r.set(x[0], new Set(x[1]))
                 });
                 this.related_info.set(vr, r);

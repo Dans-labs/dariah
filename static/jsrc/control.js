@@ -14,9 +14,9 @@ Control.prototype = {
         this.component.container.get(vr).html(`<a class="control_title" href="#">${this.component.state.showState('list', vr, 'sg')}</a> `);
     },
     _dressup: function(vr) {
-        this._control.get(vr).click(function(e) {e.preventDefault();
+        this._control.get(vr).click(e => {e.preventDefault();
             this.component.state.setState('list', vr);
-        }.bind(this))
+        })
     },
     _isActive: function(vr) {
         return this.component.state.getState('list') == vr;

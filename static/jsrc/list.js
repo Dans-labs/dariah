@@ -18,7 +18,7 @@ List.prototype = {
                 h += `${rowstart}<td><a href="#" class="fa fa-fw fa-minus"></a>${r[1]}</td>${rowend}`;
             }
             else if (vr == 'country') {
-                in_dariah = (r[3] == 1)?'dariah':'';
+                let in_dariah = (r[3] == 1)?'dariah':'';
                 h += `${rowstart}<td class="country_code">${r[1]}<td><td class="country_name">${r[2]}<td><td class="in_dariah">${in_dariah}</td><td class="latlng">${r[4]}</td><td class="latlng">${r[5]}</td>${rowend}`;
             }
             else if (vr == 'type' || vr == 'tadiraha' || vr == 'tadiraho' || vr == 'tadiraht') {

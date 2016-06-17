@@ -76,7 +76,7 @@ function toggleDetail(widget, detail, extra) {
 };
 
 function compact(cutoff, size, text) {
-    return (text.length > cutoff)?text.replace(/[^ -]+/g, function(x){return x.substr(0,size)}):text;
+    return (text.length > cutoff)?text.replace(/[^ -]+/g, x => {return x.substr(0,size)}):text;
 };
 
 function from_str(st) {

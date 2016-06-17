@@ -56,11 +56,11 @@ Filter.prototype = {
         }.bind(this);
     },
     _setClear: function(vr) {
-        this._clear_filter_control.get(vr).click(function(e) {e.preventDefault();
+        this._clear_filter_control.get(vr).click(e => {e.preventDefault();
             let filterc = this._filter_control.get(vr);
             filterc.val('');
             filterc.autocomplete('search', '');
-        }.bind(this));
+        });
     },
     stats: function(vr) {
         let stat_prefix;
