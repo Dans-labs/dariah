@@ -6,7 +6,7 @@
 function Msg(destination, on_clear) {
     this._destination = $(`#${destination}`);
     this._trash_control = $(`#trash_${destination}`);
-    this._trash_control_para = this._trash_control.closest(`p`);
+    this._trash_control_para = this._trash_control.closest('p');
     this._trash_control.click(function(e) {e.preventDefault();
         this.clear();
     }.bind(this));
@@ -21,12 +21,12 @@ Msg.prototype = {
     },
     _show: function() {
         this._destination.show();
-        if (this._destination.html() != ``) {
+        if (this._destination.html() != '') {
             this._trash_control_para.show();
         }
     },
     clear: function() {
-        this._destination.html(``);
+        this._destination.html('');
         if (this._on_clear != undefined) {
             this._on_clear();
         }
@@ -34,9 +34,9 @@ Msg.prototype = {
     },
     msg: function(text, kind) {
         if (kind == undefined) {
-            kind = `info`;
+            kind = 'info';
         }
-        var message_text = this._destination.html();
+        let message_text = this._destination.html();
         this._destination.html(`${message_text}<p class="${kind}">${text}</p>`);
         this._show();
     },

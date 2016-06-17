@@ -113,12 +113,10 @@ def type_contrib():
     relvals = {}
     reldata = dbd.executesql('''
 select
-    contrib_type_of_inkind.contrib_id as id,
-    type_of_inkind.id as tid
+    contrib_id,
+    type_of_inkind_id
 from
     contrib_type_of_inkind
-inner join type_of_inkind on
-    contrib_type_of_inkind.type_of_inkind_id = type_of_inkind.id
 ;
 ''')
     relvaldata = dbd.executesql('''
@@ -126,21 +124,19 @@ select
     id, val
 from type_of_inkind
 ''')
-    for r in reldata: relinfo.setdefault(r[0], {})[r[1]] = True
+    for r in reldata: relinfo.setdefault(r[0], set()).add(r[1])
     for r in relvaldata: relvals[r[0]] = r[1]
-    return dict(data=relinfo, relvals=relvals, msgs=[], good=True)
+    return dict(relinfo=list((x[0], list(x[1])) for x in relinfo.items()), relvals=list(relvals.items()), msgs=[], good=True)
 
 def tadiraha_contrib():
     relinfo = {}
     relvals = {}
     reldata = dbd.executesql('''
 select
-    contrib_tadirah_research_activities.contrib_id as id,
-    tadirah_research_activities.id as tid
+    contrib_id,
+    tadirah_research_activities_id
 from
     contrib_tadirah_research_activities
-inner join tadirah_research_activities on
-    contrib_tadirah_research_activities.tadirah_research_activities_id = tadirah_research_activities.id
 ;
 ''')
     relvaldata = dbd.executesql('''
@@ -148,21 +144,19 @@ select
     id, val
 from tadirah_research_activities
 ''')
-    for r in reldata: relinfo.setdefault(r[0], {})[r[1]] = True
+    for r in reldata: relinfo.setdefault(r[0], set()).add(r[1])
     for r in relvaldata: relvals[r[0]] = r[1]
-    return dict(data=relinfo, relvals=relvals, msgs=[], good=True)
+    return dict(relinfo=list((x[0], list(x[1])) for x in relinfo.items()), relvals=list(relvals.items()), msgs=[], good=True)
 
 def tadiraho_contrib():
     relinfo = {}
     relvals = {}
     reldata = dbd.executesql('''
 select
-    contrib_tadirah_research_objects.contrib_id as id,
-    tadirah_research_objects.id as tid
+    contrib_id,
+    tadirah_research_objects_id
 from
     contrib_tadirah_research_objects
-inner join tadirah_research_objects on
-    contrib_tadirah_research_objects.tadirah_research_objects_id = tadirah_research_objects.id
 ;
 ''')
     relvaldata = dbd.executesql('''
@@ -170,21 +164,19 @@ select
     id, val
 from tadirah_research_objects
 ''')
-    for r in reldata: relinfo.setdefault(r[0], {})[r[1]] = True
+    for r in reldata: relinfo.setdefault(r[0], set()).add(r[1])
     for r in relvaldata: relvals[r[0]] = r[1]
-    return dict(data=relinfo, relvals=relvals, msgs=[], good=True)
+    return dict(relinfo=list((x[0], list(x[1])) for x in relinfo.items()), relvals=list(relvals.items()), msgs=[], good=True)
 
 def tadiraht_contrib():
     relinfo = {}
     relvals = {}
     reldata = dbd.executesql('''
 select
-    contrib_tadirah_research_techniques.contrib_id as id,
-    tadirah_research_techniques.id as tid
+    contrib_id,
+    tadirah_research_techniques_id
 from
     contrib_tadirah_research_techniques
-inner join tadirah_research_techniques on
-    contrib_tadirah_research_techniques.tadirah_research_techniques_id = tadirah_research_techniques.id
 ;
 ''')
     relvaldata = dbd.executesql('''
@@ -192,9 +184,9 @@ select
     id, val
 from tadirah_research_techniques
 ''')
-    for r in reldata: relinfo.setdefault(r[0], {})[r[1]] = True
+    for r in reldata: relinfo.setdefault(r[0], set()).add(r[1])
     for r in relvaldata: relvals[r[0]] = r[1]
-    return dict(data=relinfo, relvals=relvals, msgs=[], good=True)
+    return dict(relinfo=list((x[0], list(x[1])) for x in relinfo.items()), relvals=list(relvals.items()), msgs=[], good=True)
 
 def country_contrib():
     relinfo = {}
@@ -217,6 +209,6 @@ from
     country
 ;
 ''')
-    for r in reldata: relinfo.setdefault(r[0], {})[r[1]] = True
+    for r in reldata: relinfo.setdefault(r[0], set()).add(r[1])
     for r in relvaldata: relvals[r[0]] = (r[1], r[2] == 1, r[3], r[4])
-    return dict(data=relinfo, relvals=relvals, msgs=[], good=True)
+    return dict(relinfo=list((x[0], list(x[1])) for x in relinfo.items()), relvals=list(relvals.items()), msgs=[], good=True)

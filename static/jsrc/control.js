@@ -5,42 +5,42 @@
 
 function Control(component) {
     this.component = component;
-    this.widget = {};
-    this.ctl = {};
+    this._widget = new Map();
+    this._control = new Map();
 };
 
 Control.prototype = {
     _html: function(vr) {
-        this.component.container[vr].html(`<a class="control_title" href="#">${this.component.state.showState('list', vr, 'sg')}</a> `);
+        this.component.container.get(vr).html(`<a class="control_title" href="#">${this.component.state.showState('list', vr, 'sg')}</a> `);
     },
     _dressup: function(vr) {
-        this.ctl[vr].click(function(e) {e.preventDefault();
-            this.component.state.setState(`list`, vr);
+        this._control.get(vr).click(function(e) {e.preventDefault();
+            this.component.state.setState('list', vr);
         }.bind(this))
     },
     _isActive: function(vr) {
-        return this.component.state.getState(`list`) == vr;
+        return this.component.state.getState('list') == vr;
     },
     show: function(vr) {
         return true;
     },
     weld: function(vr) {
         this._html(vr);
-        this.widget[vr] =  this.component.container[vr];
-        this.widget[vr].addClass(`control_big`);
-        this.ctl[vr] =  this.component.container[vr].find(`a`);
+        this._widget.set(vr,  this.component.container.get(vr));
+        this._widget.get(vr).addClass('control_big');
+        this._control.set(vr,  this.component.container.get(vr).find('a'));
     },
     wire: function(vr) {
         this._dressup(vr);
     },
     work: function(vr) {
         if (this._isActive(vr)) {
-            this.ctl[vr].addClass(`ison`);
-            this.widget[vr].addClass(`ison`);
+            this._control.get(vr).addClass('ison');
+            this._widget.get(vr).addClass('ison');
         }
         else {
-            this.ctl[vr].removeClass(`ison`);
-            this.widget[vr].removeClass(`ison`);
+            this._control.get(vr).removeClass('ison');
+            this._widget.get(vr).removeClass('ison');
         }
     }
 };

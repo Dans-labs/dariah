@@ -4,10 +4,10 @@ var babelify    = require('babelify');
 var source      = require('vinyl-source-stream');
 var buffer      = require('vinyl-buffer');
 var uglify      = require('gulp-uglify');
+var sass        = require('gulp-sass');
 var sourcemaps  = require('gulp-sourcemaps');
-var livereload  = require('gulp-livereload');
  
-gulp.task('build', function () {
+gulp.task('buildjs', function () {
     return browserify({entries: 'main.js', debug: true})
         .transform("babelify", { presets: ["es2015"] })
         .bundle()
@@ -17,12 +17,19 @@ gulp.task('build', function () {
         .pipe(uglify())
         .pipe(sourcemaps.write('../maps'))
         .pipe(gulp.dest('../js'))
-        .pipe(livereload());
 });
  
-gulp.task('watch', ['build'], function () {
-    livereload.listen();
-    gulp.watch('*.js', ['build']);
+gulp.task('buildcss', function () {
+  return gulp.src('../cssrc/main.scss')
+    .pipe(sourcemaps.init())
+    .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+    .pipe(sourcemaps.write('../maps'))
+    .pipe(gulp.dest('../css'));
+});
+
+gulp.task('watch', ['buildjs', 'buildcss'], function () {
+    gulp.watch('*.js', ['buildjs']);
+    gulp.watch('../cssrc/*.scss', ['buildcss']);
 });
  
-gulp.task('default', ['build', 'watch']);
+gulp.task('default', ['buildjs', 'buildcss', 'watch']);

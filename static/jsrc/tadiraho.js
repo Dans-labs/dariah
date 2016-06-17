@@ -2,10 +2,10 @@
  * This manages the facet "contribution type"
  */
 
-var Relative = require('./relative.js');
+let Relative = require('./relative.js');
 
 function TadirahO(component) {
-    Relative.call(this, component, `tadiraho`);
+    Relative.call(this, component, 'tadiraho');
 };
 
 TadirahO.prototype = Object.create(Relative.prototype);

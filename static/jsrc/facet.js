@@ -3,48 +3,46 @@
  * It will host individual facets
  */
 
-var g = require('./generic.js');
+let g = require('./generic.js');
 
 function Facet(component) {
     this.component = component;
-    this._stats = {};
-    this.data = {};
-    this.table = {};
-    this.distilled = {};
-    this.enabled_facets = {};
+    this._stats = new Map();
+    this._enabled_facets = new Map();
+    this.table = new Map();
+    this.distilled = new Map();
 };
 
 Facet.prototype = {
     _html: function(vr) {
-        var h = ``;
+        let h = '';
         h += `<p><span fct="all"></span>Filtering <span id="fstats_${vr}"></span></p>`;
-        this.component.container[vr].html(h);
+        this.component.container.get(vr).html(h);
     },
     show: function(vr) {
-        return this.component.state.getState(`list`) == vr;
+        return this.component.state.getState('list') == vr;
     },
     weld: function(vr) {
-        var children = this.component.children;
-        this.enabled_facets[vr] = {};
-        for (var facet_name in children) {
-            var facet_component = children[facet_name];
+        let children = this.component.children;
+        this._enabled_facets.set(vr, new Map());
+        for (let [facet_name, facet_component] of children) {
             if (facet_component.hasVariant(vr)) {
-                this.enabled_facets[vr][facet_name] = children[facet_name];
+                this._enabled_facets.get(vr).set(facet_name, facet_component);
             }
         }
         this._html(vr);
     },
     _display: function(expand_control, mode) {
-        var that = this;
-        var dt = expand_control.closest(`p`);
-        var hidec = dt.find(`.hidec`);
-        var morec = dt.find(`.morec`);
-        var showc = dt.find(`.showc`);
-        var expanded_material = expand_control.closest(`div`).find(`table,.flt`);
-        var condensed_material = expand_control.closest(`div`).find(`.value_list2,.flt_compact`);
-        var not_expanded_material = expand_control.closest(`div`).find(`.flt_not_expanded`);
-        var key = `fctx_${expand_control.closest('span').attr('fct')}`;
-        var mode_undef = mode == undefined;
+        let that = this;
+        let dt = expand_control.closest('p');
+        let hidec = dt.find('.hidec');
+        let morec = dt.find('.morec');
+        let showc = dt.find('.showc');
+        let expanded_material = expand_control.closest('div').find('table,.flt');
+        let condensed_material = expand_control.closest('div').find('.value_list2,.flt_compact');
+        let not_expanded_material = expand_control.closest('div').find('.flt_not_expanded');
+        let key = `fctx_${expand_control.closest('span').attr('fct')}`;
+        let mode_undef = mode == undefined;
         if (mode_undef) {
             if (g.localstorage_vars.isSet(key)) {
                 mode = g.localstorage_vars.get(key);
@@ -53,9 +51,9 @@ Facet.prototype = {
                 mode = 1;
             }
         }
-        var all_facets = key == `fctx_all`;
+        let all_facets = key == 'fctx_all';
         if (all_facets && !mode_undef) {
-            expand_control.closest(`div`).find(`div.component span[fct]`).each(function() {
+            expand_control.closest('div').find('div.component span[fct]').each(function() {
                 that._display($(this), mode);
             });
         }
@@ -92,40 +90,40 @@ Facet.prototype = {
         }
     },
     wire: function(vr) {
-        var that = this;
-        var cc = this.component.container[vr];
-        var lc = this.component.page.getComponent(`list`).container[vr];
-        this._stats[vr] = cc.find(`#fstats_${vr}`);
-        this.table[vr] =  lc.find(`#table_${vr}`);
-        var info = ` details; click to change level of details`;
-        var detailcontrols = `<a class="showc fa fa-fw fa-list-ul" href="#" title="full${info}"></a><a class="morec fa fa-fw fa-align-left" href="#" title="condensed${info}"></a><a class="hidec fa fa-fw fa-minus" href="#" title="hidden${info}"></a>`;
-        cc.addClass(`facet`);
-        cc.find(`span[fct]`).each(function() {
+        let that = this;
+        let cc = this.component.container.get(vr);
+        let lc = this.component.page.getComponent('list').container.get(vr);
+        this._stats.set(vr, cc.find(`#fstats_${vr}`));
+        this.table.set(vr,  lc.find(`#table_${vr}`));
+        let info = ' details; click to change level of details';
+        let detailcontrols = `<a class="showc fa fa-fw fa-list-ul" href="#" title="full${info}"></a><a class="morec fa fa-fw fa-align-left" href="#" title="condensed${info}"></a><a class="hidec fa fa-fw fa-minus" href="#" title="hidden${info}"></a>`;
+        cc.addClass('facet');
+        cc.find('span[fct]').each(function() {
             $(this).html(`${detailcontrols}&nbsp`);
             that._display($(this));
         });
-        cc.find(`.hidec`).click(function(e) {e.preventDefault();
+        cc.find('.hidec').click(function(e) {e.preventDefault();
             that._display($(this), 1);
         });
-        cc.find(`.morec`).click(function(e) {e.preventDefault();
+        cc.find('.morec').click(function(e) {e.preventDefault();
             that._display($(this), 2);
         });
-        cc.find(`.showc`).click(function(e) {e.preventDefault();
+        cc.find('.showc').click(function(e) {e.preventDefault();
             that._display($(this), 0);
         });
     },
     work: function(vr) {
-        this.table[vr].find(`tr[id]`).hide();
-        var mother_list = this.component.page.getComponent(`list`);
-        var data = mother_list.data[vr];
-        var facets = this.enabled_facets[vr];
-        this.distilled[vr] = [];
-        for (var facet_name in facets) {
-            var facet= facets[facet_name].implementation;
-            facet.distilled[vr] = [];
+        this.table.get(vr).find('tr[rid],tr[iid]').hide();
+        let mother_list = this.component.page.getComponent('list');
+        let data = mother_list.data.get(vr);
+        let facets = this._enabled_facets.get(vr);
+        this.distilled.set(vr, []);
+        for (let [facet_name, facet_comp] of facets) {
+            let facet = facet_comp.implementation;
+            facet.distilled.set(vr, []);
         }
-        data.forEach(function(d, i) {
-            var v = true; // will hold whether this row passes all facets
+        for (let d of data) {
+            let v = true; // will hold whether this row passes all facets
 /* We collect in the distilled member of this facet object the collective results of all individual facets,
  * Moreover, for each facet, we collect in its distilled member the results when all facets are applied except the facet in question
  * so: 
@@ -133,12 +131,12 @@ Facet.prototype = {
  * 2. rows with a failure for exactly one facet are added to the data for that facet
  * 3. rows which pass all facets are added to all facets, and also to the final filtered set
  */
-            var the_false = null; // which facet has yielded false (if there are more than one we'll discard the row
-            var discard = false; // becomes true when we have encounterd 2 facets that yield false
-            for (var facet_name in facets) {
+            let the_false = null; // which facet has yielded false (if there are more than one we'll discard the row
+            let discard = false; // becomes true when we have encounterd 2 facets that yield false
+            for (let [facet_name, facet_comp] of facets) {
                 if (!discard) {
-                    var facet = facets[facet_name].implementation;
-                    var this_v = facet.v(vr, d[0]); // this_v: whether the row passes this facet
+                    let facet = facet_comp.implementation;
+                    let this_v = facet.v(vr, d[0]); // this_v: whether the row passes this facet
                     if (!this_v) {
                         v = false;
                         if (the_false == null) { // this is the first failure, we store the facet number in the_false
@@ -152,25 +150,25 @@ Facet.prototype = {
             }
             if (!discard) {
                 if (v) {
-                    this.distilled[vr].push(d[0]);
-                    this.table[vr].find(`tr[id="r${d[0]}"]`).show();
+                    this.distilled.get(vr).push(d[0]);
+                    this.table.get(vr).find(`tr[rid="${d[0]}"],tr[iid="${d[0]}"]`).show();
                 }
                 if (the_false != null) {
-                    the_false.distilled[vr].push(d[0]);
+                    the_false.distilled.get(vr).push(d[0]);
                 }
                 else {
-                    for (var facet_name in facets) {
-                        var facet = facets[facet_name].implementation;
-                        facet.distilled[vr].push(d[0]);
+                    for (let [facet_name, facet_comp] of facets) {
+                        let facet = facet_comp.implementation;
+                        facet.distilled.get(vr).push(d[0]);
                     }
                 }
             }
-        }, this);
-        for (var facet_name in facets) {
-            var facet = facets[facet_name].implementation;
+        }
+        for (let [facet_name, facet_comp] of facets) {
+            let facet = facet_comp.implementation;
             facet.stats(vr);
         }
-        this._stats[vr].html(`${this.distilled[vr].length} of ${data.length}`);
+        this._stats.get(vr).html(`${this.distilled.get(vr).length} of ${data.length}`);
     },
 };
 

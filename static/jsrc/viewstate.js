@@ -5,159 +5,203 @@
  * There is a list of recognized request variables, with their types and allowable values.
  */
 
-var g = require('./generic.js');
+let g = require('./generic.js');
+let Msg = require('./message.js');
 
 function ViewState(page) {
-    this._data = {};
+    this._data = {}; // this should be an object and not a collection such as Map. Otherwise it does not function well with popstate.
+    this._specs = new Map();
     this.page = page;
-    this.msg = page.msg;
+    this._msg = new Msg('msg_page');
+    this._compile_specs();
     this._getInitstate();
     this._addHistory();
 };
 
 ViewState.prototype = {
-    _specs: {
-        list: {url: true, type: `string`, values: {contrib: 1, country: 1, type: 1, tadiraha: 1, tadiraho: 1, tadiraht: 1}, default_value: `contrib`},
-        flt_contrib: {url: false, type: `string`, values: null, default_value: ``},
-        flt_country: {url: false, type: `string`, values: null, default_value: ``},
-        flt_type: {url: false, type: `string`, values: null, default_value: ``},
-        flt_tadiraha: {url: false, type: `string`, values: null, default_value: ``},
-        flt_tadiraho: {url: false, type: `string`, values: null, default_value: ``},
-        flt_tadiraht: {url: false, type: `string`, values: null, default_value: ``},
-        rel_country_contrib: {url: false, type: `string`, values: null, default_value: ``},
-        rel_type_contrib: {url: false, type: `string`, values: null, default_value: ``},
-        rel_tadiraha_contrib: {url: false, type: `string`, values: null, default_value: ``},
-        rel_tadiraho_contrib: {url: false, type: `string`, values: null, default_value: ``},
-        rel_tadiraht_contrib: {url: false, type: `string`, values: null, default_value: ``},
-        item_contrib: {url: true, type: `string`, values: null, default_value: ``},
-        item_country: {url: true, type: `string`, values: null, default_value: ``},
-        sort: {url: false, type: `boolean`, values: {v: true, x: false}, default_value: true}, 
+    _spec_info: {
+        vars: new Set([
+            'list',
+            'flt_contrib',
+            'flt_country',
+            'flt_type',
+            'flt_tadiraha',
+            'flt_tadiraho',
+            'flt_tadiraht',
+            'rel_country_contrib',
+            'rel_type_contrib',
+            'rel_tadiraha_contrib',
+            'rel_tadiraho_contrib',
+            'rel_tadiraht_contrib',
+            'item_contrib',
+            'item_country',
+            'sort', 
+        ]),
+        vals: new Map([
+            ['list', new Set([
+                'contrib',
+                'country',
+                'type',
+                'tadiraha',
+                'tadiraho',
+                'tadiraht',
+            ])],
+            ['sort', new Map([
+                ['v', true],
+                ['x', false],
+            ])],
+        ]),
+        default_value: new Map([
+            ['list', 'contrib'],
+            ['sort', true],
+        ]),
+        typ: new Map([
+            ['sort', 'boolean'],
+        ]),
+        url: new Set([
+            'list',
+            'item_contrib',
+            'item_country',
+        ]),
+        showas: new Map([
+            ['list', new Map([
+                ['contrib', {sg: 'contribution', pl: 'contributions'}],
+                ['country', {sg: 'country', pl: 'countries'}],
+                ['type', {sg: 'type', pl: 'types'}],
+                ['tadiraha', {sg: 'tadirah activity', pl: 'tadirah activities'}],
+                ['tadiraho', {sg: 'tadirah object', pl: 'tadirah objects'}],
+                ['tadiraht', {sg: 'tadirah technique', pl: 'tadirah techniques'}],
+            ])],
+        ]),
     },
-    _showas: {
-        list: {
-            contrib: {sg: `contribution`, pl: `contributions`},
-            country: {sg: `country`, pl: `countries`},
-            type: {sg: `type`, pl: `types`},
-            tadiraha: {sg: `tadirah activity`, pl: `tadirah activities`},
-            tadiraho: {sg: `tadirah object`, pl: `tadirah objects`},
-            tadiraht: {sg: `tadirah technique`, pl: `tadirah techniques`},
-        },
+    _compile_specs: function() {
+        let info = this._spec_info;
+        for (let v of info.vars) {
+            let spec = {};
+            spec.vals = info.vals.get(v) || null;
+            spec.default_value = info.default_value.get(v) || '';
+            spec.typ = info.typ.get(v) || 'string';
+            spec.url = info.url.has(v);
+            spec.showas = info.showas.get(v) || {};
+            this._specs.set(v, spec);
+        }
     },
-    _validate: function(name, val) {
-        var newval, message;
-        if (name in this._specs) {
-            var spec = this._specs[name];
-            if (spec.type == `string`) {
-                if (spec.values) {
-                    if (val in spec.values) {
+    _validate: function(v, val) {
+        let newval, message;
+        if (this._specs.has(v)) {
+            let spec = this._specs.get(v);
+            if (spec.typ == 'string') {
+                if (spec.vals) {
+                    if (spec.vals.has(val)) {
                         newval = val;
                     }
                     else {
                         newval = spec.default_value;
-                        this.msg.msg(`illegal string value for ${name}: "${val}" is replaced by "${spec.default_value}"`, `warning`);
+                        this._msg.msg(`illegal string value for ${v}: "${val}" is replaced by "${spec.default_value}"`, 'warning');
                     }
                 }
                 else {
                     newval = val;
                 }
             }
-            else if (spec.type == `integer`) {
+            else if (spec.typ == 'integer') {
                 if (/^(\-|\+)?[0-9]+$/.test(val)) {
                     newval = Number(val);
                 }
                 else {
                     newval = spec.default_value;
-                    this.msg.msg(`not a number value for ${name}: "${val}" is replaced by "${spec.default_value}"`, `warning`);
+                    this._msg.msg(`not a number value for ${v}: "${val}" is replaced by "${spec.default_value}"`, 'warning');
                 }
                 if (newval < spec.limits.min) {
-                    this.msg.msg(`number to small for ${name}: "${newval}" is replaced by "${spec.limits.min}"`, `warning`);
+                    this._msg.msg(`number to small for ${v}: "${newval}" is replaced by "${spec.limits.min}"`, 'warning');
                 }
                 if (newval > spec.limits.max) {
-                    this.msg.msg(`number to big for ${name}: "${newval}" is replaced by "${spec.limits.max}"`, `warning`);
+                    this._msg.msg(`number to big for ${v}: "${newval}" is replaced by "${spec.limits.max}"`, 'warning');
                 }
             }
-            else if (spec.type == `boolean`) {
-                if (val in spec.values) {
-                    newval = spec.values[val];
+            else if (spec.typ == 'boolean') {
+                if (spec.vals.has(val)) {
+                    newval = spec.vals.get(val);
                 }
                 else {
                     newval = spec.default_value;
-                    this.msg.msg(`illegal boolean value for ${name}: "${val}" is replaced by "${spec.default_value}"`, `warning`);
+                    this._msg.msg(`illegal boolean value for ${v}: "${val}" is replaced by "${spec.default_value}"`, 'warning');
                 }
             }
         }
         else {
             newval = null;
-            this.msg.msg(`unknown parameter: ${name}=${val}`, `warning`);
+            this._msg.msg(`unknown parameter: ${v}=${val}`, 'warning');
         }
         return newval;
     },
     getVars: function(comprehensive) {
-        var vars = [];
-        for (var name in this._data) {
-            var val = this._data[name];
-            var spec = this._specs[name];
+        let vars = [];
+        for (let v in this._data) {
+            let val = this._data[v]
+            let spec = this._specs.get(v);
             if (comprehensive || spec.url) {
-                if (spec.type == `string` || spec.type == `integer`) {vars.push(`${name}=${val}`)}
-                else if (spec.type == `boolean`) {
-                    for (var valid_val in spec.values) {
-                        if (spec.values[valid_val] == val) {vars.push(`${name}=${valid_val}`)}
+                if (spec.typ == 'string' || spec.typ == 'integer') {vars.push(`${v}=${val}`)}
+                else if (spec.typ == 'boolean') {
+                    for (let [valid_val, trans_val] of spec.vals) {
+                        if (trans_val == val) {vars.push(`${v}=${valid_val}`)}
                     }
                 }
             }
         }
-        return vars.join(`&`)
+        return vars.join('&')
     },
     _getInitstate: function() {
-        for (var name in g.request_vars) {
-            if (!(name in this._specs)) {
-                this.msg.msg(`unknown parameter: ${name}=${val}`, `warning`);
+        for (let [v, val] of g.request_vars) {
+            if (!(this._specs.has(v))) {
+                this._msg.msg(`unknown parameter: ${v}=${val}`, 'warning');
             }
         }
-        for (var name in this._specs) {
-            var val = null;
-            if (name in g.request_vars) {
-                var raw_val = g.request_vars[name];
-                val = this._validate(name, raw_val);
-                g.localstorage_vars.set(name, val);
+        for (let [v, spec] of this._specs) {
+            let val = null;
+            if (g.request_vars.has(v)) {
+                let raw_val = g.request_vars.get(v);
+                val = this._validate(v, raw_val);
+                g.localstorage_vars.set(v, val);
             }
-            else if (g.localstorage_vars.isSet(name)) {
-                val = g.localstorage_vars.get(name);
+            else if (g.localstorage_vars.isSet(v)) {
+                val = g.localstorage_vars.get(v);
             }
             else {
-                val = this._specs[name].default_value;
-                g.localstorage_vars.set(name, val);
+                val = spec.default_value;
+                g.localstorage_vars.set(v, val);
             }
-            this._data[name] = val;
+            this._data[v] = val;
         }
     },
     _addHistory: function(title, view_url) {
-        var tit = `DARIAH contribution tool`;
-        var this_url = `${app_url}?${this.getVars(false)}`;
+        let tit = 'DARIAH contribution tool';
+        let this_url = `${app_url}?${this.getVars(false)}`;
         History.pushState(this._data, tit, this_url);
     },
-    setState: function(name, val) {
-        this._data[name] = val;
-        g.localstorage_vars.set(name, val);
+    setState: function(v, val) {
+        this._data[v] = val;
+        g.localstorage_vars.set(v, val);
         this._addHistory();
     },
-    getState: function(name) {
-        return this._data[name];
+    getState: function(v) {
+        return this._data[v];
     },
-    getValues: function(name) {
-        return this._specs[name].values;
+    getValues: function(v) {
+        return this._specs.get(v).vals;
     },
-    showState: function(name, val, mode) {
-        var result = val;
-        var md = (mode == undefined)?`sg`:mode;
-        if (this._showas[name] != undefined && this._showas[name][val] != undefined) {
-            result = this._showas[name][val][mode];
+    showState: function(v, val, mode) {
+        let result = val;
+        let md = (mode == undefined)?'sg':mode;
+        let showas = this._specs.get(v).showas;
+        if (showas.has(val)) {
+            result = showas.get(val)[mode];
         }
         return result;
     },
     work: function() {
         return function () {
-            var state = History.getState();
+            let state = History.getState();
             if (state && state.data) {
                 this._data = state.data;
                 this.page.work();

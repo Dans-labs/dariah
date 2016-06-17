@@ -2,10 +2,10 @@
  * This manages the facet "contribution type"
  */
 
-var Relative = require('./relative.js');
+let Relative = require('./relative.js');
 
 function CType(component) {
-    Relative.call(this, component, `type`);
+    Relative.call(this, component, 'type');
 };
 
 CType.prototype = Object.create(Relative.prototype);

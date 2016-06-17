@@ -5,21 +5,21 @@
 
 function Filter(component) {
     this.component = component;
-    this._tags = {};
-    this._filter_control = {};
-    this._filter_control2 = {};
-    this._box = {};
-    this._completions_dst = {};
-    this._stats_dst = {};
-    this._clear_filter_control = {};
-    this._wire_mode = {};
-    this._distilled = {};
-    this.distilled = {};
+    this._tags = new Map();
+    this._filter_control = new Map();
+    this._filter_control2 = new Map();
+    this._box = new Map();
+    this._completions_dst = new Map();
+    this._stats_dst = new Map();
+    this._clear_filter_control = new Map();
+    this._wire_mode = new Map();
+    this._distilled = new Map();
+    this.distilled = new Map();
 };
 
 Filter.prototype = {
     _html: function(vr) {
-        var h = `
+        let h = `
 <div>
     <p class="dctrl"><span fct="${this.component.name}-${vr}"></span> By full text search
         <a href="#" title="modify full text filter" id="flt2_${vr}" class="flt_not_expanded facet_single ison flt_pat"></a>
@@ -33,100 +33,106 @@ Filter.prototype = {
         <div id="autoc_${vr}" style="display: none;">here ${vr}</div>
     </div>
 </div>`;
-        this.component.container[vr].html(h);
+        this.component.container.get(vr).html(h);
     },
     _setFilter: function(vr) {
-        var textf = this.component.state.getState(`flt_${vr}`);
-        this._filter_control2[vr].html(textf);
-        this._filter_control[vr].val(textf);
-        this._filter_control[vr].autocomplete(`search`, textf);
+        let textf = this.component.state.getState(`flt_${vr}`);
+        let filterc = this._filter_control.get(vr);
+        this._filter_control2.get(vr).html(textf);
+        filterc.val(textf);
+        filterc.autocomplete('search', textf);
     },
     _response: function(vr) {
         return function(event, ui) {
-            this._distilled[vr] = {};
-            ui.content.forEach(function(u, i) {
-                this._distilled[vr][u.value] = 1;
-            }, this);
-            if (!(this._wire_mode[vr])) {
-                var textf = this._filter_control[vr].val();
+            this._distilled.set(vr, {});
+            let dstl = this._distilled.get(vr);
+            for (let u of ui.content) {
+                dstl[u.value] = 1;
+            }
+            if (!(this._wire_mode.get(vr))) {
+                let textf = this._filter_control.get(vr).val();
                 this.component.state.setState(`flt_${vr}`, textf);
             }
         }.bind(this);
     },
     _setClear: function(vr) {
-        this._clear_filter_control[vr].click(function(e) {e.preventDefault();
-            this._filter_control[vr].val(``);
-            this._filter_control[vr].autocomplete(`search`, ``);
+        this._clear_filter_control.get(vr).click(function(e) {e.preventDefault();
+            let filterc = this._filter_control.get(vr);
+            filterc.val('');
+            filterc.autocomplete('search', '');
         }.bind(this));
     },
     stats: function(vr) {
-        var stat_prefix;
-        if (this._filter_control[vr].val() == ``) {
-            stat_prefix = ``;
-            this._stats_dst[vr].removeClass(`ison`);
+        let stat_prefix;
+        let statd = this._stats_dst.get(vr);
+        if (this._filter_control.get(vr).val() == '') {
+            stat_prefix = '';
+            statd.removeClass('ison');
         }
         else {
-            stat_prefix = `${this.facet.distilled[vr].length} of `;
-            this._stats_dst[vr].addClass(`ison`);
+            stat_prefix = `${this.facet.distilled.get(vr).length} of `;
+            statd.addClass('ison');
         }
-        this._stats_dst[vr].html(`${stat_prefix}${this.distilled[vr].length}`);
+        statd.html(`${stat_prefix}${this.distilled.get(vr).length}`);
     },
     v: function(vr, i) {
-        return (i in this._distilled[vr]);
+        return (i in this._distilled.get(vr));
     },
     show: function(vr) {
-        return (this.component.state.getState(`list`) == vr);
+        return (this.component.state.getState('list') == vr);
     },
     weld: function(vr) {
         this._html(vr);
     },
     wire: function(vr) {
         if (!this.facet) {
-            this.facet = this.component.page.getComponent(`facet`).implementation;
+            this.facet = this.component.page.getComponent('facet').implementation;
         }
-        var data = this.component.page.getComponent(`list`).data[vr];
-        this._tags[vr] = [];
-        data.forEach(function(d, i) {
-            this._tags[vr].push({label: d[1], value: `${d[0]}`});
-        }, this);
-        this._distilled[vr] = {};
-        this.distilled[vr] = [];
-        var cc = this.component.container[vr];
-        var cf = cc.find(`#fltw_${vr}`);
-        var flt = $(`#flt_${vr}`);
-        this._filter_control[vr] = flt;
-        var flt2 = $(`#flt2_${vr}`);
-        this._filter_control2[vr] = flt2;
-        this._box[vr] = cf.find(`#fbox_${vr}`);
-        this._completions_dst[vr] = cf.find(`#autoc_${vr}`);
-        this._stats_dst[vr] = cf.find(`#stats_${vr}`);
-        this._clear_filter_control[vr] = cc.find(`#clearf_${vr}`);
-        this._filter_control[vr].autocomplete({
-            appendTo: this._completions_dst[vr],
-            source: this._tags[vr],
+        let data = this.component.page.getComponent('list').data.get(vr);
+        this._tags.set(vr, []);
+        let tgs = this._tags.get(vr);
+        for (let d of data) {
+            tgs.push({label: d[1], value: `${d[0]}`});
+        }
+        this._distilled.set(vr, {});
+        this.distilled.set(vr, []);
+        let cc = this.component.container.get(vr);
+        let cf = cc.find(`#fltw_${vr}`);
+        let flt = $(`#flt_${vr}`);
+        this._filter_control.set(vr, flt);
+        let flt2 = $(`#flt2_${vr}`);
+        this._filter_control2.set(vr, flt2);
+        this._box.set(vr, cf.find(`#fbox_${vr}`));
+        this._completions_dst.set(vr, cf.find(`#autoc_${vr}`));
+        this._stats_dst.set(vr, cf.find(`#stats_${vr}`));
+        this._clear_filter_control.set(vr, cc.find(`#clearf_${vr}`));
+        this._filter_control.get(vr).autocomplete({
+            appendTo: this._completions_dst.get(vr),
+            source: this._tags.get(vr),
             response: this._response(vr),
             minLength: 0,
         });
         flt2.click(function(e) {e.preventDefault();
-            $(this).closest(`div`).find(`.morec`).click();
+            $(this).closest('div').find('.morec').click();
             flt[0].focus();
         });
-        this._wire_mode[vr] = true;
+        this._wire_mode.set(vr, true);
         this._setClear(vr);
         this._setFilter(vr);
-        this._wire_mode[vr] = false;
+        this._wire_mode.set(vr, false);
     },
     work: function(vr) {
-        var textf = this.component.state.getState(`flt_${vr}`);
-        if (textf == ``) {
-            this._box[vr].removeClass(`ison`);
-            this._clear_filter_control[vr].hide();
+        let textf = this.component.state.getState(`flt_${vr}`);
+        let clearfc = this._clear_filter_control.get(vr);
+        if (textf == '') {
+            this._box.get(vr).removeClass('ison');
+            clearfc.hide();
         }
         else {
-            this._box[vr].addClass(`ison`);
-            this._clear_filter_control[vr].show();
+            this._box.get(vr).addClass('ison');
+            clearfc.show();
         }
-        this._filter_control2[vr].html(textf);
+        this._filter_control2.get(vr).html(textf);
     },
 };
 

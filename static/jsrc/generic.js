@@ -2,42 +2,36 @@
  * Some function for very generic purposes
  */
 
-var escapeHTML = (function () {
-    `use strict`;
-    var chr = {
-        '&': `&amp;`, '<': `&lt;`,  '>': `&gt;`
-    };
-    return function (text) {
-        return text.replace(/[&<>]/g, function (a) { return chr[a]; });
-    };
-}());
+let chr = new Map([
+    ['&', '&amp;'],
+    ['<', '&lt;'],
+    ['>', '&gt;'],
+]);
 
-var _Request = {
+function escapeHTML(text) {
+    return text.replace(/[&<>]/g, function (a) {return chr.get(a) || a;});
+};
+
+let _Request = {
     parameter: function(name) {
-        return this.parameters()[name];
+        return this.parameters().get(name);
     },
-    parameters: function(uri) {
-        var i, parameter, params, query, result;
-        result = {};
-        if (!uri) {
-            uri = window.location.search;
-        }
+    parameters: function() {
+        let result = new Map();
+        let uri = window.location.search;
         if (uri.indexOf("?") === -1) {
-            return {};
+            return result;
         }
-        query = uri.slice(1);
-        params = query.split("&");
-        params.forEach(function(p, i) {
-            parameter = p.split("=");
-            result[parameter[0]] = parameter[1];
-        });
+        for (let paramval of uri.slice(1).split("&")) {
+            result.set(...paramval.split("="));
+        }
         return result;
     }
 };
 
-var request_vars = _Request.parameters();
-var _localstorage = $.initNamespaceStorage(`req`);
-var localstorage_vars = _localstorage.localStorage;
+let request_vars = _Request.parameters();
+let _localstorage = $.initNamespaceStorage('req');
+let localstorage_vars = _localstorage.localStorage;
 
 function deselectText() {
     if (document.selection) {
@@ -51,24 +45,24 @@ function deselectText() {
 function selectText(containerid) {
     deselectText();
     if (document.selection) {
-        var range = document.body.createTextRange();
+        let range = document.body.createTextRange();
         range.moveToElementText(document.getElementById(containerid));
         range.select();
     }
     else if (window.getSelection) {
-        var range = document.createRange();
+        let range = document.createRange();
         range.selectNode(document.getElementById(containerid));
         window.getSelection().addRange(range);
     }
 };
 
 function toggleDetail(widget, detail, extra) {
-    var thedetail = (detail == undefined)?widget.closest('div').find('.detail'):detail;
+    let thedetail = (detail == undefined)?widget.closest('div').find('.detail'):detail;
     thedetail.toggle();
     if (extra != undefined) {
         extra(widget);
     }
-    var thiscl, othercl;
+    let thiscl, othercl;
     if (widget.hasClass('fa-chevron-right')) {
         thiscl = 'fa-chevron-right';
         othercl = 'fa-chevron-down';
@@ -86,26 +80,13 @@ function compact(cutoff, size, text) {
 };
 
 function from_str(st) {
-    var ob = {};
-    if (st !== null && st != undefined && st != '') {
-        var ar = st.split(',');
-        ar.forEach(function(v) {
-            ob[v] = true;
-        });
-    }
-    return ob;
+    return (st !== null && st != undefined && st != '')?new Set(st.split(',')):new Set();
 };
 function a_to_str(ar) {
     return ar.join(',');
 };
-function to_str(ob) {
-    var ar = [];
-    for (var x in ob) {
-        if (ob[x]) {
-            ar.push(x);
-        }
-    }
-    return ar.join(',');
+function to_str(set) {
+    return Array.from(set).join(',');
 };
 
 module.exports.escapeHTML = escapeHTML;
