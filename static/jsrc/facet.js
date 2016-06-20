@@ -3,7 +3,7 @@
  * It will host individual facets
  */
 
-let g = require('./generic.js');
+const g = require('./generic.js');
 
 function Facet(component) {
     this.component = component;
@@ -15,17 +15,16 @@ function Facet(component) {
 
 Facet.prototype = {
     _html: function(vr) {
-        let h = '';
-        h += `<p><span fct="all"></span>Filtering <span id="fstats_${vr}"></span></p>`;
+        const h = `<p><span fct="all"></span>Filtering <span id="fstats_${vr}"></span></p>`;
         this.component.container.get(vr).html(h);
     },
     show: function(vr) {
         return this.component.state.getState('list') == vr;
     },
     weld: function(vr) {
-        let children = this.component.children;
+        const children = this.component.children;
         this._enabled_facets.set(vr, new Map());
-        for (let [facet_name, facet_component] of children) {
+        for (const [facet_name, facet_component] of children) {
             if (facet_component.hasVariant(vr)) {
                 this._enabled_facets.get(vr).set(facet_name, facet_component);
             }
@@ -33,16 +32,16 @@ Facet.prototype = {
         this._html(vr);
     },
     _display: function(expand_control, mode) {
-        let that = this;
-        let dt = expand_control.closest('p');
-        let hidec = dt.find('.hidec');
-        let morec = dt.find('.morec');
-        let showc = dt.find('.showc');
-        let expanded_material = expand_control.closest('div').find('table,.flt');
-        let condensed_material = expand_control.closest('div').find('.value_list2,.flt_compact');
-        let not_expanded_material = expand_control.closest('div').find('.flt_not_expanded');
-        let key = `fctx_${expand_control.closest('span').attr('fct')}`;
-        let mode_undef = mode == undefined;
+        const that = this;
+        const dt = expand_control.closest('p');
+        const hidec = dt.find('.hidec');
+        const morec = dt.find('.morec');
+        const showc = dt.find('.showc');
+        const expanded_material = expand_control.closest('div').find('table,.flt');
+        const condensed_material = expand_control.closest('div').find('.value_list2,.flt_compact');
+        const not_expanded_material = expand_control.closest('div').find('.flt_not_expanded');
+        const key = `fctx_${expand_control.closest('span').attr('fct')}`;
+        const mode_undef = mode == undefined;
         if (mode_undef) {
             if (g.localstorage_vars.isSet(key)) {
                 mode = g.localstorage_vars.get(key);
@@ -51,7 +50,7 @@ Facet.prototype = {
                 mode = 1;
             }
         }
-        let all_facets = key == 'fctx_all';
+        const all_facets = key == 'fctx_all';
         if (all_facets && !mode_undef) {
             expand_control.closest('div').find('div.component span[fct]').each(function() {
                 that._display($(this), mode);
@@ -90,13 +89,13 @@ Facet.prototype = {
         }
     },
     wire: function(vr) {
-        let that = this;
-        let cc = this.component.container.get(vr);
-        let lc = this.component.page.getComponent('list').container.get(vr);
+        const that = this;
+        const cc = this.component.container.get(vr);
+        const lc = this.component.page.getComponent('list').container.get(vr);
         this._stats.set(vr, cc.find(`#fstats_${vr}`));
         this.table.set(vr,  lc.find(`#table_${vr}`));
-        let info = ' details; click to change level of details';
-        let detailcontrols = `<a class="showc fa fa-fw fa-list-ul" href="#" title="full${info}"></a><a class="morec fa fa-fw fa-align-left" href="#" title="condensed${info}"></a><a class="hidec fa fa-fw fa-minus" href="#" title="hidden${info}"></a>`;
+        const info = ' details; click to change level of details';
+        const detailcontrols = `<a class="showc fa fa-fw fa-list-ul" href="#" title="full${info}"></a><a class="morec fa fa-fw fa-align-left" href="#" title="condensed${info}"></a><a class="hidec fa fa-fw fa-minus" href="#" title="hidden${info}"></a>`;
         cc.addClass('facet');
         cc.find('span[fct]').each(function() {
             $(this).html(`${detailcontrols}&nbsp`);
@@ -114,15 +113,15 @@ Facet.prototype = {
     },
     work: function(vr) {
         this.table.get(vr).find('tr[rid],tr[iid]').hide();
-        let mother_list = this.component.page.getComponent('list');
-        let data = mother_list.data.get(vr);
-        let facets = this._enabled_facets.get(vr);
+        const mother_list = this.component.page.getComponent('list');
+        const data = mother_list.data.get(vr);
+        const facets = this._enabled_facets.get(vr);
         this.distilled.set(vr, []);
-        for (let [facet_name, facet_comp] of facets) {
-            let facet = facet_comp.implementation;
+        for (const [facet_name, facet_comp] of facets) {
+            const facet = facet_comp.implementation;
             facet.distilled.set(vr, []);
         }
-        for (let d of data) {
+        for (const d of data) {
             let v = true; // will hold whether this row passes all facets
 /* We collect in the distilled member of this facet object the collective results of all individual facets,
  * Moreover, for each facet, we collect in its distilled member the results when all facets are applied except the facet in question
@@ -133,10 +132,10 @@ Facet.prototype = {
  */
             let the_false = null; // which facet has yielded false (if there are more than one we'll discard the row
             let discard = false; // becomes true when we have encounterd 2 facets that yield false
-            for (let [facet_name, facet_comp] of facets) {
+            for (const [facet_name, facet_comp] of facets) {
                 if (!discard) {
-                    let facet = facet_comp.implementation;
-                    let this_v = facet.v(vr, d[0]); // this_v: whether the row passes this facet
+                    const facet = facet_comp.implementation;
+                    const this_v = facet.v(vr, d[0]); // this_v: whether the row passes this facet
                     if (!this_v) {
                         v = false;
                         if (the_false == null) { // this is the first failure, we store the facet number in the_false
@@ -157,15 +156,15 @@ Facet.prototype = {
                     the_false.distilled.get(vr).push(d[0]);
                 }
                 else {
-                    for (let [facet_name, facet_comp] of facets) {
-                        let facet = facet_comp.implementation;
+                    for (const [facet_name, facet_comp] of facets) {
+                        const facet = facet_comp.implementation;
                         facet.distilled.get(vr).push(d[0]);
                     }
                 }
             }
         }
-        for (let [facet_name, facet_comp] of facets) {
-            let facet = facet_comp.implementation;
+        for (const [facet_name, facet_comp] of facets) {
+            const facet = facet_comp.implementation;
             facet.stats(vr);
         }
         this._stats.get(vr).html(`${this.distilled.get(vr).length} of ${data.length}`);

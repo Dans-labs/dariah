@@ -20,8 +20,8 @@
  * Here is the generic functionality of each component
  */
 
-let g = require('./generic.js');
-let Msg = require('./message.js');
+const g = require('./generic.js');
+const Msg = require('./message.js');
 
 function Component(name, specs, page) {
     this.name = name;
@@ -29,9 +29,9 @@ function Component(name, specs, page) {
     this.specs = specs;
     this.variants = specs.variants;
     this._stage = new Map();
-    for (let vr of this.variants) {
+    for (const vr of this.variants) {
         this._stage.set(vr, new Map());
-        for (let st of this.page.stages.keys()) {
+        for (const st of this.page.stages.keys()) {
             this._stage.get(vr).set(st, true);
         }
     }
@@ -59,7 +59,7 @@ Component.prototype = {
      * Now is a function that calls a function and returns the result as promise.
      */
     need: function(vr, stage) { // check whether there is a promise and whether it has been fulfilled
-        let promise = this._stage.get(vr).get(stage)
+        const promise = this._stage.get(vr).get(stage)
         return !promise.state || (promise.state() == 'rejected');
     },
     _deed: function(vr, stage, method) { // register a promise to perform the method associated with stage by entering it in the book keeping of stages
@@ -70,11 +70,11 @@ Component.prototype = {
              * Whoever calls this new function methodCall, will perform a true method call of method method on object that.
              * This is crucial, otherwise all the careful time logic gets mangled, because the promises are stored in the component object.
              */
-        let methodCall = this[method].bind(this, vr);
-        let timing = this.page.getBefore(this.name, stage);
-        let promises = [];
-        for (let [prev_name, prev_stage] of timing) {
-            let prev_component = this.page.getComponent(prev_name);
+        const methodCall = this[method].bind(this, vr);
+        const timing = this.page.getBefore(this.name, stage);
+        const promises = [];
+        for (const [prev_name, prev_stage] of timing) {
+            const prev_component = this.page.getComponent(prev_name);
             if (prev_component.hasVariant(vr)) {
                 promises.push(prev_component._stage.get(vr).get(prev_stage));
             }
@@ -89,7 +89,7 @@ Component.prototype = {
             /* if the component works per id, the once setting of the stage is ignored
              * because we have to look whether we should execute that stage for new identifiers
              */
-            let once = this.page.stages.get(stage) && !this.specs.by_id;
+            const once = this.page.stages.get(stage) && !this.specs.by_id;
             if (!once || this.need(vr, stage)) {
                 this._deed(vr, stage, method);
             }
@@ -104,7 +104,7 @@ Component.prototype = {
     _visibility: function(vr, on) {
         if (this.hasVariant(vr)) {
             if (this.container.has(vr)) {
-                let widget = this.container.get(vr);
+                const widget = this.container.get(vr);
                 if (on) {
                     widget.show();
                 }
@@ -117,7 +117,7 @@ Component.prototype = {
     _fetch: function(vr, ids_to_fetch) { // get the material by AJAX if needed
         let fetch_url = url_tpl.replace(/_c_/, 'data').replace(/_f_/, `${this.specs.fetch_url}_${vr}`)+'.json';
         this._msg.get(vr).msg('fetching data ...');
-        let postFetch = this._postFetch.bind(this, vr);
+        const postFetch = this._postFetch.bind(this, vr);
         if (!(ids_to_fetch == undefined)) {
             fetch_url += `?ids=${ids_to_fetch.join(',')}`;
         }
@@ -132,7 +132,7 @@ Component.prototype = {
     },
     _postFetch: function(vr, json, ids_to_fetch) { // receive material after AJAX call
         this._msg.get(vr).clear();
-        for (let m of json.msgs) {
+        for (const m of json.msgs) {
             this._msg.get(vr).msg(m);
         }
         if (json.good) {
@@ -140,7 +140,7 @@ Component.prototype = {
                 this.data.set(vr, json.data);
             }
             if ('relinfo' in json) {
-                let r = new Map();
+                const r = new Map();
                 json.relinfo.forEach(x => {
                     r.set(x[0], new Set(x[1]))
                 });
@@ -150,7 +150,7 @@ Component.prototype = {
                 this.related_values.set(vr, new Map(json.relvals));
             }
             if (this.specs.by_id) {
-                for (let i of ids_to_fetch) {
+                for (const i of ids_to_fetch) {
                     this._ids_fetched.add(i);
                 }
             }
@@ -162,7 +162,7 @@ Component.prototype = {
         if (!(this.specs.by_id)) {
             this.container.set(vr, $(`#${this.name}_${vr}`));
             if (this.container.get(vr).length == 0) {
-                let destination = this.dst.get(vr);
+                const destination = this.dst.get(vr);
                 destination.append(`<div id="msg_${this.name}_${vr}"></div>`);
                 destination.append(`<div id="${this.name}_${vr}" class="component"></div>`);
                 this.container.set(vr, $(`#${this.name}_${vr}`));
@@ -171,16 +171,16 @@ Component.prototype = {
         }
         else {
             if (!this._msg.has(vr)) {
-                let destination = this.dst.get(vr);
+                const destination = this.dst.get(vr);
                 destination.prepend(`<div id="msg_${this.name}_${vr}"></div>`);
                 this._msg.set(vr, new Msg(`msg_${this.name}_${vr}`));
             }
         }
         if (this.specs.fetch_url != null) {
-            let ids_to_fetch = [];
+            const ids_to_fetch = [];
             if (this.specs.by_id) {
-                let ids_asked_for = g.from_str(this.state.getState(`${this.specs.fetch_url}_${vr}`));
-                for (let i of ids_asked_for) {
+                const ids_asked_for = g.from_str(this.state.getState(`${this.specs.fetch_url}_${vr}`));
+                for (const i of ids_asked_for) {
                     if (!this._ids_fetched.has(i)) {
                         ids_to_fetch.push(i);
                     }

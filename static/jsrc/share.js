@@ -2,7 +2,7 @@
  * Manages the sharing drawer for generating hyperlinks to the current page.
  */
 
-let g = require('./generic.js');
+const g = require('./generic.js');
 
 function Share(component) { // the SHARE component
     this.component = component;
@@ -13,7 +13,7 @@ Share.prototype = {
         return true;
     },
     weld: function(vr) {
-	    let h = `
+	    const h = `
 <p id="citeh">Cite</p>
 <table align="center">
     <tr>
@@ -37,9 +37,9 @@ Share.prototype = {
         this.component.container.get(vr).html(h);
     },
     wire: function(vr) {
-        let that = this;
-        let cc = this.component.container.get(vr);
-        let slink = $('#self_link');
+        const that = this;
+        const cc = this.component.container.get(vr);
+        const slink = $('#self_link');
         slink.hide();
         cc.addClass('socialdrawer');
         cc.find('.detail').hide();
@@ -47,21 +47,21 @@ Share.prototype = {
             window.prompt('Press <Cmd-C> and then <Enter> to copy link on clipboard', $(this).attr('lnk'));
         });
         cc.find('#clip_pv_cn').click(e => {e.preventDefault();
-            let containerid = 'middle';
-            let app_url_raw = app_url_cite+that.component.state.getVars(true);
+            const containerid = 'middle';
+            const app_url_raw = app_url_cite+that.component.state.getVars(true);
             slink.show();
             slink.attr('href', app_url_raw);
             g.selectText(containerid);
         });
         cc.find('#xc_pv').click(function(e){e.preventDefault(); g.toggleDetail($(this), $('#x_pv'))});
         cc.click(function(e){e.preventDefault();
-            let app_url_raw = app_url_cite+that.component.state.getVars(true);
-            let app_url_rawc = app_url_cite+that.component.state.getVars(false);
+            const app_url_raw = app_url_cite+that.component.state.getVars(true);
+            const app_url_rawc = app_url_cite+that.component.state.getVars(false);
             $('#citeh').hide();
             $('#cdiagpub').html('');
             $('#cdiagsts').html('');
             $('.clip_pv.clr,#cdiagpub,#cdiagsts').removeClass('error warning good special');
-            let pvtitle = g.escapeHTML($('title').text());
+            const pvtitle = g.escapeHTML($('title').text());
             $('#clip_pv_md').attr('lnk', '[${pvtitle}](${app_url_raw})');
             $('#clip_pv_ht').attr('lnk', app_url_raw);
             $('#clip_pv_htc').attr('lnk', app_url_rawc);

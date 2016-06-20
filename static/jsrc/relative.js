@@ -2,7 +2,7 @@
  * CType, Tadiraho and EUmap inherit from this.
  */
 
-let g = require('./generic.js');
+const g = require('./generic.js');
 
 function Relative(component, rtype, cols, cutoff, shortsize) {
     this.component = component;
@@ -24,8 +24,8 @@ function Relative(component, rtype, cols, cutoff, shortsize) {
 
 Relative.prototype = {
     _html: function(vr) {
-        let type_sg = this.component.state.showState('list', this._type, 'sg');
-        let type_pl = this.component.state.showState('list', this._type, 'pl');
+        const type_sg = this.component.state.showState('list', this._type, 'sg');
+        const type_pl = this.component.state.showState('list', this._type, 'pl');
         let h = '';
         h += this._preHtml(vr);
         h += `
@@ -39,7 +39,7 @@ Relative.prototype = {
             if ((i % this._cols == 0) && (i > 0) && (i < ar.length)) {
                 h += '</tr><tr>';
             }
-            let raw_value = this._related_values_index.get(vr).get(related_value);
+            const raw_value = this._related_values_index.get(vr).get(related_value);
             h += `
             <td><span rv="${related_value}" class="stats"></span></td>
             <td><a rv="${related_value}" href="#" class="facet_single">${g.escapeHTML(raw_value)}</a></td>
@@ -51,8 +51,8 @@ Relative.prototype = {
     <p class="value_list2" id="list2-${this._type}-vals_${vr}">
 `;
         this._related_values_list.get(vr).forEach((related_value, i, ar) => {
-            let raw_value = this._related_values_index.get(vr).get(related_value);
-            let compact_value = g.escapeHTML(g.compact(this._cutoff, this._shortsize, raw_value));
+            const raw_value = this._related_values_index.get(vr).get(related_value);
+            const compact_value = g.escapeHTML(g.compact(this._cutoff, this._shortsize, raw_value));
             h += `<a href="#" rv="${related_value}" class="passive_small" title="${g.escapeHTML(raw_value)}">${compact_value}</a> `;
         });
         h += `
@@ -61,13 +61,13 @@ Relative.prototype = {
         this.component.container.get(vr).html(h);
     },
     _dressup: function(vr) {
-        let cc = this.component.container.get(vr);
+        const cc = this.component.container.get(vr);
         this._list.set(vr, cc.find(`#list-${this._type}-vals_${vr}`));
         this._list2.set(vr, cc.find(`#list2-${this._type}-vals_${vr}`));
-        let that = this;
+        const that = this;
         this._list.get(vr).find('.facet_single').click(function(e) {e.preventDefault();
-            let related_value = $(this).attr('rv');
-            let selected = g.from_str(that.component.state.getState(`rel_${that._type}_${vr}`));
+            const related_value = $(this).attr('rv');
+            const selected = g.from_str(that.component.state.getState(`rel_${that._type}_${vr}`));
             if (selected.has(related_value)) {
                 selected.delete(related_value);
             }
@@ -79,8 +79,8 @@ Relative.prototype = {
             $(this).addClass('last_handled');
         });
         this._list2.get(vr).find('.passive_small').click(function(e) {e.preventDefault();
-            let related_value = $(this).attr('rv');
-            let selected = g.from_str(that.component.state.getState(`rel_${that._type}_${vr}`));
+            const related_value = $(this).attr('rv');
+            const selected = g.from_str(that.component.state.getState(`rel_${that._type}_${vr}`));
             if (selected.has(related_value)) {
                 selected.delete(related_value);
             }
@@ -89,7 +89,7 @@ Relative.prototype = {
             }
             that.component.state.setState(`rel_${that._type}_${vr}`, g.to_str(selected));
             $(this).closest('div').find('.morec').click();
-            let last_handled = that._list.get(vr).find(`a[rv="${related_value}"]`);
+            const last_handled = that._list.get(vr).find(`a[rv="${related_value}"]`);
             cc.find('.last_handled').removeClass('last_handled');
             last_handled.addClass('last_handled');
             $('#left')[0].scrollTop = 50;
@@ -100,7 +100,7 @@ Relative.prototype = {
         });
         this._all_values_control.set(vr, this.component.container.get(vr).find('[rv="_all"]'));
         this._all_values_control.get(vr).click(function(e) {e.preventDefault();
-            let ison = $(this).hasClass('ison');
+            const ison = $(this).hasClass('ison');
             if (ison) {
                 that.component.state.setState(`rel_${that._type}_${vr}`, '');
             }
@@ -111,9 +111,9 @@ Relative.prototype = {
     },
     _setFacet: function(vr) {
         let all_selected = true;
-        for (let related_value of this._related_values_index.get(vr).keys()) {
-            let facet_cell = this._list.get(vr).find(`[rv="${related_value}"]`);
-            let facet_cell2 = this._list2.get(vr).find(`[rv="${related_value}"]`);
+        for (const related_value of this._related_values_index.get(vr).keys()) {
+            const facet_cell = this._list.get(vr).find(`[rv="${related_value}"]`);
+            const facet_cell2 = this._list2.get(vr).find(`[rv="${related_value}"]`);
             if (this._related_state.get(vr).has(related_value+'')) {
                 facet_cell.addClass('ison');
                 facet_cell2.addClass('ison');
@@ -133,35 +133,35 @@ Relative.prototype = {
     },
     stats: function(vr) {
         this._statistics.set(vr, new Map());
-        let rvs = this._statistics.get(vr);
-        for (let related_value of this._related_values_index.get(vr).keys()) {
+        const rvs = this._statistics.get(vr);
+        for (const related_value of this._related_values_index.get(vr).keys()) {
             rvs.set(related_value, 0);
         } 
-        let related_info = this.component.related_info.get(vr);
-        for (let i of this.distilled.get(vr)) {
+        const related_info = this.component.related_info.get(vr);
+        for (const i of this.distilled.get(vr)) {
             let has_related_value = false;
             if (related_info.has(i)) {
-                for (let related_value of related_info.get(i)) {
+                for (const related_value of related_info.get(i)) {
                     rvs.set(related_value, rvs.get(related_value) + 1);
                     has_related_value = true;
                 }
             }
             if (!has_related_value) {
-                let nv = this._no_values.value;
+                const nv = this._no_values.value;
                 rvs.set(nv, rvs.get(nv) + 1);
             }
         }
-        for (let [related_value, stat] of rvs) {
+        for (const [related_value, stat] of rvs) {
             this.component.container.get(vr).find(`span[rv="${related_value}"].stats`).html(stat);
         }
         this.component.container.get(vr).find(`span[rv="_all"].stats`).html(this.distilled.get(vr).length);
         this._myStats(vr);
     },
     v: function(vr, i) {
-        let related_info =  this.component.related_info.get(vr);
-        let related_state = this._related_state.get(vr);
+        const related_info =  this.component.related_info.get(vr);
+        const related_state = this._related_state.get(vr);
         if (related_info.has(i)) {
-            for (let related_value of related_info.get(i)) {
+            for (const related_value of related_info.get(i)) {
                 if (related_state.has(related_value+'')) {
                     return true;
                 }
@@ -198,8 +198,8 @@ Relative.prototype = {
         this._setFacet(vr);
     },
     _plainWeld: function(vr) {
-        let related_values = this.component.related_values.get(vr);
-        for (let [i, related_value] of related_values) {
+        const related_values = this.component.related_values.get(vr);
+        for (const [i, related_value] of related_values) {
             this._related_values_list.get(vr).push(i);
             this._related_values_index.get(vr).set(i, related_value);
             this._related_values_all.get(vr).add(i);

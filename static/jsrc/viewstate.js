@@ -5,8 +5,8 @@
  * There is a list of recognized request variables, with their types and allowable values.
  */
 
-let g = require('./generic.js');
-let Msg = require('./message.js');
+const g = require('./generic.js');
+const Msg = require('./message.js');
 
 function ViewState(page) {
     this._data = {}; // this should be an object and not a collection such as Map. Otherwise it does not function well with popstate.
@@ -75,9 +75,9 @@ ViewState.prototype = {
         ]),
     },
     _compile_specs: function() {
-        let info = this._spec_info;
-        for (let v of info.vars) {
-            let spec = {};
+        const info = this._spec_info;
+        for (const v of info.vars) {
+            const spec = {};
             spec.vals = info.vals.get(v) || null;
             spec.default_value = info.default_value.get(v) || '';
             spec.typ = info.typ.get(v) || 'string';
@@ -89,7 +89,7 @@ ViewState.prototype = {
     _validate: function(v, val) {
         let newval, message;
         if (this._specs.has(v)) {
-            let spec = this._specs.get(v);
+            const spec = this._specs.get(v);
             if (spec.typ == 'string') {
                 if (spec.vals) {
                     if (spec.vals.has(val)) {
@@ -136,14 +136,14 @@ ViewState.prototype = {
         return newval;
     },
     getVars: function(comprehensive) {
-        let vars = [];
-        for (let v in this._data) {
-            let val = this._data[v]
-            let spec = this._specs.get(v);
+        const vars = [];
+        for (const v in this._data) {
+            const val = this._data[v]
+            const spec = this._specs.get(v);
             if (comprehensive || spec.url) {
                 if (spec.typ == 'string' || spec.typ == 'integer') {vars.push(`${v}=${val}`)}
                 else if (spec.typ == 'boolean') {
-                    for (let [valid_val, trans_val] of spec.vals) {
+                    for (const [valid_val, trans_val] of spec.vals) {
                         if (trans_val == val) {vars.push(`${v}=${valid_val}`)}
                     }
                 }
@@ -152,15 +152,15 @@ ViewState.prototype = {
         return vars.join('&')
     },
     _getInitstate: function() {
-        for (let [v, val] of g.request_vars) {
+        for (const [v, val] of g.request_vars) {
             if (!(this._specs.has(v))) {
                 this._msg.msg(`unknown parameter: ${v}=${val}`, 'warning');
             }
         }
-        for (let [v, spec] of this._specs) {
+        for (const [v, spec] of this._specs) {
             let val = null;
             if (g.request_vars.has(v)) {
-                let raw_val = g.request_vars.get(v);
+                const raw_val = g.request_vars.get(v);
                 val = this._validate(v, raw_val);
                 g.localstorage_vars.set(v, val);
             }
@@ -175,8 +175,8 @@ ViewState.prototype = {
         }
     },
     _addHistory: function(title, view_url) {
-        let tit = 'DARIAH contribution tool';
-        let this_url = `${app_url}?${this.getVars(false)}`;
+        const tit = 'DARIAH contribution tool';
+        const this_url = `${app_url}?${this.getVars(false)}`;
         History.pushState(this._data, tit, this_url);
     },
     setState: function(v, val) {
@@ -192,8 +192,8 @@ ViewState.prototype = {
     },
     showState: function(v, val, mode) {
         let result = val;
-        let md = (mode == undefined)?'sg':mode;
-        let showas = this._specs.get(v).showas;
+        const md = (mode == undefined)?'sg':mode;
+        const showas = this._specs.get(v).showas;
         if (showas.has(val)) {
             result = showas.get(val)[mode];
         }
@@ -201,7 +201,7 @@ ViewState.prototype = {
     },
     work: function() {
         return function () {
-            let state = History.getState();
+            const state = History.getState();
             if (state && state.data) {
                 this._data = state.data;
                 this.page.work();

@@ -2,7 +2,7 @@
  * Some function for very generic purposes
  */
 
-let chr = new Map([
+const chr = new Map([
     ['&', '&amp;'],
     ['<', '&lt;'],
     ['>', '&gt;'],
@@ -12,26 +12,26 @@ function escapeHTML(text) {
     return text.replace(/[&<>]/g, function (a) {return chr.get(a) || a;});
 };
 
-let _Request = {
+const _Request = {
     parameter: function(name) {
         return this.parameters().get(name);
     },
     parameters: function() {
-        let result = new Map();
-        let uri = window.location.search;
+        const result = new Map();
+        const uri = window.location.search;
         if (uri.indexOf("?") === -1) {
             return result;
         }
-        for (let paramval of uri.slice(1).split("&")) {
+        for (const paramval of uri.slice(1).split("&")) {
             result.set(...paramval.split("="));
         }
         return result;
     }
 };
 
-let request_vars = _Request.parameters();
-let _localstorage = $.initNamespaceStorage('req');
-let localstorage_vars = _localstorage.localStorage;
+const request_vars = _Request.parameters();
+const _localstorage = $.initNamespaceStorage('req');
+const localstorage_vars = _localstorage.localStorage;
 
 function deselectText() {
     if (document.selection) {
@@ -45,19 +45,19 @@ function deselectText() {
 function selectText(containerid) {
     deselectText();
     if (document.selection) {
-        let range = document.body.createTextRange();
+        const range = document.body.createTextRange();
         range.moveToElementText(document.getElementById(containerid));
         range.select();
     }
     else if (window.getSelection) {
-        let range = document.createRange();
+        const range = document.createRange();
         range.selectNode(document.getElementById(containerid));
         window.getSelection().addRange(range);
     }
 };
 
 function toggleDetail(widget, detail, extra) {
-    let thedetail = (detail == undefined)?widget.closest('div').find('.detail'):detail;
+    const thedetail = (detail == undefined)?widget.closest('div').find('.detail'):detail;
     thedetail.toggle();
     if (extra != undefined) {
         extra(widget);

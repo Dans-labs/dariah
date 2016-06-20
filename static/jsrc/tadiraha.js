@@ -2,7 +2,7 @@
  * This manages the facet "contribution type"
  */
 
-let Relative = require('./relative.js');
+const Relative = require('./relative.js');
 
 function TadirahA(component) {
     Relative.call(this, component, 'tadiraha');

@@ -31,27 +31,27 @@
  * The page will issue the work call forth to all components.
  */
 
-let g = require('./generic.js');
-let ViewState = require('./viewstate.js');
-let Share = require('./share.js');
-let CType = require('./ctype.js');
-let TadirahO = require('./tadiraho.js');
-let TadirahA = require('./tadiraha.js');
-let TadirahT = require('./tadiraht.js');
-let EUmap = require('./eumap.js');
-let Filter = require('./filter.js');
-let Facet = require('./facet.js');
-let List = require('./list.js');
-let Item = require('./item.js');
-let Control = require('./control.js');
-let Component = require('./components.js');
+const g = require('./generic.js');
+const ViewState = require('./viewstate.js');
+const Share = require('./share.js');
+const CType = require('./ctype.js');
+const TadirahO = require('./tadiraho.js');
+const TadirahA = require('./tadiraha.js');
+const TadirahT = require('./tadiraht.js');
+const EUmap = require('./eumap.js');
+const Filter = require('./filter.js');
+const Facet = require('./facet.js');
+const List = require('./list.js');
+const Item = require('./item.js');
+const Control = require('./control.js');
+const Component = require('./components.js');
 
 function Page() { // the one and only page object
     this.name = 'page';
     this.state = new ViewState(this);
-    let main_lists = this.state.getValues('list');
-    let contrib_list = new Set(['contrib']);
-    let empty_list = new Set(['']);
+    const main_lists = this.state.getValues('list');
+    const contrib_list = new Set(['contrib']);
+    const empty_list = new Set(['']);
     this._component_specs = new Map([
         ['share',    {dest: 'body',    variants: empty_list,   fetch_url: null,       specific: Share}], 
         ['control',  {dest: 'left',    variants: main_lists,   fetch_url: null,       specific: Control}],
@@ -117,17 +117,17 @@ function Page() { // the one and only page object
         //'filter',
     ]),
     this.components = new Map();
-    for (let [name, spec] of this._component_specs) {
+    for (const [name, spec] of this._component_specs) {
         if (this._ignore.has(name)) {continue}
         spec.by_id = this._by_id.has(name);
-        let component = new Component(name, spec, this);
+        const component = new Component(name, spec, this);
         component.children = new Map();
         this.components.set(name, component);
     }
-    for (let [name, child_component] of this.components) {
-        let dest_name = this._component_specs.get(name).dest;
+    for (const [name, child_component] of this.components) {
+        const dest_name = this._component_specs.get(name).dest;
         if (this.components.has(dest_name)) {
-            let parent_component = this.components.get(dest_name);
+            const parent_component = this.components.get(dest_name);
             parent_component.children.set(name, child_component);
         }
     }
@@ -138,8 +138,8 @@ function Page() { // the one and only page object
 
 Page.prototype = {
     _setHeight(subtract) { // the heights of the sidebars are set, depending on the height of the window
-        let wh = `${window.innerHeight - subtract}px`;
-        for (let w of new Set(['middle', 'left', 'right'])) {
+        const wh = `${window.innerHeight - subtract}px`;
+        for (const w of new Set(['middle', 'left', 'right'])) {
             $(`#${w}`).css('height', wh);
         }
     },
@@ -166,12 +166,12 @@ Page.prototype = {
          * D: 
          * The required order is: first the nodes of S0 (in any order), then those of S1, then those of S2, and so on.
          */
-        let timing_nodes = [];
-        let timing_edges = new Map();   // keys are nodes that must come before other nodes
-        let timing_edges_inv = new Map; // keys are nodes that must come after other nodes
+        const timing_nodes = [];
+        const timing_edges = new Map();   // keys are nodes that must come before other nodes
+        const timing_edges_inv = new Map; // keys are nodes that must come after other nodes
         // A: collect the nodes: pairs of component name and stage
-        for (let name of this.components.keys()) {
-            for (let stage of this.stages.keys()) {
+        for (const name of this.components.keys()) {
+            for (const stage of this.stages.keys()) {
                 timing_nodes.push(`${name}-${stage}`);
             }
         }
@@ -187,16 +187,16 @@ Page.prototype = {
             timing_edges_inv.get(next_node).add(prev_node);
         }
         // 1. per component, the stages are ordered
-        for (let [next_stage, prev_stage] of this.stages_prev) {
-            for (let name of this.components.keys()) {
+        for (const [next_stage, prev_stage] of this.stages_prev) {
+            for (const name of this.components.keys()) {
                 addEdge(`${name}-${prev_stage}`, `${name}-${next_stage}`);
             }
         }
         // 2. add the specific time constraints
-        for (let [stage, nexts] of this._before) {
-            for (let [next_name, prevs] of nexts) {
+        for (const [stage, nexts] of this._before) {
+            for (const [next_name, prevs] of nexts) {
                 if (this._ignore.has(next_name)) {continue}
-                for (let prev_name of prevs.keys()) {
+                for (const prev_name of prevs.keys()) {
                     if (this._ignore.has(prev_name)) {continue}
                     addEdge(`${prev_name}-${stage}`, `${next_name}-${stage}`);
                 }
@@ -204,24 +204,24 @@ Page.prototype = {
         }
         // B: compute the Sn (in subset)
         let n = 0;
-        let subset = [];
-        let visited = new Set(); // collect all nodes that end up in an Sn
+        const subset = [];
+        const visited = new Set(); // collect all nodes that end up in an Sn
         while (n <= timing_nodes.length) {
             subset.push(new Set());
             if (n == 0) {                                                // first round
-                for (let node of timing_nodes) {                         // select all nodes without prev_nodes
+                for (const node of timing_nodes) {                         // select all nodes without prev_nodes
                     if (!timing_edges_inv.has(node)) {
                         subset[n].add(node);                             // and store them in subset[0]              
                     }
                 }
             }
             else {
-                for (let prev_node of visited) {                          // start with prev_nodes in visited
+                for (const prev_node of visited) {                          // start with prev_nodes in visited
                     if (timing_edges.has(prev_node)) {                    // and consider their next_nodes
-                        for (let next_node of timing_edges.get(prev_node)) {
+                        for (const next_node of timing_edges.get(prev_node)) {
                             if (!visited.has(next_node)) {                // but only if the next_node is not yet visited
                                 let good = true;
-                                for (let other_prev_node of timing_edges_inv.get(next_node)) { // consider the other prev nodes of the next nodes
+                                for (const other_prev_node of timing_edges_inv.get(next_node)) {// consider the other prev nodes of the next nodes
                                     if (!visited.has(other_prev_node)) {  // and require that they have been visited already
                                         good = false;
                                         break;
@@ -238,7 +238,7 @@ Page.prototype = {
             if (subset[n].size == 0) {                      // if there are no new nodes, the next rounds will also not yield new nodes,
                 break;                                                    //  so we are done
             }
-            for (let node of subset[n]) {                                 // after each round we add the saved next_nodes to the visited nodes
+            for (const node of subset[n]) {                                 // after each round we add the saved next_nodes to the visited nodes
                 visited.add(node);
             }
             n++;
@@ -246,8 +246,8 @@ Page.prototype = {
         this._tasks = [];
         this._timing = new Map();
         if (visited.size != timing_nodes.length) {
-            let cycle = [];
-            for (let node of timing_nodes) {
+            const cycle = [];
+            for (const node of timing_nodes) {
                 if (!visited.has(node)) {
                     cycle.push(node);
                 }
@@ -255,8 +255,8 @@ Page.prototype = {
             console.log('Circular timing constraints detected', cycle);
         }
         else {
-            for (let nodes of subset) {
-                for (let node of nodes) {
+            for (const nodes of subset) {
+                for (const node of nodes) {
                     this._tasks.push(node);
                 }
             }
@@ -268,33 +268,31 @@ Page.prototype = {
         return this.components.get(name);
     },
     getContainer: function(name, variants) {
-        let container = new Map();
         if (this.components.has(name)) {
-            container = this.components.get(name).container;
+            return this.components.get(name).container;
         }
         else {
-            let addto = (name == 'body')?$('body'):$(`#${name}`);
-            for (let vr of variants) {
+            const container = new Map();
+            const addto = (name == 'body')?$('body'):$(`#${name}`);
+            for (const vr of variants) {
                 container.set(vr, addto);
             }
+            return container;
         }
-        return container;
     },
     getBefore: function(name, stage) {
-        let prev_nodes = [];
-        let next_node = `${name}-${stage}`;
-        for (let prev_node of (this._timing.get(next_node) || new Set())) {
+        const prev_nodes = [];
+        const next_node = `${name}-${stage}`;
+        for (const prev_node of (this._timing.get(next_node) || new Set())) {
             prev_nodes.push(prev_node.split('-'));
         }
         return prev_nodes;
     },
     work: function() { 
-        for (let task of this._tasks) {
-            let task_comps = task.split('-');
-            let name = task_comps[0];
-            let stage = task_comps[1];
-            let component = this.getComponent(name);
-            for (let vr of component.variants) {
+        for (const task of this._tasks) {
+            const [name, stage] = task.split('-');
+            const component = this.getComponent(name);
+            for (const vr of component.variants) {
                 component[stage](vr);
             }
         }

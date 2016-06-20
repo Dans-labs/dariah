@@ -4,21 +4,22 @@
  * All functionality (except show) is delegated to specific functions
  */
 
-let g = require('./generic.js');
+const g = require('./generic.js');
+
 function List(component) {this.component = component};
 
 List.prototype = {
     _html: function(vr) {
         let h = '';
         h += `<table id="table_${vr}">`;
-        for (let r of this.component.data.get(vr)) {
-            let rowstart = `<tr rid="${r[0]}"><td><a class="showc fa fa-fw fa-list-ul" href="#" title="hide fields"></a><a class="hidec fa fa-fw fa-minus" href="#" title="show fields"></a></td>`;
-            let rowend = '</tr>';
+        for (const r of this.component.data.get(vr)) {
+            const rowstart = `<tr rid="${r[0]}"><td><a class="showc fa fa-fw fa-list-ul" href="#" title="hide fields"></a><a class="hidec fa fa-fw fa-minus" href="#" title="show fields"></a></td>`;
+            const rowend = '</tr>';
             if (vr == 'contrib') {
                 h += `${rowstart}<td><a href="#" class="fa fa-fw fa-minus"></a>${r[1]}</td>${rowend}`;
             }
             else if (vr == 'country') {
-                let in_dariah = (r[3] == 1)?'dariah':'';
+                const in_dariah = (r[3] == 1)?'dariah':'';
                 h += `${rowstart}<td class="country_code">${r[1]}<td><td class="country_name">${r[2]}<td><td class="in_dariah">${in_dariah}</td><td class="latlng">${r[4]}</td><td class="latlng">${r[5]}</td>${rowend}`;
             }
             else if (vr == 'type' || vr == 'tadiraha' || vr == 'tadiraho' || vr == 'tadiraht') {
@@ -29,11 +30,11 @@ List.prototype = {
         this.component.container.get(vr).html(h);
     },
     _display: function(row, vr, open_ids) {
-        let that = this;
-        let hidec = row.find('.hidec');
-        let showc = row.find('.showc');
-        let rid = row.attr('rid');
-        let detail = this.component.container.get(vr).find(`tr[iid="${rid}"]`);
+        const that = this;
+        const hidec = row.find('.hidec');
+        const showc = row.find('.showc');
+        const rid = row.attr('rid');
+        const detail = this.component.container.get(vr).find(`tr[iid="${rid}"]`);
         if (open_ids.has(rid)) {
             hidec.show();
             showc.hide();
@@ -50,8 +51,8 @@ List.prototype = {
         }
     },
     _set_it: function(control, vr, state) {
-        let open_ids = g.from_str(this.state.getState(key));
-        let rid = control.closest('tr').attr('rid');
+        const open_ids = g.from_str(this.state.getState(key));
+        const rid = control.closest('tr').attr('rid');
         if (state) {
             open_ids.add(rid);
         }
@@ -67,9 +68,9 @@ List.prototype = {
         this._html(vr);
     },
     wire: function(vr) {
-        let that = this;
-        let cc = this.component.container.get(vr);
-        let key = `${this.component.name}_${vr}`;
+        const that = this;
+        const cc = this.component.container.get(vr);
+        const key = `${this.component.name}_${vr}`;
         cc.find('.hidec').click(function(e) {e.preventDefault();
             that._set_it($(this), vr, true);
         });
@@ -78,10 +79,10 @@ List.prototype = {
         });
     },
     work: function(vr) {
-        let that = this;
-        let key = `${this.component.name}_${vr}`;
-        let cc = this.component.container.get(vr);
-        let open_ids = g.from_str(this.component.state.getState(`${this.component.name}_${vr}`));
+        const that = this;
+        const key = `${this.component.name}_${vr}`;
+        const cc = this.component.container.get(vr);
+        const open_ids = g.from_str(this.component.state.getState(`${this.component.name}_${vr}`));
         cc.find('tr[rid]').each(function() {
             that._display($(this), vr, open_ids);
         });
