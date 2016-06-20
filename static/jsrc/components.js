@@ -141,9 +141,9 @@ Component.prototype = {
             }
             if ('relinfo' in json) {
                 const r = new Map();
-                json.relinfo.forEach(x => {
+                for (const x of json.relinfo) {
                     r.set(x[0], new Set(x[1]))
-                });
+                }
                 this.related_info.set(vr, r);
             }
             if ('relvals' in json) {
