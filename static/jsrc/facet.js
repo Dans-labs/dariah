@@ -3,35 +3,38 @@
  * It will host individual facets
  */
 
-const g = require('./generic.js');
+import * as g from './generic.js';
 
-function Facet(component) {
-    this.component = component;
-    this._stats = new Map();
-    this._enabled_facets = new Map();
-    this.table = new Map();
-    this.distilled = new Map();
-};
+/* private attributes as symbols */
+const _stats = Symbol();
+const _enabled_facets = Symbol();
 
-Facet.prototype = {
-    _html: function(vr) {
+export default class {
+    constructor(component) {
+        this.component = component;
+        this[_stats] = new Map();
+        this[_enabled_facets] = new Map();
+        this.table = new Map();
+        this.distilled = new Map();
+    }
+    _html(vr) {
         const h = `<p><span fct="all"></span>Filtering <span id="fstats_${vr}"></span></p>`;
         this.component.container.get(vr).html(h);
-    },
-    show: function(vr) {
+    }
+    show(vr) {
         return this.component.state.getState('list') == vr;
-    },
-    weld: function(vr) {
+    }
+    weld(vr) {
         const children = this.component.children;
-        this._enabled_facets.set(vr, new Map());
+        this[_enabled_facets].set(vr, new Map());
         for (const [facet_name, facet_component] of children) {
             if (facet_component.hasVariant(vr)) {
-                this._enabled_facets.get(vr).set(facet_name, facet_component);
+                this[_enabled_facets].get(vr).set(facet_name, facet_component);
             }
         }
         this._html(vr);
-    },
-    _display: function(expand_control, mode) {
+    }
+    _display(expand_control, mode) {
         const that = this;
         const dt = expand_control.closest('p');
         const hidec = dt.find('.hidec');
@@ -87,12 +90,12 @@ Facet.prototype = {
                 condensed_material.hide();
             }
         }
-    },
-    wire: function(vr) {
+    }
+    wire(vr) {
         const that = this;
         const cc = this.component.container.get(vr);
         const lc = this.component.page.getComponent('list').container.get(vr);
-        this._stats.set(vr, cc.find(`#fstats_${vr}`));
+        this[_stats].set(vr, cc.find(`#fstats_${vr}`));
         this.table.set(vr,  lc.find(`#table_${vr}`));
         const info = ' details; click to change level of details';
         const detailcontrols = `<a class="showc fa fa-fw fa-list-ul" href="#" title="full${info}"></a><a class="morec fa fa-fw fa-align-left" href="#" title="condensed${info}"></a><a class="hidec fa fa-fw fa-minus" href="#" title="hidden${info}"></a>`;
@@ -110,12 +113,12 @@ Facet.prototype = {
         cc.find('.showc').click(function(e) {e.preventDefault();
             that._display($(this), 0);
         });
-    },
-    work: function(vr) {
+    }
+    work(vr) {
         this.table.get(vr).find('tr[rid],tr[iid]').hide();
         const mother_list = this.component.page.getComponent('list');
         const data = mother_list.data.get(vr);
-        const facets = this._enabled_facets.get(vr);
+        const facets = this[_enabled_facets].get(vr);
         this.distilled.set(vr, []);
         for (const [facet_name, facet_comp] of facets) {
             const facet = facet_comp.implementation;
@@ -167,8 +170,6 @@ Facet.prototype = {
             const facet = facet_comp.implementation;
             facet.stats(vr);
         }
-        this._stats.get(vr).html(`${this.distilled.get(vr).length} of ${data.length}`);
-    },
-};
-
-module.exports = Facet;
+        this[_stats].get(vr).html(`${this.distilled.get(vr).length} of ${data.length}`);
+    }
+}

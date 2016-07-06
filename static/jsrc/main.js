@@ -2,6 +2,8 @@
  * The dynamic construction of the page starts here
  */
 
-const Page = require('./page.js');
+import Page from './page';
 
-$(function() {new Page().work()});
+$(function () {
+  new Page().work();
+});

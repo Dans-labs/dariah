@@ -1,25 +1,36 @@
 {
-  "name": "contrib",
+  "name": "dariah",
   "version": "1.0.0",
-  "description": "contrib",
-  "main": "gulpfile.js",
-  "dependencies": {},
-  "devDependencies": {
-    "babel-preset-es2015": "^6.9.0",
-    "babelify": "^7.3.0",
-    "browserify": "^13.0.1",
-    "gulp": "^3.9.1",
-    "gulp-livereload": "^3.8.1",
-    "gulp-sass": "^2.3.2",
-    "gulp-sourcemaps": "^1.6.0",
-    "gulp-uglify": "^1.5.3",
-    "relative": "^3.0.2",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
-  },
+  "description": "dariah contributions tool",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dans-labs/dariah.git"
+  },
+  "keywords": [
+    "inkind"
+  ],
+  "author": "Dirk Roorda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dans-labs/dariah/issues"
+  },
+  "homepage": "https://github.com/Dans-labs/dariah#readme",
+  "devDependencies": {
+    "babel-core": "^6.10.4",
+    "babel-plugin-transform-remove-console": "^6.8.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-register": "^6.9.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.0.1",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.4",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  }
 }

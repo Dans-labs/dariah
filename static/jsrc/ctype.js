@@ -2,13 +2,10 @@
  * This manages the facet "contribution type"
  */
 
-const Relative = require('./relative.js');
+import Relative from './relative';
 
-function CType(component) {
-    Relative.call(this, component, 'type');
-};
-
-CType.prototype = Object.create(Relative.prototype);
-CType.prototype.constructor = CType;
-
-module.exports = CType;
+export default class extends Relative {
+    constructor(component) {
+        super(component, 'type');
+    }
+}

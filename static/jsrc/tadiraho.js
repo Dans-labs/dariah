@@ -2,13 +2,10 @@
  * This manages the facet "contribution type"
  */
 
-const Relative = require('./relative.js');
+import Relative from './relative';
 
-function TadirahO(component) {
-    Relative.call(this, component, 'tadiraho');
-};
-
-TadirahO.prototype = Object.create(Relative.prototype);
-TadirahO.prototype.constructor = TadirahO;
-
-module.exports = TadirahO;
+export default class extends Relative {
+    constructor(component) {
+        super(component, 'tadiraho');
+    }
+}

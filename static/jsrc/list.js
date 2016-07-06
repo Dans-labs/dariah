@@ -4,12 +4,13 @@
  * All functionality (except show) is delegated to specific functions
  */
 
-const g = require('./generic.js');
+import * as g from './generic.js';
 
-function List(component) {this.component = component};
-
-List.prototype = {
-    _html: function(vr) {
+export default class {
+    constructor(component) {
+        this.component = component;
+    }
+    _html(vr) {
         let h = '';
         h += `<table id="table_${vr}">`;
         for (const r of this.component.data.get(vr)) {
@@ -28,8 +29,8 @@ List.prototype = {
         }
         h += '</table>';
         this.component.container.get(vr).html(h);
-    },
-    _display: function(row, vr, open_ids) {
+    }
+    _display(row, vr, open_ids) {
         const that = this;
         const hidec = row.find('.hidec');
         const showc = row.find('.showc');
@@ -49,8 +50,8 @@ List.prototype = {
                 detail.hide();
             }
         }
-    },
-    _set_it: function(control, vr, state) {
+    }
+    _set_it(control, vr, state) {
         const open_ids = g.from_str(this.state.getState(key));
         const rid = control.closest('tr').attr('rid');
         if (state) {
@@ -60,14 +61,14 @@ List.prototype = {
             open_ids.delete(rid);
         }
         this.state.setState(key, g.to_str(open_ids));
-    },
-    show: function(vr) {
+    }
+    show(vr) {
         return this.component.state.getState('list') == vr;
-    },
-    weld: function(vr) {
+    }
+    weld(vr) {
         this._html(vr);
-    },
-    wire: function(vr) {
+    }
+    wire(vr) {
         const that = this;
         const cc = this.component.container.get(vr);
         const key = `${this.component.name}_${vr}`;
@@ -77,8 +78,8 @@ List.prototype = {
         cc.find('.showc').click(function(e) {e.preventDefault();
             that._set_it($(this), vr, false);
         });
-    },
-    work: function(vr) {
+    }
+    work(vr) {
         const that = this;
         const key = `${this.component.name}_${vr}`;
         const cc = this.component.container.get(vr);
@@ -86,7 +87,5 @@ List.prototype = {
         cc.find('tr[rid]').each(function() {
             that._display($(this), vr, open_ids);
         });
-    },
-};
-
-module.exports = List;
+    }
+}

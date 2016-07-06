@@ -2,17 +2,16 @@
  * Manages the sharing drawer for generating hyperlinks to the current page.
  */
 
-const g = require('./generic.js');
+import * as g from './generic.js';
 
-function Share(component) { // the SHARE component
-    this.component = component;
-};
-
-Share.prototype = {
-    show: function(vr) {
+export default class {
+    constructor(component) {
+        this.component = component;
+    }
+    show(vr) {
         return true;
-    },
-    weld: function(vr) {
+    }
+    weld(vr) {
 	    const h = `
 <p id="citeh">Cite</p>
 <table align="center">
@@ -35,8 +34,8 @@ Share.prototype = {
 <p id="cdiagsts"></p>
 `;	
         this.component.container.get(vr).html(h);
-    },
-    wire: function(vr) {
+    }
+    wire(vr) {
         const that = this;
         const cc = this.component.container.get(vr);
         const slink = $('#self_link');
@@ -76,8 +75,6 @@ Share.prototype = {
             cc.animate({height:'20px', width: '40px', opacity: .7}, 300); 
             return false;
         });
-    },
-    work: function(vr) {},
-};
-
-module.exports = Share;
+    }
+    work(vr) {}
+}

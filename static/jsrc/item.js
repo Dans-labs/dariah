@@ -5,10 +5,11 @@
  * All functionality (except show) is delegated to specific functions
  */
 
-function Item(component) {this.component = component};
-
-Item.prototype = {
-    _html: function(vr, it) {
+export default class {
+    constructor(component) {
+        this.component = component;
+    }
+    _html(vr, it) {
         const destination = this.component.dst.get(vr);
         const dest_row = destination.find(`tr[rid="${it[0]}"]`);
         let h = `<tr iid="${it[0]}">`;
@@ -39,17 +40,15 @@ Item.prototype = {
         }
         h += '</tr>';
         dest_row.after(h);
-    },
-    show: function(vr) {
+    }
+    show(vr) {
         return this.component.state.getState('list') == vr;
-    },
-    weld: function(vr) {
+    }
+    weld(vr) {
         for (const it of this.component.data.get(vr)) {
             this._html(vr, it);
         }
-    },
-    wire: function(vr) {},
-    work: function(vr) {},
-};
-
-module.exports = Item;
+    }
+    wire(vr) {}
+    work(vr) {}
+}

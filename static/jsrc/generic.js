@@ -8,15 +8,15 @@ const chr = new Map([
     ['>', '&gt;'],
 ]);
 
-function escapeHTML(text) {
+export function escapeHTML(text) {
     return text.replace(/[&<>]/g, function (a) {return chr.get(a) || a;});
 };
 
 const _Request = {
-    parameter: function(name) {
+    parameter(name) {
         return this.parameters().get(name);
     },
-    parameters: function() {
+    parameters() {
         const result = new Map();
         const uri = window.location.search;
         if (uri.indexOf("?") === -1) {
@@ -29,11 +29,11 @@ const _Request = {
     }
 };
 
-const request_vars = _Request.parameters();
+export const request_vars = _Request.parameters();
 const _localstorage = $.initNamespaceStorage('req');
-const localstorage_vars = _localstorage.localStorage;
+export const localstorage_vars = _localstorage.localStorage;
 
-function deselectText() {
+export function deselectText() {
     if (document.selection) {
         document.selection.empty();
     }
@@ -42,7 +42,7 @@ function deselectText() {
     }
 };
 
-function selectText(containerid) {
+export function selectText(containerid) {
     deselectText();
     if (document.selection) {
         const range = document.body.createTextRange();
@@ -56,7 +56,7 @@ function selectText(containerid) {
     }
 };
 
-function toggleDetail(widget, detail, extra) {
+export function toggleDetail(widget, detail, extra) {
     const thedetail = (detail == undefined)?widget.closest('div').find('.detail'):detail;
     thedetail.toggle();
     if (extra != undefined) {
@@ -75,27 +75,17 @@ function toggleDetail(widget, detail, extra) {
     widget.addClass(othercl);
 };
 
-function compact(cutoff, size, text) {
+export function compact(cutoff, size, text) {
     return (text.length > cutoff)?text.replace(/[^ -]+/g, x => {return x.substr(0,size)}):text;
 };
 
-function from_str(st) {
+export function from_str(st) {
     return (st !== null && st != undefined && st != '')?new Set(st.split(',')):new Set();
 };
-function a_to_str(ar) {
+export function a_to_str(ar) {
     return ar.join(',');
 };
-function to_str(set) {
+export function to_str(set) {
     return Array.from(set).join(',');
 };
 
-module.exports.escapeHTML = escapeHTML;
-module.exports.request_vars = request_vars;
-module.exports.localstorage_vars = localstorage_vars;
-module.exports.selectText = selectText;
-module.exports.deselectText = deselectText;
-module.exports.toggleDetail = toggleDetail;
-module.exports.compact = compact;
-module.exports.from_str = from_str;
-module.exports.to_str = to_str;
-module.exports.a_to_str = a_to_str;

@@ -20,33 +20,37 @@
  * Here is the generic functionality of each component
  */
 
-const g = require('./generic.js');
-const Msg = require('./message.js');
+import * as g from './generic.js';
+import Msg from './message';
 
-function Component(name, specs, page) {
-    this.name = name;
-    this.page = page;
-    this.specs = specs;
-    this.variants = specs.variants;
-    this._stage = new Map();
-    for (const vr of this.variants) {
-        this._stage.set(vr, new Map());
-        for (const st of this.page.stages.keys()) {
-            this._stage.get(vr).set(st, true);
+/* private attributes as symbols */
+const _stage = Symbol();
+const _msg = Symbol();
+const _ids_fetched = Symbol();
+
+export default class {
+    constructor(name, specs, page) {
+        this.name = name;
+        this.page = page;
+        this.specs = specs;
+        this.variants = specs.variants;
+        this[_stage] = new Map();
+        for (const vr of this.variants) {
+            this[_stage].set(vr, new Map());
+            for (const st of this.page.stages.keys()) {
+                this[_stage].get(vr).set(st, true);
+            }
         }
+        this[_msg] = new Map();
+        this[_ids_fetched] = new Set();
+        this.container = new Map();
+        this.dst = new Map();
+        this.state = this.page.state;
+        this.data = new Map();
+        this.related_info = new Map();
+        this.related_values = new Map();
+        this.implementation = new specs.specific(this);
     }
-    this._msg = new Map();
-    this._ids_fetched = new Set();
-    this.container = new Map();
-    this.dst = new Map();
-    this.state = this.page.state;
-    this.data = new Map();
-    this.related_info = new Map();
-    this.related_values = new Map();
-    this.implementation = new specs.specific(this);
-};
-
-Component.prototype = {
     /* need, deed, ensure are wrappers around the promise mechanism.
      * The stage is a stage in processing the component, such as fetch, wire, work.
      * There should be a method method which does the work and which is expected to return a promise.
@@ -58,11 +62,11 @@ Component.prototype = {
      * So the result of ensure can be put inside the .then() of an other promise.
      * Now is a function that calls a function and returns the result as promise.
      */
-    need: function(vr, stage) { // check whether there is a promise and whether it has been fulfilled
-        const promise = this._stage.get(vr).get(stage)
+    need(vr, stage) { // check whether there is a promise and whether it has been fulfilled
+        const promise = this[_stage].get(vr).get(stage)
         return !promise.state || (promise.state() == 'rejected');
-    },
-    _deed: function(vr, stage, method) { // register a promise to perform the method associated with stage by entering it in the book keeping of stages
+    }
+    _deed(vr, stage, method) { // register a promise to perform the method associated with stage by entering it in the book keeping of stages
             /* we want to pass a method call to a .then() later on.
              * If we pass it straight, like this.method, .then() will call this function and supplies its own promise object as the this.
              * That is not our purpose: we want to call the method with the current component object as the this.
@@ -76,12 +80,12 @@ Component.prototype = {
         for (const [prev_name, prev_stage] of timing) {
             const prev_component = this.page.getComponent(prev_name);
             if (prev_component.hasVariant(vr)) {
-                promises.push(prev_component._stage.get(vr).get(prev_stage));
+                promises.push(prev_component[_stage].get(vr).get(prev_stage));
             }
         }
-        this._stage.get(vr).set(stage, $.when.apply($, promises).then(methodCall));
-    },
-    ensure: function(vr, stage, method) {
+        this[_stage].get(vr).set(stage, $.when.apply($, promises).then(methodCall));
+    }
+    ensure(vr, stage, method) {
         /* function to promise that method fun will be executed once and once only or multiple times,
          * but only if the before actions have been completed
          */
@@ -94,14 +98,14 @@ Component.prototype = {
                 this._deed(vr, stage, method);
             }
         }
-    },
+    }
     /* here are the implementations of the functions that are to be wrapped as promises
      * They can focus on the work, may or may not yield a promise
      */    
-    hasVariant: function(vr) {
+    hasVariant(vr) {
         return this.variants.has(vr);
-    },
-    _visibility: function(vr, on) {
+    }
+    _visibility(vr, on) {
         if (this.hasVariant(vr)) {
             if (this.container.has(vr)) {
                 const widget = this.container.get(vr);
@@ -113,10 +117,10 @@ Component.prototype = {
                 }
             }
         }
-    },
-    _fetch: function(vr, ids_to_fetch) { // get the material by AJAX if needed
+    }
+    _fetch(vr, ids_to_fetch) { // get the material by AJAX if needed
         let fetch_url = url_tpl.replace(/_c_/, 'data').replace(/_f_/, `${this.specs.fetch_url}_${vr}`)+'.json';
-        this._msg.get(vr).msg('fetching data ...');
+        this[_msg].get(vr).msg('fetching data ...');
         const postFetch = this._postFetch.bind(this, vr);
         if (!(ids_to_fetch == undefined)) {
             fetch_url += `?ids=${ids_to_fetch.join(',')}`;
@@ -129,11 +133,11 @@ Component.prototype = {
         }).then(json => {
             postFetch(json, ids_to_fetch);
         });
-    },
-    _postFetch: function(vr, json, ids_to_fetch) { // receive material after AJAX call
-        this._msg.get(vr).clear();
+    }
+    _postFetch(vr, json, ids_to_fetch) { // receive material after AJAX call
+        this[_msg].get(vr).clear();
         for (const m of json.msgs) {
-            this._msg.get(vr).msg(m);
+            this[_msg].get(vr).msg(m);
         }
         if (json.good) {
             if ('data' in json) {
@@ -151,13 +155,13 @@ Component.prototype = {
             }
             if (this.specs.by_id) {
                 for (const i of ids_to_fetch) {
-                    this._ids_fetched.add(i);
+                    this[_ids_fetched].add(i);
                 }
             }
         }
         this.implementation.weld(vr);
-    },
-    _weld: function(vr) {
+    }
+    _weld(vr) {
         this.dst = this.page.getContainer(this.specs.dest, this.variants);
         if (!(this.specs.by_id)) {
             this.container.set(vr, $(`#${this.name}_${vr}`));
@@ -167,13 +171,13 @@ Component.prototype = {
                 destination.append(`<div id="${this.name}_${vr}" class="component"></div>`);
                 this.container.set(vr, $(`#${this.name}_${vr}`));
             }
-            this._msg.set(vr, new Msg(`msg_${this.name}_${vr}`));
+            this[_msg].set(vr, new Msg(`msg_${this.name}_${vr}`));
         }
         else {
-            if (!this._msg.has(vr)) {
+            if (!this[_msg].has(vr)) {
                 const destination = this.dst.get(vr);
                 destination.prepend(`<div id="msg_${this.name}_${vr}"></div>`);
-                this._msg.set(vr, new Msg(`msg_${this.name}_${vr}`));
+                this[_msg].set(vr, new Msg(`msg_${this.name}_${vr}`));
             }
         }
         if (this.specs.fetch_url != null) {
@@ -181,7 +185,7 @@ Component.prototype = {
             if (this.specs.by_id) {
                 const ids_asked_for = g.from_str(this.state.getState(`${this.specs.fetch_url}_${vr}`));
                 for (const i of ids_asked_for) {
-                    if (!this._ids_fetched.has(i)) {
+                    if (!this[_ids_fetched].has(i)) {
                         ids_to_fetch.push(i);
                     }
                 }
@@ -196,32 +200,30 @@ Component.prototype = {
         else {
             this.implementation.weld(vr);
         }
-    },
-    _wire: function(vr) {
+    }
+    _wire(vr) {
         this.implementation.wire(vr); // perform wire actions that are specific to this component
-    },
-    _work: function(vr) {
+    }
+    _work(vr) {
         this._visibility(vr, true);
         this.implementation.work(vr); // perform work actions that are specific to this component
-    },
-    weld: function(vr) {
+    }
+    weld(vr) {
         if (this.hasVariant(vr) && this.implementation.show(vr)) {
             this.ensure(vr, 'weld', '_weld');
         }
-    },
-    wire: function(vr) {
+    }
+    wire(vr) {
         if (this.hasVariant(vr) && this.implementation.show(vr)) {
             this.ensure(vr, 'wire', '_wire');
         }
-    },
-    work: function(vr) { // work (changed) state to current material
+    }
+    work(vr) { // work (changed) state to current material
         if (this.hasVariant(vr) && this.implementation.show(vr)) { // show/hide depending on the specific condition
             this.ensure(vr, 'work', '_work');
         }
         else {
             this._visibility(vr, false);
         }
-    },
-};
-
-module.exports = Component;
+    }
+}
