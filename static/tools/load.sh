@@ -8,6 +8,6 @@
 
 filename=dariah_data.mongo
 
-push ~
+pushd /home/dirkr
 mongorestore --drop -d dariah $filename
 popd

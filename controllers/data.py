@@ -19,19 +19,19 @@ def item_country():
     return dict(data=list(documents), msgs=[], good=True)
 
 def list_type():
-    documents = dbm.contrib.distinct(u'type_of_inkind', {})
+    documents = dbm.contrib.distinct(u'type_of_inkind', filter={})
     return dict(data=sorted(documents, key=lambda d: d[u'value']), msgs=[], good=True)
 
 def list_tadiraha():
-    documents = dbm.contrib.distinct(u'tadirah_research_activities', {})
+    documents = dbm.contrib.distinct(u'tadirah_research_activities', filter={})
     return dict(data=sorted(documents, key=lambda d: d[u'value']), msgs=[], good=True)
 
 def list_tadiraho():
-    documents = dbm.contrib.distinct(u'tadirah_research_objects', {})
+    documents = dbm.contrib.distinct(u'tadirah_research_objects', filter={})
     return dict(data=sorted(documents, key=lambda d: d[u'value']), msgs=[], good=True)
 
 def list_tadiraht():
-    documents = dbm.contrib.distinct(u'tadirah_research_techniques', {})
+    documents = dbm.contrib.distinct(u'tadirah_research_techniques', filter={})
     return dict(data=sorted(documents, key=lambda d: d[u'value']), msgs=[], good=True)
 
 def country_contrib():
@@ -46,7 +46,7 @@ def country_contrib():
 def type_contrib():
     relinfo = []
     relvals = []
-    for d in dbm.contrib.distinct(u'type_of_inkind', {}):
+    for d in dbm.contrib.distinct(u'type_of_inkind', filter={}):
         relvals.append(d)
     for d in dbm.contrib.find({}, {u'type_of_inkind._id': True}):
         relinfo.append([d[u'_id'], [r[u'_id'] for r in d.get(u'type_of_inkind', [])]])
@@ -55,7 +55,7 @@ def type_contrib():
 def tadiraha_contrib():
     relinfo = []
     relvals = []
-    for d in dbm.contrib.distinct(u'tadirah_research_activities', {}):
+    for d in dbm.contrib.distinct(u'tadirah_research_activities', filter={}):
         relvals.append(d)
     for d in dbm.contrib.find({}, {u'tadirah_research_activities._id': True}):
         relinfo.append([d[u'_id'], [r[u'_id'] for r in d.get(u'tadirah_research_activities', [])]])
@@ -64,7 +64,7 @@ def tadiraha_contrib():
 def tadiraho_contrib():
     relinfo = []
     relvals = []
-    for d in dbm.contrib.distinct(u'tadirah_research_objects', {}):
+    for d in dbm.contrib.distinct(u'tadirah_research_objects', filter={}):
         relvals.append(d)
     for d in dbm.contrib.find({}, {u'tadirah_research_objects._id': True}):
         relinfo.append([d[u'_id'], [r[u'_id'] for r in d.get(u'tadirah_research_objects', [])]])
@@ -73,7 +73,7 @@ def tadiraho_contrib():
 def tadiraht_contrib():
     relinfo = []
     relvals = []
-    for d in dbm.contrib.distinct(u'tadirah_research_techniques', {}):
+    for d in dbm.contrib.distinct(u'tadirah_research_techniques', filter={}):
         relvals.append(d)
     for d in dbm.contrib.find({}, {u'tadirah_research_techniques._id': True}):
         relinfo.append([d[u'_id'], [r[u'_id'] for r in d.get(u'tadirah_research_techniques', [])]])
