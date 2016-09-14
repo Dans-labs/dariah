@@ -59,18 +59,28 @@ export default class extends Skeleton { // the one and only page object
         const contrib_list = new Set(['contrib']);
         const empty_list = new Set(['']);
         this._component_specs = new Map([
-            ['share',    {dest: 'body',    variants: empty_list,   fetch_url: null,       specific: Share}], 
-            ['control',  {dest: 'left',    variants: main_lists,   fetch_url: null,       specific: Control}],
-            ['list',     {dest: 'middle' , variants: main_lists,   fetch_url: 'list',     specific: List}],
-            ['item',     {dest: 'list',    variants: main_lists,   fetch_url: 'item',     specific: Item}],
-            ['facet',    {dest: 'control', variants: main_lists,   fetch_url: null,       specific: Facet}],
-            ['filter',   {dest: 'facet',   variants: main_lists,   fetch_url: null,       specific: Filter}],
-            ['eumap',    {dest: 'facet',   variants: contrib_list, fetch_url: 'country',  specific: EUmap}],
-            ['ctype',    {dest: 'facet',   variants: contrib_list, fetch_url: 'type',     specific: CType}],
-            ['tadiraha', {dest: 'facet',   variants: contrib_list, fetch_url: 'tadiraha', specific: TadirahA}],
-            ['tadiraho', {dest: 'facet',   variants: contrib_list, fetch_url: 'tadiraho', specific: TadirahO}],
-            ['tadiraht', {dest: 'facet',   variants: contrib_list, fetch_url: 'tadiraht', specific: TadirahT}],
+            ['share',    {dest: 'body',    variants: empty_list,   fetch_url: null,       varpfx: null,  specific: Share}], 
+            ['control',  {dest: 'left',    variants: main_lists,   fetch_url: null,       varpfx: null,  specific: Control}],
+            ['list',     {dest: 'middle' , variants: main_lists,   fetch_url: 'list',     varpfx: null,  specific: List}],
+            ['item',     {dest: 'list',    variants: main_lists,   fetch_url: 'item',     varpfx: null,  specific: Item}],
+            ['facet',    {dest: 'control', variants: main_lists,   fetch_url: null,       varpfx: null,  specific: Facet}],
+            ['filter',   {dest: 'facet',   variants: main_lists,   fetch_url: null,       varpfx: 'flt', specific: Filter}],
+            ['eumap',    {dest: 'facet',   variants: contrib_list, fetch_url: 'country',  varpfx: 'rel', specific: EUmap}],
+            ['ctype',    {dest: 'facet',   variants: contrib_list, fetch_url: 'type',     varpfx: 'rel', specific: CType}],
+            ['tadiraha', {dest: 'facet',   variants: contrib_list, fetch_url: 'tadiraha', varpfx: 'rel', specific: TadirahA}],
+            ['tadiraho', {dest: 'facet',   variants: contrib_list, fetch_url: 'tadiraho', varpfx: 'rel', specific: TadirahO}],
+            ['tadiraht', {dest: 'facet',   variants: contrib_list, fetch_url: 'tadiraht', varpfx: 'rel', specific: TadirahT}],
         ]),
+        /* dest: the html of the component will be appended to the dest components html container
+         * variants:  components code generic behaviour of lists, items, facets etc. But there are lists of contribs, countries, etc.
+         *            These are variants.
+         * fetch_url: if not null, the HTML for this component must be generated from data which will be fetched from the server by means
+         *            of a url constructed from fetch_url and variant.
+         * varpfx:    some components are associated with state variables, especially facets. If we need the names of those
+         *            variables, they can be computed from varpfx, fetch_url and the variant.
+         * specific:  Every component also has specific behaviour, not shared with the other components. This is implemented in a
+         *            special class, given in specific.
+         */ 
         /* some components are being dealt with on the basis of additional identifiers, such as item
          * Those components are specified below, and the specs of all components will get an extra attribute
          * by_id, which is true if the component needs an id.
@@ -92,14 +102,20 @@ export default class extends Skeleton { // the one and only page object
             if (this.ignore.has(name)) {continue}
             spec.by_id = this[_by_id].has(name);
             const component = new Component(name, spec, this);
+            component.up = null;
             component.children = new Map();
+            component.item_comp = null;
             this.components.set(name, component);
         }
         for (const [name, child_component] of this.components) {
             const dest_name = this._component_specs.get(name).dest;
             if (this.components.has(dest_name)) {
                 const parent_component = this.components.get(dest_name);
+                child_component.up = parent_component;
                 parent_component.children.set(name, child_component);
+                if (this[_by_id].has(name)) {
+                    parent_component.item_comp = name;
+                }
             }
         }
         this.resolveTiming();

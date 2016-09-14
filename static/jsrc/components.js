@@ -42,7 +42,7 @@ export default class {
             }
         }
         this[_msg] = new Map();
-        this[_ids_fetched] = new Set();
+        this[_ids_fetched] = new Map();
         this.container = new Map();
         this.dst = new Map();
         this.state = this.page.state;
@@ -74,6 +74,8 @@ export default class {
              * Whoever calls this new function methodCall, will perform a true method call of method method on object that.
              * This is crucial, otherwise all the careful time logic gets mangled, because the promises are stored in the component object.
              */
+        const sdb = this.name == 'item' && stage == 'weld';
+
         const methodCall = this[method].bind(this, vr);
         const timing = this.page.getBefore(this.name, stage);
         const promises = [];
@@ -86,7 +88,7 @@ export default class {
         this[_stage].get(vr).set(stage, $.when.apply($, promises).then(methodCall));
     }
     ensure(vr, stage, method) {
-        /* function to promise that method fun will be executed once and once only or multiple times,
+        /* function to promise that method function will be executed once and once only or multiple times,
          * but only if the before actions have been completed
          */
         if (this.page.stages.has(stage)) {
@@ -123,7 +125,7 @@ export default class {
         this[_msg].get(vr).msg('fetching data ...');
         const postFetch = this._postFetch.bind(this, vr);
         if (!(ids_to_fetch == undefined)) {
-            fetch_url += `?ids=${ids_to_fetch.join(',')}`;
+            fetch_url += `?ids=${Array.from(ids_to_fetch).join(',')}`;
         }
         return $.ajax({
             type: 'POST',
@@ -135,6 +137,7 @@ export default class {
         });
     }
     _postFetch(vr, json, ids_to_fetch) { // receive material after AJAX call
+        const sdb = this.name == 'item';
         this[_msg].get(vr).clear();
         for (const m of json.msgs) {
             this[_msg].get(vr).msg(m);
@@ -151,11 +154,11 @@ export default class {
                 this.related_info.set(vr, r);
             }
             if ('relvals' in json) {
-                this.related_values.set(vr, new Map(json.relvals));
+                this.related_values.set(vr, json.relvals);
             }
             if (this.specs.by_id) {
                 for (const i of ids_to_fetch) {
-                    this[_ids_fetched].add(i);
+                    this[_ids_fetched].get(vr).add(i);
                 }
             }
         }
@@ -179,18 +182,30 @@ export default class {
                 destination.prepend(`<div id="msg_${this.name}_${vr}"></div>`);
                 this[_msg].set(vr, new Msg(`msg_${this.name}_${vr}`));
             }
+            if (!this[_ids_fetched].has(vr)) {
+                this[_ids_fetched].set(vr, new Set());
+            }
         }
         if (this.specs.fetch_url != null) {
-            const ids_to_fetch = [];
             if (this.specs.by_id) {
+                const ids_to_fetch = new Set();
                 const ids_asked_for = g.from_str(this.state.getState(`${this.specs.fetch_url}_${vr}`));
+                if (!this[_ids_fetched].has(vr)) {
+                    this[_ids_fetched].set(vr, new Set());
+                }
+                this.data.set(vr, []);
+                this.related_info.set(vr, new Map());
+                this.related_values.set(vr, new Map());
                 for (const i of ids_asked_for) {
-                    if (!this[_ids_fetched].has(i)) {
-                        ids_to_fetch.push(i);
+                    if (!this[_ids_fetched].get(vr).has(i)) {
+                        ids_to_fetch.add(i);
                     }
                 }
-                if (ids_to_fetch.length != 0) {
+                if (ids_to_fetch.size != 0) {
                     return this._fetch(vr, ids_to_fetch);
+                }
+                else {
+                    this.implementation.weld(vr);
                 }
             }
             else {

@@ -19,6 +19,12 @@ export default class {
         this[_list] = new Map();
         this[_list2] = new Map();
         this.related_state = new Map();
+        this.changed = new Map();
+        /*
+         * The content of the corresponding state variable is stored in this.related_state.
+         * this.changed indicates whether the corresponding state variable has changed recently.
+         * Both this.related_state and this.changed are parametrized with the variant vr.
+        */
         this[_all_values_control] = new Map();
         this.statistics = new Map();
         this.related_values_list = new Map();
@@ -26,6 +32,7 @@ export default class {
         this.related_values_all = new Map();
         this.no_values = {value: '-', name: '-none'};
         this.typ = rtype;
+        this.state_var_pref = `${this.component.specs.varpfx}_${this.typ}_`;
         this[_cols] = cols || 2;
         this[_cutoff] = cutoff || 14;
         this[_shortsize] = shortsize || 6;
@@ -43,11 +50,12 @@ export default class {
         <tr>
 `;
         const ar = this.related_values_list.get(vr);
+        const ai = this.related_values_index.get(vr);
         for (const [i, related_value] of ar.entries()) {
             if ((i % this[_cols] == 0) && (i > 0) && (i < ar.length)) {
                 h += '</tr><tr>';
             }
-            const raw_value = this.related_values_index.get(vr).get(related_value);
+            const raw_value = ai.get(related_value);
             h += `
             <td><span rv="${related_value}" class="stats"></span></td>
             <td><a rv="${related_value}" href="#" class="facet_single">${g.escapeHTML(raw_value)}</a></td>
@@ -75,27 +83,27 @@ export default class {
         const that = this;
         this[_list].get(vr).find('.facet_single').click(function(e) {e.preventDefault();
             const related_value = $(this).attr('rv');
-            const selected = g.from_str(that.component.state.getState(`rel_${that.typ}_${vr}`));
+            const selected = g.from_str(that.component.state.getState(that.state_var_pref+vr));
             if (selected.has(related_value)) {
                 selected.delete(related_value);
             }
             else {
                 selected.add(related_value);
             }
-            that.component.state.setState(`rel_${that.typ}_${vr}`, g.to_str(selected));
+            that.component.state.setState(that.state_var_pref+vr, g.to_str(selected));
             cc.find('.last_handled').removeClass('last_handled');
             $(this).addClass('last_handled');
         });
         this[_list2].get(vr).find('.passive_small').click(function(e) {e.preventDefault();
             const related_value = $(this).attr('rv');
-            const selected = g.from_str(that.component.state.getState(`rel_${that.typ}_${vr}`));
+            const selected = g.from_str(that.component.state.getState(that.state_var_pref+vr));
             if (selected.has(related_value)) {
                 selected.delete(related_value);
             }
             else {
                 selected.add(related_value);
             }
-            that.component.state.setState(`rel_${that.typ}_${vr}`, g.to_str(selected));
+            that.component.state.setState(that.state_var_pref+vr, g.to_str(selected));
             $(this).closest('div').find('.morec').click();
             const last_handled = that[_list].get(vr).find(`a[rv="${related_value}"]`);
             cc.find('.last_handled').removeClass('last_handled');
@@ -110,10 +118,10 @@ export default class {
         this[_all_values_control].get(vr).click(function(e) {e.preventDefault();
             const ison = $(this).hasClass('ison');
             if (ison) {
-                that.component.state.setState(`rel_${that.typ}_${vr}`, '');
+                that.component.state.setState(that.state_var_pref+vr, '');
             }
             else {
-                that.component.state.setState(`rel_${that.typ}_${vr}`, g.to_str(that.related_values_all.get(vr)));
+                that.component.state.setState(that.state_var_pref+vr, g.to_str(that.related_values_all.get(vr)));
             }
         });
     }
@@ -122,7 +130,7 @@ export default class {
         for (const related_value of this.related_values_index.get(vr).keys()) {
             const facet_cell = this[_list].get(vr).find(`[rv="${related_value}"]`);
             const facet_cell2 = this[_list2].get(vr).find(`[rv="${related_value}"]`);
-            if (this.related_state.get(vr).has(related_value+'')) {
+            if (this.related_state.get(vr).has(related_value)) {
                 facet_cell.addClass('ison');
                 facet_cell2.addClass('ison');
             }
@@ -147,14 +155,13 @@ export default class {
         } 
         const related_info = this.component.related_info.get(vr);
         for (const i of this.distilled.get(vr)) {
-            let has_related_value = false;
-            if (related_info.has(i)) {
-                for (const related_value of related_info.get(i)) {
+            const related_values = related_info.has(i)?related_info.get(i):new Set();
+            if (related_values.size) {
+                for (const related_value of related_values) {
                     rvs.set(related_value, rvs.get(related_value) + 1);
-                    has_related_value = true;
                 }
             }
-            if (!has_related_value) {
+            else {
                 const nv = this.no_values.value;
                 rvs.set(nv, rvs.get(nv) + 1);
             }
@@ -162,15 +169,16 @@ export default class {
         for (const [related_value, stat] of rvs) {
             this.component.container.get(vr).find(`span[rv="${related_value}"].stats`).html(stat);
         }
-        this.component.container.get(vr).find(`span[rv="_all"].stats`).html(this.distilled.get(vr).length);
+        this.component.container.get(vr).find(`span[rv="_all"].stats`).html(this.distilled.get(vr).size);
         this._myStats(vr);
     }
     v(vr, i) {
         const related_info =  this.component.related_info.get(vr);
         const related_state = this.related_state.get(vr);
-        if (related_info.has(i)) {
-            for (const related_value of related_info.get(i)) {
-                if (related_state.has(related_value+'')) {
+        const related_values = related_info.has(i)?related_info.get(i):new Set();
+        if (related_values.size) {
+            for (const related_value of related_values) {
+                if (related_state.has(related_value)) {
                     return true;
                 }
             }
@@ -194,6 +202,8 @@ export default class {
         this.related_values_list.get(vr).push(this.no_values.value);
         this.related_values_index.get(vr).set(this.no_values.value, this.no_values.name);
         this.related_values_all.get(vr).add(this.no_values.value);
+        this.related_state.set(vr, new Set());
+        this.changed.set(vr, true);
         this._html(vr);
     }
     wire(vr) {
@@ -201,19 +211,26 @@ export default class {
         this._dressup(vr);
     }
     work(vr) {
-        this.related_state.set(vr, g.from_str(this.component.state.getState(`rel_${this.typ}_${vr}`)));
-        this._mySetFacet(vr);
-        this._setFacet(vr);
+        const old_state = this.related_state.get(vr);
+        const new_state = g.from_str(this.component.state.getState(this.state_var_pref+vr));
+        this.changed.set(vr, !g.set_equal(old_state, new_state));
+        if (this.changed.get(vr)) {
+            this.related_state.set(vr, new_state);
+            this._mySetFacet(vr);
+            this._setFacet(vr);
+        }
     }
     _plainWeld(vr) {
         const related_values = this.component.related_values.get(vr);
-        for (const [i, related_value] of related_values) {
+        for (const d of related_values) {
+            const i = d['_id'];
+            const related_value = d['value'];
             this.related_values_list.get(vr).push(i);
             this.related_values_index.get(vr).set(i, related_value);
             this.related_values_all.get(vr).add(i);
         }
         this.related_values_list.get(vr).sort((a,b) => {
-            return (related_values.get(a) < related_values.get(b))?-1:(related_values.get(a) > related_values.get(b))?1:0; 
+            return (this.related_values_index.get(a) < this.related_values_index.get(b))?-1:(this.related_values_index.get(a) > this.related_values_index.get(b))?1:0; 
         });
     }
     _myWeld(vr) {}

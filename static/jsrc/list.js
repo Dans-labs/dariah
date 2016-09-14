@@ -9,58 +9,55 @@ import * as g from './generic.js';
 export default class {
     constructor(component) {
         this.component = component;
+        this.row_status = new Map();
     }
     _html(vr) {
+        this.row_status.set(vr, new Map());
         let h = '';
         h += `<table id="table_${vr}">`;
         for (const r of this.component.data.get(vr)) {
-            const rowstart = `<tr rid="${r[0]}"><td><a class="showc fa fa-fw fa-list-ul" href="#" title="hide fields"></a><a class="hidec fa fa-fw fa-minus" href="#" title="show fields"></a></td>`;
+            const rid = r['_id'];
+            this.row_status.get(vr).set(rid, true);
+            const rowstart = `<tr rid="${rid}"><td><a class="showc fa fa-fw fa-list-ul" href="#" title="hide fields"></a><a class="hidec fa fa-fw fa-minus" href="#" title="show fields"></a></td>`;
             const rowend = '</tr>';
             if (vr == 'contrib') {
-                h += `${rowstart}<td><a href="#" class="fa fa-fw fa-minus"></a>${r[1]}</td>${rowend}`;
+                h += `${rowstart}<td>${r['title']}</td>${rowend}`;
             }
             else if (vr == 'country') {
-                const in_dariah = (r[3] == 1)?'dariah':'';
-                h += `${rowstart}<td class="country_code">${r[1]}<td><td class="country_name">${r[2]}<td><td class="in_dariah">${in_dariah}</td><td class="latlng">${r[4]}</td><td class="latlng">${r[5]}</td>${rowend}`;
+                const in_dariah = r['member_dariah']?'in dariah':'';
+                h += `${rowstart}<td class="country_code">${rid}<td><td class="country_name">${r['name']}<td><td class="in_dariah">${in_dariah}</td>${rowend}`;
             }
-            else if (vr == 'type' || vr == 'tadiraha' || vr == 'tadiraho' || vr == 'tadiraht') {
-                h += `${rowstart}<td class="value">${r[1]}<td>${rowend}`;
+            else if (vr == 'type') {
+                h += `${rowstart}<td class="value">${r['value']}<td>${rowend}`;
+            }
+            else if (vr == 'tadiraha' || vr == 'tadiraho' || vr == 'tadiraht') {
+                h += `${rowstart}<td class="value">${r['value']}<td>${rowend}`;
             }
         }
         h += '</table>';
         this.component.container.get(vr).html(h);
     }
-    _display(row, vr, open_ids) {
-        const that = this;
-        const hidec = row.find('.hidec');
-        const showc = row.find('.showc');
-        const rid = row.attr('rid');
-        const detail = this.component.container.get(vr).find(`tr[iid="${rid}"]`);
-        if (open_ids.has(rid)) {
-            hidec.show();
-            showc.hide();
-            if (detail.length) {
-                detail.show();
-            }
-        }
-        else {
-            hidec.hide();
-            showc.hide();
-            if (detail.length) {
-                detail.hide();
-            }
-        }
+    getRecordIds(vr) {
+        return this.row_status.get(vr).keys();
     }
-    _set_it(control, vr, state) {
-        const open_ids = g.from_str(this.state.getState(key));
-        const rid = control.closest('tr').attr('rid');
-        if (state) {
-            open_ids.add(rid);
+    getRow(vr, rid) {
+        const destination = this.component.container.get(vr);
+        return destination.find(`tr[rid="${rid}"]`);
+    }
+    select(vr) {
+        const distilled = this.component.page.getComponent('facet').implementation.distilled.get(vr);
+        const row_status = this.row_status.get(vr);
+        for (const [rid, shown] of row_status) {
+            if (shown == (distilled.has(rid))) {continue}
+            const row = this.component.container.get(vr).find(`tr[rid="${rid}"]`);
+            if (shown) {
+                row.hide();
+            }
+            else {
+                row.show();
+            }
+            row_status.set(rid, !shown);
         }
-        else {
-            open_ids.delete(rid);
-        }
-        this.state.setState(key, g.to_str(open_ids));
     }
     show(vr) {
         return this.component.state.getState('list') == vr;
@@ -69,23 +66,9 @@ export default class {
         this._html(vr);
     }
     wire(vr) {
-        const that = this;
-        const cc = this.component.container.get(vr);
-        const key = `${this.component.name}_${vr}`;
-        cc.find('.hidec').click(function(e) {e.preventDefault();
-            that._set_it($(this), vr, true);
-        });
-        cc.find('.showc').click(function(e) {e.preventDefault();
-            that._set_it($(this), vr, false);
-        });
+        const showc = this.component.container.get(vr).find(`.showc`);
+        showc.hide();
     }
     work(vr) {
-        const that = this;
-        const key = `${this.component.name}_${vr}`;
-        const cc = this.component.container.get(vr);
-        const open_ids = g.from_str(this.component.state.getState(`${this.component.name}_${vr}`));
-        cc.find('tr[rid]').each(function() {
-            that._display($(this), vr, open_ids);
-        });
     }
 }

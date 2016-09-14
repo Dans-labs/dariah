@@ -35,7 +35,8 @@ export default class { // the one and only page object
                 ['tadiraht', new Set(['list'])],
             ])],
             ['work', new Map([
-                ['facet',    new Set(['filter', 'eumap', 'ctype', 'tadiraha', 'tadiraho', 'tadiraht'])],
+                ['facet',    new Set(['list', 'filter', 'eumap', 'ctype', 'tadiraha', 'tadiraho', 'tadiraht'])],
+                ['item',     new Set(['facet'])],
             ])],
         ]);
     }

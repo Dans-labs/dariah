@@ -4,6 +4,9 @@
 request.requires_https()
 
 from get_db_config import config
+from pymongo import MongoClient
+clientm = MongoClient()
+dbm = clientm.dariah
 
 dc_u = config['dariah_user']
 dc_p = config['dariah_passwd']

@@ -5,5 +5,5 @@
 import Page from './page';
 
 $(function () {
-  new Page().work();
+    new Page().work();
 });

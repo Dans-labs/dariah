@@ -5,50 +5,121 @@
  * All functionality (except show) is delegated to specific functions
  */
 
+import * as g from './generic.js';
+
 export default class {
     constructor(component) {
         this.component = component;
+        this.open_items = new Map();
     }
     _html(vr, it) {
-        const destination = this.component.dst.get(vr);
-        const dest_row = destination.find(`tr[rid="${it[0]}"]`);
-        let h = `<tr iid="${it[0]}">`;
+        const iid = it['_id'];
+        this.open_items.get(vr).add(iid);
+        const row = this.component.up.implementation.getRow(vr, iid);
+        const hidec = row.find('.hidec');
+        const showc = row.find('.showc');
+        let h = `<tr iid="${iid}"><td>&nbsp</td>`;
 
         if (vr == 'contrib') {
             const types = [];
-            for (const tp of it[5]) {
-                types.push(`<a href="#" tid="${tp[0]}">${tp[1]}</a>`);
+            for (const tp of it['type_of_inkind']) {
+                types.push(`<a href="#" tid="${tp['_id']}">${tp['value']}</a>`);
             }
             h += `
-<td colspan="2">
-<b>Contact person:</b> ${it[2]}<br/>
-<b>Country:</b> ${it[3]} = ${it[4]}<br/>
-<b>Types:</b> ${types.join(', ')}</br>
+<td>
+<b>Contact person:</b> ${it['contact_person_name']}<br/>
+<b>Country:</b> ${it['country'][0]['_id']} = ${it['country'][0]['name']}<br/>
+<b>Types:</b> ${types.join(', ')}<br/>
 </td>
 `;
         }
         else if (vr == 'country') {
-            for (const r of this.component.data.get(vr)) {
-                in_dariah = (r[3] == 1)?'dariah':'';
-                h += `<td class="country_code">${r[1]}<td><td class="country_name">${r[2]}<td><td class="in_dariah">${in_dariah}</td><td class="latlng">${r[4]}</td><td class="latlng">${r[5]}</td>`;
-            }
+            const in_dariah = it['member_dariah']?'yes':'no';
+            h += `
+<td colspan="3">
+<b>Country code:</b> <span class="country_code">${it['_id']}</span><br/>
+<b>Country name:</b> <span class="country_name">${it['name']}</span><br/>
+<b>Member DARIAH?</b> <span class="in_dariah">${in_dariah}</span><br/>
+<b>Latitude, Longitude:</b> <span class="latlng">${it['latitude']}</span>, <span class="latlng">${it['longitude']}</span><br/>
+</td>`;
         }
         else if (vr == 'type' || vr == 'tadiraha' || vr == 'tadiraho' || vr == 'tadiraht') {
-            for (const r of this.component.data.get(vr)) {
-                h += `<td class="value">${r[1]}<td>`;
-            }
+            h += `
+<td>
+<b>Value:</b> <span class="value">${it['value']}</span><br/>
+<td>`;
         }
         h += '</tr>';
-        dest_row.after(h);
+        row.after(h);
+        hidec.hide();
+        showc.show();
+    }
+    _set_it(control, vr, state) {
+        const key = `${this.component.name}_${vr}`;
+        const open_ids = g.from_str(this.component.state.getState(key));
+        const rid = control.closest('tr').attr('rid');
+        if (state) {
+            open_ids.add(rid);
+        }
+        else {
+            open_ids.delete(rid);
+        }
+        this.component.state.setState(key, g.to_str(open_ids));
+    }
+    display(vr, iid, with_detail) {
+        if (this.open_items.get(vr).has(iid) == with_detail) {return}
+        const row = this.component.up.implementation.getRow(vr, iid);
+        const hidec = row.find('.hidec');
+        const showc = row.find('.showc');
+        const detail = this.component.up.container.get(vr).find(`tr[iid="${iid}"]`);
+        if (with_detail) {
+            hidec.hide();
+            showc.show();
+            if (detail.length) { /* it is possible that the detail is still being fetched
+                                    in that case: no problem, when it arrives it will be inserted,
+                                    no need to call show().
+                                    If the detail was already here and hidden, this show() will have effect
+                                 */ 
+                detail.show();
+            }
+        }
+        else {
+            hidec.show();
+            showc.hide();
+            if (detail.length) {
+                detail.hide();
+            }
+        }
+        if (with_detail) {
+            this.open_items.get(vr).add(iid);
+        }
+        else {
+            this.open_items.get(vr).delete(iid);
+        }
     }
     show(vr) {
         return this.component.state.getState('list') == vr;
     }
     weld(vr) {
+        if (!this.open_items.has(vr)) {this.open_items.set(vr, new Set())};
         for (const it of this.component.data.get(vr)) {
             this._html(vr, it);
         }
     }
-    wire(vr) {}
-    work(vr) {}
+    wire(vr) {
+        const that = this;
+        const cc = this.component.up.container.get(vr);
+        cc.find('.hidec').click(function(e) {e.preventDefault();
+            that._set_it($(this), vr, true);
+        });
+        cc.find('.showc').click(function(e) {e.preventDefault();
+            that._set_it($(this), vr, false);
+        });
+    }
+    work(vr) {
+        const open_ids = g.from_str(this.component.state.getState(`${this.component.name}_${vr}`));
+        for (const [iid, shown] of this.component.up.implementation.row_status.get(vr)) {
+            this.display(vr, iid, shown && open_ids.has(iid));
+        }
+    }
 }

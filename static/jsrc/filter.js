@@ -3,6 +3,8 @@
  * Setting a filter control filters the associated list.
  */
 
+import * as g from './generic.js';
+
 /* private attributes as symbols */
 const _tags = Symbol();
 const _filter_control = Symbol();
@@ -17,6 +19,13 @@ export default class {
     constructor(component) {
         this.component = component;
         this[_tags] = new Map();
+        this.filter_state = new Map();
+        this.changed = new Map();
+        /*
+         * The content of the corresponding state variable is stored in this.filter_state.
+         * this.changed indicates whether state variable has changed recently.
+         * Both this.filter_state and this.changed are parametrized with the variant vr.
+        */
         this[_filter_control] = new Map();
         this[_filter_control2] = new Map();
         this[_box] = new Map();
@@ -26,6 +35,7 @@ export default class {
         this[_wire_mode] = new Map();
         this[_distilled] = new Map();
         this.distilled = new Map();
+        this.state_var_pref = `${this.component.specs.varpfx}_`; 
     }
     _html(vr) {
         const h = `
@@ -45,7 +55,7 @@ export default class {
         this.component.container.get(vr).html(h);
     }
     _setFilter(vr) {
-        const textf = this.component.state.getState(`flt_${vr}`);
+        const textf = this.component.state.getState(this.state_var_pref+vr);
         const filterc = this[_filter_control].get(vr);
         this[_filter_control2].get(vr).html(textf);
         filterc.val(textf);
@@ -53,14 +63,14 @@ export default class {
     }
     _response(vr) {
         return function(event, ui) {
-            this[_distilled].set(vr, {});
+            this[_distilled].set(vr, new Set());
             const dstl = this[_distilled].get(vr);
             for (const u of ui.content) {
-                dstl[u.value] = 1;
+                dstl.add(u.value);
             }
             if (!(this[_wire_mode].get(vr))) {
                 const textf = this[_filter_control].get(vr).val();
-                this.component.state.setState(`flt_${vr}`, textf);
+                this.component.state.setState(this.state_var_pref+vr, textf);
             }
         }.bind(this);
     }
@@ -79,13 +89,13 @@ export default class {
             statd.removeClass('ison');
         }
         else {
-            stat_prefix = `${this.facet.distilled.get(vr).length} of `;
+            stat_prefix = `${this.facet.distilled.get(vr).size} of `;
             statd.addClass('ison');
         }
-        statd.html(`${stat_prefix}${this.distilled.get(vr).length}`);
+        statd.html(`${stat_prefix}${this.distilled.get(vr).size}`);
     }
     v(vr, i) {
-        return (i in this[_distilled].get(vr));
+        return (this[_distilled].get(vr).has(i));
     }
     show(vr) {
         return (this.component.state.getState('list') == vr);
@@ -101,10 +111,18 @@ export default class {
         this[_tags].set(vr, []);
         const tgs = this[_tags].get(vr);
         for (const d of data) {
-            tgs.push({label: d[1], value: `${d[0]}`});
+            if (vr == 'country') {
+                tgs.push({label: `${d['_id']} ${d['name']}`, value: d['_id']});
+            }
+            else if (vr == 'contrib') {
+                tgs.push({label: d['title'], value: d['_id']});
+            }
+            else {
+                tgs.push({label: d['value'], value: d['_id']});
+            }
         }
-        this[_distilled].set(vr, {});
-        this.distilled.set(vr, []);
+        this[_distilled].set(vr, new Set());
+        this.distilled.set(vr, new Set());
         const cc = this.component.container.get(vr);
         const cf = cc.find(`#fltw_${vr}`);
         const flt = $(`#flt_${vr}`);
@@ -131,16 +149,21 @@ export default class {
         this[_wire_mode].set(vr, false);
     }
     work(vr) {
-        const textf = this.component.state.getState(`flt_${vr}`);
-        const clearfc = this[_clear_filter_control].get(vr);
-        if (textf == '') {
-            this[_box].get(vr).removeClass('ison');
-            clearfc.hide();
+        const old_state = this.filter_state.has(vr)?this.filter_state.get(vr):'';
+        const new_state = this.component.state.getState(this.state_var_pref+vr);
+        this.changed = old_state != new_state;
+        if (this.changed) {
+            this.filter_state.set(vr, new_state);
+            const clearfc = this[_clear_filter_control].get(vr);
+            if (new_state == '') {
+                this[_box].get(vr).removeClass('ison');
+                clearfc.hide();
+            }
+            else {
+                this[_box].get(vr).addClass('ison');
+                clearfc.show();
+            }
+            this[_filter_control2].get(vr).html(new_state);
         }
-        else {
-            this[_box].get(vr).addClass('ison');
-            clearfc.show();
-        }
-        this[_filter_control2].get(vr).html(textf);
     }
 }

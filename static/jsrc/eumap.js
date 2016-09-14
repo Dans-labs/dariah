@@ -131,12 +131,12 @@ export default class extends Relative {
             }.bind(this),
             onRegionSelected: function(e, related_value, i, selected) {
                 if (this.change_state) {
-                    this.component.state.setState(`rel_${this.typ}_${vr}`, g.a_to_str(selected)+this._unmapped_selected(vr));
+                    this.component.state.setState(this.state_var_pref+vr, g.a_to_str(selected)+this._unmapped_selected(vr));
                 }
             }.bind(this),
             onMarkerSelected: function(e, related_value, i, selected) {
                 if (this.change_state) {
-                    this.component.state.setState(`rel_${this.typ}_${vr}`, g.a_to_str(selected)+this._unmapped_selected(vr));
+                    this.component.state.setState(this.state_var_pref+vr, g.a_to_str(selected)+this._unmapped_selected(vr));
                 }
             }.bind(this),
         });
@@ -152,7 +152,7 @@ export default class extends Relative {
     }
     _unmapped_selected(vr) {
         const result = [];
-        const this_state = g.from_str(vr, this.component.state.getState(`rel_${this.typ}_${vr}`));
+        const this_state = g.from_str(vr, this.component.state.getState(this.state_var_pref+vr));
         let empty = true;
         for (const related_value of this[_not_mapped]) {
             if (this_state.has(related_value)) {
@@ -170,10 +170,13 @@ export default class extends Relative {
         const map_regions = {};
         const map_markers = {};
         const related_values = this.related_state.get(vr);
-        for (const [i, related_value] of this.component.related_values.get(vr)) {
+        for (const d of this.component.related_values.get(vr)) {
+            const i = d['_id'];
+            const related_value = d['name'];
+            const member_dariah = d['member_dariah'];
             if (!(this[_not_mapped].has(i)) && i != this.no_values.value) {
                 map_regions[i] = related_values.has(i);
-                if (related_value[1]) {
+                if (member_dariah) {
                     map_markers[i] = related_values.has(i);
                 }
             }
@@ -184,7 +187,7 @@ export default class extends Relative {
         this.change_state = true;
     }
     _myStats(vr) {
-        let total = this.distilled.get(vr).length;
+        let total = this.distilled.get(vr).size;
         if (total == 0) {total = 1}
         const weighted_statistics = {};
         const rvs = this.statistics.get(vr);
@@ -203,12 +206,17 @@ export default class extends Relative {
         const related_values = this.component.related_values.get(vr);
         const marker = this[_marker].get(vr);
         const setv = this[_setvalues].get(vr);
-        for (const [i, related_value] of related_values) {
-            if (related_value[1]) {
+        for (const d of related_values) {
+            const i = d['_id'];
+            const related_value = d['name'];
+            const member_dariah = d['member_dariah'];
+            const latitude = d['latitude'];
+            const longitude = d['longitude'];
+            if (member_dariah) {
                 this.related_values_all.get(vr).add(i);
                 this.related_values_list.get(vr).push(i);
-                this.related_values_index.get(vr).set(i, related_value[0]);
-                marker[i] = {latLng: [related_value[2], related_value[3]], name: related_value[0]};
+                this.related_values_index.get(vr).set(i, related_value);
+                marker[i] = {latLng: [latitude, longitude], name: related_value};
                 setv[i] = 'indariah';
             }
             else {
@@ -216,7 +224,7 @@ export default class extends Relative {
             }
         }
         this.related_values_list.get(vr).sort((a,b) => {
-            return (related_values.get(a) < related_values.get(b))?-1:(related_values.get(a)[0] > related_values.get(b)[0])?1:0; 
+            return (this.related_values_index.get(a) < this.related_values_index.get(b))?-1:(this.related_values_index.get(a) > this.related_values_index.get(b))?1:0; 
         });
     }
 }

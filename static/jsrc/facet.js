@@ -14,6 +14,10 @@ export default class {
         this.component = component;
         this[_stats] = new Map();
         this[_enabled_facets] = new Map();
+            /* the set of enabled facets is derived from the component_specs of the page object.
+             * It will not change due to user interaction.
+             * So if we want to compute whether facets have changed, we can restrict ourselves to the enabled facets.
+             */
         this.table = new Map();
         this.distilled = new Map();
     }
@@ -94,9 +98,7 @@ export default class {
     wire(vr) {
         const that = this;
         const cc = this.component.container.get(vr);
-        const lc = this.component.page.getComponent('list').container.get(vr);
         this[_stats].set(vr, cc.find(`#fstats_${vr}`));
-        this.table.set(vr,  lc.find(`#table_${vr}`));
         const info = ' details; click to change level of details';
         const detailcontrols = `<a class="showc fa fa-fw fa-list-ul" href="#" title="full${info}"></a><a class="morec fa fa-fw fa-align-left" href="#" title="condensed${info}"></a><a class="hidec fa fa-fw fa-minus" href="#" title="hidden${info}"></a>`;
         cc.addClass('facet');
@@ -115,16 +117,31 @@ export default class {
         });
     }
     work(vr) {
-        this.table.get(vr).find('tr[rid],tr[iid]').hide();
-        const mother_list = this.component.page.getComponent('list');
-        const data = mother_list.data.get(vr);
         const facets = this[_enabled_facets].get(vr);
-        this.distilled.set(vr, []);
+        /* this is an expensive operation: all rows in the main list must be evaluated against all facets.
+         * We will suppress this computation if none of the facets have changed.
+         */
+        let changed = false;
         for (const [facet_name, facet_comp] of facets) {
             const facet = facet_comp.implementation;
-            facet.distilled.set(vr, []);
+            if (facet.changed) {
+                changed = true;
+                break;
+            }
         }
-        for (const d of data) {
+        if (!changed) {
+            return;
+        }
+
+        const mother_list = this.component.page.getComponent('list');
+        const key = `${mother_list.item_comp}_${vr}`;
+        const data = mother_list.implementation.getRecordIds(vr);
+        this.distilled.set(vr, new Set());
+        for (const [facet_name, facet_comp] of facets) {
+            const facet = facet_comp.implementation;
+            facet.distilled.set(vr, new Set());
+        }
+        for (const did of data) {
             let v = true; // will hold whether this row passes all facets
 /* We collect in the distilled member of this facet object the collective results of all individual facets,
  * Moreover, for each facet, we collect in its distilled member the results when all facets are applied except the facet in question
@@ -138,7 +155,7 @@ export default class {
             for (const [facet_name, facet_comp] of facets) {
                 if (!discard) {
                     const facet = facet_comp.implementation;
-                    const this_v = facet.v(vr, d[0]); // this_v: whether the row passes this facet
+                    const this_v = facet.v(vr, did); // this_v: whether the row passes this facet
                     if (!this_v) {
                         v = false;
                         if (the_false == null) { // this is the first failure, we store the facet number in the_false
@@ -152,16 +169,15 @@ export default class {
             }
             if (!discard) {
                 if (v) {
-                    this.distilled.get(vr).push(d[0]);
-                    this.table.get(vr).find(`tr[rid="${d[0]}"],tr[iid="${d[0]}"]`).show();
+                    this.distilled.get(vr).add(did);
                 }
                 if (the_false != null) {
-                    the_false.distilled.get(vr).push(d[0]);
+                    the_false.distilled.get(vr).add(did);
                 }
                 else {
                     for (const [facet_name, facet_comp] of facets) {
                         const facet = facet_comp.implementation;
-                        facet.distilled.get(vr).push(d[0]);
+                        facet.distilled.get(vr).add(did);
                     }
                 }
             }
@@ -170,6 +186,7 @@ export default class {
             const facet = facet_comp.implementation;
             facet.stats(vr);
         }
-        this[_stats].get(vr).html(`${this.distilled.get(vr).length} of ${data.length}`);
+        this[_stats].get(vr).html(`${this.distilled.get(vr).size} of ${data.length}`);
+        mother_list.implementation.select(vr);
     }
 }

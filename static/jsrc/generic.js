@@ -88,4 +88,9 @@ export function a_to_str(ar) {
 export function to_str(set) {
     return Array.from(set).join(',');
 };
+export function set_equal(s1, s2) {
+    if (s1.size != s2.size) {return false}
+    for (const e of s1) {if (!s2.has(e)) {return false}}
+    return true;
+}
 
