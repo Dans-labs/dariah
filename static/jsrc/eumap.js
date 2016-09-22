@@ -173,7 +173,7 @@ export default class extends Relative {
         for (const d of this.component.related_values.get(vr)) {
             const i = d['_id'];
             const related_value = d['name'];
-            const member_dariah = d['member_dariah'];
+            const member_dariah = d['inDARIAH'];
             if (!(this[_not_mapped].has(i)) && i != this.no_values.value) {
                 map_regions[i] = related_values.has(i);
                 if (member_dariah) {
@@ -209,7 +209,7 @@ export default class extends Relative {
         for (const d of related_values) {
             const i = d['_id'];
             const related_value = d['name'];
-            const member_dariah = d['member_dariah'];
+            const member_dariah = d['inDARIAH'];
             const latitude = d['latitude'];
             const longitude = d['longitude'];
             if (member_dariah) {

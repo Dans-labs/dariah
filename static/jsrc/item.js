@@ -22,7 +22,7 @@ export default class {
 
         if (vr == 'contrib') {
             const types = [];
-            for (const tp of it['type_of_inkind']) {
+            for (const tp of it['typeContribution']) {
                 types.push(`<a href="#" tid="${tp['_id']}">${tp['value']}</a>`);
             }
             h += `
@@ -34,7 +34,7 @@ export default class {
 `;
         }
         else if (vr == 'country') {
-            const in_dariah = it['member_dariah']?'yes':'no';
+            const in_dariah = it['inDARIAH']?'yes':'no';
             h += `
 <td colspan="3">
 <b>Country code:</b> <span class="country_code">${it['_id']}</span><br/>

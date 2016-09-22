@@ -24,7 +24,7 @@ export default class {
                 h += `${rowstart}<td>${r['title']}</td>${rowend}`;
             }
             else if (vr == 'country') {
-                const in_dariah = r['member_dariah']?'in dariah':'';
+                const in_dariah = r['inDARIAH']?'in dariah':'';
                 h += `${rowstart}<td class="country_code">${rid}<td><td class="country_name">${r['name']}<td><td class="in_dariah">${in_dariah}</td>${rowend}`;
             }
             else if (vr == 'type') {
