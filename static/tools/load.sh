@@ -6,7 +6,7 @@
 
 # loads mongo database data for the DARIAH application
 
-filename=dariah_data.mongo
+filename=dariah_data/dariah
 
 pushd /home/dirkr
 mongorestore --drop -d dariah $filename
