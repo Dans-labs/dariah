@@ -4,6 +4,20 @@ import L from 'leaflet';
 import geodata from './europe.geo.js';
 
 const MAXRADIUS = 25;
+const TRUECOLOR = {
+  color: '#884422',
+  fillColor: '#aa7766',
+};
+const MARKERCOLOR = {
+  [true]: {
+    color: '#008800',
+    fillColor: '#00cc00',
+  },
+  [false]: {
+    color: '#888844',
+    fillColor: '#bbbb66',
+  }
+};
 
 export default class EUMap extends Bymeta {
   constructor(props) {
@@ -53,13 +67,14 @@ export default class EUMap extends Bymeta {
         onEachFeature: feature => {
           if (this.inDariah(feature)) {
             const fprops = feature.properties;
+            const iso2 = fprops.iso2;
+            const isOn = this.facet && this.facet.has(iso2) && this.facet.get(iso2);
             const marker = L.circleMarker([fprops.lat, fprops.lng], {
-              radius: this.computeRadius(fprops.iso2),
-              color: '#007700',
+              ...MARKERCOLOR[isOn],
+              radius: this.computeRadius(iso2),
               weight: 1,
               fill: true,
-              fillColor: '#00aa00',
-              fillOpacity: 0.6,
+              fillOpacity: 0.8,
               pane: 'markerPane',
             }).addTo(this.map);
             this.features.set(fprops.iso2, marker);
@@ -84,7 +99,9 @@ export default class EUMap extends Bymeta {
   }
   componentDidUpdate() {
     for (const [iso2, marker] of this.features) {
+      const isOn = this.facet && this.facet.has(iso2) && this.facet.get(iso2);
       marker.setRadius(this.computeRadius(iso2));
+      marker.setStyle(MARKERCOLOR[isOn]);
     }
   }
   render() {

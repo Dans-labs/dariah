@@ -9,7 +9,11 @@ import sourcemaps  from 'gulp-sourcemaps';
  
 gulp.task('buildjs', function() {
     return browserify({entries: 'main.js', debug: true})
-        .transform("babelify", {sourceMaps: true, presets: ["es2015", "react"]})
+        .transform("babelify", {
+          sourceMaps: true,
+          presets: ["es2015", "react"],
+          plugins: ["transform-object-rest-spread"],
+        })
         .bundle()
         .pipe(source('app.min.js'))
         .pipe(buffer())
