@@ -9,7 +9,7 @@ import sourcemaps  from 'gulp-sourcemaps';
  
 gulp.task('buildjs', function() {
     return browserify({entries: 'main.js', debug: true})
-        .transform("babelify", {sourceMaps: true})
+        .transform("babelify", {sourceMaps: true, presets: ["es2015", "react"]})
         .bundle()
         .pipe(source('app.min.js'))
         .pipe(buffer())
@@ -20,7 +20,7 @@ gulp.task('buildjs', function() {
 });
  
 gulp.task('buildcss', function() {
-  return gulp.src('../cssrc/main.scss')
+  return gulp.src(['../cssrc/main.scss'])
     .pipe(sourcemaps.init())
     .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
     .pipe(sourcemaps.write('../css'))
@@ -28,8 +28,8 @@ gulp.task('buildcss', function() {
 });
 
 gulp.task('watch', function() {
-    gulp.watch('*.js', gulp.series('buildjs'));
-    gulp.watch('../cssrc/*.scss', gulp.series('buildcss'));
+    gulp.watch(['*.js', '*.jsx'], gulp.series('buildjs'));
+    gulp.watch(['../cssrc/*.scss', '../cssrc/*.css'], gulp.series('buildcss'));
 });
  
 gulp.task('default', gulp.series('buildjs', 'buildcss', 'watch'));

@@ -1,1 +1,0 @@
-'use strict';var _page=require('./page');var _page2=_interopRequireDefault(_page);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}$(function(){new _page2.default().work()});

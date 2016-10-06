@@ -1,5 +1,5 @@
-{{ left_sidebar_enabled = True }}
-{{ right_sidebar_enabled = True }}
+{{ left_sidebar_enabled = False }}
+{{ right_sidebar_enabled = False }}
 {{ extend 'layout.html' }}
 
 {{ block head }}
@@ -8,21 +8,15 @@
         var app_url = "{{=XML(URL(host=False))}}";
         var app_url_cite = "{{=XML(URL(host=True))}}";
     </script>
-    <script type="text/javascript" src="{{=URL('static', 'js/jquery-jvectormap-2.0.3.min.js')}}"></script>
-    <script type="text/javascript" src="{{=URL('static', 'js/jquery-jvectormap-europe-mill.js')}}"></script>
-    <link rel="stylesheet" type="text/css" href="{{=URL('static', 'css/jquery-jvectormap-2.0.3.css')}}" media="screen" />
 {{ end }}
 
 <div id="msg_page"></div>
 <div id="middle">
-<a id="self_link" title="to the online version of this page" href="#">See this page on DARIAH</a>
 </div>
 
 {{ block left_sidebar }}
-    <div id="left"></div>
 {{ end }}
 
 {{ block right_sidebar }}
-    <div id="right">Sidebar right</div>
 {{ end }}
 
