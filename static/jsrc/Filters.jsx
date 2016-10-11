@@ -76,9 +76,9 @@ export default class Filters extends Component {
       this.compute();
   }
   render() {
+    for (const [Fclass, Fname, params] of filterlist) {console.log(Fclass)}
     return (
       <div>
-        <p>{this.props.data.length} contributions to filter</p>
         {filterlist.map(([Fclass, Fname, params]) => (
           <Fclass
             key={getFilterId(Fname, params)}
