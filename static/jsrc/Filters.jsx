@@ -7,6 +7,7 @@ const filterlist = [
   [Fulltext, 'Fulltext', {field: 'title'}],
   [EUMap,    'EUmap',    {field: 'country',             maxcols: 3}],
   [Bymeta,   'Bymeta',   {field: 'typeContribution',    maxcols: 2}],
+  [Bymeta,   'Bymeta',   {field: 'tadirahActivities',   maxcols: 2}],
   [Bymeta,   'Bymeta',   {field: 'tadirahObjects',      maxcols: 2}],
   [Bymeta,   'Bymeta',   {field: 'tadirahTechniques',   maxcols: 1}],
 ];
