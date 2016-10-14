@@ -1,0 +1,51 @@
+{
+  "name": "dariah",
+  "version": "1.0.0",
+  "description": "dariah contributions tool",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dans-labs/dariah.git"
+  },
+  "keywords": [
+    "inkind"
+  ],
+  "author": "Dirk Roorda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dans-labs/dariah/issues"
+  },
+  "homepage": "https://github.com/Dans-labs/dariah#readme",
+  "devDependencies": {
+    "babel-cli": "^6.16.0",
+    "babel-core": "^6.10.4",
+    "babel-plugin-transform-object-rest-spread": "^6.16.0",
+    "babel-plugin-transform-remove-console": "^6.8.0",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-es2016": "^6.16.0",
+    "babel-preset-es2017": "^6.16.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-register": "^6.16.3",
+    "babelify": "^7.3.0",
+    "browserify": "^13.0.1",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-babel": "^6.1.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.4",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "dependencies": {
+    "babel-register": "^6.16.3",
+    "leaflet": "^1.0.1",
+    "react": "^15.3.2",
+    "react-addons-update": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "whatwg-fetch": "^1.0.0"
+  }
+}
