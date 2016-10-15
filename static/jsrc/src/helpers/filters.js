@@ -99,6 +99,27 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
   }
 }
 
+export const newFilterSettings = (filterSettings, filterId, data) => {
+  const freshFilterSettings = new Map([...filterSettings.entries()]);
+  switch (typeof data) {
+    case 'boolean': {
+      const filterSetting = freshFilterSettings.get(filterId);
+      freshFilterSettings.set(filterId, new Map([...filterSetting.keys()].map(valueId => [valueId, data])));
+      break;
+    }
+    case 'string': {
+      freshFilterSettings.set(filterId, data);
+      break;
+    }
+    default: {
+      const [valueId, filterSetting] = data;
+      freshFilterSettings.get(filterId).set(valueId, filterSetting);
+      break;
+    }
+  }
+  return freshFilterSettings;
+}
+
 export function placeFacets(field, fieldValues, maxcols) {
   const facets = [...fieldValues.entries()].sort((x,y) => x[1].localeCompare(y[1]));
   const rows = [];

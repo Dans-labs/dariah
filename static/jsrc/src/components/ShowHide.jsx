@@ -9,9 +9,7 @@ export default class ShowHide extends Component {
     this.applyShowHide();
   }
   applyShowHide(event) {
-    const {
-      component,
-    } = this.props;
+    const { component } = this.props;
     if (event) {event.preventDefault()}
     this.show = !this.show;
     const showC = this.refs.showControl;

@@ -11,23 +11,11 @@ export default class Bymeta extends Component {
     this.rows = null;
   }
   componentWillMount() {
-    const {
-      filterField,
-      fieldValues,
-      maxcols,
-    } = this.props;
+    const { filterField, fieldValues, maxcols } = this.props;
     this.rows = placeFacets(filterField, fieldValues, maxcols);
   }
   render () {
-    const {
-      filterId,
-      filterField,
-      filterSettings,
-      filteredAmount,
-      filteredAmountOthers,
-      amounts,
-      updFilter,
-    } = this.props;
+    const { filterId, filterField, filterSettings, filteredAmount, filteredAmountOthers, amounts, updFilter } = this.props;
     const statStyle = {align: 'right'};
     return (
       <div>
@@ -90,5 +78,3 @@ Bymeta.propTypes = {
   fieldValues: PropTypes.object.isRequired,
   updFilter: PropTypes.func.isRequired,
 }
-
-

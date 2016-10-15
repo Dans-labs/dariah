@@ -1,12 +1,6 @@
 import React, { PropTypes } from 'react';
 
-const Facet = ({
-  updFilter,
-  filterId,
-  valueId,
-  valueRep,
-  checked,
-}) => (
+const Facet = ({ updFilter, filterId, valueId, valueRep, checked }) => (
   <span>
     <input
       type="checkbox"
@@ -15,7 +9,7 @@ const Facet = ({
     />
     {` ${valueRep}`}
   </span>
-);
+)
 
 Facet.propTypes = {
   filterId: PropTypes.number.isRequired,

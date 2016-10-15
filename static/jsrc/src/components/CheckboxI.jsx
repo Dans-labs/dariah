@@ -1,40 +1,21 @@
 import React, { Component, PropTypes } from 'react';
 
 export default class CheckboxI extends Component {
-  handleChange(event) {
-    const {
-        filterId,
-        states,
-        updFilter,
-    } = this.props;
-    if (this.refs.ci.indeterminate) {
-      updFilter(filterId, true);
-    }
-    else {
-      updFilter(filterId, !states.allTrue);
-    }
-  }
   componentDidMount() {
-    const {
-      states,
-    } = this.props;
+    const { states } = this.props;
     this.refs.ci.indeterminate = !states.allTrue && !states.allFalse;
   }
   componentDidUpdate() {
-    const {
-      states,
-    } = this.props;
+    const { states } = this.props;
     this.refs.ci.indeterminate = !states.allTrue && !states.allFalse;
   }
   render () {
-    const {
-      states,
-    } = this.props;
+    const { states, filterId, updFilter } = this.props;
     return (
       <input
           ref="ci"
           type="checkbox"
-          onChange={this.handleChange.bind(this)}
+          onChange={event => updFilter(filterId, this.refs.ci.indeterminate || !states.allTrue)}
           checked={states.allTrue}
       />
     )
@@ -49,5 +30,3 @@ CheckboxI.propTypes = {
   }).isRequired,
   updFilter: PropTypes.func,
 }
-
-

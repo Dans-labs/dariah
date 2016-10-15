@@ -23,7 +23,7 @@ const msgStyle = {
     backgroundColor: '#ccddff',
     fontWeight: 'bold',
   },
-};
+}
 
 const Messages = ({data}) => (
   <div className="messages">{
@@ -32,7 +32,7 @@ const Messages = ({data}) => (
     ))
   }
   </div>
-);
+)
 
 Messages.propTypes = {
   data: PropTypes.arrayOf(PropTypes.shape({

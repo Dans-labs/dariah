@@ -7,4 +7,3 @@ render(
   <App/>,
   document.getElementById('middle')
 )
-

@@ -11,18 +11,9 @@ export const filterList = [
   {kind: Bymeta,   name: 'Bymeta',   field: 'tadirahActivities',   maxcols: 2},
   {kind: Bymeta,   name: 'Bymeta',   field: 'tadirahObjects',      maxcols: 2},
   {kind: Bymeta,   name: 'Bymeta',   field: 'tadirahTechniques',   maxcols: 1},
-];
+]
 
-const Filters = ({
-  filterSettings,
-  fieldValues,
-  filteredData,
-  filteredAmount,
-  filteredAmountOthers,
-  amounts,
-  updFilter,
-  countries,
-}) => (
+const Filters = ({ filterSettings, fieldValues, filteredData, filteredAmount, filteredAmountOthers, amounts, updFilter, countries }) => (
   <div>
     {filterList.map((filter, filterId) => {
       const needs = filter.name == 'EUMap' ? {countries} : {};
@@ -44,7 +35,7 @@ const Filters = ({
       );}
     )}
   </div>
-);
+)
 
 Filters.propTypes = {
   countries: PropTypes.object.isRequired,
