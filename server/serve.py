@@ -3,6 +3,6 @@ dir = os.path.dirname(__file__)
 if dir: os.chdir(dir)
 
 import bottle
-from app import *
+__import__('app')
 
 application = bottle.default_app()
