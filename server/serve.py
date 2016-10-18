@@ -1,10 +1,9 @@
-import os
-from importlib import import_module
+import os, sys
+import bottle
 
 dir = os.path.dirname(__file__)
 if dir: os.chdir(dir)
-
-import bottle
-import_module('app')
+sys.path.append('.')
+from app import *
 
 application = bottle.default_app()
