@@ -34,9 +34,7 @@ gulp.task('buildjs_dev', function() {
  
 gulp.task('buildcss_dev', function() {
   return gulp.src(['src/css/main.scss'])
-    .pipe(sourcemaps.init())
     .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-    .pipe(sourcemaps.write('../static/css'))
     .pipe(gulp.dest('../static/css'));
 });
 
