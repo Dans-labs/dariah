@@ -1,0 +1,23 @@
+/* PAGE LAYOUT */
+
+$link-color: #d45510;
+
+a {
+    color: $link-color;
+    text-decoration: none;
+}
+a:active, a:hover {
+    color: $link-color;
+    text-decoration: underline;
+}
+#left, #right {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+td {
+    vertical-align: top;
+}
+
+body {
+    font-family: sans-serif;
+}
