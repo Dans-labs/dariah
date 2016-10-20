@@ -37,12 +37,17 @@ class UserApi(object):
     def __init__(self):
         self.dbm = connectdb()
 
-    def store_user(self,
-            name=None,
+    def storeUser(self,
+            eppn=None,
             email=None,
         ):
         result = self.dbm.user.insert(dict(
-            name=name,
+            eppn=eppn,
             email=email,
         ))
         print(result)
+
+    def getUser(self, eppn):
+        documents = list(self.dbm.user.find({'eppn': eppn}, {}))
+        return len(documents) > 0 and documents[0]
+

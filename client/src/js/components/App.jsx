@@ -5,10 +5,15 @@ export default class extends Component {
   render() {
     return (
       <div>
-        <img style={{float:'right', marginBottom: '-1em', marginTop: '-1em'}} src="/static/images/inkind_logo_small.png"/>
         <p className="nav">
-          <NavLink to="/home">DARIAH Contributions App</NavLink>
-          <NavLink to="/" onlyActiveOnIndex={true}>Contributions</NavLink>
+          <NavLink to="/home/about">
+            <img style={{
+              marginBottom: '-1em',
+              marginTop: '-1em',
+              height: "3em",
+              }} src="/static/images/inkind_logo_small.png"/>
+            </NavLink>
+          <NavLink to="/contrib">Contributions</NavLink>
           <a href="/login">Log in</a>
         </p>
         {this.props.children}

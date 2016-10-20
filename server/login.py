@@ -26,6 +26,11 @@ session_opts = {
 }
 app = SessionMiddleware(app, session_opts)
 
+def isDev():
+    hkey = 'REMOTE_ADDR'
+    hval = '127.0.0.1'
+    env = bottle.request.environ
+    return hkey not in env or env[hkey] == '127.0.0.1'
 
 # #  Bottle methods  # #
 
@@ -95,11 +100,11 @@ def change_password():
     return 'Thanks. <a href="/login">Go to login</a>'
 
 
-@bottle.route('/')
-def index():
-    """Only authenticated users can see this"""
-    aaa.require(fail_redirect='/login')
-    return 'Welcome! <a href="/admin">Admin page</a> <a href="/logout">Logout</a>'
+#@bottle.route('/')
+#def index():
+#    """Only authenticated users can see this"""
+#    aaa.require(fail_redirect='/login')
+#    return 'Welcome! <a href="/admin">Admin page</a> <a href="/logout">Logout</a>'
 
 
 @bottle.route('/restricted_download')
@@ -175,12 +180,37 @@ def delete_role():
 @bottle.view('login_form')
 def login_form():
     """Serve login form"""
-    if 'Shib-Session-ID' in bottle.request.environ:
-        print
-        User.store_user(
-            name=bottle.request.environ['eppn'],
-            email=bottle.request.environ['mail'],
-        )
+
+    def getUser():
+        if isDev():
+            return dict(
+                authenticated=True,
+                eppn='dirk',
+                email='dirk@x.y',
+            )
+        else:
+            skey = 'Shib-Session-ID'
+            authenticated =  skey in env and env[skey] 
+            return dict(
+                authenticated=True,
+                eppn=env['eppn'],
+                email=env['mail'],
+            ) if authenticated else dict(
+                authenticated=False,
+            )
+
+    userInfo = getUser()
+    if userInfo['authenticated']:
+        eppn = userInfo['eppn']
+        email = userInfo['email']
+        existingUser = User.getUser(eppn)
+        if existingUser:
+            pass
+        else:
+            User.storeUser(
+                eppn=eppn,
+                email=email,
+            )
     return {}
 
 
