@@ -1,9 +1,9 @@
-import React, { Component, PropTypes } from 'react';
-import Bymeta from './Bymeta.jsx';
-import L from 'leaflet';
-import geodata from '../helpers/europe.geo.js';
+import React, { Component, PropTypes } from 'react'
+import Bymeta from './Bymeta.jsx'
+import L from 'leaflet'
+import geodata from '../helpers/europe.geo.js'
 
-const MAXRADIUS = 25;
+const MAXRADIUS = 25
 const TRUECOLOR = {
   color: '#884422',
   fillColor: '#aa7766',

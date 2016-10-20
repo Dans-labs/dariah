@@ -1,0 +1,32 @@
+/* NAVIGATION ELEMENTS */
+
+$active-color: #000000;
+$active-bgcolor: #ffffee;
+$inactive-color: #0000ff;
+$inactive-bgcolor: #eeeeee;
+
+p.nav {
+    background-color: #dddddd;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+}
+ul.nav {
+    list-style-type: none;
+    background-color: #dddddd;
+}
+.nav a {
+    color: $inactive-color;
+    background-color: $inactive-bgcolor;
+    text-decoration: none;
+    border-radius: 6pt;
+    padding-right: 1em;
+    padding-left: 1em;
+}
+.nav a:after {
+    content: " ";
+}
+
+.nav a.active {
+    color: $active-color;
+    background-color: $active-bgcolor;
+}

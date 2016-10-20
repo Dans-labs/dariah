@@ -1,9 +1,9 @@
-import React, { Component, PropTypes } from 'react';
-import Facet from './Facet.jsx';
-import CheckboxI from './CheckboxI.jsx';
-import Stats from './Stats.jsx';
-import ShowHide from './ShowHide.jsx';
-import { placeFacets, testAllChecks } from '../helpers/filters.js';
+import React, { Component, PropTypes } from 'react'
+import Facet from './Facet.jsx'
+import CheckboxI from './CheckboxI.jsx'
+import Stats from './Stats.jsx'
+import ShowHide from './ShowHide.jsx'
+import { placeFacets, testAllChecks } from '../helpers/filters.js'
 
 export default class Bymeta extends Component {
   constructor() {

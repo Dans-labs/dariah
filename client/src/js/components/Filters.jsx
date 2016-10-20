@@ -1,8 +1,8 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes } from 'react'
 
-import Fulltext from './Fulltext.jsx';
-import Bymeta from './Bymeta.jsx';
-import EUMap from './EUMap.jsx';
+import Fulltext from './Fulltext.jsx'
+import Bymeta from './Bymeta.jsx'
+import EUMap from './EUMap.jsx'
 
 export const filterList = [
   {kind: Fulltext, name: 'Fulltext', field: 'title',               maxcols: null},

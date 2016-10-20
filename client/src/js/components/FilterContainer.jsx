@@ -1,18 +1,9 @@
-import React, { Component, PropTypes } from 'react';
-import Contribs from './Contribs.jsx';
-import Filters, { filterList } from './Filters.jsx';
+import React, { Component, PropTypes } from 'react'
+import Contribs from './Contribs.jsx'
+import Filters, { filterList } from './Filters.jsx'
 
-import { newFilterSettings, computeFiltering } from '../helpers/filters.js';
-
-const columnStyle = (height, width, kind) => ({
-  width: width,
-  height: height,
-  overflow: 'auto',
-  'WebkitOverflowScrolling': 'touch',
-  float: kind || 'left',
-  'paddingLeft': !kind ? '1em' : '0em',
-  'paddingRight': !kind ? '1em' : '0em',
-})
+import { newFilterSettings, computeFiltering } from '../helpers/filters.js'
+import { columnStyle } from '../helpers/ui.js'
 
 export default class FilterContainer extends Component {
   constructor(props) {
@@ -33,11 +24,11 @@ export default class FilterContainer extends Component {
   }
   render() {
     const { filterSettings } = this.state;
-    const { countries, contribs, fieldValues, winHeight } = this.props;
+    const { countries, contribs, fieldValues } = this.props;
     const { filteredData, filteredAmountOthers, amounts } = computeFiltering( contribs, filterList, fieldValues, filterSettings);
     return (
       <div>
-        <div style={columnStyle(winHeight, '40%', 'left')}>
+        <div style={columnStyle('40%', 'left')}>
           <p
             style={{fontWeight: 'bold', backgroundColor: '#eeeeff'}}
           >Showing {filteredData.length} of {contribs.length}</p>
@@ -51,7 +42,7 @@ export default class FilterContainer extends Component {
             updFilter={this.updFilter.bind(this)}
           />
         </div>
-        <div style={columnStyle(winHeight, '60%', 'right')}>
+        <div style={columnStyle('60%', 'right')}>
           <Contribs filteredData={filteredData}/>
         </div>
       </div>
@@ -60,7 +51,6 @@ export default class FilterContainer extends Component {
 }
 
 FilterContainer.propTypes = {
-  winHeight: PropTypes.number.isRequired,
   contribs: PropTypes.array.isRequired,
   countries: PropTypes.object.isRequired,
   fieldValues: PropTypes.object.isRequired,

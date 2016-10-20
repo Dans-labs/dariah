@@ -3,11 +3,15 @@ from bson import json_util
 from bottle import install, JSONPlugin
 from pymongo import MongoClient
 
+def connectdb():
+    clientm = MongoClient()
+    dbm = clientm.dariah
+    install(JSONPlugin(json_dumps=lambda body: json.dumps(body, default=json_util.default)))
+    return dbm
+
 class DataApi(object):
     def __init__(self):
-        clientm = MongoClient()
-        self.dbm = clientm.dariah
-        install(JSONPlugin(json_dumps=lambda body: json.dumps(body, default=json_util.default)))
+        self.dbm = connectdb()
 
     def data(self, query):
         method = getattr(self, query, None)
@@ -28,3 +32,17 @@ class DataApi(object):
     def member_country(self):
         documents = list(self.dbm.country.find({}, {'inDARIAH': True}))
         return dict(data=documents, msgs=[], good=True)
+
+class UserApi(object):
+    def __init__(self):
+        self.dbm = connectdb()
+
+    def store_user(self,
+            name=None,
+            email=None,
+        ):
+        result = self.dbm.user.insert(dict(
+            name=name,
+            email=email,
+        ))
+        print(result)

@@ -1,13 +1,14 @@
 from bottle import route, static_file, abort
 
 from data import DataApi
+from login import *
 
 config = dict(
     static_root='../static',
     client_root='../client',
 )
 
-dataApi = DataApi()
+Data = DataApi()
 
 @route('/hello')
 def hello():
@@ -23,8 +24,8 @@ def serve_fav(filepath):
 
 @route('/data/<query:re:[a-z0-9_]+>')
 def serve_json(query):
-    return dataApi.data(query) or abort(404, '{} not provided'.format(query))
+    return Data.data(query) or abort(404, '{} not provided'.format(query))
 
-@route('/')
-def app():
+@route('/<anything:re:.*>')
+def app(anything):
     return static_file('index.html', root=config['client_root'])

@@ -1,14 +1,14 @@
-import React, { Component, PropTypes } from 'react';
-import 'whatwg-fetch';
+import React, { Component, PropTypes } from 'react'
+import 'whatwg-fetch'
 
 
-import Contribs from './Contribs.jsx';
-import Messages from './Messages.jsx';
-import FilterContainer from './FilterContainer.jsx';
-import { filterList } from './Filters.jsx';
-import { compileFiltering } from '../helpers/filters.js';
+import Contribs from './Contribs.jsx'
+import Messages from './Messages.jsx'
+import FilterContainer from './FilterContainer.jsx'
+import { filterList } from './Filters.jsx'
+import { compileFiltering } from '../helpers/filters.js'
 
-const dataUrl = '/data/';
+const dataUrl = '/data/'
 
 export default class ContribsContainer extends Component {
   constructor(props) {
@@ -44,11 +44,9 @@ export default class ContribsContainer extends Component {
     if (contribs == null || countries == null) {
       return <p> -loading data- </p>
     }
-    const { winHeight } = this.props;
     const { fieldValues, filterInit } = compileFiltering(contribs, filterList);
     const countriesMap = new Map(countries.map(x => [x._id, x]));
     return <FilterContainer
-      winHeight={winHeight}
       contribs={contribs}
       countries={countriesMap}
       fieldValues={fieldValues}
@@ -58,5 +56,4 @@ export default class ContribsContainer extends Component {
 }
 
 ContribsContainer.propTypes = {
-  winHeight: PropTypes.number.isRequired,
 }

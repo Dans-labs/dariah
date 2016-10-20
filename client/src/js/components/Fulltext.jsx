@@ -1,5 +1,5 @@
-import React, { PropTypes } from 'react';
-import Stats from './Stats.jsx';
+import React, { PropTypes } from 'react'
+import Stats from './Stats.jsx'
 
 const Fulltext = ({ updFilter, filterId, filterField, filterSettings, filteredAmount, filteredAmountOthers }) => (
   <div>
