@@ -41,7 +41,7 @@ export default class ContribsContainer extends Component {
   }
   render() {
     const { contribs, countries } = this.state;
-    if (contribs == null || countries == null) {
+    if (contribs === null || countries === null) {
       return <p> -loading data- </p>
     }
     const { fieldValues, filterInit } = compileFiltering(contribs, filterList);

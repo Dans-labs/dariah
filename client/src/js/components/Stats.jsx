@@ -8,9 +8,9 @@ const style = {
 
 const Stats = ({subTotal, total}) => (
   <span style={style}>
-    {subTotal == null? '' :`${subTotal}`}
-    {(total == null || subTotal == null)? '' : ' of '}
-    <strong>{total == null?'':`${total}`}</strong>
+    {subTotal == undefined? '' :`${subTotal}`}
+    {(total == undefined || subTotal == undefined)? '' : ' of '}
+    <strong>{total == undefined?'':`${total}`}</strong>
   </span>
 )
 

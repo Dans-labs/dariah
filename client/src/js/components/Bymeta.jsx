@@ -28,13 +28,13 @@ export default class Bymeta extends Component {
           <Stats subTotal={filteredAmount} total={filteredAmountOthers}/>{' '}
           <ShowHide showinit={true} component={this.refs.table}/>
         </p>
-        {this.rows == null ? (<p> -no facets </p>) : (
+        {this.rows === null ? (<p> -no facets </p>) : (
         <table ref='table'>
           <tbody>
             {this.rows.map((row, i) => (
               <tr key={i}>
                 {row.map((f, j) => {
-                  if (f == null) {
+                  if (f === null) {
                     return <td key={j}/>;
                   }
                   const [valueId, valueRep] = f;

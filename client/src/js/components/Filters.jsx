@@ -20,7 +20,7 @@ const styles = {
 const Filters = ({ filterSettings, fieldValues, filteredData, filteredAmount, filteredAmountOthers, amounts, updFilter, countries }) => (
   <div style={styles}>
     {filterList.map((filter, filterId) => {
-      const needs = filter.name == 'EUMap' ? {countries} : {};
+      const needs = filter.name === 'EUMap' ? {countries} : {};
       const Fclass = filter.kind;
       return (
         <Fclass

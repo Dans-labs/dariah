@@ -26,7 +26,7 @@ session_opts = {
 }
 app = SessionMiddleware(app, session_opts)
 
-def isDev():
+def is_devel():
     hkey = 'REMOTE_ADDR'
     hval = '127.0.0.1'
     env = bottle.request.environ
@@ -182,7 +182,7 @@ def login_form():
     """Serve login form"""
 
     def getUser():
-        if isDev():
+        if is_devel():
             return dict(
                 authenticated=True,
                 eppn='dirk',
