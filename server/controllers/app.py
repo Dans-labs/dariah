@@ -4,8 +4,8 @@ from data import DataApi
 from login import *
 
 config = dict(
-    static_root='../static',
-    client_root='../client',
+    static_root='../../static',
+    client_root='../../client',
 )
 
 Data = DataApi()
