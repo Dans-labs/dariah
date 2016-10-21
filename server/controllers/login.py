@@ -189,8 +189,8 @@ def login_form():
                 email='dirk@x.y',
             )
         else:
-            skey = 'Shib-Session-ID'
-            authenticated =  skey in env and env[skey] 
+            sKey = 'Shib-Session-ID'
+            authenticated =  sKey in env and env[sKey] 
             return dict(
                 authenticated=True,
                 eppn=env['eppn'],

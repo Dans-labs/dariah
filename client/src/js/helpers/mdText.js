@@ -1,5 +1,6 @@
 export default  {
-    about: `
+    about: `This is ``code``, nice`,
+    aboutx: `
 ![logo](/static/images/inkind_logo.png)
 
 # What is the DARIAH contribution tool?
