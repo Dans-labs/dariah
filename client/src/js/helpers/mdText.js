@@ -67,11 +67,15 @@ The absolute location is not important. Here we assume everything resides in \`/
   - \`web-apps\`
     - \`dariah\`
       - \`server\`
-        - \`app.py\` routes and controllers
-        - \`data.py\` json data from mongodb
-        - \`default_example.conf\` example config file for Apache httpd server
+        - \`controllers\` routes and controllers
+          - \`app.py\` entry point
+          - \`data.py\` json data from mongodb
+          - \`login.py\` handle user data and the login process
         - \`serve.py\` wsgi entry-point for apache
         - \`serve.sh\` local development server
+        - \`config\`
+          - \`requirements.txt\` the list of python packages needed; to be installed with \`pip3\`
+          - \`default_example.conf\` example config file for Apache httpd server
       - \`static\` (static files, css, javascript, fonts, etc)
         - \`css\` stylesheets built from \`client/src/css\`
         - \`js\` javascript built from \`client/src/js\`
