@@ -1,7 +1,9 @@
+import logging
+from datetime import datetime, timedelta
 import bottle
 from beaker.middleware import SessionMiddleware
 from cork import Cork
-import logging
+from cork.mongodb_backend import MongoDBBackend
 
 from data import UserApi
 
@@ -12,13 +14,19 @@ log = logging.getLogger(__name__)
 bottle.debug(True)
 
 # Use users.json and roles.json in the local example_conf directory
-aaa = Cork('example_conf', email_sender='federico.ceratto@gmail.com', smtp_url='smtp://smtp.magnet.ie')
+aaa = Cork(
+    backend=MongoDBBackend(
+        db_name='dariah',
+    ),
+    email_sender='dirk.roorda@dans.knaw.nl',
+    smtp_url='smtp://smtp.magnet.ie',
+)
 
 app = bottle.default_app()
 
 session_opts = {
     'session.cookie_expires': True,
-    'session.encrypt_key': 'please use a random key and keep it secret!',
+    'session.encrypt_key': 'xy45hgd947shfp739fgqoxkgla7c5',
     'session.httponly': True,
     'session.timeout': 3600 * 24,  # 1 day
     'session.type': 'cookie',
@@ -201,6 +209,13 @@ def login_form():
 
     userInfo = getUser()
     if userInfo['authenticated']:
+        aaa.login(userInfo['eppn'], '', success_redirect='/', fail_redirect='/')
+    else:
+        bottle.redirect('/')
+
+    '''
+    userInfo = getUser()
+    if userInfo['authenticated']:
         eppn = userInfo['eppn']
         email = userInfo['email']
         existingUser = User.getUser(eppn)
@@ -210,7 +225,14 @@ def login_form():
             User.storeUser(
                 eppn=eppn,
                 email=email,
+                dateCreated=datetime.utcnow(),
             )
+        # Setup session data
+        # self._setup_cookie(eppn)
+        bottle.redirect('/')
+    else:
+        bottle.redirect('/')
+    '''
     return {}
 
 
