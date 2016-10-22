@@ -14,15 +14,12 @@ const PdfDoc = (props) => {
   const docName = props.docName;
   const href = `/static/docs/${docName}.pdf`;
   return (
-    <iframe
+    <object
       height="100%" width="100%"
-      style={{
-        overflow: 'hidden',
-      }}
-      src={href} type="application/pdf"
+      data={href} type="application/pdf"
     >
       alt : <a target="_blank" href={href}>{docName}</a> (open pdf in a new tab)
-    </iframe>
+    </object>
   )
 }
 export default PdfDoc
