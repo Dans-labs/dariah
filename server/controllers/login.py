@@ -53,9 +53,65 @@ def post_get(name, default=''):
 @bottle.post('/login')
 def login():
     """Authenticate users"""
-    username = post_get('username')
-    password = post_get('password')
+    env = bottle.request.environ
+    username = None
+    password = None
+    if is_devel():
+        username = post_get('username')
+        password = post_get('password')
+        email = post_get('email')
+    else:
+        sKey = 'Shib-Session-ID'
+        authenticated =  sKey in env and env[sKey] 
+        if authenticated:
+            username = env['eppn']
+            password = 'shibboleth'
+            email = env['mail']
     aaa.login(username, password, success_redirect='/', fail_redirect='/login')
+    def get_user():
+        if is_devel():
+            return dict(
+                authenticated=True,
+                eppn='dirk',
+                email='dirk@x.y',
+            )
+        else:
+            sKey = 'Shib-Session-ID'
+            authenticated =  sKey in env and env[sKey] 
+            return dict(
+                authenticated=True,
+                eppn=env['eppn'],
+                email=env['mail'],
+            ) if authenticated else dict(
+                authenticated=False,
+            )
+
+    userInfo = get_user()
+    if userInfo['authenticated']:
+        aaa.login(userInfo['eppn'], '', success_redirect='/', fail_redirect='/')
+    else:
+        bottle.redirect('/')
+
+    '''
+    userInfo = get_user()
+    if userInfo['authenticated']:
+        eppn = userInfo['eppn']
+        email = userInfo['email']
+        existing_user = User.get_user(eppn)
+        if existing_user:
+            pass
+        else:
+            User.store_user(
+                eppn=eppn,
+                email=email,
+                dateCreated=datetime.utcnow(),
+            )
+        # Setup session data
+        # self._setup_cookie(eppn)
+        bottle.redirect('/')
+    else:
+        bottle.redirect('/')
+    '''
 
 @bottle.route('/user_is_anonymous')
 def user_is_anonymous():
@@ -189,7 +245,8 @@ def delete_role():
 def login_form():
     """Serve login form"""
 
-    def getUser():
+    '''
+    def get_user():
         if is_devel():
             return dict(
                 authenticated=True,
@@ -207,22 +264,21 @@ def login_form():
                 authenticated=False,
             )
 
-    userInfo = getUser()
+    userInfo = get_user()
     if userInfo['authenticated']:
         aaa.login(userInfo['eppn'], '', success_redirect='/', fail_redirect='/')
     else:
         bottle.redirect('/')
 
-    '''
-    userInfo = getUser()
+    userInfo = get_user()
     if userInfo['authenticated']:
         eppn = userInfo['eppn']
         email = userInfo['email']
-        existingUser = User.getUser(eppn)
-        if existingUser:
+        existing_user = User.get_user(eppn)
+        if existing_user:
             pass
         else:
-            User.storeUser(
+            User.store_user(
                 eppn=eppn,
                 email=email,
                 dateCreated=datetime.utcnow(),

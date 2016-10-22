@@ -1,12 +1,14 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Router, Route, browserHistory, IndexRoute, IndexRedirect } from 'react-router'
+import { Router, Route, Redirect, DefaultRoute, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
 
 import App from './components/App.jsx';
 import ContribsContainer from './components/ContribsContainer.jsx';
 import Home from './components/Home.jsx';
-import MDText from './components/MDText.jsx';
+import Doc from './components/Doc.jsx';
 import Login from './components/Login.jsx';
+
+const NotFound = (props) => (<h1>404: <code>{props.params.splat}</code> not found on this site.</h1>)
 
 render(
   <Router history={browserHistory}>
@@ -14,11 +16,12 @@ render(
       <IndexRoute component={Home}/>
       <IndexRedirect to="/home/about"/>
       <Route path="/home" component={Home}>
-        <Route path="/home/:text" component={MDText}/>
+        <Route path="/home/:docName" component={Doc}/>
       </Route>
       <Route path="/contrib" component={ContribsContainer}/>
       <Route path="/login" component={Login}/>
     </Route>
+    <Route path="*" component={NotFound}/>
   </Router>,
   document.getElementById('body')
 );
