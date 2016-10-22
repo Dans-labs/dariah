@@ -14,16 +14,17 @@ const PdfDoc = (props) => {
   const docName = props.docName;
   const href = `/static/docs/${docName}.pdf`;
   const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  return (
-    iOS ? (
-      <a target="_blank" href={href}>{docName}</a> (open pdf in a new tab)
+  return iOS ? (
+      <p>
+        <a target="_blank" href={href}>{docName}</a> (open pdf in a new tab)
+      </p>
     ) : (
-    <object
-      height="100%" width="100%"
-      data={href} type="application/pdf"
-    >
-      alt : <a target="_blank" href={href}>{docName}</a> (open pdf in a new tab)
-    </object>
+      <object
+        height="100%" width="100%"
+        data={href} type="application/pdf"
+      >
+        alt : <a target="_blank" href={href}>{docName}</a> (open pdf in a new tab)
+      </object>
   )
 }
 export default PdfDoc
