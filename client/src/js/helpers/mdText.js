@@ -37,29 +37,42 @@ Mail: [dirk.roorda@dans.knaw.nl](mailto:dirk.roorda@dans.knaw.nl)
 
 # Basic information
 
-**server ip** tclarin11.dans.knaw.nl
+**source code** GitHub repository [Dans-labs/dariah](https://github.com/Dans-labs/dariah)
 
-**url** dariah-beta.dans.knaw.nl
+**server** dariah-beta.dans.knaw.nl
 
 **database** Mongodb via pymongo (no connection information needed)
 
-# Web-app
-We use
+# Web-app overview
+
+For the *server* application code we use
 [Bottle](http://bottlepy.org/docs/dev/index.html),
 a Python3 micro framework to route urls to functions that perform requests and return responses.
-The webserver is **httpd (Apache)**. Bottle connects to it through
+It contains a development webserver.
+
+The production webserver is **httpd (Apache)**. Bottle connects to it through
 [mod_wsgi](https://modwsgi.readthedocs.io/en/develop/index.html)
 (take care to use a version that speaks Python3).
-See Prerequisites below.
-
-The connection is defined in the default config file (for contents, see *default_example.conf* in the github repo):
+This connection is defined in the default config file (for contents, see *default_example.conf* in the github repo):
 
 - \`/etc/httpd/config.d/\`
   - \`default.conf\` (config for this site)
   - \`shib.conf\` (config for shibboleth authentication)
   - ...
 
+The *client* code is done in 
+[React](https://facebook.github.io/react/) and this the shape of a structured set of components in
+[JSX](https://facebook.github.io/react/docs/introducing-jsx.html), plus some helper
+functions in plain Javascript
+[ES6 = ES2015](https://babeljs.io/docs/learn-es2015/).
+
+We make use of the DARIAH infrastructure for *user authentication* 
+[AAI](https://wiki.de.dariah.eu/display/publicde/DARIAH+AAI+Documentation).
+
+The app itself gives access to *documentation*, not only for end users, but also for developers and designers.
+
 # File structure
+
 The absolute location is not important. Here we assume everything resides in \`/opt\`.
 
 - \`/opt\`
@@ -83,7 +96,7 @@ The absolute location is not important. Here we assume everything resides in \`/
         - \`images\`
         - \`fonts\`
         - \`docs\`
-          - \`deploy.pdf\` notes on deploying this web app
+          - \`design.pdf\` notes on the design of this web app
         - \`tools\` These files are not active in the web scenarios, except for documentation. 
             They are helpers to prepare the data for the app.
           - \`update.sh\` script to deploy updates of the web app. Pulls code from the github repo, restarts httpd.
@@ -111,35 +124,46 @@ The absolute location is not important. Here we assume everything resides in \`/
             - \`main.jsx\` client-side entry-point for the javascript
           - \`css\`				
 
-# Prerequisites for the server
+# Technology
+## Server
+### Installation
+
 We assume httpd (Apache) is already installed, and Mongodb likewise.
+We also need httpd-devel.
+
+    yum install httpd-devel
 
 Python can be installed by means of the package manager.
 
-    yum install python34
+On a development server, install \`python3\`.*x*\`.\`*y* from its
+[download page](https://www.python.org/downloads/).
+Then install additional modules by means of \`pip3\`:
 
-On a strict system, like SELinux, you can install Python3 and the extra modules needed by means of \`yum install\` ...
-However, some of these modules end up in the Python2 framework, so I had to use \`pip3\`.
-On a strict system, you have to build \`pip3\` first! On SELinux, this worked
+    pip3 install pymongo bottle
 
-    sudo yum install python34-setuptools
+On the production server (SELinux), one can install Python3 and the extra modules needed by means of \`yum install\` ...
+However, some of these modules end up in the Python2 framework, then you have to use \`pip3\`.
+You have to build \`pip3\` first!
+
+    sudo yum install python34 python34-setuptools python34-devel
     sudo easy_install-3.4 pip
 
 Then you can say
 
-    sudo pip3 install pymongo bson bottle beaker bottle-cork
+    sudo pip3 install pymongo bottle beaker bottle-cork
+
+Maybe the following is also required:
+
+    sudo pip3 install bson
 
 In order to run python3 in the webserver, I followed the
 [mod_wsgi guide](https://modwsgi.readthedocs.io/en/develop/user-guides/quick-installation-guide.html).
-As preliminaries I had to install devel versions of apache and python3 first:
+This is the step for which you need the devel versions of httpd and python.
 
-    yum install httpd-devel
-    yum install python34-devel
-
-Then I downloaded the
+Then download the
 [mod_wsgi source code](https://github.com/GrahamDumpleton/mod_wsgi/releases)
 (version 4.5.7),
-untarred it, and configured it with whatever python3 I found on the path.
+untar it, and configure it with whatever python3 you find on the path.
 
     cd mod_wsgi-4.5.7
     ./configure --with-python=/bin/python3
@@ -152,8 +176,38 @@ Then
 After this, httpd works with python3.
 The website runs with SELinux enforced, and also the updating process works.
 
-# Develop environment prerequisites
-## Client and Javascript
+The server is
+[Bottle](http://bottlepy.org/docs/dev/index.html),
+
+We use the following plugins
+
+- [beaker](http://beaker.readthedocs.io/en/latest/)
+  for session middleware
+
+- [bottle-cork](http://cork.firelet.net)
+  [github](https://github.com/FedericoCeratto/bottle-cork)
+  for authentication
+
+The code for the server is basically a mapping between routes (url patterns) and functions (request => response transformers).
+The app source code for the server resides in \`app.py\` and other \`.py\` files imported by it.
+The module \`app.py\` defines routes and associates functions to be executed for those routes.
+These functions take a request, and turn it into a response.
+This file imports a few more specialized controllers:
+
+- \`data.py\` they query the mongodb and return json data
+- \'login.py\` handle all login activity
+
+## Running
+
+In development, **bottle** runs its own little webserver, in production it is connected to Apache through **wsgi**.
+You can run the development server by saying, in the \`server\` directory
+
+    ./serve.sh
+
+which starts a small webserver that listens to localhost on port 8001.
+Whenever you save a python source file, the server reloads itself.
+
+## Client
 ### Installation
 
 Install **nodejs** from its
@@ -195,43 +249,5 @@ Most of the styling is defined in the JSX, but there are a few CSS style files, 
 For example, we use the open source mapping library
 [leaflet](http://leafletjs.com),
 which comes with a plain style file.
-
-## Server and Python
-### Installation
-
-Install \`python3\`.*x*\`.\`*y* from its
-[download page](https://www.python.org/downloads/).
-Then install additional modules by means of \`pip3\`:
-
-    pip3 install pymongo bson bottle
-
-## Serving
-The server is **bottle**.
-
-We use the following plugins
-
-- [beaker](http://beaker.readthedocs.io/en/latest/)
-  for session middleware
-
-- [bottle-cork](http://cork.firelet.net)
-  [github](https://github.com/FedericoCeratto/bottle-cork)
-  for authentication
-
-The code for the server is basically a mapping between routes (url patterns) and functions (request => response transformers).
-The app source code for the server resides in \`app.py\` and other \`.py\` files imported by it.
-The module \`app.py\` defines routes and associates functions to be executed for those routes.
-These functions take a request, and turn it into a response.
-This file imports a few more specialized controllers:
-
-- \`data.py\` they query the mongodb and return json data
-- \'login.py\` handle all login activity
-
-In development, **bottle** runs its own little webserver, in production it is connected to Apache through **wsgi**.
-You can run the development server by saying, in the \`server\` directory
-
-    ./serve.sh
-
-which starts a small webserver that listens to localhost on port 8001.
-Whenever you save a python source file, the server reloads itself.
 `,
 }
