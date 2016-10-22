@@ -2,7 +2,8 @@ import React, {Component, PropTypes} from 'react'
 
 export default class Login extends Component {
   render() {
-    return <div>loggin in ...</div>
+    const msg = ' log in';
+    return (<a style={{float: 'right'}} href="/login" className="fa fa-user">{msg}</a>)
   }
 }
 
