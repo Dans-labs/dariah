@@ -15,13 +15,11 @@ const PdfDoc = (props) => {
   const href = `/static/docs/${docName}.pdf`;
   return (
     <object
+      height="100%" width="100%"
       style={{
         overflow: 'scroll',
-        WebkitBoxPack: 'center',
-        WebkitBoxAlign: 'center',
-        display: '-webkit-box',
+        WebkitOverFlowScrolling: 'touch',
       }}
-      height="100%" width="100%"
       data={href} type="application/pdf"
     >
       alt : <a target="_blank" href={href}>{docName}</a> (open pdf in a new tab)
