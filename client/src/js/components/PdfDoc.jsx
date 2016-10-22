@@ -17,8 +17,7 @@ const PdfDoc = (props) => {
     <iframe
       height="100%" width="100%"
       style={{
-        overflow: 'scroll',
-        WebkitOverFlowScrolling: 'touch',
+        overflow: 'hidden',
       }}
       src={href} type="application/pdf"
     >
