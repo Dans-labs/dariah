@@ -14,9 +14,17 @@ const PdfDoc = (props) => {
   const docName = props.docName;
   const href = `/static/docs/${docName}.pdf`;
   return (
-    <object data={href} type="application/pdf" height="100%" width="100%">
-      alt : <a target="_blank" href={href}>{docName}</a> (open pdf in a new tab)
-    </object>
+    <div style={{
+      overflow: 'scroll',
+      WebkitBoxPack: 'center',
+      WebkitBoxAlign: 'center',
+      display: '-webkit-box',
+    }}
+    >
+      <object data={href} type="application/pdf" height="100%" width="100%">
+        alt : <a target="_blank" href={href}>{docName}</a> (open pdf in a new tab)
+      </object>
+    </div>
   )
 }
 export default PdfDoc
