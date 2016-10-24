@@ -30,7 +30,7 @@ const MdDoc = ({ docName }) => {
             />
           </div>),
           (<div>
-            <pre>{text}</pre>
+            <pre style={{fontSize: 'large', color: '#0000aa', whiteSpace: 'pre-wrap'}}>{text}</pre>
           </div>),
         ]}
       />
