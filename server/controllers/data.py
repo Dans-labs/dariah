@@ -45,8 +45,8 @@ class UserApi(object):
             dateCreated=now,
             dateModified=now,
             dateLastLogin=now,
-            **userInfo,
         )
+        record.update(userInfo)
         result = self.dbm.user.insert_one(record)
         return record
 
@@ -56,8 +56,8 @@ class UserApi(object):
         record = dict(
             dateModified=now,
             dateLastLogin=now,
-            **userInfo,
         )
+        record.update(userInfo)
         result = self.dbm.user.update_one({'eppn': eppn}, {'$set': record})
         return record
 
