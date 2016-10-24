@@ -2,6 +2,8 @@ import json
 from bson import json_util
 from bottle import install, JSONPlugin
 from pymongo import MongoClient
+from datetime import datetime
+from copy import deepcopy
 
 def connectdb():
     clientm = MongoClient()
@@ -37,17 +39,37 @@ class UserApi(object):
     def __init__(self):
         self.dbm = connectdb()
 
-    def store_user(self,
-            eppn=None,
-            email=None,
-        ):
-        result = self.dbm.user.insert(dict(
-            eppn=eppn,
-            email=email,
-        ))
-        print(result)
+    def _store(self, userInfo):
+        now = datetime.utcnow()
+        record = dict(
+            dateCreated=now,
+            dateModified=now,
+            dateLastLogin=now,
+            **userInfo,
+        )
+        result = self.dbm.user.insert_one(record)
+        return record
+
+    def _update(self, userInfo):
+        eppn = userInfo['eppn']
+        now = datetime.utcnow()
+        record = dict(
+            dateModified=now,
+            dateLastLogin=now,
+            **userInfo,
+        )
+        result = self.dbm.user.update_one({'eppn': eppn}, {'$set': record})
+        return record
+
+    def store_update(self, userInfo):
+        eppn = userInfo['eppn']
+        email = userInfo['email']
+        existingUser = self.get_user(eppn)
+        if not existingUser:
+            return self._store(userInfo)
+        else:
+            return self._update(userInfo)
 
     def get_user(self, eppn):
-        documents = list(self.dbm.user.find({'eppn': eppn}, {}))
-        return len(documents) > 0 and documents[0]
+        return self.dbm.user.find_one({'eppn': eppn})
 

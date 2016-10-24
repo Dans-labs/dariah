@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import 'whatwg-fetch'
 
-
 import Contribs from './Contribs.jsx'
 import Messages from './Messages.jsx'
 import FilterContainer from './FilterContainer.jsx'

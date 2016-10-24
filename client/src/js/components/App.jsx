@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import  NavLink  from './NavLink.jsx'
-import  Login  from './Login.jsx'
+import  Login from './Login.jsx'
 
 export default class extends Component {
   render() {
@@ -18,7 +18,9 @@ export default class extends Component {
             />
             </NavLink>
           <NavLink to="/contrib">Contributions</NavLink>
-          <Login/>
+          <Login
+            user={window.viewState}
+          />
         </p>
         {this.props.children}
       </div>

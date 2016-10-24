@@ -5,6 +5,6 @@ dir = os.path.dirname(__file__)
 target_dir = '{}{}{}'.format(dir, '/' if dir else '', 'controllers')
 os.chdir(target_dir)
 sys.path.append('.')
-from app import *
+from app import app
 
-application = bottle.default_app()
+application = app

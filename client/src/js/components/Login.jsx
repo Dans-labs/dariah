@@ -1,10 +1,20 @@
-import React, {Component, PropTypes} from 'react'
+import React, {PropTypes} from 'react'
 
-export default class Login extends Component {
-  render() {
-    const msg = ' log in';
-    return (<a style={{float: 'right'}} href="/login" className="fa fa-user">{msg}</a>)
-  }
+const Login = ({ user, login, logout }) => (
+  <span style={{float: 'right', fontSize: 'small'}}>
+    { user && user.authenticated ? (
+    <span style={{color: '#333333'}}>logged in as <strong>{user && user.eppn}</strong> (DARIAH)
+        <a href="/logout" className="fa fa-user">{' logout'}</a>
+      </span>
+    ) : (
+      <a href="/login" className="fa fa-user">{' login'}</a>
+    )}
+  </span>
+)
+
+Login.propTypes = {
+  user: PropTypes.object.isRequired,
 }
 
+export default Login
 
