@@ -1,12 +1,8 @@
 import React, { PropTypes } from 'react'
 
 const styles = {
-  rep: {
-    fontSize: 'small',
-  },
-  box: {
-    fontSize: 'large',
-  },
+  rep: { fontSize: 'small' },
+  box: { fontSize: 'large' },
 }
 
 const Facet = ({ updFilter, filterId, valueId, valueRep, checked }) => (

@@ -195,7 +195,7 @@ These functions take a request, and turn it into a response.
 This file imports a few more specialized controllers:
 
 - \`data.py\` they query the mongodb and return json data
-- \'login.py\` handle all login activity
+- \`login.py\` handle all login activity
 
 ## Running
 

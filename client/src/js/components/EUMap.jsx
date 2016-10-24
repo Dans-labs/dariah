@@ -29,7 +29,7 @@ const computeRadius = (iso2, filteredAmountOthers, amounts) => {
 
 const inDariah = (feature, countries) => countries.get(feature.properties.iso2)
 
-export default class EUMap extends Bymeta {
+export default class EUMap extends Component {
   constructor(props) {
     super(props);
     this.features = new Map();
@@ -83,12 +83,13 @@ export default class EUMap extends Bymeta {
     }
   }
   render() {
+    const { countries, ...byMetaProps } = this.props;
     return (
       <div>
         <div ref="eumap" style={{
           height: 300,
           }}></div>
-        {super.render()}
+        <Bymeta {...byMetaProps}/>
       </div>
     )}
 }
