@@ -2,28 +2,19 @@ import json
 from bson import json_util
 import bottle
 from bottle import route, static_file, abort, response, view, template
-from beaker.middleware import SessionMiddleware
 
 from data import DataApi
-from auth import authenticate, deauthenticate
+from auth import AuthApi
 
 config = dict(
     static_root='../../static',
 )
 
+Auth = AuthApi('/opt/web-apps/dariah_jwt.secret')
+app = Auth.app
+
 Data = DataApi()
 
-app = bottle.default_app()
-
-session_opts = {
-    'session.cookie_expires': True,
-    'session.encrypt_key': 'xy45hgd947shfp739fgqoxkgla7c5',
-    'session.httponly': True,
-    'session.timeout': 3600 * 24,  # 1 day
-    'session.type': 'cookie',
-    'session.validate_key': True,
-}
-app = SessionMiddleware(app, session_opts)
 
 def dumpViewState(userInfo):
     return dict(viewState=json.dumps(userInfo, default=json_util.default))
@@ -47,17 +38,22 @@ def serve_json(query):
 @route('/logout')
 @view('index')
 def logout():
-    noUserInfo = deauthenticate()
-    return dumpViewState(noUserInfo)
+    Auth.deauthenticate()
+    return dumpViewState(Auth.userInfo)
 
 @route('/login')
 @view('index')
 def login():
-    userInfo = authenticate(login=True)
-    return dumpViewState(userInfo)
+    Auth.authenticate(login=True)
+    return dumpViewState(Auth.userInfo)
+
+@route('/whoami')
+def whoami():
+    Auth.authenticate()
+    print('whoami = {}'.format(Auth.userInfo))
 
 @route('/<anything:re:.*>')
 def index(anything):
-    userInfo = authenticate()
-    return template('index', **dumpViewState(userInfo))
+    Auth.authenticate()
+    return template('index', **dumpViewState(Auth.userInfo))
 
