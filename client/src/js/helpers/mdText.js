@@ -129,64 +129,34 @@ The absolute location is not important. Here we assume everything resides in \`/
 ### Installation
 
 We assume httpd (Apache) is already installed, and Mongodb likewise.
-We also need httpd-devel.
-
-    yum install httpd-devel
 
 Python can be installed by means of the package manager.
+
+    yum install rh-python35 rh-python35-python-pymongo rh-python35-mod_wsgi
+    scl enable rh-python35 bash
+    cp /opt/rh/httpd24/root/usr/lib64/httpd/modules/mod_rh-python35-wsgi.so modules
+    cd /etc/httpd
+    cp /opt/rh/httpd24/root/etc/httpd/conf.modules.d/10-rh-python35-wsgi.conf conf.modules.d/
+    pip install bottle beaker jwt
 
 On a development server, install \`python3\`.*x*\`.\`*y* from its
 [download page](https://www.python.org/downloads/).
 Then install additional modules by means of \`pip3\`:
 
-    pip3 install pymongo bottle
+    pip3 install pymongo bottle beaker jwt
 
-On the production server (SELinux), one can install Python3 and the extra modules needed by means of \`yum install\` ...
-However, some of these modules end up in the Python2 framework, then you have to use \`pip3\`.
-You have to build \`pip3\` first!
-
-    sudo yum install python34 python34-setuptools python34-devel
-    sudo easy_install-3.4 pip
-
-Then you can say
-
-    sudo pip3 install pymongo bottle beaker bottle-cork
-
-Maybe the following is also required:
-
-    sudo pip3 install bson
-
-In order to run python3 in the webserver, I followed the
+More info about running python3 in the webserver
 [mod_wsgi guide](https://modwsgi.readthedocs.io/en/develop/user-guides/quick-installation-guide.html).
-This is the step for which you need the devel versions of httpd and python.
 
-Then download the
-[mod_wsgi source code](https://github.com/GrahamDumpleton/mod_wsgi/releases)
-(version 4.5.7),
-untar it, and configure it with whatever python3 you find on the path.
-
-    cd mod_wsgi-4.5.7
-    ./configure --with-python=/bin/python3
-
-Then
-
-    make
-    sudo make install
-
-After this, httpd works with python3.
 The website runs with SELinux enforced, and also the updating process works.
 
-The server is
+The server framework is
 [Bottle](http://bottlepy.org/docs/dev/index.html),
 
 We use the following plugins
 
 - [beaker](http://beaker.readthedocs.io/en/latest/)
   for session middleware
-
-- [bottle-cork](http://cork.firelet.net)
-  [github](https://github.com/FedericoCeratto/bottle-cork)
-  for authentication
 
 The code for the server is basically a mapping between routes (url patterns) and functions (request => response transformers).
 The app source code for the server resides in \`app.py\` and other \`.py\` files imported by it.
@@ -196,6 +166,17 @@ This file imports a few more specialized controllers:
 
 - \`data.py\` they query the mongodb and return json data
 - \`login.py\` handle all login activity
+
+The server needs a secret key, we store it in a fixed place.
+Here is the command to generate and store the key.
+
+    cd /opt/web-apps
+    date +%s | sha256sum | base64 | head -c 32 > dariah_jwt.secret
+
+On the mac you have to say
+
+    date +%s | shasum -a 256 | base64 | head -c 32 > dariah_jwt.secret
+
 
 ## Running
 

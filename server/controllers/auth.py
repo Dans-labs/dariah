@@ -73,6 +73,8 @@ class AuthApi(object):
         else:
             sKey = 'Shib-Session-ID'
             authenticated =  sKey in env and env[sKey] 
+            if authenticated:
+                print('{} = {}'.format(sKey, env[sKey]))
             self.userInfo = dict(
                 authenticated=True,
                 eppn=env['eppn'],
