@@ -41,19 +41,30 @@ class AuthApi(object):
 
     def authenticate(self, login=False):
         env = bottle.request.environ
-        self._get_user(force=login)
-        if self.userInfo['authenticated']:
-            self._obtain_session()
-            self.userInfo.update(User.store_update(self.userInfo))
+        self.userInfo = None
+        eppn = self._get_session()
+        if eppn != None:
+            userInfo = User.get_user(eppn)
+            if userInfo != None:
+                self.userInfo = userInfo
+        if self.userInfo == None:
+            self._check_login(force=login)
+            if self.userInfo != None:
+                self.userInfo = User.store_update(self.userInfo)
+                if self.userInfo != None:
+                    if self.userInfo.get('mayLogin', False):
+                        self._create_session()
+        if self.userInfo == None:
+            self._delete_session
 
     def deauthenticate(self):
         self._delete_session()
         self.userInfo = dict(authenticated=False)
 
-    def _obtain_session(self):
+    def _create_session(self):
         env = bottle.request.environ
         session = bottle.request.environ.get(self._session_key)
-        for (k, v) in sorted(self.userInfo.items()): session[k] = v
+        session['eppn'] = self.userInfo['eppn']
         session.save()
 
     def _delete_session(self):
@@ -61,12 +72,16 @@ class AuthApi(object):
         session = env.get(self._session_key, None)
         if session: session.delete()
 
-    def _get_user(self, force=False):
+    def _get_session(self):
+        env = bottle.request.environ
+        session = bottle.request.environ.get(self._session_key)
+        return session.get('eppn', None)
+
+    def _check_login(self, force=False):
         self.determine_devel()
         env = bottle.request.environ
         if force and self.is_devel:
             self.userInfo = dict(
-                authenticated=True,
                 eppn='admin',
                 email='admin@localhost',
             )
@@ -74,15 +89,11 @@ class AuthApi(object):
             sKey = 'Shib-Session-ID'
             authenticated =  sKey in env and env[sKey] 
             if authenticated:
-                print('{} = {}'.format(sKey, env[sKey]))
-            self.userInfo = dict(
-                authenticated=True,
-                eppn=env['eppn'],
-                email=env['mail'],
-            ) if authenticated else dict(
-                authenticated=False,
-            )
-            if not authenticated:
-                self._delete_session
+                self.userInfo = dict(
+                    eppn=env['eppn'],
+                    email=env['mail'],
+                )
+            else:
+                self.userInfo = None
 
 

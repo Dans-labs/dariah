@@ -67,7 +67,9 @@ functions in plain Javascript
 [ES6 = ES2015](https://babeljs.io/docs/learn-es2015/).
 
 We make use of the DARIAH infrastructure for *user authentication* 
-[AAI](https://wiki.de.dariah.eu/display/publicde/DARIAH+AAI+Documentation).
+[AAI](https://wiki.de.dariah.eu/display/publicde/DARIAH+AAI+Documentation)
+(see in particular
+[/Integrating Shibboleth Authentication into your Application](https://wiki.de.dariah.eu/display/publicde/Integrating+Shibboleth+Authentication+into+your+Application)
 
 The app itself gives access to *documentation*, not only for end users, but also for developers and designers.
 

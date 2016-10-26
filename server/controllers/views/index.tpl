@@ -28,9 +28,6 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="/static/css/main.css"/>
-    <script>
-        window.viewState = {{!viewState}};
-    </script>
     </head>
     <body>
         <div id="body"/>

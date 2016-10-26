@@ -17,7 +17,7 @@ Data = DataApi()
 
 
 def dumpViewState(userInfo):
-    return dict(viewState=json.dumps(userInfo, default=json_util.default))
+    return dict(viewState=dict(user=userInfo))
 
 @route('/hello')
 def hello():
@@ -39,21 +39,21 @@ def serve_json(query):
 @view('index')
 def logout():
     Auth.deauthenticate()
-    return dumpViewState(Auth.userInfo)
+    return dict()
 
 @route('/login')
 @view('index')
 def login():
     Auth.authenticate(login=True)
-    return dumpViewState(Auth.userInfo)
+    return dict()
 
 @route('/whoami')
 def whoami():
     Auth.authenticate()
-    print('whoami = {}'.format(Auth.userInfo))
+    return dumpViewState(Auth.userInfo)
 
 @route('/<anything:re:.*>')
 def index(anything):
     Auth.authenticate()
-    return template('index', **dumpViewState(Auth.userInfo))
+    return template('index')
 
