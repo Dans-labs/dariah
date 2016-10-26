@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 import bottle
 from beaker.middleware import SessionMiddleware
 from data import UserApi
-import jwt
 
 User = UserApi()
 
@@ -54,6 +53,8 @@ class AuthApi(object):
                 if self.userInfo != None:
                     if self.userInfo.get('mayLogin', False):
                         self._create_session()
+                    else:
+                        self._delete_session()
         if self.userInfo == None:
             self._delete_session
 
