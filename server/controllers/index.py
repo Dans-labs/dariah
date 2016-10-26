@@ -35,17 +35,20 @@ def serve_fav(filepath):
 def serve_json(query):
     return Data.data(query) or abort(404, '{} not provided'.format(query))
 
-@route('/logout')
-@view('index')
+@route('/slogout')
 def logout():
     Auth.deauthenticate()
-    return dict()
+    bottle.redirect('/Shibboleth.sso/Logout?return=/')
 
 @route('/login')
-@view('index')
 def login():
     Auth.authenticate(login=True)
-    return dict()
+    return template('index')
+
+@route('/logout')
+def logout():
+    Auth.deauthenticate()
+    return template('index')
 
 @route('/whoami')
 def whoami():

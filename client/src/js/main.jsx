@@ -20,6 +20,7 @@ render(
       <Route path="/contrib" component={ContribsContainer}/>
       <Redirect from="/login" to="/home/about"/>
       <Redirect from="/logout" to="/home/about"/>
+      <Redirect from="/slogout" to="/home/about"/>
     </Route>
     <Route path="*" component={NotFound}/>
   </Router>,
