@@ -34,7 +34,7 @@ def serve_json(query):
     return Data.data(query) or abort(404, '{} not provided'.format(query))
 
 @route('/slogout')
-def logout():
+def slogout():
     Auth.deauthenticate()
     bottle.redirect('/Shibboleth.sso/Logout?return=/login')
 
