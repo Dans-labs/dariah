@@ -1,16 +1,17 @@
 import React, { Component } from 'react'
 import  NavLink  from './NavLink.jsx'
 import  Login from './Login.jsx'
+import Messages from './Messages.jsx'
 
 export default class extends Component {
   constructor(props) {
     super(props);
-    this.state = {user: {}, msgs: []};
+    this.state = {msgs: []};
   }
   getUser() {
-    const { msgs, } = this.state;
+    const { msgs } = this.state;
     this.setState({...this.state,
-      msgs: [...msgs, {kind: 'special', text: 'getting user info ...'}],
+      msgs: [...msgs, {kind: 'info', text: 'getting user info ...'}],
     });
     fetch('/whoami')
     .then((response) => response.json())
@@ -31,6 +32,7 @@ export default class extends Component {
     this.getUser();
   }
   render() {
+    const { msgs } = this.state;
     return (
       <div>
         <p className="nav">
@@ -45,10 +47,13 @@ export default class extends Component {
             />
             </NavLink>
           <NavLink to="/contrib">Contributions</NavLink>
-          <Login
-            user={this.state.user}
-          />
+          {this.state.user != undefined ? (
+            <Login
+              user={this.state.user}
+            />
+          ) : ''}
         </p>
+        {this.state.user == undefined ? <Messages data={msgs}/> : ''}
         {this.props.children}
       </div>
     )

@@ -1,5 +1,3 @@
-import json
-from bson import json_util
 import bottle
 from bottle import route, static_file, abort, response, view, template
 

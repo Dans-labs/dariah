@@ -39,9 +39,9 @@ export default class ContribsContainer extends Component {
     this.getData('member_country', 'countries');
   }
   render() {
-    const { contribs, countries } = this.state;
+    const { contribs, countries, msgs } = this.state;
     if (contribs === null || countries === null) {
-      return <p> -loading data- </p>
+      return <Messages data={msgs}/>
     }
     const { fieldValues, filterInit } = compileFiltering(contribs, filterList);
     const countriesMap = new Map(countries.map(x => [x._id, x]));
