@@ -12,7 +12,7 @@ const Login = ({ user, login, logout }) => {
     logout: {
       color: '#8800ff',
     },
-    change: {
+    quit: {
       color: '#ff00ff',
     },
   }
@@ -27,7 +27,7 @@ const Login = ({ user, login, logout }) => {
         {` authenticated by ${user.authority} `}
           <span style={styles[access]}>{label[access]}</span>
           <a href="/logout" style={styles['logout']} className="fa fa-user-times">{' logout'}</a>
-          <a href="/slogout" style={styles['change']} className="fa fa-users">{' change user'}</a>
+          <a href="/slogout" style={styles['quit']} className="fa fa-users">{' quit '}</a>
         </span>
       ) : (
         <a href="/login" style={styles['login']} className="fa fa-user-plus">{' login'}</a>

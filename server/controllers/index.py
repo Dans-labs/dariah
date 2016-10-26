@@ -36,7 +36,7 @@ def serve_json(query):
 @route('/slogout')
 def slogout():
     Auth.deauthenticate()
-    bottle.redirect('/Shibboleth.sso/Logout?return=/')
+    bottle.redirect('/Shibboleth.sso/Logout')
 
 @route('/login')
 def login():
