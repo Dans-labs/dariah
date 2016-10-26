@@ -93,6 +93,7 @@ class AuthApi(object):
                 self.userInfo = dict(
                     eppn=env['eppn'],
                     email=env['mail'],
+                    skey=env[sKey],
                 )
             else:
                 self.userInfo = None
