@@ -1,4 +1,4 @@
-import time, os, logging
+import os, logging
 from datetime import datetime, timedelta
 import bottle
 from beaker.middleware import SessionMiddleware
@@ -41,7 +41,6 @@ class AuthApi(object):
         self.app = SessionMiddleware(self.app, session_opts, environ_key=self._session_key)
 
     def authenticate(self, login=False):
-        time.sleep(5)
         env = bottle.request.environ
         self.userInfo = None
         eppn = self._get_session()
