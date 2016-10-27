@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import Facet from './Facet.jsx'
 import CheckboxI from './CheckboxI.jsx'
 import Stats from './Stats.jsx'
-import AlternativesContainer from './AlternativesContainer.jsx'
+import Alternatives from '../state/Alternatives.jsx'
 import { placeFacets, testAllChecks } from '../helpers/filters.js'
 
 export default class Bymeta extends Component {
@@ -20,7 +20,7 @@ export default class Bymeta extends Component {
     return (
       <div>
         {this.rows === null ? (<p> -no facets </p>) : (
-        <AlternativesContainer
+        <Alternatives
           controlPlacement={control => (
             <p style={{fontWeight: 'bold', marginTop: '1em', marginBottom: '0.2em', borderTop: '1px solid black'}}>
               <CheckboxI

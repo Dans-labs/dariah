@@ -1,20 +1,12 @@
-import os, logging
-from datetime import datetime, timedelta
+import os
 import bottle
 from beaker.middleware import SessionMiddleware
-from data import UserApi
+from user import UserApi
 
-User = UserApi()
-
-testUser = dict(
-    eppn='test',
-    email='test@localhost',
-    mayLogin=True,
-    authority='local',
-)
-
-class AuthApi(object):
+class AuthApi(UserApi):
     def __init__(self, secret_file):
+        UserApi.__init__(self)
+
         # determine production or devel
         self.is_devel = os.environ.get('REGIME', None) == 'devel'
 
@@ -45,13 +37,13 @@ class AuthApi(object):
         self.userInfo = None
         eppn = self._get_session()
         if eppn != None:
-            userInfo = User.get_user(eppn)
+            userInfo = self.get_user(eppn)
             if userInfo != None:
                 self.userInfo = userInfo
         if self.userInfo == None:
             self._check_login(force=login)
             if self.userInfo != None:
-                self.userInfo = User.store_update(self.userInfo)
+                self.userInfo = self.store_update(self.userInfo)
                 if self.userInfo != None:
                     if self.userInfo.get('mayLogin', False):
                         self._create_session()
@@ -83,7 +75,7 @@ class AuthApi(object):
     def _check_login(self, force=False):
         env = bottle.request.environ
         if force and self.is_devel:
-            self.userInfo = testUser
+            self.userInfo = self.testUser
         else:
             sKey = 'Shib-Session-ID'
             authenticated =  sKey in env and env[sKey] 

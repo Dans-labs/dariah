@@ -17,7 +17,7 @@ import React, { PropTypes, Component } from 'react'
  * 2. view alternative representations of a resource
 */
 
-export default class AlternativesContainer extends Component {
+export default class Alternatives extends Component {
   constructor(props) {
     super();
     this.state = {alt: props.initial || 0};
@@ -39,7 +39,7 @@ export default class AlternativesContainer extends Component {
   }
 }
 
-AlternativesContainer.propTypes = {
+Alternatives.propTypes = {
   initial: PropTypes.number,
   controlPlacement: PropTypes.func.isRequired,
   controls: PropTypes.array.isRequired,

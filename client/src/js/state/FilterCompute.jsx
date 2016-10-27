@@ -1,14 +1,24 @@
 import React, { Component, PropTypes } from 'react'
-import Contribs from './Contribs.jsx'
-import Filters, { filterList } from './Filters.jsx'
+import Contribs from '../pure/Contribs.jsx'
+import Filters, { filterList } from '../pure/Filters.jsx'
 
 import { newFilterSettings, computeFiltering } from '../helpers/filters.js'
 import { columnStyle } from '../helpers/ui.js'
 
-export default class FilterContainer extends Component {
+export default class FilterCompute extends Component {
   constructor(props) {
     super(props);
-    this.state = { fillterSettings: null };
+    this.store = props.globals.store;
+    this.sKey = this.constructor.name;
+    if (!this.store.has(this.sKey)) {
+      this.state = { fillterSettings: null };
+    }
+    else {
+      this.state = this.store.get(this.sKey);
+    }
+  }
+  componentWillUnmount() {
+    this.store.set(this.sKey, this.state);
   }
   updFilter(filterId, data) {
     const { filterSettings } = this.state;
@@ -50,7 +60,8 @@ export default class FilterContainer extends Component {
   }
 }
 
-FilterContainer.propTypes = {
+FilterCompute.propTypes = {
+  globals: PropTypes.object.isRequired,
   contribs: PropTypes.array.isRequired,
   countries: PropTypes.object.isRequired,
   fieldValues: PropTypes.object.isRequired,

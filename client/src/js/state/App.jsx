@@ -1,22 +1,29 @@
 import React, { Component } from 'react'
-import  NavLink  from './NavLink.jsx'
-import  Login from './Login.jsx'
-import Messages from './Messages.jsx'
-import { getUser } from '../helpers/data.js'
+import  NavLink  from '../pure/NavLink.jsx'
+import  Login from '../pure/Login.jsx'
+import Notification from './Notification.jsx'
+import { getData } from '../helpers/data.js'
+
+const showMe = element => element.style.display = 'block';
 
 export default class extends Component {
   constructor(props) {
     super(props);
-    this.state = {msgs: []};
+    this.state = {};
   }
   componentDidMount() {
-    getUser(this.setState.bind(this), (()=>this.state).bind(this));
+    getData({
+        user: 'user',
+      },
+      this,
+      this.props.route.globals.notification,
+    );
   }
   render() {
-    const { msgs } = this.state;
     return (
       <div>
-        <p className="nav">
+        <Notification globals={this.props.route.globals}/>
+        <p className="nav" style={{paddingRight: '5em'}}>
           <NavLink to="/home/about">
             <img style={{
                 marginBottom: '-1em',
@@ -26,15 +33,13 @@ export default class extends Component {
               src="/static/images/inkind_logo_small.png"
               title="information about this site"
             />
-            </NavLink>
-          <NavLink to="/contrib">Contributions</NavLink>
+          </NavLink>
           {this.state.user != undefined ? (
             <Login
               user={this.state.user}
             />
           ) : ''}
         </p>
-        {this.state.user == undefined ? <Messages data={msgs}/> : ''}
         {this.props.children}
       </div>
     )

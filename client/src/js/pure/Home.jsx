@@ -8,9 +8,10 @@ export default class Home extends Component {
       <div>
         <div className="nav" style={columnStyle('15%', 'left')}>
           <ul className="nav">
-            <li><NavLink to="/home/about">About</NavLink></li>
-            <li><NavLink to="/home/design">Design</NavLink></li>
-            <li><NavLink to="/home/deploy">Deploy</NavLink></li>
+            <li><NavLink to="/contrib">Contributions</NavLink></li>
+            <li><NavLink to="/doc/about">About</NavLink></li>
+            <li><NavLink to="/doc/design">Design</NavLink></li>
+            <li><NavLink to="/doc/deploy">Deploy</NavLink></li>
           </ul>
         </div>
         <div style={columnStyle('85%', 'right')}>

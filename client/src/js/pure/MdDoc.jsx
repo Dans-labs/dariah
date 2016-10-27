@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react'
 import Markdown from 'react-markdown'
 import { Link } from 'react-router'
 import mdText from '../helpers/mdText.js'
-import AlternativesContainer from './AlternativesContainer.jsx'
+import Alternatives from '../state/Alternatives.jsx'
 
 const RouterLink = (props) => (
   props.href.match(/^(https?:)?\/\//)
@@ -14,7 +14,7 @@ const MdDoc = ({ docName }) => {
   const text = mdText[docName];
   return (
     <div style={{paddingLeft: '0.5em'}}>
-      <AlternativesContainer
+      <Alternatives
         controlPlacement={control => (
           <p style={{float: 'right'}}>{control}</p>
         )}

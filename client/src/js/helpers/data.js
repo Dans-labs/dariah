@@ -1,45 +1,21 @@
 import 'whatwg-fetch'
 
-const dataUrl = '/data/'
+const baseUrl = '/data/';
 
-export function getUser(setState, getState) {
-  const { msgs } = getState();
-  setState({...getState(),
-    msgs: [...msgs, {kind: 'info', text: 'getting user info ...'}],
-  });
-  fetch('/whoami', {credentials: 'same-origin'})
-  .then((response) => response.json())
-  .then((responseData) => {
-    setState({...getState(),
-      msgs: [...msgs, {kind: 'info', text: 'user info obtained.'}],
-      user: (responseData.viewState && responseData.viewState.user) || {},
+export function getData(sources, component, notification) {
+  for (const branch of Object.keys(sources)) {
+    notification.notify({kind: 'special', text: `${branch} loading ...`});
+    fetch(`${baseUrl}${sources[branch]}`, {credentials: 'same-origin'})
+    .then((response) => response.json())
+    .then((responseData) => {
+      component.setState({
+        ...component.state,
+        [branch]: responseData.data,
+      });
+      notification.notify({kind: 'info', text: `${branch} loaded.`});
+    })
+    .catch((error) => {
+      notification.notify({kind: 'error', text: `${branch} failed to load.`});
     });
-  })
-  .catch((error) => {
-    setState({...getState(),
-      msgs: [...msgs, {kind: 'error', text: 'could not get user info'}],
-    });
-    console.log('could not get user info', error.toString());
-  });
-}
-
-export function getData(source, slice, setState, getState) {
-  const { msgs } = getState();
-  setState({...getState(),
-    msgs: [...msgs, {kind: 'special', text: `${slice} loading ...`}],
-  });
-  fetch(`${dataUrl}${source}`, {credentials: 'same-origin'})
-  .then((response) => response.json())
-  .then((responseData) => {
-    setState({...getState(),
-      msgs: [...msgs, {kind: 'info', text: `${slice} loaded.`}],
-      [slice]: responseData.data,
-    });
-  })
-  .catch((error) => {
-    setState({...getState(),
-      msgs: [...msgs, {kind: 'error', text: `${slice} failed to load`}],
-    });
-    console.log(`${slice} failed to load`, error.toString());
-  });
+  }
 }

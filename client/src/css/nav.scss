@@ -5,6 +5,7 @@ $active-bgcolor: #ffffee;
 $inactive-color: #0000ff;
 $inactive-bgcolor: #eeeeee;
 $nav-bgcolor: #eeeeee;
+$control-color: #0000cc;
 
 p.nav {
     background-color: $nav-bgcolor;
@@ -49,4 +50,7 @@ ul.nav > li {
     color: $active-color;
     background-color: $active-bgcolor;
     font-weight: bold;
+}
+a.control {
+    color: $control-color;
 }

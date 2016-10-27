@@ -8,18 +8,9 @@ config = dict(
     static_root='../../static',
 )
 
+Data = DataApi()
 Auth = AuthApi('/opt/web-apps/dariah_jwt.secret')
 app = Auth.app
-
-Data = DataApi()
-
-
-def dumpViewState(userInfo):
-    return dict(viewState=dict(user=userInfo))
-
-@route('/hello')
-def hello():
-    return 'Dag mars'
 
 @route('/static/<filepath:path>')
 def serve_static(filepath):
@@ -28,6 +19,11 @@ def serve_static(filepath):
 @route('/favicons/<filepath:path>')
 def serve_fav(filepath):
     return static_file(filepath, root='{}/favicons'.format(config['static_root']))
+
+@route('/data/user')
+def whoami():
+    Auth.authenticate()
+    return Auth.deliver()
 
 @route('/data/<query:re:[a-z0-9_]+>')
 def serve_json(query):
@@ -47,11 +43,6 @@ def login():
 def logout():
     Auth.deauthenticate()
     return template('index')
-
-@route('/whoami')
-def whoami():
-    Auth.authenticate()
-    return dumpViewState(Auth.userInfo)
 
 @route('/<anything:re:.*>')
 def index(anything):

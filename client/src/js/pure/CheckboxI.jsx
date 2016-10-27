@@ -1,13 +1,15 @@
 import React, { Component, PropTypes } from 'react'
 
+const indeterminate = states => !states.allTrue && !states.allFalse
+
 export default class CheckboxI extends Component {
   componentDidMount() {
     const { states } = this.props;
-    this.refs.ci.indeterminate = !states.allTrue && !states.allFalse;
+    this.refs.ci.indeterminate = indeterminate(states);
   }
   componentDidUpdate() {
     const { states } = this.props;
-    this.refs.ci.indeterminate = !states.allTrue && !states.allFalse;
+    this.refs.ci.indeterminate = indeterminate(states);
   }
   render () {
     const { states, filterId, updFilter } = this.props;

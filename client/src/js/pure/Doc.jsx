@@ -13,7 +13,11 @@ const docType = {
 const Doc = (props) => {
   const docName = props.params.docName;
   const DocClass = docType[docName];
-  return DocClass == undefined ? <NotFound params={{splat: `document ${docName}`}}/> : <DocClass docName={docName}/>
+  return DocClass == undefined ? (
+    <NotFound params={{splat: `document ${docName}`}}/>
+  ) : (
+    <DocClass docName={docName}/>
+  )
 }
 
 export default Doc
