@@ -2,34 +2,15 @@ import React, { Component } from 'react'
 import  NavLink  from './NavLink.jsx'
 import  Login from './Login.jsx'
 import Messages from './Messages.jsx'
+import { getUser } from '../helpers/data.js'
 
 export default class extends Component {
   constructor(props) {
     super(props);
     this.state = {msgs: []};
   }
-  getUser() {
-    const { msgs } = this.state;
-    this.setState({...this.state,
-      msgs: [...msgs, {kind: 'info', text: 'getting user info ...'}],
-    });
-    fetch('/whoami')
-    .then((response) => response.json())
-    .then((responseData) => {
-      this.setState({...this.state,
-        msgs: [...msgs, {kind: 'info', text: 'user info obtained.'}],
-        user: (responseData.viewState && responseData.viewState.user) || {},
-      });
-    })
-    .catch((error) => {
-      this.setState({...this.state,
-        msgs: [...msgs, {kind: 'error', text: 'could not get user info'}],
-      });
-      console.log('could not get user info', error.toString());
-    });
-  }
   componentDidMount() {
-    this.getUser();
+    getUser(this.setState.bind(this), (()=>this.state).bind(this));
   }
   render() {
     const { msgs } = this.state;

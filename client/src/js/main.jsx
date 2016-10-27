@@ -6,8 +6,7 @@ import App from './components/App.jsx';
 import ContribsContainer from './components/ContribsContainer.jsx';
 import Home from './components/Home.jsx';
 import Doc from './components/Doc.jsx';
-
-const NotFound = (props) => (<h1>404: <code>{props.params.splat}</code> not found on this site.</h1>)
+import NotFound from './components/NotFound.jsx';
 
 render(
   <Router history={browserHistory}>
