@@ -3,7 +3,7 @@ import { render } from 'react-dom';
 import { Router, Route, Redirect, DefaultRoute, IndexRoute, IndexRedirect, browserHistory } from 'react-router';
 
 import App from './state/App.jsx';
-import Contribs from './state/ContribsFiltered.jsx';
+import ContribsFiltered from './state/ContribsFiltered.jsx';
 import Home from './pure/Home.jsx';
 import Doc from './pure/Doc.jsx';
 import NotFound from './pure/NotFound.jsx';
@@ -46,7 +46,7 @@ render(
       <IndexRoute component={Home}/>
       <IndexRedirect to="/doc/about"/>
       <Route path="/" component={Home}>
-        <Route path="/contrib" globals={globals} component={Contribs}/>
+        <Route path="/contrib" globals={globals} component={ContribsFiltered}/>
         <Route path="/doc/:docName" component={Doc}/>
       </Route>
       <Redirect from="/login" to="/doc/about"/>
