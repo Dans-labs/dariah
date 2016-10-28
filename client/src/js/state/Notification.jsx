@@ -76,8 +76,9 @@ const msgStyle = {
 export default class Notification extends Component {
   constructor(props) {
     super(props);
-    props.globals.notification = this
-    this.store = props.globals.store;
+    const globals = this.props.globals;
+    globals.notification = this
+    this.store = globals.store;
     this.key = 'Notification';
     this.store.register(this, this.key, {msgs: null})
     this.msgs = []; // synchronous list of messages
@@ -162,5 +163,4 @@ export default class Notification extends Component {
 }
 
 Notification.propTypes = {
-  globals: PropTypes.object.isRequired,
 }

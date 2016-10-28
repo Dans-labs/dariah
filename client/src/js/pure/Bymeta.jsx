@@ -15,12 +15,17 @@ export default class Bymeta extends Component {
     this.rows = placeFacets(filterField, fieldValues, maxcols);
   }
   render () {
-    const { filterId, filterField, filterSettings, filteredAmount, filteredAmountOthers, amounts, updFilter } = this.props;
+    const {
+      filterId, filterField, filterSettings,
+      filteredAmount, filteredAmountOthers,
+      amounts, updFilter,
+      globals,
+    } = this.props;
     const statStyle = {align: 'right'};
     return (
       <div>
         {this.rows === null ? (<p> -no facets </p>) : (
-        <Alternatives
+        <Alternatives globals={globals} tag={filterField}
           controlPlacement={control => (
             <p style={{fontWeight: 'bold', marginTop: '1em', marginBottom: '0.2em', borderTop: '1px solid black'}}>
               <CheckboxI

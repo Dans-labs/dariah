@@ -17,13 +17,19 @@ const styles = {
     backgroundColor: '#ffffee',
 }
 
-const Filters = ({ filterSettings, fieldValues, filteredData, filteredAmount, filteredAmountOthers, amounts, updFilter, countries }) => (
+const Filters = ({
+  filterSettings, fieldValues, filteredData,
+  filteredAmount, filteredAmountOthers,
+  amounts, updFilter,
+  countries, globals
+}) => (
   <div style={styles}>
     {filterList.map((filter, filterId) => {
       const needs = filter.name === 'EUMap' ? {countries} : {};
       const Fclass = filter.kind;
       return (
         <Fclass
+          globals={globals}
           key={filterId}
           filterId={filterId}
           filterField={filter.field}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react'
 import { render } from 'react-dom';
 import { Router, Route, Redirect, DefaultRoute, IndexRoute, IndexRedirect, browserHistory } from 'react-router';
 
@@ -13,6 +13,18 @@ const globals = {
   store: new Store(),
   notification: null,
 };
+
+function wrapStore(Component, props) {
+  /* this handler is called for every route to a component below.
+   * It passes the globals as property to the component.
+   * All components on such a route can access the globals as this.props.globals
+   * Beware: components not mentioned on a router, but constructed during rendering
+   * must get the globals in an other way: just by passing them down (React context does not seem to work)
+   */
+
+const newProps = {...props, globals};
+  return <Component {...newProps} />
+}
 
 /* Some things need to be global!
  *
@@ -42,12 +54,12 @@ const globals = {
  */
 
 render(
-  <Router history={browserHistory}>
-    <Route path="/" globals={globals} component={App}>
+  <Router history={browserHistory} createElement={wrapStore}>
+    <Route path="/" component={App}>
       <IndexRoute component={Home}/>
       <IndexRedirect to="/doc/about"/>
       <Route path="/" component={Home}>
-        <Route path="/contrib" globals={globals} component={ContribsFiltered}/>
+        <Route path="/contrib" component={ContribsFiltered}/>
         <Route path="/doc/:docName" component={Doc}/>
       </Route>
       <Redirect from="/login" to="/doc/about"/>

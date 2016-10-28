@@ -20,16 +20,23 @@ import React, { PropTypes, Component } from 'react'
 export default class Alternatives extends Component {
   constructor(props) {
     super();
-    this.state = {alt: props.initial || 0};
+    const { tag } = props;
+    this.store = props.globals.store;
+    this.key = 'Alternatives'+tag;
+    this.store.register(this, this.key, {});
+  }
+  componentWillUnmount() {
+    this.store.save(this.key);
   }
   next(event) {
     event.preventDefault();
-    const n = this.props.alternatives.length
-    this.setState({alt: (this.state.alt + 1) % n})
+    const { alternatives, tag, initial } = this.props;
+    const newAlt = ((this.state[tag] || initial || 0) + 1) % alternatives.length; 
+    this.setState({...this.state, [tag]: newAlt});
   }
   render() {
-    const { controlPlacement, controls, alternatives } = this.props;
-    const alt = this.state.alt;
+    const { controlPlacement, controls, alternatives, tag, initial } = this.props;
+    const alt = this.state[tag] || initial || 0;
     return (
       <div>
         {controlPlacement(controls[alt](this.next.bind(this)))}

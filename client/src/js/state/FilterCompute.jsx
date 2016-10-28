@@ -24,8 +24,12 @@ export default class FilterCompute extends Component {
   }
   render() {
     const { filterSettings } = this.state;
-    const { countries, contribs, fieldValues } = this.props;
-    const { filteredData, filteredAmountOthers, amounts } = computeFiltering( contribs, filterList, fieldValues, filterSettings);
+    const { countries, contribs, fieldValues, globals } = this.props;
+    const {
+      filteredData, filteredAmountOthers, amounts
+    } = computeFiltering(
+      contribs, filterList, fieldValues, filterSettings,
+    );
     return (
       <div>
         <div style={columnStyle('40%', 'left')}>
@@ -33,6 +37,7 @@ export default class FilterCompute extends Component {
             style={{fontWeight: 'bold', backgroundColor: '#eeeeff'}}
           >Showing {filteredData.length} of {contribs.length}</p>
           <Filters
+            globals={globals}
             countries={countries}
             fieldValues={fieldValues}
             filteredAmount={filteredData.length}
@@ -51,7 +56,6 @@ export default class FilterCompute extends Component {
 }
 
 FilterCompute.propTypes = {
-  globals: PropTypes.object.isRequired,
   contribs: PropTypes.array.isRequired,
   countries: PropTypes.object.isRequired,
   fieldValues: PropTypes.object.isRequired,

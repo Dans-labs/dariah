@@ -4,17 +4,17 @@ import { Link } from 'react-router'
 import mdText from '../helpers/mdText.js'
 import Alternatives from '../state/Alternatives.jsx'
 
-const RouterLink = (props) => (
-  props.href.match(/^(https?:)?\/\//)
-    ? <a href={props.href}>{props.children}</a>
-    : <Link to={props.href}>{props.children}</Link>
+const RouterLink = ({ children, href }) => (
+  href.match(/^(https?:)?\/\//)
+    ? <a href={href}>{children}</a>
+    : <Link to={href}>{children}</Link>
 )
 
-const MdDoc = ({ docName }) => {
+const MdDoc = ({ docName, globals }) => {
   const text = mdText[docName];
   return (
     <div style={{paddingLeft: '0.5em'}}>
-      <Alternatives
+      <Alternatives globals={globals} tag={docName}
         controlPlacement={control => (
           <p style={{float: 'right'}}>{control}</p>
         )}

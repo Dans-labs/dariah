@@ -8,7 +8,7 @@ import { getData } from '../helpers/data.js'
 export default class ContribsFiltered extends Component {
   constructor(props) {
     super(props);
-    this.store = props.route.globals.store;
+    this.store = props.globals.store;
     this.key = 'ContribsFiltered';
     this.store.register(this, this.key, {contribs: null, countries: null})
   }
@@ -22,8 +22,9 @@ export default class ContribsFiltered extends Component {
     }
     const { fieldValues, filterInit } = compileFiltering(contribs, filterList);
     const countriesMap = new Map(countries.map(x => [x._id, x]));
+    const { globals } = this.props;
     return <FilterCompute
-      globals={this.props.route.globals}
+      globals={globals}
       contribs={contribs}
       countries={countriesMap}
       fieldValues={fieldValues}
@@ -38,11 +39,11 @@ export default class ContribsFiltered extends Component {
           countries: 'member_country',
         },
         this,
-        this.props.route.globals.notification,
+        this.props.globals.notification,
       );
     }
   }
 }
 
 ContribsFiltered.propTypes = {
-}
+};

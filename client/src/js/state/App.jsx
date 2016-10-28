@@ -8,12 +8,18 @@ const showMe = element => element.style.display = 'block';
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.store = props.globals.store;
+    this.key = 'App';
+    this.store.register(this, this.key, {})
+  }
+  componentWillUnmount() {
+    this.store.save(this.key);
   }
   render() {
+    const { globals } = this.props;
     return (
       <div>
-        <Notification globals={this.props.route.globals}/>
+        <Notification globals={globals}/>
         <p className="nav" style={{paddingRight: '5em'}}>
           <img style={{
               marginBottom: '-1em',
@@ -38,7 +44,7 @@ export default class App extends Component {
         user: 'user',
       },
       this,
-      this.props.route.globals.notification,
+      this.props.globals.notification,
     );
   }
 }
