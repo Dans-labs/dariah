@@ -9,28 +9,11 @@ export default class ContribsFiltered extends Component {
   constructor(props) {
     super(props);
     this.store = props.route.globals.store;
-    this.sKey = this.constructor.name;
-    if (!this.store.has(this.sKey)) {
-      this.state = {contribs: null, countries: null};
-    }
-    else {
-      this.state = this.store.get(this.sKey);
-    }
+    this.key = 'ContribsFiltered';
+    this.store.register(this, this.key, {contribs: null, countries: null})
   }
   componentWillUnmount() {
-    this.store.set(this.sKey, this.state);
-  }
-  componentDidMount() {
-    const { contribs, countries } = this.state;
-    if (contribs == null || countries == null) {
-      getData({
-          contribs: 'list_contrib',
-          countries: 'member_country',
-        },
-        this,
-        this.props.route.globals.notification,
-      );
-    }
+    this.store.save(this.key);
   }
   render() {
     const { contribs, countries } = this.state;
@@ -46,6 +29,18 @@ export default class ContribsFiltered extends Component {
       fieldValues={fieldValues}
       filterInit={filterInit}
     />
+  }
+  componentDidMount() {
+    const { contribs, countries } = this.state;
+    if (contribs == null || countries == null) {
+      getData({
+          contribs: 'list_contrib',
+          countries: 'member_country',
+        },
+        this,
+        this.props.route.globals.notification,
+      );
+    }
   }
 }
 

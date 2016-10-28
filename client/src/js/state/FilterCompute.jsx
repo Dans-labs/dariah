@@ -8,28 +8,18 @@ import { columnStyle } from '../helpers/ui.js'
 export default class FilterCompute extends Component {
   constructor(props) {
     super(props);
+    const { filterInit } = props;
     this.store = props.globals.store;
-    this.sKey = this.constructor.name;
-    if (!this.store.has(this.sKey)) {
-      this.state = { fillterSettings: null };
-    }
-    else {
-      this.state = this.store.get(this.sKey);
-    }
+    this.key = 'FilterCompute';
+    this.store.register(this, this.key, {filterSettings: filterInit})
   }
   componentWillUnmount() {
-    this.store.set(this.sKey, this.state);
+    this.store.save(this.key);
   }
   updFilter(filterId, data) {
     const { filterSettings } = this.state;
     this.setState({...this.state,
       filterSettings: newFilterSettings(filterSettings, filterId, data),
-    });
-  }
-  componentWillMount() {
-    const { filterInit } = this.props;
-    this.setState({...this.state,
-      filterSettings: filterInit,
     });
   }
   render() {

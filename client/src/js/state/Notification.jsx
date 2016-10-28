@@ -2,18 +2,18 @@ import React, { Component, PropTypes } from 'react'
 
 const msgStyle = {
   info: {
-    color: '#880000',
+    color: '#222222',
   },
   error: {
-    color: '#ff0000',
+    color: '#bb0000',
     fontWeight: 'bold',
   },
   warning: {
-    color: '#aaff00',
+    color: '#886600',
     fontWeight: 'bold',
   },
   good: {
-    color: '#00ff00',
+    color: '#00aa00',
     fontWeight: 'bold',
   },
   special: {
@@ -25,6 +25,15 @@ const msgStyle = {
     paddingBottom: 0,
     marginTop: 0,
     marginBottom: 0,
+  },
+  dismiss: {
+    paddingTop: 2,
+    paddingBottom: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    fontStyle: 'italic',
+    fontSize: 'smaller',
+    textAlign: 'right',
   },
   box: {
     position: 'fixed',
@@ -59,88 +68,96 @@ const msgStyle = {
     cursor: 'pointer',
     fontSize: 'medium',
   },
+  dot: {
+    fontSize: 'small',
+  }
 }
 
 export default class Notification extends Component {
   constructor(props) {
     super(props);
-    this.store = props.globals.store;
-    this.sKey = this.constructor.name;
-    if (!this.store.has(this.sKey)) {
-      this.state = {msgs: null};
-    }
-    else {
-      this.state = this.store.get(this.sKey);
-    }
     props.globals.notification = this
+    this.store = props.globals.store;
+    this.key = 'Notification';
+    this.store.register(this, this.key, {msgs: null})
+    this.msgs = []; // synchronous list of messages
+    this.visible = false;
   }
   componentWillUnmount() {
-    this.store.set(this.sKey, this.state);
-  }
-  componentDidMount() {
-    this.focusLast();
-  }
-  componentDidUpdate() {
-    this.focusLast();
-  }
-  focusLast() {
-    const lastMsg = (this.state && this.state.msgs)? this.state.msgs.length : 0;
-    if (lastMsg) {
-      this.refs[`m${lastMsg-1}`].scrollIntoView();
-    }
+    this.store.save(this.key);
   }
   notify(msg) {
-    if (!this.state) {
-        /* This component has not been mounted.
-         * We add the message to the saved state in the store
-         */
-      if (!this.store.has(this.sKey)) { // saved store is empty too
-        this.store.set(this.sKey, {msgs: [msg]})
-      }
-      else {
-        const savedState = this.store.get(this.sKey);
-        if (savedState.msgs == null) {
-          savedState.msgs = [msg]
-        }
-        else {
-          savedState.msgs.push(msg)
-        }
-      }
-    }
-    else {
-      this.setState({msgs: [...(this.state.msgs || []), msg]})
-    }
+    this.msgs.push(msg); // synchronous addition of msg
+    this.setState({msgs: [...(this.msgs)]}); // asynchronous update of the state
   }
-  visible(on) {
-    this.refs.notbox.style.display = on?'block':'none'
+  computeProgress() {
+    const lastMsg = this.msgs.length -1;
+    let lastError = -1;
+    let busy = 0
+    this.msgs.forEach((msg, i) => {
+      if (msg.kind == 'error') {lastError = i}
+      busy += msg.busy || 0;
+    })
+    if (busy < 0) {
+      console.warn(`SHOULD NOT HAPPEN: negative value for busy ${busy}`);
+      busy = 0;
+    }
+    const visible = this.visible || (lastError > -1);
+    return [lastMsg, lastError, busy, visible];
   }
   render() {
-    const {msgs} = this.state;
+    [this.lastMsg, this.lastError, this.busy, this.visible] = this.computeProgress();
+    const busyBlocks = new Array(this.busy).fill(1);
     return ( 
       <div>
         <p style={msgStyle.spinner}>
-          <a href="#" className="control fa fa-spinner"
-            onClick={e=>{e.preventDefault(); this.visible(true)}}
-          />
+          <a href="#" className={this.lastError > -1 ? 'spin-err' : 'spin-ok'}
+            onClick={e=>{e.preventDefault(); this.setView(!this.visible)}}
+          >
+            { busyBlocks.map((b, i) => <span key={i} style={msgStyle.dot} className="fa fa-circle"></span>) }
+            <span className={`fa fa-${this.busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}/>
+          </a>
         </p>
-        {(msgs != null && msgs.length != 0) ? ( 
-          <div ref="notbox" style={msgStyle.box}>
-            {
-              msgs.map((msg, index) => (
-              <p
-                key={index} ref={`m${index}`}
-                style={{...msgStyle.line, ...msgStyle[msg.kind]}}
-              >{msg.text}</p>
-              ))
-            }
-            <a href="#" className="control fa fa-close"
-              onClick={e=>{e.preventDefault(); this.visible(false)}}
-            />
-          </div>
-          ) : null
-        }
+        <div ref="notbox" style={msgStyle.box}
+          onClick={e=>{e.preventDefault(); this.setView(false)}}
+        >
+          {
+            (this.msgs || []).map((msg, index) => (
+            <p
+              key={index} ref={`m${index}`}
+              style={{...msgStyle.line, ...msgStyle[msg.kind]}}
+            >{msg.text}</p>
+            ))
+          }
+          <p style={msgStyle.dismiss}>click to dismiss</p>
+        </div>
       </div>
     )
+  }
+  componentDidMount() {
+    this.setView();
+  }
+  componentDidUpdate() {
+    this.setView();
+  }
+  setView(on) {
+    if (on !== undefined) {
+      this.visible = on;
+    }
+    this.refs.notbox.style.display = this.visible ? 'block' : 'none';
+    this.setScroll();
+  }
+  setScroll() {
+    if (this.visible) {
+      if (this.lastError > -1) {
+        this.refs[`m${this.lastError}`].scrollIntoView();
+      }
+      else {
+        if (this.lastMsg > -1) {
+          this.refs[`m${this.lastMsg}`].scrollIntoView()
+        }
+      }
+    }
   }
 }
 

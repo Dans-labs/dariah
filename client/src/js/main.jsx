@@ -7,9 +7,10 @@ import ContribsFiltered from './state/ContribsFiltered.jsx';
 import Home from './pure/Home.jsx';
 import Doc from './pure/Doc.jsx';
 import NotFound from './pure/NotFound.jsx';
+import Store from './helpers/Store.js';
 
 const globals = {
-  store: new Map,
+  store: new Store(),
   notification: null,
 };
 

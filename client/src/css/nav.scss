@@ -5,7 +5,8 @@ $active-bgcolor: #ffffee;
 $inactive-color: #0000ff;
 $inactive-bgcolor: #eeeeee;
 $nav-bgcolor: #eeeeee;
-$control-color: #0000cc;
+$control-color: #444444;
+$error-color: #ff0000;
 
 p.nav {
     background-color: $nav-bgcolor;
@@ -51,6 +52,9 @@ ul.nav > li {
     background-color: $active-bgcolor;
     font-weight: bold;
 }
-a.control {
+a.spin-ok {
     color: $control-color;
+}
+a.spin-err {
+    color: $error-color;
 }
