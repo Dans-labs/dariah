@@ -4,12 +4,13 @@ import Filters, { filterList } from '../pure/Filters.jsx'
 
 import { newFilterSettings, computeFiltering } from '../helpers/filters.js'
 import { columnStyle } from '../helpers/ui.js'
+import { withContext } from '../helpers/hoc.js'
 
-export default class FilterCompute extends Component {
+class FilterCompute extends Component {
   constructor(props) {
     super(props);
     const { filterInit } = props;
-    this.store = props.globals.store;
+    this.store = props.store;
     this.key = 'FilterCompute';
     this.store.register(this, this.key, {filterSettings: filterInit})
   }
@@ -24,7 +25,7 @@ export default class FilterCompute extends Component {
   }
   render() {
     const { filterSettings } = this.state;
-    const { countries, contribs, fieldValues, globals } = this.props;
+    const { countries, contribs, fieldValues } = this.props;
     const {
       filteredData, filteredAmountOthers, amounts
     } = computeFiltering(
@@ -32,12 +33,11 @@ export default class FilterCompute extends Component {
     );
     return (
       <div>
-        <div style={columnStyle('40%', 'left')}>
+        <div style={columnStyle('rightLeft')}>
           <p
             style={{fontWeight: 'bold', backgroundColor: '#eeeeff'}}
           >Showing {filteredData.length} of {contribs.length}</p>
           <Filters
-            globals={globals}
             countries={countries}
             fieldValues={fieldValues}
             filteredAmount={filteredData.length}
@@ -47,7 +47,7 @@ export default class FilterCompute extends Component {
             updFilter={this.updFilter.bind(this)}
           />
         </div>
-        <div style={columnStyle('60%', 'right')}>
+        <div style={columnStyle('rightRight')}>
           <Contribs filteredData={filteredData}/>
         </div>
       </div>
@@ -61,3 +61,5 @@ FilterCompute.propTypes = {
   fieldValues: PropTypes.object.isRequired,
   filterInit: PropTypes.object.isRequired,
 }
+
+export default withContext(FilterCompute)

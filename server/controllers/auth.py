@@ -32,6 +32,14 @@ class AuthApi(UserApi):
         self._session_key = 'dariah.session'
         self.app = SessionMiddleware(self.app, session_opts, environ_key=self._session_key)
 
+    def required(self, f): # decorator
+        def g(*args, **kwargs):
+            self.authenticate()
+            if self.userInfo == None:
+                return dict(data=[], msgs=[dict(kind='warning', text='You need to be logged in to get this data')], good=True)
+            return f(*args, **kwargs)
+        return g
+
     def authenticate(self, login=False):
         env = bottle.request.environ
         self.userInfo = None
@@ -48,7 +56,7 @@ class AuthApi(UserApi):
                     if self.userInfo.get('mayLogin', False):
                         self._create_session()
                     else:
-                        self._delete_session()
+                        self.userInfo = None
         if self.userInfo == None:
             self._delete_session
 

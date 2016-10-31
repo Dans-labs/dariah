@@ -4,11 +4,12 @@ import FilterCompute from './FilterCompute.jsx'
 import { filterList } from '../pure/Filters.jsx'
 import { compileFiltering } from '../helpers/filters.js'
 import { getData } from '../helpers/data.js'
+import { withContext } from '../helpers/hoc.js'
 
-export default class ContribsFiltered extends Component {
+class ContribsFiltered extends Component {
   constructor(props) {
     super(props);
-    this.store = props.globals.store;
+    this.store = props.store;
     this.key = 'ContribsFiltered';
     this.store.register(this, this.key, {contribs: null, countries: null})
   }
@@ -22,9 +23,7 @@ export default class ContribsFiltered extends Component {
     }
     const { fieldValues, filterInit } = compileFiltering(contribs, filterList);
     const countriesMap = new Map(countries.map(x => [x._id, x]));
-    const { globals } = this.props;
     return <FilterCompute
-      globals={globals}
       contribs={contribs}
       countries={countriesMap}
       fieldValues={fieldValues}
@@ -35,11 +34,11 @@ export default class ContribsFiltered extends Component {
     const { contribs, countries } = this.state;
     if (contribs == null || countries == null) {
       getData({
-          contribs: 'list_contrib',
+          contribs: `list_contrib`,
           countries: 'member_country',
         },
         this,
-        this.props.globals.notification,
+        this.props.notification.component,
       );
     }
   }
@@ -47,3 +46,5 @@ export default class ContribsFiltered extends Component {
 
 ContribsFiltered.propTypes = {
 };
+
+export default withContext(ContribsFiltered)

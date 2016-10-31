@@ -10,13 +10,13 @@ const docType = {
   deploy: MdDoc,
 }
 
-const Doc = ({ params, globals }) => {
+const Doc = ({ params }) => {
   const docName = params.docName;
   const DocClass = docType[docName];
   return DocClass == undefined ? (
     <NotFound params={{splat: `document ${docName}`}}/>
   ) : (
-    <DocClass globals={globals} docName={docName}/>
+    <DocClass docName={docName}/>
   )
 }
 

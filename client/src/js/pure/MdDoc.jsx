@@ -10,11 +10,11 @@ const RouterLink = ({ children, href }) => (
     : <Link to={href}>{children}</Link>
 )
 
-const MdDoc = ({ docName, globals }) => {
+const MdDoc = ({ docName }) => {
   const text = mdText[docName];
   return (
     <div style={{paddingLeft: '0.5em'}}>
-      <Alternatives globals={globals} tag={docName}
+      <Alternatives tag={docName}
         controlPlacement={control => (
           <p style={{float: 'right'}}>{control}</p>
         )}

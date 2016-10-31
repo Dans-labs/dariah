@@ -1,25 +1,27 @@
-import React, { Component } from 'react'
+import React, { Component, PropTypes } from 'react'
 import  Login from '../pure/Login.jsx'
+import  NavLink  from '../pure/NavLink.jsx'
 import Notification from './Notification.jsx'
+import { withContext } from '../helpers/hoc.js'
 import { getData } from '../helpers/data.js'
+import { columnStyle } from '../helpers/ui.js'
 
 const showMe = element => element.style.display = 'block';
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
-    this.store = props.globals.store;
+    this.store = this.props.store;
     this.key = 'App';
-    this.store.register(this, this.key, {})
+    this.store.register(this, this.key, {user: {}})
   }
   componentWillUnmount() {
     this.store.save(this.key);
   }
   render() {
-    const { globals } = this.props;
     return (
       <div>
-        <Notification globals={globals}/>
+        <Notification/>
         <p className="nav" style={{paddingRight: '5em'}}>
           <img style={{
               marginBottom: '-1em',
@@ -29,13 +31,21 @@ export default class App extends Component {
             src="/static/images/inkind_logo_small.png"
             title="information about this site"
           />
-          {this.state.user != undefined ? (
-            <Login
-              user={this.state.user}
-            />
-          ) : ''}
+          <Login
+            user={this.state.user}
+          />
         </p>
-        {this.props.children}
+        <div className="nav" style={columnStyle('left')}>
+          <ul className="nav">
+            <li><NavLink to="/contrib">Contributions</NavLink></li>
+            <li><NavLink to="/doc/about">About</NavLink></li>
+            <li><NavLink to="/doc/design">Design</NavLink></li>
+            <li><NavLink to="/doc/deploy">Deploy</NavLink></li>
+          </ul>
+        </div>
+        <div style={columnStyle('right')}>
+          {this.props.children}
+        </div>
       </div>
     )
   }
@@ -44,8 +54,9 @@ export default class App extends Component {
         user: 'user',
       },
       this,
-      this.props.globals.notification,
+      this.props.notification.component,
     );
   }
 }
 
+export default withContext(App)

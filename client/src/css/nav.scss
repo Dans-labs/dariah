@@ -7,6 +7,7 @@ $inactive-bgcolor: #eeeeee;
 $nav-bgcolor: #eeeeee;
 $control-color: #444444;
 $error-color: #ff0000;
+$warning-color: #ffaa00;
 
 p.nav {
     background-color: $nav-bgcolor;
@@ -28,11 +29,14 @@ ul.nav {
     list-style-image: none;
     list-style-position: outside;
     margin-right: 1em;
-    margin-left: -1em;
+    margin-left: 0em;
+    padding-left: 0;
 }
 ul.nav > li {
     padding-top: 0.3em;
     padding-bottom: 0.3em;
+    font-size: small;
+    margin-left: 0em;
 }
 .nav a {
     color: $inactive-color;
@@ -55,6 +59,9 @@ ul.nav > li {
 a.spin-ok {
     color: $control-color;
 }
-a.spin-err {
+a.spin-error {
+    color: $error-color;
+}
+a.spin-warning {
     color: $error-color;
 }

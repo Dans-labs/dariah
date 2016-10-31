@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react'
 
 import Fulltext from './Fulltext.jsx'
-import Bymeta from './Bymeta.jsx'
-import EUMap from './EUMap.jsx'
+import Bymeta from '../object/Bymeta.jsx'
+import EUMap from '../object/EUMap.jsx'
 
 export const filterList = [
   {kind: Fulltext, name: 'Fulltext', field: 'title',               maxcols: null},
@@ -21,7 +21,7 @@ const Filters = ({
   filterSettings, fieldValues, filteredData,
   filteredAmount, filteredAmountOthers,
   amounts, updFilter,
-  countries, globals
+  countries
 }) => (
   <div style={styles}>
     {filterList.map((filter, filterId) => {
@@ -29,7 +29,6 @@ const Filters = ({
       const Fclass = filter.kind;
       return (
         <Fclass
-          globals={globals}
           key={filterId}
           filterId={filterId}
           filterField={filter.field}

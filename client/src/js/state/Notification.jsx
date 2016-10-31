@@ -1,15 +1,16 @@
 import React, { Component, PropTypes } from 'react'
+import { withContext } from '../helpers/hoc.js'
 
 const msgStyle = {
   info: {
     color: '#222222',
   },
   error: {
-    color: '#bb0000',
+    color: '#dd0000',
     fontWeight: 'bold',
   },
   warning: {
-    color: '#886600',
+    color: '#dd8800',
     fontWeight: 'bold',
   },
   good: {
@@ -73,12 +74,13 @@ const msgStyle = {
   }
 }
 
-export default class Notification extends Component {
+const empty = [];
+
+class Notification extends Component {
   constructor(props) {
     super(props);
-    const globals = this.props.globals;
-    globals.notification = this
-    this.store = globals.store;
+    props.notification.component = this
+    this.store = props.store;
     this.key = 'Notification';
     this.store.register(this, this.key, {msgs: null})
     this.msgs = []; // synchronous list of messages
@@ -93,26 +95,30 @@ export default class Notification extends Component {
   }
   computeProgress() {
     const lastMsg = this.msgs.length -1;
-    let lastError = -1;
+    let lastNote = -1;
+    let lastKind = 'info';
     let busy = 0
     this.msgs.forEach((msg, i) => {
-      if (msg.kind == 'error') {lastError = i}
+      if (msg.kind == 'error') {lastNote = i, lastKind = 'error'}
+      else if (msg.kind == 'warning') {
+        if (lastKind != 'error') {lastNote = i, lastKind = 'warning'}
+      }
       busy += msg.busy || 0;
     })
     if (busy < 0) {
       console.warn(`SHOULD NOT HAPPEN: negative value for busy ${busy}`);
       busy = 0;
     }
-    const visible = this.visible || (lastError > -1);
-    return [lastMsg, lastError, busy, visible];
+    const visible = this.visible || (lastNote > -1);
+    return [lastMsg, lastNote, lastKind, busy, visible];
   }
   render() {
-    [this.lastMsg, this.lastError, this.busy, this.visible] = this.computeProgress();
+    [this.lastMsg, this.lastNote, this.lastKind, this.busy, this.visible] = this.computeProgress();
     const busyBlocks = new Array(this.busy).fill(1);
     return ( 
       <div>
         <p style={msgStyle.spinner}>
-          <a href="#" className={this.lastError > -1 ? 'spin-err' : 'spin-ok'}
+          <a href="#" className={this.lastNote > -1 ? `spin-${this.lastKind}` : 'spin-ok'}
             onClick={e=>{e.preventDefault(); this.setView(!this.visible)}}
           >
             { busyBlocks.map((b, i) => <span key={i} style={msgStyle.dot} className="fa fa-circle"></span>) }
@@ -123,7 +129,7 @@ export default class Notification extends Component {
           onClick={e=>{e.preventDefault(); this.setView(false)}}
         >
           {
-            (this.msgs || []).map((msg, index) => (
+            (this.msgs || empty).map((msg, index) => (
             <p
               key={index} ref={`m${index}`}
               style={{...msgStyle.line, ...msgStyle[msg.kind]}}
@@ -150,8 +156,8 @@ export default class Notification extends Component {
   }
   setScroll() {
     if (this.visible) {
-      if (this.lastError > -1) {
-        this.refs[`m${this.lastError}`].scrollIntoView();
+      if (this.lastNote > -1) {
+        this.refs[`m${this.lastNote}`].scrollIntoView();
       }
       else {
         if (this.lastMsg > -1) {
@@ -164,3 +170,5 @@ export default class Notification extends Component {
 
 Notification.propTypes = {
 }
+
+export default withContext(Notification)

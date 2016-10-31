@@ -21,7 +21,7 @@ const Login = ({ user, login, logout }) => {
   }
   return (
     <span style={{float: 'right', fontSize: 'small'}}>
-      { Object.keys(user).length > 0 ? (
+      { user && Object.keys(user).length > 0 ? (
       <span style={{color: '#333333'}}>
         <strong className="fa fa-user" style={styles[access]}>{user.eppn}</strong>
         {` authenticated by ${user.authority} `}

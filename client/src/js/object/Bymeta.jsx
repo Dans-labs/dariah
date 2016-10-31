@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
-import Facet from './Facet.jsx'
+import Facet from '../pure/Facet.jsx'
 import CheckboxI from './CheckboxI.jsx'
-import Stats from './Stats.jsx'
+import Stats from '../pure/Stats.jsx'
 import Alternatives from '../state/Alternatives.jsx'
 import { placeFacets, testAllChecks } from '../helpers/filters.js'
 
@@ -19,13 +19,12 @@ export default class Bymeta extends Component {
       filterId, filterField, filterSettings,
       filteredAmount, filteredAmountOthers,
       amounts, updFilter,
-      globals,
     } = this.props;
     const statStyle = {align: 'right'};
     return (
       <div>
         {this.rows === null ? (<p> -no facets </p>) : (
-        <Alternatives globals={globals} tag={filterField}
+        <Alternatives tag={filterField}
           controlPlacement={control => (
             <p style={{fontWeight: 'bold', marginTop: '1em', marginBottom: '0.2em', borderTop: '1px solid black'}}>
               <CheckboxI

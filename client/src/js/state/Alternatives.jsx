@@ -1,4 +1,5 @@
 import React, { PropTypes, Component } from 'react'
+import { withContext } from '../helpers/hoc.js'
 
 /*
  * A choice between several alternatives, with controls to click to the next alternative.
@@ -17,12 +18,12 @@ import React, { PropTypes, Component } from 'react'
  * 2. view alternative representations of a resource
 */
 
-export default class Alternatives extends Component {
+class Alternatives extends Component {
   constructor(props) {
     super();
-    const { tag } = props;
-    this.store = props.globals.store;
-    this.key = 'Alternatives'+tag;
+    const { tag, store } = props;
+    this.store = store;
+    this.key = 'Alternatives.'+tag;
     this.store.register(this, this.key, {});
   }
   componentWillUnmount() {
@@ -53,3 +54,4 @@ Alternatives.propTypes = {
   alternatives: PropTypes.array.isRequired,
 }
 
+export default withContext(Alternatives)

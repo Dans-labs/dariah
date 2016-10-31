@@ -2,29 +2,12 @@ import React, { Component } from 'react'
 import { render } from 'react-dom';
 import { Router, Route, Redirect, DefaultRoute, IndexRoute, IndexRedirect, browserHistory } from 'react-router';
 
+import Provider from './object/Provider.jsx';
 import App from './state/App.jsx';
 import ContribsFiltered from './state/ContribsFiltered.jsx';
-import Home from './pure/Home.jsx';
 import Doc from './pure/Doc.jsx';
 import NotFound from './pure/NotFound.jsx';
 import Store from './helpers/Store.js';
-
-const globals = {
-  store: new Store(),
-  notification: null,
-};
-
-function wrapStore(Component, props) {
-  /* this handler is called for every route to a component below.
-   * It passes the globals as property to the component.
-   * All components on such a route can access the globals as this.props.globals
-   * Beware: components not mentioned on a router, but constructed during rendering
-   * must get the globals in an other way: just by passing them down (React context does not seem to work)
-   */
-
-const newProps = {...props, globals};
-  return <Component {...newProps} />
-}
 
 /* Some things need to be global!
  *
@@ -53,20 +36,25 @@ const newProps = {...props, globals};
  * We want one place on the interface for displaying notifications.
  */
 
+const globals = {
+  store: new Store(),
+  notification: {component: null},
+};
+
 render(
-  <Router history={browserHistory} createElement={wrapStore}>
-    <Route path="/" component={App}>
-      <IndexRoute component={Home}/>
-      <IndexRedirect to="/doc/about"/>
-      <Route path="/" component={Home}>
+  <Provider globals={globals}>
+    <Router history={browserHistory}>
+      <Route path="/" component={App}>
+        <IndexRoute component={App}/>
+        <IndexRedirect to="/doc/about"/>
         <Route path="/contrib" component={ContribsFiltered}/>
         <Route path="/doc/:docName" component={Doc}/>
+        <Redirect from="/login" to="/doc/about"/>
+        <Redirect from="/logout" to="/doc/about"/>
+        <Redirect from="/slogout" to="/doc/about"/>
       </Route>
-      <Redirect from="/login" to="/doc/about"/>
-      <Redirect from="/logout" to="/doc/about"/>
-      <Redirect from="/slogout" to="/doc/about"/>
-    </Route>
-    <Route path="*" component={NotFound}/>
-  </Router>,
+      <Route path="*" component={NotFound}/>
+    </Router>
+  </Provider>,
   document.getElementById('body')
 );
