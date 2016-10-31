@@ -5,7 +5,7 @@ class UserApi(object):
     def __init__(self):
         self.dbm = connectdb()
         self.testUser = dict(
-            eppn='test',
+            eppn='test@home',
             email='test@localhost',
             mayLogin=True,
             authority='local',
