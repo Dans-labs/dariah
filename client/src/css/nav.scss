@@ -5,9 +5,9 @@ $active-bgcolor: #ffffee;
 $inactive-color: #0000ff;
 $inactive-bgcolor: #eeeeee;
 $nav-bgcolor: #eeeeee;
-$control-color: #444444;
 $error-color: #ff0000;
 $warning-color: #ffaa00;
+$control-link-color: #444444;
 
 p.nav {
     background-color: $nav-bgcolor;
@@ -39,7 +39,7 @@ ul.nav > li {
     margin-left: 0em;
 }
 .nav a {
-    color: $inactive-color;
+    color: $control-link-color;
     background-color: $inactive-bgcolor;
     font-weight: normal;
     text-decoration: none;
@@ -57,11 +57,14 @@ ul.nav > li {
     font-weight: bold;
 }
 a.spin-ok {
-    color: $control-color;
+    color: $control-link-color;
 }
 a.spin-error {
     color: $error-color;
 }
 a.spin-warning {
     color: $error-color;
+}
+a.control {
+    color: $control-link-color;
 }

@@ -27,6 +27,14 @@ const msgStyle = {
     marginTop: 0,
     marginBottom: 0,
   },
+  trash: {
+    paddingTop: 2,
+    paddingBottom: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    fontSize: 'larger',
+    float: 'left',
+  },
   dismiss: {
     paddingTop: 2,
     paddingBottom: 0,
@@ -34,7 +42,7 @@ const msgStyle = {
     marginBottom: 0,
     fontStyle: 'italic',
     fontSize: 'smaller',
-    textAlign: 'right',
+    float: 'right',
   },
   box: {
     position: 'fixed',
@@ -93,6 +101,10 @@ class Notification extends Component {
     this.msgs.push(msg); // synchronous addition of msg
     this.setState({msgs: [...(this.msgs)]}); // asynchronous update of the state
   }
+  clear() {
+    this.msgs = []; // synchronous clearing of msg
+    this.setState({msgs: []}); // asynchronous update of the state
+  }
   computeProgress() {
     const lastMsg = this.msgs.length -1;
     let lastNote = -1;
@@ -118,7 +130,10 @@ class Notification extends Component {
     return ( 
       <div>
         <p style={msgStyle.spinner}>
-          <a href="#" className={this.lastNote > -1 ? `spin-${this.lastKind}` : 'spin-ok'}
+          <a
+            title="show/hide notifications and progress messages"
+            href="#"
+            className={this.lastNote > -1 ? `spin-${this.lastKind}` : 'spin-ok'}
             onClick={e=>{e.preventDefault(); this.setView(!this.visible)}}
           >
             { busyBlocks.map((b, i) => <span key={i} style={msgStyle.dot} className="fa fa-circle"></span>) }
@@ -136,7 +151,14 @@ class Notification extends Component {
             >{msg.text}</p>
             ))
           }
-          <p style={msgStyle.dismiss}>click to dismiss</p>
+          <p
+            style={msgStyle.dismiss}>(click panel to hide)
+          </p>
+          <p style={msgStyle.trash}>
+            <a href="#" title="clear messages" className="control fa fa-trash"
+              onClick={e=>{e.preventDefault(); this.clear()}}
+            />
+          </p>
         </div>
       </div>
     )
