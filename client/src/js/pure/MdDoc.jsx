@@ -19,8 +19,8 @@ const MdDoc = ({ docName }) => {
           <p style={{float: 'right'}}>{control}</p>
         )}
         controls={[
-          (handler => <a ref='toSrc' className='fa fa-hand-o-down' href='#' onClick={handler} title="markdown source"/>),
-          (handler => <a ref='toFrm' className='fa fa-file-code-o' href='#' onClick={handler} title="formatted"/>),
+          (handler => <a ref='toSrc' className='control fa fa-hand-o-down' href='#' onClick={handler} title="markdown source"/>),
+          (handler => <a ref='toFrm' className='control fa fa-file-code-o' href='#' onClick={handler} title="formatted"/>),
         ]}
         alternatives={[
           (<div>
