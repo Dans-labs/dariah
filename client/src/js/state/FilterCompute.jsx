@@ -4,19 +4,9 @@ import Filters, { filterList } from '../pure/Filters.jsx'
 
 import { newFilterSettings, computeFiltering } from '../helpers/filters.js'
 import { columnStyle } from '../helpers/ui.js'
-import { withContext } from '../helpers/hoc.js'
+import { withContext, saveState } from '../helpers/hoc.js'
 
 class FilterCompute extends Component {
-  constructor(props) {
-    super(props);
-    const { filterInit } = props;
-    this.store = props.store;
-    this.key = 'FilterCompute';
-    this.store.register(this, this.key, {filterSettings: filterInit})
-  }
-  componentWillUnmount() {
-    this.store.save(this.key);
-  }
   updFilter(filterId, data) {
     const { filterSettings } = this.state;
     this.setState({...this.state,
@@ -62,4 +52,4 @@ FilterCompute.propTypes = {
   filterInit: PropTypes.object.isRequired,
 }
 
-export default withContext(FilterCompute)
+export default withContext(saveState(FilterCompute, 'FilterCompute', ({filterInit}) => ({filterSettings: filterInit})))

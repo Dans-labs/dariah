@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import { withContext } from '../helpers/hoc.js'
+import { withContext, saveState } from '../helpers/hoc.js'
 
 const msgStyle = {
   info: {
@@ -88,14 +88,8 @@ class Notification extends Component {
   constructor(props) {
     super(props);
     props.notification.component = this
-    this.store = props.store;
-    this.key = 'Notification';
-    this.store.register(this, this.key, {msgs: null})
     this.msgs = []; // synchronous list of messages
     this.visible = false;
-  }
-  componentWillUnmount() {
-    this.store.save(this.key);
   }
   notify(msg) {
     this.msgs.push(msg); // synchronous addition of msg
@@ -193,4 +187,4 @@ class Notification extends Component {
 Notification.propTypes = {
 }
 
-export default withContext(Notification)
+export default withContext(saveState(Notification, 'Notification', {msgs: null}))

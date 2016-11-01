@@ -4,18 +4,9 @@ import FilterCompute from './FilterCompute.jsx'
 import { filterList } from '../pure/Filters.jsx'
 import { compileFiltering } from '../helpers/filters.js'
 import { getData } from '../helpers/data.js'
-import { withContext } from '../helpers/hoc.js'
+import { withContext, saveState } from '../helpers/hoc.js'
 
 class ContribsFiltered extends Component {
-  constructor(props) {
-    super(props);
-    this.store = props.store;
-    this.key = 'ContribsFiltered';
-    this.store.register(this, this.key, {contribs: null, countries: null})
-  }
-  componentWillUnmount() {
-    this.store.save(this.key);
-  }
   render() {
     const { contribs, countries } = this.state;
     if (contribs == null || countries == null) {
@@ -47,4 +38,4 @@ class ContribsFiltered extends Component {
 ContribsFiltered.propTypes = {
 };
 
-export default withContext(ContribsFiltered)
+export default withContext(saveState(ContribsFiltered, 'ContribsFiltered', {contribs: null, countries: null}))

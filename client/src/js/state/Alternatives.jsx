@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react'
-import { withContext } from '../helpers/hoc.js'
+import { withContext, saveState } from '../helpers/hoc.js'
 
 /*
  * A choice between several alternatives, with controls to click to the next alternative.
@@ -19,16 +19,6 @@ import { withContext } from '../helpers/hoc.js'
 */
 
 class Alternatives extends Component {
-  constructor(props) {
-    super();
-    const { tag, store } = props;
-    this.store = store;
-    this.key = 'Alternatives.'+tag;
-    this.store.register(this, this.key, {});
-  }
-  componentWillUnmount() {
-    this.store.save(this.key);
-  }
   next(event) {
     event.preventDefault();
     const { alternatives, tag, initial } = this.props;
@@ -54,4 +44,4 @@ Alternatives.propTypes = {
   alternatives: PropTypes.array.isRequired,
 }
 
-export default withContext(Alternatives)
+export default withContext(saveState(Alternatives, 'Alternatives', {}))

@@ -2,22 +2,13 @@ import React, { Component, PropTypes } from 'react'
 import  Login from '../pure/Login.jsx'
 import  NavLink  from '../pure/NavLink.jsx'
 import Notification from './Notification.jsx'
-import { withContext } from '../helpers/hoc.js'
+import { withContext, saveState } from '../helpers/hoc.js'
 import { getData } from '../helpers/data.js'
 import { columnStyle } from '../helpers/ui.js'
 
 const showMe = element => element.style.display = 'block';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.store = this.props.store;
-    this.key = 'App';
-    this.store.register(this, this.key, {user: {}})
-  }
-  componentWillUnmount() {
-    this.store.save(this.key);
-  }
   render() {
     return (
       <div>
@@ -59,4 +50,4 @@ class App extends Component {
   }
 }
 
-export default withContext(App)
+export default withContext(saveState(App, 'App', {user: {}}))
