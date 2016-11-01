@@ -5,7 +5,7 @@ import Stats from '../pure/Stats.jsx'
 import Alternatives from '../state/Alternatives.jsx'
 import { placeFacets, testAllChecks } from '../helpers/filters.js'
 
-export default class Bymeta extends Component {
+export default class ByValue extends Component {
   constructor() {
     super();
     this.rows = null;
@@ -83,7 +83,7 @@ export default class Bymeta extends Component {
   }
 }
 
-Bymeta.propTypes = {
+ByValue.propTypes = {
   filterId: PropTypes.number.isRequired,
   filterField: PropTypes.string.isRequired,
   filterSettings: PropTypes.object.isRequired,

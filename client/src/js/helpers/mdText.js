@@ -1,3 +1,7 @@
+/* Static texts bound to this web application itself, rather than to the data.
+ *
+ * The texts are identified by a key and the text format is MarkDown.
+ */
 export default  {
     about: `
 ![logo](/static/images/inkind_logo.png)
@@ -139,7 +143,7 @@ Python can be installed by means of the package manager.
     cp /opt/rh/httpd24/root/usr/lib64/httpd/modules/mod_rh-python35-wsgi.so modules
     cd /etc/httpd
     cp /opt/rh/httpd24/root/etc/httpd/conf.modules.d/10-rh-python35-wsgi.conf conf.modules.d/
-    pip install bottle beaker jwt
+    pip install bottle beaker
 
 On a development server, install \`python3\`.*x*\`.\`*y* from its
 [download page](https://www.python.org/downloads/).

@@ -1,7 +1,41 @@
 import 'whatwg-fetch'
 
+/* DATA FETCHING
+ * All data from the server takes place by functions in this module.
+ * (except of course the initial load of skeleton HTML with its javascript bundle)
+ *
+ * All data comes from accessing /data plus additions.
+ */
+
 const baseUrl = '/data/';
 
+/* getData(sources, component, notification)
+ *
+ * getData performs one or more ajax calls to the server and expects json data back.
+ *
+ * - sources is an object keyed by names and valued by paths.
+ *   For every source = (name, path), a a url is constructed consisting of
+ *   base url appended by path, and this is fired at the server.
+ * - component is the one who should react to the new data with a state update
+ * - notification is the component that can display messages (progress, error)
+ *
+ * The expected response is a json object with the follwoing keys:
+ *   - data: the actual payload, the stuff that should be rendered in a component
+ *   - good: a boolean, indicating whether the server thinks it has carried out the request
+ *   - messages: an array of messages, where each message has
+ *     - kind: error, warning, etc,
+ *     - text: the actual content of the message.
+ * 
+ * getData issues messages on its own, and adds a "busy" atrribute, indicating that we are waiting:
+ * - after sending the request to the server: busy=1
+ * - after getting a response or an error back: busy = -1
+ * 
+ * A notification component can collect these messages, add up the busy attributes.
+ * If the result is > 0, we are still waiting for the server.
+ * If it is 0, all waits are over. 
+ * The notification component can display a graphic that is proportional to the number
+ * of requests that are pending.
+ */
 export function getData(sources, component, notification) {
   for (const branch of Object.keys(sources)) {
     notification.notify({kind: 'special', text: `${branch} transferring data ...`, busy: 1});

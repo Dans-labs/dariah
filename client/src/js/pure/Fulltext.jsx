@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import Stats from './Stats.jsx'
 
-const Fulltext = ({ updFilter, filterId, filterField, filterSettings, filteredAmount, filteredAmountOthers }) => (
+const FullText = ({ updFilter, filterId, filterField, filterSettings, filteredAmount, filteredAmountOthers }) => (
   <div>
     <p><input
         type="text"
@@ -14,7 +14,7 @@ const Fulltext = ({ updFilter, filterId, filterField, filterSettings, filteredAm
   </div>
 )
 
-Fulltext.propTypes = {
+FullText.propTypes = {
   filterId: PropTypes.number.isRequired,
   filterField: PropTypes.string.isRequired,
   filterSettings: PropTypes.string.isRequired,
@@ -23,4 +23,4 @@ Fulltext.propTypes = {
   updFilter: PropTypes.func.isRequired,
 }
 
-export default Fulltext
+export default FullText
