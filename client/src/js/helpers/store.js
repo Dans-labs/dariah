@@ -1,15 +1,25 @@
 /** @file
  *
- * # Local state versus Redux: compromise
+ * # Local state versus Redux
  *
- * Up till now I eschew [Redux](https://github.com/reactjs/react-redux).
- * I prefer the vamilla react way, with small components
- * and small local state, instead of a centralized store for the state.
+ * This app is organised in the vanilla react way, with components
+ * managing local state through `setState()`.
+ *
+ * An other approach
+ * ([Redux](https://github.com/reactjs/react-redux))
+ * is to have a centralized store that contains all the
+ * state:
+ *
+ * * If a component needs to update the state, it dispatches an action to the store.
+ * * So-called *reducers* translate the action into a state update. 
+ * * And then the component can re-render.
+ *
  * Using Redux requires a lot of extra code in actions and reducers,
- * that get separated from the components for which it is used.
+ * which get separated from the components for which it is used.
  *
  * But local state has a pitfall: when a component is swapped out from the interface
- * (because of routing), its state is lost. So if you have applied a lot of filtersettings,
+ * (because of routing), its state is lost.
+ * So if you have applied a lot of filter settings,
  * or have fetched a big table of data, and you switch to `/docs/about` and back,
  * a lot of ui-work and fetch-work must be done again, by you and the client and the server.
  * So, a global state outside the components is an attractive asset indeed!
