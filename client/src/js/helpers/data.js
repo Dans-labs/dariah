@@ -7,16 +7,17 @@ import 'whatwg-fetch'
  * All data comes from accessing /data plus additions.
  */
 
-const baseUrl = '/data/';
+const rootUrl = '/api/';
 
 /* getData(sources, component, notification)
  *
  * getData performs one or more ajax calls to the server and expects json data back.
  *
- * - sources is an object keyed by names and valued by paths.
- *   For every source = (name, path), a a url is constructed consisting of
- *   base url appended by path, and this is fired at the server.
- * - component is the one who should react to the new data with a state update
+ * - sources is an array of objects specifying a branch, a kind and a path.
+ *   For every source = (branch, type, path), a a url is constructed consisting of
+ *   the base url (depending on type) appended by the path, and this is fired at the server.
+ * - component is the one who should react to the new data with a state update, and the
+ *   new data appears in state[branch]
  * - notification is the component that can display messages (progress, error)
  *
  * The expected response is a json object with the follwoing keys:
@@ -37,9 +38,9 @@ const baseUrl = '/data/';
  * of requests that are pending.
  */
 export function getData(sources, component, notification) {
-  for (const branch of Object.keys(sources)) {
+  for (const { type, path, branch } of sources) {
     notification.notify({kind: 'special', text: `${branch} transferring data ...`, busy: 1});
-    fetch(`${baseUrl}${sources[branch]}`, {credentials: 'same-origin'})
+    fetch(`${rootUrl}${type}${path}`, {credentials: 'same-origin'})
     .then((response) => response.json())
     .then((responseData) => {
       for (const msg of responseData.msgs || []) {

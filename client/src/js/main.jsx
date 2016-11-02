@@ -9,9 +9,14 @@ import Doc from './pure/Doc.jsx';
 import NotFound from './pure/NotFound.jsx';
 import Store from './helpers/Store.js';
 
-/* Some things need to be global!
+/** Application wide data
  *
- * [Store]
+ * Some things need to be practically global, or at least, application wide.
+ * We will not use the javascript `window` object to store globals.
+ * Instead we use the *context* mechanism of React to pass global information
+ * around within the app.
+ *
+ * # Store
  *
  * The store is a container of component states.
  * We use it for components with a costly state, that should be preserved when components are swapped in and out from
@@ -25,13 +30,14 @@ import Store from './helpers/Store.js';
  * So the store consists of saved states keyed by component instances.
  * 
  * The most important use cases for this app:
- * - if the big contrib list is loaded, the user must be able to go back and forth between docs like "about"
+ *
+ * * if the big contrib list is loaded, the user must be able to go back and forth between docs like "about"
  *   and the contrib list without the need to reload the list all the time
- * - if a user has set up filters, the filter state should be preserved after navigating to other parts of the app
+ * * if a user has set up filters, the filter state should be preserved after navigating to other parts of the app
  *
  * Note that the DOM may be swapped out, but the state info needed to recreate the dom should be preserved.
  *
- * [Notification]
+ * # Notification
  *
  * We want one place on the interface for displaying notifications.
  */
@@ -44,14 +50,19 @@ const globals = {
 render(
   <Provider globals={globals}>
     <Router history={browserHistory}>
+      <Redirect from="/about" to="/docs/about.md"/>
+      <Redirect from="/docs/about" to="/docs/about.md"/>
+      <Redirect from="/about.md" to="/docs/about.md"/>
+      <Redirect from="/login" to="/docs/about.md"/>
+      <Redirect from="/logout" to="/docs/about.md"/>
+      <Redirect from="/slogout" to="/docs/about.md"/>
       <Route path="/" component={App}>
         <IndexRoute component={App}/>
-        <IndexRedirect to="/doc/about"/>
+        <IndexRedirect to="/docs/about.md"/>
         <Route path="/contrib" component={ContribsFiltered}/>
-        <Route path="/doc/:docName" component={Doc}/>
-        <Redirect from="/login" to="/doc/about"/>
-        <Redirect from="/logout" to="/doc/about"/>
-        <Redirect from="/slogout" to="/doc/about"/>
+        <Route path="/docs/:docFile" component={Doc}/>
+        <Route path="/tech/docs/gen/:docFile" component={Doc}/>
+        <Route path="/tech/docs/:docFile" component={Doc}/>
       </Route>
       <Route path="*" component={NotFound}/>
     </Router>

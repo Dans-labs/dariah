@@ -1,22 +1,25 @@
 import React, {Component, PropTypes} from 'react'
 
-import MdDoc from './MdDoc.jsx';
-import PdfDoc from './PdfDoc.jsx';
+import DocMd from '../state/DocMd.jsx';
+import DocPdf from './DocPdf.jsx';
+import DocHtml from './DocHtml.jsx';
 import NotFound from './NotFound.jsx';
 
 const docType = {
-  about: MdDoc,
-  design: PdfDoc,
-  deploy: MdDoc,
+  md: DocMd,
+  pdf: DocPdf,
+  html: DocHtml,
 }
 
-const Doc = ({ params }) => {
-  const docName = params.docName;
-  const DocClass = docType[docName];
+const Doc = ({ params, route }) => {
+  const docPath = route.path.replace(':docFile', params.docFile);
+  const [x, docDir, docFile] = /^(.*)\/([^/]+)$/g.exec(docPath);
+  const [y, docName, docExt] = /^(.*)\.([^.]+)$/g.exec(docFile);
+  const DocClass = docType[docExt];
   return DocClass == undefined ? (
-    <NotFound params={{splat: `document ${docName}`}}/>
+    <NotFound params={{splat: `document ${docPath}`}}/>
   ) : (
-    <DocClass docName={docName}/>
+    <DocClass docDir={docDir} docName={docName} docExt={docExt}/>
   )
 }
 

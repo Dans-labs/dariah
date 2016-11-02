@@ -24,12 +24,20 @@ class ContribsFiltered extends Component {
   componentDidMount() {
     const { contribs, countries } = this.state;
     if (contribs == null || countries == null) {
-      getData({
-          contribs: `list_contrib`,
-          countries: 'member_country',
-        },
+      getData([
+          {
+            type: 'db',
+            path: '/list_contrib',
+            branch: 'contribs',
+          },
+          {
+            type: 'db',
+            path: '/member_country',
+            branch: 'countries',
+          },
+        ],
         this,
-        this.props.notification.component,
+        this.props.notification.component
       );
     }
   }

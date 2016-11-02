@@ -15,8 +15,8 @@ const winHeight = window.innerHeight - topHeight;
 
 // left navigation bar width and remaining width
 const divWidthSpec = {
-  left: 100,
-  rightLeft: 400,
+  left: 120,
+  rightLeft: 380,
 }
 // the big right lower box can also be divided in a left bar for facets and the rest
 const divWidth = {

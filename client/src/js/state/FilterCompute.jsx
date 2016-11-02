@@ -10,7 +10,7 @@ class FilterCompute extends Component {
   updFilter(filterId, data) {
     const { filterSettings } = this.state;
     this.setState({...this.state,
-      filterSettings: newFilterSettings(filterSettings, filterId, data),
+      filterSettings: newFilterSettings(filterSettings, filterId, data)
     });
   }
   render() {
@@ -19,7 +19,7 @@ class FilterCompute extends Component {
     const {
       filteredData, filteredAmountOthers, amounts
     } = computeFiltering(
-      contribs, filterList, fieldValues, filterSettings,
+      contribs, filterList, fieldValues, filterSettings
     );
     return (
       <div>

@@ -6,30 +6,39 @@ import buffer      from 'vinyl-buffer';
 import uglify      from 'gulp-uglify';
 import sass        from 'gulp-sass';
 import sourcemaps  from 'gulp-sourcemaps';
+import jsdoc       from 'gulp-jsdoc3';
  
+/* Doc tasks */
+
+gulp.task('build_doc', function(cb) {
+  const config = require('./jsdocConfig.json');
+  gulp.src(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx'], {read: false})
+    .pipe(jsdoc(config, cb));
+});
+
 /* Development tasks */
 
 gulp.task('buildjs_dev', function() {
   return browserify({entries: 'src/js/main.jsx', debug: true})
-      .transform("babelify", {
-        sourceMaps: true,
-        presets: [
-          "latest",
-          "react",
-        ],
-        plugins: [
-            "transform-object-rest-spread",
-            "transform-react-jsx-source",
-        ],
-      })
-      .bundle()
-      .on('error', function(e) {
-        console.log(e.toString());
-        this.emit('end');
-      })
-      .pipe(source('bundle.js'))
-      .pipe(sourcemaps.write('../static/js'))
-      .pipe(gulp.dest('../static/js'));
+    .transform("babelify", {
+      sourceMaps: true,
+      presets: [
+        "latest",
+        "react",
+      ],
+      plugins: [
+          "transform-object-rest-spread",
+          "transform-react-jsx-source",
+      ],
+    })
+    .bundle()
+    .on('error', function(e) {
+      console.log(e.toString());
+      this.emit('end');
+    })
+    .pipe(source('bundle.js'))
+    .pipe(sourcemaps.write('../static/js'))
+    .pipe(gulp.dest('../static/js'));
 });
  
 gulp.task('buildcss_dev', function() {
@@ -42,22 +51,22 @@ gulp.task('buildcss_dev', function() {
 
 gulp.task('buildjs_prod', function() {
   return browserify({entries: 'src/js/main.jsx', debug: false})
-      .transform("babelify", {
-        sourceMaps: false,
-        presets: [
-          "latest",
-          "react",
-        ],
-        plugins: [
-            "transform-object-rest-spread",
-            "transform-remove-console",
-        ],
-      })
-      .bundle()
-      .pipe(source('bundle.js'))
-      .pipe(buffer())
-      .pipe(uglify())
-      .pipe(gulp.dest('../static/js'));
+    .transform("babelify", {
+      sourceMaps: false,
+      presets: [
+        "latest",
+        "react",
+      ],
+      plugins: [
+          "transform-object-rest-spread",
+          "transform-remove-console",
+      ],
+    })
+    .bundle()
+    .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe(uglify())
+    .pipe(gulp.dest('../static/js'));
 });
  
 gulp.task('buildcss_prod', function() {
@@ -69,9 +78,16 @@ gulp.task('buildcss_prod', function() {
 /* watching */
 
 gulp.task('watch', function() {
+  gulp.watch(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series('build_doc'));
   gulp.watch(['src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series('buildjs_dev'));
   gulp.watch(['src/css/*.scss', 'src/css/*.css'], gulp.series('buildcss_dev'));
 });
  
-gulp.task('dev', gulp.series('buildjs_dev', 'buildcss_dev', 'watch'));
-gulp.task('prod', gulp.series('buildjs_prod', 'buildcss_prod'));
+gulp.task('watch_doc', function() {
+  gulp.watch(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series('build_doc'));
+});
+ 
+gulp.task('doc', gulp.series('build_doc'));
+gulp.task('docx', gulp.series('build_doc', 'watch_doc'));
+gulp.task('dev', gulp.series('build_doc', 'buildjs_dev', 'buildcss_dev', 'watch'));
+gulp.task('prod', gulp.series('build_doc', 'buildjs_prod', 'buildcss_prod'));

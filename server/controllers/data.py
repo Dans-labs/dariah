@@ -9,7 +9,7 @@ class DataApi(object):
         if callable(method):
             return method()
         else:
-            return None
+            return dict(data=None, msgs=[dict(kind='error', text='query {} not provided'.format(query))], good=False)
 
     def list_contrib(self):
         documents = list(self.dbm.contrib.find({}).sort('title', 1))

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>helpers/hoc.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="App.html">App</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#register">register</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#globals">globals</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#withContext">withContext</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">helpers/hoc.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component, PropTypes, Children } from 'react'
+
+/** @file
+ *
+ * # Higher Order Components
+ *
+ * React embraces a functional paradigm, where you enhance existing functionality
+ * by composition rather than by class extension. 
+ * Put otherwise, you write an enhancer as a decorator function, that 
+ * takes a component function as input and returns that component wrapped in a function
+ * that can do extra things.
+ * Especially the react components that do not use life-cycle methods are very suitable
+ * to enhance.
+ * If a react component makes essential use of a life cycle method, it can still be
+ * useful to enhance it by class extension. But even that can be coded as function
+ * composition.
+ */
+
+/** Wraps a component to provide it with context.
+ * @func
+ * @param {Component} ComponentInner the incoming component (the wrappee)
+ * @returns {Component} ComponentOuter the enhanced component  (the wrapper)
+ *
+ * Supplies context to ComponentInner. 
+ * ComponentOuter subscribes to context (a React mechanism to pass data directly
+ * from ancestors to deep descendants), and passes the content of context.globals 
+ * to ComponentInner as props.
+ * These properties are then "magically" present in the methods of ComponentInner.
+ * By wrapping the syntax of the React context mechanism into this enhancer, we
+ * can survive API changes more easily.
+ * The [React documentation](https://facebook.github.io/react/docs/context.html)
+ * considers context as a brittle part of itself, and warns
+ * against over-use. At the same time, react-redux, a very popular React extension,
+ * depends critically on it.
+ * So, our withContext enhancer is the only place in the code where context surfaces.
+ */
+const withContext = (ComponentInner) => {
+  const ComponentOuter = class extends Component {
+    render() {
+      const newProps = {...this.props, ...this.context.globals};
+      return &lt;ComponentInner {...newProps}/>
+    }
+  }
+  ComponentOuter.contextTypes = {
+    globals: PropTypes.object,
+  }
+  return ComponentOuter
+}
+
+/** Wraps a component to let it preserve its state across unmounts.
+ *
+ * Up till now I eschew Redux. I prefer the vamilla react way, with small components
+ * and small local state, instead of a centralized store for the state.
+ * Using redux requires a lot of extra code in actions and reducers,
+ * that get separated from the components for which it is used.
+ * But local state has a pitfall: when a component is swapped out from the interface
+ * (because of routing), its state is lost. So if you have applied a lot of filtersettings,
+ * or have fetched a big table of data, and you switch to /docs/about and back,
+ * a lot of ui-work and fetch-work must be done again, by you and the client and the server.
+ * That is why we give components the option to save state when they unmount, and to
+ * retrieve it when they mount.
+ *
+ * @func
+ * @param {Component} ComponentInner the incoming component (the wrappee)
+ * @param {string} key identifier to find the saved state back in the state store
+ * @param {initialState} object the state to start with 
+ * @returns {Component} ComponentOuter the enhanced component  (the wrapper)
+ *
+ * Connnects ComponentInner with a global object called {@link Store} (provided by means
+ * of {@link withContext}).
+ * This one works by extending the `ComponentInner` class, and adding functionality
+ * to its `constructor()` and `componentWillUnmount()` methods.
+ * In order to use the {@link Store} object, a component needs to register itself with
+ * a key and an initial state value.
+ * The `initialState` can be passed as a concrete object, or as a function
+ * that computes the `initialState` on the basis of props.
+ * (See {@link FilterCompute})
+ * 
+ */
+
+const saveState = (ComponentInner, key, initialState) => {
+  const ComponentOuter = class extends ComponentInner {
+    constructor(props) {
+      super(props);
+      const store = props.store;
+      this.key = key;
+      store.register(this, key, ((typeof initialState) == 'function')?initialState(props):initialState)
+    }
+    componentWillUnmount() {
+      const store = this.props.store
+      store.save(this.key);
+    }
+  }
+  return ComponentOuter
+}
+
+export { withContext, saveState }
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Nov 02 2016 19:19:04 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

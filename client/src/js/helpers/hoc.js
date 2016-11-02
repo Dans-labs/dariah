@@ -1,6 +1,8 @@
 import React, { Component, PropTypes, Children } from 'react'
 
-/* HIGHER ORDER COMPONENTS
+/** @file
+ *
+ * # Higher Order Components
  *
  * React embraces a functional paradigm, where you enhance existing functionality
  * by composition rather than by class extension. 
@@ -12,16 +14,12 @@ import React, { Component, PropTypes, Children } from 'react'
  * If a react component makes essential use of a life cycle method, it can still be
  * useful to enhance it by class extension. But even that can be coded as function
  * composition.
- *
- * This modules contains the following enhancers:
- *
- * withContext(ComponentInner) => ComponentOuter
- * saveState(ComponentInner, key, initialState) => ComponentOuter
- *
  */
 
-/*
- * withContext(ComponentInner) => ComponentOuter
+/** Wraps a component to provide it with context.
+ * @func
+ * @param {Component} ComponentInner the incoming component (the wrappee)
+ * @returns {Component} ComponentOuter the enhanced component  (the wrapper)
  *
  * Supplies context to ComponentInner. 
  * ComponentOuter subscribes to context (a React mechanism to pass data directly
@@ -36,7 +34,6 @@ import React, { Component, PropTypes, Children } from 'react'
  * depends critically on it.
  * So, our withContext enhancer is the only place in the code where context surfaces.
  */
-
 const withContext = (ComponentInner) => {
   const ComponentOuter = class extends Component {
     render() {
@@ -50,8 +47,7 @@ const withContext = (ComponentInner) => {
   return ComponentOuter
 }
 
-/*
- * saveState(ComponentInner, key, initialState) => ComponentOuter
+/** Wraps a component to let it preserve its state across unmounts.
  *
  * Up till now I eschew Redux. I prefer the vamilla react way, with small components
  * and small local state, instead of a centralized store for the state.
@@ -59,20 +55,26 @@ const withContext = (ComponentInner) => {
  * that get separated from the components for which it is used.
  * But local state has a pitfall: when a component is swapped out from the interface
  * (because of routing), its state is lost. So if you have applied a lot of filtersettings,
- * or have fetched a big table of data, and you switch to /doc/about and back,
+ * or have fetched a big table of data, and you switch to /docs/about and back,
  * a lot of ui-work and fetch-work must be done again, by you and the client and the server.
  * That is why we give components the option to save state when they unmount, and to
  * retrieve it when they mount.
  *
- * The enhancer connnects ComponentInner with a global object called Store (provided by means
- * of withContext above).
- * This one works by extending the ComponentInner class, and adding functionality
- * to its constructor() and componentWillUnmount() methods.
- * In order to use the Store object, a component needs to register itself with
- * a key and an initial state value. (See Store).
- * The initialState can be passed to the enhancer as a concrete object, or as a function
- * that computes the initialState on the basis of props.
- * (See FilterCompute)
+ * @func
+ * @param {Component} ComponentInner the incoming component (the wrappee)
+ * @param {string} key identifier to find the saved state back in the state store
+ * @param {initialState} object the state to start with 
+ * @returns {Component} ComponentOuter the enhanced component  (the wrapper)
+ *
+ * Connnects ComponentInner with a global object called {@link Store} (provided by means
+ * of {@link withContext}).
+ * This one works by extending the `ComponentInner` class, and adding functionality
+ * to its `constructor()` and `componentWillUnmount()` methods.
+ * In order to use the {@link Store} object, a component needs to register itself with
+ * a key and an initial state value.
+ * The `initialState` can be passed as a concrete object, or as a function
+ * that computes the `initialState` on the basis of props.
+ * (See {@link FilterCompute})
  * 
  */
 

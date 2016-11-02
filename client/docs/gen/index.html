@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="App.html">App</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#register">register</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#globals">globals</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#withContext">withContext</a></li></ul>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+    <section class="readme">
+        <article><p><img src="https://raw.githubusercontent.com/Dans-labs/dariah/master/static/images/inkind_logo.png" alt="inkind"></p>
+<p>DARIAH InKind Assessment Tool</p>
+<p>The tool is in beta and currently <a href="https://dariah-beta.dans.knaw.nl/">live</a>.</p>
+<ul>
+<li>General information:
+<a href="https://dariah-beta.dans.knaw.nl/docs/about.md">about</a> (live), 
+<a href="https://github.com/Dans-labs/dariah/blob/master/client/src/js/helpers/mdText.js">in this repo</a>;</li>
+<li>Architecture:
+<a href="https://dariah-beta.dans.knaw.nl/tech/docs/design.pdf">design</a> (live), 
+<a href="https://github.com/Dans-labs/dariah/blob/master/static/docs/design.pdf">in this repo</a>;</li>
+<li>Deployment:
+<a href="https://dariah-beta.dans.knaw.nl/tech/docs/deploy.md">guide</a> (live), 
+<a href="https://github.com/Dans-labs/dariah/blob/master/client/src/js/helpers/mdText.js">in this repo</a>.</li>
+</ul></article>
+    </section>
+
+
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        helpers/hoc.js
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="helpers_hoc.js.html">helpers/hoc.js</a>, <a href="helpers_hoc.js.html#line3">line 3</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+        
+            <div class="description"><h1>Higher Order Components</h1><p>React embraces a functional paradigm, where you enhance existing functionality
+by composition rather than by class extension. 
+Put otherwise, you write an enhancer as a decorator function, that 
+takes a component function as input and returns that component wrapped in a function
+that can do extra things.
+Especially the react components that do not use life-cycle methods are very suitable
+to enhance.
+If a react component makes essential use of a life cycle method, it can still be
+useful to enhance it by class extension. But even that can be coded as function
+composition.</p></div>
+        
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        helpers/store.js
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="helpers_store.js.html">helpers/store.js</a>, <a href="helpers_store.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+        
+            <div class="description"><h1>Local state versus Redux: compromise</h1><p>Up till now I eschew <a href="https://github.com/reactjs/react-redux">Redux</a>.
+I prefer the vamilla react way, with small components
+and small local state, instead of a centralized store for the state.
+Using Redux requires a lot of extra code in actions and reducers,
+that get separated from the components for which it is used.</p>
+<p>But local state has a pitfall: when a component is swapped out from the interface
+(because of routing), its state is lost. So if you have applied a lot of filtersettings,
+or have fetched a big table of data, and you switch to <code>/docs/about</code> and back,
+a lot of ui-work and fetch-work must be done again, by you and the client and the server.
+So, a global state outside the components is an attractive asset indeed!</p>
+<p>The compromise we make is:</p>
+<ul>
+<li>components can load and save state from/to a store when they mount/unmount</li>
+</ul>
+<p>That keeps the business logic closer to the component and we can keep the state
+when components are temporarily wiped from the interface.</p></div>
+        
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Nov 02 2016 19:19:04 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

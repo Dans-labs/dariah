@@ -6,8 +6,8 @@ import { withContext, saveState } from '../helpers/hoc.js'
 import { getData } from '../helpers/data.js'
 import { columnStyle } from '../helpers/ui.js'
 
-const showMe = element => element.style.display = 'block';
-
+/** @class
+*/
 class App extends Component {
   render() {
     return (
@@ -29,9 +29,10 @@ class App extends Component {
         <div className="nav" style={columnStyle('left')}>
           <ul className="nav">
             <li><NavLink to="/contrib">Contributions</NavLink></li>
-            <li><NavLink to="/doc/about">About</NavLink></li>
-            <li><NavLink to="/doc/design">Design</NavLink></li>
-            <li><NavLink to="/doc/deploy">Deploy</NavLink></li>
+            <li><NavLink to="/docs/about.md">About</NavLink></li>
+            <li><NavLink to="/tech/docs/gen/index.html">Program</NavLink></li>
+            <li><NavLink to="/tech/docs/design.pdf">Design</NavLink></li>
+            <li><NavLink to="/tech/docs/deploy.md">Deploy</NavLink></li>
           </ul>
         </div>
         <div style={columnStyle('right')}>
@@ -41,12 +42,11 @@ class App extends Component {
     )
   }
   componentDidMount() {
-    getData({
-        user: 'user',
-      },
+    getData(
+      [ { type: 'db', path: '/who/ami', branch: 'user' } ],
       this,
-      this.props.notification.component,
-    );
+      this.props.notification.component
+    )
   }
 }
 
