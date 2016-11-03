@@ -17,8 +17,7 @@ gulp.task('build_doc', function(cb) {
    */
   if (config.source && config.source.include) { config.source.include = null }
   gulp.src(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx'], {read: false})
-    .pipe(jsdoc(config, cb))
-    .pipe(gulp.dest('./docs/gen'));
+    .pipe(jsdoc(config, cb));
 });
 
 /* Development tasks */
