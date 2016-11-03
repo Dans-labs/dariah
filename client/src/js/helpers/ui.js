@@ -1,38 +1,65 @@
-/* User Interface Quirks
+/**
+ * ## User Interface
  *
- * We want to display the app on the available window real estate,
- * so we measure it.
- * We reserve space for navigation rows and columns and for scroll-bars.
- * The remaining space can be filled with the flesh and the meat: the data.
+ * This is a collection of methods that directly
+ * address the user interface aspects of the web page.
+ *
+ * <img src="/api/file/tech/docs/design/design.005.jpeg" width="800"/>
+ *
+ * @module ui
  */
 
-// scrollbar width
+/**
+ *  scrollbar width
+ */
 const scrollBarWidth = 50;
 
-// top navigation bar height and remaining height
+/**
+ * top navigation bar height and remaining height
+ */
 const topHeight = 80;
+
+/**
+ * remaining height under the top navigation bar
+ */
 const winHeight = window.innerHeight - topHeight;
 
-// left navigation bar width and remaining width
+/**
+ * outer left navigation bar width
+ * and inner left columm width 
+ */
 const divWidthSpec = {
   left: 120,
   rightLeft: 380,
 }
-// the big right lower box can also be divided in a left bar for facets and the rest
+
+/**
+ * the widths of the main portions on the screen:
+ *
+ * * `left`: outer left navigation bar
+ * * `right`: everything else
+ * * `rightLeft`: left column inside `right` 
+ * * `rightRight`: right column inside `right` 
+ */
 const divWidth = {
   ...divWidthSpec,
   right: window.innerWidth - divWidthSpec.left - scrollBarWidth,
   rightRight: window.innerWidth - divWidthSpec.left - divWidthSpec.rightLeft - 2 * scrollBarWidth,
 }
-// we use the float property to position the left and right divs
+/**
+ * we use the float property to position the leftish and rightish divs
+ */
 const floatSpec = {
   left: 'left',
   right: 'right',
   rightLeft: 'left',
   rightRight: 'right',
 }
-/* columnStyle does it all: given an indication like 'left', 'rightLeft', ...
- * it sets the relevant box properties for the div in question
+
+/**
+ * Sets the relevant box properties for a leftish or rightish div
+ * @param {string} kind - The name of the div in question, must be a key in
+ * {@link floatSpec} and {@link divWidth}.
  */
 export function columnStyle(kind) {
   return {

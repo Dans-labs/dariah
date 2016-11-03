@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="App.html">App</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#register">register</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#globals">globals</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#withContext">withContext</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alternatives.html">Alternatives</a></li><li><a href="App.html">App</a></li><li><a href="Contrib.html">Contrib</a></li><li><a href="Contribs.html">Contribs</a></li><li><a href="ContribsFiltered.html">ContribsFiltered</a></li><li><a href="Doc.html">Doc</a></li><li><a href="DocHtml.html">DocHtml</a></li><li><a href="DocMd.html">DocMd</a></li><li><a href="DocPdf.html">DocPdf</a></li><li><a href="Facet.html">Facet</a></li><li><a href="FilterCompute.html">FilterCompute</a></li><li><a href="Filters.html">Filters</a></li><li><a href="FullText.html">FullText</a></li><li><a href="Login.html">Login</a></li><li><a href="module.exports.html">exports</a></li><li><a href="NavLink.html">NavLink</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="Notification.html">Notification</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#load">load</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li><li><a href="style.html">style</a></li></ul><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.getData">getData</a></li></ul></li><li><a href="module-europe_geo_js.html">europe_geo_js</a></li><li><a href="module-filters.html">filters</a><ul class='methods'><li data-type='method'><a href="module-filters.html#.compileFiltering">compileFiltering</a></li><li data-type='method'><a href="module-filters.html#.computeFiltering">computeFiltering</a></li><li data-type='method'><a href="module-filters.html#.newFilterSettings">newFilterSettings</a></li><li data-type='method'><a href="module-filters.html#.placeFacets">placeFacets</a></li><li data-type='method'><a href="module-filters.html#.testAllChecks">testAllChecks</a></li><li data-type='method'><a href="module-filters.html#~countFacets">countFacets</a></li><li data-type='method'><a href="module-filters.html#~facetCheck">facetCheck</a></li><li data-type='method'><a href="module-filters.html#~fullTextCheck">fullTextCheck</a></li></ul></li><li><a href="module-hoc.html">hoc</a><ul class='methods'><li data-type='method'><a href="module-hoc.html#.saveState">saveState</a></li><li data-type='method'><a href="module-hoc.html#.withContext">withContext</a></li></ul></li><li><a href="module-ui.html">ui</a><ul class='methods'><li data-type='method'><a href="module-ui.html#.columnStyle">columnStyle</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Component.html">Component</a></li><li><a href="external-componentWillUnmount.html">componentWillUnmount</a></li><li><a href="external-constructor.html">constructor</a></li><li><a href="external-context.html">context</a></li><li><a href="external-LifeCycle.html">LifeCycle</a></li><li><a href="external-Map.html">Map</a></li><li><a href="external-PropTypes.html">PropTypes</a></li><li><a href="external-Recompose.html">Recompose</a></li><li><a href="external-Redux.html">Redux</a></li><li><a href="external-render.html">render</a></li><li><a href="external-setState.html">setState</a></li><li><a href="external-StatePolicy.html">StatePolicy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#globals">globals</a></li></ul>
 </nav>
 
 <div id="main">
@@ -75,7 +75,7 @@
 <header>
     
         <h2>
-        helpers/hoc.js
+        helpers/intro.js
         </h2>
         
     
@@ -91,7 +91,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_hoc.js.html">helpers/hoc.js</a>, <a href="helpers_hoc.js.html#line3">line 3</a>
+        <a href="helpers_intro.js.html">helpers/intro.js</a>, <a href="helpers_intro.js.html#line1">line 1</a>
     </li></ul></dd>
     
 
@@ -130,134 +130,8 @@
 
 
         
-            <div class="description"><h1>Higher Order Components</h1><p>React embraces a functional paradigm, where you enhance existing functionality
-by composition rather than by class extension. 
-Put otherwise, you write an enhancer as a decorator function, that 
-takes a component function as input and returns that component wrapped in a function
-that can do extra things.
-Especially the react components that do not use life-cycle methods are very suitable
-to enhance.
-If a react component makes essential use of a life cycle method, it can still be
-useful to enhance it by class extension. But even that can be coded as function
-composition.</p></div>
-        
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>
-        helpers/store.js
-        </h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_store.js.html">helpers/store.js</a>, <a href="helpers_store.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-        
-            <div class="description"><h1>Local state versus Redux</h1><p>This app is organised in the vanilla react way, with components
-managing local state through <code>setState()</code>.</p>
-<p>An other approach
-(<a href="https://github.com/reactjs/react-redux">Redux</a>)
-is to have a centralized store that contains all the
-state:</p>
-<ul>
-<li>If a component needs to update the state, it dispatches an action to the store.</li>
-<li>So-called <em>reducers</em> translate the action into a state update. </li>
-<li>And then the component can re-render.</li>
-</ul>
-<p>Using Redux requires a lot of extra code in actions and reducers,
-which get separated from the components for which it is used.</p>
-<p>But local state has a pitfall: when a component is swapped out from the interface
-(because of routing), its state is lost.
-So if you have applied a lot of filter settings,
-or have fetched a big table of data, and you switch to <code>/docs/about</code> and back,
-a lot of ui-work and fetch-work must be done again, by you and the client and the server.
-So, a global state outside the components is an attractive asset indeed!</p>
-<p>The compromise we make is:</p>
-<ul>
-<li>components can load and save state from/to a store when they mount/unmount</li>
-</ul>
-<p>That keeps the business logic closer to the component and we can keep the state
-when components are temporarily wiped from the interface.</p></div>
+            <div class="description"><p>Documentation references.</p>
+<p>This file does not contain javascript code.</p></div>
         
 
         
@@ -293,7 +167,7 @@ when components are temporarily wiped from the interface.</p></div>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Nov 02 2016 21:52:32 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Thu Nov 03 2016 17:24:45 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

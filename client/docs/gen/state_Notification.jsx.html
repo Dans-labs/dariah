@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>state/Notification.jsx - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alternatives.html">Alternatives</a></li><li><a href="App.html">App</a></li><li><a href="Contrib.html">Contrib</a></li><li><a href="Contribs.html">Contribs</a></li><li><a href="ContribsFiltered.html">ContribsFiltered</a></li><li><a href="Doc.html">Doc</a></li><li><a href="DocHtml.html">DocHtml</a></li><li><a href="DocMd.html">DocMd</a></li><li><a href="DocPdf.html">DocPdf</a></li><li><a href="Facet.html">Facet</a></li><li><a href="FilterCompute.html">FilterCompute</a></li><li><a href="Filters.html">Filters</a></li><li><a href="FullText.html">FullText</a></li><li><a href="Login.html">Login</a></li><li><a href="module.exports.html">exports</a></li><li><a href="NavLink.html">NavLink</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="Notification.html">Notification</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#load">load</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li><li><a href="style.html">style</a></li></ul><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.getData">getData</a></li></ul></li><li><a href="module-europe_geo_js.html">europe_geo_js</a></li><li><a href="module-filters.html">filters</a><ul class='methods'><li data-type='method'><a href="module-filters.html#.compileFiltering">compileFiltering</a></li><li data-type='method'><a href="module-filters.html#.computeFiltering">computeFiltering</a></li><li data-type='method'><a href="module-filters.html#.newFilterSettings">newFilterSettings</a></li><li data-type='method'><a href="module-filters.html#.placeFacets">placeFacets</a></li><li data-type='method'><a href="module-filters.html#.testAllChecks">testAllChecks</a></li><li data-type='method'><a href="module-filters.html#~countFacets">countFacets</a></li><li data-type='method'><a href="module-filters.html#~facetCheck">facetCheck</a></li><li data-type='method'><a href="module-filters.html#~fullTextCheck">fullTextCheck</a></li></ul></li><li><a href="module-hoc.html">hoc</a><ul class='methods'><li data-type='method'><a href="module-hoc.html#.saveState">saveState</a></li><li data-type='method'><a href="module-hoc.html#.withContext">withContext</a></li></ul></li><li><a href="module-ui.html">ui</a><ul class='methods'><li data-type='method'><a href="module-ui.html#.columnStyle">columnStyle</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Component.html">Component</a></li><li><a href="external-componentWillUnmount.html">componentWillUnmount</a></li><li><a href="external-constructor.html">constructor</a></li><li><a href="external-context.html">context</a></li><li><a href="external-LifeCycle.html">LifeCycle</a></li><li><a href="external-Map.html">Map</a></li><li><a href="external-PropTypes.html">PropTypes</a></li><li><a href="external-Recompose.html">Recompose</a></li><li><a href="external-Redux.html">Redux</a></li><li><a href="external-render.html">render</a></li><li><a href="external-setState.html">setState</a></li><li><a href="external-StatePolicy.html">StatePolicy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#globals">globals</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">state/Notification.jsx</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component, PropTypes } from 'react'
+import { withContext, saveState } from '../helpers/hoc.js'
+
+const msgStyle = {
+  info: {
+    color: '#222222',
+  },
+  error: {
+    color: '#dd0000',
+    fontWeight: 'bold',
+  },
+  warning: {
+    color: '#dd8800',
+    fontWeight: 'bold',
+  },
+  good: {
+    color: '#00aa00',
+    fontWeight: 'bold',
+  },
+  special: {
+    color: '#000000',
+    fontWeight: 'bold',
+  },
+  line: {
+    paddingTop: 0,
+    paddingBottom: 0,
+    marginTop: 0,
+    marginBottom: 0,
+  },
+  trash: {
+    paddingTop: 2,
+    paddingBottom: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    fontSize: 'larger',
+    float: 'left',
+  },
+  dismiss: {
+    paddingTop: 2,
+    paddingBottom: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    fontStyle: 'italic',
+    fontSize: 'smaller',
+    float: 'right',
+  },
+  box: {
+    position: 'fixed',
+    top: 40,
+    right: 10,
+    width: 200,
+    height: 100,
+    overflow: 'auto',
+    paddingLeft: 10,
+    paddingRight: 10,
+    zIndex: 2000,
+    opacity: 0.9,
+    verticalAlign: 'middle',
+    cursor: 'pointer',
+    backgroundColor: '#eeeeee',
+    border: '2px solid #aaaaaa',
+    borderRadius: 8,
+    fontSize: 'small',
+  },
+  spinner: {
+    position: 'fixed',
+    top: '0.05em',
+    right: '1em',
+    width: '5em',
+    height: '2em',
+    textAlign: 'right',
+    paddingLeft: 0,
+    paddingRight: 0,
+    zIndex: 2000,
+    opacity: 0.9,
+    verticalAlign: 'middle',
+    cursor: 'pointer',
+    fontSize: 'medium',
+  },
+  dot: {
+    fontSize: 'small',
+  }
+}
+
+const empty = [];
+
+/**
+ * @class
+ * @classdesc
+ * **stateful** {@link external:Component|Component}
+ *
+ * Component that receives notifications and displays them in a 
+ * little div with fixed position on the screen.
+ */
+class Notification extends Component {
+  constructor(props) {
+    super(props);
+    props.notification.component = this
+    this.msgs = []; // synchronous list of messages
+    this.visible = false;
+  }
+  notify(msg) {
+    this.msgs.push(msg); // synchronous addition of msg
+    this.setState({msgs: [...(this.msgs)]}); // asynchronous update of the state
+  }
+  clear() {
+    this.msgs = []; // synchronous clearing of msg
+    this.setState({msgs: []}); // asynchronous update of the state
+  }
+  computeProgress() {
+    const lastMsg = this.msgs.length -1;
+    let lastNote = -1;
+    let lastKind = 'info';
+    let busy = 0
+    this.msgs.forEach((msg, i) => {
+      if (msg.kind == 'error') {lastNote = i, lastKind = 'error'}
+      else if (msg.kind == 'warning') {
+        if (lastKind != 'error') {lastNote = i, lastKind = 'warning'}
+      }
+      busy += msg.busy || 0;
+    })
+    if (busy &lt; 0) {
+      console.warn(`SHOULD NOT HAPPEN: negative value for busy ${busy}`);
+      busy = 0;
+    }
+    const visible = this.visible || (lastNote > -1);
+    return [lastMsg, lastNote, lastKind, busy, visible];
+  }
+  render() {
+    [this.lastMsg, this.lastNote, this.lastKind, this.busy, this.visible] = this.computeProgress();
+    const busyBlocks = new Array(this.busy).fill(1);
+    return ( 
+      &lt;div>
+        &lt;p style={msgStyle.spinner}>
+          &lt;a
+            title="show/hide notifications and progress messages"
+            href="#"
+            className={this.lastNote > -1 ? `spin-${this.lastKind}` : 'spin-ok'}
+            onClick={e=>{e.preventDefault(); this.setView(!this.visible)}}
+          >
+            { busyBlocks.map((b, i) => &lt;span key={i} style={msgStyle.dot} className="fa fa-circle">&lt;/span>) }
+            &lt;span className={`fa fa-${this.busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}/>
+          &lt;/a>
+        &lt;/p>
+        &lt;div ref="notbox" style={msgStyle.box}
+          onClick={e=>{e.preventDefault(); this.setView(false)}}
+        >
+          {
+            (this.msgs || empty).map((msg, index) => (
+            &lt;p
+              key={index} ref={`m${index}`}
+              style={{...msgStyle.line, ...msgStyle[msg.kind]}}
+            >{msg.text}&lt;/p>
+            ))
+          }
+          &lt;p
+            style={msgStyle.dismiss}>(click panel to hide)
+          &lt;/p>
+          &lt;p style={msgStyle.trash}>
+            &lt;a href="#" title="clear messages" className="control fa fa-trash"
+              onClick={e=>{e.preventDefault(); this.clear()}}
+            />
+          &lt;/p>
+        &lt;/div>
+      &lt;/div>
+    )
+  }
+  componentDidMount() {
+    this.setView();
+  }
+  componentDidUpdate() {
+    this.setView();
+  }
+  setView(on) {
+    if (on !== undefined) {
+      this.visible = on;
+    }
+    this.refs.notbox.style.display = this.visible ? 'block' : 'none';
+    this.setScroll();
+  }
+  setScroll() {
+    if (this.visible) {
+      if (this.lastNote > -1) {
+        this.refs[`m${this.lastNote}`].scrollIntoView();
+      }
+      else {
+        if (this.lastMsg > -1) {
+          this.refs[`m${this.lastMsg}`].scrollIntoView()
+        }
+      }
+    }
+  }
+}
+
+Notification.propTypes = {
+}
+
+export default withContext(saveState(Notification, 'Notification', {msgs: null}))
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Thu Nov 03 2016 17:24:45 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

@@ -6,6 +6,11 @@ import { newFilterSettings, computeFiltering } from '../helpers/filters.js'
 import { columnStyle } from '../helpers/ui.js'
 import { withContext, saveState } from '../helpers/hoc.js'
 
+/**
+ * @class
+ * @classdesc
+ * **stateful** {@link external:Component|Component}
+ */
 class FilterCompute extends Component {
   updFilter(filterId, data) {
     const { filterSettings } = this.state;

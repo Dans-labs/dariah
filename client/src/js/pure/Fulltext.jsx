@@ -1,6 +1,11 @@
 import React, { PropTypes } from 'react'
 import Stats from './Stats.jsx'
 
+/**
+ * @class
+ * @classdesc
+ * **purely functional** {@link external:Component|Component}
+ */
 const FullText = ({ updFilter, filterId, filterField, filterSettings, filteredAmount, filteredAmountOthers }) => (
   <div>
     <p><input

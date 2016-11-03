@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>state/Alternatives.jsx - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alternatives.html">Alternatives</a></li><li><a href="App.html">App</a></li><li><a href="Contrib.html">Contrib</a></li><li><a href="Contribs.html">Contribs</a></li><li><a href="ContribsFiltered.html">ContribsFiltered</a></li><li><a href="Doc.html">Doc</a></li><li><a href="DocHtml.html">DocHtml</a></li><li><a href="DocMd.html">DocMd</a></li><li><a href="DocPdf.html">DocPdf</a></li><li><a href="Facet.html">Facet</a></li><li><a href="FilterCompute.html">FilterCompute</a></li><li><a href="Filters.html">Filters</a></li><li><a href="FullText.html">FullText</a></li><li><a href="Login.html">Login</a></li><li><a href="module.exports.html">exports</a></li><li><a href="NavLink.html">NavLink</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="Notification.html">Notification</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#load">load</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li><li><a href="style.html">style</a></li></ul><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.getData">getData</a></li></ul></li><li><a href="module-europe_geo_js.html">europe_geo_js</a></li><li><a href="module-filters.html">filters</a><ul class='methods'><li data-type='method'><a href="module-filters.html#.compileFiltering">compileFiltering</a></li><li data-type='method'><a href="module-filters.html#.computeFiltering">computeFiltering</a></li><li data-type='method'><a href="module-filters.html#.newFilterSettings">newFilterSettings</a></li><li data-type='method'><a href="module-filters.html#.placeFacets">placeFacets</a></li><li data-type='method'><a href="module-filters.html#.testAllChecks">testAllChecks</a></li><li data-type='method'><a href="module-filters.html#~countFacets">countFacets</a></li><li data-type='method'><a href="module-filters.html#~facetCheck">facetCheck</a></li><li data-type='method'><a href="module-filters.html#~fullTextCheck">fullTextCheck</a></li></ul></li><li><a href="module-hoc.html">hoc</a><ul class='methods'><li data-type='method'><a href="module-hoc.html#.saveState">saveState</a></li><li data-type='method'><a href="module-hoc.html#.withContext">withContext</a></li></ul></li><li><a href="module-ui.html">ui</a><ul class='methods'><li data-type='method'><a href="module-ui.html#.columnStyle">columnStyle</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Component.html">Component</a></li><li><a href="external-componentWillUnmount.html">componentWillUnmount</a></li><li><a href="external-constructor.html">constructor</a></li><li><a href="external-context.html">context</a></li><li><a href="external-LifeCycle.html">LifeCycle</a></li><li><a href="external-Map.html">Map</a></li><li><a href="external-PropTypes.html">PropTypes</a></li><li><a href="external-Recompose.html">Recompose</a></li><li><a href="external-Redux.html">Redux</a></li><li><a href="external-render.html">render</a></li><li><a href="external-setState.html">setState</a></li><li><a href="external-StatePolicy.html">StatePolicy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#globals">globals</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">state/Alternatives.jsx</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { PropTypes, Component } from 'react'
+import { withContext, saveState } from '../helpers/hoc.js'
+
+/*
+ * A choice between several alternatives, with controls to click to the next alternative.
+ * Pass an array of alternatives and an array of controls of equal length.
+ * The alternatives are react objects to choose from.
+ * The controls must be inline elements.
+ * They will be placed in a context defined by the controlPlacement function, which
+ * must also be passed as a prop.
+ * Or rather, they are functions that take a handler and return an online element.
+ * The state is an integer corresponding to the array index of the alternative that is chosen.
+ * A click on a control increases the state by 1 modulo the number of alternatives.
+ * Upon constructing, an initial state may be passed. Default: 0.
+ *
+ * Handy for:
+ * 1. show/hide a component: pass as alternatives the component plus an empty &lt;div>
+ * 2. view alternative representations of a resource
+*/
+
+/**
+ * @class
+ * @classdesc
+ * **stateful** {@link external:Component|Component}
+ *
+ * Displays one of a list of alternatives
+ * let the user cycle through the alternatives.
+ */
+class Alternatives extends Component {
+  next(event) {
+    event.preventDefault();
+    const { alternatives, tag, initial } = this.props;
+    const newAlt = ((this.state[tag] || initial || 0) + 1) % alternatives.length; 
+    this.setState({...this.state, [tag]: newAlt});
+  }
+  render() {
+    const { controlPlacement, controls, alternatives, tag, initial } = this.props;
+    const alt = this.state[tag] || initial || 0;
+    return (
+      &lt;div>
+        {controlPlacement(controls[alt](this.next.bind(this)))}
+        {alternatives[alt]}
+      &lt;/div>
+    )
+  }
+}
+
+Alternatives.propTypes = {
+  initial: PropTypes.number,
+  controlPlacement: PropTypes.func.isRequired,
+  controls: PropTypes.array.isRequired,
+  alternatives: PropTypes.array.isRequired,
+}
+
+export default withContext(saveState(Alternatives, 'Alternatives', {}))
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Thu Nov 03 2016 17:24:45 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

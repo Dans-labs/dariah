@@ -12,6 +12,11 @@ const RouterLink = ({ children, href }) => (
     : <Link to={href}>{children}</Link>
 )
 
+/**
+ * @class
+ * @classdesc
+ * **stateful** {@link external:Component|Component}
+ */
 class DocMd extends Component {
   render() {
     const { docName } = this.props;

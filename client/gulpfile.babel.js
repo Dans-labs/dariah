@@ -12,8 +12,13 @@ import jsdoc       from 'gulp-jsdoc3';
 
 gulp.task('build_doc', function(cb) {
   const config = require('./jsdocConfig.json');
+  /* the following line fixes the problem that jsdoc stores the list of input files in the config
+   * which will increase after every run somehow. We set it to null everytime.
+   */
+  if (config.source && config.source.include) { config.source.include = null }
   gulp.src(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx'], {read: false})
-    .pipe(jsdoc(config, cb));
+    .pipe(jsdoc(config, cb))
+    .pipe(gulp.dest('./docs/gen'));
 });
 
 /* Development tasks */
@@ -87,7 +92,6 @@ gulp.task('watch_doc', function() {
   gulp.watch(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series('build_doc'));
 });
  
-gulp.task('doc', gulp.series('build_doc'));
-gulp.task('docx', gulp.series('build_doc', 'watch_doc'));
+gulp.task('doc', gulp.series('build_doc', 'watch_doc'));
 gulp.task('dev', gulp.series('build_doc', 'buildjs_dev', 'buildcss_dev', 'watch'));
 gulp.task('prod', gulp.series('build_doc', 'buildjs_prod', 'buildcss_prod'));

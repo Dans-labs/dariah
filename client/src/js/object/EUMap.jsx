@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import ByValue from './ByValue.jsx'
 import L from 'leaflet'
-import geodata from '../helpers/europe.geo.js'
+import {countryBorders} from '../helpers/europe.geo.js'
 
 /* A complex component! 
  * It is a facet filter for the field country,
@@ -92,6 +92,12 @@ const inDariah = (feature, countries) => {
 
 /* The big component with map and country filter facets
 */
+
+/**
+ * @class
+ * @classdesc
+ * **stateless, DOM-modifying** {@link external:Component|Component}
+ */
 export default class EUMap extends Component {
   constructor(props) {
     super(props);
@@ -133,7 +139,7 @@ export default class EUMap extends Component {
       zoom: mapOptions.ZOOM_INIT,
       maxBounds: mapOptions.MAP_BOUNDS,
     });
-    L.geoJSON(geodata, {
+    L.geoJSON(countryBorders, {
       style: feature => mapOptions.COUNTRY_STYLE[inDariah(feature, countries)],
       onEachFeature: feature => {
         if (inDariah(feature, countries)) {

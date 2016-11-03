@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="App.html">App</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#register">register</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#globals">globals</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#withContext">withContext</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alternatives.html">Alternatives</a></li><li><a href="App.html">App</a></li><li><a href="Contrib.html">Contrib</a></li><li><a href="Contribs.html">Contribs</a></li><li><a href="ContribsFiltered.html">ContribsFiltered</a></li><li><a href="Doc.html">Doc</a></li><li><a href="DocHtml.html">DocHtml</a></li><li><a href="DocMd.html">DocMd</a></li><li><a href="DocPdf.html">DocPdf</a></li><li><a href="Facet.html">Facet</a></li><li><a href="FilterCompute.html">FilterCompute</a></li><li><a href="Filters.html">Filters</a></li><li><a href="FullText.html">FullText</a></li><li><a href="Login.html">Login</a></li><li><a href="module.exports.html">exports</a></li><li><a href="NavLink.html">NavLink</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="Notification.html">Notification</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#load">load</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li><li><a href="style.html">style</a></li></ul><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.getData">getData</a></li></ul></li><li><a href="module-europe_geo_js.html">europe_geo_js</a></li><li><a href="module-filters.html">filters</a><ul class='methods'><li data-type='method'><a href="module-filters.html#.compileFiltering">compileFiltering</a></li><li data-type='method'><a href="module-filters.html#.computeFiltering">computeFiltering</a></li><li data-type='method'><a href="module-filters.html#.newFilterSettings">newFilterSettings</a></li><li data-type='method'><a href="module-filters.html#.placeFacets">placeFacets</a></li><li data-type='method'><a href="module-filters.html#.testAllChecks">testAllChecks</a></li><li data-type='method'><a href="module-filters.html#~countFacets">countFacets</a></li><li data-type='method'><a href="module-filters.html#~facetCheck">facetCheck</a></li><li data-type='method'><a href="module-filters.html#~fullTextCheck">fullTextCheck</a></li></ul></li><li><a href="module-hoc.html">hoc</a><ul class='methods'><li data-type='method'><a href="module-hoc.html#.saveState">saveState</a></li><li data-type='method'><a href="module-hoc.html#.withContext">withContext</a></li></ul></li><li><a href="module-ui.html">ui</a><ul class='methods'><li data-type='method'><a href="module-ui.html#.columnStyle">columnStyle</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Component.html">Component</a></li><li><a href="external-componentWillUnmount.html">componentWillUnmount</a></li><li><a href="external-constructor.html">constructor</a></li><li><a href="external-context.html">context</a></li><li><a href="external-LifeCycle.html">LifeCycle</a></li><li><a href="external-Map.html">Map</a></li><li><a href="external-PropTypes.html">PropTypes</a></li><li><a href="external-Recompose.html">Recompose</a></li><li><a href="external-Redux.html">Redux</a></li><li><a href="external-render.html">render</a></li><li><a href="external-setState.html">setState</a></li><li><a href="external-StatePolicy.html">StatePolicy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#globals">globals</a></li></ul>
 </nav>
 
 <div id="main">
@@ -43,13 +43,25 @@
         Store
         </h2>
         
-            <div class="class-description"><p>The <strong>Store</strong> is a helper class for components that want to save state
-when they unmount, and load saved state when they mount.
-It is basically a key-value store, where there components store
-there state data under a specific key.</p>
-<p><strong>NB:</strong> Do not use the Store directly.
-Provide it to your <a href="App.html">App</a> on context by means of the <a href="global.html#withContext">withContext</a> enhancer, 
-and enable its functionality by  means of the <a href="global.html#saveState">saveState</a> enhancer in.</p></div>
+            <div class="class-description"><h2>Backup for State</h2><p>The Store is a
+<a href="external-Map.html"><code>Map</code></a>
+containing saved
+<a href="external-Component.html"><code>component</code></a>
+states as values paired to keys.
+The workflow is</p>
+<ul>
+<li>a component presents itself and a key to the store
+and loads data found in the store under that key;</li>
+<li>it saves its state to the store under that key when it unmounts;</li>
+<li>when it remounts, it loads again;</li>
+<li>other components can also inspect and even manipulate saved states, if they
+know the key.</li>
+</ul>
+<h2>Usage</h2><p>Do not use the Store directly.
+Provide it to your component on context by means of the <code>withContext</code> enhancer, 
+and enable its functionality by  means of the <code>saveState</code> enhancer.</p>
+<h2>Motivation</h2><p>See
+<a href="external-StatePolicy.html"><code>State Policy</code></a></p></div>
         
     
 </header>
@@ -75,7 +87,7 @@ and enable its functionality by  means of the <a href="global.html#saveState">sa
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_store.js.html">helpers/store.js</a>, <a href="helpers_store.js.html#line48">line 48</a>
+        <a href="helpers_store.js.html">helpers/store.js</a>, <a href="helpers_store.js.html#line28">line 28</a>
     </li></ul></dd>
     
 
@@ -173,7 +185,7 @@ and enable its functionality by  means of the <a href="global.html#saveState">sa
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_store.js.html">helpers/store.js</a>, <a href="helpers_store.js.html#line100">line 100</a>
+        <a href="helpers_store.js.html">helpers/store.js</a>, <a href="helpers_store.js.html#line81">line 81</a>
     </li></ul></dd>
     
 
@@ -213,7 +225,12 @@ and enable its functionality by  means of the <a href="global.html#saveState">sa
 
 
 <div class="description">
-    <p>get(key)</p>
+    <p>get(key)
+Retrieve state from under a given key without loading it into a component state.</p>
+<p><strong>NB</strong>: whoever has retrieved a saved state, can modify its inner parts,
+so that the owner component of this state will feel the changes when it loads them. 
+As an example, you could use this to emit notifications before the <a href="Notification.html"><code>Notification</code></a>
+component mounted.</p>
 </div>
 
 
@@ -267,12 +284,7 @@ and enable its functionality by  means of the <a href="global.html#saveState">sa
 
             
 
-            <td class="description last"><p>Key for the store</p>
-<p>Other parts of the program retrieve states from under a given key.
-They can also modify the members inside that state.
-Typically, get() is called to perform state updates for components that are not currently mounted.
-As an example, you could use this to emit notifications before the Notification pseudo-element
-is mounted.</p></td>
+            <td class="description last"><p>Identifier under which the saved state is stored</p></td>
         </tr>
 
     
@@ -299,7 +311,7 @@ is mounted.</p></td>
 
     
 
-    <h4 class="name" id="register"><span class="type-signature"></span>register<span class="signature">(component, key, initialState)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="load"><span class="type-signature"></span>load<span class="signature">(component, key, initialState)</span><span class="type-signature"></span></h4>
 
     
 
@@ -311,7 +323,7 @@ is mounted.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_store.js.html">helpers/store.js</a>, <a href="helpers_store.js.html#line69">line 69</a>
+        <a href="helpers_store.js.html">helpers/store.js</a>, <a href="helpers_store.js.html#line49">line 49</a>
     </li></ul></dd>
     
 
@@ -351,7 +363,15 @@ is mounted.</p></td>
 
 
 <div class="description">
-    <p>register a component to the store</p>
+    <p>A component loads data from the store, from under a key.
+The key can be just any string. If component has multiple instances
+that need a separate key, make sure that the instances use different keys.
+If there is not yet data there, the components loads an initial state.
+This can be passed either as a concrete object,
+or as a function that computes an object from props.</p>
+<p>This method is typically called in the
+<a href="external-constructor.html"><code>constructor()</code></a>
+of component.</p>
 </div>
 
 
@@ -395,7 +415,7 @@ is mounted.</p></td>
             <td class="type">
             
                 
-<span class="param-type">Component</span>
+<span class="param-type"><a href="global.html#Component">Component</a></span>
 
 
             
@@ -405,7 +425,7 @@ is mounted.</p></td>
 
             
 
-            <td class="description last"><p>The component that wants to be registered</p></td>
+            <td class="description last"><p>The component that wants to load state</p></td>
         </tr>
 
     
@@ -428,7 +448,7 @@ is mounted.</p></td>
 
             
 
-            <td class="description last"><p>Identifier under which the saved state for this component will reside in the store</p></td>
+            <td class="description last"><p>Identifier under which the saved state is stored</p></td>
         </tr>
 
     
@@ -441,7 +461,7 @@ is mounted.</p></td>
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Object</span>
 
 
             
@@ -451,16 +471,7 @@ is mounted.</p></td>
 
             
 
-            <td class="description last"><p>The initial state to use for a component</p>
-<p>A Component needs to register itself with a key and an initial state.
-The Store is a map, and stores states under keys.
-The key can be just any string. If your Component has multiple instances
-that need a separate key, make sure that the instances use different keys.
-After registering it will be initialized with a state that has been saved under
-that key. If there is no previously save state, it will be initialized with
-initialState. This is either a concrete object, or a function that computes an object
-from props that are passed to it.
-Typically, register() is called in the constructor method of Component.</p></td>
+            <td class="description last"><p>The initial state to use for a component</p></td>
         </tr>
 
     
@@ -487,7 +498,7 @@ Typically, register() is called in the constructor method of Component.</p></td>
 
     
 
-    <h4 class="name" id="save"><span class="type-signature"></span>save<span class="signature">(key)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="save"><span class="type-signature"></span>save<span class="signature">(component, key)</span><span class="type-signature"></span></h4>
 
     
 
@@ -499,7 +510,7 @@ Typically, register() is called in the constructor method of Component.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_store.js.html">helpers/store.js</a>, <a href="helpers_store.js.html#line87">line 87</a>
+        <a href="helpers_store.js.html">helpers/store.js</a>, <a href="helpers_store.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -539,7 +550,10 @@ Typically, register() is called in the constructor method of Component.</p></td>
 
 
 <div class="description">
-    <p>save(key)</p>
+    <p>A Component saves its state in the store under key.
+Typically, save() is called in the
+<a href="external-componentWillUnmount.html"><code>componentWillUnmount()</code></a>
+of component.</p>
 </div>
 
 
@@ -577,6 +591,29 @@ Typically, register() is called in the constructor method of Component.</p></td>
 
         <tr>
             
+                <td class="name"><code>component</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Component">Component</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The component that wants to save state</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>key</code></td>
             
 
@@ -593,9 +630,7 @@ Typically, register() is called in the constructor method of Component.</p></td>
 
             
 
-            <td class="description last"><p>Key for the store</p>
-<p>A Component saves its state in the Store under key.
-Typically, save() is called in the componentWillUnmount() method of Component.</p></td>
+            <td class="description last"><p>Identifier under which the saved state is stored</p></td>
         </tr>
 
     
@@ -635,7 +670,7 @@ Typically, save() is called in the componentWillUnmount() method of Component.</
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Nov 02 2016 21:52:32 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Thu Nov 03 2016 17:24:45 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

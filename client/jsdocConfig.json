@@ -10,10 +10,13 @@
     "plugins/markdown"
   ],
   "markdown": {
-    "idInHeading": true
+    "idInHeading": true,
+    "tags": [
+        "external"
+    ]
   },
   "templates": {
-    "cleverLinks": false,
+    "cleverLinks": true,
     "monospaceLinks": false,
     "default": {
       "outputSourceFiles": true

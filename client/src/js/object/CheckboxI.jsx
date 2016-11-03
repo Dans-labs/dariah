@@ -2,6 +2,11 @@ import React, { Component, PropTypes } from 'react'
 
 const indeterminate = states => !states.allTrue && !states.allFalse
 
+/**
+ * @class
+ * @classdesc
+ * **stateless, DOM-modifying** {@link external:Component|Component}
+ */
 export default class CheckboxI extends Component {
   componentDidMount() {
     const { states } = this.props;

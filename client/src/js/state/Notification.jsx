@@ -84,6 +84,14 @@ const msgStyle = {
 
 const empty = [];
 
+/**
+ * @class
+ * @classdesc
+ * **stateful** {@link external:Component|Component}
+ *
+ * Component that receives notifications and displays them in a 
+ * little div with fixed position on the screen.
+ */
 class Notification extends Component {
   constructor(props) {
     super(props);

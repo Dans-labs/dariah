@@ -5,6 +5,11 @@ const styles = {
   box: { fontSize: 'large' },
 }
 
+/**
+ * @class
+ * @classdesc
+ * **purely functional** {@link external:Component|Component}
+ */
 const Facet = ({ updFilter, filterId, valueId, valueRep, checked }) => (
   <span>
     <input

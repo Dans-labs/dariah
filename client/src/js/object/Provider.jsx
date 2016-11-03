@@ -1,5 +1,10 @@
 import React, { Component, PropTypes, Children } from 'react'
 
+/**
+ * @class
+ * @classdesc
+ * **stateless, context providing** {@link external:Component|Component}
+ */
 export default class Provider extends Component {
   getChildContext() {
     const {globals} = this.props;

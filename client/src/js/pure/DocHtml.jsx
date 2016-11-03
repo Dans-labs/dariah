@@ -1,5 +1,10 @@
 import React, {Component, PropTypes} from 'react'
 
+/**
+ * @class
+ * @classdesc
+ * **purely functional** {@link external:Component|Component}
+ */
 const DocHtml = ({ docDir, docName, docExt }) => {
   const src = `/api/file${docDir}/${docName}.${docExt}`;
   return (

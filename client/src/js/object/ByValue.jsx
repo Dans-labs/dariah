@@ -5,6 +5,11 @@ import Stats from '../pure/Stats.jsx'
 import Alternatives from '../state/Alternatives.jsx'
 import { placeFacets, testAllChecks } from '../helpers/filters.js'
 
+/**
+ * @class
+ * @classdesc
+ * **stateless, DOM-modifying** {@link external:Component|Component}
+ */
 export default class ByValue extends Component {
   constructor() {
     super();

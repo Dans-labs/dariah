@@ -1,5 +1,10 @@
 import React, {Component, PropTypes} from 'react'
 
+/**
+ * @class
+ * @classdesc
+ * **purely functional** {@link external:Component|Component}
+ */
 const DocPdf = ({ docDir, docName, docExt }) => {
   const href = `/api/file${docDir}/${docName}.${docExt}`;
   const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;

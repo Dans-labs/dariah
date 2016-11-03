@@ -1,45 +1,41 @@
-/* FILTERS AND FACETS
+/**
+ * ## Filters and Facets
+ *
  * The big contribution list can be filtered by any number of filters.
  * This module contains helpers to set up the filtering and compute the results.
  *
- * The list of filters is specified in the Filters component.
+ * The list of available filters is in {@link Filters}.
  *
- * TOC:
- *
- * COMPILING FILTERS
- * COMPUTING FILTERS
- * UPDATING FILTER STATE
- * PLACING FACETS in COLUMNS
- * COLLECTIVE CHECKBOXES
- *
+ * @module filters
  */
 
-/*
- * COMPILING FILTERS
+/**
+ * ## Compiling Filters
  *
- * compileFiltering =
- *  (contribs, filterList) =>
- *  (fieldValues, filterInit)
+ * The compile stage inspects all data rows and sets up facets according to 
+ * the values that actually occur in the data.
  *
- * This is a one time computation once the big list of contributions has been fetched.
- * The values of fields that are subject to faceted browsing are collected.
- * We assume that these values are themselves objects with an _id and a concrete 
- * representation.
- * For each field we collect a mapping _id => representation
- * of the {_id, representation} that occur in at least one of the contrib rows.
+ * The goal is to collect all the information that is needed to display the 
+ * filters and give them an initial state.
  *
- * We also construct the initial filterSettings, which corresponds to:
- * - a fullText search string that is empty
- * - for every faceted field:
- *   - a mapping from each of its value ids to true
+ * The filter state is represented as follows:
+ *
+ * * a search string for each fullText filter (initially empty)
+ * * for every faceted field:
+ *   * a mapping from each of its valueIds to `true`
  *     (representing that every facet of that field is checked)
- *   - to this mapping we add a -none- value, with the intention that it matches
- *     those rows that lack this field.
+ *   * to this mapping we add a `-none-` value, with the intention that it matches
+ *     those rows that do not have values in this field.
  *
- * With both the properties fieldValues and filterInit it is possible
- * for a component to render the complete user interface for filtering.
+ * @param {Contrib[]} contribs - The list of contribution records as it comes form mongo db
+ * @param {Array} filterList - The list of available filters, statically imported from the 
+ * @param {Map} fieldValues - **OUT** a mapping of the valueId to the valueRepresentation of all values that have
+ * been encountered in the `field` of the `contribs` rows
+ * @param {Map} filterInit - **OUT** a mapping that maps the filterId of each available filter to initial filterSettings
+ * for that filter, i.e. the situation that the user has not yet started using the filters
+ * {@link Filters} component.
+ * @returns {Object} See **OUT** parameters 
  */
-
 export function compileFiltering(contribs, filterList) {
   const fields = filterList.filter(x => x.name !== 'FullText').map(x => x.field);
   const fieldValues = new Map(fields.map(f => [f, new Map([['', '-none-']])]));
@@ -65,26 +61,20 @@ export function compileFiltering(contribs, filterList) {
   };
 }
 
-/* COMPUTING FILTERS
+/**
+ * ## Computing Filters
  *
- * computeFiltering =
- *  (contribs, filterList, fieldValues, filterSettings) => 
- *  (filteredData, filteredAmountOthers, amounts)                  
- *
- * This is the input for the filter computation:
- * - filterList, filterValues: specify the filters that we have to reckon with
- * - filterSettings: the state that the filters have as result of user interaction
- * - contribs: the list to be filtered
- *
- * The outcomes are:
- * - filteredData: the sublist of contribs, the rows that pass all filters
- * - filteredAmountOthers: a mapping that indicates for each filter (id) how many rows pass all other filters
- * - amounts: a mapping like filteredAmountOthers, but more specific: it indicates per faceted value
- *   how many results there are left if all the other filters are active
+ * @param {Contrib[]} contribs - as in {@link compileFiltering} 
+ * @param {Array} filterList - as in {@link compileFiltering}
+ * @param {Map} fieldValues - as in {@link compileFiltering} 
+ * @param {Map} filterSettings - a {@link external:Map|Map} of filters to their current settings
+ * @param {Map} filteredData - **OUT** the sublist of contribs, the rows that pass all filters
+ * @param {Map} filteredAmountOthers - **OUT** a mapping that indicates for each filter how many rows pass all other filters
+ * @param {Map} amounts - **OUT** a mapping like `filteredAmountOthers`, but more specific: it indicates per faceted value
+ * @returns {Object} See **OUT** parameters 
  *
  * With filteredData.length, filteredAmountOthers, amounts we have exactly the right numbers to 
  * render the "(nn of mm)" statistics on the user interface next to each filter and facet.
- *
  */
 export function computeFiltering(contribs, filterList, fieldValues, filterSettings) {
 
@@ -94,7 +84,15 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
   const filteredData = [];
   const otherFilteredData = new Map(filterList.map((filterSpec, filterId) => [filterId, []]));
 
+  /**
+   * We determine for every row whether it passes all filters or not.
+   * We are also interested in those rows that fail exactly one filter.
+   * Because those rows are part of the universe that that one filter is filtering.
+   */
   for (const row of contribs) {
+    /*
+     * Here we record the one filter for which the row fails, if there is such a filter.
+     */
     let the_one_fail = null;
     let v = true;
     let discard = false;
@@ -103,9 +101,15 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
       if (!pass) {
         v = false;
         if (the_one_fail === null) {
+          /*
+           * If no other filters fail, this the the one that fails
+           */
           the_one_fail = filterId;
         }
         else {
+          /*
+           * More than one filter has failed, the row is uninteresting
+           */
           discard = true;
           break;
         }
@@ -113,12 +117,19 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
     }
     if (!discard) {
       if (v) {
+        /*
+         * the row has passed all filters
+         */
         filteredData.push(row);
         filterList.forEach((filterSpec, filterId) => {
           otherFilteredData.get(filterId).push(row);
         });
       }
       else {
+        /*
+         * the row has failed exactly one filter,
+         * we store it in its `otherFilteredData`.
+         */
         otherFilteredData.get(the_one_fail).push(row);
       }
     }
@@ -134,36 +145,40 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
   }
 }
 
-/* UPDATING FILTER STATE
- *
- * newFilterSettings =
- *  (filterSettings, filterId, data) =>
- *  (freshFilterSettings)
+/**
+ * ## Updating Filter State
  *
  * The task for this function is to generate a new state,
  * based on the current state and a user event.
- * It is, in the redux sense, a reducer.
+ * It is, in the {@link external:Redux|Redux} sense, a *reducer*.
  *
  * We take care that the new state is a shallow copy of the old state,
  * in such a way that every inside object that contains a mutated element
  * is replaced by a shallow copy.
  * So if the old state is
  *
+ * ```
  *    state = {
  *      x: { a: [1], b: [2] },
  *      y: { a: [3], b: [4] },
  *    }
+ * ```
  *
  * and we want to change
  *
+ * ```
  *    state.y.b = [4,5]
+ * ```
  *
  * we do not say:
  *
+ * ```
  *    statey.b.push(5)
+ * ```
  *
  * Instead, we produce a new state like this
  *
+ * ```
  *    newstate = {
  *      x: state.x,           // we reuse this part
  *      y: {
@@ -171,27 +186,28 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
  *        b: [4, 5],          // this is new
  *      },
  *    }
+ * ```
  *
- * So, newstate is a new object, and so is newstate.y and newstate.b
+ * So, `newstate` is a new object, and so is `newstate.y` and `newstate.b`.
  * We need to do this, so React can compare the old and new state efficiently and
  * make the minimum number of changes to the DOM to reflect the new state.
  *
- * Back to this function:
- * - filterSettings represents the old state
- * - filterId and data specify what has happened:
- *   - filterId: which filter has been touched?
- *   - data: what has happened to that filter?
- * 
  * The cases are:
  *
- * - if the filter is FullText:
- *   - data is a string: the search string entered
+ * * if the filter is FullText:
+ *   * `data` is a string: the search string entered
  *
- * - if the filter is a Facet:
- *   - data is an object {valueId, boolean}: which value has been checked or unchecked;
- *   - data is a boolean: when all values have been checked or unchecked in one go
+ * * if the filter is a Facet:
+ *   * `data` is an object {valueId, boolean}: which value has been checked or unchecked;
+ *   * `data` is a boolean: when all values have been checked or unchecked in one go
+ *
+ * @function
+ * @param {Map} filterSettings - the state before the user event, as in {@link computeFiltering} 
+ * @param {Map} filterSettings - as in {@link computeFiltering} 
+ * @param {number} filterId - the id of the filter that fired an event
+ * @param {Map} freshFilterSettings - **OUT** the nature of the event
+ * @returns {Object} See **OUT** parameters 
  */
-
 export const newFilterSettings = (filterSettings, filterId, data) => {
   const freshFilterSettings = new Map([...filterSettings.entries()]);
   switch (typeof data) {
@@ -213,15 +229,17 @@ export const newFilterSettings = (filterSettings, filterId, data) => {
   return freshFilterSettings;
 }
 
-/* performs a full text filter action
- *
- * fullTextCheck = (field, term) => (truth function)
- *
- * Given a field and a search term, a function is returned which,
- * given a row, tells whether the search term occurs in the specified field of that row.
+/**
+ * Performs full text lookup in `field` and delivers
+ * the result as a {boolean} function of rows. 
  *
  * When the search term is empty, we do not have to inspect the rows:
- * we deliver the "is always true" function.
+ * we deliver `x => true`, the *is always true* function.
+ *
+ * @function
+ * @param {string} field - the field name
+ * @param {term} term - the search term
+ * @returns {function} A truth function characterizing the lookup result
  */
 const fullTextCheck = (field, term) => {
   const search = term.toLowerCase()
@@ -234,17 +252,17 @@ const fullTextCheck = (field, term) => {
   }
 }
 
-/* performs a facet filter action
- *
- * facetCheck = (field, facetValues) => (truth function)
- *
- * Given a field and a map that tell which facet values have been checked,
- * a function is returned which,
- * given a row, tells whether that row contains at least one value
- * that has been checked in a facet.
+/**
+ * Performs a facet filter action in `field` and delivers
+ * the result as a {boolean} function of rows. 
  *
  * When the none of the facets have been checked, we do not have to inspect the rows:
- * we deliver the "is always false" function.
+ * we deliver `x => false`, the "is always false" function.
+ *
+ * @function
+ * @param {string} field - the field name
+ * @param {Map} facetValues - the facets as mapping from valueIds to whether they are checked
+ * @returns {function} A truth function characterizing the lookup result
  */
 const facetCheck = (field, facetValues) => {
   if (facetValues.size === 0) {
@@ -264,12 +282,17 @@ const facetCheck = (field, facetValues) => {
   }
 }
 
-/* performs a filter count
+/**
+ * Performs a facet count for a specific filter,
+ * in order to determine how many hits each facet has in a given set of rows.
  *
  * countFacets = (field, fieldValues, rows) => (facetAmounts)
  *
- * Given a list of rows, a field, and the possible values for that field,
- * we count how many rows contain each value in that field.
+ * @function
+ * @param {string} field - the field name
+ * @param {Map} fieldValues - the facets as mapping from valueIds to valueRepresentations
+ * @param {Array} rows - the data rows to look through
+ * @returns {Map} A mapping from valueIds to the number of times they occurred.
  */
 function countFacets(field, fieldValues, rows) {
   const facetAmounts = new Map();
@@ -290,19 +313,24 @@ function countFacets(field, fieldValues, rows) {
   return facetAmounts;
 }
 
-/* PLACING FACETS IN COLUMNS
- *
+/**
  * Places the facets of a field in a table with at most maxcols columns.
  *
  * For example, if you have 20 facets, and want to save space, you can put them
  * in three columns of 7 facets each, with the last column containing only 6.
  *
- * NB: if you want to put say 12 facets in 8 columns, the function discovers
+ * **NB:** if you want to put say 12 facets in 8 columns, the function discovers
  * first that it needs two rows and then that it can place those facets
  * in to 2 rows of only 6 columns. It will do so.
  *
  * Thus, the maxcols parameter specifies an upper limit, but the outcome might
  * be less than so many columns!
+ *
+ * @function
+ * @param {string} field - the field name
+ * @param {Map} fieldValues - the facets as mapping from valueIds to valueRepresentations
+ * @param {number} maxcols - the maximum number of columns in the resulting table
+ * @returns {Array} A table (nested array) of facets, ordered by facet value, vertical first.
  */
 export function placeFacets(field, fieldValues, maxcols) {
   const facets = [...fieldValues.entries()].sort((x,y) => x[1].localeCompare(y[1]));
@@ -321,17 +349,17 @@ export function placeFacets(field, fieldValues, maxcols) {
   return rows;
 }
 
-/* COLLECTIVE CHECKBOXES
+/**
  * The facets of a field can be checked and unchecked collectively by a
- * "collective" checkbox. 
+ * *collective* checkbox. 
  * If not all facets are checked, and not all facets are unchecked,
  * the collective checkbox should be in an indeterminate state.
  *
- * testAllChecks (filterSettings) => (allTrue, allFalse)
- *
- * This function inspects all relevant facets and returns two booleans:
- * - are they all checked?
- * - are they all unchecked?
+ * @function
+ * @param {Map} filterSettings - a {@link external:Map|Map} of filters to their current settings
+ * @returns {Object} Two booleans:
+ * * are they all checked?
+ * * are they all unchecked?
  */
 export function testAllChecks(filterSettings) {
   let allTrue = true;

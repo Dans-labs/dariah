@@ -11,6 +11,11 @@ const docType = {
   html: DocHtml,
 }
 
+/**
+ * @class
+ * @classdesc
+ * **purely functional** {@link external:Component|Component}
+ */
 const Doc = ({ params, route }) => {
   const docPath = route.path.replace(':docFile', params.docFile);
   const [x, docDir, docFile] = /^(.*)\/([^/]+)$/g.exec(docPath);

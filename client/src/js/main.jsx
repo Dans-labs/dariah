@@ -3,7 +3,7 @@ import { render } from 'react-dom';
 import { Router, Route, Redirect, DefaultRoute, IndexRoute, IndexRedirect, browserHistory } from 'react-router';
 
 import Provider from './object/Provider.jsx';
-import App from './state/App.jsx';
+import App from './pure/App.jsx';
 import ContribsFiltered from './state/ContribsFiltered.jsx';
 import Doc from './pure/Doc.jsx';
 import NotFound from './pure/NotFound.jsx';
@@ -41,7 +41,6 @@ import Store from './helpers/Store.js';
  *
  * We want one place on the interface for displaying notifications.
  */
-
 const globals = {
   store: new Store(),
   notification: {component: null},

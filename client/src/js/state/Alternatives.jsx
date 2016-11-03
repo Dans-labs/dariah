@@ -18,6 +18,14 @@ import { withContext, saveState } from '../helpers/hoc.js'
  * 2. view alternative representations of a resource
 */
 
+/**
+ * @class
+ * @classdesc
+ * **stateful** {@link external:Component|Component}
+ *
+ * Displays one of a list of alternatives
+ * let the user cycle through the alternatives.
+ */
 class Alternatives extends Component {
   next(event) {
     event.preventDefault();

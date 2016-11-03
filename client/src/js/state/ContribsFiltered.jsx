@@ -6,6 +6,17 @@ import { compileFiltering } from '../helpers/filters.js'
 import { getData } from '../helpers/data.js'
 import { withContext, saveState } from '../helpers/hoc.js'
 
+/**
+ * @class
+ * @classdesc
+ *
+ * **stateful** {@link external:Component|Component}
+ *
+ * Displays one of a list of alternatives
+ * and lets the user cycle through the alternatives.
+ *
+ * <img src="/api/file/tech/docs/design/design.002.jpeg" width="800"/>
+ */
 class ContribsFiltered extends Component {
   render() {
     const { contribs, countries } = this.state;

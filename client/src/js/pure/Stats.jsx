@@ -1,5 +1,10 @@
 import React, { PropTypes } from 'react'
 
+/**
+ * @class
+ * @classdesc
+ * **purely functional** {@link external:Component|Component}
+ */
 const style = {
   color: '#0000dd',
   fontSize: 'small',

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>pure/Filters.jsx - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alternatives.html">Alternatives</a></li><li><a href="App.html">App</a></li><li><a href="Contrib.html">Contrib</a></li><li><a href="Contribs.html">Contribs</a></li><li><a href="ContribsFiltered.html">ContribsFiltered</a></li><li><a href="Doc.html">Doc</a></li><li><a href="DocHtml.html">DocHtml</a></li><li><a href="DocMd.html">DocMd</a></li><li><a href="DocPdf.html">DocPdf</a></li><li><a href="Facet.html">Facet</a></li><li><a href="FilterCompute.html">FilterCompute</a></li><li><a href="Filters.html">Filters</a></li><li><a href="FullText.html">FullText</a></li><li><a href="Login.html">Login</a></li><li><a href="module.exports.html">exports</a></li><li><a href="NavLink.html">NavLink</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="Notification.html">Notification</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#load">load</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li><li><a href="style.html">style</a></li></ul><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.getData">getData</a></li></ul></li><li><a href="module-europe_geo_js.html">europe_geo_js</a></li><li><a href="module-filters.html">filters</a><ul class='methods'><li data-type='method'><a href="module-filters.html#.compileFiltering">compileFiltering</a></li><li data-type='method'><a href="module-filters.html#.computeFiltering">computeFiltering</a></li><li data-type='method'><a href="module-filters.html#.newFilterSettings">newFilterSettings</a></li><li data-type='method'><a href="module-filters.html#.placeFacets">placeFacets</a></li><li data-type='method'><a href="module-filters.html#.testAllChecks">testAllChecks</a></li><li data-type='method'><a href="module-filters.html#~countFacets">countFacets</a></li><li data-type='method'><a href="module-filters.html#~facetCheck">facetCheck</a></li><li data-type='method'><a href="module-filters.html#~fullTextCheck">fullTextCheck</a></li></ul></li><li><a href="module-hoc.html">hoc</a><ul class='methods'><li data-type='method'><a href="module-hoc.html#.saveState">saveState</a></li><li data-type='method'><a href="module-hoc.html#.withContext">withContext</a></li></ul></li><li><a href="module-ui.html">ui</a><ul class='methods'><li data-type='method'><a href="module-ui.html#.columnStyle">columnStyle</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Component.html">Component</a></li><li><a href="external-componentWillUnmount.html">componentWillUnmount</a></li><li><a href="external-constructor.html">constructor</a></li><li><a href="external-context.html">context</a></li><li><a href="external-LifeCycle.html">LifeCycle</a></li><li><a href="external-Map.html">Map</a></li><li><a href="external-PropTypes.html">PropTypes</a></li><li><a href="external-Recompose.html">Recompose</a></li><li><a href="external-Redux.html">Redux</a></li><li><a href="external-render.html">render</a></li><li><a href="external-setState.html">setState</a></li><li><a href="external-StatePolicy.html">StatePolicy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#globals">globals</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">pure/Filters.jsx</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { PropTypes } from 'react'
+
+import FullText from './FullText.jsx'
+import ByValue from '../object/ByValue.jsx'
+import EUMap from '../object/EUMap.jsx'
+
+/*
+ * We have several kinds of filters:
+ *
+ * - FullText: Search in the title field for pattern. The pattern is entered by the user,
+ *   the search is incremental, after each keystroke the results are updated.
+ * - ByValue: Faceted search for values of a specific field.
+ *   - EUMap: Faceted search on country, together with a map visualization
+ *
+ * The maxcols attribute specifies the number of columns in which the
+ * individual facets must be displayed.
+ *
+ * The only function of this component is to call the right component with the right props
+ * for each filter in the filterList.
+ * 
+ * filterList is also exported to the module that contains the helpers for filtering.
+ * 
+ * Filters is a pure function.
+ * All filter computations have been done by stateful parent components, such as FilterCompute.
+ * The filter results are being passed down as properties.
+ * The incoming properties can be divided into
+ * - fieldValues (which facets are there per filter?)
+ * - filterSettings (what has the user typed or clicked?)
+ * - filteredAmount, filteredAmountOthers, amounts (what are the statistics of the filtering?)
+ * - updFilter (callback coming from a stateful parent, to be passed to children that receive user events)
+ * - countries (extra information for the EUMap filter)
+ * The outgoing properties are mostly the same, except that each individual filter
+ * gets only the slice it needs.
+ *
+ */
+
+export const filterList = [
+  {kind: FullText,  name: 'FullText',  field: 'title',               maxcols: null},
+  {kind: EUMap,     name: 'EUMap',     field: 'country',             maxcols: 3},
+  {kind: ByValue,   name: 'ByValue',   field: 'typeContribution',    maxcols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivities',   maxcols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObjects',      maxcols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechniques',   maxcols: 1},
+]
+
+const styles = {
+    backgroundColor: '#ffffee',
+}
+
+/**
+ * @class
+ * @classdesc
+ * **purely functional** {@link external:Component|Component}
+ */
+const Filters = ({
+  filterSettings, fieldValues, filteredData,
+  filteredAmount, filteredAmountOthers,
+  amounts, updFilter,
+  countries
+}) => (
+  &lt;div style={styles}>
+    {filterList.map((filter, filterId) => {
+      const needs = filter.name === 'EUMap' ? {countries} : {};
+      const Fclass = filter.kind;
+      return (
+        &lt;Fclass
+          key={filterId}
+          filterId={filterId}
+          filterField={filter.field}
+          maxcols={filter.maxcols}
+          filterSettings={filterSettings.get(filterId)}
+          fieldValues={fieldValues.get(filter.field)}
+          filteredAmount={filteredAmount}
+          filteredAmountOthers={filteredAmountOthers.get(filterId)}
+          amounts={amounts.get(filterId)}
+          updFilter={updFilter}
+          {...needs}
+        />
+      );}
+    )}
+  &lt;/div>
+)
+
+Filters.propTypes = {
+  countries: PropTypes.object.isRequired,
+  filterSettings: PropTypes.object.isRequired,
+  fieldValues: PropTypes.object.isRequired,
+  filteredAmount: PropTypes.number.isRequired, 
+  filteredAmountOthers: PropTypes.object.isRequired, 
+  amounts: PropTypes.object.isRequired,
+  updFilter: PropTypes.func.isRequired,
+}
+
+export default Filters;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Thu Nov 03 2016 17:24:45 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

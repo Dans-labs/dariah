@@ -47,6 +47,11 @@ const styles = {
     backgroundColor: '#ffffee',
 }
 
+/**
+ * @class
+ * @classdesc
+ * **purely functional** {@link external:Component|Component}
+ */
 const Filters = ({
   filterSettings, fieldValues, filteredData,
   filteredAmount, filteredAmountOthers,

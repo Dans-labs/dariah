@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>object/EUMap.jsx - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alternatives.html">Alternatives</a></li><li><a href="App.html">App</a></li><li><a href="Contrib.html">Contrib</a></li><li><a href="Contribs.html">Contribs</a></li><li><a href="ContribsFiltered.html">ContribsFiltered</a></li><li><a href="Doc.html">Doc</a></li><li><a href="DocHtml.html">DocHtml</a></li><li><a href="DocMd.html">DocMd</a></li><li><a href="DocPdf.html">DocPdf</a></li><li><a href="Facet.html">Facet</a></li><li><a href="FilterCompute.html">FilterCompute</a></li><li><a href="Filters.html">Filters</a></li><li><a href="FullText.html">FullText</a></li><li><a href="Login.html">Login</a></li><li><a href="module.exports.html">exports</a></li><li><a href="NavLink.html">NavLink</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="Notification.html">Notification</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#load">load</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li><li><a href="style.html">style</a></li></ul><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.getData">getData</a></li></ul></li><li><a href="module-europe_geo_js.html">europe_geo_js</a></li><li><a href="module-filters.html">filters</a><ul class='methods'><li data-type='method'><a href="module-filters.html#.compileFiltering">compileFiltering</a></li><li data-type='method'><a href="module-filters.html#.computeFiltering">computeFiltering</a></li><li data-type='method'><a href="module-filters.html#.newFilterSettings">newFilterSettings</a></li><li data-type='method'><a href="module-filters.html#.placeFacets">placeFacets</a></li><li data-type='method'><a href="module-filters.html#.testAllChecks">testAllChecks</a></li><li data-type='method'><a href="module-filters.html#~countFacets">countFacets</a></li><li data-type='method'><a href="module-filters.html#~facetCheck">facetCheck</a></li><li data-type='method'><a href="module-filters.html#~fullTextCheck">fullTextCheck</a></li></ul></li><li><a href="module-hoc.html">hoc</a><ul class='methods'><li data-type='method'><a href="module-hoc.html#.saveState">saveState</a></li><li data-type='method'><a href="module-hoc.html#.withContext">withContext</a></li></ul></li><li><a href="module-ui.html">ui</a><ul class='methods'><li data-type='method'><a href="module-ui.html#.columnStyle">columnStyle</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Component.html">Component</a></li><li><a href="external-componentWillUnmount.html">componentWillUnmount</a></li><li><a href="external-constructor.html">constructor</a></li><li><a href="external-context.html">context</a></li><li><a href="external-LifeCycle.html">LifeCycle</a></li><li><a href="external-Map.html">Map</a></li><li><a href="external-PropTypes.html">PropTypes</a></li><li><a href="external-Recompose.html">Recompose</a></li><li><a href="external-Redux.html">Redux</a></li><li><a href="external-render.html">render</a></li><li><a href="external-setState.html">setState</a></li><li><a href="external-StatePolicy.html">StatePolicy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#globals">globals</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">object/EUMap.jsx</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component, PropTypes } from 'react'
+import ByValue from './ByValue.jsx'
+import L from 'leaflet'
+import {countryBorders} from '../helpers/europe.geo.js'
+
+/* A complex component! 
+ * It is a facet filter for the field country,
+ * and it contains a map of Europe, visualizing by means of markers,
+ * how the filter result is distributed over the DARIAH countries.
+ * 
+ * Both ingredients of this component are brought together not by
+ * class extension but by functional composition.
+ *
+ * The country facet filter is a true react component. 
+ *
+ * The map is a Leaflet component on a blank pane, with a geojson file
+ * of country boundaries laid out on it.
+ * The map is not react aware, it will be rendered in its own &lt;div>.
+ *
+ * Remember that the results of filter computation descend from a stateful
+ * parent into the present component.
+ * So, whenever we receive new props, we manipulate the leaflet map and adjust
+ * the markers on it.
+ * More precisely, since we do not have to manipulate state, we put the marker updates
+ * in the componentDidMount() and componentDidUpdate() life cycle methods of React.
+ * At those moments we know that the DOM elements that must be rendered have mounted,
+ * so the map exists, and we can put the markers there.
+ */
+
+const mapOptions = {
+  HEIGHT: 250,
+  MAX_RADIUS: 25,
+  LEVEL_OFF: 10,
+  ZOOM_INIT: 3,
+  MAP_CENTER: [52, 12],
+  MAP_BOUNDS: [[30, -20], [70,40]],
+  MARKER_COLOR: {
+    [true]: {
+      color: '#008800',
+      fillColor: '#00cc00',
+    },
+    [false]: {
+      color: '#888844',
+      fillColor: '#bbbb66',
+    },
+  },
+  MARKER_SHAPE: {
+    weight: 1,
+    fill: true,
+    fillOpacity: 0.8,
+  },
+  COUNTRY_STYLE: {
+    [true]: {
+      color: '#884422',
+      weight: 2,
+      fill: true,
+      fillColor: '#aa7766',
+      fillOpacity: 1,
+    },
+    [false]: {
+      color: '#777777',
+      weight: 1,
+      fill: true,
+      fillColor: '#bbbbbb',
+      fillOpacity: 1,
+    },
+  }
+}
+
+/* COMPUTE MARKER RADIUS
+ *
+ * When we know the filter results per country, we can put markers on countries
+ * with a radius in proportion to their scores.
+ * However, if the scores are very far apart, either the small markers get invisible,
+ * or the big markers get too big. 
+ * We mitigate this effect, by using proportional radii only for values below a certain
+ * threshold (LEVEL_OFF). For higher values we essentiall take the square root.
+ *
+*/
+const computeRadius = (iso2, filteredAmountOthers, amounts) => { 
+  const amount = amounts ? amounts.has(iso2) ? amounts.get(iso2) : 0 : 0;
+  if (!amount) {return 0}
+  const proportional = mapOptions.MAX_RADIUS * amount / filteredAmountOthers;
+  if (filteredAmountOthers &lt; mapOptions.LEVEL_OFF) {return proportional}
+  return mapOptions.LEVEL_OFF * Math.sqrt(proportional);
+}
+
+const inDariah = (feature, countries) => {
+  const iso2 = feature.properties.iso2;
+  return countries.has(iso2) &amp;&amp; countries.get(iso2).inDARIAH
+}
+
+/* The big component with map and country filter facets
+*/
+
+/**
+ * @class
+ * @classdesc
+ * **stateless, DOM-modifying** {@link external:Component|Component}
+ */
+export default class EUMap extends Component {
+  constructor(props) {
+    super(props);
+    this.features = new Map();
+  }
+  /* render() just invokes the ByValue component with the right parameters
+   * to get the country facets.
+   * And it puts a div in place that will receive the map.
+   */
+  render() {
+    const { countries, ...byMetaProps } = this.props;
+    return (
+      &lt;div>
+        &lt;div ref="eumap" style={{
+          height: mapOptions.HEIGHT,
+        }}/>
+        &lt;ByValue {...byMetaProps}/>
+      &lt;/div>
+    )
+  }
+
+  /* The following methods are dedicated to map operations.
+   * They both occur after render, when the component just has mounted or updated.
+   *
+   * componentDidMount()
+   *
+   * After the initial mount we get the countries and perform
+   * initializations that depend on the countries.
+   * These do not have to be repeated after subsequent updates.
+   * - we put the map in place
+   * - we put the country boundaries on the pane
+   * - we add markers, style them, and maintain references to them
+   */
+  componentDidMount() {
+    const { filterSettings, filteredAmountOthers, amounts, countries } = this.props;
+    this.map = L.map(this.refs.eumap, {
+      attributionControl: false,
+      center: mapOptions.MAP_CENTER,
+      zoom: mapOptions.ZOOM_INIT,
+      maxBounds: mapOptions.MAP_BOUNDS,
+    });
+    L.geoJSON(countryBorders, {
+      style: feature => mapOptions.COUNTRY_STYLE[inDariah(feature, countries)],
+      onEachFeature: feature => {
+        if (inDariah(feature, countries)) {
+          const fprops = feature.properties;
+          const iso2 = fprops.iso2;
+          const isOn = filterSettings.get(iso2);
+          const marker = L.circleMarker([fprops.lat, fprops.lng], {
+            ...mapOptions.MARKER_COLOR[isOn],
+            radius: computeRadius(iso2, filteredAmountOthers, amounts),
+            ...mapOptions.MARKER_SHAPE,
+            pane: 'markerPane',
+          }).addTo(this.map);
+          this.features.set(fprops.iso2, marker);
+        }
+      },
+    }).addTo(this.map);
+  }
+
+  /* componentDidUpdate()
+   *
+   * After getting new filter results, the only thing we have to do is to
+   * - update the marker radii
+   * - update the marker colors
+  */
+  componentDidUpdate() {
+    const { filterSettings, filteredAmountOthers, amounts } = this.props;
+    for (const [iso2, marker] of this.features) {
+      const isOn = filterSettings.get(iso2);
+      marker.setRadius(computeRadius(iso2, filteredAmountOthers, amounts));
+      marker.setStyle(mapOptions.MARKER_COLOR[isOn]);
+    }
+  }
+}
+
+EUMap.propTypes = {
+  ...ByValue.propTypes,
+  countries: PropTypes.object.isRequired,
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Thu Nov 03 2016 17:24:45 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
