@@ -6,12 +6,14 @@ The tool is in beta and currently [live](https://dariah-beta.dans.knaw.nl/).
 
 * General information:
   [about](https://dariah-beta.dans.knaw.nl/docs/about.md) (live), 
-  [in this repo](https://github.com/Dans-labs/dariah/blob/master/client/src/js/helpers/mdText.js);
-* Architecture:
-  [design](https://dariah-beta.dans.knaw.nl/tech/docs/design.pdf) (live), 
-  [in this repo](https://github.com/Dans-labs/dariah/blob/master/static/docs/design.pdf);
+  [in this repo](https://github.com/Dans-labs/dariah/blob/master/client/docs/about.md);
+* Technical Documentation:
+  [techdoc](https://dariah-beta.dans.knaw.nl/api/file/tech/docs/gen/index.html) (live), 
+  [in this repo](https://github.com/Dans-labs/dariah/tree/master/client/docs/gen).
 * Deployment:
-  [guide](https://dariah-beta.dans.knaw.nl/tech/docs/deploy.md) (live), 
-  [in this repo](https://github.com/Dans-labs/dariah/blob/master/client/src/js/helpers/mdText.js).
-
+  [deploy](https://dariah-beta.dans.knaw.nl/tech/docs/deploy.md) (live), 
+  [in this repo](https://github.com/Dans-labs/dariah/blob/master/client/docs/deploy.md).
+* Diagrams:
+  [diagrams]() (live), 
+  [in this repo](https://github.com/Dans-labs/dariah/blob/master/client/docs/design.pdf);
 
