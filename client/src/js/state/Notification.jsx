@@ -91,8 +91,14 @@ const empty = [];
  *
  * Component that receives notifications and displays them in a 
  * little div with fixed position on the screen.
+ *
+ * <img src="/api/file/tech/docs/design/design.006.jpeg" width="800"/>
  */
 class Notification extends Component {
+/**
+ * Upon construction this component registers itself as an object in {@link globals}.
+ * The state consists of the list of messages.
+ */
   constructor(props) {
     super(props);
     props.notification.component = this
@@ -107,6 +113,11 @@ class Notification extends Component {
     this.msgs = []; // synchronous clearing of msg
     this.setState({msgs: []}); // asynchronous update of the state
   }
+/**
+ * Collects the parameters to display progress information
+ * @method
+ * @returns {Array} See the input of {@link Notification.render}
+*/
   computeProgress() {
     const lastMsg = this.msgs.length -1;
     let lastNote = -1;
@@ -126,6 +137,24 @@ class Notification extends Component {
     const visible = this.visible || (lastNote > -1);
     return [lastMsg, lastNote, lastKind, busy, visible];
   }
+/**
+ * Unobtrusive notification:
+ *
+ * * if all is well, just a little circle fixed in the upper right corner
+ * * if we are waiting for the server: a spinner and a few extra disks for each pending process
+ * * clicking on the circle pops up a message panel
+ * * if there are errors/warnings, the circle changes color and a message panel pops up automatically
+ * * which can be dismissed by clicking on it
+ * * and previous messages can be cleared
+ *
+ * @param {SEP} OUT above: incoming parameters; below outgoing results
+ * @param {number} lastMsg number of the last message in the panel
+ * @param {number} lastNote number of the last error/warning message in the panel
+ * @param {number} lastKind kind of the last error/warning message in the panel
+ * @param {number} busy: the sum of the individual `busy` attributes of the messages
+ * @param {boolean} visible: whether we should show the panel
+ * @returns {DOM}
+ */
   render() {
     [this.lastMsg, this.lastNote, this.lastKind, this.busy, this.visible] = this.computeProgress();
     const busyBlocks = new Array(this.busy).fill(1);
@@ -171,6 +200,14 @@ class Notification extends Component {
   componentDidUpdate() {
     this.setView();
   }
+/**
+ * Hide/show message panel and scrolls to relevant message.
+ *
+ * @method
+ * @param {boolean} on Whether the message panel should be displayed or not
+ * @returns {DOMEffect}
+ * Hides or shows the div containing the message panel.
+*/
   setView(on) {
     if (on !== undefined) {
       this.visible = on;

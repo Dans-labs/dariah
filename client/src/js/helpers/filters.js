@@ -29,12 +29,13 @@
  *
  * @param {Contrib[]} contribs - The list of contribution records as it comes form mongo db
  * @param {Array} filterList - The list of available filters, statically imported from the 
- * @param {Map} fieldValues - **OUT** a mapping of the valueId to the valueRepresentation of all values that have
+ * @param {SEP} OUT above: incoming parameters; below outgoing results
+ * @param {Map} fieldValues - a mapping of the valueId to the valueRepresentation of all values that have
  * been encountered in the `field` of the `contribs` rows
- * @param {Map} filterInit - **OUT** a mapping that maps the filterId of each available filter to initial filterSettings
+ * @param {Map} filterInit - a mapping that maps the filterId of each available filter to initial filterSettings
  * for that filter, i.e. the situation that the user has not yet started using the filters
  * {@link Filters} component.
- * @returns {Object} See **OUT** parameters 
+ * @returns {Object} See parameters below **OUT* 
  */
 export function compileFiltering(contribs, filterList) {
   const fields = filterList.filter(x => x.name !== 'FullText').map(x => x.field);
@@ -68,10 +69,11 @@ export function compileFiltering(contribs, filterList) {
  * @param {Array} filterList - as in {@link compileFiltering}
  * @param {Map} fieldValues - as in {@link compileFiltering} 
  * @param {Map} filterSettings - a {@link external:Map|Map} of filters to their current settings
- * @param {Map} filteredData - **OUT** the sublist of contribs, the rows that pass all filters
- * @param {Map} filteredAmountOthers - **OUT** a mapping that indicates for each filter how many rows pass all other filters
- * @param {Map} amounts - **OUT** a mapping like `filteredAmountOthers`, but more specific: it indicates per faceted value
- * @returns {Object} See **OUT** parameters 
+ * @param {SEP} OUT above: incoming parameters; below outgoing results
+ * @param {Map} filteredData - the sublist of contribs, the rows that pass all filters
+ * @param {Map} filteredAmountOthers - a mapping that indicates for each filter how many rows pass all other filters
+ * @param {Map} amounts - a mapping like `filteredAmountOthers`, but more specific: it indicates per faceted value
+ * @returns {Object} See parameters below **OUT* 
  *
  * With filteredData.length, filteredAmountOthers, amounts we have exactly the right numbers to 
  * render the "(nn of mm)" statistics on the user interface next to each filter and facet.
@@ -173,7 +175,7 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
  * we do not say:
  *
  * ```
- *    statey.b.push(5)
+ *    state.y.b.push(5)
  * ```
  *
  * Instead, we produce a new state like this
@@ -205,8 +207,9 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
  * @param {Map} filterSettings - the state before the user event, as in {@link computeFiltering} 
  * @param {Map} filterSettings - as in {@link computeFiltering} 
  * @param {number} filterId - the id of the filter that fired an event
- * @param {Map} freshFilterSettings - **OUT** the nature of the event
- * @returns {Object} See **OUT** parameters 
+ * @param {SEP} OUT above: incoming parameters; below outgoing results
+ * @param {Map} freshFilterSettings - the nature of the event
+ * @returns {Object} See parameters below **OUT* 
  */
 export const newFilterSettings = (filterSettings, filterId, data) => {
   const freshFilterSettings = new Map([...filterSettings.entries()]);

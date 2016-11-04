@@ -37,24 +37,6 @@ import React, { Component, PropTypes, Children } from 'react'
  */
 
 /**
- * React mechanism to pass data directly  from ancestors to deep descendants.
- * The React documentation
- * considers context as a brittle part of itself, and warns
- * against over-use. At the same time,
- * {@link external:Redux|Redux}
- * depends critically on it, so I consider it safe to use.
- *
- * By wrapping the syntax of the React context mechanism into an enhancer, we
- * can survive API changes more easily.
- * See
- * {@link withContext}
- * .
- *
- * @external context
- * @see {@link https://facebook.github.io/react/docs/context.html|context}
- */
-
-/**
  * Wraps
  * {@link external:Component|component}
  * to provide it with context.

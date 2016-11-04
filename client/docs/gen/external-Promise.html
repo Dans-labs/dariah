@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Doc - Documentation</title>
+    <title>Promise - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Doc</h1>
+    <h1 class="page-title">Promise</h1>
     
 
     
@@ -40,10 +40,8 @@
 <header>
     
         <h2>
-        Doc
+        Promise
         </h2>
-        
-            <div class="class-description"><p><strong>purely functional</strong> <a href="external-Component.html"><code>Component</code></a></p></div>
         
     
 </header>
@@ -53,23 +51,12 @@
     
         
 
-    
-    <h2>Constructor</h2>
-    
-
-    <h4 class="name" id="Doc"><span class="type-signature"></span>new Doc<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
 <dl class="details">
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="pure_Doc.jsx.html">pure/Doc.jsx</a>, <a href="pure_Doc.jsx.html#line19">line 19</a>
+        <a href="helpers_intro.js.html">helpers/intro.js</a>, <a href="helpers_intro.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -100,6 +87,13 @@
     
 
     
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></li>
+        </ul>
+    </dd>
+    
 
     
 </dl>
@@ -107,31 +101,23 @@
 
 
 
+        
+            <div class="description"><p>ES6 datastructure to contain the result of an asynchronous function.
+It has as state that is either <em>pending</em>, <em>failed</em> or <em>resolved</em>. 
+Once the state is <em>failed</em> or <em>resolved</em>, it will not change anymore.
+If the state is <em>resolved</em>, the return value is available, and will not change anymore.
+The typical way to use a promise is</p>
+<pre class="prettyprint source"><code>  const dataStore = {};
+  const getData = url => fetch(url); 
+  // assuming that fetch returns a Promise, we can then say
+  getData('/api/blob/23').
+  then(
+    blob => {dataStore.url = blob},
+    error => console.log(error),
+  )</code></pre></div>
+        
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        
     
     </div>
 

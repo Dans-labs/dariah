@@ -1,16 +1,16 @@
 import React, { PropTypes } from 'react'
 
-/**
- * @class
- * @classdesc
- * **purely functional** {@link external:Component|Component}
- */
 const style = {
   color: '#0000dd',
   fontSize: 'small',
   fontWeight: 'normal',
 }
 
+/**
+ * @class
+ * @classdesc
+ * **purely functional** {@link external:Component|Component}
+ */
 const Stats = ({subTotal, total}) => (
   <span style={style}>
     {subTotal == undefined? '' :`${subTotal}`}

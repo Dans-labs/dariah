@@ -24,6 +24,15 @@ const rootUrl = '/api/';
  * @param {Component} component - Component for which to fetch data
  * @param {Object} notification - The {@link Notification} component that receives error/progress
  * {@link Message|messages}
+ * @returns {Promise}
+ * This is an asynchronous call.
+ * The fetched data comes in as a promise, to with getData attaches `.then` handlers,
+ * which will be new promises.
+ * If the fetch is successful, the resolved data will added to the `state[branch]` of `component`.
+ * Progress and error messages from the server appear in the fetched json as {@link Message|messages}.
+ * If the fetch itself failed, we handle it by transforming the error into a {@link Message|message}.
+ * All {@link Message|messages} generated in the process will be send to the
+ * {@link Notification|notification} component.
  */
 export function getData(sources, component, notification) {
   for (const { type, path, branch } of sources) {

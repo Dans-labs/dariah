@@ -98,7 +98,7 @@ const inDariah = (feature, countries) => {
  * @classdesc
  * **stateless, DOM-modifying** {@link external:Component|Component}
  */
-export default class EUMap extends Component {
+class EUMap extends Component {
   constructor(props) {
     super(props);
     this.features = new Map();
@@ -178,3 +178,5 @@ EUMap.propTypes = {
   ...ByValue.propTypes,
   countries: PropTypes.object.isRequired,
 }
+
+export default EUMap

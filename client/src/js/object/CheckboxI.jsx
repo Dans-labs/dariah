@@ -7,7 +7,7 @@ const indeterminate = states => !states.allTrue && !states.allFalse
  * @classdesc
  * **stateless, DOM-modifying** {@link external:Component|Component}
  */
-export default class CheckboxI extends Component {
+class CheckboxI extends Component {
   componentDidMount() {
     const { states } = this.props;
     this.refs.ci.indeterminate = indeterminate(states);
@@ -37,3 +37,5 @@ CheckboxI.propTypes = {
   }).isRequired,
   updFilter: PropTypes.func,
 }
+
+export default CheckboxI

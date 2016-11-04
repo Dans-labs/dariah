@@ -14,6 +14,38 @@
  */
 
 /**
+ * @typedef Map
+ * @type {external:Map}
+ */
+
+/**
+ * ES6 datastructure to contain the result of an asynchronous function.
+ * It has as state that is either *pending*, *failed* or *resolved*. 
+ * Once the state is *failed* or *resolved*, it will not change anymore.
+ * If the state is *resolved*, the return value is available, and will not change anymore.
+ * The typical way to use a promise is
+ *
+ * ```
+ *   const dataStore = {};
+ *   const getData = url => fetch(url); 
+ *   // assuming that fetch returns a Promise, we can then say
+ *   getData('/api/blob/23').
+ *   then(
+ *     blob => {dataStore.url = blob},
+ *     error => console.log(error),
+ *   )
+ * ```
+ *
+ * @external Promise
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise|Promise}
+ */
+
+/**
+ * @typedef Promise
+ * @type {external:Promise}
+ */
+
+/**
  * ## React Components
  *
  * React components represent pieces of the web page and their functionality.
@@ -115,6 +147,24 @@
  */
 
 /**
+ * React mechanism to pass data directly  from ancestors to deep descendants.
+ * The React documentation
+ * considers context as a brittle part of itself, and warns
+ * against over-use. At the same time,
+ * {@link external:Redux|Redux}
+ * depends critically on it, so I consider it safe to use.
+ *
+ * By wrapping the syntax of the React context mechanism into an enhancer, we
+ * can survive API changes more easily.
+ * See
+ * {@link withContext}
+ * .
+ *
+ * @external context
+ * @see {@link https://facebook.github.io/react/docs/context.html|context}
+ */
+
+/**
  * The main function of a
  * {@link external:Component|component}
  * is to act as a template to be
@@ -132,7 +182,7 @@
  * When a
  * {@link external:Component|component}
  * is being
- * @see {@link https://facebook.github.io/react/docs/react-component.html#render|rendered}
+ * {@link https://facebook.github.io/react/docs/react-component.html#render|rendered}
  * this is the method to construct the corresponding React class.
  * It will set up the state.
  *

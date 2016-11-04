@@ -10,7 +10,7 @@ import { placeFacets, testAllChecks } from '../helpers/filters.js'
  * @classdesc
  * **stateless, DOM-modifying** {@link external:Component|Component}
  */
-export default class ByValue extends Component {
+class ByValue extends Component {
   constructor() {
     super();
     this.rows = null;
@@ -98,3 +98,5 @@ ByValue.propTypes = {
   fieldValues: PropTypes.object.isRequired,
   updFilter: PropTypes.func.isRequired,
 }
+
+export default ByValue

@@ -77,6 +77,7 @@ class Store {
  *
  * @method
  * @param {string} key - Identifier under which the saved state is stored
+ * @returns {Object} The saved state object from the store found under `key`
  */
   get(key) {
     if (!this.data.has(key)) {
