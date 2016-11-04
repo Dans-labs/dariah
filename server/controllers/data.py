@@ -1,5 +1,4 @@
 from db import connectdb
-import time
 
 class DataApi(object):
     def __init__(self):
@@ -13,7 +12,6 @@ class DataApi(object):
             return dict(data=None, msgs=[dict(kind='error', text='query {} not provided'.format(query))], good=False)
 
     def list_contrib(self):
-        time.sleep(20)
         documents = list(self.dbm.contrib.find({}).sort('title', 1))
         return dict(data=documents, msgs=[], good=True)
 
@@ -23,6 +21,5 @@ class DataApi(object):
         return dict(data=list(documents), msgs=[], good=True)
 
     def member_country(self):
-        time.sleep(20)
         documents = list(self.dbm.country.find({}, {'inDARIAH': True}))
         return dict(data=documents, msgs=[], good=True)
