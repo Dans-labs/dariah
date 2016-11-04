@@ -8,15 +8,28 @@ import { placeFacets, testAllChecks } from '../helpers/filters.js'
 /**
  * @class
  * @classdesc
- * **stateless, DOM-modifying** {@link external:Component|Component}
+ * **stateless, needs-lifecycle method** {@link external:Component|Component}
+ * 
+ * A widget by which the user can click the facets associated with one field.
+ * There is also a collective checkbox, by which the user can check or uncheck all facets in one go.
+ * All values that occur are displayed, with statistics in the form *subtotal of total*.
+ *
+ * There is a subtlety here. 
+ * We do not need a
+ * {@link external:LifeCycle|life cycle method}
+ * here for modifying the DOM, but for avoiding work.
+ * When we have the facets, we want to lay them out in a grid.
+ * That work needs only be done upon construction,
+ * and not for state updates in response to user
+ * events on the filters.
+ * 
+ * So we need to put inititialization functionality in the constructor.
  */
 class ByValue extends Component {
-  constructor() {
-    super();
-    this.rows = null;
-  }
-  componentWillMount() {
-    const { filterField, fieldValues, maxcols } = this.props;
+  constructor(props) {
+    super(props);
+    console.log(props);
+    const { filterField, fieldValues, maxcols } = props;
     this.rows = placeFacets(filterField, fieldValues, maxcols);
   }
   render () {

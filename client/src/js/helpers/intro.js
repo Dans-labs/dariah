@@ -193,6 +193,44 @@
 /**
  * When a
  * {@link external:Component|component}
+ * has been added to the DOM
+ * this method will be called just after.
+ * This is the recommended time to fetch data for this component, if needed.
+ *
+ * @external componentDidMount
+ * @see {@link https://facebook.github.io/react/docs/react-component.html#componentdidmount|componentDidMount()}
+ */
+
+/**
+ * When a
+ * {@link external:Component|component}
+ * has been updated due to receiving new properties,
+ * this method will be called just after.
+ * If DOM manipulations are needed to complete the rendering, this is 
+ * the place to do it. 
+ *
+ * *NB:** This will not called upon initial rendering, so if the DOM manipulation
+ * is also needed initially, it is handy to write a function for it and
+ * call it in this method and in {@link external:componentDidMount:componentDidMount()}.
+ *
+ * @external componentDidUpdate
+ * @see {@link https://facebook.github.io/react/docs/react-component.html#componentdidupdate|componentDidUpdate()}
+ */
+
+/**
+ * When a
+ * {@link external:Component|component}
+ * will be added to the DOM, 
+ * this method will be called just before.
+ * This is the first thing that happens after {@link external:constructor|constructor()}.
+ *
+ * @external componentWillMount
+ * @see {@link https://facebook.github.io/react/docs/react-component.html#componentwillmount|componentWillMount()}
+ */
+
+/**
+ * When a
+ * {@link external:Component|component}
  * will be removed from the DOM, 
  * this method will be called just before.
  * If we want to save state, we can hook it up here.

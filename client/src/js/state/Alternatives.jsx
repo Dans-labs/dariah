@@ -1,23 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import { withContext, saveState } from '../helpers/hoc.js'
 
-/*
- * A choice between several alternatives, with controls to click to the next alternative.
- * Pass an array of alternatives and an array of controls of equal length.
- * The alternatives are react objects to choose from.
- * The controls must be inline elements.
- * They will be placed in a context defined by the controlPlacement function, which
- * must also be passed as a prop.
- * Or rather, they are functions that take a handler and return an online element.
- * The state is an integer corresponding to the array index of the alternative that is chosen.
- * A click on a control increases the state by 1 modulo the number of alternatives.
- * Upon constructing, an initial state may be passed. Default: 0.
- *
- * Handy for:
- * 1. show/hide a component: pass as alternatives the component plus an empty <div>
- * 2. view alternative representations of a resource
-*/
-
 /**
  * @class
  * @classdesc
@@ -25,6 +8,10 @@ import { withContext, saveState } from '../helpers/hoc.js'
  *
  * Displays one of a list of alternatives
  * let the user cycle through the alternatives.
+ *
+ * Handy for:
+ * * show/hide a component: pass as alternatives the component plus an empty <div>
+ * * view alternative representations of a resource
  */
 class Alternatives extends Component {
   next(event) {

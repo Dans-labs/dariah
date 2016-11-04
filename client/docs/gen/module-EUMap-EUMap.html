@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Global - Documentation</title>
+    <title>EUMap - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Global</h1>
+    <h1 class="page-title">EUMap</h1>
     
 
     
@@ -40,8 +40,16 @@
 <header>
     
         <h2>
+            <span class="ancestors"><a href="module-EUMap.html">EUMap</a>~</span>
         
+        EUMap
         </h2>
+        
+            <div class="class-description"><p><strong>stateless, DOM-modifying</strong> <a href="external-Component.html"><code>Component</code></a></p>
+<p>An ordinary faceted filter on the country field plus a container for the map,
+with
+<a href="external-LifeCycle.html"><code>life cycle methods</code></a>
+to place and update markers when the filter results have changed.</p></div>
         
     
 </header>
@@ -51,8 +59,24 @@
     
         
 
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="EUMap"><span class="type-signature"></span>new EUMap<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
 <dl class="details">
 
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="object_EUMap.jsx.html">object/EUMap.jsx</a>, <a href="object_EUMap.jsx.html#line130">line 130</a>
+    </li></ul></dd>
     
 
     
@@ -89,9 +113,31 @@
 
 
 
-        
 
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     </div>
 
@@ -106,12 +152,18 @@
     
 
     
-        <h3 class="subsection-title">Members</h3>
+
+    
+        <h3 class="subsection-title">Methods</h3>
 
         
             
-<h4 class="name" id="globals"><span class="type-signature">(constant) </span>globals<span class="type-signature"></span></h4>
 
+    
+
+    <h4 class="name" id="componentDidMount"><span class="type-signature"></span>componentDidMount<span class="signature">(filterSettings, filteredAmountOthers, amounts`, countries)</span><span class="type-signature"> &rarr; {DOMEffects}</span></h4>
+
+    
 
 
 
@@ -121,7 +173,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.jsx.html">main.jsx</a>, <a href="main.jsx.html#line44">line 44</a>
+        <a href="object_EUMap.jsx.html">object/EUMap.jsx</a>, <a href="object_EUMap.jsx.html#line173">line 173</a>
     </li></ul></dd>
     
 
@@ -161,27 +213,14 @@
 
 
 <div class="description">
-    <p>Application wide data</p>
-<p>Some things need to be practically global, or at least, application wide.
-We will not use the javascript <code>window</code> object to store globals.
-Instead we use the <em>context</em> mechanism of React to pass global information
-around within the app.</p>
-<h1>Store</h1><p>The store is a container of component states.
-We use it for components with a costly state, that should be preserved when components are swapped in and out from
-the user interface.</p>
-<p>We pass a reference to the store as a parameter to all routes that invoke a component with state that should be preserved. 
-We do not use central state. We only provide for components to store their state when they unmount,
-and to load it when they mount.</p>
-<p>A component can assign its state to the store using a self chosen key, preferably different for different instances.
-So the store consists of saved states keyed by component instances.</p>
-<p>The most important use cases for this app:</p>
+    <p>After the initial mount we get the country data and perform
+initializations that depend on that information:</p>
 <ul>
-<li>if the big contrib list is loaded, the user must be able to go back and forth between docs like &quot;about&quot;
-and the contrib list without the need to reload the list all the time</li>
-<li>if a user has set up filters, the filter state should be preserved after navigating to other parts of the app</li>
+<li>we put the map in place</li>
+<li>we put the country boundaries on the pane</li>
+<li>we add markers, style them, and maintain references to them</li>
 </ul>
-<p>Note that the DOM may be swapped out, but the state info needed to recreate the dom should be preserved.</p>
-<h1>Notification</h1><p>We want one place on the interface for displaying notifications.</p>
+<p>These do not have to be repeated after subsequent updates.</p>
 </div>
 
 
@@ -191,207 +230,13 @@ and the contrib list without the need to reload the list all the time</li>
 
 
 
-        
+
+
+
+    <h5>Parameters:</h5>
     
 
-    
-
-    
-        <h3 class="subsection-title">Type Definitions</h3>
-
-        
-                
-<h4 class="name" id="Component">Component</h4>
-
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_intro.js.html">helpers/intro.js</a>, <a href="helpers_intro.js.html#line135">line 135</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type"><a href="external-Component.html">external:Component</a></span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-
-            
-                
-<h4 class="name" id="Map">Map</h4>
-
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_intro.js.html">helpers/intro.js</a>, <a href="helpers_intro.js.html#line16">line 16</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type"><a href="external-Map.html">external:Map</a></span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-
-            
-                
-<h4 class="name" id="Message">Message</h4>
-
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_intro.js.html">helpers/intro.js</a>, <a href="helpers_intro.js.html#line354">line 354</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
+<table class="params">
     <thead>
     <tr>
         
@@ -413,13 +258,13 @@ and the contrib list without the need to reload the list all the time</li>
 
         <tr>
             
-                <td class="name"><code>kind</code></td>
+                <td class="name"><code>filterSettings</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type"><a href="global.html#Map">Map</a></span>
 
 
             
@@ -429,37 +274,14 @@ and the contrib list without the need to reload the list all the time</li>
 
             
 
-            <td class="description last"><p>one of the values <code>error</code>, <code>warning</code>, <code>good</code>, <code>special</code>, <code>info</code></p></td>
+            <td class="description last"><p>the current settings of the country facets</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>text</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>the plain text of the message</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>busy</code></td>
+                <td class="name"><code>filteredAmountOthers</code></td>
             
 
             <td class="type">
@@ -475,9 +297,53 @@ and the contrib list without the need to reload the list all the time</li>
 
             
 
-            <td class="description last"><p>an number that will be added by <code>getData</code>: +1 at the start of a request,
--1 when the waiting is over; the <a href="Notification.html"><code>Notification</code></a> object can use <code>busy</code> for displaying progress
-indication. <strong>NB:</strong> The server does not supply the <code>busy</code> attribute, only <code>getData</code> does.</p></td>
+            <td class="description last"><p>how many rows pass all other filters</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>amounts`</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Map">Map</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p><code>filteredAmountOthers</code>, but more specific: the amounts per faceted value</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>countries</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Map">Map</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the country data from the database</p></td>
         </tr>
 
     
@@ -491,25 +357,40 @@ indication. <strong>NB:</strong> The server does not supply the <code>busy</code
 
 
 
-    <h5>Type:</h5>
-    <ul>
-        <li>
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">DOMEffects</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
             
-<span class="param-type">Object</span>
 
+    
 
-        </li>
-    </ul>
+    <h4 class="name" id="componentDidUpdate"><span class="type-signature"></span>componentDidUpdate<span class="signature">(filterSettings, filteredAmountOthers, amounts`)</span><span class="type-signature"> &rarr; {DOMEffects}</span></h4>
 
-
-
-
-
-
-            
-                
-<h4 class="name" id="Promise">Promise</h4>
-
+    
 
 
 
@@ -519,7 +400,7 @@ indication. <strong>NB:</strong> The server does not supply the <code>busy</code
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_intro.js.html">helpers/intro.js</a>, <a href="helpers_intro.js.html#line43">line 43</a>
+        <a href="object_EUMap.jsx.html">object/EUMap.jsx</a>, <a href="object_EUMap.jsx.html#line211">line 211</a>
     </li></ul></dd>
     
 
@@ -558,301 +439,56 @@ indication. <strong>NB:</strong> The server does not supply the <code>busy</code
 
 
 
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type"><a href="external-Promise.html">external:Promise</a></span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-
-            
-                
-<h4 class="name" id="Result">Result</h4>
-
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_intro.js.html">helpers/intro.js</a>, <a href="helpers_intro.js.html#line346">line 346</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>the actual payload of the data transfer; this is what the component needs
-to have to do its work</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>messages</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;<a href="global.html#Message">Message</a>></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>messages issued at the server side when carrying out the request</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>good</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>whether the server has successfully carried out the request</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-
-            
-                
-<h4 class="name" id="Source">Source</h4>
-
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_intro.js.html">helpers/intro.js</a>, <a href="helpers_intro.js.html#line336">line 336</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>either</p>
+<div class="description">
+    <p>After getting new filter results, the only thing we have to do is to</p>
 <ul>
-<li><code>db</code> (mongo db access, results delivered as json)</li>
-<li><code>json</code> (file contents delivered as json)</li>
-</ul></td>
-        </tr>
+<li>update the marker radii</li>
+<li>update the marker colors</li>
+</ul>
+</div>
 
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>path</code></td>
+                <td class="name"><code>filterSettings</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type"><a href="global.html#Map">Map</a></span>
 
 
             
@@ -862,20 +498,20 @@ to have to do its work</p></td>
 
             
 
-            <td class="description last"><p>the remaining path to the controller function on the server</p></td>
+            <td class="description last"><p>the current settings of the country facets</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>branch</code></td>
+                <td class="name"><code>filteredAmountOthers</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
             
@@ -885,8 +521,30 @@ to have to do its work</p></td>
 
             
 
-            <td class="description last"><p>the subobject of the requesting component's state that will
-receive the fetched data</p></td>
+            <td class="description last"><p>how many rows pass all other filters</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>amounts`</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Map">Map</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p><code>filteredAmountOthers</code>, but more specific: the amounts per faceted value</p></td>
         </tr>
 
     
@@ -900,22 +558,212 @@ receive the fetched data</p></td>
 
 
 
-    <h5>Type:</h5>
-    <ul>
-        <li>
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">DOMEffects</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
             
-<span class="param-type">Object</span>
+
+    
+
+    <h4 class="name" id="render"><span class="type-signature"></span>render<span class="signature">(countries, byValueProps)</span><span class="type-signature"> &rarr; {DOM}</span></h4>
+
+    
 
 
-        </li>
-    </ul>
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="object_EUMap.jsx.html">object/EUMap.jsx</a>, <a href="object_EUMap.jsx.html#line145">line 145</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
 
 
 
 
+
+<div class="description">
+    <p>render() just invokes the ByValue component with the right parameters
+to get the country facets.
+And it puts a div in place that will receive the map.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>countries</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Map">Map</a></span>
 
 
             
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>This parameter is not used, but mentioned to select all the other parameters to
+pass on</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>byValueProps</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Object></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The remaining properties, to be passes to the {ByValue} component.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">DOM</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+    
+
     
 
     

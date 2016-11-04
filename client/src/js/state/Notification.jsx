@@ -147,7 +147,6 @@ class Notification extends Component {
  * * which can be dismissed by clicking on it
  * * and previous messages can be cleared
  *
- * @param {SEP} OUT above: incoming parameters; below outgoing results
  * @param {number} lastMsg number of the last message in the panel
  * @param {number} lastNote number of the last error/warning message in the panel
  * @param {number} lastKind kind of the last error/warning message in the panel

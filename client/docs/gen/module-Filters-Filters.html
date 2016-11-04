@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>NavLink - Documentation</title>
+    <title>Filters - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">NavLink</h1>
+    <h1 class="page-title">Filters</h1>
     
 
     
@@ -40,10 +40,30 @@
 <header>
     
         <h2>
-        NavLink
+            <span class="ancestors"><a href="module-Filters_.html">Filters</a>~</span>
+        
+        Filters
         </h2>
         
-            <div class="class-description"><p><strong>purely functional</strong> <a href="external-Component.html"><code>Component</code></a></p></div>
+            <div class="class-description"><p><strong>purely functional</strong> <a href="external-Component.html"><code>Component</code></a></p>
+<p>All filter computations have been done by stateful parent components, such as FilterCompute.
+The filter results are being passed down as properties.
+The incoming properties can be divided into</p>
+<ul>
+<li>fieldValues (which facets are there per filter?)</li>
+<li>filterSettings (what has the user typed or clicked?)</li>
+<li>filteredAmount, filteredAmountOthers, amounts (what are the statistics of the filtering?)</li>
+<li>updFilter (callback coming from a stateful parent, to be passed to children that receive user events)</li>
+<li>countries (extra information for the EUMap filter)
+The outgoing properties are mostly the same, except that each individual filter
+gets only the slice it needs.</li>
+</ul>
+<p>This function merely selects the right filter
+<a href="external-Component.html"><code>component</code></a>
+and calls it with the appropriate props.
+Whereas the incoming props contain information for all filters,
+each individual child filter is passed the relevant slice only.
+.</p></div>
         
     
 </header>
@@ -57,7 +77,7 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="NavLink"><span class="type-signature"></span>new NavLink<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Filters"><span class="type-signature"></span>new Filters<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
@@ -69,7 +89,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="pure_NavLink.jsx.html">pure/NavLink.jsx</a>, <a href="pure_NavLink.jsx.html#line9">line 9</a>
+        <a href="pure_Filters.jsx.html">pure/Filters.jsx</a>, <a href="pure_Filters.jsx.html#line66">line 66</a>
     </li></ul></dd>
     
 

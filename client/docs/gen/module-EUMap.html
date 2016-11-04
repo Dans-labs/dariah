@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>hoc - Documentation</title>
+    <title>EUMap - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">hoc</h1>
+    <h1 class="page-title">EUMap</h1>
     
 
     
@@ -49,21 +49,33 @@
     <div class="container-overview">
     
         
-            <div class="description"><h1>Higher Order Components</h1><p>React embraces a functional paradigm, where you enhance existing 
-<a href="external-Component.html"><code>components</code></a>
-by composition rather than by class extension. 
-Put otherwise, you write an enhancer or <em>decorator</em> function, that 
-takes a component as input and returns it wrapped inside another
-so that the new thing as an extra piece of functionality.</p>
-<p>Especially the <em>pure</em>
-<a href="external-Component.html"><code>react components</code></a>
-that do not use life-cycle methods are very suitable
-to enhance.
-If a react component makes essential use of a life cycle method, it is easier
-to enhance it by class extension.
-But even that can be coded as function composition, as 
-<code>saveState</code> shows.</p>
-<p><img src="/api/file/tech/docs/design/design.003.jpeg" width="800"/></p></div>
+            <div class="description"><p>A complex component! 
+It is a facet filter for the field country,
+and it contains a map of Europe, visualizing by means of markers,
+how the filter result is distributed over the DARIAH countries.</p>
+<p>Both ingredients of this component are brought together not by
+class extension but by functional composition.</p>
+<p>The country facet filter is a true react
+<a href="external-Component.html"><code>component</code></a>
+. </p>
+<p>The map is a <a href="http://leafletjs.com">Leaflet</a> module on a blank pane,
+with a
+<a href="module-europe_geo_js.html"><code>geojson</code></a>
+file of country boundaries laid out on it.
+The map is not react aware, it will be rendered in its own div.</p>
+<p>Remember that the results of filter computation descend from a stateful
+parent into the present component.
+So, whenever we receive new props, we manipulate the leaflet map and adjust
+the markers on it.
+More precisely, since we do not have to manipulate state, we put the marker updates
+in the
+<a href="external-componentDidMount.html"><code>componentDidMount()</code></a>
+and
+<a href="external-componentDidUpdate.html"><code>componentDidUpdate()</code></a>
+<a href="external-LifeCycle.html"><code>life cycle methods</code></a>
+of React.
+At those moments we know that the DOM elements that must be rendered have mounted,
+so the map exists, and we can put the markers there.</p></div>
         
 
         
@@ -77,7 +89,7 @@ But even that can be coded as function composition, as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_hoc.js.html">helpers/hoc.js</a>, <a href="helpers_hoc.js.html#line3">line 3</a>
+        <a href="object_EUMap.jsx.html">object/EUMap.jsx</a>, <a href="object_EUMap.jsx.html#line6">line 6</a>
     </li></ul></dd>
     
 
@@ -149,6 +161,13 @@ But even that can be coded as function composition, as
     
 
     
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="module-EUMap-EUMap.html">EUMap</a></dt>
+            <dd></dd>
+        </dl>
+    
 
      
 
@@ -164,7 +183,7 @@ But even that can be coded as function composition, as
 
     
 
-    <h4 class="name" id=".saveState"><span class="type-signature">(static) </span>saveState<span class="signature">(ComponentInner, key, object)</span><span class="type-signature"> &rarr; {<a href="global.html#Component">Component</a>}</span></h4>
+    <h4 class="name" id="~computeRadius"><span class="type-signature">(inner) </span>computeRadius<span class="signature">(iso2, filteredAmountOthers, amounts)</span><span class="type-signature"> &rarr; {number}</span></h4>
 
     
 
@@ -176,7 +195,7 @@ But even that can be coded as function composition, as
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_hoc.js.html">helpers/hoc.js</a>, <a href="helpers_hoc.js.html#line116">line 116</a>
+        <a href="object_EUMap.jsx.html">object/EUMap.jsx</a>, <a href="object_EUMap.jsx.html#line98">line 98</a>
     </li></ul></dd>
     
 
@@ -216,38 +235,12 @@ But even that can be coded as function composition, as
 
 
 <div class="description">
-    <p>Wraps a
-<a href="external-Component.html"><code>component</code></a>
-to let it preserve its state across unmounts.</p>
-<p>We assume that the original component can access the
-<a href="global.html#globals"><code>globals</code></a>
-through
-<a href="external-context.html"><code>context</code></a>
-by having been enhanced by 
-<code>withContext</code>
-.
-We assume that
-<a href="Provider.html"><code>Provider</code></a>
-has created a
-<a href="Store.html"><code>Store</code></a>
-in
-<a href="global.html#globals"><code>globals</code></a>
-.</p>
-<p>Now the resulting component is a subclass of the original, 
-with enhanced
-<a href="external-constructor.html"><code>constructor()</code></a>
-and
-<a href="external-componentWillMount.html"><code>componentWillMount()</code></a>
-methods.</p>
-<p>The resulting component will retrieve an existing state, coming from
-the
-<a href="Store.html"><code>Store</code></a>
-,
-before mounting. If there is no such state, the <code>initialState</code>
-parameter will be used.</p>
-<p>And when the component is destroyed, it will save its state in the
-<a href="Store.html"><code>Store</code></a>
-.</p>
+    <h2>Compute Marker Radius</h2><p>When we know the filter results per country, we can put markers on countries
+with a radius in proportion to their scores.
+However, if the scores are very far apart, either the small markers get invisible,
+or the big markers get too big. 
+We mitigate this effect, by using proportional radii only for values below a certain
+threshold (LEVEL_OFF). For higher values we essentiall take the square root.</p>
 </div>
 
 
@@ -285,30 +278,7 @@ parameter will be used.</p>
 
         <tr>
             
-                <td class="name"><code>ComponentInner</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Component">Component</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>the incoming component (the wrappee)</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>key</code></td>
+                <td class="name"><code>iso2</code></td>
             
 
             <td class="type">
@@ -324,20 +294,20 @@ parameter will be used.</p>
 
             
 
-            <td class="description last"><p>identifier to find the saved state back in the state store</p></td>
+            <td class="description last"><p>Two-letter country code, see <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a></p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>object</code></td>
+                <td class="name"><code>filteredAmountOthers</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">initialState</span>
+<span class="param-type">number</span>
 
 
             
@@ -347,7 +317,30 @@ parameter will be used.</p>
 
             
 
-            <td class="description last"><p>the state to start with</p></td>
+            <td class="description last"><p>how many rows pass all other filters</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>amounts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Map">Map</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p><code>filteredAmountOthers</code>, but more specific: the amounts per faceted value</p></td>
         </tr>
 
     
@@ -371,7 +364,7 @@ parameter will be used.</p>
 
         
 <div class="param-desc">
-    <p>ComponentOuter - the enhanced component (the wrapper)</p>
+    <p>the desired radius for this country</p>
 </div>
 
 
@@ -382,7 +375,7 @@ parameter will be used.</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="global.html#Component">Component</a></span>
+<span class="param-type">number</span>
 
 
     </dd>
@@ -396,7 +389,7 @@ parameter will be used.</p>
 
     
 
-    <h4 class="name" id=".withContext"><span class="type-signature">(static) </span>withContext<span class="signature">(ComponentInner)</span><span class="type-signature"> &rarr; {<a href="global.html#Component">Component</a>}</span></h4>
+    <h4 class="name" id="~inDariah"><span class="type-signature">(inner) </span>inDariah<span class="signature">(feature, countries)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
 
     
 
@@ -408,7 +401,7 @@ parameter will be used.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="helpers_hoc.js.html">helpers/hoc.js</a>, <a href="helpers_hoc.js.html#line57">line 57</a>
+        <a href="object_EUMap.jsx.html">object/EUMap.jsx</a>, <a href="object_EUMap.jsx.html#line115">line 115</a>
     </li></ul></dd>
     
 
@@ -447,18 +440,6 @@ parameter will be used.</p>
 
 
 
-<div class="description">
-    <p>Wraps
-<a href="external-Component.html"><code>component</code></a>
-to provide it with context.</p>
-<p>The resulting component subscribes to
-<a href="external-context.html"><code>context</code></a>
-and passes the content of <code>context.globals</code> (only the <code>globals</code> !) 
-to the origianal component as props.</p>
-<p>These properties are then <em>magically</em> present in the methods of the
-original component..</p>
-</div>
-
 
 
 
@@ -494,13 +475,13 @@ original component..</p>
 
         <tr>
             
-                <td class="name"><code>ComponentInner</code></td>
+                <td class="name"><code>feature</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#Component">Component</a></span>
+<span class="param-type">Object</span>
 
 
             
@@ -510,7 +491,32 @@ original component..</p>
 
             
 
-            <td class="description last"><p>the incoming component (the wrappee)</p></td>
+            <td class="description last"><p>A feature (i.e. a country) in the<br><a href="module-europe_geo_js.html"><code>geojson</code></a>
+file of European countries</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>countries</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Map">Map</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The country information as fetched from the database on the server.
+Organized as a {Map} keyed by Two-letter country codes.</p></td>
         </tr>
 
     
@@ -534,7 +540,7 @@ original component..</p>
 
         
 <div class="param-desc">
-    <p>ComponentOuter - the enhanced component (the wrapper)</p>
+    <p>Whether the country in question is a member of DARIAH.</p>
 </div>
 
 
@@ -545,7 +551,7 @@ original component..</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="global.html#Component">Component</a></span>
+<span class="param-type">boolean</span>
 
 
     </dd>

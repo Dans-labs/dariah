@@ -3,7 +3,8 @@ import ByValue from './ByValue.jsx'
 import L from 'leaflet'
 import {countryBorders} from '../helpers/europe.geo.js'
 
-/* A complex component! 
+/**
+ * A complex component! 
  * It is a facet filter for the field country,
  * and it contains a map of Europe, visualizing by means of markers,
  * how the filter result is distributed over the DARIAH countries.
@@ -11,20 +12,31 @@ import {countryBorders} from '../helpers/europe.geo.js'
  * Both ingredients of this component are brought together not by
  * class extension but by functional composition.
  *
- * The country facet filter is a true react component. 
+ * The country facet filter is a true react
+ * {@link external:Component|component}
+ * . 
  *
- * The map is a Leaflet component on a blank pane, with a geojson file
- * of country boundaries laid out on it.
- * The map is not react aware, it will be rendered in its own <div>.
+ * The map is a [Leaflet](http://leafletjs.com) module on a blank pane,
+ * with a
+ * {@link module:europe_geo_js|geojson}
+ * file of country boundaries laid out on it.
+ * The map is not react aware, it will be rendered in its own div.
  *
  * Remember that the results of filter computation descend from a stateful
  * parent into the present component.
  * So, whenever we receive new props, we manipulate the leaflet map and adjust
  * the markers on it.
  * More precisely, since we do not have to manipulate state, we put the marker updates
- * in the componentDidMount() and componentDidUpdate() life cycle methods of React.
+ * in the
+ * {@link external:componentDidMount|componentDidMount()}
+ * and
+ * {@link external:componentDidUpdate|componentDidUpdate()}
+ * {@link external:LifeCycle|life cycle methods}
+ * of React.
  * At those moments we know that the DOM elements that must be rendered have mounted,
  * so the map exists, and we can put the markers there.
+ *
+ * @module EUMap
  */
 
 const mapOptions = {
@@ -67,7 +79,8 @@ const mapOptions = {
   }
 }
 
-/* COMPUTE MARKER RADIUS
+/**
+ * ## Compute Marker Radius
  *
  * When we know the filter results per country, we can put markers on countries
  * with a radius in proportion to their scores.
@@ -75,7 +88,12 @@ const mapOptions = {
  * or the big markers get too big. 
  * We mitigate this effect, by using proportional radii only for values below a certain
  * threshold (LEVEL_OFF). For higher values we essentiall take the square root.
- *
+ * 
+ * @function
+ * @param {string} iso2 Two-letter country code, see [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+ * @param {number} filteredAmountOthers - how many rows pass all other filters
+ * @param {Map} amounts - `filteredAmountOthers`, but more specific: the amounts per faceted value
+ * @returns {number} the desired radius for this country
 */
 const computeRadius = (iso2, filteredAmountOthers, amounts) => { 
   const amount = amounts ? amounts.has(iso2) ? amounts.get(iso2) : 0 : 0;
@@ -85,52 +103,73 @@ const computeRadius = (iso2, filteredAmountOthers, amounts) => {
   return mapOptions.LEVEL_OFF * Math.sqrt(proportional);
 }
 
+/**
+ * @function
+ * @param {Object} feature A feature (i.e. a country) in the   
+ * {@link module:europe_geo_js|geojson}
+ * file of European countries
+ * @param {Map} countries The country information as fetched from the database on the server.
+ * Organized as a {Map} keyed by Two-letter country codes.
+ * @returns {boolean} Whether the country in question is a member of DARIAH.
+ */
 const inDariah = (feature, countries) => {
   const iso2 = feature.properties.iso2;
   return countries.has(iso2) && countries.get(iso2).inDARIAH
 }
 
-/* The big component with map and country filter facets
-*/
-
 /**
  * @class
  * @classdesc
  * **stateless, DOM-modifying** {@link external:Component|Component}
+ * 
+ * An ordinary faceted filter on the country field plus a container for the map,
+ * with
+ * {@link external:LifeCycle|life cycle methods}
+ * to place and update markers when the filter results have changed.
  */
 class EUMap extends Component {
   constructor(props) {
     super(props);
     this.features = new Map();
   }
-  /* render() just invokes the ByValue component with the right parameters
-   * to get the country facets.
-   * And it puts a div in place that will receive the map.
-   */
+/**
+ * render() just invokes the ByValue component with the right parameters
+ * to get the country facets.
+ * And it puts a div in place that will receive the map.
+ * @method
+ * @param {Map} countries This parameter is not used, but mentioned to select all the other parameters to
+ * pass on
+ * @param {Object[]} byValueProps The remaining properties, to be passes to the {ByValue} component.
+ * @returns {DOM}
+ */
   render() {
-    const { countries, ...byMetaProps } = this.props;
+    const { countries, ...byValueProps } = this.props;
     return (
       <div>
         <div ref="eumap" style={{
           height: mapOptions.HEIGHT,
         }}/>
-        <ByValue {...byMetaProps}/>
+        <ByValue {...byValueProps}/>
       </div>
     )
   }
 
-  /* The following methods are dedicated to map operations.
-   * They both occur after render, when the component just has mounted or updated.
-   *
-   * componentDidMount()
-   *
-   * After the initial mount we get the countries and perform
-   * initializations that depend on the countries.
-   * These do not have to be repeated after subsequent updates.
-   * - we put the map in place
-   * - we put the country boundaries on the pane
-   * - we add markers, style them, and maintain references to them
-   */
+/**
+ * After the initial mount we get the country data and perform
+ * initializations that depend on that information:
+ *
+ * * we put the map in place
+ * * we put the country boundaries on the pane
+ * * we add markers, style them, and maintain references to them
+ *
+ * These do not have to be repeated after subsequent updates.
+ * @method
+ * @param {Map} filterSettings - the current settings of the country facets
+ * @param {number} filteredAmountOthers - how many rows pass all other filters
+ * @param {Map} amounts` - `filteredAmountOthers`, but more specific: the amounts per faceted value
+ * @param {Map} countries the country data from the database
+ * @returns {DOMEffects}
+ */
   componentDidMount() {
     const { filterSettings, filteredAmountOthers, amounts, countries } = this.props;
     this.map = L.map(this.refs.eumap, {
@@ -158,12 +197,17 @@ class EUMap extends Component {
     }).addTo(this.map);
   }
 
-  /* componentDidUpdate()
-   *
-   * After getting new filter results, the only thing we have to do is to
-   * - update the marker radii
-   * - update the marker colors
-  */
+/**
+ * After getting new filter results, the only thing we have to do is to
+ *
+ * * update the marker radii
+ * * update the marker colors
+ *
+ * @param {Map} filterSettings - the current settings of the country facets
+ * @param {number} filteredAmountOthers - how many rows pass all other filters
+ * @param {Map} amounts` - `filteredAmountOthers`, but more specific: the amounts per faceted value
+ * @returns {DOMEffects}
+ */
   componentDidUpdate() {
     const { filterSettings, filteredAmountOthers, amounts } = this.props;
     for (const [iso2, marker] of this.features) {
