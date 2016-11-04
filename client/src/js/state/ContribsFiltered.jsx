@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 
 import FilterCompute from './FilterCompute.jsx'
 import { filterList } from '../pure/Filters.jsx'
-import { compileFiltering } from '../helpers/filters.js'
+import { compileFiltering } from '../helpers/filtering.js'
 import { getData } from '../helpers/data.js'
 import { withContext, saveState } from '../helpers/hoc.js'
 

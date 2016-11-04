@@ -3,7 +3,7 @@ import Facet from '../pure/Facet.jsx'
 import CheckboxI from './CheckboxI.jsx'
 import Stats from '../pure/Stats.jsx'
 import Alternatives from '../state/Alternatives.jsx'
-import { placeFacets, testAllChecks } from '../helpers/filters.js'
+import { placeFacets, testAllChecks } from '../helpers/filtering.js'
 
 /**
  * @class

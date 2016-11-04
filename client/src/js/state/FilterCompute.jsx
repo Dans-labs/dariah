@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import Contribs from '../pure/Contribs.jsx'
 import Filters, { filterList } from '../pure/Filters.jsx'
 
-import { newFilterSettings, computeFiltering } from '../helpers/filters.js'
+import { newFilterSettings, computeFiltering } from '../helpers/filtering.js'
 import { columnStyle } from '../helpers/ui.js'
 import { withContext, saveState } from '../helpers/hoc.js'
 

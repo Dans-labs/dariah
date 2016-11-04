@@ -25,7 +25,7 @@ import EUMap from '../object/EUMap.jsx'
  * * the name of the data field it is filtering
  * * how many columns the grid of facets may have.
  *
- * `filterList` is used here and imported by {@link module:filters}
+ * `filterList` is used here and imported by {@link module:filtering}
  */ 
 export const filterList = [
   {kind: FullText,  name: 'FullText',  field: 'title',               maxcols: null},
