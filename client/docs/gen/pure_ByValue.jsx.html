@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>pure/ByValue.jsx - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alternatives.html">Alternatives</a><ul class='methods'><li data-type='method'><a href="Alternatives.html#render">render</a></li></ul></li><li><a href="App.html">App</a></li><li><a href="ByValue.html">ByValue</a></li><li><a href="CheckboxI.html">CheckboxI</a><ul class='methods'><li data-type='method'><a href="CheckboxI.html#render">render</a></li></ul></li><li><a href="Contrib.html">Contrib</a></li><li><a href="Contribs.html">Contribs</a></li><li><a href="ContribsFiltered.html">ContribsFiltered</a><ul class='methods'><li data-type='method'><a href="ContribsFiltered.html#componentDidMount">componentDidMount</a></li><li data-type='method'><a href="ContribsFiltered.html#render">render</a></li></ul></li><li><a href="DocHtml.html">DocHtml</a></li><li><a href="DocPdf.html">DocPdf</a></li><li><a href="Facet.html">Facet</a></li><li><a href="FilterCompute.html">FilterCompute</a><ul class='methods'><li data-type='method'><a href="FilterCompute.html#render">render</a></li></ul></li><li><a href="FullText.html">FullText</a></li><li><a href="Login.html">Login</a></li><li><a href="module-DocMd-DocMd.html">DocMd</a><ul class='methods'><li data-type='method'><a href="module-DocMd-DocMd.html#fetchText">fetchText</a></li><li data-type='method'><a href="module-DocMd-DocMd.html#render">render</a></li></ul></li><li><a href="module-Doc-Doc.html">Doc</a></li><li><a href="module-EUMap-EUMap.html">EUMap</a><ul class='methods'><li data-type='method'><a href="module-EUMap-EUMap.html#componentDidMount">componentDidMount</a></li><li data-type='method'><a href="module-EUMap-EUMap.html#componentDidUpdate">componentDidUpdate</a></li><li data-type='method'><a href="module-EUMap-EUMap.html#render">render</a></li></ul></li><li><a href="module-Filters-Filters.html">Filters</a></li><li><a href="NavLink.html">NavLink</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="Notification.html">Notification</a><ul class='methods'><li data-type='method'><a href="Notification.html#computeProgress">computeProgress</a></li><li data-type='method'><a href="Notification.html#render">render</a></li><li data-type='method'><a href="Notification.html#setView">setView</a></li></ul></li><li><a href="Provider.html">Provider</a></li><li><a href="Stats.html">Stats</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#load">load</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.getData">getData</a></li></ul></li><li><a href="module-Doc.html">Doc</a></li><li><a href="module-DocMd.html">DocMd</a><ul class='methods'><li data-type='method'><a href="module-DocMd.html#~RouterLink">RouterLink</a></li></ul></li><li><a href="module-ES6.html">ES6</a></li><li><a href="module-EUMap.html">EUMap</a><ul class='methods'><li data-type='method'><a href="module-EUMap.html#~computeRadius">computeRadius</a></li><li data-type='method'><a href="module-EUMap.html#~inDariah">inDariah</a></li></ul></li><li><a href="module-europe_geo_js.html">europe_geo_js</a></li><li><a href="module-filtering.html">filtering</a><ul class='methods'><li data-type='method'><a href="module-filtering.html#.compileFiltering">compileFiltering</a></li><li data-type='method'><a href="module-filtering.html#.computeFiltering">computeFiltering</a></li><li data-type='method'><a href="module-filtering.html#.newFilterSettings">newFilterSettings</a></li><li data-type='method'><a href="module-filtering.html#.placeFacets">placeFacets</a></li><li data-type='method'><a href="module-filtering.html#.testAllChecks">testAllChecks</a></li><li data-type='method'><a href="module-filtering.html#~countFacets">countFacets</a></li><li data-type='method'><a href="module-filtering.html#~facetCheck">facetCheck</a></li><li data-type='method'><a href="module-filtering.html#~fullTextCheck">fullTextCheck</a></li></ul></li><li><a href="module-Filters.html">Filters</a></li><li><a href="module-hoc.html">hoc</a><ul class='methods'><li data-type='method'><a href="module-hoc.html#.saveState">saveState</a></li><li data-type='method'><a href="module-hoc.html#.withContext">withContext</a></li></ul></li><li><a href="module-main.html">main</a></li><li><a href="module-React.html">React</a></li><li><a href="module-ui.html">ui</a><ul class='methods'><li data-type='method'><a href="module-ui.html#.columnStyle">columnStyle</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Component.html">Component</a></li><li><a href="external-componentDidMount.html">componentDidMount</a></li><li><a href="external-componentDidUpdate.html">componentDidUpdate</a></li><li><a href="external-componentWillMount.html">componentWillMount</a></li><li><a href="external-componentWillUnmount.html">componentWillUnmount</a></li><li><a href="external-constructor.html">constructor</a></li><li><a href="external-context.html">context</a></li><li><a href="external-ControlledComponent.html">ControlledComponent</a></li><li><a href="external-DOM.html">DOM</a></li><li><a href="external-Fragment.html">Fragment</a></li><li><a href="external-LifeCycle.html">LifeCycle</a></li><li><a href="external-Map.html">Map</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-PropTypes.html">PropTypes</a></li><li><a href="external-Recompose.html">Recompose</a></li><li><a href="external-Reconciliation.html">Reconciliation</a></li><li><a href="external-Redux.html">Redux</a></li><li><a href="external-render.html">render</a></li><li><a href="external-Routing.html">Routing</a></li><li><a href="external-setState.html">setState</a></li><li><a href="external-StatePolicy.html">StatePolicy</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">pure/ByValue.jsx</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component, PropTypes } from 'react'
+import Facet from './Facet.jsx'
+import CheckboxI from '../object/CheckboxI.jsx'
+import Stats from './Stats.jsx'
+import Alternatives from '../state/Alternatives.jsx'
+import { placeFacets, testAllChecks } from '../helpers/filtering.js'
+
+/**
+ * **purely functional** {@link external:Component|Component}
+ * 
+ * A widget by which the user can click the facets associated with one field.
+ * There is also a collective checkbox, by which the user can check or uncheck all facets in one go.
+ * All values that occur are displayed, with statistics in the form *subtotal of total*.
+ *
+ * ### Note on performance
+ * There is a subtlety here. 
+ * When we have the facets, we want to lay them out in a grid.
+ * That work needs only be done upon construction,
+ * and not for state updates in response to user
+ * events on the filters.
+ * So we want to do the grid computation
+ * {@link module:filtering.placeFacets|placeFacets}
+ * once, in an initialization stage, e.g. in the 
+ * {@link external:constructor|constructor()}
+ * .
+ * But it turns out that for the visual performance it does not matter.
+ *
+ * This is the virtue of React: the code for rendering just constructs
+ * a 
+ * {@link external:Fragment|Fragment}, not the real 
+ * {@link external:DOM|DOM}. 
+ * The computation inside 
+ * {@link module:filtering.placeFacets|placeFacets}
+ * is just a little bit of juggling with tiny datastructures,
+ * so the fragment is constructed in no time.
+ * See {@link external:Reconciliation|Reconciliation}.
+ *
+ * @constructor
+ * @param {number} filterId The index of the filter in {@link module:Filters.filterList|filterList}
+ * @param {string} filterField The name of the field in the contribs list whose values are being filtered
+ * @param {Map} fieldValues A mapping of the valueIds to valueRepresentations for all values that occur in `filterField`
+ * @param {Map} filterSettings The current state of the facets belonging to this filter
+ * @param {number} filteredAmount The number of rows that have passed all filters
+ * @param {number} filteredAmountOthers The number of rows that have passed all other filters  
+ * @param {Map} amounts The number of rows that have passed all filters per valueId occurring in this field
+ * @param {number} maxCols The maximum number of columns to use when placing facets in a grid
+ * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
+ * @returns {Fragment}
+ */
+const ByValue = ({
+  filterId, filterField, fieldValues, filterSettings,
+  filteredAmount, filteredAmountOthers,
+  amounts, maxCols, updFilter,
+}) => { 
+  const rows = placeFacets(filterField, fieldValues, maxCols);
+  const statStyle = {align: 'right'};
+  return (
+    &lt;div>
+      {rows === null ? (&lt;p> -no facets &lt;/p>) : (
+      &lt;Alternatives tag={filterField}
+        controlPlacement={control => (
+          &lt;p style={{fontWeight: 'bold', marginTop: '1em', marginBottom: '0.2em', borderTop: '1px solid black'}}>
+            &lt;CheckboxI
+              filterId={filterId}
+              states={testAllChecks(filterSettings)}
+              updFilter={updFilter}
+            /> By {filterField}{' '}
+            &lt;Stats subTotal={filteredAmount} total={filteredAmountOthers}/>{' '}
+            {control}
+          &lt;/p>
+        )}
+        controls={[
+          (handler => &lt;a className='fa fa-chevron-down' href='#' onClick={handler}/>),
+          (handler => &lt;a className='fa fa-chevron-right' href='#' onClick={handler}/>),
+        ]}
+        alternatives={[
+          (&lt;table>
+            &lt;tbody>
+              {rows.map((row, i) => (
+                &lt;tr key={i}>
+                  {row.map((f, j) => {
+                    if (f === null) {
+                      return &lt;td key={j}/>;
+                    }
+                    const [valueId, valueRep] = f;
+                    return [
+                      (&lt;td
+                        key={j}
+                        style={j > 0 ? {paddingLeft: '0.5em'} : {}}
+                      >
+                        &lt;Facet
+                          key={valueId}
+                          filterId={filterId}
+                          valueId={valueId}
+                          valueRep={valueRep}
+                          checked={filterSettings.get(valueId)}
+                          updFilter={updFilter}
+                        />
+                      &lt;/td>),
+                      (&lt;td
+                        style={{textAlign: 'right', paddingLeft: '0.5em'}}
+                      >
+                        &lt;Stats subTotal={amounts.get(valueId)}/>
+                      &lt;/td>),
+                    ]})}
+                &lt;/tr>
+                ))}
+            &lt;/tbody>
+          &lt;/table>),
+          (&lt;div/>),
+        ]}
+      />
+      )}
+    &lt;/div>
+  )
+}
+
+ByValue.propTypes = {
+  filterId: PropTypes.number.isRequired,
+  filterField: PropTypes.string.isRequired,
+  filterSettings: PropTypes.object.isRequired,
+  filteredAmount: PropTypes.number.isRequired,
+  amounts: PropTypes.object.isRequired,
+  maxCols: PropTypes.number.isRequired,
+  fieldValues: PropTypes.object.isRequired,
+  updFilter: PropTypes.func.isRequired,
+}
+
+export default ByValue
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Sat Nov 05 2016 17:12:19 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
