@@ -3,7 +3,6 @@
  *
  * This file does not contain javascript code.
  *
- *
  * @module ES6
  */
 

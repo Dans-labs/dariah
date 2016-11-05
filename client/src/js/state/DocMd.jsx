@@ -18,7 +18,8 @@ import { withContext, saveState } from '../helpers/hoc.js'
  * A full link (with protocol `http`(`s`) is translated to a 
  * plain HTML `a` element, so it will leave this application.
  *
- * Other links are translated to Link elements for the router.
+ * Other links are translated to Link elements for the 
+ * {@link external:Routing|router}.
 */
 const RouterLink = ({ children, href }) => (
   href.match(/^(https?:)?\/\//)

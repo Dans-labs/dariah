@@ -8,12 +8,14 @@ import { columnStyle } from '../helpers/ui.js'
  * **purely functional** {@link external:Component|Component}
  *
  * Top level as far as routing is concerned.
- * Above it are only the {@link Provider} coomponent and router components.
+ * Above it are only the {@link Provider} coomponent and 
+ * {@link external:Routing|router} components.
  *
  * Display the top and right navigation bars, which will always be in view.
  *
  * @constructor
- * @param {Component[]} children The children of this component as specified in the route where App is called
+ * @param {Component[]} children The children of this component as specified in the 
+ * {@link external:Routing|route} where App is called
  * @returns {Fragment}
 */
 const App = ({children}) => ( 

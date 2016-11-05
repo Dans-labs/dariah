@@ -9,7 +9,18 @@ import Doc from './pure/Doc.jsx';
 import NotFound from './pure/NotFound.jsx';
 import Store from './helpers/Store.js';
 
-/** Application wide data
+/**
+ * @module main
+ */
+
+/**
+ * ## Routing
+ *
+ * The entry point consists of the {@link Provider} component
+ * with in it a {@link external:Routing} configuration.
+ *
+ * <img src="/api/file/tech/docs/design/design.007.jpeg" width="800"/>
+ * Application wide data
  *
  * Some things need to be practically global, or at least, application wide.
  * We will not use the javascript `window` object to store globals.
@@ -22,7 +33,8 @@ import Store from './helpers/Store.js';
  * We use it for components with a costly state, that should be preserved when components are swapped in and out from
  * the user interface.
  *
- * We pass a reference to the store as a parameter to all routes that invoke a component with state that should be preserved. 
+ * We pass a reference to the store as a parameter to all {@link external:Routing|routes}
+ * that invoke a component with state that should be preserved. 
  * We do not use central state. We only provide for components to store their state when they unmount,
  * and to load it when they mount.
  *
