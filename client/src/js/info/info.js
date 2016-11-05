@@ -1,6 +1,7 @@
 /**
  * Documentation references.
- * Bits of addtional information for this app.
+ * 
+ * {@link module:main|Entry point of this app's documentation}
  *
  * This file does not contain javascript code.
  *
