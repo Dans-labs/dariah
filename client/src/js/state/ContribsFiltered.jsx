@@ -18,6 +18,15 @@ import { withContext, saveState } from '../helpers/hoc.js'
  * <img src="/api/file/tech/docs/design/design.002.jpeg" width="800"/>
  */
 class ContribsFiltered extends Component {
+/**
+ * Calls {@link module:filtering.compileFiltering|compileFiltering} before the actual rendering.
+ *
+ * @method
+ * @param {Contrib[]} contribs (from *state*) The list of contribution records as it comes form mongo db
+ * @param {Map} countries (from *state*) The country information as fetched from the database on the server.
+ * Organized as a {Map} keyed by Two-letter country codes.
+ * @returns {Fragment}
+*/
   render() {
     const { contribs, countries } = this.state;
     if (contribs == null || countries == null) {
@@ -32,6 +41,13 @@ class ContribsFiltered extends Component {
       filterInit={filterInit}
     />
   }
+/**
+ * @method
+ * @param {Contrib[]} contribs (from *state*) The list of contribution records as it comes form mongo db
+ * @param {Map} countries (from *state*) The country information as fetched from the database on the server.
+ * Organized as a {Map} keyed by Two-letter country codes.
+ * @returns {Object} The data fetched from the server.
+*/
   componentDidMount() {
     const { contribs, countries } = this.state;
     if (contribs == null || countries == null) {

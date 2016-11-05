@@ -5,14 +5,16 @@ import Notification from '../state/Notification.jsx'
 import { columnStyle } from '../helpers/ui.js'
 
 /**
- * @class
- * @classdesc
  * **purely functional** {@link external:Component|Component}
  *
  * Top level as far as routing is concerned.
  * Above it are only the {@link Provider} coomponent and router components.
  *
  * Display the top and right navigation bars, which will always be in view.
+ *
+ * @constructor
+ * @param {Component[]} children The children of this component as specified in the route where App is called
+ * @returns {Fragment}
 */
 const App = ({children}) => ( 
   <div>

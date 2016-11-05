@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import ByValue from './ByValue.jsx'
+import ByValue from '../pure/ByValue.jsx'
 import L from 'leaflet'
 import {countryBorders} from '../helpers/europe.geo.js'
 
@@ -140,7 +140,7 @@ class EUMap extends Component {
  * @param {Map} countries This parameter is not used, but mentioned to select all the other parameters to
  * pass on
  * @param {Object[]} byValueProps The remaining properties, to be passes to the {ByValue} component.
- * @returns {DOM}
+ * @returns {Fragment}
  */
   render() {
     const { countries, ...byValueProps } = this.props;
@@ -167,8 +167,9 @@ class EUMap extends Component {
  * @param {Map} filterSettings - the current settings of the country facets
  * @param {number} filteredAmountOthers - how many rows pass all other filters
  * @param {Map} amounts` - `filteredAmountOthers`, but more specific: the amounts per faceted value
- * @param {Map} countries the country data from the database
- * @returns {DOMEffects}
+ * @param {Map} countries The country information as fetched from the database on the server.
+ * Organized as a {Map} keyed by Two-letter country codes.
+ * @returns {DOM}
  */
   componentDidMount() {
     const { filterSettings, filteredAmountOthers, amounts, countries } = this.props;
@@ -206,7 +207,7 @@ class EUMap extends Component {
  * @param {Map} filterSettings - the current settings of the country facets
  * @param {number} filteredAmountOthers - how many rows pass all other filters
  * @param {Map} amounts` - `filteredAmountOthers`, but more specific: the amounts per faceted value
- * @returns {DOMEffects}
+ * @returns {DOM}
  */
   componentDidUpdate() {
     const { filterSettings, filteredAmountOthers, amounts } = this.props;

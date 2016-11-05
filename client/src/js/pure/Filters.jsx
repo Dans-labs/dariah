@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 
 import FullText from './FullText.jsx'
-import ByValue from '../object/ByValue.jsx'
+import ByValue from './ByValue.jsx'
 import EUMap from '../object/EUMap.jsx'
 
 /**
@@ -28,12 +28,12 @@ import EUMap from '../object/EUMap.jsx'
  * `filterList` is used here and imported by {@link module:filtering}
  */ 
 export const filterList = [
-  {kind: FullText,  name: 'FullText',  field: 'title',               maxcols: null},
-  {kind: EUMap,     name: 'EUMap',     field: 'country',             maxcols: 3},
-  {kind: ByValue,   name: 'ByValue',   field: 'typeContribution',    maxcols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivities',   maxcols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObjects',      maxcols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechniques',   maxcols: 1},
+  {kind: FullText,  name: 'FullText',  field: 'title',               maxCols: null},
+  {kind: EUMap,     name: 'EUMap',     field: 'country',             maxCols: 3},
+  {kind: ByValue,   name: 'ByValue',   field: 'typeContribution',    maxCols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivities',   maxCols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObjects',      maxCols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechniques',   maxCols: 1},
 ]
 
 const styles = {
@@ -41,8 +41,6 @@ const styles = {
 }
 
 /**
- * @class
- * @classdesc
  * **purely functional** {@link external:Component|Component}
  *
  * All filter computations have been done by stateful parent components, such as FilterCompute.
@@ -61,13 +59,24 @@ const styles = {
  * and calls it with the appropriate props.
  * Whereas the incoming props contain information for all filters,
  * each individual child filter is passed the relevant slice only.
- * .
+ *
+ * @constructor
+ * @param {Map} filterSettings The current state of the facets belonging to this filter
+ * @param {Map} fieldValues A mapping of the valueIds to valueRepresentations for all values in all filtered fields
+ * @param {Object[]} filteredAmount The number of rows that have passed all filters
+ * @param {Map} filteredAmountOthers For each filter, the number of rows that have passed all other filters  
+ * @param {Map} amounts For each filter, the number of rows that have passed all filters per valueId occurring in that field
+ * @param {Map} countries The country information as fetched from the database on the server.
+ * Organized as a {Map} keyed by Two-letter country codes.
+ * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
+ * @returns {Fragment}
  */
 const Filters = ({
-  filterSettings, fieldValues, filteredData,
+  filterSettings, fieldValues, 
   filteredAmount, filteredAmountOthers,
-  amounts, updFilter,
-  countries
+  amounts,
+  countries,
+  updFilter
 }) => (
   <div style={styles}>
     {filterList.map((filter, filterId) => {
@@ -78,7 +87,7 @@ const Filters = ({
           key={filterId}
           filterId={filterId}
           filterField={filter.field}
-          maxcols={filter.maxcols}
+          maxCols={filter.maxCols}
           filterSettings={filterSettings.get(filterId)}
           fieldValues={fieldValues.get(filter.field)}
           filteredAmount={filteredAmount}

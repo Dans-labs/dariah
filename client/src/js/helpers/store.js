@@ -18,8 +18,8 @@
  *
  * ## Usage
  * Do not use the Store directly.
- * Provide it to your component on context by means of the {@link withContext} enhancer, 
- * and enable its functionality by  means of the {@link saveState} enhancer.
+ * Provide it to your component on context by means of the {@link module:hoc.withContext|withContext} enhancer, 
+ * and enable its functionality by  means of the {@link module:hoc.saveState|saveState} enhancer.
  *
  * ## Motivation
  * See

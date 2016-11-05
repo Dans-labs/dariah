@@ -32,7 +32,7 @@ class Alternatives extends Component {
  * @param {function} controlPlacement A function to put the control in place for each alternative.
  * In this way the caller can fine tune how exactly the control appears in relation to
  * the alternative component.
- * @returns {DOM} The chosen alternative with its control. The choice is remembered in the state, 
+ * @returns {Fragment} The chosen alternative with its control. The choice is remembered in the state, 
  * keyed by `tag`.
  */
   render() {

@@ -1,9 +1,14 @@
 import React, { PropTypes } from 'react'
 
 /**
- * @class
- * @classdesc
  * **purely functional** {@link external:Component|Component}
+ *
+ * Displays a contribution record in a table row.
+ * Just the title.
+ *
+ * @constructor
+ * @param {Object} row A record of data from the contributions table
+ * @returns {Fragment}
  */
 const Contrib = ({ row }) => (
   <tr id={row._id}>

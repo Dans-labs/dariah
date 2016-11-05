@@ -1,0 +1,129 @@
+import React, { Component, PropTypes } from 'react'
+import Facet from './Facet.jsx'
+import CheckboxI from '../object/CheckboxI.jsx'
+import Stats from './Stats.jsx'
+import Alternatives from '../state/Alternatives.jsx'
+import { placeFacets, testAllChecks } from '../helpers/filtering.js'
+
+/**
+ * **purely functional** {@link external:Component|Component}
+ * 
+ * A widget by which the user can click the facets associated with one field.
+ * There is also a collective checkbox, by which the user can check or uncheck all facets in one go.
+ * All values that occur are displayed, with statistics in the form *subtotal of total*.
+ *
+ * ### Note on performance
+ * There is a subtlety here. 
+ * When we have the facets, we want to lay them out in a grid.
+ * That work needs only be done upon construction,
+ * and not for state updates in response to user
+ * events on the filters.
+ * So we want to do the grid computation
+ * {@link module:filtering.placeFacets|placeFacets}
+ * once, in an initialization stage, e.g. in the 
+ * {@link external:constructor|constructor()}
+ * .
+ * But it turns out that for the visual performance it does not matter.
+ *
+ * This is the virtue of React: the code for rendering just constructs
+ * a 
+ * {@link external:Fragment|Fragment}, not the real 
+ * {@link external:DOM|DOM}. 
+ * The computation inside 
+ * {@link module:filtering.placeFacets|placeFacets}
+ * is just a little bit of juggling with tiny datastructures,
+ * so the fragment is constructed in no time.
+ * See {@link external:Reconciliation|Reconciliation}.
+ *
+ * @constructor
+ * @param {number} filterId The index of the filter in {@link module:Filters.filterList|filterList}
+ * @param {string} filterField The name of the field in the contribs list whose values are being filtered
+ * @param {Map} fieldValues A mapping of the valueIds to valueRepresentations for all values that occur in `filterField`
+ * @param {Map} filterSettings The current state of the facets belonging to this filter
+ * @param {number} filteredAmount The number of rows that have passed all filters
+ * @param {number} filteredAmountOthers The number of rows that have passed all other filters  
+ * @param {Map} amounts The number of rows that have passed all filters per valueId occurring in this field
+ * @param {number} maxCols The maximum number of columns to use when placing facets in a grid
+ * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
+ * @returns {Fragment}
+ */
+const ByValue = ({
+  filterId, filterField, fieldValues, filterSettings,
+  filteredAmount, filteredAmountOthers,
+  amounts, maxCols, updFilter,
+}) => { 
+  const rows = placeFacets(filterField, fieldValues, maxCols);
+  const statStyle = {align: 'right'};
+  return (
+    <div>
+      {rows === null ? (<p> -no facets </p>) : (
+      <Alternatives tag={filterField}
+        controlPlacement={control => (
+          <p style={{fontWeight: 'bold', marginTop: '1em', marginBottom: '0.2em', borderTop: '1px solid black'}}>
+            <CheckboxI
+              filterId={filterId}
+              states={testAllChecks(filterSettings)}
+              updFilter={updFilter}
+            /> By {filterField}{' '}
+            <Stats subTotal={filteredAmount} total={filteredAmountOthers}/>{' '}
+            {control}
+          </p>
+        )}
+        controls={[
+          (handler => <a className='fa fa-chevron-down' href='#' onClick={handler}/>),
+          (handler => <a className='fa fa-chevron-right' href='#' onClick={handler}/>),
+        ]}
+        alternatives={[
+          (<table>
+            <tbody>
+              {rows.map((row, i) => (
+                <tr key={i}>
+                  {row.map((f, j) => {
+                    if (f === null) {
+                      return <td key={j}/>;
+                    }
+                    const [valueId, valueRep] = f;
+                    return [
+                      (<td
+                        key={j}
+                        style={j > 0 ? {paddingLeft: '0.5em'} : {}}
+                      >
+                        <Facet
+                          key={valueId}
+                          filterId={filterId}
+                          valueId={valueId}
+                          valueRep={valueRep}
+                          checked={filterSettings.get(valueId)}
+                          updFilter={updFilter}
+                        />
+                      </td>),
+                      (<td
+                        style={{textAlign: 'right', paddingLeft: '0.5em'}}
+                      >
+                        <Stats subTotal={amounts.get(valueId)}/>
+                      </td>),
+                    ]})}
+                </tr>
+                ))}
+            </tbody>
+          </table>),
+          (<div/>),
+        ]}
+      />
+      )}
+    </div>
+  )
+}
+
+ByValue.propTypes = {
+  filterId: PropTypes.number.isRequired,
+  filterField: PropTypes.string.isRequired,
+  filterSettings: PropTypes.object.isRequired,
+  filteredAmount: PropTypes.number.isRequired,
+  amounts: PropTypes.object.isRequired,
+  maxCols: PropTypes.number.isRequired,
+  fieldValues: PropTypes.object.isRequired,
+  updFilter: PropTypes.func.isRequired,
+}
+
+export default ByValue

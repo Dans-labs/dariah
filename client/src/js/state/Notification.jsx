@@ -152,7 +152,7 @@ class Notification extends Component {
  * @param {number} lastKind kind of the last error/warning message in the panel
  * @param {number} busy: the sum of the individual `busy` attributes of the messages
  * @param {boolean} visible: whether we should show the panel
- * @returns {DOM}
+ * @returns {Fragment}
  */
   render() {
     [this.lastMsg, this.lastNote, this.lastKind, this.busy, this.visible] = this.computeProgress();
@@ -204,7 +204,7 @@ class Notification extends Component {
  *
  * @method
  * @param {boolean} on Whether the message panel should be displayed or not
- * @returns {DOMEffect}
+ * @returns {DOM}
  * Hides or shows the div containing the message panel.
 */
   setView(on) {

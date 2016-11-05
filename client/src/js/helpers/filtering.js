@@ -200,7 +200,7 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
  *   * `data` is a boolean: when all values have been checked or unchecked in one go
  *
  * @function
- * @param {Map} filterSettings - as in {@link computeFiltering} 
+ * @param {Map} filterSettings - as in {@link module:filtering.computeFiltering|computeFiltering} 
  * @param {number} filterId - the id of the filter that fired an event
  * @returns {Map} `freshFilterSettings` - the nature of the event
  */
@@ -310,7 +310,7 @@ function countFacets(field, fieldValues, rows) {
 }
 
 /**
- * Places the facets of a field in a table with at most maxcols columns.
+ * Places the facets of a field in a table with at most maxCols columns.
  *
  * For example, if you have 20 facets, and want to save space, you can put them
  * in three columns of 7 facets each, with the last column containing only 6.
@@ -319,21 +319,21 @@ function countFacets(field, fieldValues, rows) {
  * first that it needs two rows and then that it can place those facets
  * in to 2 rows of only 6 columns. It will do so.
  *
- * Thus, the maxcols parameter specifies an upper limit, but the outcome might
+ * Thus, the maxCols parameter specifies an upper limit, but the outcome might
  * be less than so many columns!
  *
  * @function
  * @param {string} field - the field name
  * @param {Map} fieldValues - the facets as mapping from valueIds to valueRepresentations
- * @param {number} maxcols - the maximum number of columns in the resulting table
+ * @param {number} maxCols - the maximum number of columns in the resulting table
  * @returns {Array} A table (nested array) of facets, ordered by facet value, vertical first.
  */
-export function placeFacets(field, fieldValues, maxcols) {
+export function placeFacets(field, fieldValues, maxCols) {
   if (!field || !fieldValues) {return []}
   const facets = [...fieldValues.entries()].sort((x,y) => x[1].localeCompare(y[1]));
   const rows = [];
   const lf = facets.length;
-  const nrows = Math.floor(lf / maxcols) + ((lf % maxcols) ? 1 : 0);
+  const nrows = Math.floor(lf / maxCols) + ((lf % maxCols) ? 1 : 0);
   const ncols = Math.floor(lf / nrows) + ((lf % nrows) ? 1 : 0);
   for (let r = 0; r < nrows; r++) {
     const row = [];
