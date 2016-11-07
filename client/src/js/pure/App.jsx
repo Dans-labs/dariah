@@ -7,11 +7,20 @@ import { columnStyle } from '../helpers/ui.js'
 /**
  * **purely functional** {@link external:Component|Component}
  *
- * Top level as far as routing is concerned.
- * Above it are only the {@link Provider} coomponent and 
- * {@link external:Routing|router} components.
+ * ## Top level interface component
  *
- * Display the top and right navigation bars, which will always be in view.
+ * As far as the web page is concerned, this is the top level component.
+ * Technically, there are only 
+ * some {@link external:Routing|router} components
+ * and ultimately the {@link Provider}
+ * {@link external:Component|component} above it. 
+ *
+ * ## Permanent navigation widget
+ *
+ * `App` is always in view and consists of the
+ *  * top navigation bar (with logo, {@link Login}, and {@link Notification})
+ *  * right navigation bar (with navigation links to the components of the app
+ *    and documentation).
  *
  * @constructor
  * @param {Component[]} children The children of this component as specified in the 
@@ -44,7 +53,7 @@ const App = ({children}) => (
       </ul>
     </div>
     <div style={columnStyle('right')}>
-      {children}
+      { children }
     </div>
   </div>
 )

@@ -46,59 +46,52 @@ import App from './pure/App.jsx';
 import ContribsFiltered from './state/ContribsFiltered.jsx';
 import Doc from './pure/Doc.jsx';
 import NotFound from './pure/NotFound.jsx';
-import Store from './helpers/Store.js';
-
-/**
- * @module main
- */
 
 /**
  * ## Routing
  *
- * The entry point consists of the {@link Provider} component
- * with in it a {@link external:Routing} configuration.
+ * The entry point `main.jsx` contains the
+ * {@link external:Routing|routes} configuration.
+ *
+ * This is client side routing.
+ * At the server there are other rules linking urls to behaviour.
+ *
+ * Here are a few rules that capture how routing works in a Single Page App (SPA) like this,
+ * and the diagram visualizes the same logic.
+ *
+ * * the server responds to any url with sending the `index.html` page,
+ *   which also causes the `bundle.js` to load.
+ *   * the server's rules are very simple: no matter what the url, respond with the whole app.
+ *     The response is static, it is always the same.
+ *   * The client has to figure out what component(s) of the app to show and where,
+ *     based on the details of the url.
+ *   * this behaviour is needed to cater for the case that the user hits the browser's *refresh*
+ *     button. At that moment, the current url might be a deep path,
+ *     and we cannot expect the server to know those paths. The best the server can do is to
+ *     send the whole app again.
+ *
+ * There are a few exceptions, though:
+ *
+ * * if the url points to a static file, i.e. a file under `/static/`, the server will respond with the
+ *   file contents.
+ *   Otherwise there was no way to serve the `index.html` and `bundle.js` in the first place.
+ * * if the url points to `/api/`, the server will respond in a variety of ways, depending on the rest
+ *   of the url.
+ *   By means of these `/api/` urls the client can ask for additional data services, from file system or
+ *   database.
+ *   The server side routing maps these urls to specific controllers that fetch and assemble the 
+ *   requested data.
  *
  * &lt;img src="/api/file/tech/docs/design/design.007.jpeg" width="800"/>
- * Application wide data
  *
- * Some things need to be practically global, or at least, application wide.
- * We will not use the javascript `window` object to store globals.
- * Instead we use the *context* mechanism of React to pass global information
- * around within the app.
+ * ## Providing Application wide data
  *
- * # Store
+ * The {@link Provider} component surrounding the router provides global information to other components.
  *
- * The store is a container of component states.
- * We use it for components with a costly state, that should be preserved when components are swapped in and out from
- * the user interface.
- *
- * We pass a reference to the store as a parameter to all {@link external:Routing|routes}
- * that invoke a component with state that should be preserved. 
- * We do not use central state. We only provide for components to store their state when they unmount,
- * and to load it when they mount.
- *
- * A component can assign its state to the store using a self chosen key, preferably different for different instances.
- * So the store consists of saved states keyed by component instances.
- * 
- * The most important use cases for this app:
- *
- * * if the big contrib list is loaded, the user must be able to go back and forth between docs like "about"
- *   and the contrib list without the need to reload the list all the time
- * * if a user has set up filters, the filter state should be preserved after navigating to other parts of the app
- *
- * Note that the DOM may be swapped out, but the state info needed to recreate the dom should be preserved.
- *
- * # Notification
- *
- * We want one place on the interface for displaying notifications.
+ * @module main
  */
-const globals = {
-  store: new Store(),
-  notification: {component: null},
-};
-
 render(
-  &lt;Provider globals={globals}>
+  &lt;Provider>
     &lt;Router history={browserHistory}>
       &lt;Redirect from="/about" to="/docs/about.md"/>
       &lt;Redirect from="/docs/about" to="/docs/about.md"/>
@@ -109,16 +102,18 @@ render(
       &lt;Route path="/" component={App}>
         &lt;IndexRoute component={App}/>
         &lt;IndexRedirect to="/docs/about.md"/>
-        &lt;Route path="/contrib" component={ContribsFiltered}/>
-        &lt;Route path="/docs/:docFile" component={Doc}/>
-        &lt;Route path="/tech/docs/gen/:docFile" component={Doc}/>
-        &lt;Route path="/tech/docs/:docFile" component={Doc}/>
+        &lt;Route path="contrib" component={ContribsFiltered}/>
+        &lt;Route path="docs/:docFile" component={Doc}/>
+        &lt;Route path="tech/docs/gen/:docFile" component={Doc}/>
+        &lt;Route path="tech/docs/:docFile" component={Doc}/>
       &lt;/Route>
       &lt;Route path="*" component={NotFound}/>
     &lt;/Router>
   &lt;/Provider>,
   document.getElementById('body')
 );
+
+// &lt;Route path="/tech/docs/:docFile" component={Doc}/>
 </code></pre>
         </article>
     </section>
@@ -131,7 +126,7 @@ render(
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Mon Nov 07 2016 13:29:06 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Mon Nov 07 2016 18:34:03 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

@@ -92,5 +92,5 @@ gulp.task('watch_doc', function() {
 });
  
 gulp.task('doc', gulp.series('build_doc', 'watch_doc'));
-gulp.task('dev', gulp.series('build_doc', 'buildjs_dev', 'buildcss_dev', 'watch'));
-gulp.task('prod', gulp.series('build_doc', 'buildjs_prod', 'buildcss_prod'));
+gulp.task('dev', gulp.series('buildjs_dev', 'build_doc', 'buildcss_dev', 'watch'));
+gulp.task('prod', gulp.series('buildjs_prod', 'build_doc', 'buildcss_prod'));

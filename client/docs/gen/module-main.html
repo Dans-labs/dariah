@@ -40,6 +40,8 @@
 <header>
     
         
+            
+        
     
 </header>
 
@@ -47,28 +49,44 @@
     <div class="container-overview">
     
         
-
+            <div class="description"><h2>Routing</h2><p>The entry point <code>main.jsx</code> contains the
+<a href="external-Routing.html"><code>routes</code></a> configuration.</p>
+<p>This is client side routing.
+At the server there are other rules linking urls to behaviour.</p>
+<p>Here are a few rules that capture how routing works in a Single Page App (SPA) like this,
+and the diagram visualizes the same logic.</p>
+<ul>
+<li>the server responds to any url with sending the <code>index.html</code> page,
+which also causes the <code>bundle.js</code> to load.<ul>
+<li>the server's rules are very simple: no matter what the url, respond with the whole app.
+The response is static, it is always the same.</li>
+<li>The client has to figure out what component(s) of the app to show and where,
+based on the details of the url.</li>
+<li>this behaviour is needed to cater for the case that the user hits the browser's <em>refresh</em>
+button. At that moment, the current url might be a deep path,
+and we cannot expect the server to know those paths. The best the server can do is to
+send the whole app again.</li>
+</ul>
+</li>
+</ul>
+<p>There are a few exceptions, though:</p>
+<ul>
+<li>if the url points to a static file, i.e. a file under <code>/static/</code>, the server will respond with the
+file contents.
+Otherwise there was no way to serve the <code>index.html</code> and <code>bundle.js</code> in the first place.</li>
+<li>if the url points to <code>/api/</code>, the server will respond in a variety of ways, depending on the rest
+of the url.
+By means of these <code>/api/</code> urls the client can ask for additional data services, from file system or
+database.
+The server side routing maps these urls to specific controllers that fetch and assemble the 
+requested data.</li>
+</ul>
+<p><img src="/api/file/tech/docs/design/design.007.jpeg" width="800"/></p>
+<h2>Providing Application wide data</h2><p>The <a href="Provider.html"><code>Provider</code></a> component surrounding the router provides global information to other components.</p></div>
         
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
 
         
             
-<h4 class="name" id="~globals"><span class="type-signature">(inner, constant) </span>globals<span class="type-signature"></span></h4>
-
 
 
 
@@ -78,7 +96,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.jsx.html">main.jsx</a>, <a href="main.jsx.html#line56">line 56</a>
+        <a href="main.jsx.html">main.jsx</a>, <a href="main.jsx.html#line11">line 11</a>
     </li></ul></dd>
     
 
@@ -117,33 +135,22 @@
 
 
 
-<div class="description">
-    <h2>Routing</h2><p>The entry point consists of the <a href="Provider.html"><code>Provider</code></a> component
-with in it a <a href="external-Routing.html"><code>external:Routing</code></a> configuration.</p>
-<p><img src="/api/file/tech/docs/design/design.007.jpeg" width="800"/>
-Application wide data</p>
-<p>Some things need to be practically global, or at least, application wide.
-We will not use the javascript <code>window</code> object to store globals.
-Instead we use the <em>context</em> mechanism of React to pass global information
-around within the app.</p>
-<h1>Store</h1><p>The store is a container of component states.
-We use it for components with a costly state, that should be preserved when components are swapped in and out from
-the user interface.</p>
-<p>We pass a reference to the store as a parameter to all <a href="external-Routing.html"><code>routes</code></a>
-that invoke a component with state that should be preserved. 
-We do not use central state. We only provide for components to store their state when they unmount,
-and to load it when they mount.</p>
-<p>A component can assign its state to the store using a self chosen key, preferably different for different instances.
-So the store consists of saved states keyed by component instances.</p>
-<p>The most important use cases for this app:</p>
-<ul>
-<li>if the big contrib list is loaded, the user must be able to go back and forth between docs like &quot;about&quot;
-and the contrib list without the need to reload the list all the time</li>
-<li>if a user has set up filters, the filter state should be preserved after navigating to other parts of the app</li>
-</ul>
-<p>Note that the DOM may be swapped out, but the state info needed to recreate the dom should be preserved.</p>
-<h1>Notification</h1><p>We want one place on the interface for displaying notifications.</p>
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -153,6 +160,19 @@ and the contrib list without the need to reload the list all the time</li>
 
 
         
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
     
 
     
@@ -172,7 +192,7 @@ and the contrib list without the need to reload the list all the time</li>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Mon Nov 07 2016 13:29:06 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Mon Nov 07 2016 18:34:03 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

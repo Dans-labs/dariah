@@ -390,7 +390,7 @@
  * If it matches, it renders itself. Otherwise, it does not mount, or if it was mounted,
  * it will unmount.
  *
- * There are a sleeve full of tricks to make this a really useful library.
+ * Several tricks are employed to make this a really useful library.
  * See
  * {@link https://github.com/ReactTraining/react-router/blob/master/docs/API.md#route|API documentation}.
  * However, precisely because of this repeated mounting and unmounting

@@ -32,8 +32,8 @@ const docType = {
  * {@link external:Routing|route} that rendered this component
  * @returns {Fragment}
  */
-const Doc = ({ params, route }) => {
-  const docPath = route.path.replace(':docFile', params.docFile);
+const Doc = ({ params, route, location }) => {
+  const docPath = location.pathname;
   const [x, docDir, docFile] = /^(.*)\/([^/]+)$/g.exec(docPath);
   const [y, docName, docExt] = /^(.*)\.([^.]+)$/g.exec(docFile);
   const DocClass = docType[docExt];

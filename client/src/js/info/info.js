@@ -1,7 +1,9 @@
 /**
- * Documentation references.
+ * ## Technical Documentation
  * 
- * {@link module:main|Entry point of this app's documentation}
+ * Suggested starting points
+ * * {@link module:main|main}
+ * * {@link App}
  *
  * This file does not contain javascript code.
  *
