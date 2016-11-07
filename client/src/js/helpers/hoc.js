@@ -29,8 +29,7 @@ import React, { Component, PropTypes, Children } from 'react'
  * The idea is to enhance simple components by functional composition.
  * I am not (yet) using this library, because my cases were really simple.
  * See
- * {@link withContext} and {@link setState}
- * .
+ * {@link withContext} and {@link setState}.
  *
  * @external Recompose
  * @see {@link https://github.com/acdlite/recompose|Recompose}
@@ -73,19 +72,9 @@ export const withContext = (ComponentInner) => {
  * to let it preserve its state across unmounts and certain property updates.
  *
  * We assume that the original component can access the
- * {@link globals}
- * through
- * {@link external:context|context}
- * by having been enhanced by 
- * {@link withContext}
- * .
- * We assume that
- * {@link Provider}
- * has created a
- * {@link Store}
- * in
- * {@link globals}
- * .
+ * {@link globals} through {@link external:context|context}
+ * by having been enhanced by {@link withContext}.
+ * We assume that {@link Provider} has created a {@link Store} in {@link globals}.
  *
  * Now the resulting component is a subclass of the original, 
  * with enhanced
@@ -96,11 +85,8 @@ export const withContext = (ComponentInner) => {
  * methods.
  *
  * The resulting component will retrieve an existing state, coming from
- * the
- * {@link Store}
- * ,
- * before mounting. If there is no such state, the `initialState`
- * parameter will be used.
+ * the {@link Store}, before mounting.
+ * If there is no such state, the `initialState` parameter will be used.
  * 
  * And when the component is destroyed, it will save its state in the
  * {@link Store}.

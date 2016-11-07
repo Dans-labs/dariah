@@ -12,14 +12,10 @@ import {countryBorders} from '../helpers/europe.geo.js'
  * Both ingredients of this component are brought together not by
  * class extension but by functional composition.
  *
- * The country facet filter is a true react
- * {@link external:Component|component}
- * . 
+ * The country facet filter is a true react {@link external:Component|component}. 
  *
  * The map is a [Leaflet](http://leafletjs.com) module on a blank pane,
- * with a
- * {@link module:europe_geo_js|geojson}
- * file of country boundaries laid out on it.
+ * with a {@link module:europe_geo_js|geojson} file of country boundaries laid out on it.
  * The map is not react aware, it will be rendered in its own div.
  *
  * Remember that the results of filter computation descend from a stateful
@@ -27,12 +23,9 @@ import {countryBorders} from '../helpers/europe.geo.js'
  * So, whenever we receive new props, we manipulate the leaflet map and adjust
  * the markers on it.
  * More precisely, since we do not have to manipulate state, we put the marker updates
- * in the
- * {@link external:componentDidMount|componentDidMount()}
- * and
- * {@link external:componentDidUpdate|componentDidUpdate()}
- * {@link external:LifeCycle|life cycle methods}
- * of React.
+ * in the {@link external:componentDidMount|componentDidMount()}
+ * and {@link external:componentDidUpdate|componentDidUpdate()}
+ * {@link external:LifeCycle|life cycle methods} of React.
  * At those moments we know that the DOM elements that must be rendered have mounted,
  * so the map exists, and we can put the markers there.
  *

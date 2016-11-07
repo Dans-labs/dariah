@@ -1,7 +1,9 @@
+/* 
+ * This file does not contain javascript code.
+ */
+
 /**
  * ES6 Documentation references.
- *
- * This file does not contain javascript code.
  *
  * @module ES6
  */

@@ -22,7 +22,7 @@ import { columnStyle } from '../helpers/ui.js'
  *  * right navigation bar (with navigation links to the components of the app
  *    and documentation).
  *
- * @constructor
+ * @class
  * @param {Component[]} children The children of this component as specified in the 
  * {@link external:Routing|route} where App is called
  * @returns {Fragment}

@@ -18,8 +18,7 @@
   "templates": {
     "cleverLinks": true,
     "monospaceLinks": false,
-    "default": {
-      "outputSourceFiles": true
-    }
+    "useLongnameInNav": false,
+    "outputSourceFiles": true
   }
 }

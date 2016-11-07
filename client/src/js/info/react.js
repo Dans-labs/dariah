@@ -1,7 +1,9 @@
+/* 
+ * This file does not contain javascript code.
+ */
+
 /**
  * React Documentation references.
- *
- * This file does not contain javascript code.
  *
  * @module React
  */
@@ -36,22 +38,9 @@
  * We put all these components in a directory called **object**.
  *
  * ## Stateful components
- * If a component maintains a **state**, it is stateful.
+ * If a component maintains a {@link external:state|state}, it is stateful.
  * We need to program this as a class, like in the previous case.
  * Stateful components may or may not manipulate the DOM.
- *
- * There are two main reasons for a component to maintain state:
- *
- * * getting external data
- * * reacting to user events
- *
- * In both cases, something happens in the outside world that must be remembered.
- * Components remember these things in their state, which only they can update.
- * They can compute derived data from their state and pass that as properties
- * to their children.
- * State updates trigger these computations automatically, and children
- * whose properties are dependent on this state, are rerendered automatically
- * (and economically). 
  *
  * We put all these components in a directory called **state**.
  *
@@ -101,7 +90,7 @@
 
 /**
  * React renders updates to
- * {@link external:components|components}
+ * {@link external:Component|components}
  * very efficiently.
  * The 
  * {@link external:render|render()}
@@ -133,7 +122,7 @@
  *```
  * React elements reflect HTML elements, but you can mingle them 
  * with React 
- * {@link external:component|components}, which look nearly the same in **jsx**:
+ * {@link external:Component|components}, which look nearly the same in **jsx**:
  *
  * ```
  *  <p>
@@ -198,9 +187,7 @@
  *
  * By wrapping the syntax of the React context mechanism into an enhancer, we
  * can survive API changes more easily.
- * See
- * {@link module:hoc.withContext|withContext}
- * .
+ * See {@link module:hoc.withContext|withContext}.
  *
  * @external context
  * @see {@link https://facebook.github.io/react/docs/context.html|context}
@@ -209,9 +196,7 @@
 /**
  * The main function of a
  * {@link external:Component|component}
- * is to act as a template to be
- * {@link external:render|rendered}
- * .
+ * is to act as a template to be {@link external:render|rendered}.
  * But if there is additional work to be done, this can be hooked up at various
  * stages in the component's lifecycle.
  * Most stages occur during (re)rendering, and there is a stage of construction and unmounting.
@@ -226,7 +211,8 @@
  * is being
  * {@link https://facebook.github.io/react/docs/react-component.html#render|rendered}
  * this is the method to construct the corresponding React class.
- * It will set up the state.
+ * It will set up the 
+ * {@link external:state|state}.
  *
  * @external constructor
  * @see {@link https://facebook.github.io/react/docs/react-component.html#constructor|constructor()}
@@ -321,12 +307,8 @@
 /**
  * ## Local State
  *
- * The vanilla React way is that
- * {@link external:Component|components}
- * have their own state, which only
- * they can modify through
- * {@link external:setState|setState()}
- * .
+ * The vanilla React way is that {@link external:Component|components}
+ * have their own state, which only they can modify through {@link external:setState|setState()}.
  *
  * But even in React, state is not completely local, because in many
  * cases several components need to have access to the state.
@@ -334,20 +316,42 @@
  * common ancestor of all components that need the state.
  * Descendants that must modify ancestral state are passed a callback to do so.
  *
- * A widely used approach to *central* state is {@link external:Redux|Redux}
- * ,
+ * A widely used approach to *central* state is {@link external:Redux|Redux},
  * our alternative is
- * {@link external:StatePolicy|local state plus backup}
- * .
+ * {@link external:StatePolicy|local state plus backup}.
  *
  * @external setState
  * @see {@link https://facebook.github.io/react/docs/react-component.html#setstate|setState()}
  */
 
 /**
+ * ## State
+ *
+ * There are two main reasons for a component to maintain state:
+ *
+ * * getting external data
+ * * reacting to user events
+ *
+ * In both cases, something happens in the outside world that must be remembered.
+ * Components remember these things in their 
+ * {@link external:state|state}, which only they can update.
+ * They can compute derived data from their state and pass that as properties
+ * to their children.
+ * State updates trigger these computations automatically, and children
+ * whose properties are dependent on this state, are rerendered automatically
+ * (and economically). 
+ *
+ * See also 
+ * {@link external:Component|components}.
+ *
+ * @external state
+ * @see {@link https://facebook.github.io/react/docs/state-and-lifecycle.html}
+ */
+
+/**
  * ## Central State
  *
- * This is a popular implementation of the idea that state is centralized
+ * This is a popular implementation of the idea that {@link external:state|state} is centralized
  * and all components have to subscribe to a state provider, the store.
  *
  * * If a component needs to update the state, it dispatches an action to the store.
@@ -358,11 +362,9 @@
  * which get separated from the components for which it is used.
  *
  * The plain React alternative is
- * {@link external:setState|setState()}
- * ,
+ * {@link external:setState|setState()},
  * our alternative is
- * {@link external:StatePolicy|local state plus backup}
- * .
+ * {@link external:StatePolicy|local state plus backup}.
  *
  * @external Redux
  * @see {@link https://github.com/reactjs/react-redux|Redux}

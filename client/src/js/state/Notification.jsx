@@ -116,7 +116,7 @@ class Notification extends Component {
 /**
  * Collects the parameters to display progress information
  * @method
- * @returns {Array} See the input of {@link Notification.render}
+ * @returns {Array} See the input of {@link Notification#render|render}
 */
   computeProgress() {
     const lastMsg = this.msgs.length -1;

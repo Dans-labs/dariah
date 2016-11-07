@@ -21,18 +21,13 @@ import { placeFacets, testAllChecks } from '../helpers/filtering.js'
  * So we want to do the grid computation
  * {@link module:filtering.placeFacets|placeFacets}
  * once, in an initialization stage, e.g. in the 
- * {@link external:constructor|constructor()}
- * .
+ * {@link external:constructor|constructor()}.
  * But it turns out that for the visual performance it does not matter.
  *
- * This is the virtue of React: the code for rendering just constructs
- * a 
- * {@link external:Fragment|Fragment}, not the real 
- * {@link external:DOM|DOM}. 
- * The computation inside 
- * {@link module:filtering.placeFacets|placeFacets}
- * is just a little bit of juggling with tiny datastructures,
- * so the fragment is constructed in no time.
+ * This is the virtue of React: the code for rendering just constructs a 
+ * {@link external:Fragment|Fragment}, not the real {@link external:DOM|DOM}. 
+ * The computation inside {@link module:filtering.placeFacets|placeFacets}
+ * is just a little bit of juggling with tiny datastructures, so the fragment is constructed in no time.
  * See {@link external:Reconciliation|Reconciliation}.
  *
  * @constructor

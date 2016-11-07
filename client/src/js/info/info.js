@@ -1,11 +1,19 @@
+/* 
+ * This file does not contain javascript code.
+ */
+
 /**
  * ## Technical Documentation
  * 
  * Suggested starting points
- * * {@link module:main|main}
- * * {@link App}
- *
- * This file does not contain javascript code.
+ * * {@link module:main|main} Entry point of the client side application
+ * * {@link App} The application class, ancestor of all other interface components
+ * * React
+ *   * {@link external:Component|Component} Introduction into React Components
+ *   * {@link external:StatePolicy|StatePolicy} Design choices for stateful components
+ * * {@link Login} Authentication in this app
+ * * {@link ContribsFiltered} Overview of components involved in faceted browsing
+ * * {@link module:EUMap|EUMap} All about the European countries map 
  *
  * @file
  */
@@ -29,7 +37,7 @@
  *
  * ## Why local state?
  * We want to keep the pieces of business logic close to the component that deals with them.
- * We want to avoid the extra book keeping of actions and labels that  
+ * We want to avoid the extra book keeping of actions and labels that
  * {@link external:Redux|Redux}
  * requires.
  *
@@ -49,8 +57,11 @@
  * @property {string} type - either
  * * `db` (mongo db access, results delivered as json)
  * * `json` (file contents delivered as json)  
+ * This part will be put after the root url for fetching.
  * @property {string} path - the remaining path to the controller function on the server
- * @property {string} branch - the subobject of the requesting component's state that will
+ * @property {string} branch - once the data has been fetched, it has to go somewhere.
+ * It will go into the {@link external:state|state} of the requesting component, where it 
+ * will be assigned to the key given in `branch`.
  * receive the fetched data
  */
 
