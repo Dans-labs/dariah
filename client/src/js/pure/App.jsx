@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
 import  Login from '../state/Login.jsx'
 import  NavLink  from './NavLink.jsx'
 import Notification from '../state/Notification.jsx'
@@ -48,7 +48,5 @@ const App = ({children}) => (
     </div>
   </div>
 )
-
-App.propTypes = {}
 
 export default App

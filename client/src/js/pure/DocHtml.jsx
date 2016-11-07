@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React from 'react'
 
 /**
  * **purely functional** {@link external:Component|Component}
@@ -20,12 +20,6 @@ const DocHtml = ({ docDir, docName, docExt }) => {
     >
     </iframe>
   )
-}
-
-DocHtml.propTypes = {
-  docDir: PropTypes.string.isRequired,
-  docName: PropTypes.string.isRequired,
-  docExt: PropTypes.string.isRequired,
 }
 
 export default DocHtml

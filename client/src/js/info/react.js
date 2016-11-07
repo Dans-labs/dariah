@@ -158,8 +158,31 @@
 
 /**
  * Type checking for React
- * {@link Component|components}
- * .
+ * {@link Component|components}.
+ *
+ * Proptype checking in react only happens in development mode.
+ * React checks whether the named props that are passed to a component
+ * correspond to the props declared. In addition, it performs a basic type check on the values
+ * inside those props.
+ *
+ * I find the `PropType` syntax verbose, and no match for the otherwise clean and pleasant
+ * syntax of JSX. Additionally, most of the mistakes I make, do not reveal themselves as value
+ * type mistakes. On top it this all: declaring `PropTypes` forcres you to repeat all
+ * the names of your proptypes, so is against the principle of *do't repeat yourself*.
+ * In this application, the property names are always clear in the code, either as
+ *
+ * ```
+ * const MyComponent = ({foo, bar)} => ... 
+ * ```
+ *
+ * or as
+ *
+ * ```
+ * const {foo, bar} = this.props
+ * ```
+ *
+ * Moreover, I describe the types and meaning of the properties also in nearby *jsdoc* comments.
+ * That should suffice.
  *
  * @external PropTypes
  * @see {@link https://facebook.github.io/react/docs/typechecking-with-proptypes.html|PropTypes}
@@ -245,6 +268,19 @@
  *
  * @external componentWillMount
  * @see {@link https://facebook.github.io/react/docs/react-component.html#componentwillmount|componentWillMount()}
+ */
+
+/**
+ * When a
+ * {@link external:Component|component}
+ * is about to receive new props (as part of the update process),
+ * this method will be called just before.
+ * The new props are passed with it, so that it is possible to execute
+ * actions dependent on whether pros have changed.
+ *
+ *
+ * @external componentWillReceiveProps
+ * @see {@link https://facebook.github.io/react/docs/react-component.html#componentwillreceiveprops|componentWillReceiveProps()}
  */
 
 /**

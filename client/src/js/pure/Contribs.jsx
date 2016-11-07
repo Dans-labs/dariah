@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
 import Contrib from './Contrib.jsx'
 
 /**
@@ -22,9 +22,5 @@ const Contribs = ({ filteredData }) => (
     </table>
   </div>
 )
-
-Contribs.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-}
 
 export default Contribs

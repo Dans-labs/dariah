@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import Contribs from '../pure/Contribs.jsx'
 import Filters, { filterList } from '../pure/Filters.jsx'
 
@@ -71,13 +71,6 @@ class FilterCompute extends Component {
       </div>
     )
   }
-}
-
-FilterCompute.propTypes = {
-  contribs: PropTypes.array.isRequired,
-  countries: PropTypes.object.isRequired,
-  fieldValues: PropTypes.object.isRequired,
-  filterInit: PropTypes.object.isRequired,
 }
 
 export default withContext(saveState(FilterCompute, 'FilterCompute', ({filterInit}) => ({filterSettings: filterInit})))

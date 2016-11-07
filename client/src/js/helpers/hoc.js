@@ -70,7 +70,7 @@ export const withContext = (ComponentInner) => {
 /**
  * Wraps a
  * {@link external:Component|component}
- * to let it preserve its state across unmounts.
+ * to let it preserve its state across unmounts and certain property updates.
  *
  * We assume that the original component can access the
  * {@link globals}
@@ -89,7 +89,8 @@ export const withContext = (ComponentInner) => {
  *
  * Now the resulting component is a subclass of the original, 
  * with enhanced
- * {@link external:constructor|constructor()}
+ * {@link external:constructor|constructor()},
+ * {@link external:componentWillReceiveProps|componentWillReceiveProps()}
  * and
  * {@link external:componentWillMount|componentWillMount()}
  * methods.
@@ -102,8 +103,29 @@ export const withContext = (ComponentInner) => {
  * parameter will be used.
  * 
  * And when the component is destroyed, it will save its state in the
- * {@link Store}
- * .
+ * {@link Store}.
+ *
+ * One subtlety, though.
+ * Sometimes a component is reused without being unmounted and reconstructed, but by just
+ * getting new props.
+ * For example, the {@link DocMd} component has a property `docName`.
+ * When the user browses from one document to another, the router will pass a new value
+ * for `docName` to the existing component, rather than destroying it and building it from scratch.
+ * Now {@link DocMd} uses the stateful {@link Alternatives}  component to give the user the choice
+ * to view the MarkDown source or the formatted version.
+ * When the user switches docs, also this {@link Alternatives} just get new props instead of being 
+ * unmounted and reconstructed.
+ * So our method of saving state should also apply when properties change.
+ *
+ * But not all properties.
+ * We only look at the `tag` property on the original component.
+ * The `tag` property is used in two ways:
+ *
+ * * it will be part of the key under which the state will be saved
+ * * if it changes, the present state will be saved (with the old value of `tag` as part of the key)
+ * * and a previously saved state (with the new value of `tag`) will be loaded. 
+ *
+ * If there is no property `tag` on the orginial component, we take it to be the empty string.
  *
  * @function
  * @param {Component} ComponentInner - the incoming component (the wrappee)
@@ -115,15 +137,36 @@ export const withContext = (ComponentInner) => {
  */
 export const saveState = (ComponentInner, key, initialState) => {
   const ComponentOuter = class extends ComponentInner {
+    setKey(tag) {
+      this.stateKey = this.key + ((tag==null)?'':`.${tag}`);
+    }
+    load() {
+      this.store.load(this, this.stateKey, ((typeof this.initialState) == 'function')?this.initialState(this.props):this.initialState)
+    }
+    save() {
+      this.store.save(this, this.stateKey);
+    }
     constructor(props) {
       super(props);
-      const store = props.store;
+      const { store, tag } = props;
+      this.store = store;
+      this.tag = tag;
       this.key = key;
-      store.load(this, key, ((typeof initialState) == 'function')?initialState(props):initialState)
+      this.initialState = initialState;
+      this.setKey(tag);
+      this.load();
     }
     componentWillUnmount() {
-      const store = this.props.store
-      store.save(this, this.key);
+      this.save()
+    }
+    componentWillReceiveProps(newProps) {
+      const { oldTag } = this.props;
+      const { tag } = newProps;
+      if (oldTag !== tag) {
+        this.save();
+        this.setKey(tag);
+        this.load();
+      }
     }
   }
   return ComponentOuter

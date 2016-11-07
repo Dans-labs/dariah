@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
 const indeterminate = states => !states.allTrue && !states.allFalse
 
@@ -46,15 +46,6 @@ class CheckboxI extends Component {
       />
     )
   }
-}
-
-CheckboxI.propTypes = {
-  filterId: PropTypes.number.isRequired,
-  states: PropTypes.shape({
-    allFalse: PropTypes.bool,
-    allTrue: PropTypes.bool,
-  }).isRequired,
-  updFilter: PropTypes.func,
 }
 
 export default CheckboxI

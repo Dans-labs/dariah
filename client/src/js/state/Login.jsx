@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
 import { withContext, saveState } from '../helpers/hoc.js'
 import { getData } from '../helpers/data.js'
 
@@ -35,8 +35,6 @@ class Login extends Component {
     )
   }
 }
-
-Login.propTypes = {}
 
 export default withContext(saveState(Login, 'Login', {user: {}}))
 

@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
 import FilterCompute from './FilterCompute.jsx'
 import { filterList } from '../pure/Filters.jsx'
@@ -69,8 +69,5 @@ class ContribsFiltered extends Component {
     }
   }
 }
-
-ContribsFiltered.propTypes = {
-};
 
 export default withContext(saveState(ContribsFiltered, 'ContribsFiltered', {contribs: null, countries: null}))

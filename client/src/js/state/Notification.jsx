@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { withContext, saveState } from '../helpers/hoc.js'
 
 const msgStyle = {
@@ -226,9 +226,6 @@ class Notification extends Component {
       }
     }
   }
-}
-
-Notification.propTypes = {
 }
 
 export default withContext(saveState(Notification, 'Notification', {msgs: null}))

@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
 import Markdown from 'react-markdown'
 import { Link } from 'react-router'
 import Alternatives from '../state/Alternatives.jsx'
@@ -45,7 +45,7 @@ class DocMd extends Component {
  */
   render() {
     const { docName } = this.props;
-    const text = this.state[docName];
+    const text = this.state.md;
     if (text == null ) {
       return <div/>
     }
@@ -84,9 +84,9 @@ class DocMd extends Component {
  */
   fetchText() {
     const { docDir, docName, docExt } = this.props;
-    if (this.state[docName] == null ) {
+    if (this.state.md == null ) {
       getData(
-        [ { type: 'json', path: `${docDir}/${docName}.${docExt}`, branch: docName } ],
+        [ { type: 'json', path: `${docDir}/${docName}.${docExt}`, branch: 'md' } ],
         this,
         this.props.notification.component
       );
@@ -100,10 +100,4 @@ class DocMd extends Component {
   }
 }
 
-DocMd.propTypes = {
-  docDir: PropTypes.string.isRequired,
-  docName: PropTypes.string.isRequired,
-  docExt: PropTypes.string.isRequired,
-};
-
-export default withContext(saveState(DocMd, 'DocMd', {}))
+export default withContext(saveState(DocMd, 'DocMd', {md: null}))

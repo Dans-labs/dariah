@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
 
 const style = {
   color: '#0000dd',
@@ -24,10 +24,5 @@ const Stats = ({subTotal, total}) => (
     <strong>{total == undefined?'':`${total}`}</strong>
   </span>
 )
-
-Stats.propTypes = {
-  subTotal: PropTypes.number,
-  total: PropTypes.number,
-}
 
 export default Stats

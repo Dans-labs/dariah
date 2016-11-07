@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React from 'react'
 
 /**
  * **purely functional** {@link external:Component|Component}
@@ -32,12 +32,6 @@ const DocPdf = ({ docDir, docName, docExt }) => {
         alt : <a target="_blank" href={href}>{docName}</a> (open pdf in a new tab)
       </object>
   )
-}
-
-DocPdf.propTypes = {
-  docDir: PropTypes.string.isRequired,
-  docName: PropTypes.string.isRequired,
-  docExt: PropTypes.string.isRequired,
 }
 
 export default DocPdf

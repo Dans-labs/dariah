@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
 
 /**
  * **purely functional** {@link external:Component|Component}
@@ -15,9 +15,5 @@ const Contrib = ({ row }) => (
     <td>{row.title}</td>
   </tr>
 )
-
-Contrib.propTypes = {
-  row: PropTypes.object.isRequired,
-}
 
 export default Contrib

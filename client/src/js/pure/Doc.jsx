@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React from 'react'
 
 import DocMd from '../state/DocMd.jsx';
 import DocPdf from './DocPdf.jsx';
@@ -40,7 +40,7 @@ const Doc = ({ params, route }) => {
   return DocClass == undefined ? (
     <NotFound params={{splat: `document ${docPath}`}}/>
   ) : (
-    <DocClass docDir={docDir} docName={docName} docExt={docExt}/>
+    <DocClass docDir={docDir} docName={docName} docExt={docExt} tag={docName}/>
   )
 }
 

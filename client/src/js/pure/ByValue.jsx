@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React from 'react'
 import Facet from './Facet.jsx'
 import CheckboxI from '../object/CheckboxI.jsx'
 import Stats from './Stats.jsx'
@@ -113,17 +113,6 @@ const ByValue = ({
       )}
     </div>
   )
-}
-
-ByValue.propTypes = {
-  filterId: PropTypes.number.isRequired,
-  filterField: PropTypes.string.isRequired,
-  filterSettings: PropTypes.object.isRequired,
-  filteredAmount: PropTypes.number.isRequired,
-  amounts: PropTypes.object.isRequired,
-  maxCols: PropTypes.number.isRequired,
-  fieldValues: PropTypes.object.isRequired,
-  updFilter: PropTypes.func.isRequired,
 }
 
 export default ByValue

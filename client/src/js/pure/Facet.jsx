@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
 
 const styles = {
   rep: { fontSize: 'small' },
@@ -32,13 +32,5 @@ const Facet = ({ filterId, valueId, valueRep, checked, updFilter }) => (
     <span style={styles.rep}>{` ${valueRep}`}</span>
   </span>
 )
-
-Facet.propTypes = {
-  filterId: PropTypes.number.isRequired,
-  valueId: PropTypes.string.isRequired,
-  valueRep: PropTypes.string.isRequired,
-  checked: PropTypes.bool.isRequired,
-  updFilter: PropTypes.func.isRequired,
-}
 
 export default Facet

@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import ByValue from '../pure/ByValue.jsx'
 import L from 'leaflet'
 import {countryBorders} from '../helpers/europe.geo.js'
@@ -217,11 +217,6 @@ class EUMap extends Component {
       marker.setStyle(mapOptions.MARKER_COLOR[isOn]);
     }
   }
-}
-
-EUMap.propTypes = {
-  ...ByValue.propTypes,
-  countries: PropTypes.object.isRequired,
 }
 
 export default EUMap

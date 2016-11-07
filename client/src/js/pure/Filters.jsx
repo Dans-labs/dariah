@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
 
 import FullText from './FullText.jsx'
 import ByValue from './ByValue.jsx'
@@ -100,15 +100,5 @@ const Filters = ({
     )}
   </div>
 )
-
-Filters.propTypes = {
-  countries: PropTypes.object.isRequired,
-  filterSettings: PropTypes.object.isRequired,
-  fieldValues: PropTypes.object.isRequired,
-  filteredAmount: PropTypes.number.isRequired, 
-  filteredAmountOthers: PropTypes.object.isRequired, 
-  amounts: PropTypes.object.isRequired,
-  updFilter: PropTypes.func.isRequired,
-}
 
 export default Filters;

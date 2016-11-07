@@ -1,4 +1,4 @@
-import React, { PropTypes, Component } from 'react'
+import React, { Component } from 'react'
 import { withContext, saveState } from '../helpers/hoc.js'
 
 /**
@@ -17,12 +17,13 @@ class Alternatives extends Component {
   next(event) {
     event.preventDefault();
     const { alternatives, tag, initial } = this.props;
-    const newAlt = ((this.state[tag] || initial || 0) + 1) % alternatives.length; 
-    this.setState({...this.state, [tag]: newAlt});
+    const newAlt = ((this.state.alt || initial || 0) + 1) % alternatives.length; 
+    this.setState({alt: newAlt});
   }
 /**
  * @method
  * @param {string} tag An extra identification, to distinguish this instance of the class from others
+ * The tag will be used when the state of this component must be saved or loaded.
  * @param {Component[]} alternatives A list of components to choose from
  * @param {Fragment[]} controls A list of DOM fragments that act as controllers.
  * `control[i]` corresponds to `alternative[i]` and is displayed with it.
@@ -36,8 +37,8 @@ class Alternatives extends Component {
  * keyed by `tag`.
  */
   render() {
-    const { controlPlacement, controls, alternatives, tag, initial } = this.props;
-    const alt = this.state[tag] || initial || 0;
+    const { controlPlacement, controls, alternatives, initial } = this.props;
+    const alt = this.state.alt || initial || 0;
     return (
       <div>
         {controlPlacement(controls[alt](this.next.bind(this)))}
@@ -45,13 +46,6 @@ class Alternatives extends Component {
       </div>
     )
   }
-}
-
-Alternatives.propTypes = {
-  initial: PropTypes.number,
-  controlPlacement: PropTypes.func.isRequired,
-  controls: PropTypes.array.isRequired,
-  alternatives: PropTypes.array.isRequired,
 }
 
 export default withContext(saveState(Alternatives, 'Alternatives', {}))
