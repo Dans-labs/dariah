@@ -71,6 +71,13 @@ import Store from '../helpers/Store.js';
  * inject assign itself to `globals.notification.component`.
  */
 class Provider extends Component {
+/**
+ * Here we declare Provider as a context provider,
+ * by writing a method that computes context properties and return them.
+ * This is the stuff that other components can receive through the *context*.
+ *
+ * @method
+ */
   getChildContext() {
     const globals = {
       store: new Store(),

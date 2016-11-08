@@ -7,7 +7,7 @@ import Contrib from './Contrib.jsx'
  * Displays the list of contributions as a table.
  * Only the rows that have passed all filters.
  *
- * @constructor
+ * @class
  * @param {Object[]} filteredData The list of rows to be displayed
  * @returns {Fragment}
  */

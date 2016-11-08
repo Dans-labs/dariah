@@ -9,12 +9,10 @@ import React from 'react'
  * we work around it by just displaying a link to open the PDF in a new tab.
  * We only do that when we detect an iOS browser.
  *
- * @constructor
+ * @class
  * @param {string} docDir the directory part of the location of the document
  * @param {string} docName the name part (without extension) of the location of the document
  * @param {string} docExt the extension the document
- * @constructor
- * @param {Object}
  * @returns {Fragment}
  */
 const DocPdf = ({ docDir, docName, docExt }) => {

@@ -44,6 +44,10 @@ class Login extends Component {
       </span>
     )
   }
+  /**
+   * After the initial mount we fetch the user data from the server by calling {@link module:data.getData|getData()}.
+   * @method
+   */
   componentDidMount() {
     getData(
       [ { type: 'db', path: '/who/ami', branch: 'user' } ],

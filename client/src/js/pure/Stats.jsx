@@ -12,7 +12,7 @@ const style = {
  * Displays a string of the form *subTotal* `of` *total*.
  * If one of the two is missing, the `of` will not display.
  *
- * @constructor
+ * @class
  * @param {number=} subTotal
  * @param {number=} total
  * @returns {Fragment}

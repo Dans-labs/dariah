@@ -11,7 +11,7 @@ import Stats from './Stats.jsx'
  *
  * Note that we use the strategy of {@link external:ControlledComponent|controlled components} here.
  *
- * @constructor
+ * @class
  * @param {number} filterId The index of the filter in {@link module:Filters.filterList|filterList}
  * @param {string} filterField The name of the field in the contribs list whose values are being filtered
  * @param {string} filterSettings  The currently entered search string in the input box

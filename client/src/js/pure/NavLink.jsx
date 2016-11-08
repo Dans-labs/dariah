@@ -6,7 +6,7 @@ import { Link } from 'react-router'
  *
  * Displays a navigation link that is sensitive to routing.
  *
- * @constructor
+ * @class
  * @param {Object} props Incoming properties to be passed to the underlying <Link> component.
  * @returns {Fragment}
  */

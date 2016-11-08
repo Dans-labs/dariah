@@ -5,7 +5,7 @@ import React from 'react'
  * 
  * Displays an HTML document by linking to it in an IFRAME.
  *
- * @constructor
+ * @class
  * @param {string} docDir the directory part of the location of the document
  * @param {string} docName the name part (without extension) of the location of the document
  * @param {string} docExt the extension the document

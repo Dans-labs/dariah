@@ -13,7 +13,7 @@ const styles = {
  *
  * Note that we use the strategy of {@link external:ControlledComponent|controlled components} here.
  *
- * @constructor
+ * @class
  * @param {number} filterId The index of the filter in {@link module:Filters.filterList|filterList}
  * @param {number} valueId The id of the value that is displayed in this facet
  * @param {string} valueRep The string representation of the value of this facet (the label next to the checkbox)

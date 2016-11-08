@@ -60,7 +60,7 @@ const styles = {
  * Whereas the incoming props contain information for all filters,
  * each individual child filter is passed the relevant slice only.
  *
- * @constructor
+ * @class
  * @param {Map} filterSettings The current state of the facets belonging to this filter
  * @param {Map} fieldValues A mapping of the valueIds to valueRepresentations for all values in all filtered fields
  * @param {Object[]} filteredAmount The number of rows that have passed all filters

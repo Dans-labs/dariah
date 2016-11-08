@@ -30,7 +30,7 @@ import { placeFacets, testAllChecks } from '../helpers/filtering.js'
  * is just a little bit of juggling with tiny datastructures, so the fragment is constructed in no time.
  * See {@link external:Reconciliation|Reconciliation}.
  *
- * @constructor
+ * @class
  * @param {number} filterId The index of the filter in {@link module:Filters.filterList|filterList}
  * @param {string} filterField The name of the field in the contribs list whose values are being filtered
  * @param {Map} fieldValues A mapping of the valueIds to valueRepresentations for all values that occur in `filterField`

@@ -6,7 +6,7 @@ import React from 'react'
  * Displays a contribution record in a table row.
  * Just the title.
  *
- * @constructor
+ * @class
  * @param {Object} row A record of data from the contributions table
  * @returns {Fragment}
  */

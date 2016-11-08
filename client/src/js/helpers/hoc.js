@@ -52,9 +52,18 @@ import React, { Component, PropTypes, Children } from 'react'
  * @param {Component} ComponentInner - the incoming component (the wrappee)
  * @returns {Component} ComponentOuter - the enhanced component (the wrapper)
  *
+ * ### Details of the construction of `ComponentOuter`.
+ * It contains an enhanced version of the {@link external:render|render} method
+ * of `ComponentInner` in that it has access to the prop `globals`.
+ *
+ * We will also declare context properties on this class, so that
+ * it can receive them from the {@link Provider}.
  */
 export const withContext = (ComponentInner) => {
   const ComponentOuter = class extends Component {
+    /**
+     * @method
+     */
     render() {
       const newProps = {...this.props, ...this.context.globals};
       return <ComponentInner {...newProps}/>
@@ -119,18 +128,52 @@ export const withContext = (ComponentInner) => {
  * @param {initialState} object - the state to start with 
  * @returns {Component} ComponentOuter - the enhanced component (the wrapper)
  *
+ * ### Details of the construction of `ComponentOuter`.
+ *
+ * `setStateKey(tag)`: Composes the `stateKey` from parameter `tag` and property `key`
+ * which is already present in `ComponentInner`.
+ * `tag` is meant to be the part that distinguishes this between
+ * several instances of `ComponentInner`. 
+ * The `stateKey` is added to `ComponentOuter`.
  * 
+ * `stateLoad()`: An existing state copy is looked up in the {@link Store} under `this.stateKey`
+ * and inserted into the state of `ComponentOuter`.
+ * If there is no such copy, `this.initialState` is taken (possibly after computing on the basis
+ * of `this.props`).
+ *
+ * `stateSave()`: The state of `ComponentInner` is saved in the {@link Store} under `this.stateKey`.
+ *
+ * The modified {@link external:LifeCycle|lifecycle method}
+ * {@link external:constructor|constructor(props)} 
+ * stores several pieces of information
+ * into `ComponentOuter` for use by other methods.
+ * * the `key` and `initialState` parameters of `saveState`
+ * * `store` from props (injected by {@link withContext})
+ * * `tag` from props (already present on the inner component)
+ * Then it computes and stores the `stateKey` and performs a {@link stateLoad}.
+ *
+ * The modified {@link external:LifeCycle|lifecycle method}
+ * {@link external:componentwillunmount|componentWillUnmount()}
+ * performs a {@link stateSave}.
+ *
+ * The modified {@link external:LifeCycle|lifecycle method}
+ * {@link external:componentwillreceiveprops|componentWillReceiveProps()}
+ * performs a {@link stateSave} based on the *old* value of prop `tag`, followed
+ * by a {@link stateLoad} based on the *new* value of prop `tag`.
  */
 export const saveState = (ComponentInner, key, initialState) => {
   const ComponentOuter = class extends ComponentInner {
-    setKey(tag) {
+    setStateKey(tag) {
+      const {stateKey, key} = this;
       this.stateKey = this.key + ((tag==null)?'':`.${tag}`);
     }
-    load() {
-      this.store.load(this, this.stateKey, ((typeof this.initialState) == 'function')?this.initialState(this.props):this.initialState)
+    stateLoad() {
+      const {store, stateKey, initialState, props} = this;
+      store.load(this, stateKey, ((typeof initialState) == 'function')?initialState(props):initialState)
     }
-    save() {
-      this.store.save(this, this.stateKey);
+    stateSave() {
+      const {store, stateKey} = this;
+      store.save(this, stateKey);
     }
     constructor(props) {
       super(props);
@@ -139,19 +182,19 @@ export const saveState = (ComponentInner, key, initialState) => {
       this.tag = tag;
       this.key = key;
       this.initialState = initialState;
-      this.setKey(tag);
-      this.load();
+      this.setStateKey(tag);
+      this.stateLoad();
     }
     componentWillUnmount() {
-      this.save()
+      this.stateSave()
     }
     componentWillReceiveProps(newProps) {
       const { oldTag } = this.props;
       const { tag } = newProps;
       if (oldTag !== tag) {
-        this.save();
-        this.setKey(tag);
-        this.load();
+        this.stateSave();
+        this.setStateKey(tag);
+        this.stateLoad();
       }
     }
   }
