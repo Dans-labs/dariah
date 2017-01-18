@@ -70,7 +70,7 @@ class AuthApi(UserApi):
             else:
                 authority = self.userInfo['authority']
                 inGroups = self.getInGroups()
-                self.userInfo['group'] = inGroups.get((eppn, authority), '')
+                self.userInfo['group'] = inGroups.get((eppn, authority), 'auth')
 
     def deauthenticate(self):
         self.userInfo = dict(group='');
