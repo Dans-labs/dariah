@@ -38,7 +38,8 @@ class Alternatives extends Component {
   next(event) {
     event.preventDefault();
     const { tag, alternatives, initial } = this.props;
-    const newAlt = ((this.state.alt || initial || 0) + 1) % alternatives.length; 
+    const oldAlt = (this.state.alt == undefined)?((initial == undefined)?0:initial):this.state.alt;
+    const newAlt = (oldAlt + 1) % alternatives.length; 
     this.setState({alt: newAlt});
   }
 /**
@@ -59,7 +60,7 @@ class Alternatives extends Component {
  */
   render() {
     const { controlPlacement, controls, alternatives, initial } = this.props;
-    const alt = this.state.alt || initial || 0;
+    const alt = (this.state.alt == undefined)?((initial == undefined)?0:initial):this.state.alt;
     return (
       <div>
         {controlPlacement(controls[alt](this.next.bind(this)))}

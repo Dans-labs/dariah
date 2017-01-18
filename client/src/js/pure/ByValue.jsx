@@ -43,7 +43,8 @@ import { placeFacets, testAllChecks } from '../helpers/filtering.js'
  * @returns {Fragment}
  */
 const ByValue = ({
-  filterId, filterField, fieldValues, filterSettings,
+  filterId, filterField, filterLabel,
+  fieldValues, filterSettings,
   filteredAmount, filteredAmountOthers,
   amounts, maxCols, updFilter,
 }) => { 
@@ -59,7 +60,7 @@ const ByValue = ({
               filterId={filterId}
               states={testAllChecks(filterSettings)}
               updFilter={updFilter}
-            /> By {filterField}{' '}
+            /> By {filterLabel}{' '}
             <Stats subTotal={filteredAmount} total={filteredAmountOthers}/>{' '}
             {control}
           </p>

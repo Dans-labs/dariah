@@ -82,6 +82,7 @@ class Provider extends Component {
     const globals = {
       store: new Store(),
       notification: {component: null},
+      userInfo: new Map(),
     };
     return {globals}
   }

@@ -4,7 +4,7 @@ from bottle import route, response, view, template
 from file import FileApi
 from data import DataApi
 from auth import AuthApi
-
+from perm import PermApi
 
 File = FileApi()
 Data = DataApi()
@@ -34,7 +34,9 @@ def serveApiDbWho():
 
 @route('/api/db/<query:re:[a-z0-9_]+>')
 def serveApiDb(query):
-    return Data.data(query)
+    Auth.authenticate()
+    perm = PermApi(Auth)
+    return Data.data(query, perm)
 
 @route('/slogout')
 def serveSlogout():

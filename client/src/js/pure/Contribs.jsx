@@ -1,5 +1,5 @@
 import React from 'react'
-import Contrib from './Contrib.jsx'
+import ContribTitle from './ContribTitle.jsx'
 
 /**
  * **purely functional** {@link external:Component|Component}
@@ -9,14 +9,16 @@ import Contrib from './Contrib.jsx'
  *
  * @class
  * @param {Object[]} filteredData The list of rows to be displayed
+ * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
+ * dependent on the permissions of the current user.
  * @returns {Fragment}
  */
-const Contribs = ({ filteredData }) => (
+const Contribs = ({ filteredData, fields }) => (
   <div style={{height: '100%', overflow: 'auto'}}>
     <table>
       <tbody>{
       filteredData.map((item) => (
-          <Contrib key={item._id} row={item} />
+          <ContribTitle key={item._id} row={item} fields={fields} />
       ))
       }</tbody>
     </table>

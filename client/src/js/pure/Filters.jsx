@@ -28,12 +28,16 @@ import EUMap from '../object/EUMap.jsx'
  * `filterList` is used here and imported by {@link module:filtering}
  */ 
 export const filterList = [
-  {kind: FullText,  name: 'FullText',  field: 'title',               maxCols: null},
-  {kind: EUMap,     name: 'EUMap',     field: 'country',             maxCols: 3},
-  {kind: ByValue,   name: 'ByValue',   field: 'typeContribution',    maxCols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivities',   maxCols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObjects',      maxCols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechniques',   maxCols: 1},
+  {kind: FullText,  name: 'FullText',  field: 'title',               label: 'title',      maxCols: null},
+  {kind: EUMap,     name: 'EUMap',     field: 'country',             label: 'country',    maxCols: 3},
+  {kind: ByValue,   name: 'ByValue',   field: 'vcc',                 label: 'vcc',        maxCols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'year',                label: 'year',       maxCols: 3},
+  {kind: ByValue,   name: 'ByValue',   field: 'typeContribution',    label: 'type',       maxCols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivities',   label: 'activity',   maxCols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObjects',      label: 'object',     maxCols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechniques',   label: 'technique',  maxCols: 1},
+  {kind: ByValue,   name: 'ByValue',   field: 'disciplines',         label: 'discipline', maxCols: 2},
+  {kind: ByValue,   name: 'ByValue',   field: 'keywords',            label: 'keyword',    maxCols: 1},
 ]
 
 const styles = {
@@ -72,6 +76,7 @@ const styles = {
  * @returns {Fragment}
  */
 const Filters = ({
+  fields,
   filterSettings, fieldValues, 
   filteredAmount, filteredAmountOthers,
   amounts,
@@ -79,7 +84,7 @@ const Filters = ({
   updFilter
 }) => (
   <div style={styles}>
-    {filterList.map((filter, filterId) => {
+    {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
       const needs = filter.name === 'EUMap' ? {countries} : {};
       const Fclass = filter.kind;
       return (
@@ -87,6 +92,7 @@ const Filters = ({
           key={filterId}
           filterId={filterId}
           filterField={filter.field}
+          filterLabel={filter.label}
           maxCols={filter.maxCols}
           filterSettings={filterSettings.get(filterId)}
           fieldValues={fieldValues.get(filter.field)}

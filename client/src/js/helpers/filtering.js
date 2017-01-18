@@ -28,6 +28,8 @@
  *     those rows that do not have values in this field.
  *
  * @param {Contrib[]} contribs - The list of contribution records as it comes form mongo db
+ * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
+ * dependent on the permissions of the current user.
  * @param {Array} filterList - The list of available filters, statically imported from the 
  * @returns {Map} `fieldValues` - a mapping of the valueId to the valueRepresentation of all values that have
  * been encountered in the `field` of the `contribs` rows
@@ -35,11 +37,12 @@
  * for that filter, i.e. the situation that the user has not yet started using the filters
  * {@link Filters} component.
  */
-export function compileFiltering(contribs, filterList) {
-  const fields = filterList.filter(x => x.name !== 'FullText').map(x => x.field);
-  const fieldValues = new Map(fields.map(f => [f, new Map([['', '-none-']])]));
+export function compileFiltering(contribs, fields, filterList) {
+  const presentFilterList = filterList.filter(x => fields[x.field])
+  const filterFields = presentFilterList.filter(x => x.name !== 'FullText').map(x => x.field);
+  const fieldValues = new Map(filterFields.map(f => [f, new Map([['', '-none-']])]));
   for (const row of contribs) {
-    for (const field of fields) {
+    for (const field of filterFields) {
       const fFieldValues = fieldValues.get(field);
       const metaraw = row[field];
       if (metaraw != undefined && metaraw.length !== 0) {
@@ -49,7 +52,7 @@ export function compileFiltering(contribs, filterList) {
       }
     }
   }
-  const filterInit = new Map(filterList.map((filterSpec, filterId) => [
+  const filterInit = new Map(presentFilterList.map((filterSpec, filterId) => [
     filterId,
     filterSpec.name === 'FullText' ? '' : new Map([...fieldValues.get(filterSpec.field).keys()].map(valueId => [valueId, true]))
   ]));
@@ -64,6 +67,8 @@ export function compileFiltering(contribs, filterList) {
  * ## Computing Filters
  *
  * @param {Contrib[]} contribs - as in {@link compileFiltering} 
+ * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
+ * dependent on the permissions of the current user.
  * @param {Array} filterList - as in {@link compileFiltering}
  * @param {Map} fieldValues - as in {@link compileFiltering} 
  * @param {Map} filterSettings - a {@link external:Map|Map} of filters to their current settings
@@ -74,13 +79,13 @@ export function compileFiltering(contribs, filterList) {
  * With filteredData.length, filteredAmountOthers, amounts we have exactly the right numbers to 
  * render the "(nn of mm)" statistics on the user interface next to each filter and facet.
  */
-export function computeFiltering(contribs, filterList, fieldValues, filterSettings) {
-
-  const filterChecks = new Map(filterList.map((filterSpec, filterId) => (
+export function computeFiltering(contribs, fields, filterList, fieldValues, filterSettings) {
+  const presentFilterList = filterList.filter(x => fields[x.field])
+  const filterChecks = new Map(presentFilterList.map((filterSpec, filterId) => (
     [filterId, (filterSpec.name === 'FullText' ? fullTextCheck : facetCheck)(filterSpec.field, filterSettings.get(filterId))]
   )));
   const filteredData = [];
-  const otherFilteredData = new Map(filterList.map((filterSpec, filterId) => [filterId, []]));
+  const otherFilteredData = new Map(presentFilterList.map((filterSpec, filterId) => [filterId, []]));
 
   /**
    * We determine for every row whether it passes all filters or not.
@@ -119,7 +124,7 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
          * the row has passed all filters
          */
         filteredData.push(row);
-        filterList.forEach((filterSpec, filterId) => {
+        presentFilterList.forEach((filterSpec, filterId) => {
           otherFilteredData.get(filterId).push(row);
         });
       }
@@ -132,7 +137,7 @@ export function computeFiltering(contribs, filterList, fieldValues, filterSettin
       }
     }
   }
-  const amounts = new Map(filterList.map((filterSpec, filterId) => {
+  const amounts = new Map(presentFilterList.map((filterSpec, filterId) => {
     const field = filterSpec.field;
     return [filterId, filterSpec.name === 'FullText' ? null : countFacets(field, fieldValues.get(field), otherFilteredData.get(filterId))];  
   }));

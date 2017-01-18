@@ -21,14 +21,15 @@ import Stats from './Stats.jsx'
  * @returns {Fragment}
  */
 const FullText = ({
-  filterId, filterField, filterSettings,
+  filterId, filterField, filterLabel,
+  filterSettings,
   filteredAmount, filteredAmountOthers,
   updFilter
 }) => (
   <div>
     <p><input
         type="text"
-        placeholder={`search in ${filterField}`}
+        placeholder={`search in ${filterLabel}`}
         value={filterSettings}
         onChange={event => updFilter(filterId, event.target.value)}
     />{' '}

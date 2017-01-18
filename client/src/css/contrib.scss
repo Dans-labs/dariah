@@ -1,0 +1,41 @@
+/* CONTRIB LAYOUT */
+
+$text-link-color: #d45510;
+
+a {
+    color: $text-link-color;
+    text-decoration: none;
+}
+a:active, a:hover {
+    color: $text-link-color;
+    text-decoration: underline;
+}
+#left, #right {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.value {
+    font-size: normal;
+}
+.label {
+    font-size: small;
+    font-weight: bold;
+    color: #555555;
+}
+
+.value.controlled {
+    font-size: small;
+    background-color: #ddddff;
+    font-weight: bold;
+}
+
+.value.free {
+    font-size: small;
+    background-color: #eeeeee;
+    font-size: small;
+}
+.value.free {
+    font-size: medium;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
