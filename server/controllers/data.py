@@ -40,7 +40,6 @@ class DataApi(object):
         criteria = self.perm.criteria['upd']
         mayUpdate = criteria(document)
         ufields = self.perm.projectors['upd'] if mayUpdate else {}
-        print(ufields)
         return dict(data=dict(row=document, fields=qprojector, perm=dict(upd=ufields)), msgs=msgs, good=True)
 
     def member_country(self):
