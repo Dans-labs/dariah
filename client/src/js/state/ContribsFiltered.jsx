@@ -47,13 +47,15 @@ class ContribsFiltered extends Component {
  * @returns {Fragment}
 */
   render() {
-    const { contribdata, countries } = this.state;
-    if (contribdata == null || countries == null) {
+    const { contribdata, countries, users } = this.state;
+    const { usersMap } = this.props;
+    if (contribdata == null || countries == null || users == null) {
       return <div/>
     }
     const { contribs, fields } = contribdata;
     const { fieldValues, filterInit } = compileFiltering(contribs, fields, filterList);
     const countriesMap = new Map(countries.map(x => [x._id, x]));
+    for (const u of users) {usersMap.set(u._id, u)}
     return <FilterCompute
       contribs={contribs}
       fields={fields}
@@ -70,8 +72,8 @@ class ContribsFiltered extends Component {
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { contribdata, countries } = this.state;
-    if (contribdata == null || countries == null) {
+    const { contribdata, countries, users } = this.state;
+    if (contribdata == null || countries == null || users == null) {
       getData([
           {
             type: 'db',
@@ -83,6 +85,11 @@ class ContribsFiltered extends Component {
             path: '/member_country',
             branch: 'countries',
           },
+          {
+            type: 'db',
+            path: `/users`,
+            branch: 'users',
+          },
         ],
         this,
         this.props.notification.component
@@ -91,4 +98,4 @@ class ContribsFiltered extends Component {
   }
 }
 
-export default withContext(saveState(ContribsFiltered, 'ContribsFiltered', {contribs: null, countries: null}))
+export default withContext(saveState(ContribsFiltered, 'ContribsFiltered', {contribs: null, countries: null, users: null}))

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>constructor - Documentation</title>
+    <title>ContribField - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">constructor</h1>
+    <h1 class="page-title">ContribField</h1>
     
 
     
@@ -40,10 +40,14 @@
 <header>
     
         <h2>
-            <span class="ancestors"><a href="module-React.html">React</a>~</span>
-        
-        constructor
+        ContribField
         </h2>
+        
+            <div class="class-description"><p><strong>stateful</strong> <a href="external-Component.html"><code>Component</code></a></p>
+<h2>A single contribution record</h2><p>Displays all fields that the user is entitled to read.
+With a control to edit the record.</p>
+<p>For the actual editing I intend to use
+<a href="https://github.com/kaivi/riek">React Inline Edit Kit</a></p></div>
         
     
 </header>
@@ -53,12 +57,23 @@
     
         
 
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="ContribField"><span class="type-signature"></span>new ContribField<span class="signature">(contribdata)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
 <dl class="details">
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="info_react.js.html">info/react.js</a>, <a href="info_react.js.html#line208">line 208</a>
+        <a href="state_ContribField.jsx.html">state/ContribField.jsx</a>, <a href="state_ContribField.jsx.html#line22">line 22</a>
     </li></ul></dd>
     
 
@@ -89,13 +104,6 @@
     
 
     
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="https://facebook.github.io/react/docs/react-component.html#constructor">constructor()</a></li>
-        </ul>
-    </dd>
-    
 
     
 </dl>
@@ -103,17 +111,81 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
         
-            <div class="description"><p>When a
-<a href="external-Component.html"><code>component</code></a>
-is being
-<a href="https://facebook.github.io/react/docs/react-component.html#render">rendered</a>
-this is the method to construct the corresponding React class.
-It will set up the 
-<a href="external-state.html"><code>state</code></a>.</p></div>
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
         
 
         
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>contribdata</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Contrib></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>(from <em>state</em>) The list of contribution records as it comes form mongo db,
+plus a list of fields that is provided for each row (dependent on user permissions)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     </div>
 
@@ -129,6 +201,161 @@ It will set up the
 
     
 
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="componentDidMount"><span class="type-signature"></span>componentDidMount<span class="signature">(contribs)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="state_ContribField.jsx.html">state/ContribField.jsx</a>, <a href="state_ContribField.jsx.html#line126">line 126</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>contribs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Contrib></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>(from <em>state</em>) The list of contribution records as it comes form mongo db</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The data fetched from the server.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
     
 
     

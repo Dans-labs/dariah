@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import ContribField from './ContribField.jsx'
+import { RIEToggle, RIEInput, RIETextArea, RIENumber, RIETags, RIESelect } from 'riek'
 
 import { getData } from '../helpers/data.js'
 import { withContext, saveState } from '../helpers/hoc.js'
@@ -19,7 +19,7 @@ import { withContext, saveState } from '../helpers/hoc.js'
  * {@link https://github.com/kaivi/riek|React Inline Edit Kit}
  *
  */
-class ContribItem extends Component {
+class ContribField extends Component {
 /**
  *
  * @method
@@ -32,16 +32,25 @@ class ContribItem extends Component {
     this.state = {};
   }
 
+  saveCallback(newState) {
+    this.setState(newState);
+  }
+
+  isStringAcceptable(string) {
+    return (string.length >= 1);  // Minimum 1 letter long
+  }
+
   repField(infoRaw, hasValueList, convert) {
     if (infoRaw == undefined) {return ''}
     if (hasValueList) {
       if (!Array.isArray(infoRaw)) {infoRaw = [infoRaw]}
-      return infoRaw.map((x, i) => this.repValue(x, i, convert));
+      return infoRaw.map(x => this.repValue(x, convert)).join(' | ');
     }
-    return this.repValue({value: infoRaw}, -1, convert)
+    return this.repValue({value: infoRaw}, convert)
   }
 
-  repValue(valRaw, i, convert) {
+
+  repValue(valRaw, convert) {
     let result;
     let val = valRaw.value;
     switch (convert) {
@@ -63,7 +72,7 @@ class ContribItem extends Component {
           let linkText = [fname, lname].filter(x => x).join(' '); 
           if (!linkText) {linkText = email}
           const namePart = (linkText && email)? (
-            <a href={`mailto:${email}`}>{linkText}</a>
+            `[${linkText}](mailto:${email})`
           ) : (
             linkText+email
           );
@@ -72,68 +81,41 @@ class ContribItem extends Component {
           const mayLoginPart = mayLogin?` active=${mayLogin} `:'';
           valRep = [namePart, eppnPart, authorityPart, mayLoginPart].filter(x => x).join('; ');
         }
-        result = [<span className="val" key={`v${i}`}>{valRep}</span>, ' '];
+        result = valRep;
         break;
       }
       case 'datetime': {
         const valRep = (new Date(val['$date'])).toISOString();
-        result = [<span className="val" key={`v${i}`}>{valRep}</span>, ' '];
+        result = valRep;
         break;
       }
       case 'url': {
-        result = [<a className="val" key={`v${i}`} target="_blank" href={val}>{val}</a>, ' '];
+        result = val;
         break;
       }
       default: {
-        result = [<span className="val" key={`v${i}`}>{val}</span>, ' '];
+        result = val;
         break;
       }
     }
     return result;
   }
 
-  parseFields() {
-    const { fieldData } = this.state;
-    const { row, fields, fieldSpecs, perm } = fieldData;
-    const frags = []
-    for (const fS of fieldSpecs) {
-      const { name, label, classNames } = fS;
-      if (!fields[name]) {continue}
-      const editable = !!perm.update[name];
-      const infoRaw = row[name];
-      const infoRep = this.repField(infoRaw, fS.hasValueList, fS.convert);
-      frags.push(
-        <tr key={name}>
-          <td className="label">{label}</td>
-          <td>{editable ? (
-            <ContribField
-              tag={`${row._id}_${name}`}
-              initValue={infoRaw}
-              rowId={row._id}
-              fieldSpec={fS}
-            />
-          ) : (
-            <p className={`value ${classNames}`}>{infoRep}</p>
-          )}</td>
-        </tr>
-      )
-    }
-    return frags
-  }
-
   render() {
-    const { fieldData } = this.state;
-    if (fieldData == null) {
-      return <div/>
-    }
+    const { currentValue, valueList } = this.state;
+    const { initValue, rowId, fieldSpec } = this.props;
+    const { name, hasValueList, multiple, allowNew, validation, widget, convert } = fieldSpec;
+    const fieldRep = (currentValue == null)?this.repField(initValue, hasValueList, convert):currentValue;
     return (
-      <div className="item">
-        <table>
-          <tbody>
-            {this.parseFields()}
-          </tbody>
-        </table>
-      </div>
+      <RIEInput
+        value={fieldRep}
+        change={this.saveCallback.bind(this)}
+        propName={name}
+        className="editable"
+        validate={this.isStringAcceptable}
+        classLoading="loading"
+        classInvalid="invalid"
+      />
     )
   }
 /**
@@ -142,22 +124,24 @@ class ContribItem extends Component {
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { fieldData } = this.state;
-    const { row } = this.props;
-    if (fieldData == null) {
-      getData([
-          {
-            type: 'db',
-            path: `/item_contrib?id=${row._id}`,
-            branch: 'fieldData',
-          },
-        ],
-        this,
-        this.props.notification.component
-      );
+    const { valueList } = this.state;
+    const { fieldName, hasValueList } = this.props;
+    if (hasValueList) {
+      if (valueList == null) {
+        const path = ((typeof valueList) == 'string')? valueList : `/value_list?list=${fieldName}`;
+        getData([
+            {
+              type: 'db',
+              path: path,
+              branch: 'valueList'
+            },
+          ],
+          this,
+          this.props.notification.component
+        );
+      }
     }
   }
 }
 
-export default withContext(saveState(ContribItem, 'ContribItem', {fieldData: null}))
-
+export default withContext(saveState(ContribField, 'ContribField', {currentValue: null, valueList: null}))

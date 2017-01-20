@@ -1,5 +1,6 @@
 from bottle import request
 from db import connectdb
+from contrib import contribModel
 
 class DataApi(object):
     def __init__(self):
@@ -20,32 +21,58 @@ class DataApi(object):
     def list_contrib(self):
         qfilter = self.perm.filters['read']
         qprojector = self.perm.projectors['read']
-        documents = list(self.dbm.contrib.find(qfilter, qprojector).sort('title', 1))
+        documents = list(self.dbm.contrib.find(qfilter, qprojector).sort('title', 1)) if qfilter != False else []
         return dict(data=dict(contribs=documents, fields=qprojector), msgs=[], good=True)
 
     def item_contrib(self):
         contribId = request.query.id
+        if len(contribId) > 32:
+            return dict(data=None, msgs=[dict(kind='error', text='contribution does not exist')], good=False)
         thisFilter = {'_id': contribId}
         qfilter = self.perm.filters['read']
         if qfilter != False:
             qfilter.update(thisFilter)
         qprojector = self.perm.projectors['read']
-        documents = list(self.dbm.contrib.find(qfilter, qprojector))
+        documents = list(self.dbm.contrib.find(qfilter, qprojector)) if qfilter != False else []
         ldoc = len(documents)
         if ldoc == 0:
             return dict(data=None, msgs=[dict(kind='error', text='contribution does not exist')], good=False)
         msgs = [] if ldoc == 1 else [dict(kind='warning', text='multiple contributions found')]
 
         document = documents[0]
-        criteria = self.perm.criteria['upd']
+        print(document['creator'])
+        criteria = self.perm.criteria['update']
         mayUpdate = criteria(document)
-        ufields = self.perm.projectors['upd'] if mayUpdate else {}
-        return dict(data=dict(row=document, fields=qprojector, perm=dict(upd=ufields)), msgs=msgs, good=True)
+        ufields = self.perm.projectors['update'] if mayUpdate else {}
+        return dict(
+            data=dict(
+                row=document,
+                fields=qprojector,
+                perm=dict(update=ufields),
+                fieldSpecs=[x for x in contribModel['fieldSpecs'] if x['name'] in qprojector or x['name'] in ufields],
+            ),
+            msgs=msgs,
+            good=True,
+        )
 
     def member_country(self):
         qfilter = self.perm.filters['read']
         thisProjector = {'inDARIAH': True}
         qprojector = self.perm.projectors['read']
         qprojector.update(thisProjector)
-        documents = list(self.dbm.country.find(qfilter, qprojector))
+        documents = list(self.dbm.country.find(qfilter, qprojector)) if qfilter != False else []
+        return dict(data=documents, msgs=[], good=True)
+
+    def users(self):
+        qfilter = self.perm.filters['read']
+        qprojector = self.perm.projectors['read']
+        documents = list(self.dbm.user.find(qfilter, qprojector)) if qfilter != False else []
+        return dict(data=documents, msgs=[], good=True)
+
+    def value_list(self):
+        valueList = request.query.list
+        qprojector = self.perm.projectors['read']
+        if valueList not in qprojector:
+            return dict(data=None, msgs=[dict(kind='error', text='no access to this list')], good=False)
+        documents = list(self.dbm.contrib.distinct(valueList, {})) if qfilter != False else []
         return dict(data=documents, msgs=[], good=True)

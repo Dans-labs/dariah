@@ -3,6 +3,8 @@ import bottle
 from beaker.middleware import SessionMiddleware
 from user import UserApi
 
+UNAUTH = 'x'
+
 class AuthApi(UserApi):
     def __init__(self, secret_file):
         UserApi.__init__(self)
@@ -36,7 +38,7 @@ class AuthApi(UserApi):
     def required(self, f): # decorator
         def g(*args, **kwargs):
             self.authenticate()
-            if self.userInfo.get('group', '') == '':
+            if self.userInfo.get('group', UNAUTH) == UNAUTH:
                 return dict(data=[], msgs=[dict(kind='warning', text='You need to be logged in to get this data')], good=True)
             return f(*args, **kwargs)
         return g
@@ -62,18 +64,18 @@ class AuthApi(UserApi):
             self._delete_session
 
         if self.userInfo == None:
-            self.userInfo = dict(group='')
+            self.userInfo = dict(group=UNAUTH)
         else:
             eppn = self.userInfo.get('eppn', None)
             if eppn == None:
-                self.userInfo['group'] = ''
+                self.userInfo['group'] = UNAUTH
             else:
                 authority = self.userInfo['authority']
                 inGroups = self.getInGroups()
                 self.userInfo['group'] = inGroups.get((eppn, authority), 'auth')
 
     def deauthenticate(self):
-        self.userInfo = dict(group='');
+        self.userInfo = dict(group=UNAUTH);
         self._delete_session()
 
     def _create_session(self):

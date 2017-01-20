@@ -1,6 +1,6 @@
 from db import connectdb
 from datetime import datetime
-from perm import groups, inGroupsTest
+from permissions import permissionModel
 
 class UserApi(object):
     def __init__(self):
@@ -28,6 +28,8 @@ class UserApi(object):
             self.testUsers[r['eppn']] = r
 
     def getInGroups(self):
+        groups = permissionModel['groups']
+        inGroupsTest = permissionModel['inGroupsTest']
         records = self.dbm.groups.find({})
         inGroups = {}
         inGroups.update(inGroupsTest)
@@ -39,6 +41,7 @@ class UserApi(object):
         return inGroups
 
     def deliver(self):
+        groups = permissionModel['groups']
         self.userInfo['groupDesc'] = groups.get(self.userInfo['group'], dict(desc='??'))['desc']
         return dict(data=self.userInfo, msgs=[], good=True)
 

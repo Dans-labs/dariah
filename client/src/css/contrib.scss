@@ -14,28 +14,51 @@ a:active, a:hover {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
-.value {
-    font-size: normal;
-}
 .label {
     font-size: small;
     font-weight: bold;
-    color: #555555;
+    color: #000000;
+    background-color: #dddddd;
 }
-
-.value.controlled {
-    font-size: small;
+.item {
+    background-color: #f3f3f3;
+    border-radius: 12px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+.value {
+    font-size: medium;
+}
+.value .val {
+    font-size: medium;
+}
+.value.tag .val {
+    line-height: 1.8;
     background-color: #ddddff;
-    font-weight: bold;
+    padding: 3px;
+    border-radius: 6px;
 }
-
-.value.free {
-    font-size: small;
-    background-color: #eeeeee;
-    font-size: small;
+.value.text .val {
+    font-size: medium;
+    font-family: sans-serif;
 }
-.value.free {
+.value.date .val {
+    font-size: medium;
+    font-family: monospace;
+    color: #004444;
+}
+.value.fixed .val {
     font-size: medium;
     font-family: monospace;
     white-space: pre-wrap;
+}
+.editable {
+    background-color: #ddffdd;
+}
+.loading {
+    font-style: italic;
+    background-color: #eeffee;
+}
+.invalid {
+    background-color: #ffdddd;
 }

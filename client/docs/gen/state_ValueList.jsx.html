@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>constructor - Documentation</title>
+    <title>state/ValueList.jsx - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,116 +27,89 @@
 
 <div id="main">
     
-    <h1 class="page-title">constructor</h1>
+    <h1 class="page-title">state/ValueList.jsx</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-            <span class="ancestors"><a href="module-React.html">React</a>~</span>
-        
-        constructor
-        </h2>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from 'react'
 
-<article>
-    <div class="container-overview">
-    
-        
+import { getData } from '../helpers/data.js'
+import { withContext, saveState } from '../helpers/hoc.js'
 
-<dl class="details">
+/**
+ * @class
+ * @classdesc
+ *
+ * **stateful** {@link external:Component|Component}
+ *
+ * ## A value list
+ *
+ * Displays all values for a field in the contrib list.
+ *
+ */
+class ValueList extends Component {
+/**
+ *
+ * @method
+ * @param {string} fieldName The name of the field to obtain the values from.
+ * @returns {Fragment}
+*/
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="info_react.js.html">info/react.js</a>, <a href="info_react.js.html#line208">line 208</a>
-    </li></ul></dd>
-    
+  render() {
+    const { fieldValues } = this.state;
+    if (fieldValues == null) {
+      return &lt;div/>
+    }
+    return (
+        &lt;table>
+          &lt;tbody>{
+              fieldValues.map(x => (
+                &lt;tr key={`val_${x._id}`}>&lt;td>{x._id}&lt;/td>&lt;td>{x.value}&lt;/td>&lt;/tr>
+              ))
+            }
+          &lt;/tbody>
+        &lt;/table>
+      )
+  }
+/**
+ * @method
+ * @param {Value[]} values (from *state*) The list of distinct contrib field values as it comes form mongo db
+ * @returns {Object} The data fetched from the server.
+*/
+  componentDidMount() {
+    const { fieldValues } = this.state;
+    const { fieldName } = this.props;
+    if (fieldValues == null) {
+      getData([
+          {
+            type: 'db',
+            path: `/value_list?list=${fieldName}`,
+            branch: 'fieldValues',
+          },
+        ],
+        this,
+        this.props.notification.component
+      );
+    }
+  }
+}
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="https://facebook.github.io/react/docs/react-component.html#constructor">constructor()</a></li>
-        </ul>
-    </dd>
-    
-
-    
-</dl>
+export default withContext(saveState(ValueList, 'ValueList', {fieldValues: null}))
 
 
-
-
-        
-            <div class="description"><p>When a
-<a href="external-Component.html"><code>component</code></a>
-is being
-<a href="https://facebook.github.io/react/docs/react-component.html#render">rendered</a>
-this is the method to construct the corresponding React class.
-It will set up the 
-<a href="external-state.html"><code>state</code></a>.</p></div>
-        
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+</code></pre>
+        </article>
+    </section>
 
 
 

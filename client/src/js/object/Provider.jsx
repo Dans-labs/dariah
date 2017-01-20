@@ -83,6 +83,7 @@ class Provider extends Component {
       store: new Store(),
       notification: {component: null},
       userInfo: new Map(),
+      usersMap: new Map(),
     };
     return {globals}
   }
