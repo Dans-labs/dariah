@@ -1,10 +1,10 @@
 from bottle import request
 from db import connectdb
-from contrib import contribModel
 
 class DataApi(object):
-    def __init__(self):
+    def __init__(self, CM):
         self.dbm = connectdb()
+        self.CM =CM
 
     def data(self, query, perm):
         self.perm = perm
@@ -40,7 +40,6 @@ class DataApi(object):
         msgs = [] if ldoc == 1 else [dict(kind='warning', text='multiple contributions found')]
 
         document = documents[0]
-        print(document['creator'])
         criteria = self.perm.criteria['update']
         mayUpdate = criteria(document)
         ufields = self.perm.projectors['update'] if mayUpdate else {}
@@ -49,7 +48,7 @@ class DataApi(object):
                 row=document,
                 fields=qprojector,
                 perm=dict(update=ufields),
-                fieldSpecs=[x for x in contribModel['fieldSpecs'] if x['name'] in qprojector or x['name'] in ufields],
+                fieldSpecs=[x for x in self.CM.fieldSpecs if x['name'] in qprojector or x['name'] in ufields],
             ),
             msgs=msgs,
             good=True,
@@ -66,13 +65,13 @@ class DataApi(object):
     def users(self):
         qfilter = self.perm.filters['read']
         qprojector = self.perm.projectors['read']
-        documents = list(self.dbm.user.find(qfilter, qprojector)) if qfilter != False else []
+        documents = list(self.dbm.users.find(qfilter, qprojector)) if qfilter != False else []
         return dict(data=documents, msgs=[], good=True)
 
     def value_list(self):
         valueList = request.query.list
         qprojector = self.perm.projectors['read']
         if valueList not in qprojector:
-            return dict(data=None, msgs=[dict(kind='error', text='no access to this list')], good=False)
-        documents = list(self.dbm.contrib.distinct(valueList, {})) if qfilter != False else []
+            return dict(data=None, msgs=[dict(kind='error', text='no access to list "{}"'.format(valueList))], good=False)
+        documents = list(self.dbm.contrib.distinct(valueList, {}))
         return dict(data=documents, msgs=[], good=True)

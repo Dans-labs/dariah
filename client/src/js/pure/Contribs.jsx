@@ -17,7 +17,7 @@ const Contribs = ({ filteredData, fields }) => (
   <div style={{height: '100%', overflow: 'auto'}}>
     <table>
       <tbody>{
-      filteredData.map((item) => (
+      filteredData.map(item => (
           <ContribTitle key={item._id} row={item} fields={fields} />
       ))
       }</tbody>

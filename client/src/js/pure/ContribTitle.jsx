@@ -21,7 +21,7 @@ const ContribTitle = ({ row, fields}) => (
     <td>
       <Alternatives tag={`contrib_${row._id}`}
         controlPlacement={control => (
-          <p>{control} {row.title}</p>
+          <p>{control} {row.title[0].value}</p>
         )}
         controls={[
           (handler => <a className='fa fa-chevron-down' href='#' onClick={handler}/>),

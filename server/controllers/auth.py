@@ -6,8 +6,8 @@ from user import UserApi
 UNAUTH = 'x'
 
 class AuthApi(UserApi):
-    def __init__(self, secret_file):
-        UserApi.__init__(self)
+    def __init__(self, PM, secret_file):
+        UserApi.__init__(self, PM)
 
         # determine production or devel
         self.isDevel = os.environ.get('REGIME', None) == 'devel'

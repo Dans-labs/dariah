@@ -5,10 +5,14 @@ from file import FileApi
 from data import DataApi
 from auth import AuthApi
 from perm import PermApi
+from contrib import ContribModel
+from permissions import PermissionModel
 
+CM = ContribModel()
+PM = PermissionModel(CM)
 File = FileApi()
-Data = DataApi()
-Auth = AuthApi('/opt/web-apps/dariah_jwt.secret')
+Data = DataApi(CM)
+Auth = AuthApi(PM, '/opt/web-apps/dariah_jwt.secret')
 app = Auth.app
 
 @route('/static/<filepath:path>')
@@ -35,7 +39,7 @@ def serveApiDbWho():
 @route('/api/db/<query:re:[a-z0-9_]+>')
 def serveApiDb(query):
     Auth.authenticate()
-    perm = PermApi(Auth)
+    perm = PermApi(Auth, PM)
     return Data.data(query, perm)
 
 @route('/slogout')

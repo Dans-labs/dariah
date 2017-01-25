@@ -1,25 +1,30 @@
+DEFAULTS = dict(
+    IDONLY     = False,
+    GETVALUES = '/value_list?list={}',
+)
+
 contribModel = dict(
 
     fieldSets = dict(
 
-        upublic = set('''
+        upublic = '''
             firstName
             lastName
-        '''.strip().split()),
+        ''',
 
-        uauth = set('''
+        uauth = '''
             firstName
             lastName
             email
             eppn
-        '''.strip().split()),
+        ''',
 
-        usystem = set('''
+        usystem = '''
             mayLogin
             authority
-        '''.strip().split()),
+        ''',
 
-        meta = set('''
+        meta = '''
             title
             year
             country
@@ -41,9 +46,9 @@ contribModel = dict(
             modifiedBy
             dateModified
             dateCreated
-        '''.strip().split()),
+        ''',
 
-        public = set('''
+        public = '''
             title
             year
             country
@@ -53,9 +58,9 @@ contribModel = dict(
             keywords
             vcc
             urlAcademic
-        '''.strip().split()),
+        ''',
 
-        own =  set('''
+        own =  '''
             typeContribution
             tadirahActivities
             tadirahObjects
@@ -66,251 +71,204 @@ contribModel = dict(
             costDescription
             contactPersonName
             contactPersonEmail
-        '''.strip().split()),
+        ''',
 
-        system =  set('''
+        system =  '''
             modifiedBy
             dateModified
-        '''.strip().split()),
+        ''',
     ),
 
     fieldSpecs = [
 
         dict(
-            name        ='title',
-            label       ='Title:',
-            hasValueList=False,
-            multiple    =False,
-            allowNew    =True,
-            validation  ='y',
-            widget      =dict(kind='input'),
-            convert     =None,
-            classNames  ='text',
+            name       = 'title',
+            label      = 'Title:',
+            valType    = 'text',
+            multiple   = False,
+            validation = dict(nonEmpty=True),
         ),
         dict(
-            name        ='year',
-            label       ='Year:',
-            hasValueList=True,
-            multiple    =False,
-            allowNew    =True,
-            validation  ='2000:2100',
-            widget      =dict(kind='input'),
-            convert     =None,
-            classNames  ='tag',
+            name       = 'year',
+            label      = 'Year:',
+            valType    = 'range',
+            multiple   = False,
+            validation = dict(nonEmpty=True, min=2000, max=2100, step=1),
         ),
         dict(
-            name        ='country',
-            label       ='Country(ies):',
-            hasValueList='member_country',
-            multiple    =False,
-            allowNew    =False,
-            validation  =None,
-            widget      =dict(kind='tag'),
-            convert     =None,
-            classNames  ='tag',
+            name       = 'dateCreated',
+            label      = 'created on:',
+            valType    = 'datetime',
+            multiple   = False,
+            validation = dict(nonEmpty=True),
         ),
         dict(
-            name        ='vcc',
-            label       ='VCC:',
-            hasValueList=True,
-            multiple    =True,
-            allowNew    =False,
-            validation  =None,
-            widget      =dict(kind='tag'),
-            convert     =None,
-            classNames  ='tag',
+            name       = 'dateModified',
+            label      = 'modified on:',
+            valType    = 'datetime',
+            multiple   = True,
+            validation = dict(nonEmpty=False),
         ),
         dict(
-            name        ='creator',
-            label       ='creator:',
-            hasValueList='users',
-            multiple    =False,
-            allowNew    =False,
-            validation  =None,
-            widget      =dict(kind='tag'),
-            convert     ='user',
-            classNames  ='tag',
+            name        = 'contactPersonName',
+            label       = 'contact person:',
+            valType     = 'text',
+            multiple    = False,
+            validation  = dict(nonEmpty=True),
         ),
         dict(
-            name        ='modifiedBy',
-            label       ='modified by:',
-            hasValueList='users',
-            multiple    =False,
-            allowNew    =False,
-            validation  =None,
-            widget      =dict(kind='tag'),
-            convert     ='user',
-            classNames  ='tag',
+            name        = 'contactPersonEmail',
+            label       = 'contact email:',
+            valType     = 'email',
+            multiple    = True,
+            validation  = dict(nonEmpty=True),
         ),
         dict(
-            name        ='dateCreated',
-            label       ='created on:',
-            hasValueList=None,
-            multiple    =False,
-            allowNew    =True,
-            validation  ='datetime',
-            widget      =dict(kind='input'),
-            convert     ='datetime',
-            classNames  ='date',
+            name        = 'urlContribution',
+            label       = 'Contribution url:',
+            valType     = 'url',
+            multiple    = True,
+            validation  = dict(nonEmpty=True),
         ),
         dict(
-            name        ='dateModified',
-            label       ='modified on:',
-            hasValueList=None,
-            multiple    =False,
-            allowNew    =True,
-            validation  ='datetime',
-            widget      =dict(kind='input'),
-            convert     ='datetime',
-            classNames  ='date',
+            name        = 'urlAcademic',
+            label       = 'Academic url:',
+            valType     = 'url',
+            multiple    = True,
+            validation  = dict(nonEmpty=True),
         ),
         dict(
-            name        ='contactPersonName',
-            label       ='contact person:',
-            hasValueList=False,
-            multiple    =False,
-            allowNew    =True,
-            validation  ='y',
-            widget      =dict(kind='input'),
-            convert     =None,
-            classNames  ='text',
+            name        = 'description',
+            label       = 'Description:',
+            valType     = 'textarea',
+            multiple    = False,
+            validation  = dict(nonEmpty=True),
+            convert     = 'markdown',
         ),
         dict(
-            name        ='contactPersonEmail',
-            label       ='contact email:',
-            hasValueList=True,
-            multiple    =False,
-            allowNew    =True,
-            validation  ='email',
-            widget      =dict(kind='input'),
-            convert     =None,
-            classNames  ='text',
+            name        = 'costTotal',
+            label       = 'cost (total):',
+            valType     = 'number',
+            multiple    = False,
+            validation  = dict(nonEmpty=True),
         ),
         dict(
-            name        ='disciplines',
-            label       ='Disciplines:',
-            hasValueList=True,
-            multiple    =True,
-            allowNew    =True,
-            validation  ='y',
-            widget      =dict(kind='tag'),
-            convert     =None,
-            classNames  ='tag',
+            name        = 'costDescription',
+            label       = 'cost (description):',
+            valType     = 'textarea',
+            validation  = dict(nonEmpty=True),
+            convert     = 'markdown',
+            multiple    = False,
         ),
         dict(
-            name        ='keywords',
-            label       ='Keywords:',
-            hasValueList=True,
-            multiple    =True,
-            allowNew    =True,
-            validation  ='y',
-            widget      =dict(kind='tag'),
-            convert     =None,
-            classNames  ='tag',
+            name        = 'creator',
+            label       = 'creator:',
+            valType     = 'rel',
+            multiple    = False,
+            validation  = dict(nonEmpty=True),
+            convert     = 'user',
+            allowNew    = False,
+            getValues   = '/users',
+            idOnly      = True,
         ),
         dict(
-            name        ='typeContribution',
-            label       ='Type:',
-            hasValueList=True,
-            multiple    =False,
-            allowNew    =False,
-            validation  =None,
-            widget      =dict(kind='tag'),
-            convert     =None,
-            classNames  ='tag',
+            name        = 'modifiedBy',
+            label       = 'modified by:',
+            valType     = 'rel',
+            multiple    = True,
+            validation  = dict(nonEmpty=False),
+            convert     = 'user',
+            allowNew    = False,
+            getValues   = '/users',
+            idOnly      = True,
         ),
         dict(
-            name        ='tadirahObjects',
-            label       ='Object(s):',
-            hasValueList=True,
-            multiple    =True,
-            allowNew    =False,
-            validation  =None,
-            widget      =dict(kind='tag'),
-            convert     =None,
-            classNames  ='tag',
+            name        = 'country',
+            label       = 'Country(ies):',
+            valType     = 'rel',
+            multiple    = False,
+            validation  = dict(nonEmpty=True),
+            convert     = 'country',
+            allowNew    = False,
+            getValues   = '/member_country',
         ),
         dict(
-            name        ='tadirahActivities',
-            label       ='Activity(ies):',
-            hasValueList=True,
-            multiple    =True,
-            allowNew    =False,
-            validation  =None,
-            widget      =dict(kind='tag'),
-            convert     =None,
-            classNames  ='tag',
+            name        = 'vcc',
+            label       = 'VCC:',
+            valType     = 'rel',
+            multiple    = True,
+            validation  = dict(nonEmpty=True),
+            allowNew    = False,
         ),
         dict(
-            name        ='tadirahTechniques',
-            label       ='Technique(s):',
-            hasValueList=True,
-            multiple    =True,
-            allowNew    =False,
-            validation  =None,
-            widget      =dict(kind='tag'),
-            convert     =None,
-            classNames  ='tag',
+            name        = 'disciplines',
+            label       = 'Disciplines:',
+            valType     = 'rel',
+            multiple    = True,
+            validation  = dict(nonEmpty=True),
+            allowNew    = True,
         ),
         dict(
-            name        ='urlContribution',
-            label       ='Contribution url:',
-            hasValueList=True,
-            multiple    =False,
-            allowNew    =True,
-            validation  ='url',
-            widget      =dict(kind='input'),
-            convert     ='url',
-            classNames  ='text',
+            name        = 'keywords',
+            label       = 'Keywords:',
+            valType     = 'rel',
+            multiple    = True,
+            validation  = dict(nonEmpty=True),
+            allowNew    = True,
         ),
         dict(
-            name        ='urlAcademic',
-            label       ='Academic url:',
-            hasValueList=True,
-            multiple    =False,
-            allowNew    =True,
-            validation  ='url',
-            widget      =dict(kind='input'),
-            convert     ='url',
-            classNames  ='text',
+            name        = 'typeContribution',
+            label       = 'Type:',
+            valType     = 'rel',
+            multiple    = False,
+            validation  = dict(nonEmpty=True),
+            allowNew    = False,
         ),
         dict(
-            name        ='description',
-            label       ='Description:',
-            hasValueList=False,
-            multiple    =False,
-            allowNew    =True,
-            validation  =None,
-            widget      =dict(kind='textarea'),
-            convert     ='markdown',
-            classNames  ='text',
+            name        = 'tadirahObjects',
+            label       = 'Object(s):',
+            valType     = 'rel',
+            multiple    = True,
+            validation  = dict(nonEmpty=False),
+            allowNew    = False,
         ),
         dict(
-            name        ='costTotal',
-            label       ='cost (total):',
-            hasValueList=False,
-            multiple    =False,
-            allowNew    =True,
-            validation  ='number',
-            widget      =dict(kind='input'),
-            convert     =None,
-            classNames  ='text',
+            name        = 'tadirahActivities',
+            label       = 'Activity(ies):',
+            valType     = 'rel',
+            multiple    = True,
+            validation  = dict(nonEmpty=False),
+            allowNew    = False,
         ),
         dict(
-            name        ='costDescription',
-            label       ='cost (description):',
-            hasValueList=False,
-            multiple    =False,
-            allowNew    =True,
-            validation  =None,
-            widget      =dict(kind='textarea'),
-            convert     ='markdown',
-            classNames  ='text',
+            name        = 'tadirahTechniques',
+            label       = 'Technique(s):',
+            valType     = 'rel',
+            multiple    = True,
+            validation  = dict(nonEmpty=False),
+            allowNew    = False,
         ),
     ],
 )
 
-fs = contribModel['fieldSets']
-fs['all'] = fs['public'] | fs['own'] | fs['system'] 
-fs['uall'] = fs['upublic'] | fs['uauth'] | fs['usystem'] 
+class ContribModel(object):
+    def __init__(self):
+        fs = contribModel['fieldSets']
+        for s in fs:
+            fs[s] = set(fs[s].strip().split())
 
+        fs['all'] = fs['public'] | fs['own'] | fs['system'] 
+        fs['uall'] = fs['upublic'] | fs['uauth'] | fs['usystem'] 
+
+        fs = contribModel['fieldSpecs']
+        for spec in fs:
+            valType = spec['valType']
+            if valType == 'rel':
+                if 'idOnly' not in spec:
+                    spec['idOnly'] = DEFAULTS['IDONLY']
+                if 'getValues' not in spec:
+                    spec['getValues'] = DEFAULTS['GETVALUES'].format(spec['name'])
+        for (k, v) in contribModel.items():
+            setattr(self, k, v)
+
+    

@@ -244,11 +244,12 @@ export const newFilterSettings = (filterSettings, filterId, data) => {
  */
 const fullTextCheck = (field, term) => {
   const search = term.toLowerCase()
-  if (!search) {
+  if (search == null || search == '') {
     return row => true;
   }
   return row => {
-    const val = row[field];
+    let val = row[field];
+    val = (val != null)?val[0].value : val;
     return val != undefined && val.toLowerCase().indexOf(search) !== -1;
   }
 }

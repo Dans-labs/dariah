@@ -32,89 +32,28 @@ class ContribItem extends Component {
     this.state = {};
   }
 
-  repField(infoRaw, hasValueList, convert) {
-    if (infoRaw == undefined) {return ''}
-    if (hasValueList) {
-      if (!Array.isArray(infoRaw)) {infoRaw = [infoRaw]}
-      return infoRaw.map((x, i) => this.repValue(x, i, convert));
-    }
-    return this.repValue({value: infoRaw}, -1, convert)
-  }
-
-  repValue(valRaw, i, convert) {
-    let result;
-    let val = valRaw.value;
-    switch (convert) {
-      case 'user': {
-        const { usersMap } = this.props;
-        const valId = valRaw._id;
-        let valRep;
-        if (!usersMap.has(valId)) {
-          valRep = 'UNKNOWN';
-        }
-        else {
-          const userData = usersMap.get(valId);
-          const fname = userData.firstName || '';
-          const lname = userData.lastName || '';
-          const email = userData.email || '';
-          const eppn = userData.eppn || '';
-          const authority = userData.authority || '';
-          const mayLogin = userData.mayLogin?'yes':'no';
-          let linkText = [fname, lname].filter(x => x).join(' '); 
-          if (!linkText) {linkText = email}
-          const namePart = (linkText && email)? (
-            <a href={`mailto:${email}`}>{linkText}</a>
-          ) : (
-            linkText+email
-          );
-          const eppnPart = eppn?` eppn=${eppn} `:'';
-          const authorityPart = authority?` authenticated by=${authority} `:'';
-          const mayLoginPart = mayLogin?` active=${mayLogin} `:'';
-          valRep = [namePart, eppnPart, authorityPart, mayLoginPart].filter(x => x).join('; ');
-        }
-        result = [<span className="val" key={`v${i}`}>{valRep}</span>, ' '];
-        break;
-      }
-      case 'datetime': {
-        const valRep = (new Date(val['$date'])).toISOString();
-        result = [<span className="val" key={`v${i}`}>{valRep}</span>, ' '];
-        break;
-      }
-      case 'url': {
-        result = [<a className="val" key={`v${i}`} target="_blank" href={val}>{val}</a>, ' '];
-        break;
-      }
-      default: {
-        result = [<span className="val" key={`v${i}`}>{val}</span>, ' '];
-        break;
-      }
-    }
-    return result;
-  }
 
   parseFields() {
     const { fieldData } = this.state;
     const { row, fields, fieldSpecs, perm } = fieldData;
     const frags = []
     for (const fS of fieldSpecs) {
-      const { name, label, classNames } = fS;
+      const { name, label, ...specs } = fS;
       if (!fields[name]) {continue}
       const editable = !!perm.update[name];
-      const infoRaw = row[name];
-      const infoRep = this.repField(infoRaw, fS.hasValueList, fS.convert);
       frags.push(
         <tr key={name}>
           <td className="label">{label}</td>
-          <td>{editable ? (
+          <td>
             <ContribField
               tag={`${row._id}_${name}`}
-              initValue={infoRaw}
+              initValues={row[name]}
               rowId={row._id}
-              fieldSpec={fS}
+              editable={editable}
+              name={name}
+              {...specs}
             />
-          ) : (
-            <p className={`value ${classNames}`}>{infoRep}</p>
-          )}</td>
+          </td>
         </tr>
       )
     }

@@ -2,6 +2,33 @@
 
 $text-link-color: #d45510;
 
+$field-foreground: #008888;
+$field-background: #ffffff;
+
+$field-foreground-edit: #000000;
+$field-background-edit: #eeffee;
+
+$rel-foreground: #ffffff;
+$rel-background: #00aadd;
+
+$rel-foreground-edit: #ffffff;
+$rel-background-edit: #00bb00;
+
+$text-foreground: #008888;
+$text-background: #ffffff;
+
+$text-foreground-edit: #000000;
+$text-background-edit: #eeffee;
+
+$absent-foreground: #ffffff;
+$absent-background: #ddaadd;
+
+$invalid-foreground: #ffffff;
+$invalid-background: #bb0000;
+
+$absent-foreground-edit: #ffffff;
+$absent-background-edit: #ff8800;
+
 a {
     color: $text-link-color;
     text-decoration: none;
@@ -23,37 +50,85 @@ a:active, a:hover {
 .item {
     background-color: #f3f3f3;
     border-radius: 12px;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    padding: 0 6px 0 6px;
 }
-.value {
-    font-size: medium;
+p.readonly {
+    color: $field-foreground;
+    background-color: $field-background;
 }
-.value .val {
-    font-size: medium;
+p.editable {
+    color: $field-foreground-edit;
+    background-color: $field-background-edit;
 }
-.value.tag .val {
+.value.url {
+    font-family: monospace;
+    font-size: large;
+    text-decoration: underline;
+}
+.value.email {
+    font-family: monospace;
+    font-size: large;
+    text-decoration: underline;
+}
+.value.datetime {
+    font-family: monospace;
+    font-size: large;
+}
+.value.range {
+    font-family: monospace;
+    font-size: large;
+}
+p.editable .value.invalid {
+    color: $invalid-foreground;
+    background-color: $invalid-background;
+}
+p.editable .value.rel.invalid {
+    color: $invalid-background;
+    background-color: $invalid-foreground;
+}
+p.readonly .value.text {
+}
+p.editable .value.text {
+    font-family: monospace;
+    font-size: large;
+}
+p.readonly .value.textarea {
+}
+p.editable .value.textarea {
+    font-family: monospace;
+    font-size: large;
+}
+.value.rel {
     line-height: 1.8;
-    background-color: #ddddff;
-    padding: 3px;
-    border-radius: 6px;
+    padding: 0 5px 0 5px;
+    border-radius: 5px;
 }
-.value.text .val {
-    font-size: medium;
-    font-family: sans-serif;
+p.readonly .value.rel {
+    color: $rel-foreground;
+    background-color: $rel-background;
 }
-.value.date .val {
-    font-size: medium;
-    font-family: monospace;
-    color: #004444;
+p.editable .value.rel {
+    color: $rel-foreground-edit;
+    background-color: $rel-background-edit;
 }
-.value.fixed .val {
+.absent {
+    line-height: 1.8;
+    padding: 0 5px 0 5px;
+    border-radius: 5px;
+}
+p.readonly .absent {
+    color: $absent-foreground;
+    background-color: $absent-background;
+}
+p.editable .absent {
+    color: $absent-foreground-edit;
+    background-color: $absent-background-edit;
+}
+.editing {
     font-size: medium;
-    font-family: monospace;
     white-space: pre-wrap;
-}
-.editable {
-    background-color: #ddffdd;
+    background-color: #ffffff;
+    color: #000088;
 }
 .loading {
     font-style: italic;
@@ -61,4 +136,42 @@ a:active, a:hover {
 }
 .invalid {
     background-color: #ffdddd;
+}
+.tags.loading > div {
+    background-color: grey;
+    color: white;
+}
+
+.editable-pill {
+    background-color: $rel-background-edit;
+    color: $rel-foreground-edit;
+    border-radius: 5px;
+    padding: 0 5px 0 5px;
+    cursor: pointer;
+}
+
+.tags, .tags div {
+    display: inline-block;
+}
+
+.tags > div {
+    padding-left: 5px;
+    margin: 0 3px 0 0;
+    border-radius: 5px;
+    background-color: $rel-background-edit;
+    color: $rel-foreground-edit;
+}
+
+.tags > div > div {
+    padding: 0 3px 0 0;
+}
+
+.tags input {
+    background-color: transparent;
+}
+
+.remove {
+    padding-right: 2px;
+    margin-left: 8px;
+    cursor: pointer;
 }

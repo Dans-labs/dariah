@@ -35,7 +35,7 @@ class ValueList extends Component {
         <table>
           <tbody>{
               fieldValues.map(x => (
-                <tr key={`val_${x._id}`}><td>{x._id}</td><td>{x.value}</td></tr>
+                <tr key={x._id}><td>{x._id}</td><td>{x.value}</td></tr>
               ))
             }
           </tbody>

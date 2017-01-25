@@ -1,10 +1,10 @@
 from db import connectdb
 from datetime import datetime
-from permissions import permissionModel
 
 class UserApi(object):
-    def __init__(self):
+    def __init__(self, PM):
         self.dbm = connectdb()
+        self.PM = PM
 
     def storeUpdate(self, newUserInfo):
         eppn = newUserInfo['eppn']
@@ -17,19 +17,19 @@ class UserApi(object):
 
     def getUser(self, eppn):
         authority = 'local' if self.isDevel else 'DARIAH'
-        record = self.dbm.user.find_one({'eppn': eppn, 'authority': authority})
+        record = self.dbm.users.find_one({'eppn': eppn, 'authority': authority})
         if record and '_id' in record: del record['_id']
         return record
 
     def getTestUsers(self):
         self.testUsers = {}
-        records = self.dbm.user.find({'authority': 'local'})
+        records = self.dbm.users.find({'authority': 'local'})
         for r in records:
             self.testUsers[r['eppn']] = r
 
     def getInGroups(self):
-        groups = permissionModel['groups']
-        inGroupsTest = permissionModel['inGroupsTest']
+        groups = self.PM.groups
+        inGroupsTest = self.PM.inGroupsTest
         records = self.dbm.groups.find({})
         inGroups = {}
         inGroups.update(inGroupsTest)
@@ -41,7 +41,7 @@ class UserApi(object):
         return inGroups
 
     def deliver(self):
-        groups = permissionModel['groups']
+        groups = self.PM.groups
         self.userInfo['groupDesc'] = groups.get(self.userInfo['group'], dict(desc='??'))['desc']
         return dict(data=self.userInfo, msgs=[], good=True)
 
@@ -56,7 +56,7 @@ class UserApi(object):
             statusLastLogin='Approved',
             mayLogin=True,
         ))
-        result = self.dbm.user.insert_one(record)
+        result = self.dbm.users.insert_one(record)
         return record
 
     def _update(self, userInfo, newUserInfo):
@@ -69,6 +69,6 @@ class UserApi(object):
             statusLastLogin='Approved' if userInfo.get('mayLogin', False) else 'Rejected',
         ))
         if '_id' in userInfo: del userInfo['_id']
-        result = self.dbm.user.update_one({'eppn': eppn}, {'$set': userInfo})
+        result = self.dbm.users.update_one({'eppn': eppn}, {'$set': userInfo})
         return userInfo
 

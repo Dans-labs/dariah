@@ -16,7 +16,7 @@ gulp.task('build_doc', function(cb) {
    * which will increase after every run somehow. We set it to null everytime.
    */
   if (config.source && config.source.include) { config.source.include = null }
-  gulp.src(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx'], {read: false})
+  gulp.src(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx', '!src/js/modules/**/*.*'], {read: false})
     .pipe(jsdoc(config, cb));
 });
 

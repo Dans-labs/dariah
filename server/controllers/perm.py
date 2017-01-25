@@ -1,8 +1,7 @@
-from permissions import permissionModel
-
 class PermApi(object):
-    def __init__(self, auth):
+    def __init__(self, auth, PM):
         self.userInfo = auth.userInfo
+        self.PM = PM
 
     def queryFromFilter(self, f):
         return {} if f == True else \
@@ -26,10 +25,10 @@ class PermApi(object):
         self.filters = {}
         self.criteria = {}
         self.projectors = {}
-        groups = permissionModel['groups']
-        actions = permissionModel['actions']
-        methods = permissionModel['methods']
-        permissions = permissionModel['permissions']
+        groups = self.PM.groups
+        actions = self.PM.actions
+        methods = self.PM.methods
+        permissions = self.PM.permissions
         if query not in methods:
             self.msgs.append(dict(kind='error', text='unknown query {}'.format(query)))
             return False
