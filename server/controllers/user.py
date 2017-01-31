@@ -29,10 +29,8 @@ class UserApi(object):
 
     def getInGroups(self):
         groups = self.PM.groups
-        inGroupsTest = self.PM.inGroupsTest
         records = self.dbm.groups.find({})
         inGroups = {}
-        inGroups.update(inGroupsTest)
         for r in records:
             eppn = r['eppn']
             authority = r['authority']

@@ -54,7 +54,6 @@ const styles = {
  * - filterSettings (what has the user typed or clicked?)
  * - filteredAmount, filteredAmountOthers, amounts (what are the statistics of the filtering?)
  * - updFilter (callback coming from a stateful parent, to be passed to children that receive user events)
- * - countries (extra information for the EUMap filter)
  * The outgoing properties are mostly the same, except that each individual filter
  * gets only the slice it needs.
  *
@@ -70,7 +69,6 @@ const styles = {
  * @param {Object[]} filteredAmount The number of rows that have passed all filters
  * @param {Map} filteredAmountOthers For each filter, the number of rows that have passed all other filters  
  * @param {Map} amounts For each filter, the number of rows that have passed all filters per valueId occurring in that field
- * @param {Map} countries The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
  * @returns {Fragment}
@@ -80,12 +78,10 @@ const Filters = ({
   filterSettings, fieldValues, 
   filteredAmount, filteredAmountOthers,
   amounts,
-  countries,
   updFilter
 }) => (
   <div style={styles}>
     {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
-      const needs = filter.name === 'EUMap' ? {countries} : {};
       const Fclass = filter.kind;
       return (
         <Fclass
@@ -100,7 +96,6 @@ const Filters = ({
           filteredAmountOthers={filteredAmountOthers.get(filterId)}
           amounts={amounts.get(filterId)}
           updFilter={updFilter}
-          {...needs}
         />
       );}
     )}

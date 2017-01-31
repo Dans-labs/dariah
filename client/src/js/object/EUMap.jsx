@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import ByValue from '../pure/ByValue.jsx'
 import L from 'leaflet'
 import {countryBorders} from '../helpers/europe.geo.js'
+import { withContext } from '../helpers/hoc.js'
 
 /**
  * A complex component! 
@@ -101,13 +102,13 @@ const computeRadius = (iso2, filteredAmountOthers, amounts) => {
  * @param {Object} feature A feature (i.e. a country) in the   
  * {@link module:europe_geo_js|geojson}
  * file of European countries
- * @param {Map} countries The country information as fetched from the database on the server.
+ * @param {Map} countriesMap The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {boolean} Whether the country in question is a member of DARIAH.
  */
-const inDariah = (feature, countries) => {
+const inDariah = (feature, countriesMap) => {
   const iso2 = feature.properties.iso2;
-  return countries.has(iso2) && countries.get(iso2).isMember
+  return countriesMap.has(iso2)
 }
 
 /**
@@ -130,13 +131,13 @@ class EUMap extends Component {
  * to get the country facets.
  * And it puts a div in place that will receive the map.
  * @method
- * @param {Map} countries This parameter is not used, but mentioned to select all the other parameters to
+ * @param {Map} countriesMap This parameter is not used, but mentioned to select all the other parameters to
  * pass on
  * @param {Object[]} byValueProps The remaining properties, to be passes to the {ByValue} component.
  * @returns {Fragment}
  */
   render() {
-    const { countries, ...byValueProps } = this.props;
+    const { countriesMap, ...byValueProps } = this.props;
     return (
       <div>
         <div ref="eumap" style={{
@@ -160,12 +161,12 @@ class EUMap extends Component {
  * @param {Map} filterSettings - the current settings of the country facets
  * @param {number} filteredAmountOthers - how many rows pass all other filters
  * @param {Map} amounts` - `filteredAmountOthers`, but more specific: the amounts per faceted value
- * @param {Map} countries The country information as fetched from the database on the server.
+ * @param {Map} countriesMap The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {DOM}
  */
   componentDidMount() {
-    const { filterSettings, filteredAmountOthers, amounts, countries } = this.props;
+    const { filterSettings, filteredAmountOthers, amounts, countriesMap } = this.props;
     this.map = L.map(this.refs.eumap, {
       attributionControl: false,
       center: mapOptions.MAP_CENTER,
@@ -173,9 +174,9 @@ class EUMap extends Component {
       maxBounds: mapOptions.MAP_BOUNDS,
     });
     L.geoJSON(countryBorders, {
-      style: feature => mapOptions.COUNTRY_STYLE[inDariah(feature, countries)],
+      style: feature => mapOptions.COUNTRY_STYLE[inDariah(feature, countriesMap)],
       onEachFeature: feature => {
-        if (inDariah(feature, countries)) {
+        if (inDariah(feature, countriesMap)) {
           const fprops = feature.properties;
           const iso2 = fprops.iso2;
           const isOn = filterSettings.get(iso2);
@@ -212,4 +213,4 @@ class EUMap extends Component {
   }
 }
 
-export default EUMap
+export default withContext(EUMap)

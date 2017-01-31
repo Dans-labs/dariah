@@ -48,18 +48,17 @@ class ContribsFiltered extends Component {
 */
   render() {
     const { contribdata, countries, users } = this.state;
-    const { usersMap } = this.props;
+    const { usersMap, countriesMap } = this.props;
     if (contribdata == null || countries == null || users == null) {
       return <div/>
     }
     const { contribs, fields } = contribdata;
     const { fieldValues, filterInit } = compileFiltering(contribs, fields, filterList);
-    const countriesMap = new Map(countries.map(x => [x._id, x]));
-    for (const u of users) {usersMap.set(u._id, u)}
+    for (const x of users) {usersMap.set(x._id, x)}
+    for (const x of countries) {countriesMap.set(x._id, x)}
     return <FilterCompute
       contribs={contribs}
       fields={fields}
-      countries={countriesMap}
       fieldValues={fieldValues}
       filterInit={filterInit}
     />

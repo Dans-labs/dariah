@@ -36,7 +36,6 @@ class FilterCompute extends Component {
  * Calls {@link module:filtering.computeFiltering|computeFiltering} before the actual rendering.
  *
  * @param {Map} filterSettings (from *state*) The current state of the facets belonging to this filter
- * @param {Map} countries The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
  * dependent on the permissions of the current user.
@@ -45,7 +44,7 @@ class FilterCompute extends Component {
  */
   render() {
     const { filterSettings } = this.state;
-    const { countries, contribs, fields, fieldValues } = this.props;
+    const { contribs, fields, fieldValues } = this.props;
     const {
       filteredData, filteredAmountOthers, amounts
     } = computeFiltering(
@@ -59,7 +58,6 @@ class FilterCompute extends Component {
           >Showing {filteredData.length} of {contribs.length}</p>
           <Filters
             fields={fields}
-            countries={countries}
             fieldValues={fieldValues}
             filteredAmount={filteredData.length}
             filteredAmountOthers={filteredAmountOthers}

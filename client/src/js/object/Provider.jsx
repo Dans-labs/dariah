@@ -84,6 +84,7 @@ class Provider extends Component {
       notification: {component: null},
       userInfo: new Map(),
       usersMap: new Map(),
+      countriesMap: new Map(),
     };
     return {globals}
   }

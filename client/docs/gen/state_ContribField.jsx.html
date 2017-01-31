@@ -99,6 +99,19 @@ const userAsString = (valRaw, usersMap) => {
   return valRep
 }
 
+const countryAsString = (valRaw, countriesMap) => {
+  const valId = valRaw._id;
+  let valRep;
+  if (!countriesMap.has(valId)) {
+    valRep = 'UNKNOWN';
+  }
+  else {
+    const countryData = countriesMap.get(valId);
+    valRep = countryData.name;
+  }
+  return valRep
+}
+
 const validate = (val, valType, validation) => {
   let rawVal = val;
   let vstatus = true;
@@ -214,7 +227,7 @@ class ContribField extends Component {
 
   checkForSave(info) {
     const { newValues, newReasons } = info;
-    const { name, rowId, valType, validation, convert, multiple, allowNew } = this.props;
+    const { rowId, valType, validation, multiple, allowNew } = this.props;
     const { savedValues } = this.state;
     const valid = Object.keys(newReasons).every(i => !newReasons[i]);
     let changed = false;
@@ -278,14 +291,17 @@ class ContribField extends Component {
   }
 
   valueAsString(valRaw) {
-    const { name, valType, convert, usersMap } = this.props;
+    const { valType, convert, usersMap, countriesMap } = this.props;
     switch (valType) {
       case 'rel': {
-        const valval = valRaw.value;
         switch (convert) {
-          case 'user': {return userAsString(valRaw, usersMap)}
-          case 'country': {return `${valRaw._id}=${valval}`}
-          default: {return valval}
+          case 'user': {
+            return userAsString(valRaw, usersMap)
+          }
+          case 'country': {
+            return countryAsString(valRaw, countriesMap)
+          }
+          default: {return valRaw.value}
         }
       }
       case 'datetime': {
@@ -308,9 +324,27 @@ class ContribField extends Component {
     return &lt;span key={i} className={classNames.join(' ')}>{text}&lt;/span>
   }
 
-  relSelect(i, _id, classNames, text) {
+  relOptions() {
     const { relValues } = this.state;
-    const { name } = this.props;
+    return relValues.map(rv => (&lt;p className="option" key={`rv_${rv._id}`}>{rv.value}&lt;/p>))
+  }
+  userOptions() {
+    const { usersMap } = this.props;
+    return [...usersMap.values()].map(rv => {
+      const rtext = this.valueAsString(rv);
+      return &lt;p className="option" key={`rv_${rv._id}`}>{rtext}&lt;/p>
+    })
+  }
+  countryOptions() {
+    const { countriesMap } = this.props;
+    return [...countriesMap.values()].map(rv => {
+      const rtext = this.valueAsString(rv);
+      return &lt;p className="option" key={`rv_${rv._id}`}>{rtext}&lt;/p>
+    })
+  }
+
+  relSelect(i, _id, classNames, text) {
+    const { convert } = this.props;
     return (
       &lt;div className="select" key={i}>
         &lt;p key={i} className={classNames.join(' ')}>{text}
@@ -319,11 +353,11 @@ class ContribField extends Component {
             onClick={this.removeVal.bind(this, 0, _id)}
           />
         &lt;/p>
+        &lt;div className="options">
         {
-          relValues.map(rv => (
-            &lt;p className="option" key={`rv_${rv._id}`}>{rv.value}&lt;/p>
-          ))
+          (convert == 'user')? this.userOptions() : ((convert == 'country')? this.countryOptions() : this.relOptions())
         }
+      &lt;/div>
       &lt;/div>
     );
   }
@@ -365,6 +399,7 @@ class ContribField extends Component {
 
   valuesAsReadonly() {
     const { curValues } = this.state;
+    const {name } = this.props;
     if (curValues.length == 0) {return &lt;span className='absent'>no value&lt;/span>}
     const { valType, multiple } = this.props;
     const methods = readonlyMakeFragment(this);
@@ -398,9 +433,7 @@ class ContribField extends Component {
     else if (changed) {progIcon = 'fa-deviantart changed'}
     else {progIcon = 'fa-circle-o'}
     progIcon += ' fa progress';
-    const fragments = [
-      &lt;span key={name} className={progIcon}/>
-    ];
+    const fragments = []
     curValues.forEach((v, i) => {
       const text = this.valueAsString(v);
       const _id = v._id;
@@ -426,13 +459,15 @@ class ContribField extends Component {
       }
       
     });
+    fragments.push(&lt;span key={name} className={progIcon}/>);
     return fragments
   }
 
   render() {
     const { relValues } = this.state;
-    const { editable, valType } = this.props;
-    if (editable &amp;&amp; relValues == null &amp;&amp; (valType == 'rel')) {
+    const { editable, valType, convert } = this.props;
+    const { usersMap, countriesMap } = this.props;
+    if (editable &amp;&amp; relValues == null &amp;&amp; valType == 'rel' &amp;&amp; convert != 'user' &amp;&amp; convert != 'country') {
       return null;
     }
     return editable ? (
@@ -448,9 +483,9 @@ class ContribField extends Component {
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { relValues } = this.state;
-    const { valType, getValues } = this.props;
-    if (valType == 'rel' &amp;&amp; relValues == null) {
+    let { relValues } = this.state;
+    const { valType, getValues, convert, usersMap, countriesMap } = this.props;
+    if (valType == 'rel' &amp;&amp; convert != 'user' &amp;&amp; convert != 'country' &amp;&amp; relValues == null) {
       getData([
           {
             type: 'db',
@@ -478,7 +513,7 @@ export default withContext(saveState(ContribField, 'ContribField', normalizeValu
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Tue Jan 31 2017 11:35:04 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Tue Jan 31 2017 15:08:10 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

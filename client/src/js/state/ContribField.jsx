@@ -60,6 +60,19 @@ const userAsString = (valRaw, usersMap) => {
   return valRep
 }
 
+const countryAsString = (valRaw, countriesMap) => {
+  const valId = valRaw._id;
+  let valRep;
+  if (!countriesMap.has(valId)) {
+    valRep = 'UNKNOWN';
+  }
+  else {
+    const countryData = countriesMap.get(valId);
+    valRep = countryData.name;
+  }
+  return valRep
+}
+
 const validate = (val, valType, validation) => {
   let rawVal = val;
   let vstatus = true;
@@ -175,7 +188,7 @@ class ContribField extends Component {
 
   checkForSave(info) {
     const { newValues, newReasons } = info;
-    const { name, rowId, valType, validation, convert, multiple, allowNew } = this.props;
+    const { rowId, valType, validation, multiple, allowNew } = this.props;
     const { savedValues } = this.state;
     const valid = Object.keys(newReasons).every(i => !newReasons[i]);
     let changed = false;
@@ -239,14 +252,17 @@ class ContribField extends Component {
   }
 
   valueAsString(valRaw) {
-    const { name, valType, convert, usersMap } = this.props;
+    const { valType, convert, usersMap, countriesMap } = this.props;
     switch (valType) {
       case 'rel': {
-        const valval = valRaw.value;
         switch (convert) {
-          case 'user': {return userAsString(valRaw, usersMap)}
-          case 'country': {return `${valRaw._id}=${valval}`}
-          default: {return valval}
+          case 'user': {
+            return userAsString(valRaw, usersMap)
+          }
+          case 'country': {
+            return countryAsString(valRaw, countriesMap)
+          }
+          default: {return valRaw.value}
         }
       }
       case 'datetime': {
@@ -269,9 +285,27 @@ class ContribField extends Component {
     return <span key={i} className={classNames.join(' ')}>{text}</span>
   }
 
-  relSelect(i, _id, classNames, text) {
+  relOptions() {
     const { relValues } = this.state;
-    const { name } = this.props;
+    return relValues.map(rv => (<p className="option" key={`rv_${rv._id}`}>{rv.value}</p>))
+  }
+  userOptions() {
+    const { usersMap } = this.props;
+    return [...usersMap.values()].map(rv => {
+      const rtext = this.valueAsString(rv);
+      return <p className="option" key={`rv_${rv._id}`}>{rtext}</p>
+    })
+  }
+  countryOptions() {
+    const { countriesMap } = this.props;
+    return [...countriesMap.values()].map(rv => {
+      const rtext = this.valueAsString(rv);
+      return <p className="option" key={`rv_${rv._id}`}>{rtext}</p>
+    })
+  }
+
+  relSelect(i, _id, classNames, text) {
+    const { convert } = this.props;
     return (
       <div className="select" key={i}>
         <p key={i} className={classNames.join(' ')}>{text}
@@ -280,11 +314,11 @@ class ContribField extends Component {
             onClick={this.removeVal.bind(this, 0, _id)}
           />
         </p>
+        <div className="options">
         {
-          relValues.map(rv => (
-            <p className="option" key={`rv_${rv._id}`}>{rv.value}</p>
-          ))
+          (convert == 'user')? this.userOptions() : ((convert == 'country')? this.countryOptions() : this.relOptions())
         }
+      </div>
       </div>
     );
   }
@@ -326,6 +360,7 @@ class ContribField extends Component {
 
   valuesAsReadonly() {
     const { curValues } = this.state;
+    const {name } = this.props;
     if (curValues.length == 0) {return <span className='absent'>no value</span>}
     const { valType, multiple } = this.props;
     const methods = readonlyMakeFragment(this);
@@ -359,9 +394,7 @@ class ContribField extends Component {
     else if (changed) {progIcon = 'fa-deviantart changed'}
     else {progIcon = 'fa-circle-o'}
     progIcon += ' fa progress';
-    const fragments = [
-      <span key={name} className={progIcon}/>
-    ];
+    const fragments = []
     curValues.forEach((v, i) => {
       const text = this.valueAsString(v);
       const _id = v._id;
@@ -387,13 +420,15 @@ class ContribField extends Component {
       }
       
     });
+    fragments.push(<span key={name} className={progIcon}/>);
     return fragments
   }
 
   render() {
     const { relValues } = this.state;
-    const { editable, valType } = this.props;
-    if (editable && relValues == null && (valType == 'rel')) {
+    const { editable, valType, convert } = this.props;
+    const { usersMap, countriesMap } = this.props;
+    if (editable && relValues == null && valType == 'rel' && convert != 'user' && convert != 'country') {
       return null;
     }
     return editable ? (
@@ -409,9 +444,9 @@ class ContribField extends Component {
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { relValues } = this.state;
-    const { valType, getValues } = this.props;
-    if (valType == 'rel' && relValues == null) {
+    let { relValues } = this.state;
+    const { valType, getValues, convert, usersMap, countriesMap } = this.props;
+    if (valType == 'rel' && convert != 'user' && convert != 'country' && relValues == null) {
       getData([
           {
             type: 'db',
