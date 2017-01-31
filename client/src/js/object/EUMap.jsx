@@ -90,7 +90,7 @@ const mapOptions = {
 */
 const computeRadius = (iso2, filteredAmountOthers, amounts) => { 
   const amount = amounts ? amounts.has(iso2) ? amounts.get(iso2) : 0 : 0;
-  if (!amount) {return 0}
+  if (amount == 0) {return 0}
   const proportional = mapOptions.MAX_RADIUS * amount / filteredAmountOthers;
   if (filteredAmountOthers < mapOptions.LEVEL_OFF) {return proportional}
   return mapOptions.LEVEL_OFF * Math.sqrt(proportional);
@@ -107,7 +107,7 @@ const computeRadius = (iso2, filteredAmountOthers, amounts) => {
  */
 const inDariah = (feature, countries) => {
   const iso2 = feature.properties.iso2;
-  return countries.has(iso2) && countries.get(iso2).inDARIAH
+  return countries.has(iso2) && countries.get(iso2).isMember
 }
 
 /**

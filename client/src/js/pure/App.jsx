@@ -47,7 +47,7 @@ const App = ({children}) => (
         <li><NavLink to="/docs/about.md">About</NavLink></li>
       </ul>
       <ul className="nav" style={{height: '30%', verticalAlign: 'bottom'}} >
-        <li><NavLink to="/tech/docs/gen/index.html">tech doc</NavLink></li>
+        <li><a href="/api/file/tech/docs/gen/index.html" target="_blank">tech doc</a></li>
         <li><NavLink to="/tech/docs/design.pdf">diagrams</NavLink></li>
         <li><NavLink to="/tech/docs/deploy.md">deploy</NavLink></li>
       </ul>

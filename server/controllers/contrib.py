@@ -24,6 +24,13 @@ contribModel = dict(
             authority
         ''',
 
+        call = '''
+            name
+            isMember
+            latitude
+            longitude
+        ''',
+
         meta = '''
             title
             year
@@ -87,13 +94,6 @@ contribModel = dict(
             valType    = 'text',
             multiple   = False,
             validation = dict(nonEmpty=True),
-        ),
-        dict(
-            name       = 'year',
-            label      = 'Year:',
-            valType    = 'range',
-            multiple   = False,
-            validation = dict(nonEmpty=True, min=2000, max=2100, step=1),
         ),
         dict(
             name       = 'dateCreated',
@@ -191,6 +191,13 @@ contribModel = dict(
             convert     = 'country',
             allowNew    = False,
             getValues   = '/member_country',
+        ),
+        dict(
+            name       = 'year',
+            label      = 'Year:',
+            valType    = 'rel',
+            multiple   = False,
+            validation = dict(nonEmpty=True, min=2000, max=2100, step=1),
         ),
         dict(
             name        = 'vcc',

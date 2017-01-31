@@ -56,9 +56,9 @@ class DataApi(object):
 
     def member_country(self):
         qfilter = self.perm.filters['read']
-        thisProjector = {'inDARIAH': True}
+        thisFilter = {'isMember': True}
+        qfilter.update(thisFilter)
         qprojector = self.perm.projectors['read']
-        qprojector.update(thisProjector)
         documents = list(self.dbm.country.find(qfilter, qprojector)) if qfilter != False else []
         return dict(data=documents, msgs=[], good=True)
 

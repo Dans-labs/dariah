@@ -48,7 +48,7 @@ const ByValue = ({
   filteredAmount, filteredAmountOthers,
   amounts, maxCols, updFilter,
 }) => { 
-  const rows = placeFacets(filterField, fieldValues, maxCols);
+  const rows = placeFacets(fieldValues, maxCols);
   const statStyle = {align: 'right'};
   return (
     <div>

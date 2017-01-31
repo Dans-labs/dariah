@@ -249,7 +249,7 @@ const fullTextCheck = (field, term) => {
   }
   return row => {
     let val = row[field];
-    val = (val != null)?val[0].value : val;
+    val = (val != null)?val[0] : val;
     return val != undefined && val.toLowerCase().indexOf(search) !== -1;
   }
 }
@@ -272,7 +272,7 @@ const facetCheck = (field, facetValues) => {
   }
   return row => {
     const fieldVals = row[field];
-    if (!fieldVals) {
+    if (fieldVals == null || fieldVals.length == 0) {
       return facetValues.get('');
     }
     for (const {_id: valueId} of fieldVals) {
@@ -303,7 +303,7 @@ function countFacets(field, fieldValues, rows) {
   }
   for (const row of rows) {
     const fieldVals = row[field];
-    if (!fieldVals) {
+    if (fieldVals == null || fieldVals.length == 0) {
       facetAmounts.set('', facetAmounts.get('') + 1); 
     }
     else {
@@ -329,14 +329,14 @@ function countFacets(field, fieldValues, rows) {
  * be less than so many columns!
  *
  * @function
- * @param {string} field - the field name
  * @param {Map} fieldValues - the facets as mapping from valueIds to valueRepresentations
  * @param {number} maxCols - the maximum number of columns in the resulting table
  * @returns {Array} A table (nested array) of facets, ordered by facet value, vertical first.
  */
-export function placeFacets(field, fieldValues, maxCols) {
-  if (!field || !fieldValues) {return []}
+export function placeFacets(fieldValues, maxCols) {
+  if (fieldValues == null) {return []}
   const facets = [...fieldValues.entries()].sort((x,y) => x[1].localeCompare(y[1]));
+  if (facets.length == 0) {return []}
   const rows = [];
   const lf = facets.length;
   const nrows = Math.floor(lf / maxCols) + ((lf % maxCols) ? 1 : 0);

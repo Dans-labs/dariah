@@ -68,7 +68,7 @@ export function columnStyle(kind) {
     overflow: 'auto',
     'WebkitOverflowScrolling': 'touch',
     float: floatSpec[kind],
-    'paddingLeft': !kind ? '1em' : '0em',
-    'paddingRight': !kind ? '1em' : '0em',
+    'paddingLeft': (kind == '') ? '1em' : '0em',
+    'paddingRight': (kind == '') ? '1em' : '0em',
   }
 }

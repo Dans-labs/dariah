@@ -160,7 +160,7 @@ def permissionModel(fs):
                 all = dict(
                     read = dict(
                         rows = True,
-                        fields = fs['all'],
+                        fields = fs['call'],
                     ),
                 ),
             ),

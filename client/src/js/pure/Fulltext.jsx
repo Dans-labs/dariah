@@ -6,7 +6,7 @@ import Stats from './Stats.jsx'
  *
  * Displays a full text search input field.
  * The characters entered in this field are passed upwards by means of a callback.
- * This is incremental search!
+ * This is incremental search.
  * Not only the full text search, but also all other filters are computed upon each character entered.
  *
  * Note that we use the strategy of {@link external:ControlledComponent|controlled components} here.

@@ -3,10 +3,32 @@ import React, { Component } from 'react'
 import { getData } from '../helpers/data.js'
 import { withContext, saveState } from '../helpers/hoc.js'
 
+const sizes = {
+  url: 50,
+  email: 30,
+  range: 6,
+  datetime: 25,
+  text: 50,
+  _max: 50,
+}
+
+const readonlyMakeFragment = obj => ({
+  url: obj.urlFragment.bind(obj),
+  email: obj.emailFragment.bind(obj),
+  markdown: obj.markdownFragment.bind(obj),
+  _default: obj.defaultFragment.bind(obj),
+})
+
+const editMakeFragment = obj => ({
+  rel: obj.relEditFragment.bind(obj),
+  textarea: obj.textareaEditFragment.bind(obj),
+  _default: obj.defaultEditFragment.bind(obj),
+})
+
 const normalizeValues = ({initValues}) => {
   const savedValues = (initValues == null) ? [] : initValues;
   const curValues = [...savedValues];
-  return { curValues, savedValues, reasons: {}, save: {}, relValues: null }
+  return { curValues, savedValues, reasons: {}, saving: {}, changed: false, valid: true, relValues: null }
 }
 
 const userAsString = (valRaw, usersMap) => {
@@ -24,7 +46,7 @@ const userAsString = (valRaw, usersMap) => {
     const authority = userData.authority || '';
     const mayLogin = userData.mayLogin?'yes':'no';
     let linkText = [fname, lname].filter(x => x).join(' '); 
-    if (!linkText) {linkText = email}
+    if (linkText == '') {linkText = email}
     const namePart = (linkText && email)? (
       `[${linkText}](mailto:${email})`
     ) : (
@@ -64,7 +86,6 @@ const validate = (val, valType, validation) => {
     }
   }
   if (valType == 'datetime') {
-    console.log('VALIDATE val=', val);
     let times;
     try {
       times = Date.parse(val);
@@ -72,18 +93,17 @@ const validate = (val, valType, validation) => {
     catch (error) {
       reason = `not a valid date/time - ${error}`;
       vstatus = false;
-      rawVal = null;
+      rawVal = val;
     }
     if (isNaN(times)) {
       reason = `not a valid date/time`;
       vstatus = false;
-      rawVal = null;
+      rawVal = val;
     }
     else {
       rawVal = {'$date': times}
     }
   }
-  console.log(vstatus);
   return { rawVal, vstatus, reason};
 }
 
@@ -111,55 +131,72 @@ class ContribField extends Component {
  * @returns {Fragment}
 */
 
-  newValToState(i, newVal, reason) {
-    const newValues = [...this.state.curValues];
-    newValues[i] = newVal;
-    this.setState({
-      ...this.state,
-      curValues: newValues,
-      reasons: {...this.state.reasons, [i]: reason}
-    })
-  }
-
-  newSaveToState(newValues) {
-    this.setState({
-      ...this.state,
-      savedValues: [...newValues],
-    })
-  }
-
-  changeVal(i, _id, event) {
-    event.preventDefault();
-    const { valType, validation } = this.props;
-    const newVal = event.target.value;
-    const { rawVal, vstatus, reason } = validate(newVal, valType, validation);
-    const sendVal = { _id }
-    if (rawVal != null) {
-      sendVal.value = rawVal
+  setValToState(i, newVal, _id, doSave) {
+    const { reasons } = this.state;
+    let newReasons;
+    let newValues = [...this.state.curValues];
+    if (newVal == null) {
+      newValues = newValues.filter((x,j) => j != i) 
+      newReasons = reasons;
     }
     else {
-      sendVal.dvalue = newVal
+      const { valType, validation } = this.props;
+      const { rawVal, vstatus, reason } = validate(newVal, valType, validation);
+      const sVal = (rawVal == null)?newVal:rawVal
+      const sendVal = (_id == null)? sVal:{ _id, value: sVal }
+      newValues[i] = sendVal;
+      newReasons = {...this.state.reasons, [i]: reason};
     }
-    this.newValToState(i, sendVal, reason);
+    const { valid, changed } = this.checkForSave({ newValues, newReasons });
+    if (!doSave || !valid || !changed) {
+      this.setState({
+        ...this.state,
+        curValues: newValues,
+        reasons: newReasons,
+        saving: {},
+        valid,
+        changed,
+      })
+    }
+    else {
+      this.toDb(newValues);
+    }
   }
 
-  saveField(event) {
+  changeVal(i, event) {
+    event.preventDefault();
+    this.setValToState(i, event.target.value, null, false);
+  }
+
+  removeVal(i, _id, event) {
+    event.preventDefault();
+    this.setValToState(i, null, null, true);
+  }
+
+  checkForSave(info) {
+    const { newValues, newReasons } = info;
     const { name, rowId, valType, validation, convert, multiple, allowNew } = this.props;
-    const { savedValues, curValues, reasons } = this.state;
-    const valid = Object.keys(reasons).every(i => !reasons[i]);
+    const { savedValues } = this.state;
+    const valid = Object.keys(newReasons).every(i => !newReasons[i]);
     let changed = false;
-    console.log(savedValues, curValues);
-    if (curValues.length != savedValues.length) {
+    if (newValues.length != savedValues.length) {
       changed = true
     }
     else {
-      for (const i in curValues) {
-        const cv = curValues[i];
+      for (const i in newValues) {
+        const cv = newValues[i];
         const sv = savedValues[i];
-        for (const k of Object.keys(cv)) {
-          if (cv[k] != sv[k]) {
+        if (typeof cv == 'object') {
+          for (const k of Object.keys(cv)) {
+            if (cv[k] != sv[k]) {
+              changed = true;
+              break;
+            }
+          }
+        }
+        else {
+          if (cv != sv) {
             changed = true;
-            break;
           }
         }
         if (changed) {
@@ -167,62 +204,141 @@ class ContribField extends Component {
         }
       }
     }
-        
-    if (!valid || !changed) {
-      console.log('not saving');
-      return
+    return { valid , changed }
+  }
+
+  saveField() {
+    const { valid, changed } = this.state;
+    if (valid && changed) {
+      this.toDb();
     }
-    console.log('saving');
-    this.newSaveToState(curValues);
+  }
+
+  toDb(newValues) {
+    const { curValues } = this.state;
+    /* code to send curValues to MongoDb
+     * with a callback to set the saving status
+     * and to copy the curValues into the saveValues
+     * For now, we simulate it after a 2 second delay
+    */
+    const sendValues = (newValues == null)?curValues:newValues;
+    this.setState({
+      ...this.state,
+      saving: {status: 'saving'},
+    });
+    setTimeout(()=> {
+      this.setState({
+        ...this.state,
+        saving: {status: 'saved'},
+        savedValues: [...sendValues],
+        curValues: [...sendValues],
+        changed: false,
+        valid: true,
+      });
+    }, 2000);
   }
 
   valueAsString(valRaw) {
-    const { valType, convert, usersMap } = this.props;
-    const valdval = valRaw.dvalue;
-    if (valdval != null) {
-      return valdval
-    }
-    const valval = valRaw.value;
+    const { name, valType, convert, usersMap } = this.props;
     switch (valType) {
       case 'rel': {
+        const valval = valRaw.value;
         switch (convert) {
           case 'user': {return userAsString(valRaw, usersMap)}
           case 'country': {return `${valRaw._id}=${valval}`}
           default: {return valval}
         }
       }
-      case 'datetime': {return (new Date(valval['$date'])).toISOString()}
-      default: {return valval}
+      case 'datetime': {
+        return (typeof valRaw == 'string')?valRaw:(new Date(valRaw['$date'])).toISOString();
+      }
+      default: {return valRaw}
     }
+  }
+
+  urlFragment(i, classNames, text) {
+    return <a key={i} target="_blank" href={text} className={classNames.join(' ')}>{text}</a>
+  }
+  emailFragment(i, classNames, text) {
+    return <a key={i} target="_blank" href={`mailto:${text}`} className={classNames.join(' ')}>{text}</a>
+  }
+  markdownFragment(i, classNames, text) {
+    return <span key={i} className={classNames.join(' ')}>{text}</span>
+  }
+  defaultFragment(i, classNames, text) {
+    return <span key={i} className={classNames.join(' ')}>{text}</span>
+  }
+
+  relSelect(i, _id, classNames, text) {
+    const { relValues } = this.state;
+    const { name } = this.props;
+    return (
+      <div className="select" key={i}>
+        <p key={i} className={classNames.join(' ')}>{text}
+          <span
+            className="xtag fa fa-arrow-down"
+            onClick={this.removeVal.bind(this, 0, _id)}
+          />
+        </p>
+        {
+          relValues.map(rv => (
+            <p className="option" key={`rv_${rv._id}`}>{rv.value}</p>
+          ))
+        }
+      </div>
+    );
+  }
+  relEditFragment(i, _id, classNames, text) {
+    const { multiple } = this.props;
+    return (!multiple && i == 0)? (
+      this.relSelect(i, _id, classNames, text)
+    ) : (
+      <span key={i} className={classNames.join(' ')}>{text}
+        <span
+          className="xtag fa fa-close"
+          onClick={this.removeVal.bind(this, i, _id)}
+        />
+      </span>
+    )
+  }
+  textareaEditFragment(i, _id, classNames, text, cols=50, rows=10) {
+    return (
+      <textarea key={i}
+        className={classNames.join(' ')}
+        defaultValue={text}
+        onChange={this.changeVal.bind(this, i)}
+        rows={rows}
+        cols={cols}
+        wrap="soft"
+      />
+    )
+  }
+  defaultEditFragment(i, _id, classNames, text, size=50) {
+    return (
+      <input key={i} type="text"
+        className={classNames.join(' ')}
+        defaultValue={text}
+        onChange={this.changeVal.bind(this, i)}
+        size={size}
+      />
+    )
   }
 
   valuesAsReadonly() {
     const { curValues } = this.state;
     if (curValues.length == 0) {return <span className='absent'>no value</span>}
-    const { valType, multiple, convert } = this.props;
-    const fragments = [];
+    const { valType, multiple } = this.props;
+    const methods = readonlyMakeFragment(this);
+    const makeFragment = methods[valType] || methods._default;
+    const progIcon = 'fa fa-circle-o progress';
+    const fragments = [
+      <span key={name} className={progIcon}/>
+    ];
+    fragments.push(' ');
     curValues.forEach((v, i) => {
       const text = this.valueAsString(v);
       const classNames = ['value', valType];
-      let fragment;
-      switch (valType) {
-        case 'url': {
-          fragment = <a key={i} target="_blank" href={text} className={classNames.join(' ')}>{text}</a>;
-          break
-        }
-        case 'email': {
-          fragment = <a key={i} target="_blank" href={`mailto:${text}`} className={classNames.join(' ')}>{text}</a>;
-          break;
-        }
-        case 'markdown': {
-          fragment = <span key={i} className={classNames.join(' ')}>{text}</span>;
-          break;
-        }
-        default: {
-          fragment = <span key={i} className={classNames.join(' ')}>{text}</span>;
-          break;
-        }
-      }
+      const fragment = makeFragment(i, classNames, text);
       if (multiple || i == 0) {fragments.push(fragment)}
       if (multiple) {fragments.push(' ')}
     });
@@ -230,9 +346,22 @@ class ContribField extends Component {
   }
 
   valuesAsControls() {
-    const { curValues, reasons } = this.state;
+    const { curValues, reasons, saving, valid, changed } = this.state;
     const { name, valType, multiple, validation, allowNew } = this.props;
-    const fragments = [];
+    const methods = editMakeFragment(this);
+    const makeFragment = methods[valType] || methods._default;
+    const cs = saving.status;
+    let progIcon;
+    if (cs == 'saving') {progIcon = 'fa-spinner fa-spin'}
+    else if (cs == 'saved') {progIcon = 'fa-check'}
+    else if (cs == 'error') {progIcon = 'fa-exclamation'}
+    else if (!valid) {progIcon = 'fa-close invalid'}
+    else if (changed) {progIcon = 'fa-deviantart changed'}
+    else {progIcon = 'fa-circle-o'}
+    progIcon += ' fa progress';
+    const fragments = [
+      <span key={name} className={progIcon}/>
+    ];
     curValues.forEach((v, i) => {
       const text = this.valueAsString(v);
       const _id = v._id;
@@ -241,71 +370,8 @@ class ContribField extends Component {
       if (reason != '') {
         classNames.push('invalid');
       }
-      let fragment;
-      switch (valType) {
-        case 'rel': {
-          fragment = (<span key={i}
-            className={classNames.join(' ')}
-          >{text}</span>);
-          break
-        }
-        case 'url': {
-          fragment = (<input key={i} type="text"
-            className={classNames.join(' ')}
-            defaultValue={text}
-            onChange={this.changeVal.bind(this, i, _id)}
-            size="50"
-          />);
-          break
-        }
-        case 'email': {
-          fragment = (<input key={i} type="text"
-            className={classNames.join(' ')}
-            defaultValue={text}
-            onChange={this.changeVal.bind(this, i, _id)}
-            size="50"
-          />);
-          break
-        }
-        case 'datetime': {
-          fragment = (<input key={i} type="text"
-            className={classNames.join(' ')}
-            defaultValue={text}
-            onChange={this.changeVal.bind(this, i, _id)}
-            size="50"
-          />);
-          break
-        }
-        case 'range': {
-          fragment = (<input key={i} type="text"
-            className={classNames.join(' ')}
-            defaultValue={text}
-            onChange={this.changeVal.bind(this, i, _id)}
-          />);
-          break
-        }
-        case 'textarea': {
-          fragment = (<textarea key={i}
-            className={classNames.join(' ')}
-            defaultValue={text}
-            onChange={this.changeVal.bind(this, i, _id)}
-            rows="10"
-            cols="50"
-            wrap="soft"
-          />);
-          break;
-        }
-        case 'text': {
-          classNames.push(valType);
-          fragment = (<input key={i} type="text"
-            className={classNames.join(' ')}
-            defaultValue={text}
-            onChange={this.changeVal.bind(this, i, _id)}
-            size="50"
-          />);
-          break;
-        }
-      }
+      const size = sizes[valType] || sizes._max;
+      const fragment = makeFragment(i, _id, classNames, text, size);
       if (multiple || i == 0) {
         fragments.push(fragment);
         if (reason != '') {
@@ -313,7 +379,13 @@ class ContribField extends Component {
           fragments.push(<span key={`r_${i}`} className="reason">{reason}</span>)
         }
       }
-      if (multiple) {fragments.push(' ')}
+      if (multiple) {
+        fragments.push(' ');
+        if ((i == curValues.length - 1) && (valType == 'rel')) {
+          fragments.push(this.relSelect(-1, -1, classNames, 'start typing'));
+        }
+      }
+      
     });
     return fragments
   }
@@ -325,9 +397,9 @@ class ContribField extends Component {
       return null;
     }
     return editable ? (
-      <p className="editable" onBlur={this.saveField.bind(this)}>{this.valuesAsControls()}</p>
+      <div className="editable" onBlur={this.saveField.bind(this)}>{this.valuesAsControls()}</div>
     ):(
-      <p className="readonly">{this.valuesAsReadonly()}</p>
+      <div className="readonly">{this.valuesAsReadonly()}</div>
     )
   }
 

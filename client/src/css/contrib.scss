@@ -52,126 +52,86 @@ a:active, a:hover {
     border-radius: 12px;
     padding: 0 6px 0 6px;
 }
-p.readonly {
+div.readonly .value {
     color: $field-foreground;
     background-color: $field-background;
 }
-p.editable {
+div.editable .value {
     color: $field-foreground-edit;
     background-color: $field-background-edit;
-}
-.value.url {
-    font-family: monospace;
-    font-size: large;
-    text-decoration: underline;
-}
-.value.email {
-    font-family: monospace;
-    font-size: large;
-    text-decoration: underline;
-}
-.value.datetime {
     font-family: monospace;
     font-size: large;
 }
-.value.range {
-    font-family: monospace;
-    font-size: large;
-}
-p.editable .value.invalid {
+div.editable .value.invalid {
     color: $invalid-foreground;
     background-color: $invalid-background;
 }
-p.editable .value.rel.invalid {
+div.editable .value.rel.invalid {
     color: $invalid-background;
     background-color: $invalid-foreground;
-}
-p.readonly .value.text {
-}
-p.editable .value.text {
-    font-family: monospace;
-    font-size: large;
-}
-p.readonly .value.textarea {
-}
-p.editable .value.textarea {
-    font-family: monospace;
-    font-size: large;
-}
-.value.rel {
-    line-height: 1.8;
-    padding: 0 5px 0 5px;
-    border-radius: 5px;
-}
-p.readonly .value.rel {
-    color: $rel-foreground;
-    background-color: $rel-background;
-}
-p.editable .value.rel {
-    color: $rel-foreground-edit;
-    background-color: $rel-background-edit;
 }
 .absent {
     line-height: 1.8;
     padding: 0 5px 0 5px;
     border-radius: 5px;
 }
-p.readonly .absent {
+div.readonly .absent {
     color: $absent-foreground;
     background-color: $absent-background;
 }
-p.editable .absent {
+div.editable .absent {
     color: $absent-foreground-edit;
     background-color: $absent-background-edit;
 }
-.editing {
-    font-size: medium;
-    white-space: pre-wrap;
-    background-color: #ffffff;
-    color: #000088;
+div.readonly .value.rel {
+    color: $rel-foreground;
+    background-color: $rel-background;
+    font-family: sans-serif;
+    font-size: small;
 }
-.loading {
-    font-style: italic;
-    background-color: #eeffee;
-}
-.invalid {
-    background-color: #ffdddd;
-}
-.tags.loading > div {
-    background-color: grey;
-    color: white;
-}
-
-.editable-pill {
-    background-color: $rel-background-edit;
+div.editable .value.rel {
     color: $rel-foreground-edit;
-    border-radius: 5px;
-    padding: 0 5px 0 5px;
-    cursor: pointer;
+    background-color: $rel-background-edit;
+    font-family: sans-serif;
+    font-size: small;
 }
-
-.tags, .tags div {
+.value.url {
+    text-decoration: underline;
+}
+.value.email {
+    text-decoration: underline;
+}
+.value.rel {
+    line-height: 1.8;
+    padding: 0 5px 0 5px;
+    border-radius: 5px;
+}
+.xtag {
+    cursor: pointer;
+    font-size: small;
+    color: #440000;
+}
+.progress {
+    float: right;
+    vertical-align: top;
+}
+div.editable .progress.invalid, .invalid {
+    color: #ff0000;
+}
+div.editable .progress.changed, .changed {
+    color: #dd7700;
+}
+div.editable .progress {
+    color: #aaaaaa;
+}
+div.readonly .progress {
+    color: #eeeeee;
+}
+div.select {
     display: inline-block;
 }
-
-.tags > div {
-    padding-left: 5px;
-    margin: 0 3px 0 0;
-    border-radius: 5px;
-    background-color: $rel-background-edit;
-    color: $rel-foreground-edit;
-}
-
-.tags > div > div {
-    padding: 0 3px 0 0;
-}
-
-.tags input {
-    background-color: transparent;
-}
-
-.remove {
-    padding-right: 2px;
-    margin-left: 8px;
-    cursor: pointer;
+p.option {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    font-size: small;
 }

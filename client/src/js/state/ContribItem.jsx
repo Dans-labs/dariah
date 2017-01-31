@@ -39,7 +39,7 @@ class ContribItem extends Component {
     const frags = []
     for (const fS of fieldSpecs) {
       const { name, label, ...specs } = fS;
-      if (!fields[name]) {continue}
+      if (fields[name] == null) {continue}
       const editable = !!perm.update[name];
       frags.push(
         <tr key={name}>
