@@ -2,7 +2,7 @@
 
 # Caution
 > **This web application is in development.
-If you work in it and save stuff, it can be deleted later without notice.**
+Your saved work will be deleted later without notice.**
 
 ### What is the DARIAH contribution tool?
 
