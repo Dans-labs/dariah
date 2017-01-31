@@ -1,5 +1,9 @@
 ![logo](/static/images/inkind_logo.png)
 
+##### Caution
+> This web application is in development.
+If you work in it and save stuff, it can be deleted later without notice.
+
 # What is the DARIAH contribution tool?
 
 This is a [system](/contrib) to assess the tools that have been contributed to the DARIAH infrastructure by its national members.
