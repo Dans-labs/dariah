@@ -112,7 +112,9 @@ div.editable .value.rel {
     color: #440000;
 }
 .progress {
+    float: left;
     vertical-align: top;
+    font-size: small;
 }
 div.editable .progress.invalid, .invalid {
     color: #ff0000;
@@ -134,10 +136,22 @@ div.options {
     overflow: auto;
     resize: both;
     border: 1px solid #aaaaaa;
+    border-radius: 3px;
     background-color: #ffffff;
     clear: both;
+    font-size: small;
 }
-p.option {
+p.option-type, p.option-head, p.option {
     margin: 0 0 0 0;
     padding: 1 3 1 3;
+    font-size: small;
+}
+p.option {
+    cursor: pointer;
+}
+p.option-type input {
+    margin: 0 0 0 0;
+    padding: 1 3 1 3;
+    font-size: small;
+    border-radius: 3px;
 }

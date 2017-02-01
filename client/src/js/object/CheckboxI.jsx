@@ -18,6 +18,7 @@ const indeterminate = states => !states.allTrue && !states.allFalse
  * We have to resort to a DOM manipulation after rendering to get the
  * indeterminate state across.
  */
+
 class CheckboxI extends Component {
   componentDidMount() {
     const { states } = this.props;
@@ -35,13 +36,16 @@ class CheckboxI extends Component {
  * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
  * @returns {Fragment}
 */
+  onCheck(updFilter, filterId, states){
+    return event => updFilter(filterId, this.refs.ci.indeterminate || !states.allTrue)
+  }
   render () {
     const { states, filterId, updFilter } = this.props;
     return (
       <input
           ref="ci"
           type="checkbox"
-          onChange={event => updFilter(filterId, this.refs.ci.indeterminate || !states.allTrue)}
+          onChange={this.onCheck(updFilter, filterId, states).bind(this)}
           checked={states.allTrue}
       />
     )

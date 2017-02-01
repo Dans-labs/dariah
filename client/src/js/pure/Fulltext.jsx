@@ -1,6 +1,8 @@
 import React from 'react'
 import Stats from './Stats.jsx'
 
+const onType = (updFilter, filterId) => event => updFilter(filterId, event.target.value)
+
 /**
  * **purely functional** {@link external:Component|Component}
  *
@@ -31,7 +33,7 @@ const FullText = ({
         type="text"
         placeholder={`search in ${filterLabel}`}
         value={filterSettings}
-        onChange={event => updFilter(filterId, event.target.value)}
+        onChange={onType(updFilter, filterId)}
     />{' '}
       <Stats subTotal={filteredAmount} total={filteredAmountOthers}/>
     </p>

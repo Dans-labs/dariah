@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 
+import RelSelect from './RelSelect.jsx'
+
 import { getData } from '../helpers/data.js'
 import { withContext, saveState } from '../helpers/hoc.js'
 
@@ -157,8 +159,10 @@ class ContribField extends Component {
       const { rawVal, vstatus, reason } = validate(newVal, valType, validation);
       const sVal = (rawVal == null)?newVal:rawVal
       const sendVal = (_id == null)? sVal:{ _id, value: sVal }
-      newValues[i] = sendVal;
-      newReasons = {...this.state.reasons, [i]: reason};
+      const refI = (i == -1)?newValues.length:i;
+      if (i == -1) {newValues.push(sendVal)}
+      else {newValues[i] = sendVal}
+      newReasons = {...this.state.reasons, [refI]: reason};
     }
     const { valid, changed } = this.checkForSave({ newValues, newReasons });
     if (!doSave || !valid || !changed) {
@@ -181,6 +185,10 @@ class ContribField extends Component {
     this.setValToState(i, event.target.value, null, false);
   }
 
+  changeRelVal(i, _id, value) {
+    this.setValToState(i, value, _id, true);
+  }
+
   removeVal(i, _id, event) {
     event.preventDefault();
     this.setValToState(i, null, null, true);
@@ -199,7 +207,10 @@ class ContribField extends Component {
       for (const i in newValues) {
         const cv = newValues[i];
         const sv = savedValues[i];
-        if (typeof cv == 'object') {
+        if (sv == null) {
+          changed = true
+        }
+        else if (typeof cv == 'object') {
           for (const k of Object.keys(cv)) {
             if (cv[k] != sv[k]) {
               changed = true;
@@ -287,40 +298,30 @@ class ContribField extends Component {
 
   relOptions() {
     const { relValues } = this.state;
-    return relValues.map(rv => (<p className="option" key={`rv_${rv._id}`}>{rv.value}</p>))
+    return relValues.map(rv => [rv._id, rv.value])
   }
   userOptions() {
     const { usersMap } = this.props;
-    return [...usersMap.values()].map(rv => {
-      const rtext = this.valueAsString(rv);
-      return <p className="option" key={`rv_${rv._id}`}>{rtext}</p>
-    })
+    return [...usersMap.values()].map(rv => [rv._id,  this.valueAsString(rv)])
   }
   countryOptions() {
     const { countriesMap } = this.props;
-    return [...countriesMap.values()].map(rv => {
-      const rtext = this.valueAsString(rv);
-      return <p className="option" key={`rv_${rv._id}`}>{rtext}</p>
-    })
+    return [...countriesMap.values()].map(rv => [rv._id,  this.valueAsString(rv)])
   }
 
   relSelect(i, _id, classNames, text) {
-    const { convert } = this.props;
-    return (
-      <div className="select" key={i}>
-        <p key={i} className={classNames.join(' ')}>{text}
-          <span
-            className="xtag fa fa-arrow-down"
-            onClick={this.removeVal.bind(this, 0, _id)}
-          />
-        </p>
-        <div className="options">
-        {
-          (convert == 'user')? this.userOptions() : ((convert == 'country')? this.countryOptions() : this.relOptions())
-        }
-      </div>
-      </div>
-    );
+    const { convert, allowNew } = this.props;
+    const valueList = (convert == 'user')? this.userOptions() : ((convert == 'country')? this.countryOptions() : this.relOptions())
+    return <RelSelect
+      key={i}
+      isNew={i == -1}
+      allowNew={allowNew}
+      valueList={valueList}
+      initVal={_id}
+      initText={text}
+      onChange={this.changeRelVal.bind(this, i)}
+      classNames={classNames}
+    />
   }
   relEditFragment(i, _id, classNames, text) {
     const { multiple } = this.props;
@@ -395,6 +396,7 @@ class ContribField extends Component {
     else {progIcon = 'fa-circle-o'}
     progIcon += ' fa progress';
     const fragments = []
+    fragments.push(<span key={name} className={progIcon}/>);
     curValues.forEach((v, i) => {
       const text = this.valueAsString(v);
       const _id = v._id;
@@ -415,12 +417,11 @@ class ContribField extends Component {
       if (multiple) {
         fragments.push(' ');
         if ((i == curValues.length - 1) && (valType == 'rel')) {
-          fragments.push(this.relSelect(-1, -1, classNames, 'start typing'));
+          fragments.push(this.relSelect(-1, null, classNames, null));
         }
       }
       
     });
-    fragments.push(<span key={name} className={progIcon}/>);
     return fragments
   }
 
