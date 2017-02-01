@@ -363,14 +363,14 @@ class ContribField extends Component {
       </span>
     )
   }
-  textareaEditFragment(i, _id, classNames, text, cols=50, rows=10) {
+  textareaEditFragment(i, _id, classNames, text, cols=100, rows=10) {
     return (
       <textarea key={i}
         className={classNames.join(' ')}
         defaultValue={text}
         onChange={this.changeVal.bind(this, i)}
-        rows={rows}
         cols={cols}
+        rows={rows}
         wrap="soft"
       />
     )

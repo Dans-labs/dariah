@@ -65,6 +65,9 @@ div.editable .value {
     font-family: monospace;
     font-size: large;
 }
+div.editable textarea.value {
+    width: 100%;
+}
 div.editable .value.invalid {
     color: $invalid-foreground;
     background-color: $invalid-background;
