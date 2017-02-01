@@ -193,11 +193,12 @@ contribModel = dict(
             getValues   = '/member_country',
         ),
         dict(
-            name       = 'year',
-            label      = 'Year:',
-            valType    = 'rel',
-            multiple   = False,
-            validation = dict(nonEmpty=True, min=2000, max=2100, step=1),
+            name        = 'year',
+            label       = 'Year:',
+            valType     = 'rel',
+            multiple    = False,
+            validation  = dict(nonEmpty=True, min=2000, max=2100, step=1),
+            allowNew    = True,
         ),
         dict(
             name        = 'vcc',
