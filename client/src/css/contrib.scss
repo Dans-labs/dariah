@@ -2,6 +2,8 @@
 
 $text-link-color: #d45510;
 
+$label-background: #dddddd; 
+
 $field-foreground: #008888;
 $field-background: #ffffff;
 
@@ -46,6 +48,7 @@ a:active, a:hover {
     font-weight: bold;
     color: #000000;
     background-color: #dddddd;
+    padding-right: 2ex;
 }
 .item {
     background-color: #f3f3f3;
@@ -112,8 +115,11 @@ div.editable .value.rel {
     color: #440000;
 }
 .progress {
-    float: left;
-    vertical-align: top;
+    display: inline-block;
+    position: relative;
+    width: 0;
+    left: -2ex;
+    z-index: 100;
     font-size: small;
 }
 div.editable .progress.invalid, .invalid {
@@ -122,11 +128,17 @@ div.editable .progress.invalid, .invalid {
 div.editable .progress.changed, .changed {
     color: #dd7700;
 }
+div.editable .progress.saved, .saved {
+    color: #55ee00;
+}
+div.editable .progress.error, .error {
+    color: #ff4400;
+}
 div.editable .progress {
-    color: #aaaaaa;
+    color: #cfcfcf;
 }
 div.readonly .progress {
-    color: #eeeeee;
+    color: $label-background;
 }
 div.select {
     display: inline-block;
