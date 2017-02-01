@@ -337,9 +337,10 @@ class ContribField extends Component {
   }
 
   relSelect(i, _id, classNames, text) {
-    const { convert, allowNew } = this.props;
+    const { convert, allowNew, name } = this.props;
     const valueList = (convert == 'user')? this.userOptions() : ((convert == 'country')? this.countryOptions() : this.relOptions())
     return <RelSelect
+      tag={`${name}_${_id}_${i}`}
       key={i}
       isNew={i == -1}
       allowNew={allowNew}
