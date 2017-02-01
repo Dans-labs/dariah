@@ -35,6 +35,9 @@ def permissionModel(fs):
             item_contrib = dict(
                 desc='details of a contribution',
             ),
+            save_contrib = dict(
+                desc='save fields of a contribution',
+            ),
             member_country = dict(
                 desc='member countries',
             ),

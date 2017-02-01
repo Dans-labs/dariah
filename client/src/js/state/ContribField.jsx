@@ -238,28 +238,48 @@ class ContribField extends Component {
     }
   }
 
+  saved(data) {
+    if (data == null) {
+      this.setState({
+        ...this.state,
+        saving: {status: 'error'},
+      });
+    }
+    else {
+      this.setState({
+        ...this.state,
+        saving: {status: 'saved'},
+        savedValues: data,
+        curValues: data,
+        changed: false,
+        valid: true,
+      });
+    }
+  }
+
   toDb(newValues) {
     const { curValues } = this.state;
-    /* code to send curValues to MongoDb
-     * with a callback to set the saving status
-     * and to copy the curValues into the saveValues
-     * For now, we simulate it after a 2 second delay
-    */
-    const sendValues = (newValues == null)?curValues:newValues;
+    const { name, rowId, valType } = this.props;
+    let sendValues = (newValues == null)?curValues:newValues;
+    if (valType == 'datetime') {
+      sendValues = sendValues.map(v => (new Date(v['$date'])).toISOString());
+    }
     this.setState({
       ...this.state,
       saving: {status: 'saving'},
     });
-    setTimeout(()=> {
-      this.setState({
-        ...this.state,
-        saving: {status: 'saved'},
-        savedValues: [...sendValues],
-        curValues: [...sendValues],
-        changed: false,
-        valid: true,
-      });
-    }, 2000);
+    getData([
+        {
+          type: 'db',
+          path: '/item_contrib?action=update',
+          branch: `save ${name}`,
+          callback: this.saved.bind(this),
+          data: {_id: rowId, name, values: sendValues},
+        },
+      ],
+      this,
+      this.props.notification.component
+    );
   }
 
   valueAsString(valRaw) {

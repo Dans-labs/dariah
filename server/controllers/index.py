@@ -1,5 +1,5 @@
 import bottle
-from bottle import route, response, view, template
+from bottle import post, get, route, response, view, template
 
 from file import FileApi
 from data import DataApi
@@ -36,7 +36,8 @@ def serveApiDbWho():
     Auth.authenticate()
     return Auth.deliver()
 
-@route('/api/db/<query:re:[a-z0-9_]+>')
+@post('/api/db/<query:re:[a-z0-9_]+>')
+@get('/api/db/<query:re:[a-z0-9_]+>')
 def serveApiDb(query):
     Auth.authenticate()
     perm = PermApi(Auth, PM)
