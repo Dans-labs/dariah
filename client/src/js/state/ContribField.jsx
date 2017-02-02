@@ -245,7 +245,7 @@ class ContribField extends Component {
     }
   }
 
-  saved(data) {
+  saved(data, sendValues) {
     if (data == null) {
       this.setState({
         ...this.state,
@@ -256,8 +256,8 @@ class ContribField extends Component {
       this.setState({
         ...this.state,
         saving: {status: 'saved'},
-        savedValues: data,
-        curValues: data,
+        savedValues: sendValues,
+        curValues: sendValues,
         changed: false,
         valid: true,
       });
@@ -280,7 +280,7 @@ class ContribField extends Component {
           type: 'db',
           path: '/item_contrib?action=update',
           branch: `save ${name}`,
-          callback: this.saved.bind(this),
+          callback: this.saved.bind(this, sendValues),
           data: {_id: rowId, name, values: sendValues},
         },
       ],
@@ -340,7 +340,7 @@ class ContribField extends Component {
     const { convert, allowNew, name } = this.props;
     const valueList = (convert == 'user')? this.userOptions() : ((convert == 'country')? this.countryOptions() : this.relOptions())
     return <RelSelect
-      tag={`${name}_${_id}_${i}`}
+      tag={`${name}_${i}`}
       key={i}
       isNew={i == -1}
       allowNew={allowNew}
@@ -412,6 +412,7 @@ class ContribField extends Component {
 
   valuesAsControls() {
     const { curValues, reasons, saving, valid, changed } = this.state;
+    const { savedValues } = this.state;
     const { name, valType, multiple, validation, allowNew } = this.props;
     const methods = editMakeFragment(this);
     const makeFragment = methods[valType] || methods._default;

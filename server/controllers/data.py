@@ -4,6 +4,18 @@ from datetime import datetime
 
 def getDatetime(iso): return datetime.strptime(iso, "%Y-%m-%dT%H:%M:%S.%fZ")
 
+def validate(values, fieldSpecs):
+    valType = fieldSpecs['valType']
+    fvalidation = fieldSpecs['validation']
+    nonEmpty = fvalidation.get('nonEmpty', False)
+
+    if values == None: return (not nonEmpty, [])
+    if valType == 'datetime':
+        valValues = [getDatetime(v) for v in values]
+    else:
+        valValues = [v for v in values]
+    return (True, valValues)
+
 class DataApi(object):
     def __init__(self, CM):
         self.dbm = connectdb()
@@ -70,36 +82,36 @@ class DataApi(object):
                     msgs=[dict(kind='error', text='not allowed to update field {} of this contribution'.format(name))],
                 )
             newValues = newData.get('values', None)
-            fieldType= [x['valType'] for x in self.CM.fieldSpecs if x['name'] == name]
-            if len(fieldType) == 0:
+            fieldSpecs = [x for x in self.CM.fieldSpecs if x['name'] == name]
+            if len(fieldSpecs) == 0:
                 return dict(
                     data=None,
                     good=False,
                     msgs=[dict(kind='error', text='field {} has unknown type'.format(name))],
                 )
-            if newValues != None and fieldType[0] == 'datetime':
-                newValues = [getDatetime(v) for v in newValues]
-            self.dbm.contrib.update_one(dict(_id=_id), {'$set': {name: newValues}})
-            documents = list(self.dbm.contrib.find(dict(_id=_id), {name: True}))
-            if len(documents) != 1:
+            (valid, valValues) = validate(newValues, fieldSpecs[0])
+            if not valid:
+                documents = list(self.dbm.contrib.find(dict(_id=_id), {name: True}))
+                if len(documents) != 1:
+                    return dict(
+                        data=None,
+                        good=False,
+                        msgs=[dict(kind='error', text='error during update of contribution field {}'.format(name))],
+                    )
+                document = documents[0]
+                values = document.get(name, [])
                 return dict(
-                    data=None,
+                    data=values,
                     good=False,
-                    msgs=[dict(kind='error', text='error during update of contribution field {}'.format(name))],
+                    msgs=[dict(kind='error', text='could not update contribution field {}: validation failed'.format(name))],
                 )
-            document = documents[0]
-            values = document.get(name, [])
-            if newValues != values:
+            else:
+                self.dbm.contrib.update_one(dict(_id=_id), {'$set': {name: valValues}})
                 return dict(
-                    data=newValues,
-                    good=False,
-                    msgs=[dict(kind='error', text='update of contribution field {} failed'.format(name))],
+                    data=valValues,
+                    good=True,
+                    msgs=[],
                 )
-            return dict(
-                data=values,
-                good=True,
-                msgs=[],
-            )
         else:
             action = 'read'
             contribId = request.query.id

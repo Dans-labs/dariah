@@ -27,14 +27,14 @@ class RelSelect extends Component {
     this.setState({...this.state, search})
   }
   changeSel(onChange, selVal, selText) {
+    this.setState({...this.state, poppedUp: false, selVal, selText});
     onChange(selVal, selText);
-    this.setState({...this.state, poppedUp: false, selVal, selText})
   }
 
   addVal(onChange, selText) {
     const selVal = -1;
-    onChange(-1, selText);
     this.setState({...this.state, poppedUp: false, selVal, selText})
+    onChange(-1, selText);
   }
 
   render() {
@@ -86,4 +86,3 @@ class RelSelect extends Component {
 }
 
 export default withContext(saveState(RelSelect, 'RelSelect', initState))
-
