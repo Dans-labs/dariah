@@ -119,7 +119,7 @@ const validate = (val, valType, validation) => {
       rawVal = {'$date': times}
     }
   }
-  return { rawVal, vstatus, reason};
+  return { rawVal, vstatus, reason };
 }
 
 /**
@@ -273,6 +273,7 @@ class ContribField extends Component {
     }
     this.setState({
       ...this.state,
+      reasons: {},
       saving: {status: 'saving'},
     });
     getData([
@@ -336,25 +337,28 @@ class ContribField extends Component {
     return [...countriesMap.values()].map(rv => [rv._id,  this.valueAsString(rv)])
   }
 
-  relSelect(i, _id, classNames, text) {
+  relSelect(i, _id, classNames, extraClasses, text) {
     const { convert, allowNew, name } = this.props;
+    const { valid } = this.state;
     const valueList = (convert == 'user')? this.userOptions() : ((convert == 'country')? this.countryOptions() : this.relOptions())
     return <RelSelect
       tag={`${name}_${i}`}
       key={i}
       isNew={i == -1}
       allowNew={allowNew}
+      valid={valid}
       valueList={valueList}
       initVal={_id}
       initText={text}
       onChange={this.changeRelVal.bind(this, i)}
       classNames={classNames}
+      extraClasses={extraClasses}
     />
   }
-  relEditFragment(i, _id, classNames, text) {
+  relEditFragment(i, _id, classNames, extraClasses, text) {
     const { multiple } = this.props;
     return (!multiple && i == 0)? (
-      this.relSelect(i, _id, classNames, text)
+      this.relSelect(i, _id, classNames, extraClasses, text)
     ) : (
       <span key={i} className={classNames.join(' ')}>{text}
         <span
@@ -364,10 +368,10 @@ class ContribField extends Component {
       </span>
     )
   }
-  textareaEditFragment(i, _id, classNames, text, cols=100, rows=10) {
+  textareaEditFragment(i, _id, classNames, extraClasses, text, cols=100, rows=10) {
     return (
       <textarea key={i}
-        className={classNames.join(' ')}
+        className={classNames.concat(extraClasses).join(' ')}
         defaultValue={text}
         onChange={this.changeVal.bind(this, i)}
         cols={cols}
@@ -376,10 +380,10 @@ class ContribField extends Component {
       />
     )
   }
-  defaultEditFragment(i, _id, classNames, text, size=50) {
+  defaultEditFragment(i, _id, classNames, extraClasses, text, size=50) {
     return (
       <input key={i} type="text"
-        className={classNames.join(' ')}
+        className={classNames.concat(extraClasses).join(' ')}
         defaultValue={text}
         onChange={this.changeVal.bind(this, i)}
         onKeyUp={this.keyUp.bind(this, i)}
@@ -395,7 +399,7 @@ class ContribField extends Component {
     const { valType, multiple } = this.props;
     const methods = readonlyMakeFragment(this);
     const makeFragment = methods[valType] || methods._default;
-    const progIcon = 'fa fa-circle-o progress';
+    const progIcon = 'fa fa-lock progress';
     const fragments = [
       <span key={name} className={progIcon}/>
     ];
@@ -423,7 +427,7 @@ class ContribField extends Component {
     else if (cs == 'error') {progIcon = 'fa-exclamation error'}
     else if (!valid) {progIcon = 'fa-close invalid'}
     else if (changed) {progIcon = 'fa-pencil changed'}
-    else {progIcon = 'fa-circle'}
+    else {progIcon = 'fa-pencil'}
     progIcon += ' fa progress';
     const fragments = []
     fragments.push(<span key={name} className={progIcon}/>);
@@ -431,12 +435,13 @@ class ContribField extends Component {
       const text = this.valueAsString(v);
       const _id = v._id;
       const classNames = ['value', valType];
+      const extraClasses = []
       const reason = reasons[i] || '';
       if (reason != '') {
-        classNames.push('invalid');
+        extraClasses.push('invalid');
       }
       const size = sizes[valType] || sizes._max;
-      const fragment = makeFragment(i, _id, classNames, text, size);
+      const fragment = makeFragment(i, _id, classNames, extraClasses, text, size);
       if (multiple || i == 0) {
         fragments.push(fragment);
         if (reason != '') {
@@ -447,7 +452,7 @@ class ContribField extends Component {
       if (multiple) {
         fragments.push(' ');
         if ((i == curValues.length - 1) && (valType == 'rel')) {
-          fragments.push(this.relSelect(-1, null, classNames, null));
+          fragments.push(this.relSelect(-1, null, classNames, extraClasses, null));
         }
       }
       

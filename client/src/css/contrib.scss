@@ -2,6 +2,8 @@
 
 $text-link-color: #d45510;
 
+$progress-neutral: #bbbbbb;
+
 $label-background: #dddddd; 
 
 $field-foreground: #008888;
@@ -68,7 +70,12 @@ div.editable .value {
 div.editable textarea.value {
     width: 100%;
 }
-div.editable .value.invalid {
+.reason {
+    vertical-align: top;
+    color: $invalid-foreground;
+    background-color: $invalid-background;
+}
+div.editable .invalid {
     color: $invalid-foreground;
     background-color: $invalid-background;
 }
@@ -122,6 +129,7 @@ div.editable .value.rel {
     position: relative;
     width: 0;
     left: -2ex;
+    vertical-align: top;
     z-index: 100;
     font-size: small;
 }
@@ -138,10 +146,10 @@ div.editable .progress.error, .error {
     color: #ff4400;
 }
 div.editable .progress {
-    color: #cfcfcf;
+    color: $progress-neutral;
 }
 div.readonly .progress {
-    color: $label-background;
+    color: $progress-neutral;
 }
 div.select {
     display: inline-block;

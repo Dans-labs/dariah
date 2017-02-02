@@ -38,27 +38,30 @@ class RelSelect extends Component {
   }
 
   render() {
-    const { isNew, allowNew, valueList, onChange, classNames } = this.props;
+    const { isNew, allowNew, valid, valueList, onChange, classNames, extraClasses } = this.props;
     const { poppedUp, search, selVal, selText } = this.state;
     const pat = search.toLowerCase();
     const icon = poppedUp?(isNew?'minus':'arrow-up'):(isNew?'plus':'arrow-down');
     const classes = classNames.join(' ')
+    const aclasses = classNames.concat(extraClasses).join(' ')
+    const xclasses = extraClasses.join(' ');
     return (
       <div className="select">
         <p className="option-head">
-          {(isNew?null:<span className={classes}>{selText}</span>)}
+          {(isNew?null:<span className={aclasses}>{selText}</span>)}
           <span
             className={`xtag fa fa-${icon}`}
             onClick={this.popUp.bind(this)}
           />
         </p>
-        {poppedUp? (
+        {(poppedUp || !valid)? (
           <div>
             <p className="option-type">
               <input type="text"
                 placeholder="search..."
                 onChange={this.updSearch.bind(this)}
                 defaultValue={search}
+                className={xclasses}
               />
               {(allowNew && search != '')?(
                 <span
