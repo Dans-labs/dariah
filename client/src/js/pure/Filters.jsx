@@ -28,16 +28,16 @@ import EUMap from '../object/EUMap.jsx'
  * `filterList` is used here and imported by {@link module:filtering}
  */ 
 export const filterList = [
-  {kind: FullText,  name: 'FullText',  field: 'title',               label: 'title',               maxCols: null},
-  {kind: EUMap,     name: 'EUMap',     field: 'country',             label: 'country',             maxCols: 3},
-  {kind: ByValue,   name: 'ByValue',   field: 'vcc',                 label: 'vcc',                 maxCols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'year',                label: 'year',                maxCols: 3},
-  {kind: ByValue,   name: 'ByValue',   field: 'typeContribution',    label: 'type',                maxCols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivities',   label: 'research activity',   maxCols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObjects',      label: 'research object',     maxCols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechniques',   label: 'research technique',  maxCols: 1},
-  {kind: ByValue,   name: 'ByValue',   field: 'disciplines',         label: 'discipline',          maxCols: 2},
-  {kind: ByValue,   name: 'ByValue',   field: 'keywords',            label: 'keyword',             maxCols: 1},
+  {kind: FullText,  name: 'FullText',  field: 'title',               label: 'title',               maxCols: null, expanded: null},
+  {kind: EUMap,     name: 'EUMap',     field: 'country',             label: 'country',             maxCols: 3,    expanded: true},
+  {kind: ByValue,   name: 'ByValue',   field: 'vcc',                 label: 'vcc',                 maxCols: 2,    expanded: true},
+  {kind: ByValue,   name: 'ByValue',   field: 'year',                label: 'year',                maxCols: 3,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'typeContribution',    label: 'type',                maxCols: 2,    expanded: true},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivities',   label: 'research activity',   maxCols: 2,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObjects',      label: 'research object',     maxCols: 2,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechniques',   label: 'research technique',  maxCols: 1,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'disciplines',         label: 'discipline',          maxCols: 2,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'keywords',            label: 'keyword',             maxCols: 1,    expanded: false},
 ]
 
 const styles = {
@@ -96,6 +96,7 @@ const Filters = ({
           filteredAmountOthers={filteredAmountOthers.get(filterId)}
           amounts={amounts.get(filterId)}
           updFilter={updFilter}
+          expanded={filter.expanded}
         />
       );}
     )}

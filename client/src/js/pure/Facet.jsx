@@ -1,8 +1,8 @@
 import React from 'react'
 
 const styles = {
-  rep: { fontSize: 'small' },
-  box: { fontSize: 'large' },
+  rep: { fontSize: 'x-small' },
+  box: { fontSize: 'medium', lineHeight: 0.5, margin: 0, padding: 0 },
 }
 
 /**

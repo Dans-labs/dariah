@@ -18,7 +18,6 @@ class UserApi(object):
     def getUser(self, eppn):
         authority = 'local' if self.isDevel else 'DARIAH'
         record = self.dbm.users.find_one({'eppn': eppn, 'authority': authority})
-        if record and '_id' in record: del record['_id']
         return record
 
     def getTestUsers(self):
@@ -41,7 +40,7 @@ class UserApi(object):
     def deliver(self):
         groups = self.PM.groups
         self.userInfo['groupDesc'] = groups.get(self.userInfo['group'], dict(desc='??'))['desc']
-        return dict(data=self.userInfo, msgs=[], good=True)
+        return dict(data=dict(((x for x in self.userInfo.items() if x[0] != '_id'))), msgs=[], good=True)
 
     def _store(self, newUserInfo):
         now = datetime.utcnow()

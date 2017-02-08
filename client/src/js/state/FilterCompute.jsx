@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Contribs from '../pure/Contribs.jsx'
 import Filters, { filterList } from '../pure/Filters.jsx'
 
-import { newFilterSettings, computeFiltering } from '../helpers/filtering.js'
+import { newFilterSettings, computeFiltering, setf } from '../helpers/filtering.js'
 import { columnStyle } from '../helpers/ui.js'
 import { withContext, saveState } from '../helpers/hoc.js'
 
@@ -28,6 +28,15 @@ class FilterCompute extends Component {
  */
   updFilter(filterId, data) {
     const { filterSettings } = this.state;
+    if (typeof data == 'string') {
+      setf(filterId, '', data)
+    }
+    if (typeof data == 'boolean') {
+      setf(filterId, '', data)
+    }
+    else {
+      setf(filterId, data[0], data[1])
+    }
     this.setState({...this.state,
       filterSettings: newFilterSettings(filterSettings, filterId, data)
     });

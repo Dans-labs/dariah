@@ -1,3 +1,5 @@
+import { lsHas, lsGet, lsSet } from '../helpers/localstorage.js'
+
 /**
  * ## Filters and Facets
  *
@@ -37,6 +39,16 @@
  * for that filter, i.e. the situation that the user has not yet started using the filters
  * {@link Filters} component.
  */
+
+const initf = (tag, key, defaultVal) => {
+  const lskey = `flt_${tag}.${key}`;
+  return lsHas(lskey)?lsGet(lskey):defaultVal;
+}
+export const setf = (tag, key, val) => {
+  const lskey = `flt_${tag}.${key}`;
+  lsSet(lskey, val);
+}
+
 export function compileFiltering(contribs, fields, filterList) {
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterFields = presentFilterList.filter(x => x.name !== 'FullText').map(x => x.field);
@@ -54,7 +66,14 @@ export function compileFiltering(contribs, fields, filterList) {
   }
   const filterInit = new Map(presentFilterList.map((filterSpec, filterId) => [
     filterId,
-    filterSpec.name === 'FullText' ? '' : new Map([...fieldValues.get(filterSpec.field).keys()].map(valueId => [valueId, true]))
+    /*
+    filterSpec.name === 'FullText' ? '' : new Map(
+      [...fieldValues.get(filterSpec.field).keys()].map(valueId => [valueId, true]
+    ))
+    */
+    filterSpec.name === 'FullText' ? initf(filterId, '', '') : new Map(
+      [...fieldValues.get(filterSpec.field).keys()].map(valueId => [valueId, initf(filterId, valueId, true)]
+    ))
   ]));
 
   return {

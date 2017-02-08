@@ -22,8 +22,28 @@ gulp.task('build_doc', function(cb) {
 
 /* Development tasks */
 
-gulp.task('buildjs_dev', function() {
-  return browserify({entries: 'src/js/main.jsx', debug: true})
+const dependencies = [
+	'react',
+  'react-dom',
+  'react-markdown',
+  'react-router',
+  'leaflet',
+  'whatwg-fetch'
+];
+
+let buildCount = 0;
+
+function buildjs_dev() {
+  const appBundle = browserify({entries: 'src/js/main.jsx', debug: true});
+  buildCount++;
+  if (buildCount == 1) {
+    browserify({require: dependencies, debug: true})
+      .bundle()
+      .pipe(source('lib.js'))
+      .pipe(gulp.dest('../static/js'));
+  }
+  dependencies.forEach(function(dep) {appBundle.external(dep)});
+  return appBundle
     .transform("babelify", {
       sourceMaps: true,
       presets: [
@@ -36,14 +56,10 @@ gulp.task('buildjs_dev', function() {
       ],
     })
     .bundle()
-    .on('error', function(e) {
-      console.log(e.toString());
-      this.emit('end');
-    })
-    .pipe(source('bundle.js'))
+    .pipe(source('app.js'))
     .pipe(sourcemaps.write('../static/js'))
     .pipe(gulp.dest('../static/js'));
-});
+};
  
 gulp.task('buildcss_dev', function() {
   return gulp.src(['src/css/main.scss'])
@@ -67,7 +83,7 @@ gulp.task('buildjs_prod', function() {
       ],
     })
     .bundle()
-    .pipe(source('bundle.js'))
+    .pipe(source('app.js'))
     .pipe(buffer())
     .pipe(uglify())
     .pipe(gulp.dest('../static/js'));
@@ -82,8 +98,7 @@ gulp.task('buildcss_prod', function() {
 /* watching */
 
 gulp.task('watch', function() {
-  gulp.watch(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series('build_doc'));
-  gulp.watch(['src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series('buildjs_dev'));
+  gulp.watch(['src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series(buildjs_dev));
   gulp.watch(['src/css/*.scss', 'src/css/*.css'], gulp.series('buildcss_dev'));
 });
  
@@ -92,5 +107,5 @@ gulp.task('watch_doc', function() {
 });
  
 gulp.task('doc', gulp.series('build_doc', 'watch_doc'));
-gulp.task('dev', gulp.series('buildjs_dev', 'build_doc', 'buildcss_dev', 'watch'));
+gulp.task('dev', gulp.series(buildjs_dev, 'buildcss_dev', 'watch'));
 gulp.task('prod', gulp.series('buildjs_prod', 'build_doc', 'buildcss_prod'));

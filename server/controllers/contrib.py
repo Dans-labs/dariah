@@ -1,9 +1,13 @@
 DEFAULTS = dict(
     IDONLY     = False,
-    GETVALUES = '/value_list?list={}',
+    APPEARANCE = dict(),
+    GETVALUES  = '/value_list?list={}',
 )
 
 contribModel = dict(
+
+    modDate = 'dateModified',
+    modBy = 'modifiedBy',
 
     fieldSets = dict(
 
@@ -86,82 +90,95 @@ contribModel = dict(
         ''',
     ),
 
-    fieldSpecs = [
+    fieldOrder = '''
+title
+year
+country
+vcc
+typeContribution
+description
+costTotal
+costDescription
+contactPersonName
+contactPersonEmail
+urlContribution
+urlAcademic
+creator
+dateCreated
+dateModified
+modifiedBy
+tadirahObjects
+tadirahActivities
+tadirahTechniques
+disciplines
+keywords
+    '''.strip().split(),
 
-        dict(
-            name       = 'title',
+    fieldSpecs = dict(
+        title=dict(
             label      = 'Title:',
             valType    = 'text',
             multiple   = False,
             validation = dict(nonEmpty=True),
         ),
-        dict(
-            name       = 'dateCreated',
+        dateCreated=dict(
             label      = 'created on:',
             valType    = 'datetime',
             multiple   = False,
             validation = dict(nonEmpty=True),
         ),
-        dict(
-            name       = 'dateModified',
+        dateModified=dict(
             label      = 'modified on:',
             valType    = 'datetime',
             multiple   = True,
             validation = dict(nonEmpty=False),
+            appearance = dict(reverse=True, cutoff=1),
         ),
-        dict(
-            name        = 'contactPersonName',
+        contactPersonName=dict(
             label       = 'contact person:',
             valType     = 'text',
             multiple    = False,
             validation  = dict(nonEmpty=True),
         ),
-        dict(
-            name        = 'contactPersonEmail',
+        contactPersonEmail=dict(
             label       = 'contact email:',
             valType     = 'email',
             multiple    = True,
             validation  = dict(nonEmpty=True),
         ),
-        dict(
-            name        = 'urlContribution',
+        urlContribution=dict(
             label       = 'Contribution url:',
             valType     = 'url',
             multiple    = True,
             validation  = dict(nonEmpty=True),
         ),
-        dict(
-            name        = 'urlAcademic',
+        urlAcademic=dict(
             label       = 'Academic url:',
             valType     = 'url',
             multiple    = True,
             validation  = dict(nonEmpty=True),
         ),
-        dict(
-            name        = 'description',
+        description=dict(
             label       = 'Description:',
             valType     = 'textarea',
             multiple    = False,
             validation  = dict(nonEmpty=True),
             convert     = 'markdown',
         ),
-        dict(
-            name        = 'costTotal',
+        costTotal=dict(
             label       = 'cost (total):',
             valType     = 'number',
             multiple    = False,
             validation  = dict(nonEmpty=True),
         ),
-        dict(
-            name        = 'costDescription',
+        costDescription=dict(
             label       = 'cost (description):',
             valType     = 'textarea',
             validation  = dict(nonEmpty=True),
             convert     = 'markdown',
             multiple    = False,
         ),
-        dict(
-            name        = 'creator',
+        creator=dict(
             label       = 'creator:',
             valType     = 'rel',
             multiple    = False,
@@ -171,8 +188,7 @@ contribModel = dict(
             getValues   = '/users',
             idOnly      = True,
         ),
-        dict(
-            name        = 'modifiedBy',
+        modifiedBy=dict(
             label       = 'modified by:',
             valType     = 'rel',
             multiple    = True,
@@ -181,9 +197,9 @@ contribModel = dict(
             allowNew    = False,
             getValues   = '/users',
             idOnly      = True,
+            appearance = dict(reverse=True, cutoff=1),
         ),
-        dict(
-            name        = 'country',
+        country=dict(
             label       = 'Country(ies):',
             valType     = 'rel',
             multiple    = False,
@@ -192,71 +208,63 @@ contribModel = dict(
             allowNew    = False,
             getValues   = '/member_country',
         ),
-        dict(
-            name        = 'year',
+        year=dict(
             label       = 'Year:',
             valType     = 'rel',
             multiple    = False,
             validation  = dict(nonEmpty=True, min=2000, max=2100, step=1),
             allowNew    = True,
         ),
-        dict(
-            name        = 'vcc',
+        vcc=dict(
             label       = 'VCC:',
             valType     = 'rel',
             multiple    = True,
             validation  = dict(nonEmpty=True),
             allowNew    = False,
         ),
-        dict(
-            name        = 'disciplines',
+        disciplines=dict(
             label       = 'Disciplines:',
             valType     = 'rel',
             multiple    = True,
             validation  = dict(nonEmpty=True),
             allowNew    = True,
         ),
-        dict(
-            name        = 'keywords',
+        keywords=dict(
             label       = 'Keywords:',
             valType     = 'rel',
             multiple    = True,
             validation  = dict(nonEmpty=True),
             allowNew    = True,
         ),
-        dict(
-            name        = 'typeContribution',
+        typeContribution=dict(
             label       = 'Type:',
             valType     = 'rel',
             multiple    = False,
             validation  = dict(nonEmpty=True),
             allowNew    = False,
         ),
-        dict(
-            name        = 'tadirahObjects',
+        tadirahObjects=dict(
             label       = 'Object(s):',
             valType     = 'rel',
             multiple    = True,
             validation  = dict(nonEmpty=False),
             allowNew    = False,
         ),
-        dict(
-            name        = 'tadirahActivities',
+        tadirahActivities=dict(
             label       = 'Activity(ies):',
             valType     = 'rel',
             multiple    = True,
             validation  = dict(nonEmpty=False),
             allowNew    = False,
         ),
-        dict(
-            name        = 'tadirahTechniques',
+        tadirahTechniques=dict(
             label       = 'Technique(s):',
             valType     = 'rel',
             multiple    = True,
             validation  = dict(nonEmpty=False),
             allowNew    = False,
         ),
-    ],
+    ),
 )
 
 class ContribModel(object):
@@ -269,13 +277,15 @@ class ContribModel(object):
         fs['uall'] = fs['upublic'] | fs['uauth'] | fs['usystem'] 
 
         fs = contribModel['fieldSpecs']
-        for spec in fs:
+        for (name, spec) in fs.items():
+            if 'appearance' not in spec:
+                    spec['appearance'] = DEFAULTS['APPEARANCE']
             valType = spec['valType']
             if valType == 'rel':
                 if 'idOnly' not in spec:
                     spec['idOnly'] = DEFAULTS['IDONLY']
                 if 'getValues' not in spec:
-                    spec['getValues'] = DEFAULTS['GETVALUES'].format(spec['name'])
+                    spec['getValues'] = DEFAULTS['GETVALUES'].format(name)
         for (k, v) in contribModel.items():
             setattr(self, k, v)
 

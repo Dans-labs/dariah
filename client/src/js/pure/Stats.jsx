@@ -2,7 +2,7 @@ import React from 'react'
 
 const style = {
   color: '#0000dd',
-  fontSize: 'small',
+  fontSize: 'x-small',
   fontWeight: 'normal',
 }
 

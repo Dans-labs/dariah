@@ -23,6 +23,7 @@ class DataApi(object):
 
     def data(self, query, perm):
         self.perm = perm
+        self.uid = perm.getUid()
         method = getattr(self, query, None)
         if callable(method):
             allowed = perm.getPerms(query)
@@ -82,14 +83,14 @@ class DataApi(object):
                     msgs=[dict(kind='error', text='not allowed to update field {} of this contribution'.format(name))],
                 )
             newValues = newData.get('values', None)
-            fieldSpecs = [x for x in self.CM.fieldSpecs if x['name'] == name]
-            if len(fieldSpecs) == 0:
+            fieldSpecs = self.CM.fieldSpecs.get(name, None)
+            if fieldSpecs == None:
                 return dict(
                     data=None,
                     good=False,
                     msgs=[dict(kind='error', text='field {} has unknown type'.format(name))],
                 )
-            (valid, valValues) = validate(newValues, fieldSpecs[0])
+            (valid, valValues) = validate(newValues, fieldSpecs)
             if not valid:
                 documents = list(self.dbm.contrib.find(dict(_id=_id), {name: True}))
                 if len(documents) != 1:
@@ -101,14 +102,36 @@ class DataApi(object):
                 document = documents[0]
                 values = document.get(name, [])
                 return dict(
-                    data=values,
+                    data={name: values},
                     good=False,
                     msgs=[dict(kind='error', text='could not update contribution field {}: validation failed'.format(name))],
                 )
             else:
-                self.dbm.contrib.update_one(dict(_id=_id), {'$set': {name: valValues}})
+                modDate = self.CM.modDate
+                modBy = self.CM.modBy
+                changeVals = {
+                    '$set': {name: valValues},
+                    '$push': {
+                        modDate: datetime.utcnow(),
+                        modBy: dict(_id=self.uid),
+                    },
+                }
+                self.dbm.contrib.update_one(dict(_id=_id), changeVals)
+                documents = list(self.dbm.contrib.find(dict(_id=_id), {name: True, modDate: True, modBy: True}))
+                if len(documents) != 1:
+                    return dict(
+                        data=None,
+                        good=False,
+                        msgs=[dict(kind='error', text='contribution not properly identified after update')],
+                    )
+                document = documents[0]
+                changedVals = {
+                    name: document[name],
+                    modDate: document[modDate],
+                    modBy: document[modBy],
+                }
                 return dict(
-                    data=valValues,
+                    data=changedVals,
                     good=True,
                     msgs=[],
                 )
@@ -130,12 +153,14 @@ class DataApi(object):
             document = documents[0]
             mayUpdate = criteria(document)
             ufields = self.perm.projectors['update'] if mayUpdate else {}
+            fieldOrder = [x for x in self.CM.fieldOrder if x in qprojector or x in ufields]
             return dict(
                 data=dict(
                     row=document,
                     fields=qprojector,
                     perm=dict(update=ufields),
-                    fieldSpecs=[x for x in self.CM.fieldSpecs if x['name'] in qprojector or x['name'] in ufields],
+                    fieldOrder=fieldOrder,
+                    fieldSpecs=dict(((x for x in self.CM.fieldSpecs.items() if x[0] in fieldOrder))),
                 ),
                 msgs=msgs,
                 good=True,

@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
 import { withContext, saveState } from '../helpers/hoc.js'
+import { lsHas, lsGet, lsSet } from '../helpers/localstorage.js'
+
+const initAlt = ({ tag }) => ({alt: lsGet(tag)})
 
 /**
  * @class
@@ -40,6 +43,7 @@ class Alternatives extends Component {
     const { tag, alternatives, initial } = this.props;
     const oldAlt = (this.state.alt == undefined)?((initial == undefined)?0:initial):this.state.alt;
     const newAlt = (oldAlt + 1) % alternatives.length; 
+    lsSet(tag, newAlt);
     this.setState({alt: newAlt});
   }
 /**
@@ -60,7 +64,8 @@ class Alternatives extends Component {
  */
   render() {
     const { controlPlacement, controls, alternatives, initial } = this.props;
-    const alt = (this.state.alt == undefined)?((initial == undefined)?0:initial):this.state.alt;
+    const stateAlt = this.state.alt;
+    const alt = (stateAlt == null)?((initial == null)?0:initial):stateAlt;
     return (
       <div>
         {controlPlacement(controls[alt](this.next.bind(this)))}
@@ -70,4 +75,4 @@ class Alternatives extends Component {
   }
 }
 
-export default withContext(saveState(Alternatives, 'Alternatives', {}))
+export default withContext(saveState(Alternatives, 'Alternatives', initAlt))

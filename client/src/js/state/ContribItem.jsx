@@ -32,13 +32,26 @@ class ContribItem extends Component {
     this.state = {};
   }
 
+  updMod(modifiedFieldData) {
+    const newState = {
+      ...this.state,
+      fieldData: {
+        ...this.state.fieldData,
+        fields: {
+          ...this.state.fieldData.fields,
+          ...modifiedFieldData
+        }
+      }
+    }
+    this.setState(newState)
+  }
 
   parseFields() {
     const { fieldData } = this.state;
-    const { row, fields, fieldSpecs, perm } = fieldData;
+    const { row, fields, fieldSpecs, fieldOrder, perm } = fieldData;
     const frags = []
-    for (const fS of fieldSpecs) {
-      const { name, label, ...specs } = fS;
+    for (const name of fieldOrder) {
+      const { label, ...specs } = fieldSpecs[name];
       if (fields[name] == null) {continue}
       const editable = !!perm.update[name];
       frags.push(
@@ -51,6 +64,7 @@ class ContribItem extends Component {
               rowId={row._id}
               editable={editable}
               name={name}
+              updMod={this.updMod.bind(this)}
               {...specs}
             />
           </td>

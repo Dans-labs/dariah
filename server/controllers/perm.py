@@ -3,6 +3,9 @@ class PermApi(object):
         self.userInfo = auth.userInfo
         self.PM = PM
 
+    def getUid(self):
+        return self.userInfo.get('_id', None)
+
     def queryFromFilter(self, f):
         return {} if f == True else \
             ({'creator.eppn': self.userInfo['eppn']} if 'eppn' in self.userInfo else False) if f == 'own' else \
