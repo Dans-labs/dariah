@@ -92,12 +92,8 @@ class DocMd extends Component {
       );
     }
   }
-  componentDidMount() {
-    this.fetchText();
-  }
-  componentDidUpdate() {
-    this.fetchText();
-  }
+  componentDidMount()  {this.fetchText()}
+  componentDidUpdate() {this.fetchText()}
 }
 
 export default withContext(saveState(DocMd, 'DocMd', {md: null}))

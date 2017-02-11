@@ -5,6 +5,8 @@ import { Router, Route, Redirect, DefaultRoute, IndexRoute, IndexRedirect, brows
 import Provider from './object/Provider.jsx';
 import App from './pure/App.jsx';
 import ContribsFiltered from './state/ContribsFiltered.jsx';
+import ContribsMy from './state/ContribsMy.jsx';
+import ContribItemPre from './pure/ContribItemPre.jsx';
 import Doc from './pure/Doc.jsx';
 import NotFound from './pure/NotFound.jsx';
 
@@ -55,6 +57,9 @@ import NotFound from './pure/NotFound.jsx';
  *
  * @module main
  */
+
+const progs = {}
+
 render(
   <Provider>
     <Router history={browserHistory}>
@@ -68,6 +73,9 @@ render(
         <IndexRoute component={App}/>
         <IndexRedirect to="/docs/about.md"/>
         <Route path="contrib" component={ContribsFiltered}/>
+        <Route path="mycontrib" component={ContribsMy} progs={progs}>
+          <Route path=":contribId" component={ContribItemPre} progs={progs} ownOnly={true}/>
+        </Route>
         <Route path="docs/:docFile" component={Doc}/>
         <Route path="tech/docs/gen/:docFile" component={Doc}/>
         <Route path="tech/docs/:docFile" component={Doc}/>

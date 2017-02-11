@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>state/ValueList.jsx - Documentation</title>
+    <title>state/ContribsMy.jsx - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">state/ValueList.jsx</h1>
+    <h1 class="page-title">state/ContribsMy.jsx</h1>
     
 
     
@@ -39,8 +39,11 @@
         <article>
             <pre class="prettyprint source linenums"><code>import React, { Component } from 'react'
 
+import Contribs from '../pure/Contribs.jsx'
+
 import { getData } from '../helpers/data.js'
 import { withContext, saveState } from '../helpers/hoc.js'
+import { columnStyle } from '../helpers/ui.js'
 
 /**
  * @class
@@ -48,53 +51,72 @@ import { withContext, saveState } from '../helpers/hoc.js'
  *
  * **stateful** {@link external:Component|Component}
  *
- * ## A value list
+ * ## The list of "my" contributiuons
  *
- * Displays all values for a field in the contrib list.
+ * Displays the list of contributions of the current user in the left column,
+ * with a details/edit view in the right column.
  *
+ * See also:
+ * * {@link Contribs} The list of filtered contributions in the right column
  */
-class ValueList extends Component {
+class ContribsMy extends Component {
 /**
- *
  * @method
- * @param {string} fieldName The name of the field to obtain the values from.
+ * @param {Contrib[]} contribdata (from *state*) The list of contribution records as it comes form mongo db,
+ * plus a list of fields that is provided for each row (dependent on user permissions)
+ * @param {Map} countries (from *state*) The country information as fetched from the database on the server.
+ * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {Fragment}
 */
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
   render() {
-    const { fieldValues } = this.state;
-    if (fieldValues == null) {
+    const { contribdata, countries, users } = this.state;
+    const { usersMap, countriesMap, children, route } = this.props;
+    const { progs } = route;
+    if (contribdata == null || countries == null || users == null) {
       return &lt;div/>
     }
+    const { contribs, fields } = contribdata;
+    for (const x of users) {usersMap.set(x._id, x)}
+    for (const x of countries) {countriesMap.set(x._id, x)}
     return (
-        &lt;table>
-          &lt;tbody>{
-              fieldValues.map(x => (
-                &lt;tr key={x._id}>&lt;td>{x._id}&lt;/td>&lt;td>{x.value}&lt;/td>&lt;/tr>
-              ))
-            }
-          &lt;/tbody>
-        &lt;/table>
-      )
+      &lt;div>
+        &lt;div style={columnStyle('rightLeft')}>
+          &lt;p
+            style={{fontWeight: 'bold', backgroundColor: '#eeeeff'}}
+          >{contribs.length} contributions&lt;/p>
+          &lt;Contribs filteredData={contribs} inplace={false} progs={progs}/>
+        &lt;/div>
+        &lt;div style={columnStyle('rightRight')}>
+          {children}
+        &lt;/div>
+      &lt;/div>
+    )
   }
 /**
  * @method
- * @param {Value[]} values (from *state*) The list of distinct contrib field values as it comes form mongo db
+ * @param {Contrib[]} contribs (from *state*) The list of contribution records as it comes form mongo db
+ * @param {Map} countries (from *state*) The country information as fetched from the database on the server.
+ * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { fieldValues } = this.state;
-    const { fieldName } = this.props;
-    if (fieldValues == null) {
+    const { contribdata, countries, users } = this.state;
+    if (contribdata == null || countries == null || users == null) {
       getData([
           {
             type: 'db',
-            path: `/value_list?list=${fieldName}`,
-            branch: 'fieldValues',
+            path: '/my_contribs',
+            branch: 'contribdata',
+          },
+          {
+            type: 'db',
+            path: '/member_country',
+            branch: 'countries',
+          },
+          {
+            type: 'db',
+            path: `/users`,
+            branch: 'users',
           },
         ],
         this,
@@ -104,8 +126,7 @@ class ValueList extends Component {
   }
 }
 
-export default withContext(saveState(ValueList, 'ValueList', {fieldValues: null}))
-
+export default withContext(saveState(ContribsMy, 'ContribsMy', {contribs: null, countries: null, users: null}))
 
 </code></pre>
         </article>

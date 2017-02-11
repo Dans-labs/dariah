@@ -37,7 +37,7 @@ const Doc = ({ params, route, location }) => {
   const [x, docDir, docFile] = /^(.*)\/([^/]+)$/g.exec(docPath);
   const [y, docName, docExt] = /^(.*)\.([^.]+)$/g.exec(docFile);
   const DocClass = docType[docExt];
-  return DocClass == undefined ? (
+  return DocClass == null ? (
     <NotFound params={{splat: `document ${docPath}`}}/>
   ) : (
     <DocClass docDir={docDir} docName={docName} docExt={docExt} tag={docName}/>

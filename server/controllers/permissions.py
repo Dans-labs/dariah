@@ -29,6 +29,9 @@ def permissionModel(fs):
             ),
         ),
         methods = dict(
+            my_contribs = dict(
+                desc='list my contributions',
+            ),
             list_contrib = dict(
                 desc='list contributions',
             ),
@@ -49,6 +52,32 @@ def permissionModel(fs):
             ),
         ),
         permissions = dict(
+            my_contribs = dict(
+                x = dict(
+                    read = dict(
+                        rows = False,
+                        fields = fs['public'] & fs['meta'],
+                    ),
+                ),
+                auth = dict(
+                    read = dict(
+                        rows = 'own',
+                        fields = fs['all'] & fs['meta'],
+                    ),
+                ),
+                man = dict(
+                    read = dict(
+                        rows = 'own',
+                        fields = fs['all'] & fs['meta'],
+                    ),
+                ),
+                sys = dict(
+                    read = dict(
+                        rows = 'own',
+                        fields = fs['all'] & fs['meta'],
+                    ),
+                ),
+            ),
             list_contrib = dict(
                 x = dict(
                     read = dict(
@@ -82,7 +111,7 @@ def permissionModel(fs):
                         fields = fs['public'],
                     ),
                     update = dict(
-                        rows = set(),
+                        rows = False,
                         fields = set(),
                     ),
                 ),
@@ -124,7 +153,7 @@ def permissionModel(fs):
                         fields = fs['public'] & fs['meta'],
                     ),
                     update = dict(
-                        rows = set(),
+                        rows = False,
                         fields = set(),
                     ),
                 ),
@@ -134,7 +163,7 @@ def permissionModel(fs):
                         fields = (fs['public'] | fs['own']) & fs['meta'],
                     ),
                     update = dict(
-                        rows = set(),
+                        rows = False,
                         fields = set(),
                     ),
                 ),

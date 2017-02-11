@@ -61,7 +61,7 @@ class RelSelect extends Component {
               <input type="text"
                 placeholder="search..."
                 onChange={this.updSearch.bind(this)}
-                defaultValue={search}
+                value={search}
                 className={xclasses}
               />
               {(allowNew && search != '')?(

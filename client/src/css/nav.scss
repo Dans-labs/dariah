@@ -2,8 +2,10 @@
 
 $active-color: #000000;
 $active-bgcolor: #ffffee;
+$xactive-bgcolor: #aaffaa;
 $inactive-color: #0000ff;
 $inactive-bgcolor: #eeeeee;
+$xinactive-bgcolor: #ffffff;
 $nav-bgcolor: #eeeeee;
 $error-color: #ff0000;
 $warning-color: #ffaa00;
@@ -54,6 +56,20 @@ ul.nav > li {
 .nav a.active {
     color: $active-color;
     background-color: $active-bgcolor;
+    font-weight: bold;
+}
+a.nav {
+    color: $control-link-color;
+    background-color: $xinactive-bgcolor;
+    font-weight: normal;
+    text-decoration: none;
+    border-radius: 6pt;
+    padding-right: 0.5em;
+    padding-left: 0.5em;
+}
+a.nav.active {
+    color: $active-color;
+    background-color: $xactive-bgcolor;
     font-weight: bold;
 }
 a.spin-ok {

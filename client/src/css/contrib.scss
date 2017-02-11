@@ -50,7 +50,6 @@ a:active, a:hover {
     font-weight: bold;
     color: #000000;
     background-color: #dddddd;
-    padding-right: 2ex;
 }
 .item {
     background-color: #f3f3f3;
@@ -126,21 +125,18 @@ div.editable .value.rel {
 }
 .progress {
     display: inline-block;
-    position: relative;
-    width: 0;
-    left: -2ex;
+    text-align: center;
     vertical-align: top;
-    z-index: 100;
-    font-size: small;
+    font-size: medium;
 }
 div.editable .progress.invalid, .invalid {
     color: #ff0000;
 }
 div.editable .progress.changed, .changed {
-    color: #dd7700;
+    color: #ee9900;
 }
 div.editable .progress.saved, .saved {
-    color: #55ee00;
+    color: #00cc00;
 }
 div.editable .progress.error, .error {
     color: #ff4400;
@@ -184,4 +180,64 @@ p.option-type input {
     border: 0;
     line-height: 0.8;
     -webkit-border-vertical-spacing: 0;
+}
+.save.dirty {
+    font-weight: normal;
+    text-decoration: none;
+    border-radius: 6pt;
+    padding-right: 1em;
+    padding-left: 1em;
+}
+.save.dirty.valid {
+    color: #000000;
+    background-color: #ee9900;
+}
+.save.dirty.invalid {
+    color: $invalid-foreground;
+    background-color: $invalid-background;
+}
+.save.clean {
+    font-weight: normal;
+    text-decoration: none;
+    border-radius: 6pt;
+    padding-right: 1em;
+    padding-left: 1em;
+}
+.save.clean.valid {
+    color: #888888;
+    background-color: #eeeeee;
+}
+.save.clean.invalid {
+    color: $invalid-foreground;
+    background-color: $invalid-background;
+}
+.savei.dirty {
+    font-weight: normal;
+    text-decoration: none;
+    border-radius: 6pt;
+    padding-right: 0.5ex;
+    padding-left: 0.5ex;
+}
+.savei.dirty.valid {
+    color: #000000;
+    background-color: #ee9900;
+}
+.savei.dirty.invalid {
+    color: $invalid-foreground;
+    background-color: $invalid-background;
+}
+.savei.clean {
+    font-weight: normal;
+    text-decoration: none;
+    border-radius: 6pt;
+}
+.savei.clean.valid {
+    color: #888888;
+    background-color: #eeeeee;
+}
+.savei.clean.invalid {
+    color: $invalid-foreground;
+    background-color: $invalid-background;
+    padding-right: 0.5ex;
+    padding-left: 0.5ex;
 }

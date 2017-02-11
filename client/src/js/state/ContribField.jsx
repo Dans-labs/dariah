@@ -214,7 +214,7 @@ class ContribField extends Component {
 
   checkForSave(info) {
     const { newValues, newReasons } = info;
-    const { rowId, valType, validation, multiple, allowNew } = this.props;
+    const { rowId, name, valType, validation, multiple, allowNew, updEdit } = this.props;
     const { savedValues } = this.state;
     const valid = Object.keys(newReasons).every(i => !newReasons[i]);
     let changed = false;
@@ -246,17 +246,19 @@ class ContribField extends Component {
         }
       }
     }
+    updEdit(name, changed, valid);
     return { valid , changed }
   }
 
   saveField() {
-    const { valid, changed } = this.state;
-    if (valid && changed) {
+    const { valid, changed, saving } = this.state;
+    if (valid && changed && !saving.status) {
       this.toDb();
     }
   }
 
   saved(data) {
+    const { name, updMod, updEdit } = this.props;
     if (data == null) {
       this.setState({
         ...this.state,
@@ -264,7 +266,6 @@ class ContribField extends Component {
       });
     }
     else {
-      const { name, updMod } = this.props;
       const { [name]: newValues, ...modValues } = data;
       this.setState({
         ...this.state,
@@ -275,6 +276,7 @@ class ContribField extends Component {
         valid: true,
       });
       updMod(modValues);
+      updEdit(name, false, true);
     }
   }
 
@@ -302,6 +304,12 @@ class ContribField extends Component {
       this,
       this.props.notification.component
     );
+  }
+
+  fullfillSave() {
+    const { editable, saveConcern } = this.props;
+    const { name } = this.props;
+    if (editable && saveConcern) { this.saveField() }
   }
 
   valueAsString(valRaw) {
@@ -357,11 +365,11 @@ class ContribField extends Component {
 
   relSelect(i, _id, classNames, extraClasses, valText) {
     const { text, full } = valText;
-    const { convert, allowNew, name } = this.props;
+    const { convert, allowNew, name, rowId } = this.props;
     const { valid } = this.state;
     const valueList = (convert == 'user')? this.userOptions() : ((convert == 'country')? this.countryOptions() : this.relOptions())
     return <RelSelect
-      tag={`${name}_${i}`}
+      tag={`relselect_${rowId}_${name}_${i}`}
       key={i}
       isNew={i == -1}
       allowNew={allowNew}
@@ -391,10 +399,11 @@ class ContribField extends Component {
   }
   textareaEditFragment(i, _id, classNames, extraClasses, valText, cols=100, rows=10) {
     const { text, full } = valText;
+    this.saveLater = true;
     return (
       <textarea key={i}
         className={classNames.concat(extraClasses).join(' ')}
-        defaultValue={full}
+        value={full}
         onChange={this.changeVal.bind(this, i)}
         cols={cols}
         rows={rows}
@@ -404,10 +413,11 @@ class ContribField extends Component {
   }
   defaultEditFragment(i, _id, classNames, extraClasses, valText, size=50) {
     const { text, full } = valText;
+    this.saveLater = true;
     return (
       <input key={i} type="text"
         className={classNames.concat(extraClasses).join(' ')}
-        defaultValue={full}
+        value={full}
         onChange={this.changeVal.bind(this, i)}
         onKeyUp={this.keyUp.bind(this, i)}
         size={size}
@@ -415,19 +425,36 @@ class ContribField extends Component {
     )
   }
 
+  progIcon() {
+    const { editable } = this.props;
+    let progIcon;
+    if (editable) {
+      const { saving, changed, valid } = this.state;
+      const cs = saving.status;
+      if (cs == 'saving') {progIcon = 'fa-spinner fa-spin'}
+      else if (cs == 'saved') {progIcon = 'fa-check saved'}
+      else if (cs == 'error') {progIcon = 'fa-exclamation error'}
+      else if (!valid) {progIcon = 'fa-close invalid'}
+      else if (changed) {progIcon = 'fa-pencil changed'}
+      else {progIcon = 'fa-pencil'}
+      progIcon += ' fa progress';
+    }
+    else {
+      progIcon = 'fa fa-lock progress';
+    }
+    return (<span key={name} className={progIcon}/>)
+  }
+
   valuesAsReadonly() {
     const { curValues } = this.state;
-    const {name } = this.props;
+    const { name } = this.props;
     if (curValues.length == 0) {return <span className='absent'>no value</span>}
     const { valType, multiple, appearance } = this.props;
     const methods = readonlyMakeFragment(this);
     const makeFragment = methods[valType] || methods._default;
-    const progIcon = 'fa fa-lock progress';
     const cutoff = appearance.cutoff;
     const alt2 = []
-    const alt1 = [
-      <span key={name} className={progIcon}/>
-    ];
+    const alt1 = [];
     alt1.push(' ');
     const processValues = appearance.reverse?[...curValues].reverse():curValues;
     processValues.forEach((v, i) => {
@@ -442,24 +469,14 @@ class ContribField extends Component {
   }
 
   valuesAsControls() {
-    const { curValues, reasons, saving, valid, changed } = this.state;
+    const { curValues, reasons } = this.state;
     const { savedValues } = this.state;
     const { name, valType, multiple, validation, allowNew, appearance } = this.props;
     const methods = editMakeFragment(this);
     const makeFragment = methods[valType] || methods._default;
-    const cs = saving.status;
-    let progIcon;
-    if (cs == 'saving') {progIcon = 'fa-spinner fa-spin'}
-    else if (cs == 'saved') {progIcon = 'fa-check saved'}
-    else if (cs == 'error') {progIcon = 'fa-exclamation error'}
-    else if (!valid) {progIcon = 'fa-close invalid'}
-    else if (changed) {progIcon = 'fa-pencil changed'}
-    else {progIcon = 'fa-pencil'}
-    progIcon += ' fa progress';
     const cutoff = appearance.cutoff;
     const alt2 = []
     const alt1 = []
-    alt1.push(<span key={name} className={progIcon}/>);
     const processValues = appearance.reverse?[...curValues].reverse():curValues;
     processValues.forEach((v, i) => {
       let destAlt = (!cutoff || i <= cutoff-1)?alt1:alt2;
@@ -512,15 +529,21 @@ class ContribField extends Component {
 
   render() {
     const { relValues } = this.state;
-    const { editable, valType, convert } = this.props;
-    const { usersMap, countriesMap } = this.props;
+    const { name, label, editable, valType, convert } = this.props;
+    const { curValues } = this.state;
     if (editable && relValues == null && valType == 'rel' && convert != 'user' && convert != 'country') {
       return null;
     }
-    return editable ? (
-      <div className="editable" onBlur={this.saveField.bind(this)}>{this.valuesAsControls()}</div>
-    ):(
-      <div className="readonly">{this.valuesAsReadonly()}</div>
+    const classNames = editable?'editable':'readonly';
+    const prog = this.progIcon();
+    const values = editable?this.valuesAsControls():this.valuesAsReadonly();
+    const onClick = (editable && this.saveLater) ? {onClick: this.saveField.bind(this)} : {};
+    return (
+      <tr>
+        <td className="label" {...onClick} >{label}</td>
+        <td className="label" {...onClick} >{prog}</td>
+        <td><div className={classNames}>{values}</div></td>
+      </tr>
     )
   }
 
@@ -529,7 +552,8 @@ class ContribField extends Component {
  * @param {Contrib[]} contribs (from *state*) The list of contribution records as it comes form mongo db
  * @returns {Object} The data fetched from the server.
 */
-  componentDidMount() {
+  fetchValues() {
+    const { rowId } = this.props;
     let { relValues } = this.state;
     const { valType, getValues, convert, usersMap, countriesMap } = this.props;
     if (valType == 'rel' && convert != 'user' && convert != 'country' && relValues == null) {
@@ -545,6 +569,8 @@ class ContribField extends Component {
       );
     }
   }
+  componentDidMount()  {this.fetchValues(); this.fullfillSave()}
+  componentDidUpdate() {this.fetchValues(); this.fullfillSave()}
 }
 
 export default withContext(saveState(ContribField, 'ContribField', normalizeValues))

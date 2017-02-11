@@ -57,7 +57,7 @@ export function compileFiltering(contribs, fields, filterList) {
     for (const field of filterFields) {
       const fFieldValues = fieldValues.get(field);
       const metaraw = row[field];
-      if (metaraw != undefined && metaraw.length !== 0) {
+      if (metaraw != null && metaraw.length !== 0) {
         for (const {_id: valueId, value: valueRep} of metaraw) {
           if (!fFieldValues.has(valueId)) {fFieldValues.set(valueId, valueRep)}
         }
@@ -269,7 +269,7 @@ const fullTextCheck = (field, term) => {
   return row => {
     let val = row[field];
     val = (val != null)?val[0] : val;
-    return val != undefined && val.toLowerCase().indexOf(search) !== -1;
+    return val != null && val.toLowerCase().indexOf(search) !== -1;
   }
 }
 

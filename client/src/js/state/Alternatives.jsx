@@ -41,7 +41,7 @@ class Alternatives extends Component {
   next(event) {
     event.preventDefault();
     const { tag, alternatives, initial } = this.props;
-    const oldAlt = (this.state.alt == undefined)?((initial == undefined)?0:initial):this.state.alt;
+    const oldAlt = (this.state.alt == null)?((initial == null)?0:initial):this.state.alt;
     const newAlt = (oldAlt + 1) % alternatives.length; 
     lsSet(tag, newAlt);
     this.setState({alt: newAlt});

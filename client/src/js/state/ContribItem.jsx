@@ -27,12 +27,11 @@ class ContribItem extends Component {
  * plus a list of fields that is provided for each row (dependent on user permissions)
  * @returns {Fragment}
 */
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
   updMod(modifiedFieldData) {
+    const newEditing = {}
+    for (const n in modifiedFieldData) {
+      newEditing[n] = false;
+    }
     const newState = {
       ...this.state,
       fieldData: {
@@ -41,9 +40,39 @@ class ContribItem extends Component {
           ...this.state.fieldData.fields,
           ...modifiedFieldData
         }
-      }
+      },
     }
     this.setState(newState)
+  }
+  progIcon(noChange, allValid) {
+    const { progs, contribId } = this.props;
+    const classes = ['savei']
+    classes.push(allValid?'valid':'invalid');
+    classes.push(noChange?'clean':'dirty');
+    if (!allValid) {classes.push('fa fa-close invalid')}
+    else if (!noChange) {classes.push('fa fa-pencil changed')}
+    progs[contribId].className = classes.join(' ');
+  }
+
+  updEdit(name, changed, valid) {
+    const { saveConcern } = this.state;
+    const newState = {
+      ...this.state,
+      changed: {...this.state.changed, [name]: changed},
+      valid: {...this.state.valid, [name]: valid},
+    }
+    const { noChange, allValid, canSave } = this.saveStatus(newState);
+    this.progIcon(noChange, allValid);
+    if (!canSave) {
+      newState.saveConcern = false;
+    }
+    this.setState(newState)
+  }
+  saveAll() {
+    const { canSave } = this.saveStatus();
+    if (canSave) {
+      this.setState({...this.state, saveConcern: true})
+    }
   }
 
   parseFields() {
@@ -55,32 +84,54 @@ class ContribItem extends Component {
       if (fields[name] == null) {continue}
       const editable = !!perm.update[name];
       frags.push(
-        <tr key={name}>
-          <td className="label">{label}</td>
-          <td>
-            <ContribField
-              tag={`${row._id}_${name}`}
-              initValues={row[name]}
-              rowId={row._id}
-              editable={editable}
-              name={name}
-              updMod={this.updMod.bind(this)}
-              {...specs}
-            />
-          </td>
-        </tr>
+        <ContribField
+          key={name}
+          tag={`field_${row._id}_${name}`}
+          initValues={row[name]}
+          rowId={row._id}
+          editable={editable}
+          name={name}
+          label={label}
+          saveConcern={this.state.saveConcern}
+          updMod={this.updMod.bind(this)}
+          updEdit={this.updEdit.bind(this)}
+          {...specs}
+        />
       )
     }
     return frags
   }
 
+  saveStatus(newState) {
+    const { fieldData, changed, valid } = (newState == null)? this.state : newState;
+    const noChange = Object.keys(changed).every(n=>!changed[n])
+    const allValid = Object.keys(valid).every(n=>valid[n])
+    const canSave = !Object.keys(changed).every(n=>(!changed[n] || !valid[n]))
+    return { noChange, allValid, canSave }
+  }
+
   render() {
-    const { fieldData } = this.state;
-    if (fieldData == null) {
+    const { fieldData, changed, valid } = this.state;
+    if (fieldData == null || fieldData.row == null) {
       return <div/>
     }
+    const { noChange, allValid, canSave } = this.saveStatus(); 
+    const allValidClass = allValid?'valid':'invalid';
+    const noChangeClass = noChange?'clean':'dirty';
+    const elemText = noChange?'all saved':(allValid?'save changes':'make corrections');
     return (
       <div className="item">
+        <p>{
+          canSave? (
+            <a
+              className={`save ${noChangeClass} ${allValidClass}`}
+              href="#"
+              onClick={this.saveAll.bind(this)}
+            >{elemText}</a>
+          ) : (
+            <span className={`save ${noChangeClass} ${allValidClass}`}>{elemText}</span>
+          )
+        }</p>
         <table>
           <tbody>
             {this.parseFields()}
@@ -94,14 +145,14 @@ class ContribItem extends Component {
  * @param {Contrib[]} contribs (from *state*) The list of contribution records as it comes form mongo db
  * @returns {Object} The data fetched from the server.
 */
-  componentDidMount() {
+  fetchRow() {
     const { fieldData } = this.state;
-    const { row } = this.props;
+    const { contribId, ownOnly } = this.props;
     if (fieldData == null) {
       getData([
           {
             type: 'db',
-            path: `/item_contrib?id=${row._id}`,
+            path: `/item_contrib?id=${contribId}${ownOnly?'&own=true':''}`,
             branch: 'fieldData',
           },
         ],
@@ -110,7 +161,10 @@ class ContribItem extends Component {
       );
     }
   }
+  componentDidMount()  {this.fetchRow()}
+  componentDidUpdate() {this.fetchRow()}
+
 }
 
-export default withContext(saveState(ContribItem, 'ContribItem', {fieldData: null}))
+export default withContext(saveState(ContribItem, 'ContribItem', {fieldData: null, changed: {}, valid: {}, saveConcern: false}))
 

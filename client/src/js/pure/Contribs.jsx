@@ -9,16 +9,14 @@ import ContribTitle from './ContribTitle.jsx'
  *
  * @class
  * @param {Object[]} filteredData The list of rows to be displayed
- * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
- * dependent on the permissions of the current user.
  * @returns {Fragment}
  */
-const Contribs = ({ filteredData, fields }) => (
+const Contribs = ({ filteredData, inplace, progs }) => (
   <div style={{height: '100%', overflow: 'auto'}}>
     <table>
       <tbody>{
       filteredData.map(item => (
-          <ContribTitle key={item._id} row={item} fields={fields} />
+          <ContribTitle key={item._id} row={item} inplace={inplace} progs={progs}/>
       ))
       }</tbody>
     </table>

@@ -1,6 +1,6 @@
 import React from 'react'
-import  Login from '../state/Login.jsx'
-import  NavLink  from './NavLink.jsx'
+import Login from '../state/Login.jsx'
+import NavLink  from './NavLink.jsx'
 import Notification from '../state/Notification.jsx'
 import { columnStyle } from '../helpers/ui.js'
 
@@ -44,6 +44,7 @@ const App = ({children}) => (
     <div className="nav" style={columnStyle('left')}>
       <ul className="nav" style={{height: '60%'}}>
         <li><NavLink to="/contrib">Contributions</NavLink></li>
+        <li><NavLink to="/mycontrib">My work</NavLink></li>
         <li><NavLink to="/docs/about.md">About</NavLink></li>
       </ul>
       <ul className="nav" style={{height: '30%', verticalAlign: 'bottom'}} >

@@ -189,7 +189,7 @@ export const saveState = (ComponentInner, key, initialState) => {
       this.stateSave()
     }
     componentWillReceiveProps(newProps) {
-      const { oldTag } = this.props;
+      const { tag: oldTag } = this.props;
       const { tag } = newProps;
       if (oldTag !== tag) {
         this.stateSave();

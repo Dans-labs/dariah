@@ -76,7 +76,7 @@ class FilterCompute extends Component {
           />
         </div>
         <div style={columnStyle('rightRight')}>
-          <Contribs filteredData={filteredData} fields={fields}/>
+          <Contribs filteredData={filteredData} inplace={true}/>
         </div>
       </div>
     )

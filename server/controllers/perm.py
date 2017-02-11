@@ -7,16 +7,23 @@ class PermApi(object):
         return self.userInfo.get('_id', None)
 
     def queryFromFilter(self, f):
-        return {} if f == True else \
-            ({'creator.eppn': self.userInfo['eppn']} if 'eppn' in self.userInfo else False) if f == 'own' else \
-            False if len(f) == 0 else f
+        uid = self.userInfo.get('_id', None)
+        if f == 'own':
+            return {'creator._id': uid} if uid != None else {'_id': {'$in': []}}
+        if f == True:
+            return {}
+        if f == False:
+            return f
+        return {'_id': {'$in': f}}
 
     def criteriaFromFilter(self, f):
-        eppn = self.userInfo.get('eppn', None)
+        uid = self.userInfo.get('_id', None)
         if f == 'own':
-            return (lambda x: x.get('creator', {}).get('eppn', None) == eppn) if eppn != None else lambda x: False
+            return (lambda x: uid in set(map(lambda c: c['_id'], x.get('creator', [])))) if uid != None else (lambda x: False)
         if f == True:
             return lambda x: True
+        if f == False:
+            return lambda x: False
         return lambda x: x['_id'] in f
 
     def queryFromProjector(self, p):

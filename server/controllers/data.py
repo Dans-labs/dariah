@@ -28,13 +28,19 @@ class DataApi(object):
         if callable(method):
             allowed = perm.getPerms(query)
             if not allowed:
-                return dict(data=None, msgs=self.perm.msgs, good=False)
+                return dict(data=[], msgs=self.perm.msgs, good=False)
             else:
                 return method()
         else:
-            return dict(data=None, msgs=[dict(kind='error', text='query {} not provided'.format(query))], good=False)
+            return dict(data=[], msgs=[dict(kind='error', text='query {} not provided'.format(query))], good=False)
 
     def list_contrib(self):
+        qfilter = self.perm.filters['read']
+        qprojector = self.perm.projectors['read']
+        documents = list(self.dbm.contrib.find(qfilter, qprojector).sort('title', 1)) if qfilter != False else []
+        return dict(data=dict(contribs=documents, fields=qprojector), msgs=[], good=True)
+
+    def my_contribs(self):
         qfilter = self.perm.filters['read']
         qprojector = self.perm.projectors['read']
         documents = list(self.dbm.contrib.find(qfilter, qprojector).sort('title', 1)) if qfilter != False else []
@@ -137,18 +143,23 @@ class DataApi(object):
                 )
         else:
             action = 'read'
+            own = request.query.own == 'true'
             contribId = request.query.id
             if len(contribId) > 32:
-                return dict(data=None, msgs=[dict(kind='error', text='contribution does not exist')], good=False)
+                return dict(data=[], msgs=[dict(kind='error', text='contribution does not exist')], good=False)
             thisFilter = {'_id': contribId}
-            qfilter = self.perm.filters[action]
+            paction = 'update' if own else action
+            qfilter = self.perm.filters[paction]
             if qfilter != False:
                 qfilter.update(thisFilter)
             qprojector = self.perm.projectors[action]
             documents = list(self.dbm.contrib.find(qfilter, qprojector)) if qfilter != False else []
             ldoc = len(documents)
             if ldoc == 0:
-                return dict(data=None, msgs=[dict(kind='error', text='contribution does not exist')], good=False)
+                if own: 
+                    return dict(data={}, msgs=[], good=True)
+                else:
+                    return dict(data={}, msgs=[dict(kind='error', text='contribution does not exist')], good=False)
             msgs = [] if ldoc == 1 else [dict(kind='warning', text='multiple contributions found')]
             document = documents[0]
             mayUpdate = criteria(document)
@@ -184,6 +195,6 @@ class DataApi(object):
         valueList = request.query.list
         qprojector = self.perm.projectors['read']
         if valueList not in qprojector:
-            return dict(data=None, msgs=[dict(kind='error', text='no access to list "{}"'.format(valueList))], good=False)
+            return dict(data=[], msgs=[dict(kind='error', text='no access to list "{}"'.format(valueList))], good=False)
         documents = list(self.dbm.contrib.distinct(valueList, {}))
         return dict(data=documents, msgs=[], good=True)

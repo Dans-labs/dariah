@@ -208,7 +208,7 @@ class Notification extends Component {
  * Hides or shows the div containing the message panel.
 */
   setView(on) {
-    if (on !== undefined) {
+    if (on != null) {
       this.visible = on;
     }
     this.refs.notbox.style.display = this.visible ? 'block' : 'none';
