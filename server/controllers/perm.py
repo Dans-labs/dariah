@@ -7,7 +7,7 @@ class PermApi(object):
         return self.userInfo.get('_id', None)
 
     def queryFromFilter(self, f):
-        uid = self.userInfo.get('_id', None)
+        uid = self.getUid()
         if f == 'own':
             return {'creator._id': uid} if uid != None else {'_id': {'$in': []}}
         if f == True:
@@ -17,7 +17,7 @@ class PermApi(object):
         return {'_id': {'$in': f}}
 
     def criteriaFromFilter(self, f):
-        uid = self.userInfo.get('_id', None)
+        uid = self.getUid()
         if f == 'own':
             return (lambda x: uid in set(map(lambda c: c['_id'], x.get('creator', [])))) if uid != None else (lambda x: False)
         if f == True:
@@ -27,7 +27,7 @@ class PermApi(object):
         return lambda x: x['_id'] in f
 
     def queryFromProjector(self, p):
-        return dict(((f, True) for f in p))
+        return dict((f, True) for f in p)
 
     def getPerms(self, query):
         self.query = query
@@ -67,12 +67,15 @@ class PermApi(object):
                 continue
 
             conditions = perms[action]
-            if 'rows' not in conditions: conditions['rows'] = 'none'
-            if 'fields' not in conditions: conditions['fields'] = 'none'
+            if type(conditions) is bool:
+                self.criteria[action] = conditions
+            else:
+                if 'rows' not in conditions: conditions['rows'] = 'none'
+                if 'fields' not in conditions: conditions['fields'] = 'none'
 
-            self.filters[action] = self.queryFromFilter(conditions['rows'])
-            self.criteria[action] = self.criteriaFromFilter(conditions['rows'])
-            self.projectors[action] = self.queryFromProjector(conditions['fields'])
+                self.filters[action] = self.queryFromFilter(conditions['rows'])
+                self.criteria[action] = self.criteriaFromFilter(conditions['rows'])
+                self.projectors[action] = self.queryFromProjector(conditions['fields'])
         return True
 
 

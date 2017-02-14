@@ -15,15 +15,12 @@ import { withContext, saveState } from '../helpers/hoc.js'
  * Displays all fields that the user is entitled to read.
  * With a control to edit the record.
  * 
- * For the actual editing I intend to use
- * {@link https://github.com/kaivi/riek|React Inline Edit Kit}
- *
  */
 class ContribItem extends Component {
 /**
  *
  * @method
- * @param {Contrib[]} contribdata (from *state*) The list of contribution records as it comes form mongo db,
+ * @param {Contrib[]} contribData (from *state*) The list of contribution records as it comes form mongo db,
  * plus a list of fields that is provided for each row (dependent on user permissions)
  * @returns {Fragment}
 */
@@ -45,17 +42,21 @@ class ContribItem extends Component {
     this.setState(newState)
   }
   progIcon(noChange, allValid) {
-    const { progs, contribId } = this.props;
+    const { editStatus, contribId } = this.props;
     const classes = ['savei']
     classes.push(allValid?'valid':'invalid');
     classes.push(noChange?'clean':'dirty');
     if (!allValid) {classes.push('fa fa-close invalid')}
     else if (!noChange) {classes.push('fa fa-pencil changed')}
-    progs[contribId].className = classes.join(' ');
+    editStatus[contribId].prog.className = classes.join(' ');
   }
 
-  updEdit(name, changed, valid) {
-    const { saveConcern } = this.state;
+  updEdit(name, changed, valid, newVals) {
+    const { editStatus, contribId } = this.props;
+    const { saveConcern, fieldData } = this.state;
+    if (name == 'title' && changed) {
+      editStatus[contribId].title.innerHTML = newVals[0];
+    }
     const newState = {
       ...this.state,
       changed: {...this.state.changed, [name]: changed},
@@ -83,12 +84,13 @@ class ContribItem extends Component {
       const { label, ...specs } = fieldSpecs[name];
       if (fields[name] == null) {continue}
       const editable = !!perm.update[name];
+      const rowId = row._id;
       frags.push(
         <ContribField
           key={name}
-          tag={`field_${row._id}_${name}`}
+          tag={`field_${rowId}_${name}`}
           initValues={row[name]}
-          rowId={row._id}
+          rowId={rowId}
           editable={editable}
           name={name}
           label={label}

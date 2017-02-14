@@ -64,17 +64,29 @@ def permissionModel(fs):
                         rows = 'own',
                         fields = fs['all'] & fs['meta'],
                     ),
+                    insert = True,
+                    delete = dict(
+                        rows = 'own',
+                    ),
                 ),
                 man = dict(
                     read = dict(
                         rows = 'own',
                         fields = fs['all'] & fs['meta'],
                     ),
+                    insert = True,
+                    delete = dict(
+                        rows = 'own',
+                    ),
                 ),
                 sys = dict(
                     read = dict(
                         rows = 'own',
                         fields = fs['all'] & fs['meta'],
+                    ),
+                    insert = True,
+                    delete = dict(
+                        rows = 'own',
                     ),
                 ),
             ),
@@ -124,6 +136,10 @@ def permissionModel(fs):
                         rows = 'own',
                         fields = fs['public'] | fs['own'],
                     ),
+                    insert = True,
+                    delete = dict(
+                        rows = 'own',
+                    ),
                 ),
                 man = dict(
                     read = dict(
@@ -134,6 +150,10 @@ def permissionModel(fs):
                         rows = True,
                         fields = fs['public'] | fs['own'],
                     ),
+                    insert = True,
+                    delete = dict(
+                        rows = 'own',
+                    ),
                 ),
                 sys = dict(
                     read = dict(
@@ -143,6 +163,10 @@ def permissionModel(fs):
                     update = dict(
                         rows = True,
                         fields = fs['all'],
+                    ),
+                    insert = True,
+                    delete = dict(
+                        rows = 'own',
                     ),
                 ),
             ),

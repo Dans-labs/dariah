@@ -89,26 +89,12 @@ const mapOptions = {
  * @param {Map} amounts - `filteredAmountOthers`, but more specific: the amounts per faceted value
  * @returns {number} the desired radius for this country
 */
-const computeRadius = (iso2, filteredAmountOthers, amounts) => { 
-  const amount = amounts ? amounts.has(iso2) ? amounts.get(iso2) : 0 : 0;
+const computeRadius = (i, filteredAmountOthers, amounts) => { 
+  const amount = amounts ? amounts.has(i) ? amounts.get(i) : 0 : 0;
   if (amount == 0) {return 0}
   const proportional = mapOptions.MAX_RADIUS * amount / filteredAmountOthers;
   if (filteredAmountOthers < mapOptions.LEVEL_OFF) {return proportional}
   return mapOptions.LEVEL_OFF * Math.sqrt(proportional);
-}
-
-/**
- * @function
- * @param {Object} feature A feature (i.e. a country) in the   
- * {@link module:europe_geo_js|geojson}
- * file of European countries
- * @param {Map} countriesMap The country information as fetched from the database on the server.
- * Organized as a {Map} keyed by Two-letter country codes.
- * @returns {boolean} Whether the country in question is a member of DARIAH.
- */
-const inDariah = (feature, countriesMap) => {
-  const iso2 = feature.properties.iso2;
-  return countriesMap.has(iso2)
 }
 
 /**
@@ -126,6 +112,9 @@ class EUMap extends Component {
     super(props);
     this.features = new Map();
   }
+  setMap(dom) {
+    if (dom) {this.dom = dom}
+  }
 /**
  * render() just invokes the ByValue component with the right parameters
  * to get the country facets.
@@ -140,9 +129,10 @@ class EUMap extends Component {
     const { countriesMap, ...byValueProps } = this.props;
     return (
       <div>
-        <div ref="eumap" style={{
-          height: mapOptions.HEIGHT,
-        }}/>
+        <div
+          ref={this.setMap.bind(this)}
+          style={{height: mapOptions.HEIGHT}}
+        />
         <ByValue {...byValueProps}/>
       </div>
     )
@@ -165,24 +155,27 @@ class EUMap extends Component {
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {DOM}
  */
+
   componentDidMount() {
     const { filterSettings, filteredAmountOthers, amounts, countriesMap } = this.props;
-    this.map = L.map(this.refs.eumap, {
+    this.map = L.map(this.dom, {
       attributionControl: false,
       center: mapOptions.MAP_CENTER,
       zoom: mapOptions.ZOOM_INIT,
       maxBounds: mapOptions.MAP_BOUNDS,
     });
+    this.idFromIso = new Map([...countriesMap.values()].map(d => [d.iso, d._id]));
     L.geoJSON(countryBorders, {
-      style: feature => mapOptions.COUNTRY_STYLE[inDariah(feature, countriesMap)],
+      style: feature => mapOptions.COUNTRY_STYLE[this.inDariah(feature)],
       onEachFeature: feature => {
-        if (inDariah(feature, countriesMap)) {
+        if (this.inDariah(feature)) {
           const fprops = feature.properties;
           const iso2 = fprops.iso2;
-          const isOn = filterSettings.get(iso2);
+          const i = this.idFromIso.get(iso2);
+          const isOn = filterSettings.get(i);
           const marker = L.circleMarker([fprops.lat, fprops.lng], {
             ...mapOptions.MARKER_COLOR[isOn],
-            radius: computeRadius(iso2, filteredAmountOthers, amounts),
+            radius: computeRadius(i, filteredAmountOthers, amounts),
             ...mapOptions.MARKER_SHAPE,
             pane: 'markerPane',
           }).addTo(this.map);
@@ -191,6 +184,8 @@ class EUMap extends Component {
       },
     }).addTo(this.map);
   }
+
+  inDariah(feature) {return this.idFromIso.has(feature.properties.iso2)}
 
 /**
  * After getting new filter results, the only thing we have to do is to
@@ -206,8 +201,9 @@ class EUMap extends Component {
   componentDidUpdate() {
     const { filterSettings, filteredAmountOthers, amounts } = this.props;
     for (const [iso2, marker] of this.features) {
-      const isOn = filterSettings.get(iso2);
-      marker.setRadius(computeRadius(iso2, filteredAmountOthers, amounts));
+      const i = this.idFromIso.get(iso2);
+      const isOn = filterSettings.get(i);
+      marker.setRadius(computeRadius(i, filteredAmountOthers, amounts));
       marker.setStyle(mapOptions.MARKER_COLOR[isOn]);
     }
   }

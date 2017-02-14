@@ -6,6 +6,8 @@ DEFAULTS = dict(
 
 contribModel = dict(
 
+    createdDate = 'dateCreated',
+    createdBy = 'creator',
     modDate = 'dateModified',
     modBy = 'modifiedBy',
 
@@ -30,6 +32,7 @@ contribModel = dict(
 
         call = '''
             name
+            iso
             isMember
             latitude
             longitude

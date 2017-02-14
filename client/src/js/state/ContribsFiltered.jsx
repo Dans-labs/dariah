@@ -40,19 +40,19 @@ class ContribsFiltered extends Component {
  * Calls {@link module:filtering.compileFiltering|compileFiltering} before the actual rendering.
  *
  * @method
- * @param {Contrib[]} contribdata (from *state*) The list of contribution records as it comes form mongo db,
+ * @param {Contrib[]} contribData (from *state*) The list of contribution records as it comes form mongo db,
  * plus a list of fields that is provided for each row (dependent on user permissions)
  * @param {Map} countries (from *state*) The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {Fragment}
 */
   render() {
-    const { contribdata, countries, users } = this.state;
+    const { contribData, countries, users } = this.state;
     const { usersMap, countriesMap } = this.props;
-    if (contribdata == null || countries == null || users == null) {
+    if (contribData == null || countries == null || users == null) {
       return <div/>
     }
-    const { contribs, fields } = contribdata;
+    const { contribs, fields } = contribData;
     const { fieldValues, filterInit } = compileFiltering(contribs, fields, filterList);
     for (const x of users) {usersMap.set(x._id, x)}
     for (const x of countries) {countriesMap.set(x._id, x)}
@@ -71,13 +71,13 @@ class ContribsFiltered extends Component {
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { contribdata, countries, users } = this.state;
-    if (contribdata == null || countries == null || users == null) {
+    const { contribData, countries, users } = this.state;
+    if (contribData == null || countries == null || users == null) {
       getData([
           {
             type: 'db',
             path: '/list_contrib',
-            branch: 'contribdata',
+            branch: 'contribData',
           },
           {
             type: 'db',

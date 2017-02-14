@@ -20,13 +20,9 @@ const indeterminate = states => !states.allTrue && !states.allFalse
  */
 
 class CheckboxI extends Component {
-  componentDidMount() {
-    const { states } = this.props;
-    this.refs.ci.indeterminate = indeterminate(states);
-  }
   componentDidUpdate() {
     const { states } = this.props;
-    this.refs.ci.indeterminate = indeterminate(states);
+    this.dom.indeterminate = indeterminate(states)
   }
 /**
  * @method
@@ -37,13 +33,20 @@ class CheckboxI extends Component {
  * @returns {Fragment}
 */
   onCheck(updFilter, filterId, states){
-    return event => updFilter(filterId, this.refs.ci.indeterminate || !states.allTrue)
+    return event => updFilter(filterId, this.dom.indeterminate || !states.allTrue)
+  }
+  setIndeterminate(domElem) {
+    const { states } = this.props;
+    if (domElem) {
+      this.dom = domElem;
+      domElem.indeterminate = indeterminate(states);
+    }
   }
   render () {
     const { states, filterId, updFilter } = this.props;
     return (
       <input
-          ref="ci"
+          ref={this.setIndeterminate.bind(this)}
           type="checkbox"
           onChange={this.onCheck(updFilter, filterId, states).bind(this)}
           checked={states.allTrue}

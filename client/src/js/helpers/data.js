@@ -80,3 +80,5 @@ export function getData(sources, component, notification) {
     });
   }
 }
+
+//export const dtm = dateVal => (new Date(dateVal['$date'])).toISOString())

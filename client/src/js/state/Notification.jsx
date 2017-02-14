@@ -104,6 +104,7 @@ class Notification extends Component {
     props.notification.component = this
     this.msgs = []; // synchronous list of messages
     this.visible = false;
+    this.dom = {};
   }
   notify(msg) {
     this.msgs.push(msg); // synchronous addition of msg
@@ -154,6 +155,10 @@ class Notification extends Component {
  * @param {boolean} visible: whether we should show the panel
  * @returns {Fragment}
  */
+  refDom(label, dom) {
+    if (dom) {this.dom[label] = dom}
+  }
+
   render() {
     [this.lastMsg, this.lastNote, this.lastKind, this.busy, this.visible] = this.computeProgress();
     const busyBlocks = new Array(this.busy).fill(1);
@@ -170,13 +175,16 @@ class Notification extends Component {
             <span className={`fa fa-${this.busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}/>
           </a>
         </p>
-        <div ref="notbox" style={msgStyle.box}
+        <div
+          ref={this.refDom.bind(this, 'notbox')}
+          style={msgStyle.box}
           onClick={e=>{e.preventDefault(); this.setView(false)}}
         >
           {
             (this.msgs || empty).map((msg, index) => (
             <p
-              key={index} ref={`m${index}`}
+              key={index}
+              ref={this.refDom.bind(this, `m${index}`)}
               style={{...msgStyle.line, ...msgStyle[msg.kind]}}
             >{msg.text}</p>
             ))
@@ -211,17 +219,17 @@ class Notification extends Component {
     if (on != null) {
       this.visible = on;
     }
-    this.refs.notbox.style.display = this.visible ? 'block' : 'none';
+    this.dom.notbox.style.display = this.visible ? 'block' : 'none';
     this.setScroll();
   }
   setScroll() {
     if (this.visible) {
       if (this.lastNote > -1) {
-        this.refs[`m${this.lastNote}`].scrollIntoView();
+        this.dom[`m${this.lastNote}`].scrollIntoView();
       }
       else {
         if (this.lastMsg > -1) {
-          this.refs[`m${this.lastMsg}`].scrollIntoView()
+          this.dom[`m${this.lastMsg}`].scrollIntoView()
         }
       }
     }

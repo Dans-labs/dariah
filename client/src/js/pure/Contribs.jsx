@@ -11,12 +11,12 @@ import ContribTitle from './ContribTitle.jsx'
  * @param {Object[]} filteredData The list of rows to be displayed
  * @returns {Fragment}
  */
-const Contribs = ({ filteredData, inplace, progs }) => (
+const Contribs = ({ filteredData, inplace }) => (
   <div style={{height: '100%', overflow: 'auto'}}>
     <table>
       <tbody>{
       filteredData.map(item => (
-          <ContribTitle key={item._id} row={item} inplace={inplace} progs={progs}/>
+          <ContribTitle key={item._id} row={item} inplace={inplace}/>
       ))
       }</tbody>
     </table>

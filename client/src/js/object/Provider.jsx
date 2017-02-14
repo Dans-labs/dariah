@@ -85,6 +85,7 @@ class Provider extends Component {
       userInfo: new Map(),
       usersMap: new Map(),
       countriesMap: new Map(),
+      editStatus: {},
     };
     return {globals}
   }

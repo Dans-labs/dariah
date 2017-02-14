@@ -15,7 +15,7 @@ const sizes = {
   _max: 50,
 }
 
-const trimdate = text => ({ full: text, text: text.replace(/\.[0-9]+/, '')})
+const trimDate = text => ({ full: text, text: text.replace(/\.[0-9]+/, '')})
 
 const condense = text => ({ full: text, text: (text.length > 20)?`${text.slice(0,8)}...${text.slice(-8)}`:text})
 
@@ -81,13 +81,12 @@ const countryAsString = (valRaw, countriesMap) => {
   else {
     const countryData = countriesMap.get(valId);
     valShort = countryData.name;
-    valRep = `${valId}: ${countryData.name}`;
+    valRep = `${countryData.iso}: ${countryData.name}`;
   }
   return {text: valShort, full:valRep}
 }
 
 const validate = (val, valType, validation) => {
-  let rawVal = val;
   let vstatus = true;
   let reason = '';
   if (validation.nonEmpty && (val == null || val == '')) {
@@ -119,18 +118,13 @@ const validate = (val, valType, validation) => {
     catch (error) {
       reason = `not a valid date/time - ${error}`;
       vstatus = false;
-      rawVal = val;
     }
     if (isNaN(times)) {
       reason = `not a valid date/time`;
       vstatus = false;
-      rawVal = val;
-    }
-    else {
-      rawVal = {'$date': times}
     }
   }
-  return { rawVal, vstatus, reason };
+  return { vstatus, reason };
 }
 
 /**
@@ -144,15 +138,12 @@ const validate = (val, valType, validation) => {
  * Displays all fields that the user is entitled to read.
  * With a control to edit the record.
  * 
- * For the actual editing I intend to use
- * {@link https://github.com/kaivi/riek|React Inline Edit Kit}
- *
  */
 class ContribField extends Component {
 /**
  *
  * @method
- * @param {Contrib[]} contribdata (from *state*) The list of contribution records as it comes form mongo db,
+ * @param {Contrib[]} contribData (from *state*) The list of contribution records as it comes form mongo db,
  * plus a list of fields that is provided for each row (dependent on user permissions)
  * @returns {Fragment}
 */
@@ -167,9 +158,8 @@ class ContribField extends Component {
     }
     else {
       const { valType, validation } = this.props;
-      const { rawVal, vstatus, reason } = validate(newVal, valType, validation);
-      const sVal = (rawVal == null)?newVal:rawVal
-      const sendVal = (_id == null)? sVal:{ _id, value: sVal }
+      const { vstatus, reason } = validate(newVal, valType, validation);
+      const sendVal = (_id == null)? newVal :{ _id, value: newVal }
       const refI = (i == -1)?newValues.length:i;
       if (i == -1) {newValues.push(sendVal)}
       else {newValues[i] = sendVal}
@@ -246,7 +236,7 @@ class ContribField extends Component {
         }
       }
     }
-    updEdit(name, changed, valid);
+    updEdit(name, changed, valid, newValues);
     return { valid , changed }
   }
 
@@ -276,7 +266,7 @@ class ContribField extends Component {
         valid: true,
       });
       updMod(modValues);
-      updEdit(name, false, true);
+      updEdit(name, false, true, newValues);
     }
   }
 
@@ -284,9 +274,11 @@ class ContribField extends Component {
     const { curValues } = this.state;
     const { name, rowId, valType } = this.props;
     let sendValues = (newValues == null)?curValues:newValues;
+    /*
     if (valType == 'datetime') {
-      sendValues = sendValues.map(v => (new Date(v['$date'])).toISOString());
+      sendValues = sendValues.map(v => dtm(v));
     }
+    */
     this.setState({
       ...this.state,
       reasons: {},
@@ -327,7 +319,7 @@ class ContribField extends Component {
         }
       }
       case 'datetime': {
-        return trimdate((typeof valRaw == 'string')?valRaw:(new Date(valRaw['$date'])).toISOString());
+        return trimDate(valRaw);
       }
       default: {return {text: valRaw, full: valRaw}}
     }
@@ -477,34 +469,37 @@ class ContribField extends Component {
     const cutoff = appearance.cutoff;
     const alt2 = []
     const alt1 = []
-    const processValues = appearance.reverse?[...curValues].reverse():curValues;
-    processValues.forEach((v, i) => {
-      let destAlt = (!cutoff || i <= cutoff-1)?alt1:alt2;
+    const enumCurValues = curValues.map((v,i) => [i, v])
+    const processValues = appearance.reverse?enumCurValues.reverse():enumCurValues;
+    const classNames = ['value', valType];
+    let destAlt = alt1;
+    let extraClasses = []
+    processValues.forEach((ev, j) => {
+      const [i, v] = ev;
+      destAlt = (!cutoff || j <= cutoff-1)?alt1:alt2;
       const valText = this.valueAsString(v);
       const _id = v._id;
-      const classNames = ['value', valType];
-      const extraClasses = []
+      extraClasses = []
       const reason = reasons[i] || '';
       if (reason != '') {
         extraClasses.push('invalid');
       }
       const size = sizes[valType] || sizes._max;
       const fragment = makeFragment(i, _id, classNames, extraClasses, valText, size);
-      if (multiple || i == 0) {
+      if (multiple || j == 0) {
         destAlt.push(fragment);
         if (reason != '') {
           destAlt.push(' ');
           destAlt.push(<span key={`r_${i}`} className="reason">{reason}</span>)
         }
       }
-      if (multiple) {
-        destAlt.push(' ');
-        if ((i == curValues.length - 1) && (valType == 'rel')) {
-          destAlt.push(this.relSelect(-1, null, classNames, extraClasses, {text: null, full: null}));
-        }
-      }
-      
     });
+    if (multiple || curValues.length == 0) {
+      destAlt.push(' ');
+      if (valType == 'rel') {
+        destAlt.push(this.relSelect(-1, null, classNames, extraClasses, {text: null, full: null}));
+      }
+    }
     return this.knead(alt1, alt2)
   }
 

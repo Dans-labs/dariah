@@ -19,9 +19,8 @@ import ContribItem from '../state/ContribItem.jsx';
  */
 const ContribItemPre = ({ params, route }) => {
   const cId = params.contribId;
-  const { progs } = route;
-  const ownOnly = route != null && route.ownOnly;
-  return (<ContribItem tag={`contrib_${cId}`} contribId={cId} progs={progs} ownOnly={ownOnly}/>)
+  const own = route.ownOnly;
+  return (<ContribItem tag={`contrib_${cId}`} contribId={cId} ownOnly={own}/>)
 }
 
 export default ContribItemPre

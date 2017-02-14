@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 
 import Contribs from '../pure/Contribs.jsx'
+import ContribNew from '../pure/ContribNew.jsx'
+import ContribItemPre from '../pure/ContribItemPre.jsx';
 
 import { getData } from '../helpers/data.js'
 import { withContext, saveState } from '../helpers/hoc.js'
@@ -23,20 +25,47 @@ import { columnStyle } from '../helpers/ui.js'
 class ContribsMy extends Component {
 /**
  * @method
- * @param {Contrib[]} contribdata (from *state*) The list of contribution records as it comes form mongo db,
+ * @param {Contrib[]} contribData (from *state*) The list of contribution records as it comes form mongo db,
  * plus a list of fields that is provided for each row (dependent on user permissions)
  * @param {Map} countries (from *state*) The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {Fragment}
 */
+  inserted(data) {
+    this.setState({...this.state, inserted: data})
+    if (data != null) {
+      const { router } = this.props;
+      router.push(`/mycontrib/${data}`);
+    }
+  }
+
+  insertRow(event) {
+    event.preventDefault();
+    getData([
+        {
+          type: 'db',
+          path: '/item_contrib?action=insert',
+          branch: 'insert',
+          callback: this.inserted.bind(this),
+        },
+        {
+          type: 'db',
+          path: '/my_contribs',
+          branch: 'contribData',
+        },
+      ],
+      this,
+      this.props.notification.component
+    );
+  }
+
   render() {
-    const { contribdata, countries, users } = this.state;
-    const { usersMap, countriesMap, children, route } = this.props;
-    const { progs } = route;
-    if (contribdata == null || countries == null || users == null) {
+    const { contribData, countries, users } = this.state;
+    const { usersMap, countriesMap, children } = this.props;
+    if (contribData == null || countries == null || users == null) {
       return <div/>
     }
-    const { contribs, fields } = contribdata;
+    const { contribs, fields, perm } = contribData;
     for (const x of users) {usersMap.set(x._id, x)}
     for (const x of countries) {countriesMap.set(x._id, x)}
     return (
@@ -44,11 +73,16 @@ class ContribsMy extends Component {
         <div style={columnStyle('rightLeft')}>
           <p
             style={{fontWeight: 'bold', backgroundColor: '#eeeeff'}}
-          >{contribs.length} contributions</p>
-          <Contribs filteredData={contribs} inplace={false} progs={progs}/>
+          >
+            {contribs.length} contributions{' '}
+            {(perm != null && perm.insert)? (
+            <ContribNew insertRow={this.insertRow.bind(this)}/>
+            ): null}
+          </p>
+          <Contribs filteredData={contribs} inplace={false}/>
         </div>
         <div style={columnStyle('rightRight')}>
-          {children}
+          { children }
         </div>
       </div>
     )
@@ -61,13 +95,13 @@ class ContribsMy extends Component {
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { contribdata, countries, users } = this.state;
-    if (contribdata == null || countries == null || users == null) {
+    const { contribData, countries, users, inserted } = this.state;
+    if (contribData == null || countries == null || users == null) {
       getData([
           {
             type: 'db',
             path: '/my_contribs',
-            branch: 'contribdata',
+            branch: 'contribData',
           },
           {
             type: 'db',
@@ -84,8 +118,21 @@ class ContribsMy extends Component {
         this.props.notification.component
       );
     }
+    else if (inserted) {
+      this.setState({...this.state, inserted: null})
+      getData([
+          {
+            type: 'db',
+            path: '/my_contribs',
+            branch: 'contribData',
+          },
+        ],
+        this,
+        this.props.notification.component
+      );
+    }
   }
 }
 
-export default withContext(saveState(ContribsMy, 'ContribsMy', {contribs: null, countries: null, users: null}))
+export default withContext(saveState(ContribsMy, 'ContribsMy', {contribs: null, countries: null, users: null, inserted: null}))
 

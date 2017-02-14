@@ -2,6 +2,7 @@ import React from 'react'
 import Alternatives from '../state/Alternatives.jsx'
 import ContribItem from '../state/ContribItem.jsx'
 import NavLink  from './NavLink.jsx'
+import { withContext } from '../helpers/hoc.js'
 
 /**
  * **purely functional** {@link external:Component|Component}
@@ -15,33 +16,45 @@ import NavLink  from './NavLink.jsx'
  * @returns {Fragment}
  */
 
-const ContribTitle = ({ row, inplace, progs }) => (
-  <tr id={row._id}>
-    <td>{
-      inplace? (
-        <Alternatives tag={`contrib_${row._id}`}
-          controlPlacement={control => (
-            <p> {control} {row.title[0]}</p>
-          )}
-          controls={[
-            (handler => <a className='fa fa-chevron-down' href='#' onClick={handler}/>),
-            (handler => <a className='fa fa-chevron-right' href='#' onClick={handler}/>),
-          ]}
-          alternatives={[
-            (<ContribItem tag={`contrib_${row._id}`} contribId={row._id}/>),
-            '',
-          ]}
-          initial={1}
-        />
-      ) : (
-        <NavLink className="nav" to={`/mycontrib/${row._id}`}>
-          <span ref={ prog => { progs[row._id] = prog }}/>{' '}
-          {row.title}
-        </NavLink>
-      )
-    }
-    </td>
-  </tr>
-)
+const ContribTitle = ({ row, inplace, editStatus }) => {
+  const rowId = row._id;
+  const rowTitle = row.title;
+  return (
+    <tr id={rowId}>
+      <td>{
+        inplace? (
+          <Alternatives tag={`contrib_${rowId}`}
+            controlPlacement={control => (
+            <p>
+                {control}
+                <span ref={ prog => { editStatus[rowId] = {...editStatus[rowId], prog}}}/>{' '}
+                <span ref={ title => { editStatus[rowId] = {...editStatus[rowId], title}}}>
+                    {rowTitle[0]}
+                </span>
+            </p>
+            )}
+            controls={[
+              (handler => <a className='fa fa-chevron-down' href='#' onClick={handler}/>),
+              (handler => <a className='fa fa-chevron-right' href='#' onClick={handler}/>),
+            ]}
+            alternatives={[
+              (<ContribItem tag={`contrib_${rowId}`} contribId={rowId}/>),
+              '',
+            ]}
+            initial={1}
+          />
+        ) : (
+          <NavLink className="nav" to={`/mycontrib/${rowId}`}>
+            <span ref={ prog => { editStatus[rowId] = {...editStatus[rowId], prog}}}/>{' '}
+            <span ref={ title => { editStatus[rowId] = {...editStatus[rowId], title}}}>
+                {rowTitle[0]}
+            </span>
+          </NavLink>
+        )
+      }
+      </td>
+    </tr>
+  )
+}
 
-export default ContribTitle
+export default withContext(ContribTitle)

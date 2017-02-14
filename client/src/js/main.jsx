@@ -58,8 +58,6 @@ import NotFound from './pure/NotFound.jsx';
  * @module main
  */
 
-const progs = {}
-
 render(
   <Provider>
     <Router history={browserHistory}>
@@ -73,8 +71,8 @@ render(
         <IndexRoute component={App}/>
         <IndexRedirect to="/docs/about.md"/>
         <Route path="contrib" component={ContribsFiltered}/>
-        <Route path="mycontrib" component={ContribsMy} progs={progs}>
-          <Route path=":contribId" component={ContribItemPre} progs={progs} ownOnly={true}/>
+        <Route path="mycontrib" component={ContribsMy}>
+          <Route path=":contribId" component={ContribItemPre} ownOnly={true}/>
         </Route>
         <Route path="docs/:docFile" component={Doc}/>
         <Route path="tech/docs/gen/:docFile" component={Doc}/>
@@ -86,4 +84,3 @@ render(
   document.getElementById('body')
 );
 
-// <Route path="/tech/docs/:docFile" component={Doc}/>

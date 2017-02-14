@@ -1,8 +1,7 @@
 from bottle import request
-from db import connectdb
-from datetime import datetime
+from db import connectdb, now, dtm, oid
 
-def getDatetime(iso): return datetime.strptime(iso, "%Y-%m-%dT%H:%M:%S.%fZ")
+IDNAME = '_id'
 
 def validate(values, fieldSpecs):
     valType = fieldSpecs['valType']
@@ -11,7 +10,9 @@ def validate(values, fieldSpecs):
 
     if values == None: return (not nonEmpty, [])
     if valType == 'datetime':
-        valValues = [getDatetime(v) for v in values]
+        valValues = [dtm(v) for v in values]
+    elif valType == 'rel':
+        valValues = [dict((k, oid(m) if k == IDNAME else m) for (k, m) in v.items()) for v in values]
     else:
         valValues = [v for v in values]
     return (True, valValues)
@@ -43,14 +44,15 @@ class DataApi(object):
     def my_contribs(self):
         qfilter = self.perm.filters['read']
         qprojector = self.perm.projectors['read']
+        perm = dict(insert= self.perm.criteria.get('insert', False))
         documents = list(self.dbm.contrib.find(qfilter, qprojector).sort('title', 1)) if qfilter != False else []
-        return dict(data=dict(contribs=documents, fields=qprojector), msgs=[], good=True)
+        return dict(data=dict(contribs=documents, fields=qprojector, perm=perm), msgs=[], good=True)
 
     def item_contrib(self):
         action = request.query.action
-        criteria = self.perm.criteria['update']
 
         if action == 'update':
+            criteria = self.perm.criteria['update']
             qprojector = self.perm.projectors['update']
             newData = request.json
             _id = newData.get('_id', None)
@@ -73,7 +75,8 @@ class DataApi(object):
                     good=False,
                     msgs=[dict(kind='error', text='not allowed to update contribution field {}'.format(name))],
                 )
-            documents = list(self.dbm.contrib.find(dict(_id=_id)))
+            _oid = oid(_id)
+            documents = list(self.dbm.contrib.find(dict(_id=_oid)))
             if len(documents) != 1:
                 return dict(
                     data=None,
@@ -98,7 +101,7 @@ class DataApi(object):
                 )
             (valid, valValues) = validate(newValues, fieldSpecs)
             if not valid:
-                documents = list(self.dbm.contrib.find(dict(_id=_id), {name: True}))
+                documents = list(self.dbm.contrib.find(dict(_id=_oid), {name: True}))
                 if len(documents) != 1:
                     return dict(
                         data=None,
@@ -117,13 +120,16 @@ class DataApi(object):
                 modBy = self.CM.modBy
                 changeVals = {
                     '$set': {name: valValues},
-                    '$push': {
-                        modDate: datetime.utcnow(),
-                        modBy: dict(_id=self.uid),
-                    },
                 }
-                self.dbm.contrib.update_one(dict(_id=_id), changeVals)
-                documents = list(self.dbm.contrib.find(dict(_id=_id), {name: True, modDate: True, modBy: True}))
+                if name != modDate and name != modBy:
+                    changeVals.update({
+                        '$push': {
+                            modDate: now(),
+                            modBy: dict(_id=self.uid),
+                        },
+                    })
+                self.dbm.contrib.update_one(dict(_id=_oid), changeVals)
+                documents = list(self.dbm.contrib.find(dict(_id=_oid), {name: True, modDate: True, modBy: True}))
                 if len(documents) != 1:
                     return dict(
                         data=None,
@@ -141,13 +147,38 @@ class DataApi(object):
                     good=True,
                     msgs=[],
                 )
+        elif action == 'insert':
+            mayInsert = self.perm.criteria.get('insert', False)
+            if not mayInsert:
+                return dict(
+                    data=None,
+                    good=False,
+                    msgs=[dict(kind='error', text='not allowed to insert a new contribution')],
+                )
+            modDate = self.CM.modDate
+            modBy = self.CM.modBy
+            createdDate = self.CM.createdDate
+            createdBy = self.CM.createdBy
+            insertVals = {
+                'title': ['no title'],
+                createdDate: [now()],
+                createdBy: [dict(_id=self.uid)],
+                modDate: [now()],
+                modBy: [dict(_id=self.uid)],
+            }
+            result = self.dbm.contrib.insert_one(insertVals)
+            return dict(
+                data=result.inserted_id,
+                good=result.acknowledged,
+                msgs=[],
+            )
         else:
             action = 'read'
             own = request.query.own == 'true'
             contribId = request.query.id
-            if len(contribId) > 32:
+            if len(contribId) > 65:
                 return dict(data=[], msgs=[dict(kind='error', text='contribution does not exist')], good=False)
-            thisFilter = {'_id': contribId}
+            thisFilter = {'_id': oid(contribId)}
             paction = 'update' if own else action
             qfilter = self.perm.filters[paction]
             if qfilter != False:
@@ -162,7 +193,7 @@ class DataApi(object):
                     return dict(data={}, msgs=[dict(kind='error', text='contribution does not exist')], good=False)
             msgs = [] if ldoc == 1 else [dict(kind='warning', text='multiple contributions found')]
             document = documents[0]
-            mayUpdate = criteria(document)
+            mayUpdate = self.perm.criteria['update'](document)
             ufields = self.perm.projectors['update'] if mayUpdate else {}
             fieldOrder = [x for x in self.CM.fieldOrder if x in qprojector or x in ufields]
             return dict(
@@ -171,7 +202,7 @@ class DataApi(object):
                     fields=qprojector,
                     perm=dict(update=ufields),
                     fieldOrder=fieldOrder,
-                    fieldSpecs=dict(((x for x in self.CM.fieldSpecs.items() if x[0] in fieldOrder))),
+                    fieldSpecs=dict(x for x in self.CM.fieldSpecs.items() if x[0] in fieldOrder),
                 ),
                 msgs=msgs,
                 good=True,

@@ -40,7 +40,7 @@ class UserApi(object):
     def deliver(self):
         groups = self.PM.groups
         self.userInfo['groupDesc'] = groups.get(self.userInfo['group'], dict(desc='??'))['desc']
-        return dict(data=dict(((x for x in self.userInfo.items() if x[0] != '_id'))), msgs=[], good=True)
+        return dict(data=dict(x for x in self.userInfo.items() if x[0] != '_id'), msgs=[], good=True)
 
     def _store(self, newUserInfo):
         now = datetime.utcnow()
