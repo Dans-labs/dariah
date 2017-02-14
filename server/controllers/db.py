@@ -15,7 +15,7 @@ def dtm(isostr):
 
 def json_string(obj):
     if isinstance(obj, datetime):
-        return obj.isoformat(timespec='milliseconds')
+        return obj.isoformat()
     elif isinstance(obj, ObjectId):
         return str(obj)
     raise TypeError('Not sure how to serialize %s' % (obj,))
