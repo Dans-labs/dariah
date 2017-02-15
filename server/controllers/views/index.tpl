@@ -31,6 +31,7 @@
     </head>
     <body>
         <div id="body"/>
+        <script src="/static/js/framework.js"></script>
         <script src="/static/js/lib.js"></script>
         <script src="/static/js/app.js"></script>
     </body>

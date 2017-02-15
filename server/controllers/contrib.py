@@ -6,6 +6,7 @@ DEFAULTS = dict(
 
 contribModel = dict(
 
+    title= 'title',
     createdDate = 'dateCreated',
     createdBy = 'creator',
     modDate = 'dateModified',

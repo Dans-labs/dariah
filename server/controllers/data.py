@@ -36,16 +36,18 @@ class DataApi(object):
             return dict(data=[], msgs=[dict(kind='error', text='query {} not provided'.format(query))], good=False)
 
     def list_contrib(self):
+        title = self.CM.title
         qfilter = self.perm.filters['read']
         qprojector = self.perm.projectors['read']
-        documents = list(self.dbm.contrib.find(qfilter, qprojector).sort('title', 1)) if qfilter != False else []
+        documents = list(self.dbm.contrib.find(qfilter, qprojector).sort(title, 1)) if qfilter != False else []
         return dict(data=dict(contribs=documents, fields=qprojector), msgs=[], good=True)
 
     def my_contribs(self):
+        title = self.CM.title
         qfilter = self.perm.filters['read']
         qprojector = self.perm.projectors['read']
         perm = dict(insert= self.perm.criteria.get('insert', False))
-        documents = list(self.dbm.contrib.find(qfilter, qprojector).sort('title', 1)) if qfilter != False else []
+        documents = list(self.dbm.contrib.find(qfilter, qprojector).sort(title, 1)) if qfilter != False else []
         return dict(data=dict(contribs=documents, fields=qprojector, perm=perm), msgs=[], good=True)
 
     def item_contrib(self):
@@ -148,6 +150,8 @@ class DataApi(object):
                     msgs=[],
                 )
         elif action == 'insert':
+            qprojector = self.perm.projectors['update']
+            print(qprojector)
             mayInsert = self.perm.criteria.get('insert', False)
             if not mayInsert:
                 return dict(
@@ -155,12 +159,13 @@ class DataApi(object):
                     good=False,
                     msgs=[dict(kind='error', text='not allowed to insert a new contribution')],
                 )
+            title = self.CM.title
             modDate = self.CM.modDate
             modBy = self.CM.modBy
             createdDate = self.CM.createdDate
             createdBy = self.CM.createdBy
             insertVals = {
-                'title': ['no title'],
+                title: ['no title'],
                 createdDate: [now()],
                 createdBy: [dict(_id=self.uid)],
                 modDate: [now()],

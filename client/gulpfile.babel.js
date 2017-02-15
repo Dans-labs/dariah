@@ -10,19 +10,27 @@ import jsdoc       from 'gulp-jsdoc3';
  
 /* Doc tasks */
 
-gulp.task('build_doc', function(cb) {
-  const config = require('./jsdocConfig.json');
+const docConfig = './jsdocConfig.json';
+const docSrc = [
+  '../README.md',
+  'src/js/**/*.js',
+  'src/js/**/*.jsx',
+  '!src/js/modules/**/*.*',
+];
+
+function buildDoc(cb) {
+  const config = require(docConfig);
   /* the following line fixes the problem that jsdoc stores the list of input files in the config
    * which will increase after every run somehow. We set it to null everytime.
    */
   if (config.source && config.source.include) { config.source.include = null }
-  gulp.src(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx', '!src/js/modules/**/*.*'], {read: false})
+  gulp.src(docSrc, {read: false})
     .pipe(jsdoc(config, cb));
-});
+}
 
-/* Development tasks */
+/* Build config settings */
 
-const dependencies = [
+const vDependencies = [
 	'react',
   'react-dom',
   'react-markdown',
@@ -31,81 +39,135 @@ const dependencies = [
   'whatwg-fetch'
 ];
 
+const paths = ['./src/js/lib'];
+const pathsApp = [
+  './src/js/app/pure',
+  './src/js/app/object',
+  './src/js/app/state',
+];
+const mDependencies = [
+  'data.js',
+  'filtering.js',
+  'hoc.js',
+  'localstorage.js',
+  'store.js',
+  'ui.js',
+  'europe.geo.js',
+];
+
+const app = 'app.js';
+const lib = 'lib.js';
+const framework = 'framework.js';
+const entry = 'src/js/app/main.jsx';
+const entryCss = 'src/css/main.scss';
+
+const dest = '../static/js';
+const destCss = '../static/css';
+
+/* Common functions */
+
 let buildCount = 0;
 
-function buildjs_dev() {
-  const appBundle = browserify({entries: 'src/js/main.jsx', debug: true});
-  buildCount++;
-  if (buildCount == 1) {
-    browserify({require: dependencies, debug: true})
-      .bundle()
-      .pipe(source('lib.js'))
-      .pipe(gulp.dest('../static/js'));
+function transform(bundle, {
+    src = app, 
+    es6 = true,
+    sourceMaps = false,
+    compress = false,
+    dst = dest,
+  } = {}) {
+  if (es6) {
+    bundle = bundle
+      .transform("babelify", {
+        sourceMaps: sourceMaps,
+        presets: [
+          "latest",
+          "react",
+        ],
+        plugins: [
+            "transform-object-rest-spread",
+            "transform-react-jsx-source",
+        ],
+      })
   }
-  dependencies.forEach(function(dep) {appBundle.external(dep)});
-  return appBundle
-    .transform("babelify", {
-      sourceMaps: true,
-      presets: [
-        "latest",
-        "react",
-      ],
-      plugins: [
-          "transform-object-rest-spread",
-          "transform-react-jsx-source",
-      ],
-    })
+  bundle = bundle
     .bundle()
-    .pipe(source('app.js'))
-    .pipe(sourcemaps.write('../static/js'))
-    .pipe(gulp.dest('../static/js'));
-};
- 
-gulp.task('buildcss_dev', function() {
-  return gulp.src(['src/css/main.scss'])
-    .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-    .pipe(gulp.dest('../static/css'));
-});
-
-/* Production tasks */
-
-gulp.task('buildjs_prod', function() {
-  return browserify({entries: 'src/js/main.jsx', debug: false})
-    .transform("babelify", {
-      sourceMaps: false,
-      presets: [
-        "latest",
-        "react",
-      ],
-      plugins: [
-          "transform-object-rest-spread",
-          "transform-remove-console",
-      ],
-    })
-    .bundle()
-    .pipe(source('app.js'))
+    .pipe(source(src));
+  if (compress) {
+    bundle = bundle
     .pipe(buffer())
     .pipe(uglify())
-    .pipe(gulp.dest('../static/js'));
-});
+  }
+  if (sourceMaps) {
+    bundle = bundle
+    .pipe(sourcemaps.write(dst))
+  }
+  return bundle
+    .pipe(gulp.dest(dst));
+}
+
+function transformCss({
+    src = entryCss,
+    outputStyle = 'compressed',
+    dst = destCss,
+  } = {}) {
+  return gulp.src([src])
+    .pipe(sass({outputStyle}).on('error', sass.logError))
+    .pipe(gulp.dest(dst));
+}
+
+function buildCss() {
+  return transformCss()
+}
+
+/* Development tasks */
+
+function buildjsDevApp() {
+  const appBundle = browserify({entries: entry, debug: true, paths: pathsApp});
+  vDependencies.forEach(function(dep) {appBundle.external(dep)});
+  mDependencies.forEach(function(dep) {appBundle.external(dep)});
+  return transform(appBundle, {sourceMaps: true})
+}
+
+function buildjsDevLib() {
+  return transform(browserify({require: mDependencies, debug: true, paths: paths}), {src: lib});
+}
+function buildjsDevFramework() {
+  return transform(browserify({require: vDependencies, debug: true}), {src: framework, es6: false});
+}
  
-gulp.task('buildcss_prod', function() {
-  return gulp.src(['src/css/main.scss'])
-    .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-    .pipe(gulp.dest('../static/css'));
-});
+function buildjsDev() {
+  buildCount++;
+  if (buildCount == 1) {
+    buildjsDevLib();
+    buildjsDevFramework();
+  }
+  return buildjsDevApp()
+}
+ 
+/* Production tasks */
+
+function buildjsProd() {
+  transform(browserify({require: mDependencies, debug: false, paths: paths}), {src: lib, compress: true});
+  transform(browserify({require: vDependencies, debug: false}), {src: framework, es6: false, compress: true});
+  const appBundle = browserify({entries: entry, debug: false, paths: pathsApp});
+  vDependencies.forEach(function(dep) {appBundle.external(dep)});
+  mDependencies.forEach(function(dep) {appBundle.external(dep)});
+  return transform(appBundle, {src: app, sourceMaps: false, compress: true})
+}
 
 /* watching */
 
-gulp.task('watch', function() {
-  gulp.watch(['src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series(buildjs_dev));
-  gulp.watch(['src/css/*.scss', 'src/css/*.css'], gulp.series('buildcss_dev'));
-});
+function watch() {
+  //gulp.watch(['src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series(buildjsDev));
+  gulp.watch(['src/js/app/**/*.js', 'src/js/app/**/*.jsx'], gulp.series(buildjsDevApp));
+  gulp.watch(['src/js/lib/**/*.js', 'src/js/lib/**/*.jsx'], gulp.series(buildjsDevLib));
+  gulp.watch(['src/css/*.scss', 'src/css/*.css'], gulp.series(buildCss));
+}
  
-gulp.task('watch_doc', function() {
-  gulp.watch(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series('build_doc'));
-});
+function watchDoc() {
+  gulp.watch(['../README.md', 'src/js/**/*.js', 'src/js/**/*.jsx'], gulp.series(buildDoc));
+}
  
-gulp.task('doc', gulp.series('build_doc', 'watch_doc'));
-gulp.task('dev', gulp.series(buildjs_dev, 'buildcss_dev', 'watch'));
-gulp.task('prod', gulp.series('buildjs_prod', 'build_doc', 'buildcss_prod'));
+gulp.task('doc', gulp.series(buildDoc, watchDoc));
+gulp.task('dev', gulp.series(buildjsDev, buildCss, watch));
+gulp.task('prod', gulp.series(buildjsProd, buildDoc, buildCss));
