@@ -50,23 +50,12 @@ const ByValue = ({
   expanded,
 }) => { 
   const rows = placeFacets(fieldValues, maxCols);
-  const statStyle = {align: 'right'};
-  const labelStyle = {
-    marginTop: '0.05em', marginBottom: '0.05em',
-    fontSize: 'small',
-    fontWeight: 'bold',
-  };
-  const widgetStyle = {
-    marginTop: '0.3em', marginBottom: '0.1em',
-    border: '1px solid #aaaaaa',
-    borderRadius: '6px',
-  };
   return (
-    <div style={widgetStyle}>
+    <div className="facet">
       {rows === null ? (<p> -no facets </p>) : (
       <Alternatives tag={filterField}
         controlPlacement={control => (
-          <p style={labelStyle}>
+          <p className="facet">
             <CheckboxI
               filterId={filterId}
               states={testAllChecks(filterSettings)}
@@ -77,8 +66,8 @@ const ByValue = ({
           </p>
         )}
         controls={[
-          (handler => <a className='fa fa-chevron-down' href='#' onClick={handler}/>),
-          (handler => <a className='fa fa-chevron-right' href='#' onClick={handler}/>),
+          (handler => <span className='button-small fa fa-chevron-down' onClick={handler}/>),
+          (handler => <span className='button-small fa fa-chevron-right' onClick={handler}/>),
         ]}
         initial={expanded?0:1}
         alternatives={[
@@ -106,9 +95,7 @@ const ByValue = ({
                           updFilter={updFilter}
                         />
                       </td>),
-                      (<td
-                        style={{textAlign: 'right', paddingLeft: '0.5em'}}
-                      >
+                      (<td className="statistic">
                         <Stats subTotal={amounts.get(valueId)}/>
                       </td>),
                     ]})}

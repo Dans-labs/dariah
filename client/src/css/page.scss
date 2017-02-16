@@ -1,15 +1,5 @@
 /* PAGE LAYOUT */
 
-$text-link-color: #d45510;
-
-a {
-    color: $text-link-color;
-    text-decoration: none;
-}
-a:active, a:hover {
-    color: $text-link-color;
-    text-decoration: underline;
-}
 #left, #right {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -18,6 +8,17 @@ td {
     vertical-align: top;
 }
 
-body {
+body,p,div,td,li {
     font-family: sans-serif;
 }
+span.login {
+    float: right;
+    color: $widget-fixed-fore;
+    font-size: small;
+}
+
+div.sized {
+    height: 100%;
+    overflow: auto;
+}
+

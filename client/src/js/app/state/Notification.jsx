@@ -1,87 +1,6 @@
 import React, { Component } from 'react'
 import { withContext, saveState } from 'hoc.js'
 
-const msgStyle = {
-  info: {
-    color: '#222222',
-  },
-  error: {
-    color: '#dd0000',
-    fontWeight: 'bold',
-  },
-  warning: {
-    color: '#dd8800',
-    fontWeight: 'bold',
-  },
-  good: {
-    color: '#00aa00',
-    fontWeight: 'bold',
-  },
-  special: {
-    color: '#000000',
-    fontWeight: 'bold',
-  },
-  line: {
-    paddingTop: 0,
-    paddingBottom: 0,
-    marginTop: 0,
-    marginBottom: 0,
-  },
-  trash: {
-    paddingTop: 2,
-    paddingBottom: 0,
-    marginTop: 0,
-    marginBottom: 0,
-    fontSize: 'larger',
-    float: 'left',
-  },
-  dismiss: {
-    paddingTop: 2,
-    paddingBottom: 0,
-    marginTop: 0,
-    marginBottom: 0,
-    fontStyle: 'italic',
-    fontSize: 'smaller',
-    float: 'right',
-  },
-  box: {
-    position: 'fixed',
-    top: 40,
-    right: 10,
-    width: 200,
-    height: 100,
-    overflow: 'auto',
-    paddingLeft: 10,
-    paddingRight: 10,
-    zIndex: 2000,
-    opacity: 0.9,
-    verticalAlign: 'middle',
-    cursor: 'pointer',
-    backgroundColor: '#eeeeee',
-    border: '2px solid #aaaaaa',
-    borderRadius: 8,
-    fontSize: 'small',
-  },
-  spinner: {
-    position: 'fixed',
-    top: '0.05em',
-    right: '1em',
-    width: '5em',
-    height: '2em',
-    textAlign: 'right',
-    paddingLeft: 0,
-    paddingRight: 0,
-    zIndex: 2000,
-    opacity: 0.9,
-    verticalAlign: 'middle',
-    cursor: 'pointer',
-    fontSize: 'medium',
-  },
-  dot: {
-    fontSize: 'small',
-  }
-}
-
 const empty = [];
 
 /**
@@ -164,20 +83,20 @@ class Notification extends Component {
     const busyBlocks = new Array(this.busy).fill(1);
     return ( 
       <div>
-        <p style={msgStyle.spinner}>
+        <p className="msg-spinner">
           <a
             title="show/hide notifications and progress messages"
             href="#"
             className={this.lastNote > -1 ? `spin-${this.lastKind}` : 'spin-ok'}
             onClick={e=>{e.preventDefault(); this.setView(!this.visible)}}
           >
-            { busyBlocks.map((b, i) => <span key={i} style={msgStyle.dot} className="fa fa-circle"></span>) }
+            { busyBlocks.map((b, i) => <span key={i} className="msg-dot fa fa-circle"></span>) }
             <span className={`fa fa-${this.busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}/>
           </a>
         </p>
         <div
           ref={this.refDom.bind(this, 'notbox')}
-          style={msgStyle.box}
+          className="msg-box"
           onClick={e=>{e.preventDefault(); this.setView(false)}}
         >
           {
@@ -185,14 +104,14 @@ class Notification extends Component {
             <p
               key={index}
               ref={this.refDom.bind(this, `m${index}`)}
-              style={{...msgStyle.line, ...msgStyle[msg.kind]}}
+              className={`msg-line msg-${[msg.kind]}`}
             >{msg.text}</p>
             ))
           }
           <p
-            style={msgStyle.dismiss}>(click panel to hide)
+            className="msg-dismiss">(click panel to hide)
           </p>
-          <p style={msgStyle.trash}>
+          <p className="msg-trash">
             <a href="#" title="clear messages" className="control fa fa-trash"
               onClick={e=>{e.preventDefault(); this.clear()}}
             />

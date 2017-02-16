@@ -2,6 +2,7 @@ from bottle import request
 from db import connectdb, now, dtm, oid
 
 IDNAME = '_id'
+VALNAME = 'value'
 
 def validate(values, fieldSpecs):
     valType = fieldSpecs['valType']
@@ -12,7 +13,16 @@ def validate(values, fieldSpecs):
     if valType == 'datetime':
         valValues = [dtm(v) for v in values]
     elif valType == 'rel':
-        valValues = [dict((k, oid(m) if k == IDNAME else m) for (k, m) in v.items()) for v in values]
+        seenIds = set()
+        seenVals = set()
+        valValues = []
+        for v in values:
+            vId = v.get(IDNAME, None)
+            vVal = v.get(VALNAME, None)
+            if v == None or vId in seenIds or (vVal != None and vVal) in seenVals: continue
+            seenIds.add(vId)
+            seenVals.add(vVal)
+            valValues.append(dict((k, oid(m) if k == IDNAME else m) for (k, m) in v.items()))
     else:
         valValues = [v for v in values]
     return (True, valValues)
@@ -57,7 +67,7 @@ class DataApi(object):
             criteria = self.perm.criteria['update']
             qprojector = self.perm.projectors['update']
             newData = request.json
-            _id = newData.get('_id', None)
+            _id = newData.get(IDNAME, None)
             if _id == None:
                 return dict(
                     data=None,
@@ -78,7 +88,7 @@ class DataApi(object):
                     msgs=[dict(kind='error', text='not allowed to update contribution field {}'.format(name))],
                 )
             _oid = oid(_id)
-            documents = list(self.dbm.contrib.find(dict(_id=_oid)))
+            documents = list(self.dbm.contrib.find({IDNAME: _oid}))
             if len(documents) != 1:
                 return dict(
                     data=None,
@@ -103,7 +113,7 @@ class DataApi(object):
                 )
             (valid, valValues) = validate(newValues, fieldSpecs)
             if not valid:
-                documents = list(self.dbm.contrib.find(dict(_id=_oid), {name: True}))
+                documents = list(self.dbm.contrib.find({IDNAME: _oid}, {name: True}))
                 if len(documents) != 1:
                     return dict(
                         data=None,
@@ -127,11 +137,11 @@ class DataApi(object):
                     changeVals.update({
                         '$push': {
                             modDate: now(),
-                            modBy: dict(_id=self.uid),
+                            modBy: {IDNAME: self.uid},
                         },
                     })
-                self.dbm.contrib.update_one(dict(_id=_oid), changeVals)
-                documents = list(self.dbm.contrib.find(dict(_id=_oid), {name: True, modDate: True, modBy: True}))
+                self.dbm.contrib.update_one({IDNAME: _oid}, changeVals)
+                documents = list(self.dbm.contrib.find({IDNAME: _oid}, {name: True, modDate: True, modBy: True}))
                 if len(documents) != 1:
                     return dict(
                         data=None,
@@ -151,7 +161,6 @@ class DataApi(object):
                 )
         elif action == 'insert':
             qprojector = self.perm.projectors['update']
-            print(qprojector)
             mayInsert = self.perm.criteria.get('insert', False)
             if not mayInsert:
                 return dict(
@@ -167,9 +176,9 @@ class DataApi(object):
             insertVals = {
                 title: ['no title'],
                 createdDate: [now()],
-                createdBy: [dict(_id=self.uid)],
+                createdBy: [{IDNAME: self.uid}],
                 modDate: [now()],
-                modBy: [dict(_id=self.uid)],
+                modBy: [{IDNAME: self.uid}],
             }
             result = self.dbm.contrib.insert_one(insertVals)
             return dict(
@@ -183,7 +192,7 @@ class DataApi(object):
             contribId = request.query.id
             if len(contribId) > 65:
                 return dict(data=[], msgs=[dict(kind='error', text='contribution does not exist')], good=False)
-            thisFilter = {'_id': oid(contribId)}
+            thisFilter = {IDNAME: oid(contribId)}
             paction = 'update' if own else action
             qfilter = self.perm.filters[paction]
             if qfilter != False:
@@ -198,6 +207,7 @@ class DataApi(object):
                     return dict(data={}, msgs=[dict(kind='error', text='contribution does not exist')], good=False)
             msgs = [] if ldoc == 1 else [dict(kind='warning', text='multiple contributions found')]
             document = documents[0]
+            mayDelete = self.perm.criteria['delete'](document)
             mayUpdate = self.perm.criteria['update'](document)
             ufields = self.perm.projectors['update'] if mayUpdate else {}
             fieldOrder = [x for x in self.CM.fieldOrder if x in qprojector or x in ufields]
@@ -205,7 +215,7 @@ class DataApi(object):
                 data=dict(
                     row=document,
                     fields=qprojector,
-                    perm=dict(update=ufields),
+                    perm=dict(update=ufields, delete=mayDelete),
                     fieldOrder=fieldOrder,
                     fieldSpecs=dict(x for x in self.CM.fieldSpecs.items() if x[0] in fieldOrder),
                 ),
@@ -227,10 +237,18 @@ class DataApi(object):
         documents = list(self.dbm.users.find(qfilter, qprojector)) if qfilter != False else []
         return dict(data=documents, msgs=[], good=True)
 
+    def vlist(self):
+        valueList = request.query.list
+        qprojector = self.perm.projectors['read']
+        if valueList not in qprojector:
+            return dict(data=[], msgs=[dict(kind='error', text='no access to list "{}"'.format(valueList))], good=False)
+        documents = list(self.dbm[valueList].find({}, {IDNAME: True, VALNAME: True}))
+        return dict(data=documents, msgs=[], good=True)
+
     def value_list(self):
         valueList = request.query.list
         qprojector = self.perm.projectors['read']
         if valueList not in qprojector:
             return dict(data=[], msgs=[dict(kind='error', text='no access to list "{}"'.format(valueList))], good=False)
-        documents = list(self.dbm.contrib.distinct(valueList, {}))
+        documents = list(self.dbm.contrib.distinct(valueList))
         return dict(data=documents, msgs=[], good=True)

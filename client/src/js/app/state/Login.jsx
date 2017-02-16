@@ -35,17 +35,17 @@ class Login extends Component {
       userInfo.set(k, user[k]);
     }
     return (
-      <span style={{float: 'right', fontSize: 'small'}}>
+      <span className="login">
         { user.eppn && Object.keys(user).length > 0 ? (
-        <span style={{color: '#333333'}}>
+        <span>
           <strong className="fa fa-user" title={user.eppn}>{user.eppn.split('@')[0]}</strong>
           <span className="fa fa-hashtag"/>{user.authority}{' '}
           <em>{user.groupDesc || 'not authenticated'}</em>
-            <a href="/logout" className="control fa fa-user-times">{' logout'}</a>
-            <a href="/slogout" className="control fa fa-users">{' quit '}</a>
-          </span>
+          <a href="/logout" className="control fa fa-user-times">{' logout'}</a>
+          <a href="/slogout" className="control fa fa-users">{' quit '}</a>
+        </span>
         ) : (
-          <a href="/login" className="control fa fa-user-plus">{' login'}</a>
+        <a href="/login" className="control fa fa-user-plus">{' login'}</a>
         )}
       </span>
     )

@@ -15,14 +15,14 @@ const sizes = {
   _max: 50,
 }
 
-const trimDate = text => ({ full: text, text: text.replace(/\.[0-9]+/, '')})
+const trimDate = text => ({ full: text, text: (text == null) ? '' : (text.replace(/\.[0-9]+/, ''))})
 
-const condense = text => ({ full: text, text: (text.length > 20)?`${text.slice(0,8)}...${text.slice(-8)}`:text})
+const condense = text => ({ full: text, text: (text == null) ? '' : ((text.length > 20)?`${text.slice(0,8)}...${text.slice(-8)}`:text)})
 
 const readonlyMakeFragment = obj => ({
   url: obj.urlFragment.bind(obj),
   email: obj.emailFragment.bind(obj),
-  markdown: obj.markdownFragment.bind(obj),
+  textarea: obj.textareaFragment.bind(obj),
   _default: obj.defaultFragment.bind(obj),
 })
 
@@ -159,7 +159,7 @@ class ContribField extends Component {
     else {
       const { valType, validation } = this.props;
       const { vstatus, reason } = validate(newVal, valType, validation);
-      const sendVal = (_id == null)? newVal :{ _id, value: newVal }
+      const sendVal = (valType == 'rel')? ((typeof newVal != 'string')? newVal : { _id, value: newVal }) : newVal;
       const refI = (i == -1)?newValues.length:i;
       if (i == -1) {newValues.push(sendVal)}
       else {newValues[i] = sendVal}
@@ -333,9 +333,9 @@ class ContribField extends Component {
     const { text, full } = valText;
     return <a key={i} target="_blank" href={`mailto:${full}`} className={classNames.join(' ')}>{full}</a>
   }
-  markdownFragment(i, classNames, valText) {
+  textareaFragment(i, classNames, valText) {
     const { text, full } = valText;
-    return <span key={i} className={classNames.join(' ')}>{full}</span>
+    return <p key={i} className={classNames.join(' ')}>{full}</p>
   }
   defaultFragment(i, classNames, valText) {
     const { text, full } = valText;
@@ -381,9 +381,9 @@ class ContribField extends Component {
     return (!multiple && i == 0)? (
       this.relSelect(i, _id, classNames, extraClasses, valText)
     ) : (
-      <span key={i} className={classNames.join(' ')} title={full}>{text}
+      <span key={i} className={classNames.join(' ')} title={full}>{text}{' '}
         <span
-          className="xtag fa fa-close"
+          className="button-small fa fa-close"
           onClick={this.removeVal.bind(this, i, _id)}
         />
       </span>
@@ -399,6 +399,7 @@ class ContribField extends Component {
         onChange={this.changeVal.bind(this, i)}
         cols={cols}
         rows={rows}
+        placeholder={valText.initial}
         wrap="soft"
       />
     )
@@ -410,6 +411,7 @@ class ContribField extends Component {
       <input key={i} type="text"
         className={classNames.concat(extraClasses).join(' ')}
         value={full}
+        placeholder={valText.initial}
         onChange={this.changeVal.bind(this, i)}
         onKeyUp={this.keyUp.bind(this, i)}
         size={size}
@@ -463,7 +465,7 @@ class ContribField extends Component {
   valuesAsControls() {
     const { curValues, reasons } = this.state;
     const { savedValues } = this.state;
-    const { name, valType, multiple, validation, allowNew, appearance } = this.props;
+    const { name, initial, valType, multiple, validation, allowNew, appearance } = this.props;
     const methods = editMakeFragment(this);
     const makeFragment = methods[valType] || methods._default;
     const cutoff = appearance.cutoff;
@@ -492,6 +494,7 @@ class ContribField extends Component {
           destAlt.push(' ');
           destAlt.push(<span key={`r_${i}`} className="reason">{reason}</span>)
         }
+        destAlt.push(' ');
       }
     });
     if (multiple || curValues.length == 0) {
@@ -501,7 +504,7 @@ class ContribField extends Component {
       }
       else {
         destAlt.push(
-          makeFragment(-1, null, classNames, extraClasses, {text: 'no', full: 'no value'}, size)
+          makeFragment(-1, null, classNames, extraClasses, {text: '', full: '', initial}, size)
         )
       }
     }
@@ -515,8 +518,8 @@ class ContribField extends Component {
       <Alternatives tag={`field_${rowId}_${name}`}
         controlPlacement={control => (<span>{alt1}{' '}{control}</span>)}
         controls={[
-          (handler => <a href='#' onClick={handler}>more</a>),
-          (handler => <a href='#' onClick={handler}>less</a>),
+          (handler => <span className="button-small" onClick={handler}>show more</span>),
+          (handler => <span className="button-small" onClick={handler}>show less</span>),
         ]}
         alternatives={[
           '',

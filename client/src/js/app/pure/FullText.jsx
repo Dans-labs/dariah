@@ -31,6 +31,7 @@ const FullText = ({
   <div>
     <p><input
         type="text"
+        className="search"
         placeholder={`search in ${filterLabel}`}
         value={filterSettings}
         onChange={onType(updFilter, filterId)}

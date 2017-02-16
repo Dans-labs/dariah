@@ -42,16 +42,16 @@ const App = ({children}) => (
       <Login/>
     </p>
     <div className="nav" style={columnStyle('left')}>
-      <ul className="nav" style={{height: '60%'}}>
-        <li><NavLink to="/contrib">Contributions</NavLink></li>
-        <li><NavLink to="/mycontrib">My work</NavLink></li>
-        <li><NavLink to="/docs/about.md">About</NavLink></li>
-      </ul>
-      <ul className="nav" style={{height: '30%', verticalAlign: 'bottom'}} >
-        <li><a href="/api/file/tech/docs/gen/index.html" target="_blank">tech doc</a></li>
-        <li><NavLink to="/tech/docs/design.pdf">diagrams</NavLink></li>
-        <li><NavLink to="/tech/docs/deploy.md">deploy</NavLink></li>
-      </ul>
+      <div className="nav" style={{height: '60%'}}>
+        <p><NavLink to="/contrib">Contributions</NavLink></p>
+        <p><NavLink to="/mycontrib">My work</NavLink></p>
+        <p><NavLink to="/docs/about.md">About</NavLink></p>
+      </div>
+      <div className="nav" style={{height: '30%', verticalAlign: 'bottom'}} >
+        <p><a href="/api/file/tech/docs/gen/index.html" target="_blank">tech doc</a></p>
+        <p><NavLink to="/tech/docs/design.pdf">diagrams</NavLink></p>
+        <p><NavLink to="/tech/docs/deploy.md">deploy</NavLink></p>
+      </div>
     </div>
     <div style={columnStyle('right')}>
       { children }

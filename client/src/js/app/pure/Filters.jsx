@@ -40,10 +40,6 @@ export const filterList = [
   {kind: ByValue,   name: 'ByValue',   field: 'keywords',            label: 'keyword',             maxCols: 1,    expanded: false},
 ]
 
-const styles = {
-    backgroundColor: '#ffffee',
-}
-
 /**
  * **purely functional** {@link external:Component|Component}
  *
@@ -80,7 +76,7 @@ const Filters = ({
   amounts,
   updFilter
 }) => (
-  <div style={styles}>
+  <div>
     {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
       const Fclass = filter.kind;
       return (

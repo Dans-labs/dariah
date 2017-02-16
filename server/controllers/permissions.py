@@ -47,6 +47,9 @@ def permissionModel(fs):
             users = dict(
                 desc='users',
             ),
+            vlist = dict(
+                desc='value lists',
+            ),
             value_list = dict(
                 desc='value lists',
             ),
@@ -126,6 +129,9 @@ def permissionModel(fs):
                         rows = False,
                         fields = set(),
                     ),
+                    delete = dict(
+                        rows = False,
+                    )
                 ),
                 auth = dict(
                     read = dict(
@@ -170,7 +176,7 @@ def permissionModel(fs):
                     ),
                 ),
             ),
-            value_list = dict(
+            vlist = dict(
                 x = dict(
                     read = dict(
                         rows = True,
@@ -207,6 +213,32 @@ def permissionModel(fs):
                         fields = fs['all'] & fs['meta'],
                     ),
                     update = dict(
+                        rows = True,
+                        fields = fs['all'] & fs['meta'],
+                    ),
+                ),
+            ),
+            value_list = dict(
+                x = dict(
+                    read = dict(
+                        rows = True,
+                        fields = fs['public'] & fs['meta'],
+                    ),
+                ),
+                auth = dict(
+                    read = dict(
+                        rows = True,
+                        fields = (fs['public'] | fs['own']) & fs['meta'],
+                    ),
+                ),
+                man = dict(
+                    read = dict(
+                        rows = True,
+                        fields = (fs['public'] | fs['own']) & fs['meta'],
+                    ),
+                ),
+                sys = dict(
+                    read = dict(
                         rows = True,
                         fields = fs['all'] & fs['meta'],
                     ),

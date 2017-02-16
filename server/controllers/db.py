@@ -4,8 +4,11 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from datetime import datetime
 
-def oid(oidstr): return ObjectId(oidstr) 
+def oid(oidstr):
+    return ObjectId() if oidstr == None else ObjectId(oidstr) 
+
 def now(): return datetime.utcnow()
+
 def dtm(isostr):
     try:
         date = datetime.strptime(isostr, "%Y-%m-%dT%H:%M:%S.%f")

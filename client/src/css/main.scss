@@ -1,4 +1,38 @@
+$action-back: #ffffee;
+$action-high: #ffff88;
+$action-fore: #0000bb;
+$action-border: #aaaa66;
+$action-text: #000044;
+
+$widget-fixed-fore: #226622; 
+$widget-fixed-back: #eeeeee; 
+$widget-border: #aaaaaa; 
+$widget-varia-fore: #000000; 
+$widget-varia-back: #ffffff; 
+$widget-high-fore: #ffffff; 
+$widget-high-back: #444444; 
+
+$stat-fore: #008800;
+
+$absent-fore: #ffffff;
+$absent-back: #444444;
+
+$invalid-fore: #ee0000;
+$invalid-back: #ffcccc;
+
+$changed-fore: #ee9900;
+$saved-fore: #006600;
+$error-fore: #880000;
+$warning-fore: #dd8800;
+$good-fore: #00aa00;
+$progress-neutral: #bbbbbb;
+
+$error-color: #ff0000;
+$warning-color: #ffaa00;
+$control-link-color: #444444;
+
 @import 'leaflet';
 @import 'page';
 @import 'nav';
 @import 'contrib';
+@import 'filtering';

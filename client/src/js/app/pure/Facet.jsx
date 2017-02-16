@@ -1,10 +1,5 @@
 import React from 'react'
 
-const styles = {
-  rep: { fontSize: 'x-small' },
-  box: { fontSize: 'medium', lineHeight: 0.5, margin: 0, padding: 0 },
-}
-
 /**
  * **purely functional** {@link external:Component|Component}
  *
@@ -27,9 +22,9 @@ const Facet = ({ filterId, valueId, valueRep, checked, updFilter }) => (
       type="checkbox"
       onChange={event => updFilter(filterId, [valueId, event.target.checked])}
       checked={checked}
-      style={styles.box}
+      className="facet"
     />
-    <span style={styles.rep}>{` ${valueRep}`}</span>
+    {` ${valueRep}`}
   </span>
 )
 

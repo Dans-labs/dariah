@@ -33,9 +33,9 @@ class RelSelect extends Component {
   }
 
   addVal(onChange, selText) {
-    const selVal = -1;
+    const selVal = null;
     this.setState({...this.state, poppedUp: false, selVal, selText, selText})
-    onChange(-1, selText);
+    onChange(null, selText);
   }
 
   render() {
@@ -51,7 +51,7 @@ class RelSelect extends Component {
         <p className="option-head">
           {(isNew?null:<span className={aclasses} title={selFull}>{selText}</span>)}
           <span
-            className={`xtag fa fa-${icon}`}
+            className={`button-small fa fa-${icon}`}
             onClick={this.popUp.bind(this)}
           />
         </p>
@@ -66,15 +66,16 @@ class RelSelect extends Component {
               />
               {(allowNew && search != '')?(
                 <span
-                  className={`xtag fa fa-plus-square`}
+                  className="button-small fa fa-plus-square"
                   onClick={this.addVal.bind(this, onChange, search)}
                 />
               ):null}
             </p>
             <div className="options">{
-              valueList.map(([_id, value]) => (pat == null || pat == '' || value.full.toLowerCase().indexOf(pat) !== -1)?(
+              valueList.map(([_id, value]) => (
+                pat == null || pat == '' || value == null || value.full == null || value.full.toLowerCase().indexOf(pat) !== -1)?(
                 <RelOption
-                  key={_id}
+                  key={(_id == null)?'null':_id}
                   valId={_id}
                   value={value}
                   classes={(_id == selVal)?classes:''}

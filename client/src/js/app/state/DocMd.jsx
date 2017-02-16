@@ -67,7 +67,7 @@ class DocMd extends Component {
               />
             </div>),
             (<div>
-              <pre style={{fontSize: 'large', color: '#0000aa', whiteSpace: 'pre-wrap'}}>{text}</pre>
+              <pre className="md-source">{text}</pre>
             </div>),
           ]}
         />

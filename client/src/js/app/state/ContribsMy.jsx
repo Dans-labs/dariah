@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 
 import Contribs from 'Contribs.jsx'
-import ContribNew from 'ContribNew.jsx'
 import ContribItemPre from 'ContribItemPre.jsx';
 
 import { getData } from 'data.js'
@@ -70,18 +69,21 @@ class ContribsMy extends Component {
     for (const x of countries) {countriesMap.set(x._id, x)}
     return (
       <div>
-        <div style={columnStyle('rightLeft')}>
-          <p
-            style={{fontWeight: 'bold', backgroundColor: '#eeeeff'}}
-          >
-            {contribs.length} contributions{' '}
+        <div className="nav" style={columnStyle('rightLeftNav')}>
+          <p>
+            {contribs.length} contributions
+            {' '}
             {(perm != null && perm.insert)? (
-            <ContribNew insertRow={this.insertRow.bind(this)}/>
+              <span
+                className="fa fa-plus button-large insert"
+                title="New contribution"
+                onClick={this.insertRow.bind(this)}
+              />
             ): null}
           </p>
           <Contribs filteredData={contribs} inplace={false}/>
         </div>
-        <div style={columnStyle('rightRight')}>
+        <div style={columnStyle('rightRightBody')}>
           { children }
         </div>
       </div>

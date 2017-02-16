@@ -12,12 +12,14 @@
 /**
  *  scrollbar width
  */
-const scrollBarWidth = 50;
+const scrollBarWidth = 40;
+const leftMargin = 10;
 
 /**
  * top navigation bar height and remaining height
  */
-const topHeight = 80;
+const topHeight = 30;
+const topMargin = 0;
 
 /**
  * remaining height under the top navigation bar
@@ -31,6 +33,7 @@ const winHeight = window.innerHeight - topHeight;
 const divWidthSpec = {
   left: 120,
   rightLeft: 380,
+  rightLeftNav: 150,
 }
 
 /**
@@ -44,8 +47,18 @@ const divWidthSpec = {
 const divWidth = {
   ...divWidthSpec,
   right: window.innerWidth - divWidthSpec.left - scrollBarWidth,
-  rightRight: window.innerWidth - divWidthSpec.left - divWidthSpec.rightLeft - 2 * scrollBarWidth,
+  rightRight: window.innerWidth - divWidthSpec.left - divWidthSpec.rightLeft - scrollBarWidth - leftMargin,
+  rightRightBody: window.innerWidth - divWidthSpec.left - divWidthSpec.rightLeftNav - scrollBarWidth - leftMargin,
 }
+const divHeight = {
+  left: winHeight - topHeight,
+  right: winHeight - topHeight,
+  rightLeft: winHeight - topHeight - topMargin,
+  rightLeftNav: winHeight - topHeight - topMargin,
+  rightRight: winHeight - topHeight - topMargin,
+  rightRightBody: winHeight - topHeight - topMargin,
+}
+
 /**
  * we use the float property to position the leftish and rightish divs
  */
@@ -53,7 +66,9 @@ const floatSpec = {
   left: 'left',
   right: 'right',
   rightLeft: 'left',
+  rightLeftNav: 'left',
   rightRight: 'right',
+  rightRightBody: 'right',
 }
 
 /**
@@ -64,11 +79,10 @@ const floatSpec = {
 export function columnStyle(kind) {
   return {
     width: divWidth[kind],
-    height: winHeight,
+    height: divHeight[kind],
     overflow: 'auto',
     'WebkitOverflowScrolling': 'touch',
     float: floatSpec[kind],
-    'paddingLeft': (kind == '') ? '1em' : '0em',
-    'paddingRight': (kind == '') ? '1em' : '0em',
+    padding: 0,
   }
 }

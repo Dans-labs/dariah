@@ -124,6 +124,7 @@ keywords
             valType    = 'text',
             multiple   = False,
             validation = dict(nonEmpty=True),
+            initial    = 'title',
         ),
         dateCreated=dict(
             label      = 'created on:',
@@ -143,24 +144,28 @@ keywords
             valType     = 'text',
             multiple    = False,
             validation  = dict(nonEmpty=True),
+            initial    = 'First_name Last_name',
         ),
         contactPersonEmail=dict(
             label       = 'contact email:',
             valType     = 'email',
             multiple    = True,
             validation  = dict(nonEmpty=True),
+            initial    = 'name@myinstitute.org',
         ),
         urlContribution=dict(
             label       = 'Contribution url:',
             valType     = 'url',
             multiple    = True,
             validation  = dict(nonEmpty=True),
+            initial    = 'www.mycontrib.org',
         ),
         urlAcademic=dict(
             label       = 'Academic url:',
             valType     = 'url',
             multiple    = True,
             validation  = dict(nonEmpty=True),
+            initial    = 'www.myinstitute.org',
         ),
         description=dict(
             label       = 'Description:',
@@ -168,12 +173,14 @@ keywords
             multiple    = False,
             validation  = dict(nonEmpty=True),
             convert     = 'markdown',
+            initial     = 'This contribution is about ...',
         ),
         costTotal=dict(
             label       = 'cost (total):',
             valType     = 'number',
             multiple    = False,
             validation  = dict(nonEmpty=True),
+            initial     = '€ 1000',
         ),
         costDescription=dict(
             label       = 'cost (description):',
@@ -181,6 +188,7 @@ keywords
             validation  = dict(nonEmpty=True),
             convert     = 'markdown',
             multiple    = False,
+            initial     = 'The costs of this contribution can be broken down as follows ...',
         ),
         creator=dict(
             label       = 'creator:',
@@ -225,6 +233,7 @@ keywords
             multiple    = True,
             validation  = dict(nonEmpty=True),
             allowNew    = False,
+            getValues   = '/vlist?list={}',
         ),
         disciplines=dict(
             label       = 'Disciplines:',
@@ -246,6 +255,7 @@ keywords
             multiple    = False,
             validation  = dict(nonEmpty=True),
             allowNew    = False,
+            getValues   = '/vlist?list={}',
         ),
         tadirahObjects=dict(
             label       = 'Object(s):',
@@ -253,6 +263,7 @@ keywords
             multiple    = True,
             validation  = dict(nonEmpty=False),
             allowNew    = False,
+            getValues   = '/vlist?list={}',
         ),
         tadirahActivities=dict(
             label       = 'Activity(ies):',
@@ -260,6 +271,7 @@ keywords
             multiple    = True,
             validation  = dict(nonEmpty=False),
             allowNew    = False,
+            getValues   = '/vlist?list={}',
         ),
         tadirahTechniques=dict(
             label       = 'Technique(s):',
@@ -267,6 +279,7 @@ keywords
             multiple    = True,
             validation  = dict(nonEmpty=False),
             allowNew    = False,
+            getValues   = '/vlist?list={}',
         ),
     ),
 )
@@ -290,6 +303,8 @@ class ContribModel(object):
                     spec['idOnly'] = DEFAULTS['IDONLY']
                 if 'getValues' not in spec:
                     spec['getValues'] = DEFAULTS['GETVALUES'].format(name)
+                else:
+                    spec['getValues'] = spec['getValues'].format(name)
         for (k, v) in contribModel.items():
             setattr(self, k, v)
 

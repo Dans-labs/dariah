@@ -1,11 +1,5 @@
 import React from 'react'
 
-const style = {
-  color: '#0000dd',
-  fontSize: 'x-small',
-  fontWeight: 'normal',
-}
-
 /**
  * **purely functional** {@link external:Component|Component}
  *
@@ -18,7 +12,7 @@ const style = {
  * @returns {Fragment}
  */
 const Stats = ({subTotal, total}) => (
-  <span style={style}>
+  <span>
     {subTotal == null? '' :`${subTotal}`}
     {(total == null || subTotal == null)? '' : ' of '}
     <strong>{total == null?'':`${total}`}</strong>

@@ -62,9 +62,7 @@ class FilterCompute extends Component {
     return (
       <div>
         <div style={columnStyle('rightLeft')}>
-          <p
-            style={{fontWeight: 'bold', backgroundColor: '#eeeeff'}}
-          >Showing {filteredData.length} of {contribs.length}</p>
+          <p>Total {contribs.length}</p>
           <Filters
             fields={fields}
             fieldValues={fieldValues}

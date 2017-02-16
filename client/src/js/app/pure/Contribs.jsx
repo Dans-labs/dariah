@@ -12,7 +12,7 @@ import ContribTitle from 'ContribTitle.jsx'
  * @returns {Fragment}
  */
 const Contribs = ({ filteredData, inplace }) => (
-  <div style={{height: '100%', overflow: 'auto'}}>
+  <div>
     <table>
       <tbody>{
       filteredData.map(item => (

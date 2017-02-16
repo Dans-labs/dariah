@@ -54,7 +54,7 @@ class ContribItem extends Component {
   updEdit(name, changed, valid, newVals) {
     const { editStatus, contribId } = this.props;
     const { saveConcern, fieldData } = this.state;
-    if (name == 'title' && changed) {
+    if (name == 'title') {
       editStatus[contribId].title.innerHTML = newVals[0];
     }
     const newState = {
@@ -75,17 +75,22 @@ class ContribItem extends Component {
       this.setState({...this.state, saveConcern: true})
     }
   }
+  delete() {
+    console.log('delete requested')
+  }
 
   parseFields() {
     const { fieldData } = this.state;
     const { row, fields, fieldSpecs, fieldOrder, perm } = fieldData;
-    const frags = []
+    const fragments = []
+    let hasEditable = false;
     for (const name of fieldOrder) {
-      const { label, ...specs } = fieldSpecs[name];
+      const { label, initial, ...specs } = fieldSpecs[name];
       if (fields[name] == null) {continue}
       const editable = !!perm.update[name];
+      if (editable) {hasEditable = true}
       const rowId = row._id;
-      frags.push(
+      fragments.push(
         <ContribField
           key={name}
           tag={`field_${rowId}_${name}`}
@@ -94,6 +99,7 @@ class ContribItem extends Component {
           editable={editable}
           name={name}
           label={label}
+          initial={initial}
           saveConcern={this.state.saveConcern}
           updMod={this.updMod.bind(this)}
           updEdit={this.updEdit.bind(this)}
@@ -101,7 +107,7 @@ class ContribItem extends Component {
         />
       )
     }
-    return frags
+    return {fragments, hasEditable}
   }
 
   saveStatus(newState) {
@@ -121,22 +127,37 @@ class ContribItem extends Component {
     const allValidClass = allValid?'valid':'invalid';
     const noChangeClass = noChange?'clean':'dirty';
     const elemText = noChange?'all saved':(allValid?'save changes':'make corrections');
+    const { perm } = fieldData;
+    const { fragments, hasEditable } = this.parseFields();
     return (
       <div className="item">
-        <p>{
-          canSave? (
-            <a
-              className={`save ${noChangeClass} ${allValidClass}`}
-              href="#"
-              onClick={this.saveAll.bind(this)}
-            >{elemText}</a>
-          ) : (
-            <span className={`save ${noChangeClass} ${allValidClass}`}>{elemText}</span>
-          )
-        }</p>
+        <p>
+          {hasEditable? [
+            canSave? (
+              <span
+                key="1"
+                className={`button-large save ${noChangeClass} ${allValidClass}`}
+                onClick={this.saveAll.bind(this)}
+              >{elemText}</span>
+            ) : (
+              <span
+                key="1"
+                className={`save ${noChangeClass} ${allValidClass}`}
+              >{elemText}</span>
+            ),
+            perm.delete? (
+              <span
+                key="2"
+                className={'fa fa-trash button-large delete'}
+                onClick={this.delete.bind(this)}
+                title="delete this contribution"
+              />
+            ) : null
+          ] : null}
+        </p>
         <table>
           <tbody>
-            {this.parseFields()}
+            {fragments}
           </tbody>
         </table>
       </div>
