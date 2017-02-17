@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 
 import { withContext, saveState } from 'hoc.js'
 
-const RelOption = ({ valId, value, classes, onHit }) => (
+const RelOption = ({ valId, value, selected, onHit }) => (
   <p
-    className={`option ${classes}`}
+    className={`option ${selected}`}
     onClick={event=>onHit(valId, value.text, value.full)}
   >{value.text}</p> 
 )
@@ -39,17 +39,15 @@ class RelSelect extends Component {
   }
 
   render() {
-    const { isNew, allowNew, valid, valueList, onChange, classNames, extraClasses } = this.props;
+    const { isNew, allowNew, valid, valueList, onChange, extraClasses } = this.props;
     const { poppedUp, search, selVal, selText, selFull } = this.state;
     const pat = search.toLowerCase();
     const icon = poppedUp?(isNew?'minus':'arrow-up'):(isNew?'plus':'arrow-down');
-    const classes = classNames.join(' ')
-    const aclasses = classNames.concat(extraClasses).join(' ')
     const xclasses = extraClasses.join(' ');
     return (
       <div className="select">
-        <p className="option-head">
-          {(isNew?null:<span className={aclasses} title={selFull}>{selText}</span>)}
+        <p className="option-head tag-medium">
+          {(isNew?null:<span className={xclasses} title={selFull}>{selText}</span>)}
           <span
             className={`button-small fa fa-${icon}`}
             onClick={this.popUp.bind(this)}
@@ -78,7 +76,7 @@ class RelSelect extends Component {
                   key={(_id == null)?'null':_id}
                   valId={_id}
                   value={value}
-                  classes={(_id == selVal)?classes:''}
+                  selected={_id == selVal}
                   onHit={this.changeSel.bind(this, onChange)}
                 />
               ):null)

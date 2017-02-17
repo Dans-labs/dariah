@@ -69,6 +69,7 @@ contribModel = dict(
             country
             creator
             dateCreated
+            description
             disciplines
             keywords
             vcc
@@ -81,7 +82,6 @@ contribModel = dict(
             tadirahObjects
             tadirahTechniques
             urlContribution
-            description
             costTotal
             costDescription
             contactPersonName
@@ -170,7 +170,7 @@ keywords
         description=dict(
             label       = 'Description:',
             valType     = 'textarea',
-            multiple    = False,
+            multiple    = True,
             validation  = dict(nonEmpty=True),
             convert     = 'markdown',
             initial     = 'This contribution is about ...',

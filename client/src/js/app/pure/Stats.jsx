@@ -12,7 +12,7 @@ import React from 'react'
  * @returns {Fragment}
  */
 const Stats = ({subTotal, total}) => (
-  <span>
+  <span className="good-o">
     {subTotal == null? '' :`${subTotal}`}
     {(total == null || subTotal == null)? '' : ' of '}
     <strong>{total == null?'':`${total}`}</strong>

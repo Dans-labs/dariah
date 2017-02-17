@@ -1,0 +1,304 @@
+/* generic functions */
+
+@mixin sizing($size, $radius, $border) {
+    font-size: $size;
+    border-radius: $radius;
+    border-style: solid;
+    border-width: $border;
+    padding-top: $radius * 0.2;
+    padding-bottom: $radius * 0.2;
+    padding-left: $radius * 0.8;
+    padding-right: $radius * 0.8;
+}
+@mixin sizing2($size, $hor, $ver, $border) {
+    font-size: $size;
+    border-style: solid;
+    border-width: $border;
+    padding-top: $hor;
+    padding-bottom: $hor;
+    padding-left: $ver;
+    padding-right: $ver;
+}
+
+/* elements involved in user interaction */
+$action-back: #ffffee;
+$action-high: #ffff88;
+$action-fore: #0000bb;
+$action-border: #aaaa66;
+$action-text: #000044;
+
+@mixin action() {
+    color: $action-fore;
+    cursor: pointer;
+}
+@mixin actiontext() {
+    color: $action-text;
+    background-color: $action-back;
+    font-size: large;
+    font-family: monospace;
+}
+
+.button-large,.button-medium,.button-small  {
+    @include action();
+    background-color: $action-back;
+    border-color: $action-border;
+    white-space: nowrap;
+}
+.button-large { @include sizing(medium, 6, 2) }
+.button-medium { @include sizing(medium, 4, 1) }
+.button-small { @include sizing(small, 2, 0 ) }
+
+.link {
+    @include action();
+}
+input {
+    @include actiontext();
+}
+textarea {
+    @include actiontext();
+}
+.input.textarea {
+    width: 100%;
+}
+div.select {
+    display: inline-block;
+}
+div.options {
+    height: 6em;
+    overflow: auto;
+    resize: both;
+    border: 1px solid $action-border;
+    border-radius: 3px;
+    background-color: $action-back;
+    clear: both;
+}
+p.option {
+    @include action();
+    color: $action-fore;
+    background-color: $action-back;
+}
+p.option.selected {
+    background-color: $action-high;
+    border: 1px solid $action-border;
+}
+p.option-type, p.option-head, p.option {
+    margin: 0 0 0 0;
+    padding: 1 3 1 3;
+}
+p.option-type input {
+    margin: 0 0 0 0;
+    padding: 1 3 1 3;
+    border-radius: 3px;
+}
+
+/* signal coloring: error-warning-good-info */
+
+$error-fore-o: #880000;
+$error-fore: #ee0000;
+$error-back: #ffcccc;
+
+$warning-fore-o: #bb7700;
+$warning-fore: #000000;
+$warning-back: #ffcc88;
+
+$good-fore-o: #00aa00;
+$good-fore: #000000;
+$good-back: #88ff88;
+
+$info-fore-o: #222222;
+$info-fore: #226622;
+$info-back: #eeeeee;
+
+.error {
+    color: $error-fore;
+    background-color: $error-back;
+}
+.error-o {
+    color: $error-fore-o;
+}
+.warning {
+    color: $warning-fore;
+    background-color: $warning-back;
+}
+.warning-o {
+    color: $warning-fore-o;
+}
+.good {
+    color: $good-fore;
+    background-color: $good-back;
+}
+.good-o {
+    color: $good-fore-o;
+}
+.info {
+    color: $info-fore;
+    background-color: $info-back;
+}
+.info-o {
+    color: $info-fore-o;
+}
+.msg-high {
+    font-weight: bold;
+}
+.msg-line {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.msg-trash {
+    padding-top: 2;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: medium;
+    float: left;
+}
+.msg-dismiss {
+    padding-top: 2;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-style: italic;
+    font-size: x-small;
+    float: right;
+}
+.msg-box {
+    position: fixed;
+    top: 40;
+    right: 10;
+    width: 200;
+    height: 100;
+    overflow: auto;
+    padding-left: 10;
+    padding-right: 10;
+    z-index: 2000;
+    opacity: 0.9;
+    vertical-align: middle;
+    cursor: pointer;
+    background-color: #eeeeee;
+    border: 2px solid #aaaaaa;
+    border-radius: 8;
+    font-size: small;
+}
+.msg-spinner {
+    @include action();
+    position: fixed;
+    top: 0.05em;
+    right: 1em;
+    width: 5em;
+    height: 2em;
+    text-align: right;
+    padding-left: 0;
+    padding-right: 0;
+    z-index: 2000;
+    opacity: 0.9;
+    vertical-align: middle;
+}
+.msg-dot {
+    font-size: small;
+}
+
+.progress {
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+}
+
+.reason {
+    vertical-align: top;
+    color: $error-fore;
+    background-color: $error-back;
+}
+.input.invalid {
+    color: $action-text;
+    background-color: $error-back;
+}
+
+/* tags */
+
+$tag-back: #fafafa;
+$tag-fore: #008800;
+$tag-border: #888888;
+
+.tag-large,.tag-medium,.tag-small  {
+    color: $tag-fore;
+    background-color: $tag-back;
+    border-color: $tag-border;
+    white-space: nowrap;
+}
+.tag-large { @include sizing(medium, 6, 2) }
+.tag-medium { @include sizing(medium, 4, 1) }
+.tag-small { @include sizing(small, 2, 0) }
+
+/* values */
+
+.values {
+    line-height: 1.5;
+}
+
+/* structural elements, boxes, widgets */
+
+$widget-fixed-fore: #226622; 
+$widget-fixed-back: #eeeeee; 
+$widget-border: #aaaaaa; 
+$widget-varia-fore: #000000; 
+$widget-varia-back: #ffffff; 
+$widget-high-fore: #ffffff; 
+$widget-high-back: #444444; 
+
+.hidden {
+    color: $widget-fixed-back;
+}
+.widget-large,.widget-medium,.widget-small  {
+    color: $widget-fixed-fore;
+    background-color: $widget-fixed-back;
+    border-color: $widget-border;
+}
+.widget-large { @include sizing(medium, 6, 2) }
+.widget-medium { @include sizing(medium, 4, 1) }
+.widget-small { @include sizing(small, 2, 0) }
+
+.fixed-large,.fixed-medium,.fixed-small  {
+    color: $widget-fixed-fore;
+    background-color: $widget-fixed-back;
+}
+.fixed-large { @include sizing2(large, 1ex, 1em, 0) }
+.fixed-medium { @include sizing2(medium, 0.5ex, 0.5em, 0) }
+.fixed-small { @include sizing2(small, 0, 0.2em, 0) }
+
+.label {
+    @include sizing2(medium, 0.5ex, 0.5em, 0)
+    font-weight: bold;
+}
+
+.varia-large,.varia-medium,.varia-small  {
+    color: $widget-varia-fore;
+    background-color: $widget-varia-back;
+}
+.varia-large { @include sizing2(large, 1ex, 1em, 0) }
+.varia-medium { @include sizing2(medium, 0.5ex, 0.5em, 0) }
+.varia-small { @include sizing2(small, 0, 0.2em, 0) }
+
+.left {
+}
+.right {
+    float: right;
+}
+.stick {
+    float: left;
+    overflow: visible;
+    position: relative;
+    width: 0;
+    top: 2ex;
+    left: -1.5em;
+}
+
+/* documents */
+
+pre.md-source {
+    font-size: medium;
+    color: $action-text;
+    white-space: pre-wrap;
+}
+

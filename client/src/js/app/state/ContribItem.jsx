@@ -43,12 +43,9 @@ class ContribItem extends Component {
   }
   progIcon(noChange, allValid) {
     const { editStatus, contribId } = this.props;
-    const classes = ['savei']
-    classes.push(allValid?'valid':'invalid');
-    classes.push(noChange?'clean':'dirty');
-    if (!allValid) {classes.push('fa fa-close invalid')}
-    else if (!noChange) {classes.push('fa fa-pencil changed')}
-    editStatus[contribId].prog.className = classes.join(' ');
+    const statusClass = noChange?'info':(allValid?'warning':'error')
+    const statusIcon = noChange?'':(allValid?'fa-pencil':'fa-close')
+    editStatus[contribId].prog.className = `${statusClass} fa ${statusIcon}`;
   }
 
   updEdit(name, changed, valid, newVals) {
@@ -124,25 +121,24 @@ class ContribItem extends Component {
       return <div/>
     }
     const { noChange, allValid, canSave } = this.saveStatus(); 
-    const allValidClass = allValid?'valid':'invalid';
-    const noChangeClass = noChange?'clean':'dirty';
+    const statusClass = noChange?'info':(allValid?'warning':'error')
     const elemText = noChange?'all saved':(allValid?'save changes':'make corrections');
     const { perm } = fieldData;
     const { fragments, hasEditable } = this.parseFields();
     return (
-      <div className="item">
+      <div className="widget-medium">
         <p>
           {hasEditable? [
             canSave? (
               <span
                 key="1"
-                className={`button-large save ${noChangeClass} ${allValidClass}`}
+                className={`button-large ${statusClass}`}
                 onClick={this.saveAll.bind(this)}
               >{elemText}</span>
             ) : (
               <span
                 key="1"
-                className={`save ${noChangeClass} ${allValidClass}`}
+                className={`save ${statusClass}`}
               >{elemText}</span>
             ),
             perm.delete? (

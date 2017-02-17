@@ -20,6 +20,7 @@ td.facet {
     -webkit-border-vertical-spacing: 0;
 }
 input.facet {
+    @include action();
     margin: 0;
     padding: 0;
 }
@@ -34,7 +35,6 @@ td.statistic {
   text-align: right;
   padding-left: 0.5em;
   font-size: small;
-  color: $stat-fore;
 }
 
 

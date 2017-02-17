@@ -84,15 +84,14 @@ class Notification extends Component {
     return ( 
       <div>
         <p className="msg-spinner">
-          <a
+          <span
             title="show/hide notifications and progress messages"
-            href="#"
             className={this.lastNote > -1 ? `spin-${this.lastKind}` : 'spin-ok'}
             onClick={e=>{e.preventDefault(); this.setView(!this.visible)}}
           >
             { busyBlocks.map((b, i) => <span key={i} className="msg-dot fa fa-circle"></span>) }
             <span className={`fa fa-${this.busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}/>
-          </a>
+          </span>
         </p>
         <div
           ref={this.refDom.bind(this, 'notbox')}
@@ -104,7 +103,7 @@ class Notification extends Component {
             <p
               key={index}
               ref={this.refDom.bind(this, `m${index}`)}
-              className={`msg-line msg-${[msg.kind]}`}
+              className={`msg-line ${[msg.kind]}-o ${(msg.kind != 'info')?'msg-high':''}`}
             >{msg.text}</p>
             ))
           }

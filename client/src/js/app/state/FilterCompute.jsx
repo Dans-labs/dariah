@@ -62,7 +62,7 @@ class FilterCompute extends Component {
     return (
       <div>
         <div style={columnStyle('rightLeft')}>
-          <p>Total {contribs.length}</p>
+          <p>Total <span className="good-o">{contribs.length}</span></p>
           <Filters
             fields={fields}
             fieldValues={fieldValues}

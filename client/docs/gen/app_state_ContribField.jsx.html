@@ -38,6 +38,7 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>import React, { Component } from 'react'
+import Markdown from 'react-markdown'
 
 import RelSelect from 'RelSelect.jsx'
 import Alternatives from 'Alternatives.jsx'
@@ -344,7 +345,8 @@ class ContribField extends Component {
   }
 
   valueAsString(valRaw) {
-    const { valType, convert, usersMap, countriesMap } = this.props;
+    const { valType, convert, usersMap, countriesMap, initial } = this.props;
+    if (valRaw == null) {return { text: '', full: '', initial: (valType == 'rel')? true : initial }}
     switch (valType) {
       case 'rel': {
         switch (convert) {
@@ -360,25 +362,34 @@ class ContribField extends Component {
       case 'datetime': {
         return trimDate(valRaw);
       }
-      default: {return {text: valRaw, full: valRaw}}
+      default: {
+        return {text: valRaw, full: valRaw}
+      }
     }
   }
 
-  urlFragment(i, classNames, valText) {
+  urlFragment(i, valType, valText) {
     const { text, full } = valText;
-    return &lt;a key={i} target="_blank" href={full} className={classNames.join(' ')}>{text}&lt;/a>
+    return &lt;a key={i} target="_blank" href={full} className="link">{text}&lt;/a>
   }
-  emailFragment(i, classNames, valText) {
+  emailFragment(i, valType, valText) {
     const { text, full } = valText;
-    return &lt;a key={i} target="_blank" href={`mailto:${full}`} className={classNames.join(' ')}>{full}&lt;/a>
+    return &lt;a key={i} target="_blank" href={`mailto:${full}`} className="link">{full}&lt;/a>
   }
-  textareaFragment(i, classNames, valText) {
+  textareaFragment(i, valType, valText) {
     const { text, full } = valText;
-    return &lt;p key={i} className={classNames.join(' ')}>{full}&lt;/p>
+    return (
+      &lt;Markdown
+        key={i}
+        source={full}
+      />
+    )
+    //return &lt;p key={i} className="varia-large">{full}&lt;/p>
   }
-  defaultFragment(i, classNames, valText) {
+  defaultFragment(i, valType, valText) {
     const { text, full } = valText;
-    return &lt;span key={i} className={classNames.join(' ')} title={full}>{text}&lt;/span>
+    const cl = `${(valType == 'rel')?'tag':'varia'}-medium`;
+    return &lt;span key={i} className={cl} title={full}>{text}&lt;/span>
   }
 
   relOptions() {
@@ -394,7 +405,7 @@ class ContribField extends Component {
     return [...countriesMap.values()].map(rv => [rv._id,  this.valueAsString(rv)])
   }
 
-  relSelect(i, _id, classNames, extraClasses, valText) {
+  relSelect(i, _id, isNew, extraClasses, valText) {
     const { text, full } = valText;
     const { convert, allowNew, name, rowId } = this.props;
     const { valid } = this.state;
@@ -402,7 +413,7 @@ class ContribField extends Component {
     return &lt;RelSelect
       tag={`relselect_${rowId}_${name}_${i}`}
       key={i}
-      isNew={i == -1}
+      isNew={isNew}
       allowNew={allowNew}
       valid={valid}
       valueList={valueList}
@@ -410,51 +421,77 @@ class ContribField extends Component {
       initText={text}
       initFull={full}
       onChange={this.changeRelVal.bind(this, i)}
-      classNames={classNames}
       extraClasses={extraClasses}
     />
   }
-  relEditFragment(i, _id, classNames, extraClasses, valText) {
+  editValControl(i, _id, isNew) {
+    const { multiple } = this.props;
+    return (isNew || !multiple)? null : (
+      &lt;span
+        className="button-small fa fa-close"
+        onClick={this.removeVal.bind(this, i, _id)}
+      />
+    )
+  }
+
+  relEditFragment(i, _id, isNew, valType, extraClasses, valText) {
     const { text, full } = valText;
     const { multiple } = this.props;
-    return (!multiple &amp;&amp; i == 0)? (
-      this.relSelect(i, _id, classNames, extraClasses, valText)
+    return ((!multiple &amp;&amp; i == 0) || isNew)? (
+      this.relSelect(i, _id, isNew, extraClasses, valText)
     ) : (
-      &lt;span key={i} className={classNames.join(' ')} title={full}>{text}{' '}
-        &lt;span
-          className="button-small fa fa-close"
-          onClick={this.removeVal.bind(this, i, _id)}
-        />
+      &lt;span key={i} className="tag-medium" title={full}>{text}{' '}
+        {this.editValControl(i, _id, isNew)}
       &lt;/span>
     )
   }
-  textareaEditFragment(i, _id, classNames, extraClasses, valText, cols=100, rows=10) {
+  textareaEditFragment(i, _id, isNew, valType, extraClasses, valText, cols=100, rows=10) {
+    const { rowId, name } = this.props;
     const { text, full } = valText;
     this.saveLater = true;
     return (
-      &lt;textarea key={i}
-        className={classNames.concat(extraClasses).join(' ')}
-        value={full}
-        onChange={this.changeVal.bind(this, i)}
-        cols={cols}
-        rows={rows}
-        placeholder={valText.initial}
-        wrap="soft"
+      &lt;Alternatives key={i} tag={`md_${rowId}_${name}`}
+        controlPlacement={control => (&lt;p className="stick">{control}&lt;/p>)}
+        controls={[
+          (handler => &lt;span className="button-small fa fa-pencil" onClick={handler}/>),
+          (handler => &lt;span className="button-small fa fa-hand-o-down" onClick={handler}/>),
+        ]}
+        alternatives={[
+          &lt;Markdown
+            source={full}
+          />,
+          &lt;span>
+            &lt;textarea
+              className={`input ${valType} ${extraClasses.join(' ')}`}
+              value={full}
+              onChange={this.changeVal.bind(this, i)}
+              cols={cols}
+              rows={rows}
+              placeholder={valText.initial}
+              wrap="soft"
+            />
+            {this.editValControl(i, _id, isNew)}
+          &lt;/span>
+        ]}
+        initial={0}
       />
     )
   }
-  defaultEditFragment(i, _id, classNames, extraClasses, valText, size=50) {
+  defaultEditFragment(i, _id, isNew, valType, extraClasses, valText, size=50) {
     const { text, full } = valText;
     this.saveLater = true;
     return (
-      &lt;input key={i} type="text"
-        className={classNames.concat(extraClasses).join(' ')}
-        value={full}
-        placeholder={valText.initial}
-        onChange={this.changeVal.bind(this, i)}
-        onKeyUp={this.keyUp.bind(this, i)}
-        size={size}
-      />
+      &lt;span key={i}>
+        &lt;input type="text"
+          className={`input ${valType} ${extraClasses.join(' ')}`}
+          value={full}
+          placeholder={valText.initial}
+          onChange={this.changeVal.bind(this, i)}
+          onKeyUp={this.keyUp.bind(this, i)}
+          size={size}
+        />
+        {this.editValControl(i, _id, isNew)}
+      &lt;/span>
     )
   }
 
@@ -465,15 +502,15 @@ class ContribField extends Component {
       const { saving, changed, valid } = this.state;
       const cs = saving.status;
       if (cs == 'saving') {progIcon = 'fa-spinner fa-spin'}
-      else if (cs == 'saved') {progIcon = 'fa-check saved'}
+      else if (cs == 'saved') {progIcon = 'fa-check good'}
       else if (cs == 'error') {progIcon = 'fa-exclamation error'}
-      else if (!valid) {progIcon = 'fa-close invalid'}
-      else if (changed) {progIcon = 'fa-pencil changed'}
-      else {progIcon = 'fa-pencil'}
+      else if (!valid) {progIcon = 'fa-close error'}
+      else if (changed) {progIcon = 'fa-pencil warning'}
+      else {progIcon = 'fa-circle-o hidden'}
       progIcon += ' fa progress';
     }
     else {
-      progIcon = 'fa fa-lock progress';
+      progIcon = 'fa fa-lock progress info';
     }
     return (&lt;span key={name} className={progIcon}/>)
   }
@@ -481,7 +518,7 @@ class ContribField extends Component {
   valuesAsReadonly() {
     const { curValues } = this.state;
     const { name } = this.props;
-    if (curValues.length == 0) {return &lt;span className='absent'>no value&lt;/span>}
+    if (curValues.length == 0) {return &lt;span className='warning'>no value&lt;/span>}
     const { valType, multiple, appearance } = this.props;
     const methods = readonlyMakeFragment(this);
     const makeFragment = methods[valType] || methods._default;
@@ -493,8 +530,7 @@ class ContribField extends Component {
     processValues.forEach((v, i) => {
       let destAlt = (!cutoff || i &lt;= cutoff-1)?alt1:alt2;
       const valText = this.valueAsString(v);
-      const classNames = ['value', valType];
-      const fragment = makeFragment(i, classNames, valText);
+      const fragment = makeFragment(i, valType, valText);
       if (multiple || i == 0) {destAlt.push(fragment)}
       if (multiple) {destAlt.push(' ')}
     });
@@ -504,29 +540,33 @@ class ContribField extends Component {
   valuesAsControls() {
     const { curValues, reasons } = this.state;
     const { savedValues } = this.state;
-    const { name, initial, valType, multiple, validation, allowNew, appearance } = this.props;
+    const { name, valType, multiple, validation, allowNew, appearance } = this.props;
     const methods = editMakeFragment(this);
     const makeFragment = methods[valType] || methods._default;
     const cutoff = appearance.cutoff;
     const alt2 = []
     const alt1 = []
     const enumCurValues = curValues.map((v,i) => [i, v])
+    const nValues = curValues.length;
     const processValues = appearance.reverse?enumCurValues.reverse():enumCurValues;
-    const classNames = ['value', valType];
+    if (multiple || nValues == 0) {
+      processValues.push([nValues, null])
+    }
     const size = sizes[valType] || sizes._max;
     let destAlt = alt1;
     let extraClasses = []
     processValues.forEach((ev, j) => {
       const [i, v] = ev;
+      const isNew = j == nValues;
       destAlt = (!cutoff || j &lt;= cutoff-1)?alt1:alt2;
       const valText = this.valueAsString(v);
-      const _id = v._id;
+      const _id = (v == null)? null : v._id;
       extraClasses = []
       const reason = reasons[i] || '';
       if (reason != '') {
-        extraClasses.push('invalid');
+        extraClasses.push('error');
       }
-      const fragment = makeFragment(i, _id, classNames, extraClasses, valText, size);
+      const fragment = makeFragment(i, _id, isNew, valType, extraClasses, valText, size);
       if (multiple || j == 0) {
         destAlt.push(fragment);
         if (reason != '') {
@@ -536,17 +576,6 @@ class ContribField extends Component {
         destAlt.push(' ');
       }
     });
-    if (multiple || curValues.length == 0) {
-      destAlt.push(' ');
-      if (valType == 'rel') {
-        destAlt.push(this.relSelect(-1, null, classNames, extraClasses, {text: null, full: null}));
-      }
-      else {
-        destAlt.push(
-          makeFragment(-1, null, classNames, extraClasses, {text: '', full: '', initial}, size)
-        )
-      }
-    }
     return this.knead(alt1, alt2)
   }
 
@@ -584,7 +613,7 @@ class ContribField extends Component {
       &lt;tr>
         &lt;td className="label" {...onClick} >{label}&lt;/td>
         &lt;td className="label" {...onClick} >{prog}&lt;/td>
-        &lt;td>&lt;div className={classNames}>{values}&lt;/div>&lt;/td>
+        &lt;td>&lt;div className="values">{values}&lt;/div>&lt;/td>
       &lt;/tr>
     )
   }
@@ -628,7 +657,7 @@ export default withContext(saveState(ContribField, 'ContribField', normalizeValu
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu Feb 16 2017 17:51:45 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri Feb 17 2017 16:43:40 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
