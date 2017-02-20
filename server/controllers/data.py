@@ -186,10 +186,44 @@ class DataApi(object):
                 good=result.acknowledged,
                 msgs=[],
             )
+        elif action == 'delete':
+            criteria = self.perm.criteria['delete']
+            newData = request.json
+            _id = newData.get(IDNAME, None)
+            if _id == None:
+                return dict(
+                    data=None,
+                    good=False,
+                    msgs=[dict(kind='error', text='contribution not identified')],
+                )
+            _oid = oid(_id)
+            documents = list(self.dbm.contrib.find({IDNAME: _oid}))
+            if len(documents) != 1:
+                return dict(
+                    data=None,
+                    good=False,
+                    msgs=[dict(kind='error', text='contribution not properly identified')],
+                )
+            document = documents[0]
+            mayDelete = criteria(document)
+            if not mayDelete:
+                return dict(
+                    data=None,
+                    good=False,
+                    msgs=[dict(kind='error', text='not allowed to delete this contribution'.format(name))],
+                )
+            else:
+                self.dbm.contrib.delete_one({IDNAME: _oid})
+                return dict(
+                    data={IDNAME: _id},
+                    good=True,
+                    msgs=[],
+                )
         else:
             action = 'read'
             own = request.query.own == 'true'
             contribId = request.query.id
+            print('contribId={}'.format(contribId))
             if len(contribId) > 65:
                 return dict(data=[], msgs=[dict(kind='error', text='contribution does not exist')], good=False)
             thisFilter = {IDNAME: oid(contribId)}

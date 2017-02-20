@@ -72,10 +72,6 @@ class ContribItem extends Component {
       this.setState({...this.state, saveConcern: true})
     }
   }
-  delete() {
-    console.log('delete requested')
-  }
-
   parseFields() {
     const { fieldData } = this.state;
     const { row, fields, fieldSpecs, fieldOrder, perm } = fieldData;
@@ -117,13 +113,15 @@ class ContribItem extends Component {
 
   render() {
     const { fieldData, changed, valid } = this.state;
+    const { delCallback } = this.props;
     if (fieldData == null || fieldData.row == null) {
       return <div/>
     }
     const { noChange, allValid, canSave } = this.saveStatus(); 
     const statusClass = noChange?'info':(allValid?'warning':'error')
     const elemText = noChange?'all saved':(allValid?'save changes':'make corrections');
-    const { perm } = fieldData;
+    const { row, perm } = fieldData;
+    const rowId = row._id;
     const { fragments, hasEditable } = this.parseFields();
     return (
       <div className="widget-medium">
@@ -145,7 +143,7 @@ class ContribItem extends Component {
               <span
                 key="2"
                 className={'fa fa-trash button-large delete'}
-                onClick={this.delete.bind(this)}
+                onClick={delCallback.contrib.bind(null, rowId)}
                 title="delete this contribution"
               />
             ) : null
@@ -185,5 +183,10 @@ class ContribItem extends Component {
 
 }
 
-export default withContext(saveState(ContribItem, 'ContribItem', {fieldData: null, changed: {}, valid: {}, saveConcern: false}))
+export default withContext(saveState(ContribItem, 'ContribItem', {
+  fieldData: null,
+  changed: {},
+  valid: {},
+  saveConcern: false,
+}))
 

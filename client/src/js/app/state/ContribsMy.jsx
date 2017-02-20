@@ -58,15 +58,45 @@ class ContribsMy extends Component {
     );
   }
 
+  deleted(data) {
+    this.setState({...this.state, deleted: data})
+    if (data != null) {
+      const { router } = this.props;
+      router.push(`/mycontrib/`);
+    }
+  }
+
+  deleteRow(contribId, event) {
+    event.preventDefault();
+    getData([
+        {
+          type: 'db',
+          path: '/item_contrib?action=delete',
+          branch: `delete`,
+          callback: this.deleted.bind(this),
+          data: {_id: contribId},
+        },
+        {
+          type: 'db',
+          path: '/my_contribs',
+          branch: 'contribData',
+        },
+      ],
+      this,
+      this.props.notification.component
+    );
+  }
+
   render() {
     const { contribData, countries, users } = this.state;
-    const { usersMap, countriesMap, children } = this.props;
+    const { usersMap, countriesMap, children, delCallback } = this.props;
     if (contribData == null || countries == null || users == null) {
       return <div/>
     }
     const { contribs, fields, perm } = contribData;
     for (const x of users) {usersMap.set(x._id, x)}
     for (const x of countries) {countriesMap.set(x._id, x)}
+    delCallback.contrib = this.deleteRow.bind(this);
     return (
       <div>
         <div className="nav" style={columnStyle('rightLeftNav')}>
@@ -97,7 +127,7 @@ class ContribsMy extends Component {
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { contribData, countries, users, inserted } = this.state;
+    const { contribData, countries, users, inserted, deleted } = this.state;
     if (contribData == null || countries == null || users == null) {
       getData([
           {
@@ -120,8 +150,11 @@ class ContribsMy extends Component {
         this.props.notification.component
       );
     }
-    else if (inserted) {
-      this.setState({...this.state, inserted: null})
+    else if (inserted && deleted) {
+      newState = {}
+      if (inserted) {newState.inserted = null}
+      if (deleted) {newState.deleted = null}
+      this.setState({...this.state, ...newState})
       getData([
           {
             type: 'db',
