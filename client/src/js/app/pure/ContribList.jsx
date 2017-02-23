@@ -11,7 +11,7 @@ import ContribTitle from 'ContribTitle.jsx'
  * @param {Object[]} filteredData The list of rows to be displayed
  * @returns {Fragment}
  */
-const Contribs = ({ filteredData, inplace }) => (
+const ContribList = ({ filteredData, inplace }) => (
   <div>
     <table>
       <tbody>{
@@ -23,4 +23,4 @@ const Contribs = ({ filteredData, inplace }) => (
   </div>
 )
 
-export default Contribs
+export default ContribList

@@ -380,7 +380,7 @@
  * <Router history={browserHistory}>
  *   <Route path="/" component={App}>
  *     <Route path="about" component={About} />
- *     <Route path="contribs" component={Contribs} />
+ *     <Route path="contrib" component={ContribList} />
  *   </Route>
  * </Router>
  * ```

@@ -1,0 +1,255 @@
+generic:
+  createdDate: dateCreated
+  createdBy: creator
+  modDate: dateModified
+  modBy: modifiedBy
+  idField: _id
+  valField: value
+
+tables:
+  contrib:
+    title: title
+    fieldOrder: 
+      - title
+      - year
+      - country
+      - vcc
+      - typeContribution
+      - description
+      - costTotal
+      - costDescription
+      - contactPersonName
+      - contactPersonEmail
+      - urlContribution
+      - urlAcademic
+      - creator
+      - dateCreated
+      - dateModified
+      - modifiedBy
+      - tadirahObject
+      - tadirahActivity
+      - tadirahTechnique
+      - discipline
+      - keyword
+
+    fieldSpecs: 
+      title:
+        label: Title
+        valType: text
+        multiple: false
+        validation:
+            nonEmpty: true
+        initial: title
+        appearance: {}
+
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+        validation:
+            nonEmpty: true
+        appearance: {}
+
+      dateModified:
+        label: modified on
+        valType: datetime
+        multiple: true
+        validation:
+          nonEmpty: false
+        appearance:
+          reverse: true
+          cutoff: 1
+
+      contactPersonName:
+        label: contact person
+        valType: text
+        multiple: false
+        validation:
+          nonEmpty: true
+        initial: First_name Last_name
+        appearance: {}
+
+      contactPersonEmail:
+        label: contact email
+        valType: email
+        multiple: true
+        validation:
+          nonEmpty: true
+        initial: name@myinstitute.org
+        appearance: {}
+
+      urlContribution:
+        label: Contribution url
+        valType: url
+        multiple: true
+        validation:
+          nonEmpty: true
+        initial: www.mycontrib.org
+        appearance: {}
+
+      urlAcademic:
+        label: Academic url
+        valType: url
+        multiple: true
+        validation:
+          nonEmpty: true
+        initial: www.myinstitute.org
+        appearance: {}
+
+      description:
+        label: Description
+        valType: textarea
+        multiple: true
+        validation:
+          nonEmpty: true
+        convert: markdown
+        initial: This contribution is about ...
+        appearance: {}
+
+      costTotal:
+        label: cost (total)
+        valType: number
+        multiple: false
+        validation:
+          nonEmpty: true
+        initial: € 1000
+        appearance: {}
+
+      costDescription:
+        label: cost (description)
+        valType: textarea
+        validation:
+          nonEmpty: true
+        convert: markdown
+        multiple: false
+        initial: The costs of this contribution can be broken down as follows ...
+        appearance: {}
+
+      creator:
+        label: creator
+        valType: rel
+        multiple: false
+        validation:
+          nonEmpty: true
+        convert: user
+        allowNew: false
+        getValues: /user
+        idOnly: true
+        appearance: {}
+
+      modifiedBy:
+        label: modified by
+        valType: rel
+        multiple: true
+        validation:
+          nonEmpty: false
+        convert: user
+        allowNew: false
+        getValues: /user
+        idOnly: true
+        appearance:
+          reverse: true
+          cutoff: 1
+
+      country:
+        label: Country(ies)
+        valType: rel
+        multiple: false
+        validation:
+          nonEmpty: true
+        convert: country
+        allowNew: false
+        getValues: /member_country
+        idOnly: false
+        appearance: {}
+
+      year:
+        label: Year
+        valType: rel
+        multiple: false
+        validation:
+          nonEmpty: true
+          min: 2000
+          max: 2100
+          step: 1
+        allowNew: true
+        getValues: /value_skim?table={table}&field={field}
+        idOnly: false
+        appearance: {}
+
+      vcc:
+        label: VCC
+        valType: rel
+        multiple: true
+        validation:
+          nonEmpty: true
+        allowNew: false
+        getValues: /value_table?table={table}&field={field}
+        idOnly: false
+        appearance: {}
+
+      discipline:
+        label: Disciplines
+        valType: rel
+        multiple: true
+        validation:
+          nonEmpty: true
+        allowNew: true
+        getValues: /value_skim?table={table}&field={field}
+        idOnly: false
+        appearance: {}
+
+      keyword:
+        label: Keywords
+        valType: rel
+        multiple: true
+        validation:
+          nonEmpty: true
+        allowNew: true
+        getValues: /value_skim?table={table}&field={field}
+        idOnly: false
+        appearance: {}
+
+      typeContribution:
+        label: Type
+        valType: rel
+        multiple: false
+        validation:
+          nonEmpty: true
+        allowNew: false
+        getValues: /value_table?table={table}&field={field}
+        idOnly: false
+        appearance: {}
+
+      tadirahObject:
+        label: Object(s)
+        valType: rel
+        multiple: true
+        validation:
+          nonEmpty: false
+        allowNew: false
+        getValues: /value_table?table={table}&field={field}
+        idOnly: false
+        appearance: {}
+
+      tadirahActivity:
+        label: Activity(ies)
+        valType: rel
+        multiple: true
+        validation:
+          nonEmpty: false
+        allowNew: false
+        getValues: /value_table?table={table}&field={field}
+        idOnly: false
+        appearance: {}
+
+      tadirahTechnique:
+        label: Technique(s)
+        valType: rel
+        multiple: true
+        validation:
+          nonEmpty: false
+        allowNew: false
+        getValues: /value_table?table={table}&field={field}
+        idOnly: false
+        appearance: {}

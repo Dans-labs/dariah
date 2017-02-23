@@ -1,5 +1,5 @@
 import React from 'react'
-import Alternatives from 'Alternatives.jsx'
+import Alternative from 'Alternative.jsx'
 import ContribItem from 'ContribItem.jsx'
 import NavLink  from 'NavLink.jsx'
 import { withContext } from 'hoc.js'
@@ -23,7 +23,7 @@ const ContribTitle = ({ row, inplace, editStatus }) => {
     <tr id={rowId}>
       <td>{
         inplace? (
-          <Alternatives tag={`contrib_${rowId}`}
+          <Alternative tag={`contrib_${rowId}`}
             controlPlacement={control => (
             <p>
                 {control}

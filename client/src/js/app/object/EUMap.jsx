@@ -76,7 +76,7 @@ const mapOptions = {
 /**
  * ## Compute Marker Radius
  *
- * When we know the filter results per country, we can put markers on countries
+ * When we know the filter results per country, we can put markers on them
  * with a radius in proportion to their scores.
  * However, if the scores are very far apart, either the small markers get invisible,
  * or the big markers get too big. 
@@ -120,13 +120,13 @@ class EUMap extends Component {
  * to get the country facets.
  * And it puts a div in place that will receive the map.
  * @method
- * @param {Map} countriesMap This parameter is not used, but mentioned to select all the other parameters to
+ * @param {Map} countryMap This parameter is not used, but mentioned to select all the other parameters to
  * pass on
  * @param {Object[]} byValueProps The remaining properties, to be passes to the {ByValue} component.
  * @returns {Fragment}
  */
   render() {
-    const { countriesMap, ...byValueProps } = this.props;
+    const { countryMap, ...byValueProps } = this.props;
     return (
       <div>
         <div
@@ -151,20 +151,20 @@ class EUMap extends Component {
  * @param {Map} filterSettings - the current settings of the country facets
  * @param {number} filteredAmountOthers - how many rows pass all other filters
  * @param {Map} amounts` - `filteredAmountOthers`, but more specific: the amounts per faceted value
- * @param {Map} countriesMap The country information as fetched from the database on the server.
+ * @param {Map} countryMap The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {DOM}
  */
 
   componentDidMount() {
-    const { filterSettings, filteredAmountOthers, amounts, countriesMap } = this.props;
+    const { filterSettings, filteredAmountOthers, amounts, countryMap } = this.props;
     this.map = L.map(this.dom, {
       attributionControl: false,
       center: mapOptions.MAP_CENTER,
       zoom: mapOptions.ZOOM_INIT,
       maxBounds: mapOptions.MAP_BOUNDS,
     });
-    this.idFromIso = new Map([...countriesMap.values()].map(d => [d.iso, d._id]));
+    this.idFromIso = new Map([...countryMap.values()].map(d => [d.iso, d._id]));
     L.geoJSON(countryBorders, {
       style: feature => mapOptions.COUNTRY_STYLE[this.inDariah(feature)],
       onEachFeature: feature => {

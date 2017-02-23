@@ -83,8 +83,8 @@ class Provider extends Component {
       store: new Store(),
       notification: {component: null},
       userInfo: new Map(),
-      usersMap: new Map(),
-      countriesMap: new Map(),
+      userMap: new Map(),
+      countryMap: new Map(),
       editStatus: {},
       delCallback: {},
     };

@@ -6,7 +6,7 @@ import { lsHas, lsGet, lsSet } from 'localstorage.js'
  * The big contribution list can be filtered by any number of filters.
  * This module contains helpers to set up the filtering and compute the results.
  *
- * The list of available filters is in {@link Filters}.
+ * The list of available filters is in {@link Filter}.
  *
  * @module filtering
  */
@@ -29,15 +29,15 @@ import { lsHas, lsGet, lsSet } from 'localstorage.js'
  *   * to this mapping we add a `-none-` value, with the intention that it matches
  *     those rows that do not have values in this field.
  *
- * @param {Contrib[]} contribs - The list of contribution records as it comes form mongo db
+ * @param {Contrib[]} records - The list of contribution records as it comes form mongo db
  * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
  * dependent on the permissions of the current user.
  * @param {Array} filterList - The list of available filters, statically imported from the 
  * @returns {Map} `fieldValues` - a mapping of the valueId to the valueRepresentation of all values that have
- * been encountered in the `field` of the `contribs` rows
+ * been encountered in the `field` of the `records` rows
  * @returns {Map} `filterInit` - a mapping that maps the filterId of each available filter to initial filterSettings
  * for that filter, i.e. the situation that the user has not yet started using the filters
- * {@link Filters} component.
+ * {@link Filter} component.
  */
 
 const initf = (tag, key, defaultVal) => {
@@ -49,11 +49,11 @@ export const setf = (tag, key, val) => {
   lsSet(lskey, val);
 }
 
-export function compileFiltering(contribs, fields, filterList) {
+export function compileFiltering(records, fields, filterList) {
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterFields = presentFilterList.filter(x => x.name !== 'FullText').map(x => x.field);
   const fieldValues = new Map(filterFields.map(f => [f, new Map([['', '-none-']])]));
-  for (const row of contribs) {
+  for (const row of records) {
     for (const field of filterFields) {
       const fFieldValues = fieldValues.get(field);
       const metaraw = row[field];
@@ -85,20 +85,20 @@ export function compileFiltering(contribs, fields, filterList) {
 /**
  * ## Computing Filters
  *
- * @param {Contrib[]} contribs - as in {@link compileFiltering} 
+ * @param {Contrib[]} records - as in {@link compileFiltering} 
  * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
  * dependent on the permissions of the current user.
  * @param {Array} filterList - as in {@link compileFiltering}
  * @param {Map} fieldValues - as in {@link compileFiltering} 
  * @param {Map} filterSettings - a {@link external:Map|Map} of filters to their current settings
- * @returns {Map} `filteredData` - the sublist of contribs, the rows that pass all filters
+ * @returns {Map} `filteredData` - the sublist of records, the rows that pass all filters
  * @returns {Map} `filteredAmountOthers` - a mapping that indicates for each filter how many rows pass all other filters
  * @returns {Map} `amounts` - a mapping like `filteredAmountOthers`, but more specific: it splits the amount per faceted value
  *
  * With filteredData.length, filteredAmountOthers, amounts we have exactly the right numbers to 
  * render the "(nn of mm)" statistics on the user interface next to each filter and facet.
  */
-export function computeFiltering(contribs, fields, filterList, fieldValues, filterSettings) {
+export function computeFiltering(records, fields, filterList, fieldValues, filterSettings) {
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterChecks = new Map(presentFilterList.map((filterSpec, filterId) => (
     [filterId, (filterSpec.name === 'FullText' ? fullTextCheck : facetCheck)(filterSpec.field, filterSettings.get(filterId))]
@@ -111,7 +111,7 @@ export function computeFiltering(contribs, fields, filterList, fieldValues, filt
    * We are also interested in those rows that fail exactly one filter.
    * Because those rows are part of the universe that that one filter is filtering.
    */
-  for (const row of contribs) {
+  for (const row of records) {
     /*
      * Here we record the one filter for which the row fails, if there is such a filter.
      */

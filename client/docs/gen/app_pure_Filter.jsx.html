@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>app/pure/Filter.jsx - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alternative.html">Alternative</a><ul class='methods'><li data-type='method'><a href="Alternative.html#next">next</a></li><li data-type='method'><a href="Alternative.html#render">render</a></li></ul></li><li><a href="App.html">App</a></li><li><a href="ByValue.html">ByValue</a></li><li><a href="CheckboxI.html">CheckboxI</a><ul class='methods'><li data-type='method'><a href="CheckboxI.html#onCheck">onCheck</a></li></ul></li><li><a href="ContribField.html">ContribField</a><ul class='methods'><li data-type='method'><a href="ContribField.html#fetchValues">fetchValues</a></li><li data-type='method'><a href="ContribField.html#setValToState">setValToState</a></li></ul></li><li><a href="ContribFiltered.html">ContribFiltered</a><ul class='methods'><li data-type='method'><a href="ContribFiltered.html#componentDidMount">componentDidMount</a></li><li data-type='method'><a href="ContribFiltered.html#render">render</a></li></ul></li><li><a href="ContribItem.html">ContribItem</a><ul class='methods'><li data-type='method'><a href="ContribItem.html#fetchRow">fetchRow</a></li><li data-type='method'><a href="ContribItem.html#updMod">updMod</a></li></ul></li><li><a href="ContribList.html">ContribList</a></li><li><a href="ContribMy.html">ContribMy</a><ul class='methods'><li data-type='method'><a href="ContribMy.html#componentDidMount">componentDidMount</a></li><li data-type='method'><a href="ContribMy.html#inserted">inserted</a></li></ul></li><li><a href="ContribTitle.html">ContribTitle</a></li><li><a href="DocHtml.html">DocHtml</a></li><li><a href="DocPdf.html">DocPdf</a></li><li><a href="Facet.html">Facet</a></li><li><a href="FilterCompute.html">FilterCompute</a><ul class='methods'><li data-type='method'><a href="FilterCompute.html#render">render</a></li></ul></li><li><a href="FullText.html">FullText</a></li><li><a href="Login.html">Login</a><ul class='methods'><li data-type='method'><a href="Login.html#componentDidMount">componentDidMount</a></li></ul></li><li><a href="module-ContribItemPre-ContribItemPre.html">ContribItemPre</a></li><li><a href="module-DocMd-DocMd.html">DocMd</a><ul class='methods'><li data-type='method'><a href="module-DocMd-DocMd.html#fetchText">fetchText</a></li><li data-type='method'><a href="module-DocMd-DocMd.html#render">render</a></li></ul></li><li><a href="module-Doc-Doc.html">Doc</a></li><li><a href="module-EUMap-EUMap.html">EUMap</a><ul class='methods'><li data-type='method'><a href="module-EUMap-EUMap.html#componentDidMount">componentDidMount</a></li><li data-type='method'><a href="module-EUMap-EUMap.html#componentDidUpdate">componentDidUpdate</a></li><li data-type='method'><a href="module-EUMap-EUMap.html#render">render</a></li></ul></li><li><a href="module-Filter-Filter.html">Filter</a></li><li><a href="NavLink.html">NavLink</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="Notification.html">Notification</a><ul class='methods'><li data-type='method'><a href="Notification.html#computeProgress">computeProgress</a></li><li data-type='method'><a href="Notification.html#refDom">refDom</a></li><li data-type='method'><a href="Notification.html#setView">setView</a></li></ul></li><li><a href="Provider.html">Provider</a><ul class='methods'><li data-type='method'><a href="Provider.html#getChildContext">getChildContext</a></li></ul></li><li><a href="Stat.html">Stat</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#load">load</a></li><li data-type='method'><a href="Store.html#save">save</a></li></ul></li><li><a href="ValueList.html">ValueList</a><ul class='methods'><li data-type='method'><a href="ValueList.html#componentDidMount">componentDidMount</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-ContribItemPre.html">ContribItemPre</a></li><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.getData">getData</a></li></ul></li><li><a href="module-Doc.html">Doc</a></li><li><a href="module-DocMd.html">DocMd</a><ul class='methods'><li data-type='method'><a href="module-DocMd.html#~RouterLink">RouterLink</a></li></ul></li><li><a href="module-ES6.html">ES6</a></li><li><a href="module-EUMap.html">EUMap</a><ul class='methods'><li data-type='method'><a href="module-EUMap.html#~computeRadius">computeRadius</a></li></ul></li><li><a href="module-europe_geo_js.html">europe_geo_js</a></li><li><a href="module-Filter.html">Filter</a></li><li><a href="module-filtering.html">filtering</a><ul class='methods'><li data-type='method'><a href="module-filtering.html#.computeFiltering">computeFiltering</a></li><li data-type='method'><a href="module-filtering.html#.newFilterSettings">newFilterSettings</a></li><li data-type='method'><a href="module-filtering.html#.placeFacets">placeFacets</a></li><li data-type='method'><a href="module-filtering.html#.testAllChecks">testAllChecks</a></li><li data-type='method'><a href="module-filtering.html#~countFacets">countFacets</a></li><li data-type='method'><a href="module-filtering.html#~facetCheck">facetCheck</a></li><li data-type='method'><a href="module-filtering.html#~fullTextCheck">fullTextCheck</a></li><li data-type='method'><a href="module-filtering.html#~initf">initf</a></li></ul></li><li><a href="module-hoc.html">hoc</a><ul class='methods'><li data-type='method'><a href="module-hoc.html#.saveState">saveState</a></li><li data-type='method'><a href="module-hoc.html#.withContext">withContext</a></li></ul></li><li><a href="module-main.html">main</a></li><li><a href="module-React.html">React</a></li><li><a href="module-ui.html">ui</a><ul class='methods'><li data-type='method'><a href="module-ui.html#.columnStyle">columnStyle</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Component.html">Component</a></li><li><a href="external-componentDidMount.html">componentDidMount</a></li><li><a href="external-componentDidUpdate.html">componentDidUpdate</a></li><li><a href="external-componentWillMount.html">componentWillMount</a></li><li><a href="external-componentWillReceiveProps.html">componentWillReceiveProps</a></li><li><a href="external-componentWillUnmount.html">componentWillUnmount</a></li><li><a href="external-constructor.html">constructor</a></li><li><a href="external-context.html">context</a></li><li><a href="external-ControlledComponent.html">ControlledComponent</a></li><li><a href="external-DOM.html">DOM</a></li><li><a href="external-Fragment.html">Fragment</a></li><li><a href="external-LifeCycle.html">LifeCycle</a></li><li><a href="external-Map.html">Map</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-PropTypes.html">PropTypes</a></li><li><a href="external-Recompose.html">Recompose</a></li><li><a href="external-Reconciliation.html">Reconciliation</a></li><li><a href="external-Redux.html">Redux</a></li><li><a href="external-render.html">render</a></li><li><a href="external-Routing.html">Routing</a></li><li><a href="external-setState.html">setState</a></li><li><a href="external-state.html">state</a></li><li><a href="external-StatePolicy.html">StatePolicy</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">app/pure/Filter.jsx</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react'
+
+import FullText from 'FullText.jsx'
+import ByValue from 'ByValue.jsx'
+import EUMap from 'EUMap.jsx'
+
+/**
+ * @module Filter
+ */
+
+/**
+ * ## Filter inventory
+ *
+ * The following types of filters are implemented.
+ * * {@link FullText}: Search in a textual field for a pattern.
+ *   The pattern is entered by the user,
+ *   the search is incremental, after each keystroke the results are updated.
+ * * {@link ByValue}: Faceted search for values of a specific field.
+ *   * {@link EUMap}: Faceted search on country, together with a map visualization
+ *
+ * Here we store the list of the available filter types and their characteristics.
+ * Every entry contains a few items:
+ * * the {@link external:Component|component} class associated with it
+ * * its name (as string)
+ * * the name of the data field it is filtering
+ * * how many columns the grid of facets may have.
+ *
+ * `filterList` is used here and imported by {@link module:filtering}
+ */ 
+export const filterList = [
+  {kind: FullText,  name: 'FullText',  field: 'title',               label: 'title',               maxCols: null, expanded: null},
+  {kind: EUMap,     name: 'EUMap',     field: 'country',             label: 'country',             maxCols: 3,    expanded: true},
+  {kind: ByValue,   name: 'ByValue',   field: 'vcc',                 label: 'vcc',                 maxCols: 2,    expanded: true},
+  {kind: ByValue,   name: 'ByValue',   field: 'year',                label: 'year',                maxCols: 3,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'typeContribution',    label: 'type',                maxCols: 2,    expanded: true},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivity',     label: 'research activity',   maxCols: 2,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObject',       label: 'research object',     maxCols: 2,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechnique',    label: 'research technique',  maxCols: 1,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'discipline',          label: 'discipline',          maxCols: 2,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'keyword',             label: 'keyword',             maxCols: 1,    expanded: false},
+]
+
+/**
+ * **purely functional** {@link external:Component|Component}
+ *
+ * All filter computations have been done by stateful parent components, such as FilterCompute.
+ * The filter results are being passed down as properties.
+ * The incoming properties can be divided into
+ * - fieldValues (which facets are there per filter?)
+ * - filterSettings (what has the user typed or clicked?)
+ * - filteredAmount, filteredAmountOthers, amounts (what are the statistics of the filtering?)
+ * - updFilter (callback coming from a stateful parent, to be passed to children that receive user events)
+ * The outgoing properties are mostly the same, except that each individual filter
+ * gets only the slice it needs.
+ *
+ * This function merely selects the right filter
+ * {@link external:Component|component}
+ * and calls it with the appropriate props.
+ * Whereas the incoming props contain information for all filters,
+ * each individual child filter is passed the relevant slice only.
+ *
+ * @class
+ * @param {Map} filterSettings The current state of the facets belonging to this filter
+ * @param {Map} fieldValues A mapping of the valueIds to valueRepresentations for all values in all filtered fields
+ * @param {Object[]} filteredAmount The number of rows that have passed all filters
+ * @param {Map} filteredAmountOthers For each filter, the number of rows that have passed all other filters  
+ * @param {Map} amounts For each filter, the number of rows that have passed all filters per valueId occurring in that field
+ * Organized as a {Map} keyed by Two-letter country codes.
+ * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
+ * @returns {Fragment}
+ */
+const Filter = ({
+  fields,
+  filterSettings, fieldValues, 
+  filteredAmount, filteredAmountOthers,
+  amounts,
+  updFilter
+}) => (
+  &lt;div>
+    {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
+      const Fclass = filter.kind;
+      return (
+        &lt;Fclass
+          key={filterId}
+          filterId={filterId}
+          filterField={filter.field}
+          filterLabel={filter.label}
+          maxCols={filter.maxCols}
+          filterSettings={filterSettings.get(filterId)}
+          fieldValues={fieldValues.get(filter.field)}
+          filteredAmount={filteredAmount}
+          filteredAmountOthers={filteredAmountOthers.get(filterId)}
+          amounts={amounts.get(filterId)}
+          updFilter={updFilter}
+          expanded={filter.expanded}
+        />
+      );}
+    )}
+  &lt;/div>
+)
+
+export default Filter;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu Feb 23 2017 18:33:54 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

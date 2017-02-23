@@ -3,15 +3,14 @@ import bottle
 from beaker.middleware import SessionMiddleware
 from user import UserApi
 
-UNAUTH = 'x'
-
 class AuthApi(UserApi):
-    def __init__(self, PM, secret_file):
-        UserApi.__init__(self, PM)
+    def __init__(self, DB, PM, secret_file):
+        super().__init__(DB, PM)
 
         # determine production or devel
         self.isDevel = os.environ.get('REGIME', None) == 'devel'
-        if self.isDevel: self.getTestUsers()
+
+        if self.isDevel: self.testUsers = self.getTestUsers()
 
         # read secret from the system
         self.secret = ''
@@ -36,14 +35,16 @@ class AuthApi(UserApi):
         self.app = SessionMiddleware(self.app, session_opts, environ_key=self._session_key)
 
     def required(self, f): # decorator
+        unauth = self.PM.unauth
         def g(*args, **kwargs):
             self.authenticate()
-            if self.userInfo.get('group', UNAUTH) == UNAUTH:
+            if self.userInfo.get('group', unauth) == unauth:
                 return dict(data=[], msgs=[dict(kind='warning', text='You need to be logged in to get this data')], good=True)
             return f(*args, **kwargs)
         return g
 
     def authenticate(self, login=False):
+        unauth = self.PM.unauth
         env = bottle.request.environ
         self.userInfo = None
         eppn = self._get_session()
@@ -64,18 +65,19 @@ class AuthApi(UserApi):
             self._delete_session
 
         if self.userInfo == None:
-            self.userInfo = dict(group=UNAUTH)
+            self.userInfo = dict(group=unauth)
         else:
             eppn = self.userInfo.get('eppn', None)
             if eppn == None:
-                self.userInfo['group'] = UNAUTH
+                self.userInfo['group'] = unauth
             else:
                 authority = self.userInfo['authority']
-                inGroups = self.getInGroups()
-                self.userInfo['group'] = inGroups.get((eppn, authority), 'auth')
+                inGroup = self.getInGroup()
+                self.userInfo['group'] = inGroup.get((eppn, authority), 'auth')
 
     def deauthenticate(self):
-        self.userInfo = dict(group=UNAUTH);
+        unauth = self.PM.unauth
+        self.userInfo = dict(group=unauth);
         self._delete_session()
 
     def _create_session(self):

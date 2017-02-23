@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Markdown from 'react-markdown'
 
 import RelSelect from 'RelSelect.jsx'
-import Alternatives from 'Alternatives.jsx'
+import Alternative from 'Alternative.jsx'
 
 import { getData } from 'data.js'
 import { withContext, saveState } from 'hoc.js'
@@ -39,16 +39,16 @@ const normalizeValues = ({initValues}) => {
   return { curValues, savedValues, reasons: {}, saving: {}, changed: false, valid: true, relValues: null }
 }
 
-const userAsString = (valRaw, usersMap) => {
+const userAsString = (valRaw, userMap) => {
   const valId = valRaw._id;
   let valRep;
   let valShort;
-  if (!usersMap.has(valId)) {
+  if (!userMap.has(valId)) {
     valRep = 'UNKNOWN';
     valShort = '??';
   }
   else {
-    const userData = usersMap.get(valId);
+    const userData = userMap.get(valId);
     const fname = userData.firstName || '';
     const lname = userData.lastName || '';
     const email = userData.email || '';
@@ -71,16 +71,16 @@ const userAsString = (valRaw, usersMap) => {
   return {text: valShort , full: valRep}
 }
 
-const countryAsString = (valRaw, countriesMap) => {
+const countryAsString = (valRaw, countryMap) => {
   const valId = valRaw._id;
   let valRep;
   let valShort;
-  if (!countriesMap.has(valId)) {
+  if (!countryMap.has(valId)) {
     valRep = 'UNKNOWN';
     valShort = '??';
   }
   else {
-    const countryData = countriesMap.get(valId);
+    const countryData = countryMap.get(valId);
     valShort = countryData.name;
     valRep = `${countryData.iso}: ${countryData.name}`;
   }
@@ -288,7 +288,7 @@ class ContribField extends Component {
     getData([
         {
           type: 'db',
-          path: '/item_contrib?action=update',
+          path: '/mod_contrib?action=update',
           branch: `save ${name}`,
           callback: this.saved.bind(this),
           data: {_id: rowId, name, values: sendValues},
@@ -306,16 +306,16 @@ class ContribField extends Component {
   }
 
   valueAsString(valRaw) {
-    const { valType, convert, usersMap, countriesMap, initial } = this.props;
+    const { valType, convert, userMap, countryMap, initial } = this.props;
     if (valRaw == null) {return { text: '', full: '', initial: (valType == 'rel')? true : initial }}
     switch (valType) {
       case 'rel': {
         switch (convert) {
           case 'user': {
-            return userAsString(valRaw, usersMap)
+            return userAsString(valRaw, userMap)
           }
           case 'country': {
-            return countryAsString(valRaw, countriesMap)
+            return countryAsString(valRaw, countryMap)
           }
           default: {return condense(valRaw.value)}
         }
@@ -358,12 +358,12 @@ class ContribField extends Component {
     return relValues.map(rv => [rv._id, condense(rv.value)])
   }
   userOptions() {
-    const { usersMap } = this.props;
-    return [...usersMap.values()].map(rv => [rv._id,  this.valueAsString(rv)])
+    const { userMap } = this.props;
+    return [...userMap.values()].map(rv => [rv._id,  this.valueAsString(rv)])
   }
   countryOptions() {
-    const { countriesMap } = this.props;
-    return [...countriesMap.values()].map(rv => [rv._id,  this.valueAsString(rv)])
+    const { countryMap } = this.props;
+    return [...countryMap.values()].map(rv => [rv._id,  this.valueAsString(rv)])
   }
 
   relSelect(i, _id, isNew, extraClasses, valText) {
@@ -411,7 +411,7 @@ class ContribField extends Component {
     const { text, full } = valText;
     this.saveLater = true;
     return (
-      <Alternatives key={i} tag={`md_${rowId}_${name}`}
+      <Alternative key={i} tag={`md_${rowId}_${name}`}
         controlPlacement={control => (<p className="stick">{control}</p>)}
         controls={[
           (handler => <span className="button-small fa fa-pencil" onClick={handler}/>),
@@ -544,7 +544,7 @@ class ContribField extends Component {
     const { rowId, name } = this.props;
     if (alt2.length == 0) {return alt1}
     return (
-      <Alternatives tag={`field_${rowId}_${name}`}
+      <Alternative tag={`field_${rowId}_${name}`}
         controlPlacement={control => (<span>{alt1}{' '}{control}</span>)}
         controls={[
           (handler => <span className="button-small" onClick={handler}>show more</span>),
@@ -581,13 +581,13 @@ class ContribField extends Component {
 
 /**
  * @method
- * @param {Contrib[]} contribs (from *state*) The list of contribution records as it comes form mongo db
+ * @param {Contrib[]} records (from *state*) The list of contribution records as it comes form mongo db
  * @returns {Object} The data fetched from the server.
 */
   fetchValues() {
     const { rowId } = this.props;
     let { relValues } = this.state;
-    const { valType, getValues, convert, usersMap, countriesMap } = this.props;
+    const { valType, getValues, convert, userMap, countryMap } = this.props;
     if (valType == 'rel' && convert != 'user' && convert != 'country' && relValues == null) {
       getData([
           {

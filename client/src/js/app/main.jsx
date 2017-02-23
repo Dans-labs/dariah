@@ -4,8 +4,8 @@ import { Router, Route, Redirect, DefaultRoute, IndexRoute, IndexRedirect, brows
 
 import Provider from 'Provider.jsx';
 import App from 'App.jsx';
-import ContribsFiltered from 'ContribsFiltered.jsx';
-import ContribsMy from 'ContribsMy.jsx';
+import ContribFiltered from 'ContribFiltered.jsx';
+import ContribMy from 'ContribMy.jsx';
 import ContribItemPre from 'ContribItemPre.jsx';
 import Doc from 'Doc.jsx';
 import NotFound from 'NotFound.jsx';
@@ -70,8 +70,8 @@ render(
       <Route path="/" component={App}>
         <IndexRoute component={App}/>
         <IndexRedirect to="/docs/about.md"/>
-        <Route path="contrib" component={ContribsFiltered}/>
-        <Route path="mycontrib" component={ContribsMy}>
+        <Route path="contrib" component={ContribFiltered}/>
+        <Route path="mycontrib" component={ContribMy}>
           <Route path=":contribId" component={ContribItemPre} ownOnly={true}/>
         </Route>
         <Route path="docs/:docFile" component={Doc}/>

@@ -11,6 +11,7 @@ destserver="dirkr@tclarin11.dans.knaw.nl"
 destdir="/home/dirkr"
 
 pushd ~/Downloads
+rm -rf $filename
 mongodump -o $filename -d dariah
 scp -r $filename $destserver:$destdir
 popd

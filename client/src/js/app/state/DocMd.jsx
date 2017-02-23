@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import Markdown from 'react-markdown'
 import { Link } from 'react-router'
-import Alternatives from 'Alternatives.jsx'
+import Alternative from 'Alternative.jsx'
 
 import { getData } from 'data.js'
 import { withContext, saveState } from 'hoc.js'
@@ -51,7 +51,7 @@ class DocMd extends Component {
     }
     return (
       <div style={{paddingLeft: '0.5em'}}>
-        <Alternatives tag={docName}
+        <Alternative tag={docName}
           controlPlacement={control => (
             <p style={{float: 'right'}}>{control}</p>
           )}

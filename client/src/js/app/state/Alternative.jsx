@@ -25,12 +25,12 @@ const initAlt = ({ tag }) => ({alt: lsGet(tag)})
  * The state maintains the number of the currently chosen alternative.
  * It resides in `state.alt`.
  */
-class Alternatives extends Component {
+class Alternative extends Component {
 /**
  * @method
  * @param {string} tag An extra identification, to distinguish this instance of the class from others.
  * The tag will be used when the state of this component must be saved or loaded.
- * **NB:** The tag property will be injected into Alternatives by the 
+ * **NB:** The tag property will be injected into Alternative by the 
  * {@link module:hoc.saveState|saveState} component enhancer.
  * @param {Component[]} alternatives A list of components to choose from
  * @param {number} initial The number of the initial alternative to be displayed
@@ -53,9 +53,9 @@ class Alternatives extends Component {
  * `control[i]` corresponds to `alternative[i]` and is displayed with it.
  * Every individual control must be given as a function `handler => fragment`.
  * When the controls are placed, the control functions will be passed the 
- * {@link Alternatives#next|next} method in this class,
+ * {@link Alternative#next|next} method in this class,
  * so that a click on the control eventually translates to a 
- * call of {@link Alternatives#next|next}.
+ * call of {@link Alternative#next|next}.
  * @param {number} initial The number of the initial alternative to be displayed
  * @param {function} controlPlacement A function to put the control in place for each alternative.
  * In this way the caller can fine tune how exactly the control appears in relation to
@@ -75,4 +75,4 @@ class Alternatives extends Component {
   }
 }
 
-export default withContext(saveState(Alternatives, 'Alternatives', initAlt))
+export default withContext(saveState(Alternative, 'Alternative', initAlt))

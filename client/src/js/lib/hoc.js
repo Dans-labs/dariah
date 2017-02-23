@@ -106,9 +106,9 @@ export const withContext = (ComponentInner) => {
  * For example, the {@link DocMd} component has a property `docName`.
  * When the user browses from one document to another, the router will pass a new value
  * for `docName` to the existing component, rather than destroying it and building it from scratch.
- * Now {@link DocMd} uses the stateful {@link Alternatives}  component to give the user the choice
+ * Now {@link DocMd} uses the stateful {@link Alternative}  component to give the user the choice
  * to view the MarkDown source or the formatted version.
- * When the user switches docs, also this {@link Alternatives} just get new props instead of being 
+ * When the user switches docs, also this {@link Alternative} just get new props instead of being 
  * unmounted and reconstructed.
  * So our method of saving state should also apply when properties change.
  *

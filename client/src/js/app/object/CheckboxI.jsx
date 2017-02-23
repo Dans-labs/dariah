@@ -28,7 +28,7 @@ class CheckboxI extends Component {
  * @method
  * @param {boolean[]} states Exactly two booleans, indicating whether the associate checkboxes
  * are all checked or all unchecked
- * @param {number} filterId The index of the filter in {@link module:Filters.filterList|filterList}
+ * @param {number} filterId The index of the filter in {@link module:Filter.filterList|filterList}
  * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
  * @returns {Fragment}
 */

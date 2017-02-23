@@ -1,8 +1,8 @@
 import React from 'react'
 import Facet from 'Facet.jsx'
 import CheckboxI from 'CheckboxI.jsx'
-import Stats from 'Stats.jsx'
-import Alternatives from 'Alternatives.jsx'
+import Stat from 'Stat.jsx'
+import Alternative from 'Alternative.jsx'
 import { placeFacets, testAllChecks } from 'filtering.js'
 
 /**
@@ -31,8 +31,8 @@ import { placeFacets, testAllChecks } from 'filtering.js'
  * See {@link external:Reconciliation|Reconciliation}.
  *
  * @class
- * @param {number} filterId The index of the filter in {@link module:Filters.filterList|filterList}
- * @param {string} filterField The name of the field in the contribs list whose values are being filtered
+ * @param {number} filterId The index of the filter in {@link module:Filter.filterList|filterList}
+ * @param {string} filterField The name of the field in the contrib list whose values are being filtered
  * @param {Map} fieldValues A mapping of the valueIds to valueRepresentations for all values that occur in `filterField`
  * @param {Map} filterSettings The current state of the facets belonging to this filter
  * @param {number} filteredAmount The number of rows that have passed all filters
@@ -53,7 +53,7 @@ const ByValue = ({
   return (
     <div className="facet">
       {rows === null ? (<p> -no facets </p>) : (
-      <Alternatives tag={filterField}
+      <Alternative tag={filterField}
         controlPlacement={control => (
           <p className="facet">
             <CheckboxI
@@ -61,7 +61,7 @@ const ByValue = ({
               states={testAllChecks(filterSettings)}
               updFilter={updFilter}
             /> {filterLabel}{' '}
-            <Stats subTotal={filteredAmount} total={filteredAmountOthers}/>{' '}
+            <Stat subTotal={filteredAmount} total={filteredAmountOthers}/>{' '}
             {control}
           </p>
         )}
@@ -96,7 +96,7 @@ const ByValue = ({
                         />
                       </td>),
                       (<td className="statistic">
-                        <Stats subTotal={amounts.get(valueId)}/>
+                        <Stat subTotal={amounts.get(valueId)}/>
                       </td>),
                     ]})}
                 </tr>

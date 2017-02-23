@@ -5,7 +5,7 @@ import ByValue from 'ByValue.jsx'
 import EUMap from 'EUMap.jsx'
 
 /**
- * @module Filters
+ * @module Filter
  */
 
 /**
@@ -33,11 +33,11 @@ export const filterList = [
   {kind: ByValue,   name: 'ByValue',   field: 'vcc',                 label: 'vcc',                 maxCols: 2,    expanded: true},
   {kind: ByValue,   name: 'ByValue',   field: 'year',                label: 'year',                maxCols: 3,    expanded: false},
   {kind: ByValue,   name: 'ByValue',   field: 'typeContribution',    label: 'type',                maxCols: 2,    expanded: true},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivities',   label: 'research activity',   maxCols: 2,    expanded: false},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObjects',      label: 'research object',     maxCols: 2,    expanded: false},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechniques',   label: 'research technique',  maxCols: 1,    expanded: false},
-  {kind: ByValue,   name: 'ByValue',   field: 'disciplines',         label: 'discipline',          maxCols: 2,    expanded: false},
-  {kind: ByValue,   name: 'ByValue',   field: 'keywords',            label: 'keyword',             maxCols: 1,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivity',     label: 'research activity',   maxCols: 2,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObject',       label: 'research object',     maxCols: 2,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechnique',    label: 'research technique',  maxCols: 1,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'discipline',          label: 'discipline',          maxCols: 2,    expanded: false},
+  {kind: ByValue,   name: 'ByValue',   field: 'keyword',             label: 'keyword',             maxCols: 1,    expanded: false},
 ]
 
 /**
@@ -69,7 +69,7 @@ export const filterList = [
  * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
  * @returns {Fragment}
  */
-const Filters = ({
+const Filter = ({
   fields,
   filterSettings, fieldValues, 
   filteredAmount, filteredAmountOthers,
@@ -99,4 +99,4 @@ const Filters = ({
   </div>
 )
 
-export default Filters;
+export default Filter;

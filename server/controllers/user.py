@@ -1,10 +1,19 @@
-from db import connectdb
 from datetime import datetime
 
 class UserApi(object):
-    def __init__(self, PM):
-        self.dbm = connectdb()
+    def __init__(self, DB, PM):
+        self.DB = DB
         self.PM = PM
+
+    def getUser(self, eppn):
+        return self.DB.userFind(eppn, authority = 'local' if self.isDevel else 'DARIAH')
+
+    def getTestUsers(self):
+        testUsers = {}
+        records = self.DB.userLocal() 
+        for r in records:
+            testUsers[r['eppn']] = r
+        return testUsers
 
     def storeUpdate(self, newUserInfo):
         eppn = newUserInfo['eppn']
@@ -15,31 +24,20 @@ class UserApi(object):
             record = self._update(record, newUserInfo)
         return record
 
-    def getUser(self, eppn):
-        authority = 'local' if self.isDevel else 'DARIAH'
-        record = self.dbm.users.find_one({'eppn': eppn, 'authority': authority})
-        return record
-
-    def getTestUsers(self):
-        self.testUsers = {}
-        records = self.dbm.users.find({'authority': 'local'})
-        for r in records:
-            self.testUsers[r['eppn']] = r
-
-    def getInGroups(self):
+    def getInGroup(self):
         groups = self.PM.groups
-        records = self.dbm.groups.find({})
-        inGroups = {}
+        records = self.DB.userInGroup()
+        inGroup = {}
         for r in records:
             eppn = r['eppn']
             authority = r['authority']
             group = r['group']
-            inGroups[(eppn, authority)] = group
-        return inGroups
+            inGroup[(eppn, authority)] = group
+        return inGroup
 
     def deliver(self):
         groups = self.PM.groups
-        self.userInfo['groupDesc'] = groups.get(self.userInfo['group'], dict(desc='??'))['desc']
+        self.userInfo['groupDesc'] = groups.get(self.userInfo['group'], '??')
         return dict(data=dict(x for x in self.userInfo.items() if x[0] != '_id'), msgs=[], good=True)
 
     def _store(self, newUserInfo):
@@ -53,7 +51,7 @@ class UserApi(object):
             statusLastLogin='Approved',
             mayLogin=True,
         ))
-        result = self.dbm.users.insert_one(record)
+        self.DB.userAdd()
         return record
 
     def _update(self, userInfo, newUserInfo):
@@ -66,6 +64,6 @@ class UserApi(object):
             statusLastLogin='Approved' if userInfo.get('mayLogin', False) else 'Rejected',
         ))
         if '_id' in userInfo: del userInfo['_id']
-        result = self.dbm.users.update_one({'eppn': eppn}, {'$set': userInfo})
+        self.DB.userMod(userInfo)
         return userInfo
 

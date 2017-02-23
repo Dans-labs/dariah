@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import Contribs from 'Contribs.jsx'
+import ContribList from 'ContribList.jsx'
 import ContribItemPre from 'ContribItemPre.jsx';
 
 import { getData } from 'data.js'
@@ -19,14 +19,14 @@ import { columnStyle } from 'ui.js'
  * with a details/edit view in the right column.
  *
  * See also:
- * * {@link Contribs} The list of filtered contributions in the right column
+ * * {@link ContribList} The list of filtered contributions in the right column
  */
-class ContribsMy extends Component {
+class ContribMy extends Component {
 /**
  * @method
  * @param {Contrib[]} contribData (from *state*) The list of contribution records as it comes form mongo db,
  * plus a list of fields that is provided for each row (dependent on user permissions)
- * @param {Map} countries (from *state*) The country information as fetched from the database on the server.
+ * @param {Map} countryData (from *state*) The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {Fragment}
 */
@@ -43,13 +43,13 @@ class ContribsMy extends Component {
     getData([
         {
           type: 'db',
-          path: '/item_contrib?action=insert',
+          path: '/mod_contrib?action=insert',
           branch: 'insert',
           callback: this.inserted.bind(this),
         },
         {
           type: 'db',
-          path: '/my_contribs',
+          path: '/my_contrib',
           branch: 'contribData',
         },
       ],
@@ -71,14 +71,14 @@ class ContribsMy extends Component {
     getData([
         {
           type: 'db',
-          path: '/item_contrib?action=delete',
+          path: '/mod_contrib?action=delete',
           branch: `delete`,
           callback: this.deleted.bind(this),
           data: {_id: contribId},
         },
         {
           type: 'db',
-          path: '/my_contribs',
+          path: '/my_contrib',
           branch: 'contribData',
         },
       ],
@@ -88,20 +88,20 @@ class ContribsMy extends Component {
   }
 
   render() {
-    const { contribData, countries, users } = this.state;
-    const { usersMap, countriesMap, children, delCallback } = this.props;
-    if (contribData == null || countries == null || users == null) {
+    const { contribData, countryData, userData } = this.state;
+    const { userMap, countryMap, children, delCallback } = this.props;
+    if (contribData == null || countryData == null || userData == null) {
       return <div/>
     }
-    const { contribs, fields, perm } = contribData;
-    for (const x of users) {usersMap.set(x._id, x)}
-    for (const x of countries) {countriesMap.set(x._id, x)}
+    const { records, fields, perm } = contribData;
+    for (const x of userData) {userMap.set(x._id, x)}
+    for (const x of countryData) {countryMap.set(x._id, x)}
     delCallback.contrib = this.deleteRow.bind(this);
     return (
       <div>
         <div className="nav" style={columnStyle('rightLeftNav')}>
           <p>
-            {contribs.length} contributions
+            {records.length} contributions
             {' '}
             {(perm != null && perm.insert)? (
               <span
@@ -111,7 +111,7 @@ class ContribsMy extends Component {
               />
             ): null}
           </p>
-          <Contribs filteredData={contribs} inplace={false}/>
+          <ContribList filteredData={records} inplace={false}/>
         </div>
         <div style={columnStyle('rightRightBody')}>
           { children }
@@ -121,29 +121,29 @@ class ContribsMy extends Component {
   }
 /**
  * @method
- * @param {Contrib[]} contribs (from *state*) The list of contribution records as it comes form mongo db
- * @param {Map} countries (from *state*) The country information as fetched from the database on the server.
+ * @param {Contrib[]} contribData (from *state*) The list of contribution records as it comes form mongo db
+ * @param {Map} countryData (from *state*) The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { contribData, countries, users, inserted, deleted } = this.state;
-    if (contribData == null || countries == null || users == null) {
+    const { contribData, countryData, userData, inserted, deleted } = this.state;
+    if (contribData == null || countryData == null || userData == null) {
       getData([
           {
             type: 'db',
-            path: '/my_contribs',
+            path: '/my_contrib',
             branch: 'contribData',
           },
           {
             type: 'db',
             path: '/member_country',
-            branch: 'countries',
+            branch: 'countryData',
           },
           {
             type: 'db',
-            path: `/users`,
-            branch: 'users',
+            path: `/user`,
+            branch: 'userData',
           },
         ],
         this,
@@ -158,7 +158,7 @@ class ContribsMy extends Component {
       getData([
           {
             type: 'db',
-            path: '/my_contribs',
+            path: '/my_contrib',
             branch: 'contribData',
           },
         ],
@@ -169,5 +169,5 @@ class ContribsMy extends Component {
   }
 }
 
-export default withContext(saveState(ContribsMy, 'ContribsMy', {contribs: null, countries: null, users: null, inserted: null}))
+export default withContext(saveState(ContribMy, 'ContribMy', {contribData: null, countryData: null, userData: null, inserted: null}))
 

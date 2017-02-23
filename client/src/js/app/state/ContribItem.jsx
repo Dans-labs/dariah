@@ -143,7 +143,7 @@ class ContribItem extends Component {
               <span
                 key="2"
                 className={'fa fa-trash button-large delete'}
-                onClick={delCallback.contrib.bind(null, rowId)}
+                onClick={delCallback.contrib? delCallback.contrib.bind(null, rowId) : null}
                 title="delete this contribution"
               />
             ) : null
@@ -159,7 +159,6 @@ class ContribItem extends Component {
   }
 /**
  * @method
- * @param {Contrib[]} contribs (from *state*) The list of contribution records as it comes form mongo db
  * @returns {Object} The data fetched from the server.
 */
   fetchRow() {
@@ -169,7 +168,7 @@ class ContribItem extends Component {
       getData([
           {
             type: 'db',
-            path: `/item_contrib?id=${contribId}${ownOnly?'&own=true':''}`,
+            path: `/view_contrib?id=${contribId}${ownOnly?'&own=true':''}`,
             branch: 'fieldData',
           },
         ],

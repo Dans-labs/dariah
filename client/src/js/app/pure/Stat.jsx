@@ -11,7 +11,7 @@ import React from 'react'
  * @param {number=} total
  * @returns {Fragment}
  */
-const Stats = ({subTotal, total}) => (
+const Stat = ({subTotal, total}) => (
   <span className="good-o">
     {subTotal == null? '' :`${subTotal}`}
     {(total == null || subTotal == null)? '' : ' of '}
@@ -19,4 +19,4 @@ const Stats = ({subTotal, total}) => (
   </span>
 )
 
-export default Stats
+export default Stat

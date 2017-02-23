@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
 import FilterCompute from 'FilterCompute.jsx'
-import { filterList } from 'Filters.jsx'
+import { filterList } from 'Filter.jsx'
 import { compileFiltering } from 'filtering.js'
 import { getData } from 'data.js'
 import { withContext, saveState } from 'hoc.js'
@@ -28,36 +28,36 @@ import { withContext, saveState } from 'hoc.js'
  *
  * See also:
  * * {@link FilterCompute} The parent of all the filter widgets in the left column
- * * {@link module:Filters|Filters} The parent of all the filter widgets in the left column
+ * * {@link module:Filter|Filter} The parent of all the filter widgets in the left column
  * * {@link ByValue|ByValue} A faceted filter widget
  * * {@link FullText|FullText} A full-text search widget
- * * {@link module:filtering|Filters} Helper module for filter computations
+ * * {@link module:filtering|Filter} Helper module for filter computations
  * * {@link module:EUMap|EUMap} The map of European countries
- * * {@link Contribs} The list of filtered contributions in the right column
+ * * {@link ContribList} The list of filtered contributions in the right column
  */
-class ContribsFiltered extends Component {
+class ContribFiltered extends Component {
 /**
  * Calls {@link module:filtering.compileFiltering|compileFiltering} before the actual rendering.
  *
  * @method
  * @param {Contrib[]} contribData (from *state*) The list of contribution records as it comes form mongo db,
  * plus a list of fields that is provided for each row (dependent on user permissions)
- * @param {Map} countries (from *state*) The country information as fetched from the database on the server.
+ * @param {Map} countryData (from *state*) The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {Fragment}
 */
   render() {
-    const { contribData, countries, users } = this.state;
-    const { usersMap, countriesMap } = this.props;
-    if (contribData == null || countries == null || users == null) {
+    const { contribData, countryData, userData } = this.state;
+    const { userMap, countryMap } = this.props;
+    if (contribData == null || countryData == null || userData == null) {
       return <div/>
     }
-    const { contribs, fields } = contribData;
-    const { fieldValues, filterInit } = compileFiltering(contribs, fields, filterList);
-    for (const x of users) {usersMap.set(x._id, x)}
-    for (const x of countries) {countriesMap.set(x._id, x)}
+    const { records, fields } = contribData;
+    const { fieldValues, filterInit } = compileFiltering(records, fields, filterList);
+    for (const x of userData) {userMap.set(x._id, x)}
+    for (const x of countryData) {countryMap.set(x._id, x)}
     return <FilterCompute
-      contribs={contribs}
+      records={records}
       fields={fields}
       fieldValues={fieldValues}
       filterInit={filterInit}
@@ -65,14 +65,14 @@ class ContribsFiltered extends Component {
   }
 /**
  * @method
- * @param {Contrib[]} contribs (from *state*) The list of contribution records as it comes form mongo db
- * @param {Map} countries (from *state*) The country information as fetched from the database on the server.
+ * @param {Contrib[]} contribData (from *state*) The list of contribution records as it comes form mongo db
+ * @param {Map} countryData (from *state*) The country information as fetched from the database on the server.
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { contribData, countries, users } = this.state;
-    if (contribData == null || countries == null || users == null) {
+    const { contribData, countryData, userData } = this.state;
+    if (contribData == null || countryData == null || userData == null) {
       getData([
           {
             type: 'db',
@@ -82,12 +82,12 @@ class ContribsFiltered extends Component {
           {
             type: 'db',
             path: '/member_country',
-            branch: 'countries',
+            branch: 'countryData',
           },
           {
             type: 'db',
-            path: `/users`,
-            branch: 'users',
+            path: `/user`,
+            branch: 'userData',
           },
         ],
         this,
@@ -97,4 +97,4 @@ class ContribsFiltered extends Component {
   }
 }
 
-export default withContext(saveState(ContribsFiltered, 'ContribsFiltered', {contribs: null, countries: null, users: null}))
+export default withContext(saveState(ContribFiltered, 'ContribFiltered', {contribData: null, countryData: null, userData: null}))
