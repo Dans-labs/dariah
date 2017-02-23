@@ -51,7 +51,7 @@ class UserApi(object):
             statusLastLogin='Approved',
             mayLogin=True,
         ))
-        self.DB.userAdd()
+        self.DB.userAdd(record)
         return record
 
     def _update(self, userInfo, newUserInfo):

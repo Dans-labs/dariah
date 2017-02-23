@@ -13,5 +13,6 @@ destdir="/home/dirkr"
 pushd ~/Downloads
 rm -rf $filename
 mongodump -o $filename -d dariah
+ssh $destserver "rm -rf $filename" 
 scp -r $filename $destserver:$destdir
 popd
