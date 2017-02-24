@@ -28,7 +28,7 @@ class PermApi(object):
         fields = self.PM.fields
         actions = self.PM.actions
         if table not in tables or table not in fields or action not in actions or action not in tables[table]:
-            return (False, set())
+            return (False, {})
         level = tables[table][action]
         if document == None:
             authorized = self._authorize(level)
@@ -37,7 +37,7 @@ class PermApi(object):
             isOwn = self._isOwn(table, document)
             authorized = self._authorize(level, isOwn=isOwn)
             fieldSet = self._fieldSet(table, document, action, isOwn)
-        if not authorized: return (False, set())
+        if not authorized: return (False, {})
         return (True, fieldSet)
 
     def _isOwn(self, table, document):
