@@ -89,7 +89,7 @@ class Notification extends Component {
             className={this.lastNote > -1 ? `spin-${this.lastKind}` : 'spin-ok'}
             onClick={e=>{e.preventDefault(); this.setView(!this.visible)}}
           >
-            { busyBlocks.map((b, i) => <span key={i} className="msg-dot fa fa-circle"></span>) }
+            { busyBlocks.map((b, i) => <span key={i} className="msg-dot fa fa-caret-left"></span>) }
             <span className={`fa fa-${this.busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}/>
           </span>
         </p>
