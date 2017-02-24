@@ -1,5 +1,5 @@
+export const lsClear = () => {localStorage.clear()}
 export const lsHas = key => localStorage.getItem(key) != null
-
 export const lsGet = key => {
   if (localStorage == null) {return null}
   const val = localStorage.getItem(key);

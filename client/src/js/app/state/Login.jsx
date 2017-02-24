@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import LocalSettings  from 'LocalSettings.jsx'
 import { withContext, saveState } from 'hoc.js'
 import { getData } from 'data.js'
 
@@ -47,6 +48,7 @@ class Login extends Component {
         ) : (
         <a href="/login" className="control fa fa-user-plus">{' login'}</a>
         )}
+        <LocalSettings/>
       </span>
     )
   }
