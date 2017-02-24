@@ -19,9 +19,9 @@ import { withContext } from 'hoc.js'
 const ItemHead = ({ table, row, title, inplace, editStatus }) => {
   const rowId = row._id;
   let rowHead = row[title];
-  //if (rowHead != null) {rowHead = rowHead[0]}
-  //if (typeof rowHead == 'object') {rowHead = rowHead.value}
-  //if (!rowHead) {rowHead = '-empty-'}
+  if (rowHead != null) {rowHead = rowHead[0]}
+  if (typeof rowHead == 'object') {rowHead = rowHead.value}
+  if (!rowHead) {rowHead = '-empty-'}
 
   return (
     <tr id={rowId}>
