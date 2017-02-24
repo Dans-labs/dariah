@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import ContribList from 'ContribList.jsx'
-import Filter, { filterList } from 'Filter.jsx'
+import ItemList from 'ItemList.jsx'
+import Filter from 'Filter.jsx'
 
 import { newFilterSettings, computeFiltering, setf } from 'filtering.js'
 import { columnStyle } from 'ui.js'
@@ -53,7 +53,7 @@ class FilterCompute extends Component {
  */
   render() {
     const { filterSettings } = this.state;
-    const { records, fields, fieldValues } = this.props;
+    const { table, title, records, fields, fieldValues, filterList } = this.props;
     const {
       filteredData, filteredAmountOthers, amounts
     } = computeFiltering(
@@ -64,17 +64,19 @@ class FilterCompute extends Component {
         <div style={columnStyle('rightLeft')}>
           <p>Total <span className="good-o">{records.length}</span></p>
           <Filter
+            table={table}
             fields={fields}
             fieldValues={fieldValues}
             filteredAmount={filteredData.length}
             filteredAmountOthers={filteredAmountOthers}
             amounts={amounts}
+            filterList={filterList}
             filterSettings={filterSettings}
             updFilter={this.updFilter.bind(this)}
           />
         </div>
         <div style={columnStyle('rightRight')}>
-          <ContribList filteredData={filteredData} inplace={true}/>
+          <ItemList table={table} title={title} filteredData={filteredData} inplace={true}/>
         </div>
       </div>
     )

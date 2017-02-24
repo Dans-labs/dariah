@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import ContribField from 'ContribField.jsx'
+import ItemField from 'ItemField.jsx'
 
 import { getData } from 'data.js'
 import { withContext, saveState } from 'hoc.js'
@@ -10,17 +10,17 @@ import { withContext, saveState } from 'hoc.js'
  *
  * **stateful** {@link external:Component|Component}
  *
- * ## A single contribution record
+ * ## A single record
  *
- * Displays all fields that the user is entitled to read.
+ * Displays all fields that the user is allowed to read.
  * With a control to edit the record.
  * 
  */
-class ContribItem extends Component {
+class ItemRecord extends Component {
 /**
  *
  * @method
- * @param {Contrib[]} contribData (from *state*) The list of contribution records as it comes form mongo db,
+ * @param {Item[]} listData (from *state*) The list of records as it comes form mongo db,
  * plus a list of fields that is provided for each row (dependent on user permissions)
  * @returns {Fragment}
 */
@@ -42,17 +42,18 @@ class ContribItem extends Component {
     this.setState(newState)
   }
   progIcon(noChange, allValid) {
-    const { editStatus, contribId } = this.props;
+    const { editStatus, table, recordId } = this.props;
     const statusClass = noChange?'info':(allValid?'warning':'error')
     const statusIcon = noChange?'':(allValid?'fa-pencil':'fa-close')
-    editStatus[contribId].prog.className = `${statusClass} fa ${statusIcon}`;
+    editStatus[table][recordId].prog.className = `${statusClass} fa ${statusIcon}`;
   }
 
   updEdit(name, changed, valid, newVals) {
-    const { editStatus, contribId } = this.props;
+    const { editStatus, table, recordId } = this.props;
     const { saveConcern, fieldData } = this.state;
-    if (name == 'title') {
-      editStatus[contribId].title.innerHTML = newVals[0];
+    const { title } = fieldData;
+    if (name == title) {
+      editStatus[table][recordId].title.innerHTML = newVals[0];
     }
     const newState = {
       ...this.state,
@@ -73,6 +74,7 @@ class ContribItem extends Component {
     }
   }
   parseFields() {
+    const { table } = this.props;
     const { fieldData } = this.state;
     const { row, fields, fieldSpecs, fieldOrder, perm } = fieldData;
     const fragments = []
@@ -84,9 +86,10 @@ class ContribItem extends Component {
       if (editable) {hasEditable = true}
       const rowId = row._id;
       fragments.push(
-        <ContribField
+        <ItemField
           key={name}
-          tag={`field_${rowId}_${name}`}
+          tag={`field_${table}_${rowId}_${name}`}
+          table={table}
           initValues={row[name]}
           rowId={rowId}
           editable={editable}
@@ -113,16 +116,17 @@ class ContribItem extends Component {
 
   render() {
     const { fieldData, changed, valid } = this.state;
-    const { delCallback } = this.props;
+    const { table, delCallback } = this.props;
     if (fieldData == null || fieldData.row == null) {
       return <div/>
     }
     const { noChange, allValid, canSave } = this.saveStatus(); 
-    const statusClass = noChange?'info':(allValid?'warning':'error')
+    const statusClass = noChange?'special':(allValid?'warning':'error')
     const elemText = noChange?'all saved':(allValid?'save changes':'make corrections');
     const { row, perm } = fieldData;
     const rowId = row._id;
     const { fragments, hasEditable } = this.parseFields();
+    const delCb = delCallback[table]; 
     return (
       <div className="widget-medium">
         <p>
@@ -136,15 +140,15 @@ class ContribItem extends Component {
             ) : (
               <span
                 key="1"
-                className={`save ${statusClass}`}
+                className={`button-large ${statusClass}`}
               >{elemText}</span>
             ),
             perm.delete? (
               <span
                 key="2"
                 className={'fa fa-trash button-large delete'}
-                onClick={delCallback.contrib? delCallback.contrib.bind(null, rowId) : null}
-                title="delete this contribution"
+                onClick={delCb? delCb.bind(null, rowId) : null}
+                title="delete this item"
               />
             ) : null
           ] : null}
@@ -163,12 +167,12 @@ class ContribItem extends Component {
 */
   fetchRow() {
     const { fieldData } = this.state;
-    const { contribId, ownOnly } = this.props;
+    const { table, recordId, ownOnly } = this.props;
     if (fieldData == null) {
       getData([
           {
             type: 'db',
-            path: `/view_contrib?id=${contribId}${ownOnly?'&own=true':''}`,
+            path: `/view?table=${table}&id=${recordId}${ownOnly?'&own=true':''}`,
             branch: 'fieldData',
           },
         ],
@@ -182,7 +186,7 @@ class ContribItem extends Component {
 
 }
 
-export default withContext(saveState(ContribItem, 'ContribItem', {
+export default withContext(saveState(ItemRecord, 'ItemRecord', {
   fieldData: null,
   changed: {},
   valid: {},

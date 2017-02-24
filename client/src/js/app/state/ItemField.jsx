@@ -134,17 +134,17 @@ const validate = (val, valType, validation) => {
  *
  * **stateful** {@link external:Component|Component}
  *
- * ## A single contribution record
+ * ## A single record
  *
- * Displays all fields that the user is entitled to read.
+ * Displays all fields that the user is allowed to read.
  * With a control to edit the record.
  * 
  */
-class ContribField extends Component {
+class ItemField extends Component {
 /**
  *
  * @method
- * @param {Contrib[]} contribData (from *state*) The list of contribution records as it comes form mongo db,
+ * @param {Item[]} listData (from *state*) The list of records as it comes form mongo db,
  * plus a list of fields that is provided for each row (dependent on user permissions)
  * @returns {Fragment}
 */
@@ -273,7 +273,7 @@ class ContribField extends Component {
 
   toDb(newValues) {
     const { curValues } = this.state;
-    const { name, rowId, valType } = this.props;
+    const { table, name, rowId, valType } = this.props;
     let sendValues = (newValues == null)?curValues:newValues;
     /*
     if (valType == 'datetime') {
@@ -288,7 +288,7 @@ class ContribField extends Component {
     getData([
         {
           type: 'db',
-          path: '/mod_contrib?action=update',
+          path: `/mod?table=${table}&action=update`,
           branch: `save ${name}`,
           callback: this.saved.bind(this),
           data: {_id: rowId, name, values: sendValues},
@@ -368,11 +368,12 @@ class ContribField extends Component {
 
   relSelect(i, _id, isNew, extraClasses, valText) {
     const { text, full } = valText;
-    const { convert, allowNew, name, rowId } = this.props;
+    const { table, convert, allowNew, name, rowId } = this.props;
     const { valid } = this.state;
     const valueList = (convert == 'user')? this.userOptions() : ((convert == 'country')? this.countryOptions() : this.relOptions())
     return <RelSelect
-      tag={`relselect_${rowId}_${name}_${i}`}
+      tag={`relselect_${table}_${rowId}_${name}_${i}`}
+      table={table}
       key={i}
       isNew={isNew}
       allowNew={allowNew}
@@ -407,11 +408,11 @@ class ContribField extends Component {
     )
   }
   textareaEditFragment(i, _id, isNew, valType, extraClasses, valText, cols=100, rows=10) {
-    const { rowId, name } = this.props;
+    const { table, rowId, name } = this.props;
     const { text, full } = valText;
     this.saveLater = true;
     return (
-      <Alternative key={i} tag={`md_${rowId}_${name}`}
+      <Alternative key={i} tag={`md_${table}_${rowId}_${name}`}
         controlPlacement={control => (<p className="stick">{control}</p>)}
         controls={[
           (handler => <span className="button-small fa fa-pencil" onClick={handler}/>),
@@ -541,10 +542,10 @@ class ContribField extends Component {
   }
 
   knead(alt1, alt2) {
-    const { rowId, name } = this.props;
+    const { table, rowId, name } = this.props;
     if (alt2.length == 0) {return alt1}
     return (
-      <Alternative tag={`field_${rowId}_${name}`}
+      <Alternative tag={`field_${table}_${rowId}_${name}`}
         controlPlacement={control => (<span>{alt1}{' '}{control}</span>)}
         controls={[
           (handler => <span className="button-small" onClick={handler}>show more</span>),
@@ -581,7 +582,7 @@ class ContribField extends Component {
 
 /**
  * @method
- * @param {Contrib[]} records (from *state*) The list of contribution records as it comes form mongo db
+ * @param {Item[]} records (from *state*) The list of records as it comes form mongo db
  * @returns {Object} The data fetched from the server.
 */
   fetchValues() {
@@ -605,4 +606,4 @@ class ContribField extends Component {
   componentDidUpdate() {this.fetchValues(); this.fullfillSave()}
 }
 
-export default withContext(saveState(ContribField, 'ContribField', normalizeValues))
+export default withContext(saveState(ItemField, 'ItemField', normalizeValues))

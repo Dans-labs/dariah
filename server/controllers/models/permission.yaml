@@ -44,17 +44,17 @@ actions:
   delete: delete item
 
 methods:
-  my_contrib:
-    desc: list my contributions
+  my:
+    desc: list my items
     call: OWN
-  list_contrib:
-    desc: list all contributions
+  list:
+    desc: list all items
     call: public
-  view_contrib:
-    desc: details of a contribution
+  view:
+    desc: details of an item
     call: public
-  mod_contrib:
-    desc: modify (insert/update/delete) a contribution
+  mod:
+    desc: modify (insert/update/delete) an item
     call: own
   member_country:
     desc: member countries

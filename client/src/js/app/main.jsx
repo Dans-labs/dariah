@@ -4,9 +4,11 @@ import { Router, Route, Redirect, DefaultRoute, IndexRoute, IndexRedirect, brows
 
 import Provider from 'Provider.jsx';
 import App from 'App.jsx';
-import ContribFiltered from 'ContribFiltered.jsx';
-import ContribMy from 'ContribMy.jsx';
-import ContribItemPre from 'ContribItemPre.jsx';
+import SubApp from 'SubApp.jsx';
+import Backoffice from 'Backoffice.jsx';
+import ItemFiltered from 'ItemFiltered.jsx';
+import ItemMy from 'ItemMy.jsx';
+import ItemRecordPre from 'ItemRecordPre.jsx';
 import Doc from 'Doc.jsx';
 import NotFound from 'NotFound.jsx';
 
@@ -70,13 +72,16 @@ render(
       <Route path="/" component={App}>
         <IndexRoute component={App}/>
         <IndexRedirect to="/docs/about.md"/>
-        <Route path="contrib" component={ContribFiltered}/>
-        <Route path="mycontrib" component={ContribMy}>
-          <Route path=":contribId" component={ContribItemPre} ownOnly={true}/>
-        </Route>
         <Route path="docs/:docFile" component={Doc}/>
         <Route path="tech/docs/gen/:docFile" component={Doc}/>
         <Route path="tech/docs/:docFile" component={Doc}/>
+        <Route path=":tag" component={SubApp}>
+          <Route path="list" component={ItemFiltered}/>
+          <Route path="mylist" component={ItemMy}>
+            <Route path=":recordId" component={ItemRecordPre} ownOnly={true}/>
+          </Route>
+          <Route path=":func" component={Backoffice}/>
+        </Route>
       </Route>
       <Route path="*" component={NotFound}/>
     </Router>

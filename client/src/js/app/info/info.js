@@ -12,7 +12,7 @@
  *   * {@link external:Component|Component} Introduction into React Components
  *   * {@link external:StatePolicy|StatePolicy} Design choices for stateful components
  * * {@link Login} Authentication in this app
- * * {@link ContribFiltered} Overview of components involved in faceted browsing
+ * * {@link ItemFiltered} Overview of components involved in faceted browsing
  * * {@link module:EUMap|EUMap} All about the European country map 
  *
  * @file

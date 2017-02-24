@@ -253,3 +253,56 @@ tables:
         getValues: /value_table?table={table}&field={field}
         idOnly: false
         appearance: {}
+
+    filters:
+      - field: title
+        label: title
+        type: FullText
+        maxCols: null
+        expanded: null
+      - field: country
+        label: country
+        type: EUMap
+        maxCols: 3
+        expanded: true
+      - field: vcc
+        label: vcc
+        type: ByValue
+        maxCols: 2
+        expanded: true
+      - field: year
+        label: year
+        type: ByValue
+        maxCols: 3
+        expanded: false
+      - field: typeContribution
+        label: type
+        type: ByValue
+        maxCols: 2
+        expanded: true
+      - field: tadirahActivity
+        label: research activity
+        type: ByValue
+        maxCols: 2
+        expanded: false
+      - field: tadirahObject
+        label: research object
+        type: ByValue
+        maxCols: 2
+        expanded: false
+      - field: tadirahTechnique
+        label: research technique
+        type: ByValue
+        maxCols: 1
+        expanded: false
+      - field: discipline
+        label: discipline
+        type: ByValue
+        maxCols: 2
+        expanded: false
+      - field: keyword
+        label: keyword
+        type: ByValue
+        maxCols: 1
+        expanded: false
+

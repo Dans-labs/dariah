@@ -84,7 +84,7 @@ class DbAccess(object):
         documents = list(_DBM[table].distinct(field))
         return self._stop(data=documents)
 
-    def getList(self, controller, table, action, withFields=False, rFilter=None, sort=None):
+    def getList(self, controller, table, action, withFields=False, rFilter=None, sort=None, withFilters=False):
         Perm = self.Perm
         (mayInsert, iFields) = Perm.may(table, 'insert')
         perm = dict(insert=mayInsert)
@@ -102,7 +102,10 @@ class DbAccess(object):
             sortField = self.DM.tables[table][sortField[1:]] if sortField[0] == '*' else sortField
             documents = list(_DBM[table].find(rowFilter, fieldFilter).sort(sortField, sortDir))
         if withFields:
-            data=dict(records=documents, fields=fieldFilter, perm=perm)
+            title = self.DM.tables[table]['title']
+            data = dict(records=documents, fields=fieldFilter, title=title, perm=perm)
+            if withFilters:
+                data['filterList'] = self.DM.tables[table]['filters']
         else:
             data = documents
         return self._stop(data=data)
@@ -133,6 +136,7 @@ class DbAccess(object):
         return self._stop(data=dict(
             row=document,
             fields=fieldFilter,
+            title=self.DM.tables[table]['title'],
             perm=perm,
             fieldOrder=fieldOrder,
             fieldSpecs=fieldSpecs,
@@ -161,7 +165,7 @@ class DbAccess(object):
                 modDate: [now()],
                 modBy: [{idField: self.uid}],
             }
-            result = _DBM.contrib.insert_one(insertVals)
+            result = _DBM[table].insert_one(insertVals)
             return self._stop(data=result.inserted_id)
 
         elif action == 'delete':
@@ -170,7 +174,7 @@ class DbAccess(object):
             if ident == None:
                 return self._stop(data=none, text='Not specified which item to delete')
             rowFilter.update({idField: oid(ident)})
-            documents = list(_DBM.contrib.find(rowFilter, {idField: True}))
+            documents = list(_DBM[table].find(rowFilter, {idField: True}))
             if len(documents) != 1:
                 return self._stop(data=none, text='Unidentified item to delete')
             document = documents[0]
@@ -178,7 +182,7 @@ class DbAccess(object):
             if not mayDelete:
                 return self._stop(data=none, text='Not allowed to delete this item')
             else:
-                _DBM.contrib.delete_one(rowFilter)
+                _DBM[table].delete_one(rowFilter)
                 return self._stop(data={idField: ident})
 
         elif action == 'update':
@@ -190,7 +194,7 @@ class DbAccess(object):
             if name == None:
                 return self._stop(data=none, text='Not specified which field to update')
             rowFilter.update({idField: oid(ident)})
-            documents = list(_DBM.contrib.find(rowFilter))
+            documents = list(_DBM[table].find(rowFilter))
             if len(documents) != 1:
                 return self._stop(data=none, text='Unidentified item to update')
             document = documents[0]
@@ -205,7 +209,7 @@ class DbAccess(object):
                 return self._stop(data=none, text='field {} has unknown type'.format(name))
             (valid, valValues) = self.validate(newValues, fieldSpecs)
             if not valid:
-                documents = list(_DBM.contrib.find(rowFilter, {name: True}))
+                documents = list(_DBM[table].find(rowFilter, {name: True}))
                 if len(documents) != 1:
                     return self._stop(data=none, text='error during update of field {}'.format(name))
                 document = documents[0]
@@ -226,8 +230,8 @@ class DbAccess(object):
                             modBy: {idField: self.uid},
                         },
                     })
-                _DBM.contrib.update_one(rowFilter, changeVals)
-                documents = list(_DBM.contrib.find(rowFilter, {name: True, modDate: True, modBy: True}))
+                _DBM[table].update_one(rowFilter, changeVals)
+                documents = list(_DBM[table].find(rowFilter, {name: True, modDate: True, modBy: True}))
                 if len(documents) != 1:
                     return self._stop(data=none, text='item not properly identified after update')
                 document = documents[0]

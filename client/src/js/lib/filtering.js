@@ -3,7 +3,7 @@ import { lsHas, lsGet, lsSet } from 'localstorage.js'
 /**
  * ## Filters and Facets
  *
- * The big contribution list can be filtered by any number of filters.
+ * Item lists can be filtered by any number of filters.
  * This module contains helpers to set up the filtering and compute the results.
  *
  * The list of available filters is in {@link Filter}.
@@ -29,10 +29,10 @@ import { lsHas, lsGet, lsSet } from 'localstorage.js'
  *   * to this mapping we add a `-none-` value, with the intention that it matches
  *     those rows that do not have values in this field.
  *
- * @param {Contrib[]} records - The list of contribution records as it comes form mongo db
+ * @param {Item[]} records - The list of item records as it comes form mongo db
  * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
  * dependent on the permissions of the current user.
- * @param {Array} filterList - The list of available filters, statically imported from the 
+ * @param {Array} filterList - The list of available filters
  * @returns {Map} `fieldValues` - a mapping of the valueId to the valueRepresentation of all values that have
  * been encountered in the `field` of the `records` rows
  * @returns {Map} `filterInit` - a mapping that maps the filterId of each available filter to initial filterSettings
@@ -51,7 +51,7 @@ export const setf = (tag, key, val) => {
 
 export function compileFiltering(records, fields, filterList) {
   const presentFilterList = filterList.filter(x => fields[x.field])
-  const filterFields = presentFilterList.filter(x => x.name !== 'FullText').map(x => x.field);
+  const filterFields = presentFilterList.filter(x => x.type !== 'FullText').map(x => x.field);
   const fieldValues = new Map(filterFields.map(f => [f, new Map([['', '-none-']])]));
   for (const row of records) {
     for (const field of filterFields) {
@@ -66,12 +66,7 @@ export function compileFiltering(records, fields, filterList) {
   }
   const filterInit = new Map(presentFilterList.map((filterSpec, filterId) => [
     filterId,
-    /*
-    filterSpec.name === 'FullText' ? '' : new Map(
-      [...fieldValues.get(filterSpec.field).keys()].map(valueId => [valueId, true]
-    ))
-    */
-    filterSpec.name === 'FullText' ? initf(filterId, '', '') : new Map(
+    filterSpec.type === 'FullText' ? initf(filterId, '', '') : new Map(
       [...fieldValues.get(filterSpec.field).keys()].map(valueId => [valueId, initf(filterId, valueId, true)]
     ))
   ]));
@@ -85,7 +80,7 @@ export function compileFiltering(records, fields, filterList) {
 /**
  * ## Computing Filters
  *
- * @param {Contrib[]} records - as in {@link compileFiltering} 
+ * @param {Item[]} items - as in {@link compileFiltering} 
  * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
  * dependent on the permissions of the current user.
  * @param {Array} filterList - as in {@link compileFiltering}
@@ -101,7 +96,7 @@ export function compileFiltering(records, fields, filterList) {
 export function computeFiltering(records, fields, filterList, fieldValues, filterSettings) {
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterChecks = new Map(presentFilterList.map((filterSpec, filterId) => (
-    [filterId, (filterSpec.name === 'FullText' ? fullTextCheck : facetCheck)(filterSpec.field, filterSettings.get(filterId))]
+    [filterId, (filterSpec.type === 'FullText' ? fullTextCheck : facetCheck)(filterSpec.field, filterSettings.get(filterId))]
   )));
   const filteredData = [];
   const otherFilteredData = new Map(presentFilterList.map((filterSpec, filterId) => [filterId, []]));
@@ -158,7 +153,7 @@ export function computeFiltering(records, fields, filterList, fieldValues, filte
   }
   const amounts = new Map(presentFilterList.map((filterSpec, filterId) => {
     const field = filterSpec.field;
-    return [filterId, filterSpec.name === 'FullText' ? null : countFacets(field, fieldValues.get(field), otherFilteredData.get(filterId))];  
+    return [filterId, filterSpec.type === 'FullText' ? null : countFacets(field, fieldValues.get(field), otherFilteredData.get(filterId))];  
   }));
   return {
     filteredData,

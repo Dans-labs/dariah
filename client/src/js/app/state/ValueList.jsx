@@ -11,7 +11,7 @@ import { withContext, saveState } from 'hoc.js'
  *
  * ## A value list
  *
- * Displays all values for a field in the contrib list.
+ * Displays all values for a field in the item list.
  *
  */
 class ValueList extends Component {
@@ -44,7 +44,7 @@ class ValueList extends Component {
   }
 /**
  * @method
- * @param {Value[]} values (from *state*) The list of distinct contrib field values as it comes form mongo db
+ * @param {Value[]} values (from *state*) The list of distinct field values as it comes form mongo db
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {

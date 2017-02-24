@@ -20,19 +20,23 @@ class Controller(object):
     def user(self, name):
         return self.DB.getList(name, 'user', 'read')
 
-    def list_contrib(self, name):
-        return self.DB.getList(name, 'contrib', 'read', withFields=True, sort=('*title', 1))
+    def list(self, name):
+        table = getq('table')
+        return self.DB.getList(name, table, 'read', withFields=True, sort=('*title', 1), withFilters=True)
 
-    def my_contrib(self, name):
-        return self.DB.getList(name, 'contrib', 'read', withFields=True, sort=('*title', 1))
+    def my(self, name):
+        table = getq('table')
+        return self.DB.getList(name, table, 'read', withFields=True, sort=('*title', 1), withFilters=False)
 
-    def view_contrib(self, name):
+    def view(self, name):
+        table = getq('table')
         ident = getq('id')
-        return self.DB.getItem(name, 'contrib', ident, 'read')
+        return self.DB.getItem(name, table, ident, 'read')
 
-    def mod_contrib(self, name):
+    def mod(self, name):
+        table = getq('table')
         action = getq('action')
-        return self.DB.modList(name, 'contrib', action)
+        return self.DB.modList(name, table, action)
 
     def value_table(self, name):
         table = getq('table')

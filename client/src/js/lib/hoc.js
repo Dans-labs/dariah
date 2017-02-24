@@ -161,6 +161,9 @@ export const withContext = (ComponentInner) => {
  * performs a {@link stateSave} based on the *old* value of prop `tag`, followed
  * by a {@link stateLoad} based on the *new* value of prop `tag`.
  */
+
+const getTag = (tag, params) => (tag == null)?((params == null)?null:params.tag):tag
+
 export const saveState = (ComponentInner, key, initialState) => {
   const ComponentOuter = class extends ComponentInner {
     setStateKey(tag) {
@@ -177,9 +180,9 @@ export const saveState = (ComponentInner, key, initialState) => {
     }
     constructor(props) {
       super(props);
-      const { store, tag } = props;
+      const { store, tag, params } = props;
       this.store = store;
-      this.tag = tag;
+      this.tag = getTag(tag, params);
       this.key = key;
       this.initialState = initialState;
       this.setStateKey(tag);
@@ -189,11 +192,13 @@ export const saveState = (ComponentInner, key, initialState) => {
       this.stateSave()
     }
     componentWillReceiveProps(newProps) {
-      const { tag: oldTag } = this.props;
-      const { tag } = newProps;
-      if (oldTag !== tag) {
+      const { tag: oldTag, params: oldParams } = this.props;
+      const { tag, params } = newProps;
+      const realTag = getTag(tag, params);
+      const oldRealTag = getTag(oldTag, oldParams);
+      if (oldRealTag !== realTag) {
         this.stateSave();
-        this.setStateKey(tag);
+        this.setStateKey(realTag);
         this.stateLoad();
       }
     }

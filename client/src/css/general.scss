@@ -109,6 +109,10 @@ $info-fore-o: #222222;
 $info-fore: #226622;
 $info-back: #eeeeee;
 
+$special-fore-o: #000000;
+$special-fore: #000000;
+$special-back: #eeffee;
+
 .error {
     color: $error-fore;
     background-color: $error-back;
@@ -136,6 +140,13 @@ $info-back: #eeeeee;
 }
 .info-o {
     color: $info-fore-o;
+}
+.special {
+    color: $special-fore;
+    background-color: $special-back;
+}
+.special-o {
+    color: $special-fore-o;
 }
 .msg-high {
     font-weight: bold;

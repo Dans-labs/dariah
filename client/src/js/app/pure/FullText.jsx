@@ -14,8 +14,8 @@ const onType = (updFilter, filterId) => event => updFilter(filterId, event.targe
  * Note that we use the strategy of {@link external:ControlledComponent|controlled components} here.
  *
  * @class
- * @param {number} filterId The index of the filter in {@link module:Filter.filterList|filterList}
- * @param {string} filterField The name of the field in the contrib list whose values are being filtered
+ * @param {number} filterId The index of the filter in the filterList
+ * @param {string} filterField The name of the field in the item list whose values are being filtered
  * @param {string} filterSettings  The currently entered search string in the input box
  * @param {number} filteredAmount The number of rows that have passed all filters
  * @param {number} filteredAmountOthers The number of rows that have passed all other filters  

@@ -31,8 +31,8 @@ import { placeFacets, testAllChecks } from 'filtering.js'
  * See {@link external:Reconciliation|Reconciliation}.
  *
  * @class
- * @param {number} filterId The index of the filter in {@link module:Filter.filterList|filterList}
- * @param {string} filterField The name of the field in the contrib list whose values are being filtered
+ * @param {number} filterId The index of the filter in the filterList
+ * @param {string} filterField The name of the field in the item list whose values are being filtered
  * @param {Map} fieldValues A mapping of the valueIds to valueRepresentations for all values that occur in `filterField`
  * @param {Map} filterSettings The current state of the facets belonging to this filter
  * @param {number} filteredAmount The number of rows that have passed all filters
@@ -43,6 +43,7 @@ import { placeFacets, testAllChecks } from 'filtering.js'
  * @returns {Fragment}
  */
 const ByValue = ({
+  table,
   filterId, filterField, filterLabel,
   fieldValues, filterSettings,
   filteredAmount, filteredAmountOthers,
@@ -53,7 +54,7 @@ const ByValue = ({
   return (
     <div className="facet">
       {rows === null ? (<p> -no facets </p>) : (
-      <Alternative tag={filterField}
+      <Alternative tag={`${table}_${filterField}`}
         controlPlacement={control => (
           <p className="facet">
             <CheckboxI

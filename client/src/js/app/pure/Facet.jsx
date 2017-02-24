@@ -9,7 +9,7 @@ import React from 'react'
  * Note that we use the strategy of {@link external:ControlledComponent|controlled components} here.
  *
  * @class
- * @param {number} filterId The index of the filter in {@link module:Filter.filterList|filterList}
+ * @param {number} filterId The index of the filter in the filterList
  * @param {number} valueId The id of the value that is displayed in this facet
  * @param {string} valueRep The string representation of the value of this facet (the label next to the checkbox)
  * @param {boolean} cheked Whether the checkbox is checked

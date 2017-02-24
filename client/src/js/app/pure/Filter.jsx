@@ -25,20 +25,13 @@ import EUMap from 'EUMap.jsx'
  * * the name of the data field it is filtering
  * * how many columns the grid of facets may have.
  *
- * `filterList` is used here and imported by {@link module:filtering}
  */ 
-export const filterList = [
-  {kind: FullText,  name: 'FullText',  field: 'title',               label: 'title',               maxCols: null, expanded: null},
-  {kind: EUMap,     name: 'EUMap',     field: 'country',             label: 'country',             maxCols: 3,    expanded: true},
-  {kind: ByValue,   name: 'ByValue',   field: 'vcc',                 label: 'vcc',                 maxCols: 2,    expanded: true},
-  {kind: ByValue,   name: 'ByValue',   field: 'year',                label: 'year',                maxCols: 3,    expanded: false},
-  {kind: ByValue,   name: 'ByValue',   field: 'typeContribution',    label: 'type',                maxCols: 2,    expanded: true},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahActivity',     label: 'research activity',   maxCols: 2,    expanded: false},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahObject',       label: 'research object',     maxCols: 2,    expanded: false},
-  {kind: ByValue,   name: 'ByValue',   field: 'tadirahTechnique',    label: 'research technique',  maxCols: 1,    expanded: false},
-  {kind: ByValue,   name: 'ByValue',   field: 'discipline',          label: 'discipline',          maxCols: 2,    expanded: false},
-  {kind: ByValue,   name: 'ByValue',   field: 'keyword',             label: 'keyword',             maxCols: 1,    expanded: false},
-]
+
+const filterClass = {
+  FullText: FullText,
+  EUMap   : EUMap,
+  ByValue : ByValue,
+}
 
 /**
  * **purely functional** {@link external:Component|Component}
@@ -70,18 +63,20 @@ export const filterList = [
  * @returns {Fragment}
  */
 const Filter = ({
-  fields,
-  filterSettings, fieldValues, 
+  table,
+  fields, fieldValues, 
+  filterList, filterSettings,
   filteredAmount, filteredAmountOthers,
   amounts,
   updFilter
 }) => (
   <div>
     {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
-      const Fclass = filter.kind;
+      const Fclass = filterClass[filter.type];
       return (
         <Fclass
           key={filterId}
+          table={table}
           filterId={filterId}
           filterField={filter.field}
           filterLabel={filter.label}
