@@ -85,6 +85,7 @@ class Provider extends Component {
       userInfo: new Map(),
       userMap: new Map(),
       countryMap: new Map(),
+      relValuesMap: new Map(),
       editStatus: {},
       delCallback: {},
     };

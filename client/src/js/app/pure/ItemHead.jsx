@@ -38,8 +38,8 @@ const ItemHead = ({ table, row, title, inplace, editStatus }) => {
             </p>
             )}
             controls={[
-              (handler => <a className='fa fa-chevron-down' href='#' onClick={handler}/>),
-              (handler => <a className='fa fa-chevron-right' href='#' onClick={handler}/>),
+              (handler => <span className='button-small fa fa-chevron-down' onClick={handler}/>),
+              (handler => <span className='button-small fa fa-chevron-right' onClick={handler}/>),
             ]}
             alternatives={[
               (<ItemRecord tag={`${table}_${rowId}`} table={table} recordId={rowId}/>),

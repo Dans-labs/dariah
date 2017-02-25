@@ -31,7 +31,7 @@ import Notification from 'Notification.jsx'
 const App = ({children}) => ( 
   <div>
     <Notification/>
-    <p className="nav" style={{paddingRight: '5em'}}>
+    <p className="nav small" style={{paddingRight: '5em'}}>
       <img style={{
           marginBottom: '-1em',
           marginTop: '-1em',

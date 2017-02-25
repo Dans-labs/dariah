@@ -42,8 +42,8 @@ class Login extends Component {
           <strong className="fa fa-user" title={user.eppn}>{user.eppn.split('@')[0]}</strong>
           <span className="fa fa-hashtag"/>{user.authority}{' '}
           <em>{user.groupDesc || 'not authenticated'}</em>
-          <a href="/logout" className="control fa fa-user-times">{' logout'}</a>
-          <a href="/slogout" className="control fa fa-users">{' quit '}</a>
+          <a href="/logout" className="control fa fa-user-times" title="log out"/>
+          <a href="/slogout" className="control fa fa-users" title="sign out"/>
         </span>
         ) : (
         <a href="/login" className="control fa fa-user-plus">{' login'}</a>

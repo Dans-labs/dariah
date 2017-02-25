@@ -20,7 +20,7 @@ import { columnStyle } from 'ui.js'
  * @returns {Fragment}
 */
 const Static = () => (
-  <span>
+  <span className="small">
     <NavLink to="/docs/about.md">About</NavLink>
     <NavLink to="/tech/docs/design.pdf">diagrams</NavLink>
     <NavLink to="/tech/docs/deploy.md">deploy</NavLink>
