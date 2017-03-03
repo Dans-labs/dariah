@@ -222,7 +222,7 @@ fields:
       update: own
     typeContributionLegacy:
       read:   office
-      update: office
+      update: system
     vcc:
       read:   public
       update: own
