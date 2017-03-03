@@ -15,6 +15,7 @@ tables:
       - country
       - vcc
       - typeContribution
+      - typeContributionLegacy
       - description
       - costTotal
       - costDescription
@@ -213,11 +214,22 @@ tables:
       typeContribution:
         label: Type
         valType: rel
-        multiple: false
+        multiple: true
         validation:
           nonEmpty: true
         allowNew: false
         getValues: /value_table?table={table}&field={field}
+        idOnly: false
+        appearance: {}
+
+      typeContributionLegacy:
+        label: Type (legacy)
+        valType: rel
+        multiple: false
+        validation:
+          nonEmpty: true
+        allowNew: false
+        getValues: /value_skim?table={table}&field={field}
         idOnly: false
         appearance: {}
 

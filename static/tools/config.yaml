@@ -282,3 +282,36 @@ BOOL_VALUES:
     - '0'
     - 'NULL'
 
+CONVERSIONS:
+  contrib-typeContribution:
+    Access:
+    - access to resources
+    Expertise: 
+    - support services
+    - consulting
+    Interoperability: 
+    - processing services
+    Content Hosting:
+    - hosting services
+    - access to resources
+    - access to software
+    Tools and Software:
+    - processing services
+    - software development
+    Event: 
+    - event
+    Training: 
+    - event
+    Summer School: 
+    - event
+    Cooperation: 
+    - consulting
+    Educational Resources: 
+    - access to resources
+    Data:
+    - access to resources
+    - resource creation
+    DARIAH Coordination: 
+    - dariah coordination
+    Workshop: 
+    - event

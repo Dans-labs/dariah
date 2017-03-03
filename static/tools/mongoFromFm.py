@@ -484,6 +484,30 @@ class FMConvert(object):
                 if value[0] in mine:
                     row[field] = [dict(_id=my)]
 
+    def legacyConvert(self):
+        for (item, mapping) in self.CONVERSIONS.items():
+            (mainTable, table) = item.split('-')
+            oldTable = '{}Legacy'.format(table)
+            self.allData[oldTable] = self.allData[table]
+            self.allFields[oldTable] = self.allFields[table]
+            self.allData[table] = []
+            newValues = set()
+            for vals in mapping.values():
+                for val in vals: newValues.add(val)
+            newValueList = sorted(newValues)
+            newValueIndex = dict((newVal, self.mongo.newId()) for newVal in newValueList)
+            self.allData[table] = [dict(_id=newValueIndex[nv], value=nv) for nv in newValueList]
+            fullMapping = dict()
+            for (ov, newVals) in mapping.items():
+                for nv in newVals:
+                    fullMapping.setdefault(ov, []).append(dict(_id=newValueIndex[nv], value=nv))
+            for row in self.allData[mainTable]:
+                oldValues = row.get(table, [])
+                newValues = []
+                for ov in oldValues: newValues.extend(fullMapping[ov['value']])
+                row[oldTable] = oldValues
+                row[table] = newValues
+        
     def importMongo(self):
         client = MongoClient()
         client.drop_database('dariah')
@@ -552,6 +576,7 @@ class FMConvert(object):
         self.userTable()
         self.relTables()
         self.testTweaks()
+        self.legacyConvert()
         self.importMongo()
         #self.showData()
         #self.showMoney()

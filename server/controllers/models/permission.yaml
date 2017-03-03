@@ -193,6 +193,11 @@ fields:
       read:   public
       update: office
 
+  typeContributionLegacy:
+    value:
+      read:   office
+      update: office
+
   tadirahActivity:
     value:
       read:   public
@@ -215,6 +220,9 @@ fields:
     typeContribution:
       read:   public
       update: own
+    typeContributionLegacy:
+      read:   office
+      update: office
     vcc:
       read:   public
       update: own
