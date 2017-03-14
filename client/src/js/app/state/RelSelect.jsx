@@ -6,15 +6,15 @@ const RelOption = ({ valId, value, selected, onHit }) => (
   <p
     className={`option ${selected}`}
     onClick={event=>onHit(valId, value.text, value.full)}
-  >{value.text}</p> 
+  >{value.full}</p> 
 )
 
-const initState = ({ initVal, initText, initFull }) => ({ 
+const initState = ({ initVal, initFull, initText }) => ({ 
   poppedUp: false,
   search: '',
   selVal: initVal,
-  selText: initText,
   selFull: initFull,
+  selText: initText,
 })
 
 class RelSelect extends Component {
@@ -27,20 +27,27 @@ class RelSelect extends Component {
     const search = event.target.value;
     this.setState({...this.state, search})
   }
-  changeSel(onChange, selVal, selText, selFull) {
-    this.setState({...this.state, poppedUp: false, selVal, selText, selFull});
+  changeSel(onChange, selVal, selFull, selText) {
+    this.setState({...this.state, poppedUp: false, selVal, selFull, selText});
     onChange(selVal, selText, selFull);
   }
 
   addVal(onChange, selText) {
     const selVal = null;
-    this.setState({...this.state, poppedUp: false, selVal, selText, selText})
+    this.setState({...this.state, poppedUp: false, selVal, selFull: selText, selText})
     onChange(null, selText);
+  }
+  setHeight(n, domElem) {
+    if (domElem != null) {
+      const height = Math.max(1, Math.min(n, 25))*1.7;
+      domElem.style.height = `${height}em`;
+      domElem.scrollIntoView();
+    }
   }
 
   render() {
     const { isNew, allowNew, valid, valueList, onChange, extraClasses } = this.props;
-    const { poppedUp, search, selVal, selText, selFull } = this.state;
+    const { poppedUp, search, selVal, selFull, selText } = this.state;
     const pat = search.toLowerCase();
     const icon = poppedUp?(isNew?'minus':'arrow-up'):(isNew?'plus':'arrow-down');
     const xclasses = extraClasses.join(' ');
@@ -54,7 +61,7 @@ class RelSelect extends Component {
           />
         </p>
         {(poppedUp || !valid)? (
-          <div>
+          <div className="option-popup">
             <p className="option-type">
               <input type="text"
                 placeholder="search..."
@@ -69,7 +76,10 @@ class RelSelect extends Component {
                 />
               ):null}
             </p>
-            <div className="options">{
+            <div
+              ref={this.setHeight.bind(this, valueList.length)}
+              className="options"
+            >{
               valueList.map(([_id, value]) => (
                 pat == null || pat == '' || value == null || value.full == null || value.full.toLowerCase().indexOf(pat) !== -1)?(
                 <RelOption

@@ -35,8 +35,6 @@ const pathCss = './src/css'
 
 const pathsLib = [pathLib]
 const pathsApp = globby.sync([`${pathApp}/*`, `!${pathApp}/*.jsx`])
-//console.log(pathsApp);
-//process.exit();
 
 const mDependencies = globby.sync('*.js', {cwd: pathLib})
 const vDependencies = [

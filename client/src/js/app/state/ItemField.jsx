@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Markdown from 'react-markdown'
+import isequal from 'lodash/isequal'
 
 import RelSelect from 'RelSelect.jsx'
 import Alternative from 'Alternative.jsx'
@@ -149,6 +150,18 @@ class ItemField extends Component {
  * plus a list of fields that is provided for each row (dependent on user permissions)
  * @returns {Fragment}
 */
+
+  initEdit(initValues) {
+    const newState = {
+      ...this.state,
+      savedValues: initValues,
+      curValues: [...initValues],
+      saving: {},
+      changed: false,
+      valid: true,
+    };
+    this.setState(newState);
+  }
 
   setValToState(i, newVal, _id, doSave) {
     const { reasons } = this.state;
@@ -575,8 +588,7 @@ class ItemField extends Component {
 
   render() {
     const { relValues } = this.state;
-    const { name, label, editable, valType, convert } = this.props;
-    const { curValues } = this.state;
+    const { label, editable, valType, convert } = this.props;
     if (editable && relValues == null && valType == 'rel' && convert != 'user' && convert != 'country') {
       return null;
     }
@@ -618,6 +630,14 @@ class ItemField extends Component {
         if (!relValuesMap.has(table)) {relValuesMap.set(table, new Map())}
         if (!relValuesMap.get(table).has(name)) {relValuesMap.get(table).set(name, relValues)}
       }
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { initValues } = this.props;
+    const { initValues: newInitValues } = nextProps;
+    if (!isequal(initValues, newInitValues)) {
+      this.initEdit(newInitValues)
     }
   }
   componentDidMount()  {this.fetchValues(); this.fullfillSave()}

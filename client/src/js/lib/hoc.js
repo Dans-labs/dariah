@@ -80,6 +80,9 @@ export const withContext = (ComponentInner) => {
  * {@link external:Component|component}
  * to let it preserve its state across unmounts and certain property updates.
  *
+ * This function can only take components that are react classes.
+ * It will not take purely functional components.
+ *
  * We assume that the original component can access the
  * {@link globals} through {@link external:context|context}
  * by having been enhanced by {@link withContext}.
@@ -189,6 +192,7 @@ export const saveState = (ComponentInner, key, initialState) => {
       this.stateLoad();
     }
     componentWillUnmount() {
+      if (super.componentWillUnmount != null) {super.componentWillUnmount()}
       this.stateSave()
     }
     componentWillReceiveProps(newProps) {
@@ -201,6 +205,7 @@ export const saveState = (ComponentInner, key, initialState) => {
         this.setStateKey(realTag);
         this.stateLoad();
       }
+      if (super.componentWillReceiveProps != null) {super.componentWillReceiveProps(newProps)}
     }
   }
   return ComponentOuter

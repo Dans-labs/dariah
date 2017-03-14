@@ -33,8 +33,8 @@ class ItemRecord extends Component {
       ...this.state,
       fieldData: {
         ...this.state.fieldData,
-        fields: {
-          ...this.state.fieldData.fields,
+        row: {
+          ...this.state.fieldData.row,
           ...modifiedFieldData
         }
       },
@@ -183,7 +183,6 @@ class ItemRecord extends Component {
   }
   componentDidMount()  {this.fetchRow()}
   componentDidUpdate() {this.fetchRow()}
-
 }
 
 export default withContext(saveState(ItemRecord, 'ItemRecord', {
