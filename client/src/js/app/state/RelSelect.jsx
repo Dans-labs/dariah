@@ -5,8 +5,8 @@ import { withContext, saveState } from 'hoc.js'
 const RelOption = ({ valId, value, selected, onHit }) => (
   <p
     className={`option ${selected}`}
-    onClick={event=>onHit(valId, value.text, value.full)}
-  >{value.full}</p> 
+    onClick={event=>onHit(valId, value.full, value.text)}
+  >{value.long || value.full}</p> 
 )
 
 const initState = ({ initVal, initFull, initText }) => ({ 
@@ -21,20 +21,20 @@ class RelSelect extends Component {
   popUp() {
     let { poppedUp } = this.state;
     poppedUp = !poppedUp;
-    this.setState({...this.state, poppedUp })
+    this.setState({ poppedUp })
   }
   updSearch(event) {
     const search = event.target.value;
-    this.setState({...this.state, search})
+    this.setState({ search })
   }
   changeSel(onChange, selVal, selFull, selText) {
-    this.setState({...this.state, poppedUp: false, selVal, selFull, selText});
-    onChange(selVal, selText, selFull);
+    this.setState({poppedUp: false, selVal, selFull, selText});
+    onChange(selVal, selFull, selText);
   }
 
   addVal(onChange, selText) {
     const selVal = null;
-    this.setState({...this.state, poppedUp: false, selVal, selFull: selText, selText})
+    this.setState({poppedUp: false, selVal, selFull: selText, selText})
     onChange(null, selText);
   }
   setHeight(n, domElem) {

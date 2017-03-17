@@ -224,24 +224,23 @@ export function computeFiltering(records, fields, filterList, fieldValues, filte
  * @returns {Map} `freshFilterSettings` - the nature of the event
  */
 export const newFilterSettings = (filterSettings, filterId, data) => {
-  const freshFilterSettings = new Map([...filterSettings.entries()]);
   switch (typeof data) {
     case 'boolean': {
-      const filterSetting = freshFilterSettings.get(filterId);
-      freshFilterSettings.set(filterId, new Map([...filterSetting.keys()].map(valueId => [valueId, data])));
+      const filterSetting = filterSettings.get(filterId);
+      filterSettings.set(filterId, new Map([...filterSetting.keys()].map(valueId => [valueId, data])));
       break;
     }
     case 'string': {
-      freshFilterSettings.set(filterId, data);
+      filterSettings.set(filterId, data);
       break;
     }
     default: {
       const [valueId, filterSetting] = data;
-      freshFilterSettings.get(filterId).set(valueId, filterSetting);
+      filterSettings.get(filterId).set(valueId, filterSetting);
       break;
     }
   }
-  return freshFilterSettings;
+  return filterSettings;
 }
 
 /**

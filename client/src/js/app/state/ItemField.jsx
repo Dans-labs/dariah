@@ -86,7 +86,7 @@ const countryAsString = (valRaw, countryMap) => {
     valShort = countryData.name;
     valRep = `${countryData.iso}: ${countryData.name}`;
   }
-  return {text: valShort, full:valRep}
+  return {text: valShort, full:valShort, long: valRep}
 }
 
 const validate = (val, valType, validation) => {
@@ -152,15 +152,13 @@ class ItemField extends Component {
 */
 
   initEdit(initValues) {
-    const newState = {
-      ...this.state,
+    this.setState({
       savedValues: initValues,
       curValues: [...initValues],
       saving: {},
       changed: false,
       valid: true,
-    };
-    this.setState(newState);
+    });
   }
 
   setValToState(i, newVal, _id, doSave) {
@@ -200,7 +198,6 @@ class ItemField extends Component {
     const { valid, changed } = this.checkForSave({ newValues, newReasons });
     if (!doSave || !valid || !changed) {
       this.setState({
-        ...this.state,
         curValues: newValues,
         reasons: newReasons,
         saving: {},
@@ -283,14 +280,12 @@ class ItemField extends Component {
     const { name, updMod, updEdit } = this.props;
     if (data == null) {
       this.setState({
-        ...this.state,
         saving: {status: 'error'},
       });
     }
     else {
       const { [name]: newValues, ...modValues } = data;
       this.setState({
-        ...this.state,
         saving: {status: 'saved'},
         savedValues: newValues,
         curValues: newValues,
@@ -307,7 +302,6 @@ class ItemField extends Component {
     const { table, name, rowId, valType } = this.props;
     let sendValues = (newValues == null)?curValues:newValues;
     this.setState({
-      ...this.state,
       reasons: {},
       saving: {status: 'saving'},
     });

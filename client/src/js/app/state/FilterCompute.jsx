@@ -31,13 +31,15 @@ class FilterCompute extends Component {
     if (typeof data == 'string') {
       setf(filterId, '', data)
     }
-    if (typeof data == 'boolean') {
-      setf(filterId, '', data)
+    else if (typeof data == 'boolean') {
+      for (const [fval, fset] of filterSettings.get(filterId).entries()) {
+        setf(filterId, fval, data)
+      }
     }
     else {
       setf(filterId, data[0], data[1])
     }
-    this.setState({...this.state,
+    this.setState({
       filterSettings: newFilterSettings(filterSettings, filterId, data)
     });
   }

@@ -60,7 +60,6 @@ export function getData(sources, component, notification) {
       try {
         if (callback == null) {
           component.setState({
-            ...(component.state || {}),
             [branch]: responseData.data,
           });
         }

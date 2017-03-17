@@ -33,7 +33,7 @@ class ItemMy extends Component {
   inserted(data) {
     const { params } = this.props;
     const { tag } = params;
-    this.setState({...this.state, inserted: data})
+    this.setState({inserted: data})
     if (data != null) {
       const { router } = this.props;
       router.push(`/${tag}/mylist/${data}`);
@@ -65,7 +65,7 @@ class ItemMy extends Component {
   deleted(data) {
     const { params, router } = this.props;
     const { tag } = params;
-    this.setState({...this.state, deleted: data})
+    this.setState({deleted: data})
     if (data != null) {
       const { router } = this.props;
       router.push(`/${tag}/mylist`);
@@ -165,7 +165,7 @@ class ItemMy extends Component {
       newState = {}
       if (inserted) {newState.inserted = null}
       if (deleted) {newState.deleted = null}
-      this.setState({...this.state, ...newState})
+      this.setState({...newState})
       getData([
           {
             type: 'db',

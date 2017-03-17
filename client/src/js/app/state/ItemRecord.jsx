@@ -30,7 +30,6 @@ class ItemRecord extends Component {
       newEditing[n] = false;
     }
     const newState = {
-      ...this.state,
       fieldData: {
         ...this.state.fieldData,
         row: {
@@ -56,7 +55,6 @@ class ItemRecord extends Component {
       editStatus[table][recordId].title.innerHTML = newVals[0];
     }
     const newState = {
-      ...this.state,
       changed: {...this.state.changed, [name]: changed},
       valid: {...this.state.valid, [name]: valid},
     }
@@ -70,7 +68,7 @@ class ItemRecord extends Component {
   saveAll() {
     const { canSave } = this.saveStatus();
     if (canSave) {
-      this.setState({...this.state, saveConcern: true})
+      this.setState({saveConcern: true})
     }
   }
   parseFields() {
