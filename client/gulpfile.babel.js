@@ -188,4 +188,5 @@ function watchDoc() {
 gulp.task('doc', gulp.series(buildDoc, watchDoc));
 gulp.task('lint', gulp.series(lint));
 gulp.task('dev', gulp.series(buildjsDev, buildCss, watch));
-gulp.task('prod', gulp.series(buildjsProd, buildDoc, buildCss));
+//gulp.task('prod', gulp.series(buildjsProd, buildCss, buildDoc));
+gulp.task('prod', gulp.series(buildjsProd, buildCss));
