@@ -1,17 +1,18 @@
 import React, { Component } from 'react'
 import { withContext, saveState } from 'hoc.js'
+import memoBind from 'memoBind.js'
 
-const empty = [];
+const empty = []
 
 /**
  * @class
  * @classdesc
  * **stateful** {@link external:Component|Component}
  *
- * Component that receives notifications and displays them in a 
+ * Component that receives notifications and displays them in a
  * little div with fixed position on the screen.
  *
- * <img src="/api/file/tech/docs/design/design.006.jpeg" width="800"/>
+ * <img src="/api/file/tech/docs/design/design.006.jpeg" width="800" />
  */
 class Notification extends Component {
 /**
@@ -19,19 +20,19 @@ class Notification extends Component {
  * The state consists of the list of messages.
  */
   constructor(props) {
-    super(props);
+    super(props)
     props.notification.component = this
-    this.msgs = []; // synchronous list of messages
-    this.visible = false;
-    this.dom = {};
+    this.msgs = [] // synchronous list of messages
+    this.visible = false
+    this.dom = {}
   }
   notify(msg) {
-    this.msgs.push(msg); // synchronous addition of msg
-    this.setState({msgs: [...(this.msgs)]}); // asynchronous update of the state
+    this.msgs.push(msg) // synchronous addition of msg
+    this.setState({msgs: [...(this.msgs)]}) // asynchronous update of the state
   }
   clear() {
-    this.msgs = []; // synchronous clearing of msg
-    this.setState({msgs: []}); // asynchronous update of the state
+    this.msgs = [] // synchronous clearing of msg
+    this.setState({msgs: []}) // asynchronous update of the state
   }
 /**
  * Collects the parameters to display progress information
@@ -39,23 +40,23 @@ class Notification extends Component {
  * @returns {Array} See the input of {@link Notification#render|render}
 */
   computeProgress() {
-    const lastMsg = this.msgs.length -1;
-    let lastNote = -1;
-    let lastKind = 'info';
+    const lastMsg = this.msgs.length - 1
+    let lastNote = -1
+    let lastKind = 'info'
     let busy = 0
     this.msgs.forEach((msg, i) => {
-      if (msg.kind == 'error') {lastNote = i, lastKind = 'error'}
+      if (msg.kind == 'error') {lastNote = i; lastKind = 'error'}
       else if (msg.kind == 'warning') {
-        if (lastKind != 'error') {lastNote = i, lastKind = 'warning'}
+        if (lastKind != 'error') {lastNote = i; lastKind = 'warning'}
       }
-      busy += msg.busy || 0;
+      busy += msg.busy || 0
     })
     if (busy < 0) {
-      console.warn(`SHOULD NOT HAPPEN: negative value for busy ${busy}`);
-      busy = 0;
+      //console.warn(`SHOULD NOT HAPPEN: negative value for busy ${busy}`)
+      busy = 0
     }
-    const visible = this.visible || (lastNote > -1);
-    return [lastMsg, lastNote, lastKind, busy, visible];
+    const visible = this.visible || (lastNote > -1)
+    return [lastMsg, lastNote, lastKind, busy, visible]
   }
 /**
  * Unobtrusive notification:
@@ -74,45 +75,58 @@ class Notification extends Component {
  * @param {boolean} visible: whether we should show the panel
  * @returns {Fragment}
  */
-  refDom(label, dom) {
+  refDom = label => dom => {
     if (dom) {this.dom[label] = dom}
   }
 
+  notificationHandler = action => event => {
+    event.preventDefault()
+    if (action == null) {
+      this.clear()
+    }
+    else {
+      this.setView(action)
+    }
+  }
+
   render() {
-    [this.lastMsg, this.lastNote, this.lastKind, this.busy, this.visible] = this.computeProgress();
-    const busyBlocks = new Array(this.busy).fill(1);
-    return ( 
+    [this.lastMsg, this.lastNote, this.lastKind, this.busy, this.visible] = this.computeProgress()
+    const busyBlocks = new Array(this.busy).fill(1)
+    return (
       <div>
-        <p className="msg-spinner">
+        <p className="msg-spinner" >
           <span
             title="show/hide notifications and progress messages"
             className={this.lastNote > -1 ? `spin-${this.lastKind}` : 'spin-ok'}
-            onClick={e=>{e.preventDefault(); this.setView(!this.visible)}}
           >
-            { busyBlocks.map((b, i) => <span key={i} className="msg-dot fa fa-caret-left"></span>) }
-            <span className={`fa fa-${this.busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}/>
+            { busyBlocks.map((b, i) => <span key={i} className="msg-dot fa fa-caret-left" />) }
+            <span
+              className={`fa fa-${this.busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}
+              onClick={memoBind(this, 'notificationHandler', [!this.visible])}
+            />
           </span>
         </p>
         <div
-          ref={this.refDom.bind(this, 'notbox')}
+          ref={memoBind(this, 'refDom', ['notbox'])}
           className="msg-box"
-          onClick={e=>{e.preventDefault(); this.setView(false)}}
-        >
-          {
-            (this.msgs || empty).map((msg, index) => (
+          onClick={memoBind(this, 'notificationHandler', [false])}
+        >{
+          (this.msgs || empty).map((msg, index) => (
             <p
+              title={msg.cause}
               key={index}
-              ref={this.refDom.bind(this, `m${index}`)}
-              className={`msg-line ${[msg.kind]}-o ${(msg.kind != 'info')?'msg-high':''}`}
+              ref={memoBind(this, 'refDom', [`m${index}`])}
+              className={`msg-line ${[msg.kind]}-o ${(msg.kind != 'info') ? 'msg-high' : ''}`}
             >{msg.text}</p>
-            ))
-          }
-          <p
-            className="msg-dismiss">(click panel to hide)
-          </p>
-          <p className="msg-trash">
-            <a href="#" title="clear messages" className="control fa fa-trash"
-              onClick={e=>{e.preventDefault(); this.clear()}}
+          ))
+        }
+          <p className="msg-dismiss" >{'(click panel to hide)'}</p>
+          <p className="msg-trash" >
+            <a
+              href="#"
+              title="clear messages"
+              className="control fa fa-trash"
+              onClick={memoBind(this, 'notificationHandler', [null])}
             />
           </p>
         </div>
@@ -120,10 +134,10 @@ class Notification extends Component {
     )
   }
   componentDidMount() {
-    this.setView();
+    this.setView()
   }
   componentDidUpdate() {
-    this.setView();
+    this.setView()
   }
 /**
  * Hide/show message panel and scrolls to relevant message.
@@ -135,15 +149,15 @@ class Notification extends Component {
 */
   setView(on) {
     if (on != null) {
-      this.visible = on;
+      this.visible = on
     }
-    this.dom.notbox.style.display = this.visible ? 'block' : 'none';
-    this.setScroll();
+    this.dom.notbox.style.display = this.visible ? 'block' : 'none'
+    this.setScroll()
   }
   setScroll() {
     if (this.visible) {
       if (this.lastNote > -1) {
-        this.dom[`m${this.lastNote}`].scrollIntoView();
+        this.dom[`m${this.lastNote}`].scrollIntoView()
       }
       else {
         if (this.lastMsg > -1) {

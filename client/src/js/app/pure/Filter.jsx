@@ -25,12 +25,12 @@ import EUMap from 'EUMap.jsx'
  * * the name of the data field it is filtering
  * * how many columns the grid of facets may have.
  *
- */ 
+ */
 
 const filterClass = {
-  FullText: FullText,
-  EUMap   : EUMap,
-  ByValue : ByValue,
+  FullText,
+  EUMap,
+  ByValue,
 }
 
 /**
@@ -56,23 +56,24 @@ const filterClass = {
  * @param {Map} filterSettings The current state of the facets belonging to this filter
  * @param {Map} fieldValues A mapping of the valueIds to valueRepresentations for all values in all filtered fields
  * @param {Object[]} filteredAmount The number of rows that have passed all filters
- * @param {Map} filteredAmountOthers For each filter, the number of rows that have passed all other filters  
+ * @param {Map} filteredAmountOthers For each filter, the number of rows that have passed all other filters
  * @param {Map} amounts For each filter, the number of rows that have passed all filters per valueId occurring in that field
  * Organized as a {Map} keyed by Two-letter country codes.
- * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
+ * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred
  * @returns {Fragment}
  */
 const Filter = ({
   table,
-  fields, fieldValues, 
+  fields, fieldValues,
   filterList, filterSettings,
   filteredAmount, filteredAmountOthers,
   amounts,
-  updFilter
+  updFilter,
 }) => (
   <div>
     {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
-      const Fclass = filterClass[filter.type];
+      const { type } = filter
+      const { [type]: Fclass } = filterClass
       return (
         <Fclass
           key={filterId}
@@ -89,9 +90,9 @@ const Filter = ({
           updFilter={updFilter}
           expanded={filter.expanded}
         />
-      );}
+      )}
     )}
   </div>
 )
 
-export default Filter;
+export default Filter

@@ -3,6 +3,7 @@ import ItemField from 'ItemField.jsx'
 
 import { getData } from 'data.js'
 import { withContext, saveState } from 'hoc.js'
+import memoBind from 'memoBind.js'
 
 /**
  * @class
@@ -14,8 +15,9 @@ import { withContext, saveState } from 'hoc.js'
  *
  * Displays all fields that the user is allowed to read.
  * With a control to edit the record.
- * 
+ *
  */
+
 class ItemRecord extends Component {
 /**
  *
@@ -24,79 +26,84 @@ class ItemRecord extends Component {
  * plus a list of fields that is provided for each row (dependent on user permissions)
  * @returns {Fragment}
 */
-  updMod(modifiedFieldData) {
-    const newEditing = {}
-    for (const n in modifiedFieldData) {
-      newEditing[n] = false;
-    }
-    const newState = {
-      fieldData: {
-        ...this.state.fieldData,
-        row: {
-          ...this.state.fieldData.row,
-          ...modifiedFieldData
-        }
-      },
-    }
-    this.setState(newState)
+  updMod = modifiedRowData => {
+    const updRow = ({ fieldData: { row, ...oldFieldData } }) => ({
+      ...oldFieldData,
+      row: { row, ...modifiedRowData },
+    })
+
+    this.setState(updRow)
   }
   progIcon(noChange, allValid) {
-    const { editStatus, table, recordId } = this.props;
-    const statusClass = noChange?'info':(allValid?'warning':'error')
-    const statusIcon = noChange?'':(allValid?'fa-pencil':'fa-close')
-    editStatus[table][recordId].prog.className = `${statusClass} fa ${statusIcon}`;
+    const { props: { editStatus, table, recordId } } = this
+    const statusClass = noChange ? 'info' : (allValid ? 'warning' : 'error')
+    const statusIcon = noChange ? '' : (allValid ? 'fa-pencil' : 'fa-close')
+    const { [table]: { [recordId]: { prog: domProg } } } = editStatus
+    domProg.className = `${statusClass} fa ${statusIcon}`
   }
 
-  updEdit(name, changed, valid, newVals) {
-    const { editStatus, table, recordId } = this.props;
-    const { saveConcern, fieldData } = this.state;
-    const { title } = fieldData;
+  updEdit = (name, changed, valid, newVals) => {
+    const {
+      props: { editStatus, table, recordId },
+      state: {
+        fieldData: { title },
+        changed: prevChanged,
+        valid: prevValid,
+      },
+    } = this
     if (name == title) {
-      editStatus[table][recordId].title.innerHTML = newVals[0];
+      const { [table]: { [recordId]: { title: domTitle } } } = editStatus;
+      [domTitle.innerHTML] = newVals
     }
     const newState = {
-      changed: {...this.state.changed, [name]: changed},
-      valid: {...this.state.valid, [name]: valid},
+      changed: {...prevChanged, [name]: changed},
+      valid: {...prevValid, [name]: valid},
     }
-    const { noChange, allValid, canSave } = this.saveStatus(newState);
-    this.progIcon(noChange, allValid);
+    const { noChange, allValid, canSave } = this.saveStatus(newState)
+    this.progIcon(noChange, allValid)
     if (!canSave) {
-      newState.saveConcern = false;
+      newState.saveConcern = false
     }
     this.setState(newState)
   }
-  saveAll() {
-    const { canSave } = this.saveStatus();
+  handleSaveAll = () => {
+    const { canSave } = this.saveStatus()
     if (canSave) {
       this.setState({saveConcern: true})
     }
   }
   parseFields() {
-    const { table } = this.props;
-    const { fieldData } = this.state;
-    const { row, fields, fieldSpecs, fieldOrder, perm } = fieldData;
+    const {
+      props: { table },
+      state: {
+        fieldData: { row, fields, fieldSpecs, fieldOrder, perm },
+        saveConcern,
+      },
+    } = this
+    const { _id: rowId } = row
     const fragments = []
-    let hasEditable = false;
+    let hasEditable = false
     for (const name of fieldOrder) {
-      const { label, initial, ...specs } = fieldSpecs[name];
-      if (fields[name] == null) {continue}
-      const editable = !!perm.update[name];
+      const { [name]: { label, initial, ...specs } } = fieldSpecs
+      const { [name]: f } = fields
+      if (f == null) {continue}
+      const { update: { [name]: editable } } = perm
       if (editable) {hasEditable = true}
-      const rowId = row._id;
+      const { [name]: initValues } = row
       fragments.push(
         <ItemField
           key={name}
           tag={`field_${table}_${rowId}_${name}`}
           table={table}
-          initValues={row[name]}
+          initValues={initValues}
           rowId={rowId}
-          editable={editable}
+          editable={!!editable}
           name={name}
           label={label}
           initial={initial}
-          saveConcern={this.state.saveConcern}
-          updMod={this.updMod.bind(this)}
-          updEdit={this.updEdit.bind(this)}
+          saveConcern={saveConcern}
+          updMod={this.updMod}
+          updEdit={this.updEdit}
           {...specs}
         />
       )
@@ -105,50 +112,52 @@ class ItemRecord extends Component {
   }
 
   saveStatus(newState) {
-    const { fieldData, changed, valid } = (newState == null)? this.state : newState;
-    const noChange = Object.keys(changed).every(n=>!changed[n])
-    const allValid = Object.keys(valid).every(n=>valid[n])
-    const canSave = !Object.keys(changed).every(n=>(!changed[n] || !valid[n]))
+    const { state } = this
+    const { changed, valid } = (newState == null) ? state : newState
+    const noChange = Object.keys(changed).every(n => !changed[n])
+    const allValid = Object.keys(valid).every(n => valid[n])
+    const canSave = !Object.keys(changed).every(n => (!changed[n] || !valid[n]))
     return { noChange, allValid, canSave }
   }
 
   render() {
-    const { fieldData, changed, valid } = this.state;
-    const { table, delCallback } = this.props;
-    if (fieldData == null || fieldData.row == null) {
-      return <div/>
+    const {
+      props: { table, parentList },
+      state: { fieldData: { row, perm } },
+    } = this
+    if (row == null) {
+      return <div />
     }
-    const { noChange, allValid, canSave } = this.saveStatus(); 
-    const statusClass = noChange?'special':(allValid?'warning':'error')
-    const elemText = noChange?'all saved':(allValid?'save changes':'make corrections');
-    const { row, perm } = fieldData;
-    const rowId = row._id;
-    const { fragments, hasEditable } = this.parseFields();
-    const delCb = delCallback[table]; 
+    const { noChange, allValid, canSave } = this.saveStatus()
+    const statusClass = noChange ? 'special' : (allValid ? 'warning' : 'error')
+    const elemText = noChange ? 'all saved' : (allValid ? 'save changes' : 'make corrections')
+    const { _id: rowId } = row
+    const { fragments, hasEditable } = this.parseFields()
+    const { [table]: parent } = parentList
     return (
-      <div className="widget-medium">
+      <div className="widget-medium" >
         <p>
-          {hasEditable? [
-            canSave? (
+          {hasEditable ? [
+            canSave ? (
               <span
-                key="1"
+                key="save"
                 className={`button-large ${statusClass}`}
-                onClick={this.saveAll.bind(this)}
+                onClick={this.handleSaveAll}
               >{elemText}</span>
             ) : (
               <span
-                key="1"
+                key="nosave"
                 className={`button-large ${statusClass}`}
               >{elemText}</span>
             ),
-            perm.delete? (
+            perm.delete ? (
               <span
-                key="2"
+                key="delete"
                 className={'fa fa-trash button-large delete'}
-                onClick={delCb? delCb.bind(null, rowId) : null}
                 title="delete this item"
+                onClick={parent ? memoBind(parent, 'deleteRow', [rowId]) : null}
               />
-            ) : null
+            ) : null,
           ] : null}
         </p>
         <table>
@@ -164,27 +173,30 @@ class ItemRecord extends Component {
  * @returns {Object} The data fetched from the server.
 */
   fetchRow() {
-    const { fieldData } = this.state;
-    const { table, recordId, ownOnly } = this.props;
-    if (fieldData == null) {
-      getData([
+    const {
+      props: { table, recordId, ownOnly, notification },
+      state: { fieldData },
+    } = this
+    if (Object.keys(fieldData).length == 0) {
+      getData(
+        [
           {
             type: 'db',
-            path: `/view?table=${table}&id=${recordId}${ownOnly?'&own=true':''}`,
+            path: `/view?table=${table}&id=${recordId}${ownOnly ? '&own=true' : ''}`,
             branch: 'fieldData',
           },
         ],
         this,
-        this.props.notification.component
-      );
+        notification.component
+      )
     }
   }
-  componentDidMount()  {this.fetchRow()}
+  componentDidMount() {this.fetchRow()}
   componentDidUpdate() {this.fetchRow()}
 }
 
 export default withContext(saveState(ItemRecord, 'ItemRecord', {
-  fieldData: null,
+  fieldData: {},
   changed: {},
   valid: {},
   saveConcern: false,

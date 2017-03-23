@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React from 'react'
 import { Link } from 'react-router'
 
 /**
@@ -10,6 +10,6 @@ import { Link } from 'react-router'
  * @param {Object} props Incoming properties to be passed to the underlying <Link> component.
  * @returns {Fragment}
  */
-const NavLink = (props) => <Link {...props} activeClassName="active"/>
+const NavLink = props => <Link {...props} activeClassName="active" />
 
 export default NavLink

@@ -17,7 +17,7 @@ import { withContext, saveState } from 'hoc.js'
  * only those that have passed all the filters, which are displayed in the
  * left column.
  *
- * <img src="/api/file/tech/docs/design/design.002.jpeg" width="800"/>
+ * <img src="/api/file/tech/docs/design/design.002.jpeg" width="800" />
  *
  * This is a complex system of components, where data is fetched from the server,
  * and user events are registered at the filter widgets.
@@ -46,26 +46,29 @@ class ItemFiltered extends Component {
  * @returns {Fragment}
 */
   render() {
-    const { listData, countryData, userData } = this.state;
-    const { params, userMap, countryMap } = this.props;
-    const { tag } = params;
+    const {
+      props: { params: { tag }, userMap, countryMap },
+      state: { listData, countryData, userData },
+    } = this
     if (listData == null || countryData == null || userData == null) {
-      return <div/>
+      return <div />
     }
-    const { records, fields, title, filterList } = listData;
-    const { fieldValues, filterInit } = compileFiltering(records, fields, filterList);
+    const { records, fields, title, filterList } = listData
+    const { fieldValues, filterInit } = compileFiltering(records, fields, filterList)
     for (const x of userData) {userMap.set(x._id, x)}
     for (const x of countryData) {countryMap.set(x._id, x)}
-    return <FilterCompute
-      tag={tag}
-      table={tag}
-      records={records}
-      fields={fields}
-      title={title}
-      fieldValues={fieldValues}
-      filterList={filterList}
-      filterInit={filterInit}
-    />
+    return (
+      <FilterCompute
+        tag={tag}
+        table={tag}
+        records={records}
+        fields={fields}
+        title={title}
+        fieldValues={fieldValues}
+        filterList={filterList}
+        filterInit={filterInit}
+      />
+    )
   }
 /**
  * @method
@@ -75,11 +78,13 @@ class ItemFiltered extends Component {
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { params } = this.props;
-    const { tag } = params;
-    const { listData, countryData, userData } = this.state;
+    const {
+      props: { params: { tag }, notification },
+      state: { listData, countryData, userData },
+    } = this
     if (listData == null || countryData == null || userData == null) {
-      getData([
+      getData(
+        [
           {
             type: 'db',
             path: `/list?table=${tag}`,
@@ -97,8 +102,8 @@ class ItemFiltered extends Component {
           },
         ],
         this,
-        this.props.notification.component
-      );
+        notification.component
+      )
     }
   }
 }

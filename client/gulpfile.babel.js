@@ -6,32 +6,38 @@ import buffer      from 'vinyl-buffer';
 import uglify      from 'gulp-uglify';
 import sass        from 'gulp-sass';
 import sourcemaps  from 'gulp-sourcemaps';
+import eslint      from 'gulp-eslint';
 import jsdoc       from 'gulp-jsdoc3';
 import globby      from 'globby';
  
 /* Config settings */
 
-const app = 'app.js'
-const lib = 'lib.js'
-const framework = 'framework.js'
-const entry = 'src/js/app/main.jsx'
-const entryCss = 'src/css/main.scss'
-
-const dest = '../static/js'
-const destCss = '../static/css'
-
-const docConfig = './jsdocConfig.json'
-const docSrc = [
-  '../README.md',
-  'src/js/**/*.js',
-  'src/js/**/*.jsx',
-  '!src/js/modules/**/*.*',
-]
-
 const pathJs = './src/js'
 const pathLib = './src/js/lib'
 const pathApp = './src/js/app'
 const pathCss = './src/css'
+const pathStatic = '../static'
+
+const app = 'app.js'
+const lib = 'lib.js'
+const framework = 'framework.js'
+const entry = `${pathApp}/main.jsx`
+const entryCss = `${pathCss}/main.scss`
+
+const dest = `${pathStatic}/js`
+const destCss = `${pathStatic}/css`
+
+const docConfig = './jsdocConfig.json'
+const docSrc = [
+  '../README.md',
+  `${pathApp}/**/*.jsx`,
+  `${pathLib}/*.js`,
+]
+
+const lintSrc = [
+  `${pathApp}/**/*.jsx`,
+  `${pathLib}/*.js`,
+]
 
 const pathsLib = [pathLib]
 const pathsApp = globby.sync([`${pathApp}/*`, `!${pathApp}/*.jsx`])
@@ -90,6 +96,7 @@ function transform(bundle, {
         plugins: [
             "transform-object-rest-spread",
             "transform-react-jsx-source",
+            "transform-class-properties",
         ],
       })
   }
@@ -124,6 +131,15 @@ function buildCss() {
 }
 
 /* Development tasks */
+
+function lint() {
+  return gulp.src(lintSrc)
+    .pipe(eslint({
+      configFile: 'eslint.yaml',
+    }))
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+}
 
 function buildjsDevApp() {
   const appBundle = browserify({entries: entry, debug: true, paths: pathsApp});
@@ -170,5 +186,6 @@ function watchDoc() {
 }
  
 gulp.task('doc', gulp.series(buildDoc, watchDoc));
+gulp.task('lint', gulp.series(lint));
 gulp.task('dev', gulp.series(buildjsDev, buildCss, watch));
 gulp.task('prod', gulp.series(buildjsProd, buildDoc, buildCss));

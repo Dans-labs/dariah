@@ -1,4 +1,4 @@
-/* 
+/*
  * This file does not contain javascript code.
  */
 
@@ -24,14 +24,14 @@
 
 /**
  * ES6 datastructure to contain the result of an asynchronous function.
- * It has as state that is either *pending*, *failed* or *resolved*. 
+ * It has as state that is either *pending*, *failed* or *resolved*.
  * Once the state is *failed* or *resolved*, it will not change anymore.
  * If the state is *resolved*, the return value is available, and will not change anymore.
  * The typical way to use a promise is
  *
  * ```
- *   const dataStore = {};
- *   const getData = url => fetch(url); 
+ *   const dataStore = {}
+ *   const getData = url => fetch(url)
  *   // assuming that fetch returns a Promise, we can then say
  *   getData('/api/blob/23').
  *   then(

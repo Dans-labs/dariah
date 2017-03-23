@@ -11,12 +11,12 @@ import 'whatwg-fetch'
 /**
  * The client fetches data by means of Ajax calls to `/api' plus additional paths.
  */
-const rootUrl = '/api/';
+const rootUrl = '/api/'
 
 /**
  * A component may request for a number of data queries in one go.
  * Every query is specified as {@link Source} object in the parameter `sources`.
- * 
+ *
  * The expected response is always a json {@link Result} object.
  *
  * @function
@@ -36,48 +36,45 @@ const rootUrl = '/api/';
  */
 export function getData(sources, component, notification) {
   for (const { type, path, branch, data, callback } of sources) {
-    notification.notify({kind: 'special', text: `${branch} transferring data ...`, busy: 1});
-    let settings = {credentials: 'same-origin'};
+    notification.notify({kind: 'special', text: `${branch} transferring data ...`, busy: 1})
+    let settings = {credentials: 'same-origin'}
     if (data != null) {
       settings = {
         ...settings,
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     }
     fetch(`${rootUrl}${type}${path}`, settings)
-    .then((response) => response.json())
-    .then((responseData) => {
+    .then(response => response.json())
+    .then(responseData => {
       for (const msg of responseData.msgs || []) {
-        notification.notify(msg);
+        notification.notify(msg)
       }
-      const kind = responseData.good ? 'info' : 'error';
-      const statm = responseData.good ? 'data fetched' : 'server error';
-      notification.notify({kind, text: `${branch} ${statm}.`, busy: -1});
+      const kind = responseData.good ? 'info' : 'error'
+      const statm = responseData.good ? 'data fetched' : 'server error'
+      notification.notify({kind, text: `${branch} ${statm}.`, busy: -1})
       try {
         if (callback == null) {
           component.setState({
             [branch]: responseData.data,
-          });
+          })
         }
         else {
           callback(responseData.data)
         }
-        notification.notify({kind: 'info', text: `${branch} processed.`, busy: 0});
+        notification.notify({kind: 'info', text: `${branch} processed.`, busy: 0})
       }
       catch (error) {
-        console.error(error);
-        notification.notify({kind: 'error', text: `${branch} processing error.`, busy: 0});
+        notification.notify({kind: 'error', text: `${branch} processing error.`, busy: 0, cause: error})
       }
     })
-    .catch((error) => {
-      console.error(error);
-      notification.notify({kind: 'error', text: `${branch} transmission error.`, busy: -1});
-    });
+    .catch(error => {
+      notification.notify({kind: 'error', text: `${branch} transmission error.`, busy: -1, cause: error})
+    })
   }
 }
 
-//export const dtm = dateVal => (new Date(dateVal['$date'])).toISOString())

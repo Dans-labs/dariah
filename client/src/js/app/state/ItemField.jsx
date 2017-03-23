@@ -7,6 +7,7 @@ import Alternative from 'Alternative.jsx'
 
 import { getData } from 'data.js'
 import { withContext, saveState } from 'hoc.js'
+import memoBind from 'memoBind.js'
 
 const sizes = {
   url: 50,
@@ -19,115 +20,101 @@ const sizes = {
 
 const trimDate = text => ({ full: text, text: (text == null) ? '' : (text.replace(/\.[0-9]+/, ''))})
 
-const condense = text => ({ full: text, text: (text == null) ? '' : ((text.length > 20)?`${text.slice(0,8)}...${text.slice(-8)}`:text)})
-
-const readonlyMakeFragment = obj => ({
-  url: obj.urlFragment.bind(obj),
-  email: obj.emailFragment.bind(obj),
-  textarea: obj.textareaFragment.bind(obj),
-  _default: obj.defaultFragment.bind(obj),
-})
-
-const editMakeFragment = obj => ({
-  rel: obj.relEditFragment.bind(obj),
-  textarea: obj.textareaEditFragment.bind(obj),
-  _default: obj.defaultEditFragment.bind(obj),
-})
+const condense = text => ({ full: text, text: (text == null) ? '' : ((text.length > 20) ? `${text.slice(0, 8)}...${text.slice(-8)}` : text)})
 
 const normalizeValues = ({initValues, relValuesMap, table, name }) => {
-  const savedValues = (initValues == null) ? [] : initValues;
-  const curValues = [...savedValues];
-  const relValues = relValuesMap.has(table)?(relValuesMap.get(table).has(name)?relValuesMap.get(table).get(name):null):null;
+  const savedValues = (initValues == null) ? [] : initValues
+  const curValues = [...savedValues]
+  const relValues = relValuesMap.has(table) ? (relValuesMap.get(table).has(name) ? relValuesMap.get(table).get(name) : null) : null
   return { curValues, savedValues, reasons: {}, saving: {}, changed: false, valid: true, relValues }
 }
 
-const userAsString = (valRaw, userMap) => {
-  const valId = valRaw._id;
-  let valRep;
-  let valShort;
+const userAsString = ({ _id: valId }, userMap) => {
+  let valRep
+  let valShort
   if (!userMap.has(valId)) {
-    valRep = 'UNKNOWN';
-    valShort = '??';
+    valRep = 'UNKNOWN'
+    valShort = '??'
   }
   else {
-    const userData = userMap.get(valId);
-    const fname = userData.firstName || '';
-    const lname = userData.lastName || '';
-    const email = userData.email || '';
-    const eppn = userData.eppn || '';
-    const authority = userData.authority || '';
-    const mayLogin = userData.mayLogin?'yes':'no';
-    let linkText = [fname, lname].filter(x => x).join(' '); 
+    const userData = userMap.get(valId)
+    const fname = userData.firstName || ''
+    const lname = userData.lastName || ''
+    const email = userData.email || ''
+    const eppn = userData.eppn || ''
+    const authority = userData.authority || ''
+    const mayLogin = userData.mayLogin ? 'yes' : 'no'
+    let linkText = [fname, lname].filter(x => x).join(' ')
     if (linkText == '') {linkText = email}
-    const namePart = (linkText && email)? (
+    const namePart = (linkText && email) ? (
       `[${linkText}](mailto:${email})`
     ) : (
-      linkText+email
-    );
-    const eppnPart = eppn?` eppn=${eppn} `:'';
-    const authorityPart = authority?` authenticated by=${authority} `:'';
-    const mayLoginPart = mayLogin?` active=${mayLogin} `:'';
-    valRep = [namePart, eppnPart, authorityPart, mayLoginPart].filter(x => x).join('; ');
-    valShort = [fname, lname, eppn].filter(x => x).slice(0, 2).join(' ');
+      linkText + email
+    )
+    const eppnPart = eppn ? ` eppn=${eppn} ` : ''
+    const authorityPart = authority ? ` authenticated by=${authority} ` : ''
+    const mayLoginPart = mayLogin ? ` active=${mayLogin} ` : ''
+    valRep = [namePart, eppnPart, authorityPart, mayLoginPart].filter(x => x).join('; ')
+    valShort = [fname, lname, eppn].filter(x => x).slice(0, 2).join(' ')
   }
-  return {text: valShort , full: valRep}
+  return { text: valShort, full: valRep }
 }
 
-const countryAsString = (valRaw, countryMap) => {
-  const valId = valRaw._id;
-  let valRep;
-  let valShort;
+const countryAsString = ({ _id: valId }, countryMap) => {
+  let valRep
+  let valShort
   if (!countryMap.has(valId)) {
-    valRep = 'UNKNOWN';
-    valShort = '??';
+    valRep = 'UNKNOWN'
+    valShort = '??'
   }
   else {
-    const countryData = countryMap.get(valId);
-    valShort = countryData.name;
-    valRep = `${countryData.iso}: ${countryData.name}`;
+    const countryData = countryMap.get(valId)
+    const { name, iso } = countryData
+    valShort = name
+    valRep = `${iso}: ${name}`
   }
-  return {text: valShort, full:valShort, long: valRep}
+  return {text: valShort, full: valShort, long: valRep}
 }
 
 const validate = (val, valType, validation) => {
-  let vstatus = true;
-  let reason = '';
+  let vstatus = true
+  let reason = ''
   if (validation.nonEmpty && (val == null || val == '')) {
-    reason = `field may not be empty`;
-    vstatus =  false;
+    reason = `field may not be empty`
+    vstatus = false
   }
   if (validation.min != null || validation.max != null) {
     if (isNaN(val)) {
-      reason = `value must be a number`;
-      vstatus = false;
+      reason = `value must be a number`
+      vstatus = false
     }
     else {
-      const valn = parseInt(val);
-      if (!(validation.min <= valn)){
-        reason = `value must be at least ${validation.min}`;
-        vstatus = false;
+      const valn = parseInt(val)
+      if (!(validation.min <= valn)) {
+        reason = `value must be at least ${validation.min}`
+        vstatus = false
       }
-        if (!(validation.max >= val)) {
-        reason = `value must be at most ${validation.max}`;
-        vstatus = false;
+      if (!(validation.max >= val)) {
+        reason = `value must be at most ${validation.max}`
+        vstatus = false
       }
     }
   }
   if (valType == 'datetime') {
-    let times;
+    let times
     try {
-      times = Date.parse(val);
+      times = Date.parse(val)
     }
     catch (error) {
-      reason = `not a valid date/time - ${error}`;
-      vstatus = false;
+      reason = `not a valid date/time - ${error}`
+      vstatus = false
     }
     if (isNaN(times)) {
-      reason = `not a valid date/time`;
-      vstatus = false;
+      reason = `not a valid date/time`
+      vstatus = false
     }
   }
-  return { vstatus, reason };
+  return { vstatus, reason }
 }
 
 /**
@@ -140,7 +127,7 @@ const validate = (val, valType, validation) => {
  *
  * Displays all fields that the user is allowed to read.
  * With a control to edit the record.
- * 
+ *
  */
 class ItemField extends Component {
 /**
@@ -153,26 +140,26 @@ class ItemField extends Component {
 
   initEdit(initValues) {
     this.setState({
-      savedValues: initValues,
-      curValues: [...initValues],
+      savedValues: initValues || [],
+      curValues: [...(initValues || [])],
       saving: {},
       changed: false,
       valid: true,
-    });
+    })
   }
 
   setValToState(i, newVal, _id, doSave) {
-    const { reasons } = this.state;
-    let newReasons;
-    let newValues = [...this.state.curValues];
+    const { state: { reasons, curValues } } = this
+    let newReasons
+    let newValues = [...curValues]
     if (newVal == null) {
-      newValues = newValues.filter((x,j) => j != i) 
-      newReasons = reasons;
+      newValues = newValues.filter((x, j) => j != i)
+      newReasons = reasons
     }
     else {
-      const { valType, validation, table, name, relValuesMap } = this.props;
-      const { vstatus, reason } = validate(newVal, valType, validation);
-      const sendVal = (valType == 'rel')? ((typeof newVal != 'string')? newVal : { _id, value: newVal }) : newVal;
+      const { props: { valType, validation } } = this
+      const { vstatus, reason } = validate(newVal, valType, validation)
+      const sendVal = (valType == 'rel') ? ((typeof newVal != 'string') ? newVal : { _id, value: newVal }) : newVal
       if (vstatus && valType == 'rel' && _id == null) {
         /* add new value to value list
          * assume that fields that have allowNew, do not have an associated value table.
@@ -180,22 +167,22 @@ class ItemField extends Component {
          * We maintain the related values in the relValuesMap, so we have to update it with {_id: null, value: sendVal}
          * What if we have multiple new values, all with _id: null, will that go wrong?
          * Yes.
-         * It is better to fetch the relValues anew. 
+         * It is better to fetch the relValues anew.
          * In order to do this, we do two things:
          * 1. set the current state for relValues to null
          * 2. set the prop relValuesMap.table.name to null
-         * 
+         *
          * This is surprisingly difficult to achieve.
-         * And a simple refresh also solves the problem. 
+         * And a simple refresh also solves the problem.
          * So: put a (limited) refresh button on the interface, also for the filters.
          */
       }
-      const refI = (i == -1)?newValues.length:i;
+      const refI = (i == -1) ? newValues.length : i
       if (i == -1) {newValues.push(sendVal)}
       else {newValues[i] = sendVal}
-      newReasons = {...this.state.reasons, [refI]: reason};
+      newReasons = {...reasons, [refI]: reason}
     }
-    const { valid, changed } = this.checkForSave({ newValues, newReasons });
+    const { valid, changed } = this.checkForSave({ newValues, newReasons })
     if (!doSave || !valid || !changed) {
       this.setState({
         curValues: newValues,
@@ -206,128 +193,132 @@ class ItemField extends Component {
       })
     }
     else {
-      this.toDb(newValues);
+      this.toDb(newValues)
     }
   }
 
-  changeVal(i, event) {
-    event.preventDefault();
-    this.setValToState(i, event.target.value, null, false);
-  }
-
-  keyUp(i, event) {
+  keyUp = i => event => {
     if (event.keyCode === 13) {
-      event.target.blur();
-      this.setValToState(i, event.target.value, null, true);
+      event.target.blur()
+      this.setValToState(i, event.target.value, null, true)
     }
   }
 
-  changeRelVal(i, _id, value) {
-    this.setValToState(i, value, _id, true);
+  changeVal = i => event => {
+    event.preventDefault()
+    this.setValToState(i, event.target.value, null, false)
   }
 
-  removeVal(i, _id, event) {
-    event.preventDefault();
-    this.setValToState(i, null, null, true);
+  changeRelVal = i => (_id, value) => {
+    this.setValToState(i, value, _id, true)
+  }
+
+  removeVal = i => event => {
+    event.preventDefault()
+    this.setValToState(i, null, null, true)
   }
 
   checkForSave(info) {
-    const { newValues, newReasons } = info;
-    const { rowId, name, valType, validation, multiple, allowNew, updEdit } = this.props;
-    const { savedValues } = this.state;
-    const valid = Object.keys(newReasons).every(i => !newReasons[i]);
-    let changed = false;
+    const { newValues, newReasons } = info
+    const {
+      props: { name, updEdit },
+      state: { savedValues },
+    } = this
+    const valid = Object.keys(newReasons).every(i => !newReasons[i])
+    let changed = false
     if (newValues.length != savedValues.length) {
       changed = true
     }
     else {
       for (const i in newValues) {
-        const cv = newValues[i];
-        const sv = savedValues[i];
+        const { [i]: cv } = newValues
+        const { [i]: sv } = savedValues
         if (sv == null) {
           changed = true
         }
         else if (typeof cv == 'object') {
           for (const k of Object.keys(cv)) {
             if (cv[k] != sv[k]) {
-              changed = true;
-              break;
+              changed = true
+              break
             }
           }
         }
         else {
           if (cv != sv) {
-            changed = true;
+            changed = true
           }
         }
         if (changed) {
-          break;
+          break
         }
       }
     }
-    updEdit(name, changed, valid, newValues);
-    return { valid , changed }
+    updEdit(name, changed, valid, newValues)
+    return { valid, changed }
   }
 
-  saveField() {
-    const { valid, changed, saving } = this.state;
+  saveField = () => {
+    const { state: { valid, changed, saving } } = this
     if (valid && changed && !saving.status) {
-      this.toDb();
+      this.toDb()
     }
   }
 
-  saved(data) {
-    const { name, updMod, updEdit } = this.props;
+  saved = data => {
+    const { props: { name, updMod, updEdit } } = this
     if (data == null) {
       this.setState({
         saving: {status: 'error'},
-      });
+      })
     }
     else {
-      const { [name]: newValues, ...modValues } = data;
+      const { [name]: newValues, ...modValues } = data
       this.setState({
         saving: {status: 'saved'},
         savedValues: newValues,
         curValues: newValues,
         changed: false,
         valid: true,
-      });
-      updMod(modValues);
-      updEdit(name, false, true, newValues);
+      })
+      updMod(modValues)
+      updEdit(name, false, true, newValues)
     }
   }
 
   toDb(newValues) {
-    const { curValues } = this.state;
-    const { table, name, rowId, valType } = this.props;
-    let sendValues = (newValues == null)?curValues:newValues;
+    const {
+      props: { table, name, rowId, notification },
+      state: { curValues },
+    } = this
+    const sendValues = (newValues == null) ? curValues : newValues
     this.setState({
       reasons: {},
       saving: {status: 'saving'},
-    });
-    getData([
+    })
+    getData(
+      [
         {
           type: 'db',
           path: `/mod?table=${table}&action=update`,
           branch: `save ${name}`,
-          callback: this.saved.bind(this),
+          callback: this.saved,
           data: {_id: rowId, name, values: sendValues},
         },
       ],
       this,
-      this.props.notification.component
-    );
+      notification.component
+    )
   }
 
   fullfillSave() {
-    const { editable, saveConcern } = this.props;
-    const { name } = this.props;
-    if (editable && saveConcern) { this.saveField() }
+    const { props: { editable, saveConcern } } = this
+    if (editable && saveConcern) {this.saveField()}
   }
 
   valueAsString(valRaw) {
-    const { valType, convert, userMap, countryMap, initial } = this.props;
-    if (valRaw == null) {return { text: '', full: '', initial: (valType == 'rel')? true : initial }}
+    const { props: { valType, convert, userMap, countryMap, initial } } = this
+    if (valRaw == null) {return { text: '', full: '', initial: (valType == 'rel') ? true : initial }}
     switch (valType) {
       case 'rel': {
         switch (convert) {
@@ -341,7 +332,7 @@ class ItemField extends Component {
         }
       }
       case 'datetime': {
-        return trimDate(valRaw);
+        return trimDate(valRaw)
       }
       default: {
         return {text: valRaw, full: valRaw}
@@ -349,252 +340,268 @@ class ItemField extends Component {
     }
   }
 
-  urlFragment(i, valType, valText) {
-    const { text, full } = valText;
-    return <a key={i} target="_blank" href={full} className="link">{text}</a>
+  urlFragment = (i, valType, valText) => {
+    const { text, full } = valText
+    return <a key={i} target="_blank" rel="noopener noreferrer" href={full} className="link" >{text}</a>
   }
-  emailFragment(i, valType, valText) {
-    const { text, full } = valText;
-    return <a key={i} target="_blank" href={`mailto:${full}`} className="link">{full}</a>
+  emailFragment = (i, valType, valText) => {
+    const { full } = valText
+    return <a key={i} target="_blank" rel="noopener noreferrer" href={`mailto:${full}`} className="link" >{full}</a>
   }
-  textareaFragment(i, valType, valText) {
-    const { text, full } = valText;
+  textareaFragment = (i, valType, valText) => {
+    const { full } = valText
     return (
       <Markdown
         key={i}
         source={full}
       />
     )
-    //return <p key={i} className="varia-large">{full}</p>
   }
-  defaultFragment(i, valType, valText) {
-    const { text, full } = valText;
-    const cl = `${(valType == 'rel')?'tag':'varia'}-medium`;
-    return <span key={i} className={cl} title={full}>{text}</span>
+  defaultFragment = (i, valType, valText) => {
+    const { text, full } = valText
+    const cl = `${(valType == 'rel') ? 'tag' : 'varia'}-medium`
+    return <span key={i} className={cl} title={full} >{text}</span>
   }
 
   relOptions() {
-    const { relValues } = this.state;
+    const { state: { relValues } } = this
     return relValues.map(rv => [rv._id, condense(rv.value)])
   }
   userOptions() {
-    const { userMap } = this.props;
-    return [...userMap.values()].map(rv => [rv._id,  this.valueAsString(rv)])
+    const { props: { userMap } } = this
+    return [...userMap.values()].map(rv => [rv._id, this.valueAsString(rv)])
   }
   countryOptions() {
-    const { countryMap } = this.props;
-    return [...countryMap.values()].map(rv => [rv._id,  this.valueAsString(rv)])
+    const { props: { countryMap } } = this
+    return [...countryMap.values()].map(rv => [rv._id, this.valueAsString(rv)])
   }
 
   relSelect(i, _id, isNew, extraClasses, valText) {
-    const { text, full } = valText;
-    const { table, convert, allowNew, name, rowId } = this.props;
-    const { valid } = this.state;
-    const valueList = (convert == 'user')? this.userOptions() : ((convert == 'country')? this.countryOptions() : this.relOptions())
-    return <RelSelect
-      tag={`relselect_${table}_${rowId}_${name}_${i}`}
-      table={table}
-      key={i}
-      isNew={isNew}
-      allowNew={allowNew}
-      valid={valid}
-      valueList={valueList}
-      initVal={_id}
-      initText={text}
-      initFull={full}
-      onChange={this.changeRelVal.bind(this, i)}
-      extraClasses={extraClasses}
-    />
+    const { text, full } = valText
+    const {
+      props: { table, convert, allowNew, name, rowId },
+      state: { valid },
+    } = this
+    const valueList = (convert == 'user') ? this.userOptions() : ((convert == 'country') ? this.countryOptions() : this.relOptions())
+    return (
+      <RelSelect
+        tag={`relselect_${table}_${rowId}_${name}_${i}`}
+        table={table}
+        key={i}
+        isNew={isNew}
+        allowNew={allowNew}
+        valid={valid}
+        valueList={valueList}
+        initVal={_id}
+        initText={text}
+        initFull={full}
+        extraClasses={extraClasses}
+        onChange={memoBind(this, 'changeRelVal', [i])}
+      />
+    )
   }
   editValControl(i, _id, isNew) {
-    const { multiple } = this.props;
-    return (isNew || !multiple)? null : (
+    const { props: { multiple } } = this
+    return (isNew || !multiple) ? null : (
       <span
         className="button-small fa fa-close"
-        onClick={this.removeVal.bind(this, i, _id)}
+        onClick={memoBind(this, 'removeVal', [i])}
       />
     )
   }
 
-  relEditFragment(i, _id, isNew, valType, extraClasses, valText) {
-    const { text, full } = valText;
-    const { multiple } = this.props;
-    return ((!multiple && i == 0) || isNew)? (
+  relEditFragment = (i, _id, isNew, valType, extraClasses, valText) => {
+    const { text, full } = valText
+    const { props: { multiple } } = this
+    return ((!multiple && i == 0) || isNew) ? (
       this.relSelect(i, _id, isNew, extraClasses, valText)
     ) : (
-      <span key={i} className="tag-medium" title={full}>{text}{' '}
+      <span key={i} className="tag-medium" title={full} >{text}{' '}
         {this.editValControl(i, _id, isNew)}
       </span>
     )
   }
-  textareaEditFragment(i, _id, isNew, valType, extraClasses, valText, cols=100, rows=10) {
-    const { table, rowId, name } = this.props;
-    const { text, full } = valText;
-    this.saveLater = true;
+  textAreaControlPlacement = control => <p className="stick" >{control}</p>
+  textAreaControl1 = handler => <span className="button-small fa fa-pencil" onClick={handler} />
+  textAreaControl2 = handler => <span className="button-small fa fa-hand-o-down" onClick={handler} />
+
+  textareaEditFragment = (i, _id, isNew, valType, extraClasses, valText, cols = 100, rows = 10) => {
+    const { props: { table, rowId, name } } = this
+    const { full } = valText
+    this.saveLater = true
     return (
-      <Alternative key={i} tag={`md_${table}_${rowId}_${name}`}
-        controlPlacement={control => (<p className="stick">{control}</p>)}
-        controls={[
-          (handler => <span className="button-small fa fa-pencil" onClick={handler}/>),
-          (handler => <span className="button-small fa fa-hand-o-down" onClick={handler}/>),
-        ]}
+      <Alternative
+        key={i}
+        tag={`md_${table}_${rowId}_${name}`}
+        controlPlacement={this.textAreaControlPlacement}
+        controls={[this.textAreaControl1, this.textAreaControl2]}
         alternatives={[
           <Markdown
+            key="fmt"
             source={full}
           />,
-          <span>
+          <span key="src" >
             <textarea
               className={`input ${valType} ${extraClasses.join(' ')}`}
               value={full}
-              onChange={this.changeVal.bind(this, i)}
               cols={cols}
               rows={rows}
               placeholder={valText.initial}
               wrap="soft"
+              onChange={memoBind(this, 'changeVal', [i])}
             />
             {this.editValControl(i, _id, isNew)}
-          </span>
+          </span>,
         ]}
         initial={0}
       />
     )
   }
-  defaultEditFragment(i, _id, isNew, valType, extraClasses, valText, size=50) {
-    const { text, full } = valText;
-    this.saveLater = true;
+  defaultEditFragment = (i, _id, isNew, valType, extraClasses, valText, size = 50) => {
+    const { full } = valText
+    this.saveLater = true
     return (
-      <span key={i}>
-        <input type="text"
+      <span key={i} >
+        <input
+          type="text"
           className={`input ${valType} ${extraClasses.join(' ')}`}
           value={full}
           placeholder={valText.initial}
-          onChange={this.changeVal.bind(this, i)}
-          onKeyUp={this.keyUp.bind(this, i)}
           size={size}
+          onChange={memoBind(this, 'changeVal', [i])}
+          onKeyUp={memoBind(this, 'keyUp', [i])}
         />
         {this.editValControl(i, _id, isNew)}
       </span>
     )
   }
 
+  readonlyMakeFragment = valType => {
+    if (valType == 'url') {return this.urlFragment}
+    if (valType == 'email') {return this.emailFragment}
+    if (valType == 'textarea') {return this.textareaFragment}
+    return this.defaultFragment
+  }
+
+  editMakeFragment = valType => {
+    if (valType == 'rel') {return this.relEditFragment}
+    if (valType == 'textarea') {return this.textareaEditFragment}
+    return this.defaultEditFragment
+  }
+
   progIcon() {
-    const { editable } = this.props;
-    let progIcon;
+    const { props: { editable } } = this
+    let progIcon
     if (editable) {
-      const { saving, changed, valid } = this.state;
-      const cs = saving.status;
-      if (cs == 'saving') {progIcon = 'fa-spinner fa-spin'}
-      else if (cs == 'saved') {progIcon = 'fa-check good'}
-      else if (cs == 'error') {progIcon = 'fa-exclamation error'}
+      const { state: { saving: { status }, changed, valid } } = this
+      if (status == 'saving') {progIcon = 'fa-spinner fa-spin'}
+      else if (status == 'saved') {progIcon = 'fa-check good'}
+      else if (status == 'error') {progIcon = 'fa-exclamation error'}
       else if (!valid) {progIcon = 'fa-close error'}
       else if (changed) {progIcon = 'fa-pencil warning'}
       else {progIcon = 'fa-circle-o hidden'}
-      progIcon += ' fa progress';
+      progIcon += ' fa progress'
     }
     else {
-      progIcon = 'fa fa-lock progress info';
+      progIcon = 'fa fa-lock progress info'
     }
-    return (<span key={name} className={progIcon}/>)
+    return (<span key={name} className={progIcon} />)
   }
 
   valuesAsReadonly() {
-    const { curValues } = this.state;
-    const { name } = this.props;
-    if (curValues.length == 0) {return <span className='warning'>no value</span>}
-    const { valType, multiple, appearance } = this.props;
-    const methods = readonlyMakeFragment(this);
-    const makeFragment = methods[valType] || methods._default;
-    const cutoff = appearance.cutoff;
+    const { state: { curValues } } = this
+    if (curValues.length == 0) {return <span className="warning" >{'no value'}</span>}
+    const { props: { valType, multiple, appearance: { cutoff, reverse } } } = this
+    const makeFragment = memoBind(this, 'readonlyMakeFragment', [valType])
     const alt2 = []
-    const alt1 = [];
-    alt1.push(' ');
-    const processValues = appearance.reverse?[...curValues].reverse():curValues;
+    const alt1 = []
+    alt1.push(' ')
+    const processValues = reverse ? [...curValues].reverse() : curValues
     processValues.forEach((v, i) => {
-      let destAlt = (!cutoff || i <= cutoff-1)?alt1:alt2;
-      const valText = this.valueAsString(v);
-      const fragment = makeFragment(i, valType, valText);
+      const destAlt = (!cutoff || i <= cutoff - 1) ? alt1 : alt2
+      const valText = this.valueAsString(v)
+      const fragment = makeFragment(i, valType, valText)
       if (multiple || i == 0) {destAlt.push(fragment)}
       if (multiple) {destAlt.push(' ')}
-    });
+    })
     return this.knead(alt1, alt2)
   }
 
   valuesAsControls() {
-    const { curValues, reasons } = this.state;
-    const { savedValues } = this.state;
-    const { name, valType, multiple, validation, allowNew, appearance } = this.props;
-    const methods = editMakeFragment(this);
-    const makeFragment = methods[valType] || methods._default;
-    const cutoff = appearance.cutoff;
+    const {
+      props: { valType, multiple, appearance: { cutoff, reverse } },
+      state: { curValues, reasons },
+    } = this
+    const makeFragment = memoBind(this, 'editMakeFragment', [valType])
     const alt2 = []
     const alt1 = []
-    const enumCurValues = curValues.map((v,i) => [i, v])
-    const nValues = curValues.length;
-    const processValues = appearance.reverse?enumCurValues.reverse():enumCurValues;
+    const enumCurValues = curValues.map((v, i) => [i, v])
+    const { length: nValues } = curValues
+    const processValues = reverse ? enumCurValues.reverse() : enumCurValues
     if (multiple || nValues == 0) {
       processValues.push([nValues, null])
     }
-    const size = sizes[valType] || sizes._max;
-    let destAlt = alt1;
+    const size = sizes[valType] || sizes._max
+    let destAlt = alt1
     let extraClasses = []
     processValues.forEach((ev, j) => {
-      const [i, v] = ev;
-      const isNew = j == nValues;
-      destAlt = (!cutoff || j <= cutoff-1)?alt1:alt2;
-      const valText = this.valueAsString(v);
-      const _id = (v == null)? null : v._id;
+      const [i, v] = ev
+      const isNew = j == nValues
+      destAlt = (!cutoff || j <= cutoff - 1) ? alt1 : alt2
+      const valText = this.valueAsString(v)
+      const _id = (v == null) ? null : v._id
       extraClasses = []
-      const reason = reasons[i] || '';
+      const reason = reasons[i] || ''
       if (reason != '') {
-        extraClasses.push('error');
+        extraClasses.push('error')
       }
-      const fragment = makeFragment(i, _id, isNew, valType, extraClasses, valText, size);
+      const fragment = makeFragment(i, _id, isNew, valType, extraClasses, valText, size)
       if (multiple || j == 0) {
-        destAlt.push(fragment);
+        destAlt.push(fragment)
         if (reason != '') {
-          destAlt.push(' ');
-          destAlt.push(<span key={`r_${i}`} className="reason">{reason}</span>)
+          destAlt.push(' ')
+          destAlt.push(<span key={`r_${i}`} className="reason" >{reason}</span>)
         }
-        destAlt.push(' ');
+        destAlt.push(' ')
       }
-    });
+    })
     return this.knead(alt1, alt2)
   }
 
+  kneadControlPlacement = alt1 => control => <span>{alt1}{' '}{control}</span>
+  kneadControl1 = handler => <span className="button-small" onClick={handler} >{'show more'}</span>
+  kneadControl2 = handler => <span className="button-small" onClick={handler} >{'show less'}</span>
+
   knead(alt1, alt2) {
-    const { table, rowId, name } = this.props;
+    const { props: { table, rowId, name } } = this
     if (alt2.length == 0) {return alt1}
     return (
-      <Alternative tag={`field_${table}_${rowId}_${name}`}
-        controlPlacement={control => (<span>{alt1}{' '}{control}</span>)}
-        controls={[
-          (handler => <span className="button-small" onClick={handler}>show more</span>),
-          (handler => <span className="button-small" onClick={handler}>show less</span>),
-        ]}
-        alternatives={[
-          '',
-          alt2,
-        ]}
+      <Alternative
+        tag={`field_${table}_${rowId}_${name}`}
+        controlPlacement={memoBind(this, 'kneadControlPlacement', [], [alt1])}
+        controls={[this.kneadControl1, this.kneadControl2]}
+        alternatives={['', alt2]}
         initial={0}
       />
     )
   }
 
   render() {
-    const { relValues } = this.state;
-    const { label, editable, valType, convert } = this.props;
+    const {
+      props: { label, editable, valType, convert },
+      state: { relValues },
+    } = this
     if (editable && relValues == null && valType == 'rel' && convert != 'user' && convert != 'country') {
-      return null;
+      return null
     }
-    const classNames = editable?'editable':'readonly';
-    const prog = this.progIcon();
-    const values = editable?this.valuesAsControls():this.valuesAsReadonly();
-    const onClick = (editable && this.saveLater) ? {onClick: this.saveField.bind(this)} : {};
+    const prog = this.progIcon()
+    const values = editable ? this.valuesAsControls() : this.valuesAsReadonly()
+    const onClick = (editable && this.saveLater) ? {onClick: this.saveField} : {}
     return (
       <tr>
         <td className="label" {...onClick} >{label}</td>
         <td className="label" {...onClick} >{prog}</td>
-        <td><div className="values">{values}</div></td>
+        <td><div className="values" >{values}</div></td>
       </tr>
     )
   }
@@ -605,19 +612,22 @@ class ItemField extends Component {
  * @returns {Object} The data fetched from the server.
 */
   fetchValues() {
-    let { relValues } = this.state;
-    const { valType, getValues, relValuesMap, convert, userMap, countryMap, table, rowId, name } = this.props;
-    if (valType == 'rel' && convert != 'user' && convert != 'country')  {
+    const {
+      props: { valType, getValues, relValuesMap, convert, table, name, notification },
+      state: { relValues },
+    } = this
+    if (valType == 'rel' && convert != 'user' && convert != 'country') {
       if (relValues == null) {
-        getData([
+        getData(
+          [
             {
               type: 'db',
               path: getValues,
-              branch: 'relValues'
+              branch: 'relValues',
             },
           ],
           this,
-          this.props.notification.component
+          notification.component,
         )
       }
       else {
@@ -628,13 +638,13 @@ class ItemField extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { initValues } = this.props;
-    const { initValues: newInitValues } = nextProps;
+    const { props: { initValues } } = this
+    const { initValues: newInitValues } = nextProps
     if (!isequal(initValues, newInitValues)) {
       this.initEdit(newInitValues)
     }
   }
-  componentDidMount()  {this.fetchValues(); this.fullfillSave()}
+  componentDidMount() {this.fetchValues(); this.fullfillSave()}
   componentDidUpdate() {this.fetchValues(); this.fullfillSave()}
 }
 

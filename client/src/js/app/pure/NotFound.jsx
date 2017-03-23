@@ -1,9 +1,9 @@
-import React from 'react';
+import React from 'react'
 
 /**
  * **purely functional** {@link external:Component|Component}
  *
- * Displays a 404 if no 
+ * Displays a 404 if no
  * {@link external:Routing|route} matches.
  *
  * @class
@@ -11,7 +11,7 @@ import React from 'react';
  * among which the full path (`splat`)
  * @returns {Fragment}
  */
-const NotFound = ({params}) => (<h1>404: <code>{params.splat}</code> not found on this site.</h1>)
+const NotFound = ({params: { splat } }) => (<h1>{'404: '}<code>{splat}</code>{' not found on this site.'}</h1>)
 
 export default NotFound
 

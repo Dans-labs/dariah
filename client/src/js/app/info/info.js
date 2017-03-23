@@ -1,10 +1,10 @@
-/* 
+/*
  * This file does not contain javascript code.
  */
 
 /**
  * ## Technical Documentation
- * 
+ *
  * Suggested starting points
  * * {@link module:main|main} Entry point of the client side application
  * * {@link App} The application class, ancestor of all other interface components
@@ -13,7 +13,7 @@
  *   * {@link external:StatePolicy|StatePolicy} Design choices for stateful components
  * * {@link Login} Authentication in this app
  * * {@link ItemFiltered} Overview of components involved in faceted browsing
- * * {@link module:EUMap|EUMap} All about the European country map 
+ * * {@link module:EUMap|EUMap} All about the European country map
  *
  * @file
  */
@@ -23,7 +23,7 @@
  * This app manages state locally through
  * {@link external:setState|setState()}
  * but with the enhancement that components can save state in a global store.
- * 
+ *
  * So, we do not adopt the full
  * {@link external:Redux|Redux}
  * approach, but
@@ -56,11 +56,11 @@
  * @typedef {Object} Source
  * @property {string} type - either
  * * `db` (mongo db access, results delivered as json)
- * * `json` (file contents delivered as json)  
+ * * `json` (file contents delivered as json)
  * This part will be put after the root url for fetching.
  * @property {string} path - the remaining path to the controller function on the server
  * @property {string} branch - once the data has been fetched, it has to go somewhere.
- * It will go into the {@link external:state|state} of the requesting component, where it 
+ * It will go into the {@link external:state|state} of the requesting component, where it
  * will be assigned to the key given in `branch`.
  * receive the fetched data
  */

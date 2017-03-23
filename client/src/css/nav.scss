@@ -30,6 +30,14 @@ p.nav {
     padding-right: 0.5em;
     padding-left: 0.5em;
 }
+p.nav.top {
+    padding-right: 8em;
+}
+p.nav.top img {
+    margin-bottom: -1em;
+    margin-top: -1em;
+    height: 3em;
+}
 div.nav {
     background-color: $widget-fixed-back;
     padding: 0;
@@ -44,4 +52,8 @@ div.nav {
     border-radius: 6pt;
     padding-right: 0.5em;
     padding-left: 0.5em;
+}
+.resize {
+    font-size: x-small;
+    color: #66ff66;
 }

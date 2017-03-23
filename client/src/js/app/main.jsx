@@ -1,16 +1,16 @@
-import React, { Component } from 'react'
-import { render } from 'react-dom';
-import { Router, Route, Redirect, DefaultRoute, IndexRoute, IndexRedirect, browserHistory } from 'react-router';
+import React from 'react'
+import { render } from 'react-dom'
+import { Router, Route, Redirect, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
 
-import Provider from 'Provider.jsx';
-import App from 'App.jsx';
-import SubApp from 'SubApp.jsx';
-import Backoffice from 'Backoffice.jsx';
-import ItemFiltered from 'ItemFiltered.jsx';
-import ItemMy from 'ItemMy.jsx';
-import ItemRecordPre from 'ItemRecordPre.jsx';
-import Doc from 'Doc.jsx';
-import NotFound from 'NotFound.jsx';
+import Provider from 'Provider.jsx'
+import App from 'App.jsx'
+import SubApp from 'SubApp.jsx'
+import Backoffice from 'Backoffice.jsx'
+import ItemFiltered from 'ItemFiltered.jsx'
+import ItemMy from 'ItemMy.jsx'
+import ItemRecordPre from 'ItemRecordPre.jsx'
+import Doc from 'Doc.jsx'
+import NotFound from 'NotFound.jsx'
 
 /**
  * # Entry point
@@ -26,7 +26,7 @@ import NotFound from 'NotFound.jsx';
  * The second priority is to set up the {@link external:Routing|routes} configuration,
  * i.e. the way urls give rise to activating certain components.
  *
- * <img src="/api/file/tech/docs/design/design.007.jpeg" width="800"/>
+ * <img src="/api/file/tech/docs/design/design.007.jpeg" width="800" />
  *
  * We are talking about *client side* routing.
  * At the server there are other rules that link urls to behaviour.
@@ -54,7 +54,7 @@ import NotFound from 'NotFound.jsx';
  *   of the url.
  *   By means of these `/api/` urls the client can ask for additional data services, from file system or
  *   database.
- *   The server side routing maps these urls to specific controllers that fetch and assemble the 
+ *   The server side routing maps these urls to specific controllers that fetch and assemble the
  *   requested data.
  *
  * @module main
@@ -62,30 +62,30 @@ import NotFound from 'NotFound.jsx';
 
 render(
   <Provider>
-    <Router history={browserHistory}>
-      <Redirect from="/about" to="/docs/about.md"/>
-      <Redirect from="/docs/about" to="/docs/about.md"/>
-      <Redirect from="/about.md" to="/docs/about.md"/>
-      <Redirect from="/login" to="/docs/about.md"/>
-      <Redirect from="/logout" to="/docs/about.md"/>
-      <Redirect from="/slogout" to="/docs/about.md"/>
-      <Route path="/" component={App}>
-        <IndexRoute component={App}/>
-        <IndexRedirect to="/docs/about.md"/>
-        <Route path="docs/:docFile" component={Doc}/>
-        <Route path="tech/docs/gen/:docFile" component={Doc}/>
-        <Route path="tech/docs/:docFile" component={Doc}/>
-        <Route path=":tag" component={SubApp}>
-          <Route path="list" component={ItemFiltered}/>
-          <Route path="mylist" component={ItemMy}>
-            <Route path=":recordId" component={ItemRecordPre} ownOnly={true}/>
+    <Router history={browserHistory} >
+      <Redirect from="/about" to="/docs/about.md" />
+      <Redirect from="/docs/about" to="/docs/about.md" />
+      <Redirect from="/about.md" to="/docs/about.md" />
+      <Redirect from="/login" to="/docs/about.md" />
+      <Redirect from="/logout" to="/docs/about.md" />
+      <Redirect from="/slogout" to="/docs/about.md" />
+      <Route path="/" component={App} >
+        <IndexRoute component={App} />
+        <IndexRedirect to="/docs/about.md" />
+        <Route path="docs/:docFile" component={Doc} />
+        <Route path="tech/docs/gen/:docFile" component={Doc} />
+        <Route path="tech/docs/:docFile" component={Doc} />
+        <Route path=":tag" component={SubApp} >
+          <Route path="list" component={ItemFiltered} />
+          <Route path="mylist" component={ItemMy} >
+            <Route path=":recordId" component={ItemRecordPre} ownOnly={true} />
           </Route>
-          <Route path=":func" component={Backoffice}/>
+          <Route path=":func" component={Backoffice} />
         </Route>
       </Route>
-      <Route path="*" component={NotFound}/>
+      <Route path="*" component={NotFound} />
     </Router>
   </Provider>,
   document.getElementById('body')
-);
+)
 

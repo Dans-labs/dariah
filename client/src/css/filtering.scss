@@ -19,6 +19,9 @@ td.facet {
     font-size: small;
     -webkit-border-vertical-spacing: 0;
 }
+td.facet.mid {
+    padding-left: 0.5em;
+}
 input.facet {
     @include action();
     margin: 0;

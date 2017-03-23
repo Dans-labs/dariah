@@ -15,16 +15,16 @@ import { withContext, saveState } from 'hoc.js'
  * It makes it possible to write MarkDown documents with
  * internal links to this application.
  *
- * A full link (with protocol `http`(`s`) is translated to a 
+ * A full link (with protocol `http`(`s`) is translated to a
  * plain HTML `a` element, so it will leave this application.
  *
- * Other links are translated to Link elements for the 
+ * Other links are translated to Link elements for the
  * {@link external:Routing|router}.
 */
 const RouterLink = ({ children, href }) => (
   href.match(/^(https?:)?\/\//)
-    ? <a href={href}>{children}</a>
-    : <Link to={href}>{children}</Link>
+    ? <a href={href} >{children}</a>
+    : <Link to={href} >{children}</Link>
 )
 
 /**
@@ -44,32 +44,35 @@ class DocMd extends Component {
  * @returns {Fragment}
  */
   render() {
-    const { docName } = this.props;
-    const text = this.state.md;
-    if (text == null ) {
-      return <div/>
+    const {
+      props: { docName },
+      state: { md },
+    } = this
+    const controlPlacement = control => <p style={{float: 'right'}} >{control}</p>
+    const control1 = handler => <a className="control fa fa-hand-o-down" href="#" title="markdown source" onClick={handler} />
+    const control2 = handler => <a className="control fa fa-file-code-o" href="#" title="formatted" onClick={handler} />
+
+    if (md == null) {
+      return <div />
     }
     return (
-      <div style={{paddingLeft: '0.5em'}}>
-        <Alternative tag={docName}
-          controlPlacement={control => (
-            <p style={{float: 'right'}}>{control}</p>
-          )}
-          controls={[
-            (handler => <a ref='toSrc' className='control fa fa-hand-o-down' href='#' onClick={handler} title="markdown source"/>),
-            (handler => <a ref='toFrm' className='control fa fa-file-code-o' href='#' onClick={handler} title="formatted"/>),
-          ]}
-          alternatives={[
-            (<div>
+      <div style={{paddingLeft: '0.5em'}} >
+        <Alternative
+          tag={docName}
+          controlPlacement={controlPlacement}
+          controls={[control1, control2]}
+          alternatives={[(
+            <div key="fmt" >
               <Markdown
-                source={text}
+                source={md}
                 renderers={{Link: RouterLink}}
               />
-            </div>),
-            (<div>
-              <pre className="md-source">{text}</pre>
-            </div>),
-          ]}
+            </div>
+          ), (
+            <div key="src" >
+              <pre className="md-source" >{md}</pre>
+            </div>
+          )]}
         />
       </div>
     )
@@ -83,16 +86,19 @@ class DocMd extends Component {
  * @param {string} docExt the extension the document
  */
   fetchText() {
-    const { docDir, docName, docExt } = this.props;
-    if (this.state.md == null ) {
+    const {
+      props: { docDir, docName, docExt, notification },
+      state: { md },
+    } = this
+    if (md == null) {
       getData(
         [ { type: 'json', path: `${docDir}/${docName}.${docExt}`, branch: 'md' } ],
         this,
-        this.props.notification.component
-      );
+        notification.component
+      )
     }
   }
-  componentDidMount()  {this.fetchText()}
+  componentDidMount() {this.fetchText()}
   componentDidUpdate() {this.fetchText()}
 }
 

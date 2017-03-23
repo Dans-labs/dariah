@@ -22,25 +22,25 @@ class ValueList extends Component {
  * @returns {Fragment}
 */
   constructor(props) {
-    super(props);
-    this.state = {};
+    super(props)
+    this.state = {}
   }
 
   render() {
-    const { fieldValues } = this.state;
+    const { state: { fieldValues } } = this
     if (fieldValues == null) {
-      return <div/>
+      return <div />
     }
     return (
-        <table>
-          <tbody>{
-              fieldValues.map(x => (
-                <tr key={x._id}><td>{x._id}</td><td>{x.value}</td></tr>
-              ))
-            }
-          </tbody>
-        </table>
-      )
+      <table>
+        <tbody>{
+          fieldValues.map(x => (
+            <tr key={x._id} ><td>{x._id}</td><td>{x.value}</td></tr>
+          ))
+        }
+        </tbody>
+      </table>
+    )
   }
 /**
  * @method
@@ -48,10 +48,13 @@ class ValueList extends Component {
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { fieldValues } = this.state;
-    const { fieldName } = this.props;
+    const {
+      props: { fieldName, notification },
+      state: { fieldValues },
+    } = this
     if (fieldValues == null) {
-      getData([
+      getData(
+        [
           {
             type: 'db',
             path: `/value_list?list=${fieldName}`,
@@ -59,8 +62,8 @@ class ValueList extends Component {
           },
         ],
         this,
-        this.props.notification.component
-      );
+        notification.component
+      )
     }
   }
 }

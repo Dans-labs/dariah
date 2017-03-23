@@ -45,15 +45,9 @@ testUsers:
     authority: local
 
 inGroup:
-  - eppn: DirkRoorda@dariah.eu
-    authority: DARIAH
-    group: system
   - eppn: dirk
     authority: local
     group: system
-  - eppn: LisaDeLeeuw@dariah.eu
-    authority: DARIAH
-    group: office
   - eppn: lisa
     authority: local
     group: office
@@ -66,6 +60,18 @@ inGroup:
   - eppn: gertjan
     authority: local
     group: auth
+  - eppn: DirkRoorda@dariah.eu
+    authority: DARIAH
+    group: system
+  - eppn: LisaDeLeeuw@dariah.eu
+    authority: DARIAH
+    group: office
+  - eppn: CarstenThiel@dariah.eu
+    authority: DARIAH
+    group: system
+  - eppn: PaulinRibbe@dariah.eu
+    authority: DARIAH
+    group: office
 
 testOwner:
   contrib:

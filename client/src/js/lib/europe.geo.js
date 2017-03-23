@@ -7,8 +7,8 @@
 /**
  * Contains low resulution geographical coordinates of borders of European countries.
  * These coordinates can be drawn on a map, e.g. by [Leaflet](http://leafletjs.com).
- * 
- * More information, and the computation itself is in 
+ *
+ * More information, and the computation itself is in
  * [countries.ipynb](/api/file/tools/country_compose/countries.html)
  * a Jupyer notebook that you can run for yourself, if you want to tweak the
  * resolution and precision of the border coordinates.

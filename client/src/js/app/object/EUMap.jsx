@@ -5,15 +5,15 @@ import {countryBorders} from 'europe.geo.js'
 import { withContext } from 'hoc.js'
 
 /**
- * A complex component! 
+ * A complex component!
  * It is a facet filter for the field country,
  * and it contains a map of Europe, visualizing by means of markers,
  * how the filter result is distributed over the DARIAH countries.
- * 
+ *
  * Both ingredients of this component are brought together not by
  * class extension but by functional composition.
  *
- * The country facet filter is a true react {@link external:Component|component}. 
+ * The country facet filter is a true react {@link external:Component|component}.
  *
  * The map is a [Leaflet](http://leafletjs.com) module on a blank pane,
  * with a {@link module:europe_geo_js|geojson} file of country boundaries laid out on it.
@@ -39,7 +39,7 @@ const mapOptions = {
   LEVEL_OFF: 10,
   ZOOM_INIT: 3,
   MAP_CENTER: [52, 12],
-  MAP_BOUNDS: [[30, -20], [70,40]],
+  MAP_BOUNDS: [[30, -20], [70, 40]],
   MARKER_COLOR: {
     [true]: {
       color: '#008800',
@@ -70,7 +70,7 @@ const mapOptions = {
       fillColor: '#bbbbbb',
       fillOpacity: 1,
     },
-  }
+  },
 }
 
 /**
@@ -79,29 +79,30 @@ const mapOptions = {
  * When we know the filter results per country, we can put markers on them
  * with a radius in proportion to their scores.
  * However, if the scores are very far apart, either the small markers get invisible,
- * or the big markers get too big. 
+ * or the big markers get too big.
  * We mitigate this effect, by using proportional radii only for values below a certain
  * threshold (LEVEL_OFF). For higher values we essentiall take the square root.
- * 
+ *
  * @function
  * @param {string} iso2 Two-letter country code, see [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
  * @param {number} filteredAmountOthers - how many rows pass all other filters
  * @param {Map} amounts - `filteredAmountOthers`, but more specific: the amounts per faceted value
  * @returns {number} the desired radius for this country
 */
-const computeRadius = (i, filteredAmountOthers, amounts) => { 
-  const amount = amounts ? amounts.has(i) ? amounts.get(i) : 0 : 0;
+const computeRadius = (i, filteredAmountOthers, amounts) => {
+  const amount = amounts ? amounts.has(i) ? amounts.get(i) : 0 : 0
   if (amount == 0) {return 0}
-  const proportional = mapOptions.MAX_RADIUS * amount / filteredAmountOthers;
-  if (filteredAmountOthers < mapOptions.LEVEL_OFF) {return proportional}
-  return mapOptions.LEVEL_OFF * Math.sqrt(proportional);
+  const { MAX_RADIUS, LEVEL_OFF } = mapOptions
+  const proportional = MAX_RADIUS * amount / filteredAmountOthers
+  if (filteredAmountOthers < LEVEL_OFF) {return proportional}
+  return LEVEL_OFF * Math.sqrt(proportional)
 }
 
 /**
  * @class
  * @classdesc
  * **stateless, DOM-modifying** {@link external:Component|Component}
- * 
+ *
  * An ordinary faceted filter on the country field plus a container for the map,
  * with
  * {@link external:LifeCycle|life cycle methods}
@@ -109,12 +110,10 @@ const computeRadius = (i, filteredAmountOthers, amounts) => {
  */
 class EUMap extends Component {
   constructor(props) {
-    super(props);
-    this.features = new Map();
+    super(props)
+    this.features = new Map()
   }
-  setMap(dom) {
-    if (dom) {this.dom = dom}
-  }
+  setMap = dom => {if (dom) {this.dom = dom}}
 /**
  * render() just invokes the ByValue component with the right parameters
  * to get the country facets.
@@ -126,14 +125,13 @@ class EUMap extends Component {
  * @returns {Fragment}
  */
   render() {
-    const { countryMap, ...byValueProps } = this.props;
+    const { props: { countryMap, ...byValueProps }, setMap } = this
     return (
       <div>
         <div
-          ref={this.setMap.bind(this)}
-          style={{height: mapOptions.HEIGHT}}
+          ref={setMap}
         />
-        <ByValue {...byValueProps}/>
+        <ByValue {...byValueProps} />
       </div>
     )
   }
@@ -157,35 +155,39 @@ class EUMap extends Component {
  */
 
   componentDidMount() {
-    const { filterSettings, filteredAmountOthers, amounts, countryMap } = this.props;
-    this.map = L.map(this.dom, {
+    const {
+      props: { filterSettings, filteredAmountOthers, amounts, countryMap },
+      dom,
+    } = this
+    const { HEIGHT, MAP_CENTER, ZOOM_INIT, MAP_BOUNDS, MARKER_COLOR, MARKER_SHAPE, COUNTRY_STYLE } = mapOptions
+    dom.style.height = HEIGHT
+    this.map = L.map(dom, {
       attributionControl: false,
-      center: mapOptions.MAP_CENTER,
-      zoom: mapOptions.ZOOM_INIT,
-      maxBounds: mapOptions.MAP_BOUNDS,
-    });
-    this.idFromIso = new Map([...countryMap.values()].map(d => [d.iso, d._id]));
+      center: MAP_CENTER,
+      zoom: ZOOM_INIT,
+      maxBounds: MAP_BOUNDS,
+    })
+    this.idFromIso = new Map([...countryMap.values()].map(({ iso, _id }) => [iso, _id]))
     L.geoJSON(countryBorders, {
-      style: feature => mapOptions.COUNTRY_STYLE[this.inDariah(feature)],
+      style: feature => COUNTRY_STYLE[this.inDariah(feature)],
       onEachFeature: feature => {
         if (this.inDariah(feature)) {
-          const fprops = feature.properties;
-          const iso2 = fprops.iso2;
-          const i = this.idFromIso.get(iso2);
-          const isOn = filterSettings.get(i);
-          const marker = L.circleMarker([fprops.lat, fprops.lng], {
-            ...mapOptions.MARKER_COLOR[isOn],
+          const { properties: { iso2, lat, lng } } = feature
+          const i = this.idFromIso.get(iso2)
+          const isOn = filterSettings.get(i)
+          const marker = L.circleMarker([lat, lng], {
+            ...MARKER_COLOR[isOn],
             radius: computeRadius(i, filteredAmountOthers, amounts),
-            ...mapOptions.MARKER_SHAPE,
+            ...MARKER_SHAPE,
             pane: 'markerPane',
-          }).addTo(this.map);
-          this.features.set(fprops.iso2, marker);
+          }).addTo(this.map)
+          this.features.set(iso2, marker)
         }
       },
-    }).addTo(this.map);
+    }).addTo(this.map)
   }
 
-  inDariah(feature) {return this.idFromIso.has(feature.properties.iso2)}
+  inDariah = feature => this.idFromIso.has(feature.properties.iso2)
 
 /**
  * After getting new filter results, the only thing we have to do is to
@@ -199,14 +201,16 @@ class EUMap extends Component {
  * @returns {DOM}
  */
   componentDidUpdate() {
-    const { filterSettings, filteredAmountOthers, amounts } = this.props;
+    const { props: { filterSettings, filteredAmountOthers, amounts } } = this
+    const { MARKER_COLOR } = mapOptions
     for (const [iso2, marker] of this.features) {
-      const i = this.idFromIso.get(iso2);
-      const isOn = filterSettings.get(i);
-      marker.setRadius(computeRadius(i, filteredAmountOthers, amounts));
-      marker.setStyle(mapOptions.MARKER_COLOR[isOn]);
+      const i = this.idFromIso.get(iso2)
+      const isOn = filterSettings.get(i)
+      marker.setRadius(computeRadius(i, filteredAmountOthers, amounts))
+      marker.setStyle(MARKER_COLOR[isOn])
     }
   }
 }
 
+EUMap.displayName = 'EUMap'
 export default withContext(EUMap)

@@ -14,10 +14,10 @@ import { lsHas, lsGet, lsSet } from 'localstorage.js'
 /**
  * ## Compiling Filters
  *
- * The compile stage inspects all data rows and sets up facets according to 
+ * The compile stage inspects all data rows and sets up facets according to
  * the values that actually occur in the data.
  *
- * The goal is to collect all the information that is needed to display the 
+ * The goal is to collect all the information that is needed to display the
  * filters and give them an initial state.
  *
  * The filter state is represented as follows:
@@ -30,7 +30,7 @@ import { lsHas, lsGet, lsSet } from 'localstorage.js'
  *     those rows that do not have values in this field.
  *
  * @param {Item[]} records - The list of item records as it comes form mongo db
- * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
+ * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is
  * dependent on the permissions of the current user.
  * @param {Array} filterList - The list of available filters
  * @returns {Map} `fieldValues` - a mapping of the valueId to the valueRepresentation of all values that have
@@ -41,22 +41,22 @@ import { lsHas, lsGet, lsSet } from 'localstorage.js'
  */
 
 const initf = (tag, key, defaultVal) => {
-  const lskey = `flt_${tag}.${key}`;
-  return lsHas(lskey)?lsGet(lskey):defaultVal;
+  const lskey = `flt_${tag}.${key}`
+  return lsHas(lskey) ? lsGet(lskey) : defaultVal
 }
 export const setf = (tag, key, val) => {
-  const lskey = `flt_${tag}.${key}`;
-  lsSet(lskey, val);
+  const lskey = `flt_${tag}.${key}`
+  lsSet(lskey, val)
 }
 
 export function compileFiltering(records, fields, filterList) {
   const presentFilterList = filterList.filter(x => fields[x.field])
-  const filterFields = presentFilterList.filter(x => x.type !== 'FullText').map(x => x.field);
-  const fieldValues = new Map(filterFields.map(f => [f, new Map([['', '-none-']])]));
+  const filterFields = presentFilterList.filter(x => x.type !== 'FullText').map(x => x.field)
+  const fieldValues = new Map(filterFields.map(f => [f, new Map([['', '-none-']])]))
   for (const row of records) {
     for (const field of filterFields) {
-      const fFieldValues = fieldValues.get(field);
-      const metaraw = row[field];
+      const fFieldValues = fieldValues.get(field)
+      const { [field]: metaraw } = row
       if (metaraw != null && metaraw.length !== 0) {
         for (const {_id: valueId, value: valueRep} of metaraw) {
           if (!fFieldValues.has(valueId)) {fFieldValues.set(valueId, valueRep)}
@@ -67,39 +67,39 @@ export function compileFiltering(records, fields, filterList) {
   const filterInit = new Map(presentFilterList.map((filterSpec, filterId) => [
     filterId,
     filterSpec.type === 'FullText' ? initf(filterId, '', '') : new Map(
-      [...fieldValues.get(filterSpec.field).keys()].map(valueId => [valueId, initf(filterId, valueId, true)]
-    ))
-  ]));
+      [...fieldValues.get(filterSpec.field).keys()].map(valueId => [valueId, initf(filterId, valueId, true)])
+    ),
+  ]))
 
   return {
     fieldValues,
     filterInit,
-  };
+  }
 }
 
 /**
  * ## Computing Filters
  *
- * @param {Item[]} items - as in {@link compileFiltering} 
- * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
+ * @param {Item[]} items - as in {@link compileFiltering}
+ * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is
  * dependent on the permissions of the current user.
  * @param {Array} filterList - as in {@link compileFiltering}
- * @param {Map} fieldValues - as in {@link compileFiltering} 
+ * @param {Map} fieldValues - as in {@link compileFiltering}
  * @param {Map} filterSettings - a {@link external:Map|Map} of filters to their current settings
  * @returns {Map} `filteredData` - the sublist of records, the rows that pass all filters
  * @returns {Map} `filteredAmountOthers` - a mapping that indicates for each filter how many rows pass all other filters
  * @returns {Map} `amounts` - a mapping like `filteredAmountOthers`, but more specific: it splits the amount per faceted value
  *
- * With filteredData.length, filteredAmountOthers, amounts we have exactly the right numbers to 
+ * With filteredData.length, filteredAmountOthers, amounts we have exactly the right numbers to
  * render the "(nn of mm)" statistics on the user interface next to each filter and facet.
  */
 export function computeFiltering(records, fields, filterList, fieldValues, filterSettings) {
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterChecks = new Map(presentFilterList.map((filterSpec, filterId) => (
     [filterId, (filterSpec.type === 'FullText' ? fullTextCheck : facetCheck)(filterSpec.field, filterSettings.get(filterId))]
-  )));
-  const filteredData = [];
-  const otherFilteredData = new Map(presentFilterList.map((filterSpec, filterId) => [filterId, []]));
+  )))
+  const filteredData = []
+  const otherFilteredData = new Map(presentFilterList.map((filterSpec, filterId) => [filterId, []]))
 
   /**
    * We determine for every row whether it passes all filters or not.
@@ -110,25 +110,25 @@ export function computeFiltering(records, fields, filterList, fieldValues, filte
     /*
      * Here we record the one filter for which the row fails, if there is such a filter.
      */
-    let the_one_fail = null;
-    let v = true;
-    let discard = false;
+    let theOneFail = null
+    let v = true
+    let discard = false
     for (const [filterId, filterCheck] of filterChecks) {
-      const pass = filterCheck(row);
+      const pass = filterCheck(row)
       if (!pass) {
-        v = false;
-        if (the_one_fail === null) {
+        v = false
+        if (theOneFail === null) {
           /*
            * If no other filters fail, this the the one that fails
            */
-          the_one_fail = filterId;
+          theOneFail = filterId
         }
         else {
           /*
            * More than one filter has failed, the row is uninteresting
            */
-          discard = true;
-          break;
+          discard = true
+          break
         }
       }
     }
@@ -137,27 +137,26 @@ export function computeFiltering(records, fields, filterList, fieldValues, filte
         /*
          * the row has passed all filters
          */
-        filteredData.push(row);
+        filteredData.push(row)
         presentFilterList.forEach((filterSpec, filterId) => {
-          otherFilteredData.get(filterId).push(row);
-        });
+          otherFilteredData.get(filterId).push(row)
+        })
       }
       else {
         /*
          * the row has failed exactly one filter,
          * we store it in its `otherFilteredData`.
          */
-        otherFilteredData.get(the_one_fail).push(row);
+        otherFilteredData.get(theOneFail).push(row)
       }
     }
   }
-  const amounts = new Map(presentFilterList.map((filterSpec, filterId) => {
-    const field = filterSpec.field;
-    return [filterId, filterSpec.type === 'FullText' ? null : countFacets(field, fieldValues.get(field), otherFilteredData.get(filterId))];  
-  }));
+  const amounts = new Map(presentFilterList.map(({ field, type }, filterId) => (
+    [filterId, type === 'FullText' ? null : countFacets(field, fieldValues.get(field), otherFilteredData.get(filterId))]
+  )))
   return {
     filteredData,
-    filteredAmountOthers: new Map([...otherFilteredData.entries()].map(([filterId,x]) => [filterId, x.length])),
+    filteredAmountOthers: new Map([...otherFilteredData.entries()].map(([filterId, x]) => [filterId, x.length])),
     amounts,
   }
 }
@@ -215,37 +214,37 @@ export function computeFiltering(records, fields, filterList, fieldValues, filte
  *   * `data` is a string: the search string entered
  *
  * * if the filter is a Facet:
- *   * `data` is an object {valueId, boolean}: which value has been checked or unchecked;
+ *   * `data` is an object {valueId, boolean}: which value has been checked or unchecked
  *   * `data` is a boolean: when all values have been checked or unchecked in one go
  *
  * @function
- * @param {Map} filterSettings - as in {@link module:filtering.computeFiltering|computeFiltering} 
+ * @param {Map} filterSettings - as in {@link module:filtering.computeFiltering|computeFiltering}
  * @param {number} filterId - the id of the filter that fired an event
  * @returns {Map} `freshFilterSettings` - the nature of the event
  */
 export const newFilterSettings = (filterSettings, filterId, data) => {
   switch (typeof data) {
     case 'boolean': {
-      const filterSetting = filterSettings.get(filterId);
-      filterSettings.set(filterId, new Map([...filterSetting.keys()].map(valueId => [valueId, data])));
-      break;
+      const filterSetting = filterSettings.get(filterId)
+      filterSettings.set(filterId, new Map([...filterSetting.keys()].map(valueId => [valueId, data])))
+      break
     }
     case 'string': {
-      filterSettings.set(filterId, data);
-      break;
+      filterSettings.set(filterId, data)
+      break
     }
     default: {
-      const [valueId, filterSetting] = data;
-      filterSettings.get(filterId).set(valueId, filterSetting);
-      break;
+      const [valueId, filterSetting] = data
+      filterSettings.get(filterId).set(valueId, filterSetting)
+      break
     }
   }
-  return filterSettings;
+  return filterSettings
 }
 
 /**
  * Performs full text lookup in `field` and delivers
- * the result as a {boolean} function of rows. 
+ * the result as a {boolean} function of rows.
  *
  * When the search term is empty, we do not have to inspect the rows:
  * we deliver `x => true`, the *is always true* function.
@@ -258,18 +257,18 @@ export const newFilterSettings = (filterSettings, filterId, data) => {
 const fullTextCheck = (field, term) => {
   const search = term.toLowerCase()
   if (search == null || search == '') {
-    return row => true;
+    return () => true
   }
   return row => {
-    let val = row[field];
-    val = (val != null)?val[0] : val;
-    return val != null && val.toLowerCase().indexOf(search) !== -1;
+    let { [field]: val } = row
+    val = (val != null) ? val[0] : val
+    return val != null && val.toLowerCase().indexOf(search) !== -1
   }
 }
 
 /**
  * Performs a facet filter action in `field` and delivers
- * the result as a {boolean} function of rows. 
+ * the result as a {boolean} function of rows.
  *
  * When the none of the facets have been checked, we do not have to inspect the rows:
  * we deliver `x => false`, the "is always false" function.
@@ -281,19 +280,19 @@ const fullTextCheck = (field, term) => {
  */
 const facetCheck = (field, facetValues) => {
   if (facetValues.size === 0) {
-    return row => false;
+    return () => false
   }
   return row => {
-    const fieldVals = row[field];
+    const { [field]: fieldVals } = row
     if (fieldVals == null || fieldVals.length == 0) {
-      return facetValues.get('');
+      return facetValues.get('')
     }
     for (const {_id: valueId} of fieldVals) {
       if (facetValues.get(valueId)) {
-        return true;
+        return true
       }
     }
-    return false;
+    return false
   }
 }
 
@@ -310,22 +309,21 @@ const facetCheck = (field, facetValues) => {
  * @returns {Map} A mapping from valueIds to the number of times they occurred.
  */
 function countFacets(field, fieldValues, rows) {
-  const facetAmounts = new Map();
+  const facetAmounts = new Map()
   for (const valueId of fieldValues.keys()) {
-    facetAmounts.set(valueId, 0);
+    facetAmounts.set(valueId, 0)
   }
-  for (const row of rows) {
-    const fieldVals = row[field];
+  for (const { [field]: fieldVals } of rows) {
     if (fieldVals == null || fieldVals.length == 0) {
-      facetAmounts.set('', facetAmounts.get('') + 1); 
+      facetAmounts.set('', facetAmounts.get('') + 1)
     }
     else {
       for (const {_id: valueId} of fieldVals) {
-        facetAmounts.set(valueId, facetAmounts.get(valueId) + 1); 
+        facetAmounts.set(valueId, facetAmounts.get(valueId) + 1)
       }
     }
   }
-  return facetAmounts;
+  return facetAmounts
 }
 
 /**
@@ -348,26 +346,26 @@ function countFacets(field, fieldValues, rows) {
  */
 export function placeFacets(fieldValues, maxCols) {
   if (fieldValues == null) {return []}
-  const facets = [...fieldValues.entries()].sort((x,y) => x[1].localeCompare(y[1]));
+  const facets = [...fieldValues.entries()].sort((x, y) => x[1].localeCompare(y[1]))
   if (facets.length == 0) {return []}
-  const rows = [];
-  const lf = facets.length;
-  const nrows = Math.floor(lf / maxCols) + ((lf % maxCols) ? 1 : 0);
-  const ncols = Math.floor(lf / nrows) + ((lf % nrows) ? 1 : 0);
+  const rows = []
+  const { length: lf } = facets
+  const nrows = Math.floor(lf / maxCols) + ((lf % maxCols) ? 1 : 0)
+  const ncols = Math.floor(lf / nrows) + ((lf % nrows) ? 1 : 0)
   for (let r = 0; r < nrows; r++) {
-    const row = [];
-    for (let c = 0; c < ncols;  c++) {
-      const f = nrows * c + r;
-      row.push((f < lf) ? facets[f] : null);
+    const row = []
+    for (let c = 0; c < ncols; c++) {
+      const f = nrows * c + r
+      row.push((f < lf) ? facets[f] : null)
     }
-    rows.push(row);
+    rows.push(row)
   }
-  return rows;
+  return rows
 }
 
 /**
  * The facets of a field can be checked and unchecked collectively by a
- * *collective* checkbox. 
+ * *collective* checkbox.
  * If not all facets are checked, and not all facets are unchecked,
  * the collective checkbox should be in an indeterminate state.
  *
@@ -378,16 +376,16 @@ export function placeFacets(fieldValues, maxCols) {
  * * are they all unchecked?
  */
 export function testAllChecks(filterSettings) {
-  let allTrue = true;
-  let allFalse = true;
+  let allTrue = true
+  let allFalse = true
   for (const valueId of filterSettings.keys()) {
     if (filterSettings.get(valueId)) {
-      allFalse = false;
+      allFalse = false
     }
     else {
-      allTrue = false;
+      allTrue = false
     }
   }
-  return {allTrue: allTrue, allFalse: allFalse};
+  return { allTrue, allFalse }
 }
 

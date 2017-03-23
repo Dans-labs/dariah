@@ -1,9 +1,5 @@
 /* PAGE LAYOUT */
 
-#left, #right {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-}
 td {
     vertical-align: top;
 }
@@ -21,7 +17,8 @@ span.login {
 }
 
 div.sized {
-    height: 100%;
     overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0;
 }
 

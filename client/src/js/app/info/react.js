@@ -1,4 +1,4 @@
-/* 
+/*
  * This file does not contain javascript code.
  */
 
@@ -18,7 +18,7 @@
  *
  * Components can be programmed as classes or as functions.
  * In both cases they can be given the
- * {@link external:PropTypes|types}. 
+ * {@link external:PropTypes|types}.
  * of their incoming properties as metadata.
  *
  * In this app we distinguish between three *capability levels* of components.
@@ -31,7 +31,7 @@
  *
  * ## DOM-manipulating components
  * If a component has to handle the DOM after it has been constructed,
- * e.g. apply some hiding and showing, fill a div with a third party component, 
+ * e.g. apply some hiding and showing, fill a div with a third party component,
  * then we need to program the component as a class with so-called
  * {@link external:LifeCycle| life cycle methods}.
  *
@@ -45,14 +45,14 @@
  * We put all these components in a directory called **state**.
  *
  * @example <caption>pure component</caption>
- * const Widget = ({shape, children}) => <div className={shape}>{children}</div>
+ * const Widget = ({shape, children}) => <div className={shape} >{children}</div>
  *
  * @example <caption>object component (DOM)</caption>
  * class Widget extends Component {
  *  render() {
- *    const {typed} = this.props;
+ *    const {typed} = this.props
  *    return (
- *      <input ref="user" type="text" value={typed}/>
+ *      <input ref="user" type="text" value={typed} />
  *    )
  *  }
  *  componentDidUpdate() {
@@ -62,19 +62,19 @@
  * @example <caption>stateful component</caption>
  * class Widget extends Component {
  *  constructor() {
- *    super();
+ *    super()
  *    this.state = {data: []}
  *  }
  *  render() {
  *    return (
  *      <div>
- *      {this.state.data.map((line, i) => <p key={i}>{line}</p>)
+ *      {this.state.data.map((line, i) => <p key={i} >{line}</p>)
  *      </div>
  *    )
  *  }
  *  componentDidMount() {
- *    const newData = getData();
- *    this.setState(data: newData);
+ *    const newData = getData()
+ *    this.setState(data: newData)
  *  }
  * }
  *
@@ -92,10 +92,10 @@
  * React renders updates to
  * {@link external:Component|components}
  * very efficiently.
- * The 
+ * The
  * {@link external:render|render()}
- * function is a template for a 
- * {@link external:Fragment|element fragment}, not the real 
+ * function is a template for a
+ * {@link external:Fragment|element fragment}, not the real
  * {@link external:DOM|DOM}.
  * So, after an update, it is not costly to recompute the fragment
  * for that component completely, because the DOM is not touched.
@@ -120,13 +120,13 @@
  * ```
  *   <p>foo</p>
  *```
- * React elements reflect HTML elements, but you can mingle them 
- * with React 
+ * React elements reflect HTML elements, but you can mingle them
+ * with React
  * {@link external:Component|components}, which look nearly the same in **jsx**:
  *
  * ```
  *  <p>
- *    <NavLink to="/data">bar</NavLink>
+ *    <NavLink to="/data" >bar</NavLink>
  *  </p>
  *```
  *
@@ -161,7 +161,7 @@
  * In this application, the property names are always clear in the code, either as
  *
  * ```
- * const MyComponent = ({foo, bar)} => ... 
+ * const MyComponent = ({foo, bar)} => ...
  * ```
  *
  * or as
@@ -211,7 +211,7 @@
  * is being
  * {@link https://facebook.github.io/react/docs/react-component.html#render|rendered}
  * this is the method to construct the corresponding React class.
- * It will set up the 
+ * It will set up the
  * {@link external:state|state}.
  *
  * @external constructor
@@ -234,8 +234,8 @@
  * {@link external:Component|component}
  * has been updated due to receiving new properties,
  * this method will be called just after.
- * If DOM manipulations are needed to complete the rendering, this is 
- * the place to do it. 
+ * If DOM manipulations are needed to complete the rendering, this is
+ * the place to do it.
  *
  * *NB:** This will not called upon initial rendering, so if the DOM manipulation
  * is also needed initially, it is handy to write a function for it and
@@ -248,7 +248,7 @@
 /**
  * When a
  * {@link external:Component|component}
- * will be added to the DOM, 
+ * will be added to the DOM,
  * this method will be called just before.
  * This is the first thing that happens after {@link external:constructor|constructor()}.
  *
@@ -272,7 +272,7 @@
 /**
  * When a
  * {@link external:Component|component}
- * will be removed from the DOM, 
+ * will be removed from the DOM,
  * this method will be called just before.
  * If we want to save state, we can hook it up here.
  *
@@ -333,15 +333,15 @@
  * * reacting to user events
  *
  * In both cases, something happens in the outside world that must be remembered.
- * Components remember these things in their 
+ * Components remember these things in their
  * {@link external:state|state}, which only they can update.
  * They can compute derived data from their state and pass that as properties
  * to their children.
  * State updates trigger these computations automatically, and children
  * whose properties are dependent on this state, are rerendered automatically
- * (and economically). 
+ * (and economically).
  *
- * See also 
+ * See also
  * {@link external:Component|components}.
  *
  * @external state
@@ -355,7 +355,7 @@
  * and all components have to subscribe to a state provider, the store.
  *
  * * If a component needs to update the state, it dispatches an action to the store.
- * * So-called *reducers* translate the action into a state update. 
+ * * So-called *reducers* translate the action into a state update.
  * * And then the component can re-render.
  *
  * Using Redux requires a lot of extra code in actions and reducers,
@@ -373,19 +373,19 @@
 /**
  * ## Routing
  *
- * React-router is a convenient library to manage the connection between 
+ * React-router is a convenient library to manage the connection between
  * the url and the part of your app that should be active in response to it.
  *
  * ```
- * <Router history={browserHistory}>
- *   <Route path="/" component={App}>
+ * <Router history={browserHistory} >
+ *   <Route path="/" component={App} >
  *     <Route path="about" component={About} />
  *     <Route path="table" component={ItemList} />
  *   </Route>
  * </Router>
  * ```
  *
- * The router and its routes are basically React 
+ * The router and its routes are basically React
  * {@link external:Component|components}.
  * But they come loaded with some extra behaviour.
  * Basically, when a route is rendered, it checks its `path` attribute with the current url.

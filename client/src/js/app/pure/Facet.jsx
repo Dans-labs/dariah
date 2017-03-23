@@ -1,4 +1,5 @@
 import React from 'react'
+import memoBind from 'memoBind.js'
 
 /**
  * **purely functional** {@link external:Component|Component}
@@ -13,16 +14,22 @@ import React from 'react'
  * @param {number} valueId The id of the value that is displayed in this facet
  * @param {string} valueRep The string representation of the value of this facet (the label next to the checkbox)
  * @param {boolean} cheked Whether the checkbox is checked
- * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
+ * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred
  * @returns {Fragment}
  */
+
+class callBacks {
+  onChange = (filterId, valueId, updFilter) => event => updFilter(filterId, [valueId, event.target.checked])
+}
+const memo = new callBacks()
+
 const Facet = ({ filterId, valueId, valueRep, checked, updFilter }) => (
   <span>
     <input
       type="checkbox"
-      onChange={event => updFilter(filterId, [valueId, event.target.checked])}
       checked={checked}
       className="facet"
+      onChange={memoBind(memo, 'onChange', [filterId, valueId], [updFilter])}
     />
     {` ${valueRep}`}
   </span>

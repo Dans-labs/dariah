@@ -19,7 +19,7 @@ const ItemList = ({ table, title, filteredData, inplace, editStatus }) => {
       <table>
         <tbody>{
         filteredData.map(item => (
-            <ItemHead key={item._id} table={table} title={title} row={item} inplace={inplace}/>
+          <ItemHead key={item._id} table={table} title={title} row={item} inplace={inplace} />
         ))
         }</tbody>
       </table>

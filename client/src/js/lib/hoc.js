@@ -1,12 +1,12 @@
-import React, { Component, PropTypes, Children } from 'react'
+import React, { PropTypes } from 'react'
 
 /**
  * # Higher Order Components
  *
- * React embraces a functional paradigm, where you enhance existing 
+ * React embraces a functional paradigm, where you enhance existing
  * {@link external:Component|components}
- * by composition rather than by class extension. 
- * Put otherwise, you write an enhancer or *decorator* function, that 
+ * by composition rather than by class extension.
+ * Put otherwise, you write an enhancer or *decorator* function, that
  * takes a component as input and returns it wrapped inside another
  * so that the new thing as an extra piece of functionality.
  *
@@ -16,10 +16,10 @@ import React, { Component, PropTypes, Children } from 'react'
  * to enhance.
  * If a react component makes essential use of a life cycle method, it is easier
  * to enhance it by class extension.
- * But even that can be coded as function composition, as 
+ * But even that can be coded as function composition, as
  * {@link saveState} shows.
  *
- * <img src="/api/file/tech/docs/design/design.003.jpeg" width="800"/>
+ * <img src="/api/file/tech/docs/design/design.003.jpeg" width="800" />
  *
  * @module hoc
  */
@@ -42,7 +42,7 @@ import React, { Component, PropTypes, Children } from 'react'
  *
  * The resulting component subscribes to
  * {@link external:context|context}
- * and passes the content of `context.globals` (only the `globals` !) 
+ * and passes the content of `context.globals` (only the `globals` !)
  * to the origianal component as props.
  *
  * These properties are then *magically* present in the methods of the
@@ -59,16 +59,13 @@ import React, { Component, PropTypes, Children } from 'react'
  * We will also declare context properties on this class, so that
  * it can receive them from the {@link Provider}.
  */
-export const withContext = (ComponentInner) => {
-  const ComponentOuter = class extends Component {
-    /**
-     * @method
-     */
-    render() {
-      const newProps = {...this.props, ...this.context.globals};
-      return <ComponentInner {...newProps}/>
-    }
+
+export const withContext = ComponentInner => {
+  const ComponentOuter = (props, context) => {
+    const newProps = {...props, ...context.globals}
+    return <ComponentInner {...newProps} />
   }
+  ComponentOuter.displayName = `wc(${ComponentInner.displayName || ComponentInner.name || 'ComponentInner'})`
   ComponentOuter.contextTypes = {
     globals: PropTypes.object,
   }
@@ -88,7 +85,7 @@ export const withContext = (ComponentInner) => {
  * by having been enhanced by {@link withContext}.
  * We assume that {@link Provider} has created a {@link Store} in {@link globals}.
  *
- * Now the resulting component is a subclass of the original, 
+ * Now the resulting component is a subclass of the original,
  * with enhanced
  * {@link external:constructor|constructor()},
  * {@link external:componentWillReceiveProps|componentWillReceiveProps()}
@@ -99,7 +96,7 @@ export const withContext = (ComponentInner) => {
  * The resulting component will retrieve an existing state, coming from
  * the {@link Store}, before mounting.
  * If there is no such state, the `initialState` parameter will be used.
- * 
+ *
  * And when the component is destroyed, it will save its state in the
  * {@link Store}.
  *
@@ -111,7 +108,7 @@ export const withContext = (ComponentInner) => {
  * for `docName` to the existing component, rather than destroying it and building it from scratch.
  * Now {@link DocMd} uses the stateful {@link Alternative}  component to give the user the choice
  * to view the MarkDown source or the formatted version.
- * When the user switches docs, also this {@link Alternative} just get new props instead of being 
+ * When the user switches docs, also this {@link Alternative} just get new props instead of being
  * unmounted and reconstructed.
  * So our method of saving state should also apply when properties change.
  *
@@ -121,14 +118,14 @@ export const withContext = (ComponentInner) => {
  *
  * * it will be part of the key under which the state will be saved
  * * if it changes, the present state will be saved (with the old value of `tag` as part of the key)
- * * and a previously saved state (with the new value of `tag`) will be loaded. 
+ * * and a previously saved state (with the new value of `tag`) will be loaded.
  *
  * If there is no property `tag` on the orginial component, we take it to be the empty string.
  *
  * @function
  * @param {Component} ComponentInner - the incoming component (the wrappee)
  * @param {string} key - identifier to find the saved state back in the state store
- * @param {initialState} object - the state to start with 
+ * @param {initialState} object - the state to start with
  * @returns {Component} ComponentOuter - the enhanced component (the wrapper)
  *
  * ### Details of the construction of `ComponentOuter`.
@@ -136,9 +133,9 @@ export const withContext = (ComponentInner) => {
  * `setStateKey(tag)`: Composes the `stateKey` from parameter `tag` and property `key`
  * which is already present in `ComponentInner`.
  * `tag` is meant to be the part that distinguishes this between
- * several instances of `ComponentInner`. 
+ * several instances of `ComponentInner`.
  * The `stateKey` is added to `ComponentOuter`.
- * 
+ *
  * `stateLoad()`: An existing state copy is looked up in the {@link Store} under `this.stateKey`
  * and inserted into the state of `ComponentOuter`.
  * If there is no such copy, `this.initialState` is taken (possibly after computing on the basis
@@ -147,7 +144,7 @@ export const withContext = (ComponentInner) => {
  * `stateSave()`: The state of `ComponentInner` is saved in the {@link Store} under `this.stateKey`.
  *
  * The modified {@link external:LifeCycle|lifecycle method}
- * {@link external:constructor|constructor(props)} 
+ * {@link external:constructor|constructor(props)}
  * stores several pieces of information
  * into `ComponentOuter` for use by other methods.
  * * the `key` and `initialState` parameters of `saveState`
@@ -165,48 +162,48 @@ export const withContext = (ComponentInner) => {
  * by a {@link stateLoad} based on the *new* value of prop `tag`.
  */
 
-const getTag = (tag, params) => (tag == null)?((params == null)?null:params.tag):tag
+const getTag = (tag, params) => (tag == null) ? ((params == null) ? null : params.tag) : tag
 
 export const saveState = (ComponentInner, key, initialState) => {
   const ComponentOuter = class extends ComponentInner {
     setStateKey(tag) {
-      const {stateKey, key} = this;
-      this.stateKey = this.key + ((tag==null)?'':`.${tag}`);
+      this.stateKey = this.key + ((tag == null) ? '' : `.${tag}`)
     }
-    stateLoad() {
-      const {store, stateKey, initialState, props} = this;
-      store.load(this, stateKey, ((typeof initialState) == 'function')?initialState(props):initialState)
+    stateLoad(isInit) {
+      const {store, stateKey, initialState, props} = this
+      store.load(this, stateKey, ((typeof initialState) == 'function') ? initialState(props) : initialState, isInit)
     }
     stateSave() {
-      const {store, stateKey} = this;
-      store.save(this, stateKey);
+      const {store, stateKey} = this
+      store.save(this, stateKey)
     }
     constructor(props) {
-      super(props);
-      const { store, tag, params } = props;
-      this.store = store;
-      this.tag = getTag(tag, params);
-      this.key = key;
-      this.initialState = initialState;
-      this.setStateKey(tag);
-      this.stateLoad();
+      super(props)
+      const { store, tag, params } = props
+      this.store = store
+      this.tag = getTag(tag, params)
+      this.key = key
+      this.initialState = initialState
+      this.setStateKey(tag)
+      this.stateLoad(true)
     }
     componentWillUnmount() {
       if (super.componentWillUnmount != null) {super.componentWillUnmount()}
       this.stateSave()
     }
     componentWillReceiveProps(newProps) {
-      const { tag: oldTag, params: oldParams } = this.props;
-      const { tag, params } = newProps;
-      const realTag = getTag(tag, params);
-      const oldRealTag = getTag(oldTag, oldParams);
-      if (oldRealTag !== realTag) {
-        this.stateSave();
-        this.setStateKey(realTag);
-        this.stateLoad();
-      }
       if (super.componentWillReceiveProps != null) {super.componentWillReceiveProps(newProps)}
+      const { props: { tag: oldTag, params: oldParams } } = this
+      const { tag, params } = newProps
+      const realTag = getTag(tag, params)
+      const oldRealTag = getTag(oldTag, oldParams)
+      if (oldRealTag !== realTag) {
+        this.stateSave()
+        this.setStateKey(realTag)
+        this.stateLoad(false)
+      }
     }
   }
+  ComponentOuter.displayName = `ss(${ComponentInner.displayName || ComponentInner.name || 'ComponentInner'})`
   return ComponentOuter
 }

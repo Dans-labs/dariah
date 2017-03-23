@@ -17,7 +17,7 @@ import { withContext, saveState } from 'hoc.js'
 class FilterCompute extends Component {
 /**
  * User events received by children should use this callback to
- * trigger state updates here. 
+ * trigger state updates here.
  * The callback collects a few pieces of information, which
  * it passes to {@link module:filtering.newFilterSettings|newFilterSettings} to
  * update the state.
@@ -26,45 +26,48 @@ class FilterCompute extends Component {
  * @param {string} filterId The id of the filter where a user event happened
  * @param {Object} data Data describing what user event has happened.
  */
-  updFilter(filterId, data) {
-    const { filterSettings } = this.state;
+  updFilter = (filterId, data) => {
+    const { state: { filterSettings } } = this
     if (typeof data == 'string') {
       setf(filterId, '', data)
     }
     else if (typeof data == 'boolean') {
-      for (const [fval, fset] of filterSettings.get(filterId).entries()) {
+      for (const fval of filterSettings.get(filterId)) {
         setf(filterId, fval, data)
       }
     }
     else {
       setf(filterId, data[0], data[1])
     }
-    this.setState({
-      filterSettings: newFilterSettings(filterSettings, filterId, data)
-    });
+    this.setState({ filterSettings: newFilterSettings(filterSettings, filterId, data) })
   }
 /**
  * Calls {@link module:filtering.computeFiltering|computeFiltering} before the actual rendering.
  *
  * @param {Map} filterSettings (from *state*) The current state of the facets belonging to this filter
  * Organized as a {Map} keyed by Two-letter country codes.
- * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is 
+ * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is
  * dependent on the permissions of the current user.
- * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
+ * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred
  * @returns {Fragment}
  */
   render() {
-    const { filterSettings } = this.state;
-    const { table, title, records, fields, fieldValues, filterList } = this.props;
     const {
-      filteredData, filteredAmountOthers, amounts
+      props: { table, title, records, fields, fieldValues, filterList, ui },
+      state: { filterSettings },
+    } = this
+    const {
+      filteredData, filteredAmountOthers, amounts,
     } = computeFiltering(
-      records, fields, filterList, fieldValues, filterSettings
-    );
+      records, fields, filterList, fieldValues, filterSettings,
+    )
     return (
       <div>
-        <div style={columnStyle('rightLeft')}>
-          <p>Total <span className="good-o">{records.length}</span></p>
+        <div
+          className="sized"
+          style={columnStyle('rightLeft', ui)}
+        >
+          <p>{'Total '}<span className="good-o" >{records.length}</span></p>
           <Filter
             table={table}
             fields={fields}
@@ -74,11 +77,14 @@ class FilterCompute extends Component {
             amounts={amounts}
             filterList={filterList}
             filterSettings={filterSettings}
-            updFilter={this.updFilter.bind(this)}
+            updFilter={this.updFilter}
           />
         </div>
-        <div style={columnStyle('rightRight')}>
-          <ItemList table={table} title={title} filteredData={filteredData} inplace={true}/>
+        <div
+          className="sized"
+          style={columnStyle('rightRight', ui)}
+        >
+          <ItemList table={table} title={title} filteredData={filteredData} inplace={true} />
         </div>
       </div>
     )

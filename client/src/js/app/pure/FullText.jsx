@@ -1,7 +1,6 @@
 import React from 'react'
 import Stat from 'Stat.jsx'
-
-const onType = (updFilter, filterId) => event => updFilter(filterId, event.target.value)
+import memoBind from 'memoBind.js'
 
 /**
  * **purely functional** {@link external:Component|Component}
@@ -18,25 +17,32 @@ const onType = (updFilter, filterId) => event => updFilter(filterId, event.targe
  * @param {string} filterField The name of the field in the item list whose values are being filtered
  * @param {string} filterSettings  The currently entered search string in the input box
  * @param {number} filteredAmount The number of rows that have passed all filters
- * @param {number} filteredAmountOthers The number of rows that have passed all other filters  
- * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
+ * @param {number} filteredAmountOthers The number of rows that have passed all other filters
+ * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred
  * @returns {Fragment}
  */
+
+class callBacks {
+  onType = (filterId, updFilter) => event => updFilter(filterId, event.target.value)
+}
+const memo = new callBacks()
+
 const FullText = ({
   filterId, filterField, filterLabel,
   filterSettings,
   filteredAmount, filteredAmountOthers,
-  updFilter
+  updFilter,
 }) => (
   <div>
-    <p><input
+    <p title={`Search in ${filterField}`} >
+      <input
         type="text"
         className="search"
         placeholder={`search in ${filterLabel}`}
         value={filterSettings}
-        onChange={onType(updFilter, filterId)}
-    />{' '}
-      <Stat subTotal={filteredAmount} total={filteredAmountOthers}/>
+        onChange={memoBind(memo, 'onType', [filterId], [updFilter])}
+      />{' '}
+      <Stat subTotal={filteredAmount} total={filteredAmountOthers} />
     </p>
   </div>
 )

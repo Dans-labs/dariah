@@ -21,7 +21,7 @@ const indeterminate = states => !states.allTrue && !states.allFalse
 
 class CheckboxI extends Component {
   componentDidUpdate() {
-    const { states } = this.props;
+    const { props: { states } } = this
     this.dom.indeterminate = indeterminate(states)
   }
 /**
@@ -29,27 +29,28 @@ class CheckboxI extends Component {
  * @param {boolean[]} states Exactly two booleans, indicating whether the associate checkboxes
  * are all checked or all unchecked
  * @param {number} filterId The index of the filter in the filterList
- * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred 
+ * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred
  * @returns {Fragment}
 */
-  onCheck(updFilter, filterId, states){
-    return event => updFilter(filterId, this.dom.indeterminate || !states.allTrue)
+  handleCheck = () => {
+    const { props: {states, filterId, updFilter } } = this
+    return updFilter(filterId, this.dom.indeterminate || !states.allTrue)
   }
-  setIndeterminate(domElem) {
-    const { states } = this.props;
+  setIndeterminate = domElem => {
+    const { props: { states } } = this
     if (domElem) {
-      this.dom = domElem;
-      domElem.indeterminate = indeterminate(states);
+      this.dom = domElem
+      domElem.indeterminate = indeterminate(states)
     }
   }
-  render () {
-    const { states, filterId, updFilter } = this.props;
+  render() {
+    const { props: { states } } = this
     return (
       <input
-          ref={this.setIndeterminate.bind(this)}
+          ref={this.setIndeterminate}
           type="checkbox"
-          onChange={this.onCheck(updFilter, filterId, states).bind(this)}
           checked={states.allTrue}
+          onChange={this.handleCheck}
       />
     )
   }

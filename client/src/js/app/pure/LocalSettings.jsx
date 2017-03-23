@@ -11,11 +11,15 @@ import { lsClear } from 'localstorage.js'
  * @class
  * @returns {Fragment}
 */
+const handle = () => {
+  lsClear()
+}
+
 const LocalSettings = () => (
   <span
     className="button-small fa fa-eraser"
     title="forget my settings"
-    onClick={event=>{lsClear()}}
+    onClick={handle}
   />
 )
 

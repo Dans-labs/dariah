@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import LocalSettings  from 'LocalSettings.jsx'
+import LocalSettings from 'LocalSettings.jsx'
 import { withContext, saveState } from 'hoc.js'
 import { getData } from 'data.js'
 
@@ -9,7 +9,7 @@ import { getData } from 'data.js'
  * **stateful** {@link external:Component|Component}
  *
  * ## Authentication
- * <img src="/api/file/tech/docs/design/design.004.jpeg" width="800"/>
+ * <img src="/api/file/tech/docs/design/design.004.jpeg" width="800" />
  *
  * This component takes care of login/logout.
  * The actual login/logout actions take place at the server, by visiting `/login`,
@@ -29,26 +29,28 @@ import { getData } from 'data.js'
  */
 class Login extends Component {
   render() {
-    const {user} = this.state;
-    const {userInfo} = this.props;
-    userInfo.clear();
+    const {
+      props: { userInfo },
+      state: { user },
+    } = this
+    userInfo.clear()
     for (const k of Object.keys(user)) {
-      userInfo.set(k, user[k]);
+      userInfo.set(k, user[k])
     }
     return (
-      <span className="login">
-        { user.eppn && Object.keys(user).length > 0 ? (
-        <span>
-          <strong className="fa fa-user" title={user.eppn}>{user.eppn.split('@')[0]}</strong>
-          <span className="fa fa-hashtag"/>{user.authority}{' '}
-          <em>{user.groupDesc || 'not authenticated'}</em>
-          <a href="/logout" className="control fa fa-user-times" title="log out"/>
-          <a href="/slogout" className="control fa fa-users" title="sign out"/>
-        </span>
+      <span className="login" >{
+        user.eppn && Object.keys(user).length > 0 ? (
+          <span>
+            <strong className="fa fa-user" title={user.eppn} >{user.eppn.split('@')[0]}</strong>
+            <span className="fa fa-hashtag" />{user.authority}{' '}
+            <em>{user.groupDesc || 'not authenticated'}</em>
+            <a href="/logout" className="control fa fa-user-times" title="log out" />
+            <a href="/slogout" className="control fa fa-users" title="sign out" />
+          </span>
         ) : (
-        <a href="/login" className="control fa fa-user-plus">{' login'}</a>
+          <a href="/login" className="control fa fa-user-plus" >{' login'}</a>
         )}
-        <LocalSettings/>
+        <LocalSettings />
       </span>
     )
   }
@@ -57,10 +59,11 @@ class Login extends Component {
    * @method
    */
   componentDidMount() {
+    const { props: { notification } } = this
     getData(
       [ { type: 'db', path: '/who/ami', branch: 'user' } ],
       this,
-      this.props.notification.component
+      notification.component
     )
   }
 }

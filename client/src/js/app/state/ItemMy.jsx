@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 
 import ItemList from 'ItemList.jsx'
-import ItemRecordPre from 'ItemRecordPre.jsx';
 
 import { getData } from 'data.js'
 import { withContext, saveState } from 'hoc.js'
@@ -30,26 +29,23 @@ class ItemMy extends Component {
  * Organized as a {Map} keyed by Two-letter country codes.
  * @returns {Fragment}
 */
-  inserted(data) {
-    const { params } = this.props;
-    const { tag } = params;
-    this.setState({inserted: data})
+  inserted = data => {
+    const { props: { params: { tag }, router } } = this
     if (data != null) {
-      const { router } = this.props;
-      router.push(`/${tag}/mylist/${data}`);
+      router.push(`/${tag}/mylist/${data}`)
     }
   }
 
-  insertRow(event) {
-    event.preventDefault();
-    const { params } = this.props;
-    const { tag } = params;
-    getData([
+  handleInsert = event => {
+    event.preventDefault()
+    const { props: { params: { tag }, notification } } = this
+    getData(
+      [
         {
           type: 'db',
           path: `/mod?table=${tag}&action=insert`,
           branch: 'insert',
-          callback: this.inserted.bind(this),
+          callback: this.inserted,
         },
         {
           type: 'db',
@@ -58,30 +54,27 @@ class ItemMy extends Component {
         },
       ],
       this,
-      this.props.notification.component
-    );
+      notification.component
+    )
   }
 
-  deleted(data) {
-    const { params, router } = this.props;
-    const { tag } = params;
-    this.setState({deleted: data})
+  deleted = data => {
+    const { props: { params: { tag }, router } } = this
     if (data != null) {
-      const { router } = this.props;
-      router.push(`/${tag}/mylist`);
+      router.push(`/${tag}/mylist`)
     }
   }
 
-  deleteRow(recordId, event) {
-    event.preventDefault();
-    const { params } = this.props;
-    const { tag } = params;
-    getData([
+  deleteRow = recordId => event => {
+    event.preventDefault()
+    const { props: { params: { tag }, notification } } = this
+    getData(
+      [
         {
           type: 'db',
           path: `/mod?table=${tag}&action=delete`,
           branch: `delete`,
-          callback: this.deleted.bind(this),
+          callback: this.deleted,
           data: {_id: recordId},
         },
         {
@@ -91,38 +84,44 @@ class ItemMy extends Component {
         },
       ],
       this,
-      this.props.notification.component
-    );
+      notification.component
+    )
   }
 
   render() {
-    const { listData, countryData, userData } = this.state;
-    const { params, userMap, countryMap, children, delCallback } = this.props;
-    const { tag } = params;
+    const {
+      props: { params: { tag }, userMap, countryMap, children, parentList, ui },
+      state: { listData, countryData, userData },
+    } = this
     if (listData == null || countryData == null || userData == null) {
-      return <div/>
+      return <div />
     }
-    const { records, fields, title, perm } = listData;
+    const { records, title, perm } = listData
     for (const x of userData) {userMap.set(x._id, x)}
     for (const x of countryData) {countryMap.set(x._id, x)}
-    delCallback[tag] = this.deleteRow.bind(this);
+    parentList[tag] = this
     return (
       <div>
-        <div className="nav" style={columnStyle('rightLeftNav')}>
+        <div
+          className="nav sized"
+          style={columnStyle('rightLeftNav', ui)}
+        >
           <p>
-            {records.length} items
-            {' '}
-            {(perm != null && perm.insert)? (
+            {`${records.length} items `}
+            {(perm != null && perm.insert) ? (
               <span
                 className="fa fa-plus button-large insert"
                 title="New item"
-                onClick={this.insertRow.bind(this)}
+                onClick={this.handleInsert}
               />
-            ): null}
+            ) : null}
           </p>
-          <ItemList table={tag} title={title} filteredData={records} inplace={false}/>
+          <ItemList table={tag} title={title} filteredData={records} inplace={false} />
         </div>
-        <div style={columnStyle('rightRightBody')}>
+        <div
+          className="sized"
+          style={columnStyle('rightRightBody', ui)}
+        >
           { children }
         </div>
       </div>
@@ -136,11 +135,13 @@ class ItemMy extends Component {
  * @returns {Object} The data fetched from the server.
 */
   componentDidMount() {
-    const { params } = this.props;
-    const { tag } = params;
-    const { listData, countryData, userData, inserted, deleted } = this.state;
+    const {
+      props: { params: { tag }, notification },
+      state: { listData, countryData, userData },
+    } = this
     if (listData == null || countryData == null || userData == null) {
-      getData([
+      getData(
+        [
           {
             type: 'db',
             path: `/my?table=${tag}`,
@@ -158,27 +159,11 @@ class ItemMy extends Component {
           },
         ],
         this,
-        this.props.notification.component
-      );
-    }
-    else if (inserted && deleted) {
-      newState = {}
-      if (inserted) {newState.inserted = null}
-      if (deleted) {newState.deleted = null}
-      this.setState({...newState})
-      getData([
-          {
-            type: 'db',
-            path: `/my?table=${tag}`,
-            branch: 'listData',
-          },
-        ],
-        this,
-        this.props.notification.component
-      );
+        notification.component
+      )
     }
   }
 }
 
-export default withContext(saveState(ItemMy, 'ItemMy', {listData: null, countryData: null, userData: null, inserted: null}))
+export default withContext(saveState(ItemMy, 'ItemMy', {listData: null, countryData: null, userData: null }))
 
