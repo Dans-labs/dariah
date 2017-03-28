@@ -3,24 +3,7 @@ import React, { Component } from 'react'
 import { getData } from 'data.js'
 import { withContext, saveState } from 'hoc.js'
 
-/**
- * @class
- * @classdesc
- *
- * **stateful** {@link external:Component|Component}
- *
- * ## A value list
- *
- * Displays all values for a field in the item list.
- *
- */
 class ValueList extends Component {
-/**
- *
- * @method
- * @param {string} fieldName The name of the field to obtain the values from.
- * @returns {Fragment}
-*/
   constructor(props) {
     super(props)
     this.state = {}
@@ -42,11 +25,6 @@ class ValueList extends Component {
       </table>
     )
   }
-/**
- * @method
- * @param {Value[]} values (from *state*) The list of distinct field values as it comes form mongo db
- * @returns {Object} The data fetched from the server.
-*/
   componentDidMount() {
     const {
       props: { fieldName, notification },

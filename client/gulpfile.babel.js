@@ -1,14 +1,14 @@
-import gulp        from 'gulp';
-import browserify  from 'browserify';
-import babelify    from 'babelify';
-import source      from 'vinyl-source-stream';
-import buffer      from 'vinyl-buffer';
-import uglify      from 'gulp-uglify';
-import sass        from 'gulp-sass';
-import sourcemaps  from 'gulp-sourcemaps';
-import eslint      from 'gulp-eslint';
-import jsdoc       from 'gulp-jsdoc3';
-import globby      from 'globby';
+import gulp        from 'gulp'
+import browserify  from 'browserify'
+import babelify    from 'babelify'
+import source      from 'vinyl-source-stream'
+import buffer      from 'vinyl-buffer'
+import uglify      from 'gulp-uglify'
+import sass        from 'gulp-sass'
+import sourcemaps  from 'gulp-sourcemaps'
+import eslint      from 'gulp-eslint'
+import jsdoc       from 'gulp-jsdoc3'
+import globby      from 'globby'
  
 /* Config settings */
 
@@ -45,9 +45,14 @@ const pathsApp = globby.sync([`${pathApp}/*`, `!${pathApp}/*.jsx`])
 const mDependencies = globby.sync('*.js', {cwd: pathLib})
 const vDependencies = [
 	'react',
+  'react-addons-update',
   'react-dom',
   'react-markdown',
   'react-router',
+  'react-redux',
+  'redux',
+  'redux-thunk',
+  'redux-logger',
   'leaflet',
   'whatwg-fetch'
 ]
@@ -142,16 +147,29 @@ function lint() {
 }
 
 function buildjsDevApp() {
-  const appBundle = browserify({entries: entry, debug: true, paths: pathsApp});
+  const appBundle = browserify({
+    entries: entry,
+    debug: true,
+    paths: pathsApp,
+    transform: [['envify', {NODE_ENV: 'development', global: true}]],
+  });
   stripDeps(appBundle);
   return transform(appBundle, {sourceMaps: true})
 }
 
 function buildjsDevLib() {
-  return transform(browserify({require: mDependencies, debug: true, paths: pathsLib}), {src: lib})
+  return transform(browserify({
+    require: mDependencies,
+    debug: true,
+    paths: pathsLib,
+    transform: [['envify', {NODE_ENV: 'development', global: true}]],
+  }), {src: lib})
 }
 function buildjsDevFramework() {
-  return transform(browserify({require: vDependencies, debug: true}), {src: framework, es6: false})
+  return transform(browserify({
+    require: vDependencies,
+    debug: true,
+  }), {src: framework, es6: false})
 }
  
 function buildjsDev() {
@@ -166,9 +184,22 @@ function buildjsDev() {
 /* Production tasks */
 
 function buildjsProd() {
-  transform(browserify({require: mDependencies, debug: false, paths: pathsLib}), {src: lib, compress: true});
-  transform(browserify({require: vDependencies, debug: false}), {src: framework, es6: false, compress: true});
-  const appBundle = browserify({entries: entry, debug: false, paths: pathsApp});
+  transform(browserify({
+    require: mDependencies,
+    debug: false,
+    paths: pathsLib,
+    transform: [['envify', {NODE_ENV: 'production', global: true}]],
+  }), {src: lib, compress: true});
+  transform(browserify({
+    require: vDependencies,
+    debug: false,
+  }), {src: framework, es6: false, compress: true});
+  const appBundle = browserify({
+    entries: entry,
+    debug: false,
+    paths: pathsApp,
+    transform: [['envify', {NODE_ENV: 'production', global: true}]],
+  });
   stripDeps(appBundle);
   return transform(appBundle, {src: app, sourceMaps: false, compress: true})
 }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import Markdown from 'react-markdown'
 import isequal from 'lodash/isequal'
 
@@ -29,15 +30,15 @@ const normalizeValues = ({initValues, relValuesMap, table, name }) => {
   return { curValues, savedValues, reasons: {}, saving: {}, changed: false, valid: true, relValues }
 }
 
-const userAsString = ({ _id: valId }, userMap) => {
+const userAsString = ({ _id: valId }, user) => {
   let valRep
   let valShort
-  if (!userMap.has(valId)) {
+  const userData = user[valId]
+  if (!userData) {
     valRep = 'UNKNOWN'
     valShort = '??'
   }
   else {
-    const userData = userMap.get(valId)
     const fname = userData.firstName || ''
     const lname = userData.lastName || ''
     const email = userData.email || ''
@@ -60,15 +61,15 @@ const userAsString = ({ _id: valId }, userMap) => {
   return { text: valShort, full: valRep }
 }
 
-const countryAsString = ({ _id: valId }, countryMap) => {
+const countryAsString = ({ _id: valId }, country) => {
   let valRep
   let valShort
-  if (!countryMap.has(valId)) {
+  const countryData = country[valId]
+  if (!countryData) {
     valRep = 'UNKNOWN'
     valShort = '??'
   }
   else {
-    const countryData = countryMap.get(valId)
     const { name, iso } = countryData
     valShort = name
     valRep = `${iso}: ${name}`
@@ -117,26 +118,7 @@ const validate = (val, valType, validation) => {
   return { vstatus, reason }
 }
 
-/**
- * @class
- * @classdesc
- *
- * **stateful** {@link external:Component|Component}
- *
- * ## A single record
- *
- * Displays all fields that the user is allowed to read.
- * With a control to edit the record.
- *
- */
 class ItemField extends Component {
-/**
- *
- * @method
- * @param {Item[]} listData (from *state*) The list of records as it comes form mongo db,
- * plus a list of fields that is provided for each row (dependent on user permissions)
- * @returns {Fragment}
-*/
 
   initEdit(initValues) {
     this.setState({
@@ -317,16 +299,16 @@ class ItemField extends Component {
   }
 
   valueAsString(valRaw) {
-    const { props: { valType, convert, userMap, countryMap, initial } } = this
+    const { props: { valType, convert, user, country, initial } } = this
     if (valRaw == null) {return { text: '', full: '', initial: (valType == 'rel') ? true : initial }}
     switch (valType) {
       case 'rel': {
         switch (convert) {
           case 'user': {
-            return userAsString(valRaw, userMap)
+            return userAsString(valRaw, user)
           }
           case 'country': {
-            return countryAsString(valRaw, countryMap)
+            return countryAsString(valRaw, country)
           }
           default: {return condense(valRaw.value)}
         }
@@ -368,12 +350,12 @@ class ItemField extends Component {
     return relValues.map(rv => [rv._id, condense(rv.value)])
   }
   userOptions() {
-    const { props: { userMap } } = this
-    return [...userMap.values()].map(rv => [rv._id, this.valueAsString(rv)])
+    const { props: { user } } = this
+    return [...user].map(rv => [rv._id, this.valueAsString(rv)])
   }
   countryOptions() {
-    const { props: { countryMap } } = this
-    return [...countryMap.values()].map(rv => [rv._id, this.valueAsString(rv)])
+    const { props: { country } } = this
+    return [...country].map(rv => [rv._id, this.valueAsString(rv)])
   }
 
   relSelect(i, _id, isNew, extraClasses, valText) {
@@ -606,11 +588,6 @@ class ItemField extends Component {
     )
   }
 
-/**
- * @method
- * @param {Item[]} records (from *state*) The list of records as it comes form mongo db
- * @returns {Object} The data fetched from the server.
-*/
   fetchValues() {
     const {
       props: { valType, getValues, relValuesMap, convert, table, name, notification },
@@ -648,4 +625,10 @@ class ItemField extends Component {
   componentDidUpdate() {this.fetchValues(); this.fullfillSave()}
 }
 
-export default withContext(saveState(ItemField, 'ItemField', normalizeValues))
+const mapStateToProps = ({ tables: { user, country } }) => {
+  return { user, country }
+}
+
+export default connect(mapStateToProps)(
+  withContext(saveState(ItemField, 'ItemField', normalizeValues))
+)

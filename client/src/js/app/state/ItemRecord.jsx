@@ -1,31 +1,12 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import ItemField from 'ItemField.jsx'
 
 import { getData } from 'data.js'
 import { withContext, saveState } from 'hoc.js'
 import memoBind from 'memoBind.js'
 
-/**
- * @class
- * @classdesc
- *
- * **stateful** {@link external:Component|Component}
- *
- * ## A single record
- *
- * Displays all fields that the user is allowed to read.
- * With a control to edit the record.
- *
- */
-
 class ItemRecord extends Component {
-/**
- *
- * @method
- * @param {Item[]} listData (from *state*) The list of records as it comes form mongo db,
- * plus a list of fields that is provided for each row (dependent on user permissions)
- * @returns {Fragment}
-*/
   updMod = modifiedRowData => {
     const updRow = ({ fieldData: { row, ...oldFieldData } }) => ({
       ...oldFieldData,
@@ -122,7 +103,7 @@ class ItemRecord extends Component {
 
   render() {
     const {
-      props: { table, parentList },
+      props: { table, lists },
       state: { fieldData: { row, perm } },
     } = this
     if (row == null) {
@@ -133,7 +114,7 @@ class ItemRecord extends Component {
     const elemText = noChange ? 'all saved' : (allValid ? 'save changes' : 'make corrections')
     const { _id: rowId } = row
     const { fragments, hasEditable } = this.parseFields()
-    const { [table]: parent } = parentList
+    const { [table]: parent } = lists
     return (
       <div className="widget-medium" >
         <p>
@@ -168,10 +149,6 @@ class ItemRecord extends Component {
       </div>
     )
   }
-/**
- * @method
- * @returns {Object} The data fetched from the server.
-*/
   fetchRow() {
     const {
       props: { table, recordId, ownOnly, notification },
@@ -195,10 +172,14 @@ class ItemRecord extends Component {
   componentDidUpdate() {this.fetchRow()}
 }
 
-export default withContext(saveState(ItemRecord, 'ItemRecord', {
-  fieldData: {},
-  changed: {},
-  valid: {},
-  saveConcern: false,
-}))
+const mapStateToProps = ({ lists }) => ({ lists })
+
+export default connect(mapStateToProps)(
+  withContext(saveState(ItemRecord, 'ItemRecord', {
+    fieldData: {},
+    changed: {},
+    valid: {},
+    saveConcern: false,
+  }))
+)
 

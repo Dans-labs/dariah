@@ -1,31 +1,13 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import ItemList from 'ItemList.jsx'
 import Filter from 'Filter.jsx'
 
 import { newFilterSettings, computeFiltering, setf } from 'filtering.js'
-import { columnStyle } from 'ui.js'
+import { columnStyle } from 'window.js'
 import { withContext, saveState } from 'hoc.js'
 
-/**
- * @class
- * @classdesc
- * **stateful** {@link external:Component|Component}
- *
- * Parent component of all filters.
- * The filter state (`filterSettings`) are maintained here.
- */
 class FilterCompute extends Component {
-/**
- * User events received by children should use this callback to
- * trigger state updates here.
- * The callback collects a few pieces of information, which
- * it passes to {@link module:filtering.newFilterSettings|newFilterSettings} to
- * update the state.
- *
- * @callback
- * @param {string} filterId The id of the filter where a user event happened
- * @param {Object} data Data describing what user event has happened.
- */
   updFilter = (filterId, data) => {
     const { state: { filterSettings } } = this
     if (typeof data == 'string') {
@@ -41,33 +23,23 @@ class FilterCompute extends Component {
     }
     this.setState({ filterSettings: newFilterSettings(filterSettings, filterId, data) })
   }
-/**
- * Calls {@link module:filtering.computeFiltering|computeFiltering} before the actual rendering.
- *
- * @param {Map} filterSettings (from *state*) The current state of the facets belonging to this filter
- * Organized as a {Map} keyed by Two-letter country codes.
- * @param {Object} fields - Contains the fields that mongo db has supplied for each row. This is
- * dependent on the permissions of the current user.
- * @param {FilterCompute#updFilter} updFilter Callback to update the state when user event has occurred
- * @returns {Fragment}
- */
   render() {
     const {
-      props: { table, title, records, fields, fieldValues, filterList, ui },
+      props: { table, title, records, order, fields, fieldValues, filterList, height, width },
       state: { filterSettings },
     } = this
     const {
       filteredData, filteredAmountOthers, amounts,
     } = computeFiltering(
-      records, fields, filterList, fieldValues, filterSettings,
+      records, order, fields, filterList, fieldValues, filterSettings,
     )
     return (
       <div>
         <div
           className="sized"
-          style={columnStyle('rightLeft', ui)}
+          style={columnStyle('rightLeft', { height, width })}
         >
-          <p>{'Total '}<span className="good-o" >{records.length}</span></p>
+          <p>{'Total '}<span className="good-o" >{order.length}</span></p>
           <Filter
             table={table}
             fields={fields}
@@ -82,7 +54,7 @@ class FilterCompute extends Component {
         </div>
         <div
           className="sized"
-          style={columnStyle('rightRight', ui)}
+          style={columnStyle('rightRight', { height, width })}
         >
           <ItemList table={table} title={title} filteredData={filteredData} inplace={true} />
         </div>
@@ -90,5 +62,8 @@ class FilterCompute extends Component {
     )
   }
 }
+const mapStateToProps = ({ win: { height, width } }) => ({ height, width })
 
-export default withContext(saveState(FilterCompute, 'FilterCompute', ({filterInit}) => ({filterSettings: filterInit})))
+export default connect(mapStateToProps)(
+  withContext(saveState(FilterCompute, 'FilterCompute', ({filterInit}) => ({filterSettings: filterInit})))
+)

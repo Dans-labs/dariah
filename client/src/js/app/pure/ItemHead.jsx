@@ -4,18 +4,6 @@ import ItemRecord from 'ItemRecord.jsx'
 import NavLink from 'NavLink.jsx'
 import { withContext } from 'hoc.js'
 
-/**
- * **purely functional** {@link external:Component|Component}
- *
- * Displays an item heading in a table row.
- * With a control to view the whole records.
- * Only the fields that the user is allowed to view.
- *
- * @class
- * @param {Object} row A record of data from the table
- * @returns {Fragment}
- */
-
 const ItemHead = ({ table, row, title, inplace, editStatus }) => {
   const { _id: rowId, [title]: rowHeadPre } = row
   let rowHead

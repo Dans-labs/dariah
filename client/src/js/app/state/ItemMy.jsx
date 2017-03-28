@@ -1,55 +1,35 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { fetchData } from 'server.js'
 
 import ItemList from 'ItemList.jsx'
 
 import { getData } from 'data.js'
 import { withContext, saveState } from 'hoc.js'
-import { columnStyle } from 'ui.js'
+import { columnStyle } from 'window.js'
 
-/**
- * @class
- * @classdesc
- *
- * **stateful** {@link external:Component|Component}
- *
- * ## The list of "my" items
- *
- * Displays the list of items of the current user in the left column,
- * with a details/edit view in the right column.
- *
- * See also:
- * * {@link ItemList} The list of filtered items in the right column
- */
 class ItemMy extends Component {
-/**
- * @method
- * @param {Item[]} listData (from *state*) The list of records as it comes form mongo db,
- * plus a list of fields that is provided for each row (dependent on user permissions)
- * @param {Map} countryData (from *state*) The country information as fetched from the database on the server.
- * Organized as a {Map} keyed by Two-letter country codes.
- * @returns {Fragment}
-*/
   inserted = data => {
-    const { props: { params: { tag }, router } } = this
+    const { props: { params: { table }, router } } = this
     if (data != null) {
-      router.push(`/${tag}/mylist/${data}`)
+      router.push(`/${table}/mylist/${data}`)
     }
   }
 
   handleInsert = event => {
     event.preventDefault()
-    const { props: { params: { tag }, notification } } = this
+    const { props: { params: { table }, notification } } = this
     getData(
       [
         {
           type: 'db',
-          path: `/mod?table=${tag}&action=insert`,
+          path: `/mod?table=${table}&action=insert`,
           branch: 'insert',
           callback: this.inserted,
         },
         {
           type: 'db',
-          path: `/my?table=${tag}`,
+          path: `/my?table=${table}`,
           branch: 'listData',
         },
       ],
@@ -59,27 +39,27 @@ class ItemMy extends Component {
   }
 
   deleted = data => {
-    const { props: { params: { tag }, router } } = this
+    const { props: { params: { table }, router } } = this
     if (data != null) {
-      router.push(`/${tag}/mylist`)
+      router.push(`/${table}/mylist`)
     }
   }
 
   deleteRow = recordId => event => {
     event.preventDefault()
-    const { props: { params: { tag }, notification } } = this
+    const { props: { params: { table }, notification } } = this
     getData(
       [
         {
           type: 'db',
-          path: `/mod?table=${tag}&action=delete`,
+          path: `/mod?table=${table}&action=delete`,
           branch: `delete`,
           callback: this.deleted,
           data: {_id: recordId},
         },
         {
           type: 'db',
-          path: `/my?table=${tag}`,
+          path: `/my?table=${table}`,
           branch: 'listData',
         },
       ],
@@ -90,24 +70,23 @@ class ItemMy extends Component {
 
   render() {
     const {
-      props: { params: { tag }, userMap, countryMap, children, parentList, ui },
-      state: { listData, countryData, userData },
+      props: { params: { table }, tables, children, height, width },
     } = this
-    if (listData == null || countryData == null || userData == null) {
+    if (
+      tables == null || tables[table] == null || tables[table].my == null ||
+      tables.country == null || tables.user == null
+    ) {
       return <div />
     }
-    const { records, title, perm } = listData
-    for (const x of userData) {userMap.set(x._id, x)}
-    for (const x of countryData) {countryMap.set(x._id, x)}
-    parentList[tag] = this
+    const { records, title, perm, my } = tables[table]
     return (
       <div>
         <div
           className="nav sized"
-          style={columnStyle('rightLeftNav', ui)}
+          style={columnStyle('rightLeftNav', { height, width })}
         >
           <p>
-            {`${records.length} items `}
+            {`${my.length} items `}
             {(perm != null && perm.insert) ? (
               <span
                 className="fa fa-plus button-large insert"
@@ -116,54 +95,43 @@ class ItemMy extends Component {
               />
             ) : null}
           </p>
-          <ItemList table={tag} title={title} filteredData={records} inplace={false} />
+          <ItemList table={table} title={title} filteredData={my.map(_id => records[_id])} inplace={false} />
         </div>
         <div
           className="sized"
-          style={columnStyle('rightRightBody', ui)}
+          style={columnStyle('rightRightBody', { height, width })}
         >
           { children }
         </div>
       </div>
     )
   }
-/**
- * @method
- * @param {Item[]} listData (from *state*) The list of records as it comes form mongo db
- * @param {Map} countryData (from *state*) The country information as fetched from the database on the server.
- * Organized as a {Map} keyed by Two-letter country codes.
- * @returns {Object} The data fetched from the server.
-*/
   componentDidMount() {
     const {
-      props: { params: { tag }, notification },
-      state: { listData, countryData, userData },
+      props: {
+        params: { table },
+        tables,
+        fetch,
+        setList,
+      },
     } = this
-    if (listData == null || countryData == null || userData == null) {
-      getData(
-        [
-          {
-            type: 'db',
-            path: `/my?table=${tag}`,
-            branch: 'listData',
-          },
-          {
-            type: 'db',
-            path: '/member_country',
-            branch: 'countryData',
-          },
-          {
-            type: 'db',
-            path: `/user`,
-            branch: 'userData',
-          },
-        ],
-        this,
-        notification.component
-      )
+    if (tables == null || tables[table] == null || tables[table].my == null) {
+      fetch({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)}`, table })
+      setList({ type: 'setList', table, listObj: this })
+    }
+    if (tables == null || tables.country == null) {
+      fetch({ type: 'fetchTable', contentType: 'db', path: `/member_country`, desc: `country table}`, table: 'country' })
+    }
+    if (tables == null || tables.user == null) {
+      fetch({ type: 'fetchTable', contentType: 'db', path: `/user`, desc: `user table}`, table: 'user' })
     }
   }
 }
 
-export default withContext(saveState(ItemMy, 'ItemMy', {listData: null, countryData: null, userData: null }))
+const mapStateToProps = ({ tables, win: { height, width } }) => ({ tables, height, width })
+
+export default connect(mapStateToProps, { fetch: fetchData, setList: x=>dispatch=>x })(
+  withContext(ItemMy)
+)
+
 

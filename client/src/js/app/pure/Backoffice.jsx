@@ -1,22 +1,5 @@
 import React from 'react'
 
-/**
- * **purely functional** {@link external:Component|Component}
- *
- * ## Backoffice functions
- *
- * As far as the web page is concerned, this is the top level component.
- * Technically, there are only
- * some {@link external:Routing|router} components
- * and ultimately the {@link Provider}
- * {@link external:Component|component} above it.
- *
- *
- * @class
- * @param {Component[]} children The children of this component as specified in the
- * {@link external:Routing|route} where App is called
- * @returns {Fragment}
-*/
 const Backoffice = ({ params: { func } }) => {
   const headings = {
     type: 'Contribution types',
