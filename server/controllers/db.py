@@ -84,11 +84,12 @@ class DbAccess(object):
         documents = list(_DBM[table].distinct(field))
         return self._stop(data=documents)
 
-    def getList(self, controller, table, action, withFields=False, rFilter=None, sort=None, withFilters=False):
+    def getList(self, controller, table, action, rFilter=None, sort=None, withFilters=False):
         Perm = self.Perm
+        idField = self.DM.generic['idField']
         (mayInsert, iFields) = Perm.may(table, 'insert')
         perm = dict(insert=mayInsert)
-        none = dict(records=[], fields={}, perm={}) if withFields else []
+        none = dict(records=[], fields={}, perm={})
         (good, result) = Perm.getPerm(controller, table, action)
         if not good:
             return self._stop(data=none, text=result)
@@ -101,13 +102,16 @@ class DbAccess(object):
             (sortField, sortDir) = sort
             sortField = self.DM.tables[table][sortField[1:]] if sortField[0] == '*' else sortField
             documents = list(_DBM[table].find(rowFilter, fieldFilter).sort(sortField, sortDir))
-        if withFields:
-            title = self.DM.tables[table]['title']
-            data = dict(records=documents, fields=fieldFilter, title=title, perm=perm)
-            if withFilters:
-                data['filterList'] = self.DM.tables[table]['filters']
-        else:
-            data = documents
+        title = self.DM.tables.get(table, {}).get('title', None)
+        data = dict(
+            order=[d[idField] for d in documents],
+            records=dict((str(d[idField]), d) for d in documents),
+            fields=fieldFilter,
+            title=title,
+            perm=perm,
+        )
+        if withFilters:
+            data['filterList'] = self.DM.tables[table]['filters']
         return self._stop(data=data)
 
     def getItem(self, controller, table, ident, action):
