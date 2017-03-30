@@ -4,6 +4,14 @@ import { ask, err, succeed } from 'notify.js'
 
 const rootUrl = '/api/'
 
+/* ACTIONS */
+/*
+ * Generic action to fetch data from the server.
+ * The query is configured by the task object.
+ * It can be used for database queries or file content.
+ * During request, notify actions will be dispatched.
+ */
+
 /* REDUCER */
 /*
  * no dedicated reducer.
@@ -14,14 +22,6 @@ const rootUrl = '/api/'
 /*
  * no dedicated selectors.
  * See the selectors corresponding to the dedicated reducers.
- */
-
-/* ACTIONS */
-/*
- * Generic action to fetch data from the server.
- * The query is configured by the task object.
- * It can be used for database queries or file content.
- * During request, notify actions will be dispatched.
  */
 
 export const fetchData = task => dispatch => {

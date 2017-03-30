@@ -1,3 +1,8 @@
+/* ACTIONS */
+/*
+ * Actions are dispatch in the process of fetching data from the server
+ */
+
 /* REDUCER */
 
 export default (state = {}, { type, path, data }) => {
@@ -13,11 +18,6 @@ export default (state = {}, { type, path, data }) => {
 /* SELECTORS */
 
 export const getMe = ({ me }) => ({ me })
-
-/* ACTIONS */
-/*
- * Actions are dispatch in the process of fetching data from the server
- */
 
 /* HELPERS */
 

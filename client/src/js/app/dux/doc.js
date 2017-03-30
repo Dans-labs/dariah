@@ -1,3 +1,8 @@
+/* ACTIONS */
+/*
+ * Actions are dispatch in the process of fetching data from the server
+ */
+
 /* REDUCER */
 
 export default (state = {}, { type, path, data }) => {
@@ -15,11 +20,6 @@ export default (state = {}, { type, path, data }) => {
 export const getDoc = ({ doc }, { docDir, docName, docExt }) => {
   return { data: doc[`${docDir}/${docName}.${docExt}`] }
 }
-
-/* ACTIONS */
-/*
- * Actions are dispatch in the process of fetching data from the server
- */
 
 /* HELPERS */
 

@@ -1,5 +1,17 @@
 import memoBind from 'memoBind.js'
 
+/* ACTIONS */
+
+export const changeFulltext = (filterId, searchString) => ({ type: 'fulltext', filterId, data: searchString })
+export const changeFacet = (filterId, valueId, onOff) => ({ type: 'facet', filterId, data: [valueId, onOff] })
+export const changeFacetAll = (filterId, onOff) => ({ type: 'facetAll', filterId, data: onOff })
+
+export const setupFiltering = (table, tables) => dispatch => {
+  const fieldValues = memoBind(fCC, 'compileFiltering', [table], [tables])
+  const filterSettings = memoBind(fCC, 'initFiltering', [table], [tables, fieldValues])
+  dispatch({ type: 'setupFiltering', filterSettings })
+}
+
 /* REDUCER */
 
 export default (state={
@@ -75,18 +87,6 @@ export const getFilterApplied = ({ tables, filter: { filterSettings, initialized
       fieldValues,
     }
   }
-}
-
-/* ACTIONS */
-
-export const changeFulltext = (filterId, searchString) => ({ type: 'fulltext', filterId, data: searchString })
-export const changeFacet = (filterId, valueId, onOff) => ({ type: 'facet', filterId, data: [valueId, onOff] })
-export const changeFacetAll = (filterId, onOff) => ({ type: 'facetAll', filterId, data: onOff })
-
-export const setupFiltering = (table, tables) => dispatch => {
-  const fieldValues = memoBind(fCC, 'compileFiltering', [table], [tables])
-  const filterSettings = memoBind(fCC, 'initFiltering', [table], [tables, fieldValues])
-  dispatch({ type: 'setupFiltering', filterSettings })
 }
 
 /* HELPERS */

@@ -1,3 +1,9 @@
+/* ACTIONS */
+
+export const changeWinDim = () => dispatch => {
+  dispatch({ type: 'windim', ...initWinDim() })
+}
+
 /* REDUCER */
 
 export default (state = initWinDim(), { type, height, width }) => {
@@ -7,12 +13,6 @@ export default (state = initWinDim(), { type, height, width }) => {
     }
     default: return state
   }
-}
-
-/* ACTIONS */
-
-export const changeWinDim = () => dispatch => {
-  dispatch({ type: 'windim', ...initWinDim() })
 }
 
 /* SELECTORS */

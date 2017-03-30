@@ -1,3 +1,9 @@
+/* ACTIONS */
+
+export const ask =     (desc)       => ({ type: 'notify', status: 'pending', desc })
+export const err =     (desc, data) => ({ type: 'notify', status: 'error',   desc, msgs: data })
+export const succeed = (desc)       => ({ type: 'notify', status: 'success', desc })
+
 /* REDUCER */
 
 export default (state = {}, { type, desc, status, msgs }) => {
@@ -20,12 +26,6 @@ export default (state = {}, { type, desc, status, msgs }) => {
 /* SELECTORS */
 
 export const getNotify = ({ notify }) => ({ notify })
-
-/* ACTIONS */
-
-export const ask =     (desc)       => ({ type: 'notify', status: 'pending', desc })
-export const err =     (desc, data) => ({ type: 'notify', status: 'error',   desc, msgs: data })
-export const succeed = (desc)       => ({ type: 'notify', status: 'success', desc })
 
 /* HELPERS */
 

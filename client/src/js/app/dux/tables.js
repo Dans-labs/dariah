@@ -1,3 +1,8 @@
+/* ACTIONS */
+/*
+ * Actions are dispatch in the process of fetching data from the server
+ */
+
 /* REDUCER */
 
 export default (state={}, { type, path, data, table }) => {
@@ -64,11 +69,6 @@ export const getTableFilters =  ({ tables }, { table }) => {
   const { [table]: { fields, filterList } } = tables
   return { fields, filterList }
 }
-
-/* ACTIONS */
-/*
- * Actions are dispatch in the process of fetching data from the server
- */
 
 /* HELPERS */
 
