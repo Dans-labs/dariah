@@ -1,6 +1,5 @@
 import React from 'react'
 import { render } from 'react-dom'
-import { Provider } from 'react-redux'
 import { Router, Route, Redirect, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
 
 import Root from 'Root.jsx'
@@ -14,9 +13,9 @@ import Doc from 'Doc.jsx'
 import NotFound from 'NotFound.jsx'
 
 import configureStore from 'configureStore.js'
-import reducer from 'reducers.js'
+import rootReducer from 'reducers.js'
 
-const store = configureStore(reducer)
+const store = configureStore(rootReducer)
 
 render(
   <Root store={store}>
