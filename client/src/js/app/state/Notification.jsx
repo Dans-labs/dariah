@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { withContext, saveState } from 'hoc.js'
 import memoBind from 'memoBind.js'
 
 const empty = []
@@ -7,7 +6,6 @@ const empty = []
 class Notification extends Component {
   constructor(props) {
     super(props)
-    props.notification.component = this
     this.msgs = [] // synchronous list of messages
     this.visible = false
     this.dom = {}
@@ -33,7 +31,7 @@ class Notification extends Component {
       busy += msg.busy || 0
     })
     if (busy < 0) {
-      //console.warn(`SHOULD NOT HAPPEN: negative value for busy ${busy}`)
+      //warn(`SHOULD NOT HAPPEN: negative value for busy ${busy}`)
       busy = 0
     }
     const visible = this.visible || (lastNote > -1)
@@ -124,4 +122,4 @@ class Notification extends Component {
   }
 }
 
-export default withContext(saveState(Notification, 'Notification', {msgs: null}))
+export default Notification

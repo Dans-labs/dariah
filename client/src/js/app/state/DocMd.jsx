@@ -4,6 +4,7 @@ import Markdown from 'react-markdown'
 import { Link } from 'react-router'
 import Alternative from 'Alternative.jsx'
 import { fetchData } from 'server.js'
+import { getDoc } from 'doc.js'
 
 const RouterLink = ({ children, href }) => (
   href.match(/^(https?:)?\/\//)
@@ -50,8 +51,4 @@ class DocMd extends Component {
   }
 }
 
-const mapStateToProps = (state, { docDir, docName, docExt }) => ({
-  data: state.doc[`${docDir}/${docName}.${docExt}`]
-})
-
-export default connect(mapStateToProps, { fetch: fetchData })(DocMd)
+export default connect(getDoc, { fetch: fetchData })(DocMd)

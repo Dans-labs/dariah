@@ -1,16 +1,17 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import Facet from 'Facet.jsx'
 import CheckboxI from 'CheckboxI.jsx'
 import Stat from 'Stat.jsx'
 import Alternative from 'Alternative.jsx'
-import { placeFacets, testAllChecks } from 'filtering.js'
+import { getFieldValues, placeFacets } from 'filter.js'
 
 const ByValue = ({
   table,
   filterId, filterField, filterLabel,
-  fieldValues, filterSettings,
+  fieldValues,
   filteredAmount, filteredAmountOthers,
-  amounts, maxCols, updFilter,
+  amounts, maxCols, 
   expanded,
 }) => {
   const rows = placeFacets(fieldValues, maxCols)
@@ -20,8 +21,6 @@ const ByValue = ({
     <p className="facet" >
       <CheckboxI
         filterId={filterId}
-        states={testAllChecks(filterSettings)}
-        updFilter={updFilter}
       /> {filterLabel}{' '}
       <Stat subTotal={filteredAmount} total={filteredAmountOthers} />{' '}
       {control}
@@ -31,16 +30,16 @@ const ByValue = ({
     <div className="facet" >{
       rows === null ? (<p>{' -no facets '}</p>) : (
         <Alternative
-          tag={`${table}_${filterField}`}
+          tag={`${table}_${filterId}`}
           controlPlacement={controlPlacement}
           controls={[control1, control2]}
           initial={expanded ? 0 : 1}
           alternatives={[
             (<table key="table" >
               <tbody>
-                {rows.map((row, i) => (
+                {rows.map((entity, i) => (
                   <tr key={i} >
-                    {row.map((f, j) => {
+                    {entity.map((f, j) => {
                       if (f === null) {
                         return <td key={j} />
                       }
@@ -55,8 +54,6 @@ const ByValue = ({
                             filterId={filterId}
                             valueId={valueId}
                             valueRep={valueRep}
-                            checked={filterSettings.get(valueId)}
-                            updFilter={updFilter}
                           />
                         </td>
                       ), (
@@ -64,7 +61,7 @@ const ByValue = ({
                           key="stat"
                           className="statistic"
                         >
-                          <Stat subTotal={amounts.get(valueId)} />
+                          <Stat subTotal={amounts[valueId]} />
                         </td>
                       )]
                     })}
@@ -80,4 +77,4 @@ const ByValue = ({
   )
 }
 
-export default ByValue
+export default connect(getFieldValues)(ByValue)

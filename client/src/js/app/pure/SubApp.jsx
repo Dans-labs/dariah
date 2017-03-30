@@ -1,14 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import NavLink from 'NavLink.jsx'
-import { columnStyle } from 'window.js'
+import Pane from 'Pane.jsx'
+import { getWinDim } from 'win.js'
 
 const SubApp = ({params: { table }, children, height, width }) => (
   <div>
-    <div
-      className="nav sized"
-      style={columnStyle('left', { height, width })}
-    >
+    <Pane format="nav sized" position="left">
       {(table == 'contrib') ? (
         <div>
           <p><NavLink to={`/${table}/list`} >{'All items'}</NavLink></p>
@@ -21,18 +19,11 @@ const SubApp = ({params: { table }, children, height, width }) => (
           <p><NavLink to={`/${table}/package`} >{'Packages'}</NavLink></p>
         </div>
       )}
-    </div>
-    <div>
-      <div
-        className="sized"
-        style={columnStyle('right', { height, width })}
-      >
-        { children }
-      </div>
-    </div>
+    </Pane>
+    <Pane format="sized" position="right">
+      { children }
+    </Pane>
   </div>
 )
 
-const mapStateToProps = ({ win: { height, width } }) => ({ height, width })
-
-export default connect(mapStateToProps)(SubApp)
+export default connect(getWinDim)(SubApp)

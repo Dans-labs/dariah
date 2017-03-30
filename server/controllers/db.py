@@ -75,6 +75,7 @@ class DbAccess(object):
 
     def getValues(self, controller, table, field, action):
         Perm = self.Perm
+        idField = self.DM.generic['idField']
         (good, result) = Perm.getPerm(controller, table, action)
         if not good:
             return self._stop(text=result)
@@ -82,18 +83,31 @@ class DbAccess(object):
         if field not in fieldFilter:
             return self._stop(text='no visible field {} in {}'.format(field, table))
         documents = list(_DBM[table].distinct(field))
-        return self._stop(data=documents)
+        data = dict(
+            order=[d[idField] for d in documents],
+            entities=dict((str(d[idField]), d) for d in documents),
+        )
+        return self._stop(data=data)
 
-    def getList(self, controller, table, action, rFilter=None, sort=None, withFilters=False):
+    def getList(self, controller, table, action, rFilter=None, sort=None, titleOnly=False, withFilters=False):
         Perm = self.Perm
         idField = self.DM.generic['idField']
+        title = self.DM.tables.get(table, {}).get('title', None)
         (mayInsert, iFields) = Perm.may(table, 'insert')
         perm = dict(insert=mayInsert)
-        none = dict(records=[], fields={}, perm={})
+        none = dict(order=[], entities={}, fields={}, perm={})
         (good, result) = Perm.getPerm(controller, table, action)
         if not good:
             return self._stop(data=none, text=result)
         (rowFilter, fieldFilter) = result
+        fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
+        fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
+        if titleOnly:
+            filters = {f['field'] for f in self.DM.tables[table].get('filters', None)}
+            print(filters)
+            getFields = set(fieldFilter)
+            for f in getFields:
+                if f != title and (filters == None or f not in filters): del fieldFilter[f] 
         if rFilter != None:
             rowFilter.update(rFilter)
         if sort == None:
@@ -102,13 +116,14 @@ class DbAccess(object):
             (sortField, sortDir) = sort
             sortField = self.DM.tables[table][sortField[1:]] if sortField[0] == '*' else sortField
             documents = list(_DBM[table].find(rowFilter, fieldFilter).sort(sortField, sortDir))
-        title = self.DM.tables.get(table, {}).get('title', None)
         data = dict(
             order=[d[idField] for d in documents],
-            records=dict((str(d[idField]), d) for d in documents),
+            entities=dict((str(d[idField]), dict(values=d, complete=not titleOnly)) for d in documents),
             fields=fieldFilter,
             title=title,
             perm=perm,
+            fieldOrder=fieldOrder,
+            fieldSpecs=fieldSpecs,
         )
         if withFilters:
             data['filterList'] = self.DM.tables[table]['filters']
@@ -122,6 +137,8 @@ class DbAccess(object):
         if not good:
             return self._stop(text=result)
         (rowFilter, fieldFilter) = result
+        fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
+        fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
         rowFilter.update({idField: oid(ident)})
         documents = list(_DBM[table].find(rowFilter, fieldFilter))
 
@@ -132,19 +149,10 @@ class DbAccess(object):
         (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
         (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
         perm = dict(update=uFields, delete=mayDelete)
-        fieldOrder = [x for x in self.DM.tables[table]['fieldOrder'] if x in fieldFilter]
-        fieldSpecs = dict(x for x in self.DM.tables[table]['fieldSpecs'].items() if x[0] in fieldOrder)
         fillIn = 'getValues'
         for (fName, specs) in fieldSpecs.items():
             if fillIn in specs: specs[fillIn] = specs[fillIn].format(table=table, field=fName) 
-        return self._stop(data=dict(
-            row=document,
-            fields=fieldFilter,
-            title=self.DM.tables[table]['title'],
-            perm=perm,
-            fieldOrder=fieldOrder,
-            fieldSpecs=fieldSpecs,
-        ))
+        return self._stop(data=dict(values=document, complete=True, perm=perm, fields=fieldFilter))
 
     def modList(self, controller, table, action):
         idField = self.DM.generic['idField']

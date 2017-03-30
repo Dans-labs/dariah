@@ -8,15 +8,15 @@ export default function memoBind(thisArg, funcName, keyArgs, extraArgs) {
     throw new TypeError(`'${funcName}' is not a function.`)
   }
 
-  if (thisArg._memCache == null) {thisArg._memCache = new Map()}
-  if (!thisArg._memCache.has(funcName)) {
-    thisArg._memCache.set(funcName, new Map())
+  if (thisArg._memCache == null) {thisArg._memCache = {}}
+  if (thisArg._memCache[funcName] == null) {
+    thisArg._memCache[funcName] = {}
   }
-  const cache = thisArg._memCache.get(funcName)
+  const cache = thisArg._memCache[funcName]
 
   const memoKey = JSON.stringify(keyArgs)
-  if (!cache.has(memoKey)) {
-    cache.set(memoKey, func.apply(thisArg, [...keyArgs, ...(extraArgs || [])]))
+  if (cache[memoKey] == null) {
+    cache[memoKey] = func.apply(thisArg, [...keyArgs, ...(extraArgs || [])])
   }
-  return cache.get(memoKey)
+  return cache[memoKey]
 }

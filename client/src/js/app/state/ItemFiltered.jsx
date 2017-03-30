@@ -2,41 +2,21 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import FilterCompute from 'FilterCompute.jsx'
-import { compileFiltering } from 'filtering.js'
 import { fetchData } from 'server.js'
+import { getTables } from 'tables.js'
 
 class ItemFiltered extends Component {
   render() {
-    const {
-      props: { params: { table }, tables },
-    } = this
+    const { props: { params: { table }, tables } } = this
     if (tables == null || tables[table] == null || tables.country == null || tables.user == null) {
       return <div />
     }
-    const { records, order, fields, title, filterList } = tables[table]
-    const { fieldValues, filterInit } = compileFiltering(records, order, fields, filterList)
     return (
-      <FilterCompute
-        tag={table}
-        table={table}
-        records={records}
-        order={order}
-        fields={fields}
-        title={title}
-        fieldValues={fieldValues}
-        filterList={filterList}
-        filterInit={filterInit}
-      />
+      <FilterCompute table={table} />
     )
   }
   componentDidMount() {
-    const {
-      props: {
-        params: { table },
-        tables,
-        fetch,
-      },
-    } = this
+    const { props: { params: { table }, tables, fetch, } } = this
     if (tables == null || tables[table] == null) {
       fetch({ type: 'fetchTable', contentType: 'db', path: `/list?table=${table}`, desc: `${table} table}`, table })
     }
@@ -49,6 +29,4 @@ class ItemFiltered extends Component {
   }
 }
 
-const mapStateToProps = ({ tables }) => ({ tables })
-
-export default connect(mapStateToProps, { fetch: fetchData })(ItemFiltered)
+export default connect(getTables, { fetch: fetchData })(ItemFiltered)

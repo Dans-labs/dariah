@@ -1,25 +1,31 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { changeFacetAll, getFilterSetting, testAllChecks } from 'filter.js'
 
 const indeterminate = states => !states.allTrue && !states.allFalse
 
 class CheckboxI extends Component {
   componentDidUpdate() {
-    const { props: { states } } = this
+    const { props: { filterSetting } } = this
+    const states = testAllChecks(filterSetting)
     this.dom.indeterminate = indeterminate(states)
   }
   handleCheck = () => {
-    const { props: {states, filterId, updFilter } } = this
-    return updFilter(filterId, this.dom.indeterminate || !states.allTrue)
+    const { props: {filterSetting, filterId, handle } } = this
+    const states = testAllChecks(filterSetting)
+    return handle(filterId, this.dom.indeterminate || !states.allTrue)
   }
   setIndeterminate = domElem => {
-    const { props: { states } } = this
+    const { props: { filterSetting } } = this
+    const states = testAllChecks(filterSetting)
     if (domElem) {
       this.dom = domElem
       domElem.indeterminate = indeterminate(states)
     }
   }
   render() {
-    const { props: { states } } = this
+    const { props: { filterSetting } } = this
+    const states = testAllChecks(filterSetting)
     return (
       <input
           ref={this.setIndeterminate}
@@ -31,4 +37,4 @@ class CheckboxI extends Component {
   }
 }
 
-export default CheckboxI
+export default connect(getFilterSetting, { handle: changeFacetAll })(CheckboxI)

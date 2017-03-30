@@ -1,76 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { fetchData } from 'server.js'
+import { getTables } from 'tables.js'
 
 import ItemList from 'ItemList.jsx'
-
-import { getData } from 'data.js'
-import { withContext, saveState } from 'hoc.js'
-import { columnStyle } from 'window.js'
+import Pane from 'Pane.jsx'
 
 class ItemMy extends Component {
-  inserted = data => {
-    const { props: { params: { table }, router } } = this
-    if (data != null) {
-      router.push(`/${table}/mylist/${data}`)
-    }
-  }
-
-  handleInsert = event => {
-    event.preventDefault()
-    const { props: { params: { table }, notification } } = this
-    getData(
-      [
-        {
-          type: 'db',
-          path: `/mod?table=${table}&action=insert`,
-          branch: 'insert',
-          callback: this.inserted,
-        },
-        {
-          type: 'db',
-          path: `/my?table=${table}`,
-          branch: 'listData',
-        },
-      ],
-      this,
-      notification.component
-    )
-  }
-
-  deleted = data => {
-    const { props: { params: { table }, router } } = this
-    if (data != null) {
-      router.push(`/${table}/mylist`)
-    }
-  }
-
-  deleteRow = recordId => event => {
-    event.preventDefault()
-    const { props: { params: { table }, notification } } = this
-    getData(
-      [
-        {
-          type: 'db',
-          path: `/mod?table=${table}&action=delete`,
-          branch: `delete`,
-          callback: this.deleted,
-          data: {_id: recordId},
-        },
-        {
-          type: 'db',
-          path: `/my?table=${table}`,
-          branch: 'listData',
-        },
-      ],
-      this,
-      notification.component
-    )
-  }
-
   render() {
     const {
-      props: { params: { table }, tables, children, height, width },
+      props: { params: { table }, tables, children },
     } = this
     if (
       tables == null || tables[table] == null || tables[table].my == null ||
@@ -78,31 +17,24 @@ class ItemMy extends Component {
     ) {
       return <div />
     }
-    const { records, title, perm, my } = tables[table]
+    const { entities, title, perm, my } = tables[table]
     return (
       <div>
-        <div
-          className="nav sized"
-          style={columnStyle('rightLeftNav', { height, width })}
-        >
+        <Pane format="nav sized" position="rightLeftNav">
           <p>
             {`${my.length} items `}
             {(perm != null && perm.insert) ? (
               <span
                 className="fa fa-plus button-large insert"
                 title="New item"
-                onClick={this.handleInsert}
               />
             ) : null}
           </p>
-          <ItemList table={table} title={title} filteredData={my.map(_id => records[_id])} inplace={false} />
-        </div>
-        <div
-          className="sized"
-          style={columnStyle('rightRightBody', { height, width })}
-        >
+          <ItemList table={table} title={title} filteredData={my} inplace={false} />
+        </Pane>
+        <Pane format="sized" position="rightRightBody">
           { children }
-        </div>
+        </Pane>
       </div>
     )
   }
@@ -112,12 +44,10 @@ class ItemMy extends Component {
         params: { table },
         tables,
         fetch,
-        setList,
       },
     } = this
     if (tables == null || tables[table] == null || tables[table].my == null) {
       fetch({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)}`, table })
-      setList({ type: 'setList', table, listObj: this })
     }
     if (tables == null || tables.country == null) {
       fetch({ type: 'fetchTable', contentType: 'db', path: `/member_country`, desc: `country table}`, table: 'country' })
@@ -128,10 +58,6 @@ class ItemMy extends Component {
   }
 }
 
-const mapStateToProps = ({ tables, win: { height, width } }) => ({ tables, height, width })
-
-export default connect(mapStateToProps, { fetch: fetchData, setList: x=>dispatch=>x })(
-  withContext(ItemMy)
-)
+export default connect(getTables, { fetch: fetchData })(ItemMy)
 
 

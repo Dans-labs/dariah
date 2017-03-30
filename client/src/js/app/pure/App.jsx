@@ -4,6 +4,7 @@ import Login from 'Login.jsx'
 import NavLink from 'NavLink.jsx'
 import Static from 'Static.jsx'
 import Notification from 'Notification.jsx'
+import { getWinDim } from 'win.js'
 
 const App = ({ children, height, width }) => {
   const text = `${width} x ${height}`
@@ -26,6 +27,4 @@ const App = ({ children, height, width }) => {
   )
 }
 
-const mapStateToProps = ({ win: { height, width } }) => ({ height, width })
-
-export default connect(mapStateToProps)(App)
+export default connect(getWinDim)(App)

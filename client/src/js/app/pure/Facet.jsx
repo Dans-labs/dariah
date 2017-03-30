@@ -1,21 +1,20 @@
 import React from 'react'
-import memoBind from 'memoBind.js'
+import { connect } from 'react-redux'
+import { changeFacet, getFilterSetting } from 'filter.js'
 
-class callBacks {
-  onChange = (filterId, valueId, updFilter) => event => updFilter(filterId, [valueId, event.target.checked])
-}
-const memo = new callBacks()
-
-const Facet = ({ filterId, valueId, valueRep, checked, updFilter }) => (
+const Facet = ({ filterId, valueId, valueRep, filterSetting, handle }) => {
+  const { [valueId]: isOn } = filterSetting
+  return (
   <span>
     <input
       type="checkbox"
-      checked={checked}
+      checked={isOn}
       className="facet"
-      onChange={memoBind(memo, 'onChange', [filterId, valueId], [updFilter])}
+      onChange={() => handle(filterId, valueId, !isOn)}
     />
     {` ${valueRep}`}
   </span>
 )
+}
 
-export default Facet
+export default connect(getFilterSetting, { handle: changeFacet })(Facet)

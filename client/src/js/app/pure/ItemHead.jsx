@@ -2,57 +2,51 @@ import React from 'react'
 import Alternative from 'Alternative.jsx'
 import ItemRecord from 'ItemRecord.jsx'
 import NavLink from 'NavLink.jsx'
-import { withContext } from 'hoc.js'
 
-const ItemHead = ({ table, row, title, inplace, editStatus }) => {
-  const { _id: rowId, [title]: rowHeadPre } = row
-  let rowHead
-  if (!rowHeadPre) {rowHead = '-empty-'}
+const ItemHead = ({ table, values, title, inplace }) => {
+  const { _id: eId, [title]: entityHeadPre } = values
+  let entityHead
+  if (!entityHeadPre) {entityHead = '-empty-'}
   else {
-    [rowHead] = rowHeadPre
-    if (typeof rowHead == 'object') {
-      const { value } = rowHead
-      rowHead = value
+    [entityHead] = entityHeadPre
+    if (typeof entityHead == 'object') {
+      const { value } = entityHead
+      entityHead = value
     }
   }
 
-  const refProg = prog => {editStatus[table][rowId] = {...editStatus[table][rowId], prog}}
-  const refTitle = title => {editStatus[table][rowId] = {...editStatus[table][rowId], title}}
   const control1 = handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />)
   const control2 = handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />)
   const controlPlacement = control => (
     <p>
       {control}
-      <span ref={refProg} />{' '}
-      <span ref={refTitle} >
-        {rowHead}
+      <span>
+        {entityHead}
       </span>
     </p>
   )
 
   return (
-    <tr id={rowId} >
+    <tr id={eId} >
       <td>{
         inplace ? (
           <Alternative
-            tag={`${table}_${rowId}`}
+            tag={`${table}_${eId}`}
             controlPlacement={controlPlacement}
             controls={[control1, control2]}
             alternatives={[(
               <ItemRecord
                 key="show"
-                tag={`${table}_${rowId}`}
                 table={table}
-                recordId={rowId}
+                eId={eId}
               />
             ), '']}
             initial={1}
           />
         ) : (
-          <NavLink className="nav" to={`/${table}/mylist/${rowId}`} >
-            <span ref={refProg} />{' '}
-            <span ref={refTitle} >
-              {rowHead}
+          <NavLink className="nav" to={`/${table}/mylist/${eId}`} >
+            <span>
+              {entityHead}
             </span>
           </NavLink>
         )
@@ -62,4 +56,4 @@ const ItemHead = ({ table, row, title, inplace, editStatus }) => {
   )
 }
 
-export default withContext(ItemHead)
+export default ItemHead

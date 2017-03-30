@@ -36,7 +36,7 @@ render(
         <Route path=":table" component={SubApp} >
           <Route path="list" component={ItemFiltered} />
           <Route path="mylist" component={ItemMy} >
-            <Route path=":recordId" component={ItemRecordPre} ownOnly={true} />
+            <Route path=":eId" component={ItemRecordPre} ownOnly={true} />
           </Route>
           <Route path=":func" component={Backoffice} />
         </Route>

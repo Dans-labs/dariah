@@ -1,8 +1,11 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
 import FullText from 'FullText.jsx'
 import ByValue from 'ByValue.jsx'
 import EUMap from 'EUMap.jsx'
+
+import { getTableFilters } from 'tables.js'
 
 const filterClass = {
   FullText,
@@ -11,17 +14,20 @@ const filterClass = {
 }
 
 const Filter = ({
+  tables,
   table,
-  fields, fieldValues,
-  filterList, filterSettings,
+  fields,
+  filterList, 
   filteredAmount, filteredAmountOthers,
   amounts,
-  updFilter,
 }) => (
   <div>
     {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
       const { type } = filter
       const { [type]: Fclass } = filterClass
+      if (false && type != 'FullText') {
+        return <p key={filterId}>{type}</p>
+      }
       return (
         <Fclass
           key={filterId}
@@ -30,12 +36,9 @@ const Filter = ({
           filterField={filter.field}
           filterLabel={filter.label}
           maxCols={filter.maxCols}
-          filterSettings={filterSettings.get(filterId)}
-          fieldValues={fieldValues.get(filter.field)}
           filteredAmount={filteredAmount}
-          filteredAmountOthers={filteredAmountOthers.get(filterId)}
-          amounts={amounts.get(filterId)}
-          updFilter={updFilter}
+          filteredAmountOthers={filteredAmountOthers[filterId]}
+          amounts={amounts[filterId]}
           expanded={filter.expanded}
         />
       )}
@@ -43,4 +46,4 @@ const Filter = ({
   </div>
 )
 
-export default Filter
+export default connect(getTableFilters)(Filter)

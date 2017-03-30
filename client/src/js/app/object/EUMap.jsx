@@ -3,7 +3,9 @@ import { connect } from 'react-redux'
 import ByValue from 'ByValue.jsx'
 import L from 'leaflet'
 import {countryBorders} from 'europe.geo.js'
-import { withContext } from 'hoc.js'
+import { getFilterSetting } from 'filter.js'
+import { getCountry } from 'tables.js'
+import { combineSelectors } from 'reducers.js'
 
 const mapOptions = {
   HEIGHT: 250,
@@ -45,8 +47,8 @@ const mapOptions = {
   },
 }
 
-const computeRadius = (i, filteredAmountOthers, amounts) => {
-  const amount = amounts ? amounts.has(i) ? amounts.get(i) : 0 : 0
+const computeRadius = (_id, filteredAmountOthers, amounts) => {
+  const amount = amounts ? (amounts[_id] || 0) : 0
   if (amount == 0) {return 0}
   const { MAX_RADIUS, LEVEL_OFF } = mapOptions
   const proportional = MAX_RADIUS * amount / filteredAmountOthers
@@ -57,7 +59,7 @@ const computeRadius = (i, filteredAmountOthers, amounts) => {
 class EUMap extends Component {
   constructor(props) {
     super(props)
-    this.features = new Map()
+    this.features = {}
   }
   setMap = dom => {if (dom) {this.dom = dom}}
   render() {
@@ -74,7 +76,7 @@ class EUMap extends Component {
 
   componentDidMount() {
     const {
-      props: { filterSettings, filteredAmountOthers, amounts, country },
+      props: { filterSetting, filteredAmountOthers, amounts, country },
       dom,
     } = this
     const { HEIGHT, MAP_CENTER, ZOOM_INIT, MAP_BOUNDS, MARKER_COLOR, MARKER_SHAPE, COUNTRY_STYLE } = mapOptions
@@ -85,46 +87,45 @@ class EUMap extends Component {
       zoom: ZOOM_INIT,
       maxBounds: MAP_BOUNDS,
     })
-    this.idFromIso = new Map([...country].map(({ iso, _id }) => [iso, _id]))
+    const { order, entities } = country
+    this.idFromIso = {}
+    order.forEach(_id => {
+      const { [_id]: { values: { iso } } } = entities
+      this.idFromIso[iso] = _id
+    })
     L.geoJSON(countryBorders, {
       style: feature => COUNTRY_STYLE[this.inDariah(feature)],
       onEachFeature: feature => {
         if (this.inDariah(feature)) {
           const { properties: { iso2, lat, lng } } = feature
-          const i = this.idFromIso.get(iso2)
-          const isOn = filterSettings.get(i)
+          const _id = this.idFromIso[iso2]
+          const isOn = filterSetting[_id]
           const marker = L.circleMarker([lat, lng], {
             ...MARKER_COLOR[isOn],
-            radius: computeRadius(i, filteredAmountOthers, amounts),
+            radius: computeRadius(_id, filteredAmountOthers, amounts),
             ...MARKER_SHAPE,
             pane: 'markerPane',
           }).addTo(this.map)
-          this.features.set(iso2, marker)
+          this.features[iso2] = marker
         }
       },
     }).addTo(this.map)
   }
 
-  inDariah = feature => this.idFromIso.has(feature.properties.iso2)
+  inDariah = feature => !!this.idFromIso[feature.properties.iso2]
 
   componentDidUpdate() {
-    const { props: { filterSettings, filteredAmountOthers, amounts } } = this
+    const { props: { filterSetting, filteredAmountOthers, amounts } } = this
     const { MARKER_COLOR } = mapOptions
-    for (const [iso2, marker] of this.features) {
-      const i = this.idFromIso.get(iso2)
-      const isOn = filterSettings.get(i)
-      marker.setRadius(computeRadius(i, filteredAmountOthers, amounts))
+    Object.entries(this.features).forEach(([iso2, marker]) => {
+      const _id = this.idFromIso[iso2]
+      const isOn = filterSetting[_id]
+      marker.setRadius(computeRadius(_id, filteredAmountOthers, amounts))
       marker.setStyle(MARKER_COLOR[isOn])
-    }
+    })
   }
 }
 
 EUMap.displayName = 'EUMap'
 
-const mapStateToProps = ({ tables: { country } }) => {
-  return { country }
-}
-
-export default connect(mapStateToProps)(
-    withContext(EUMap)
-)
+export default connect(combineSelectors(getCountry, getFilterSetting))(EUMap)

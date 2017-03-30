@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
-import LocalSettings from 'LocalSettings.jsx'
 import { fetchData } from 'server.js'
+import { getMe } from 'me.js'
 
 class Login extends Component {
   render() {
@@ -19,7 +19,6 @@ class Login extends Component {
         ) : (
           <a href="/login" className="control fa fa-user-plus" >{' login'}</a>
         )}
-        <LocalSettings />
       </span>
     )
   }
@@ -29,7 +28,5 @@ class Login extends Component {
   }
 }
 
-const mapStateToProps = ( { me } ) => ({ me })
-
-export default connect(mapStateToProps, { fetch: fetchData })(Login)
+export default connect(getMe, { fetch: fetchData })(Login)
 

@@ -99,6 +99,7 @@ function transform(bundle, {
           "react",
         ],
         plugins: [
+            "transform-runtime",
             "transform-object-rest-spread",
             "transform-react-jsx-source",
             "transform-class-properties",
