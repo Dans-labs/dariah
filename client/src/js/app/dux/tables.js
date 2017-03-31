@@ -1,7 +1,35 @@
+import { fetchData } from 'server.js'
+import { propsChanged } from 'helpers.js'
+
 /* ACTIONS */
 /*
- * Actions are dispatch in the process of fetching data from the server
+ * Most actions call fetchData, which will dispatch the ultimate fetch action.
  */
+
+export const fetchTable = (table) => (
+  fetchData({ type: 'fetchTable', contentType: 'db', path: `/list?table=${table}`, desc: `${table} table`, table })
+)
+export const fetchTableMy = (table) => (
+  fetchData({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)`, table })
+)
+export const fetchCountries = () => (
+  fetchData({ type: 'fetchTable', contentType: 'db', path: `/member_country`, desc: `country table`, table: 'country' })
+)
+export const fetchUsers = () => (
+  fetchData({ type: 'fetchTable', contentType: 'db', path: `/user`, desc: `user table`, table: 'user' })
+)
+export const fetchItem = (props) => {
+  const { tables, table, eId, ownOnly, fetch } = props
+  const { [table]: { entities, title } } = tables
+  const { [eId]: { values: { [title]: eHead } } } = entities
+  return fetchData({
+    type: 'fetchItem',
+    contentType: 'db',
+    path: `/view?table=${table}&id=${eId}${ownOnly ? '&own=true' : ''}`,
+    desc: `${table} record ${eHead}`,
+    table,
+  })
+}
 
 /* REDUCER */
 
@@ -72,3 +100,20 @@ export const getTableFilters =  ({ tables }, { table }) => {
 
 /* HELPERS */
 
+export const needTables = (tables, tableNames, my=false) => {
+  if (tables == null) {return true}
+  const tNames = (!Array.isArray(tableNames)) ? [tableNames] : tableNames
+  return tNames.some(table => (
+    tables[table] == null ||
+    (my && tables[table].my == null) ||
+    (!my && tables[table].order == null)
+  ))
+}
+
+export const needValues = (tables, table, eId) => (
+  tables == null || tables[table] == null || tables[table].entities[eId] == null || !tables[table].entities[eId].complete
+)
+
+export const changedItem = (newProps, oldProps) => (
+  propsChanged(newProps, needValues, oldProps, ['table', 'eId'])
+)

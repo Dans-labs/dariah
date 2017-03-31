@@ -11,9 +11,9 @@ class CheckboxI extends Component {
     this.dom.indeterminate = indeterminate(states)
   }
   handleCheck = () => {
-    const { props: {filterSetting, filterId, handle } } = this
+    const { props: {filterSetting, table, filterId, handle } } = this
     const states = testAllChecks(filterSetting)
-    return handle(filterId, this.dom.indeterminate || !states.allTrue)
+    return handle(table, filterId, this.dom.indeterminate || !states.allTrue)
   }
   setIndeterminate = domElem => {
     const { props: { filterSetting } } = this

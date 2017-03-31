@@ -5,6 +5,7 @@ import { changeFulltext, getFilterSetting } from 'filter.js'
 
 
 const FullText = ({
+  table,
   filterId, filterField, filterLabel,
   filterSetting,
   filteredAmount, filteredAmountOthers,
@@ -17,7 +18,7 @@ const FullText = ({
         className="search"
         placeholder={`search in ${filterLabel}`}
         value={filterSetting}
-        onChange={event => handle(filterId, event.target.value)}
+        onChange={event => handle(table, filterId, event.target.value)}
       />{' '}
       <Stat subTotal={filteredAmount} total={filteredAmountOthers} />
     </p>

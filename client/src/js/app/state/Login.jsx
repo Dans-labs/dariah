@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
-import { fetchData } from 'server.js'
-import { getMe } from 'me.js'
+import { getMe, fetchMe } from 'me.js'
 
 class Login extends Component {
   render() {
@@ -28,5 +27,5 @@ class Login extends Component {
   }
 }
 
-export default connect(getMe, { fetch: fetchData })(Login)
+export default connect(getMe, { fetch: fetchMe })(Login)
 

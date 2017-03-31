@@ -12,18 +12,6 @@ const rootUrl = '/api/'
  * During request, notify actions will be dispatched.
  */
 
-/* REDUCER */
-/*
- * no dedicated reducer.
- * Results of actions will be reduced by dedicated reducers.
- */
-
-/* SELECTORS */
-/*
- * no dedicated selectors.
- * See the selectors corresponding to the dedicated reducers.
- */
-
 export const fetchData = task => dispatch => {
   const { type, path, contentType, desc } = task
   dispatch(ask(desc))
@@ -43,10 +31,21 @@ export const fetchData = task => dispatch => {
     }
   })
   .catch(error => {
-      console.err(error)
-      dispatch(err(desc, [{kind: 'error', text: error}]))
+      dispatch(err(desc, [{kind: 'error', text: error.toString()}]))
   })
 }
+
+/* REDUCER */
+/*
+ * no dedicated reducer.
+ * Results of actions will be reduced by dedicated reducers.
+ */
+
+/* SELECTORS */
+/*
+ * no dedicated selectors.
+ * See the selectors corresponding to the dedicated reducers.
+ */
 
 /* HELPERS */
 

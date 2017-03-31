@@ -20,6 +20,7 @@ const ByValue = ({
   const controlPlacement = control => (
     <p className="facet" >
       <CheckboxI
+        table={table}
         filterId={filterId}
       /> {filterLabel}{' '}
       <Stat subTotal={filteredAmount} total={filteredAmountOthers} />{' '}
@@ -51,6 +52,7 @@ const ByValue = ({
                          className={facetClass}
                         >
                           <Facet
+                            table={table}
                             filterId={filterId}
                             valueId={valueId}
                             valueRep={valueRep}

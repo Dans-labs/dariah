@@ -7,6 +7,8 @@ import me from 'me.js'
 import filter from 'filter.js'
 import alter from 'alter.js'
 
+/* ACTIONS */
+
 /* ROOT REDUCER */
 
 export default combineReducers({
@@ -33,3 +35,6 @@ export const combineSelectors = function() {
     return result
   }
 }
+
+/* HELPERS */
+

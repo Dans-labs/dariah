@@ -1,7 +1,4 @@
 /* ACTIONS */
-/*
- * Actions are dispatch in the process of fetching data from the server
- */
 
 export const nextAlt = (tag, nAlts, initial) => ({ type: 'nextAlt', tag, nAlts, initial })
 

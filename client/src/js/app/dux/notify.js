@@ -13,7 +13,7 @@ export const display = (onOff)      => ({ type: 'display', onOff })
 export default (state = { items: [], busy: 0, show: false }, { type, desc, status, msgs, onOff }) => {
   switch (type) {
     case 'async': {
-      const { items, busy, msgs } = state
+      const { items, busy, show } = state
       const extraMsgs = msgs || []
       switch (status) {
         case 'pending': {
@@ -24,7 +24,6 @@ export default (state = { items: [], busy: 0, show: false }, { type, desc, statu
               { kind: 'special', text: `waiting for ${desc}` },
             ],
             busy: busy + 1,
-            show: true,
           }
         }
         case 'success': {
@@ -36,7 +35,6 @@ export default (state = { items: [], busy: 0, show: false }, { type, desc, statu
               { kind: 'info', text: `${desc} ok` },
             ],
             busy: busy - 1,
-            show: false,
           }
         }
         

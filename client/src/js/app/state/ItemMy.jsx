@@ -1,22 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { fetchData } from 'server.js'
-import { getTables } from 'tables.js'
+import { getTables, needTables, fetchTableMy, fetchCountries, fetchUsers } from 'tables.js'
 
 import ItemList from 'ItemList.jsx'
 import Pane from 'Pane.jsx'
 
 class ItemMy extends Component {
   render() {
-    const {
-      props: { params: { table }, tables, children },
-    } = this
-    if (
-      tables == null || tables[table] == null || tables[table].my == null ||
-      tables.country == null || tables.user == null
-    ) {
-      return <div />
-    }
+    const { props: { params: { table }, tables, children } } = this
+    if (needTables(tables, table, true) || needTables(tables, ['country', 'user'])) {return <div />}
     const { entities, title, perm, my } = tables[table]
     return (
       <div>
@@ -39,25 +31,16 @@ class ItemMy extends Component {
     )
   }
   componentDidMount() {
-    const {
-      props: {
-        params: { table },
-        tables,
-        fetch,
-      },
-    } = this
-    if (tables == null || tables[table] == null || tables[table].my == null) {
-      fetch({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)`, table })
-    }
-    if (tables == null || tables.country == null) {
-      fetch({ type: 'fetchTable', contentType: 'db', path: `/member_country`, desc: `country table`, table: 'country' })
-    }
-    if (tables == null || tables.user == null) {
-      fetch({ type: 'fetchTable', contentType: 'db', path: `/user`, desc: `user table`, table: 'user' })
-    }
+    const { props: { params: { table }, tables, fetch, fetchC, fetchU } } = this
+    if (needTables(tables, table, true)) {fetch(table)}
+    if (needTables(tables, 'country'))   {fetchC()}
+    if (needTables(tables, 'user'))      {fetchU()}
   }
 }
 
-export default connect(getTables, { fetch: fetchData })(ItemMy)
-
+export default connect(getTables, {
+  fetch: fetchTableMy,
+  fetchC: fetchCountries,
+  fetchU: fetchUsers,
+})(ItemMy)
 

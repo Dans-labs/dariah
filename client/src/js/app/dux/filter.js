@@ -1,33 +1,36 @@
-import memoBind from 'memoBind.js'
+import { memoBind } from 'helpers.js'
 
 /* ACTIONS */
 
-export const changeFulltext = (filterId, searchString) => ({ type: 'fulltext', filterId, data: searchString })
-export const changeFacet = (filterId, valueId, onOff) => ({ type: 'facet', filterId, data: [valueId, onOff] })
-export const changeFacetAll = (filterId, onOff) => ({ type: 'facetAll', filterId, data: onOff })
+export const changeFulltext = (table, filterId, searchString) => ({ type: 'fulltext', table, filterId, data: searchString })
+export const changeFacet = (table, filterId, valueId, onOff) => ({ type: 'facet', table, filterId, data: [valueId, onOff] })
+export const changeFacetAll = (table, filterId, onOff) => ({ type: 'facetAll', table, filterId, data: onOff })
 
 export const setupFiltering = (table, tables) => dispatch => {
   const fieldValues = memoBind(fCC, 'compileFiltering', [table], [tables])
   const filterSettings = memoBind(fCC, 'initFiltering', [table], [tables, fieldValues])
-  dispatch({ type: 'setupFiltering', filterSettings })
+  dispatch({ type: 'setupFiltering', table, filterSettings })
 }
 
 /* REDUCER */
 
-export default (state={
-  filterSettings: {},
-  initialized: false,
-}, { type, filterId, data, ...rest }) => {
+export default (state={}, { type, table, filterId, data, filterSettings }) => {
   switch (type) {
     case 'setupFiltering': {
-      return { ...state, ...rest, initialized: true }
+      return {
+        ...state,
+        [table]: { filterSettings, initialized: true }
+      }
     }
     case 'fulltext': {
       return {
         ...state,
-        filterSettings: {
-          ...state.filterSettings,
-          [filterId]: data,
+        [table]: {
+          ...state[table],
+          filterSettings: {
+            ...state[table].filterSettings,
+            [filterId]: data,
+          },
         },
       }
     }
@@ -36,9 +39,12 @@ export default (state={
       Object.keys(state.filterSettings[filterId]).forEach(valueId => {sameSettings[valueId] = data})
       return {
         ...state,
-        filterSettings: {
-          ...state.filterSettings,
-          [filterId]: sameSettings,
+        [table]: {
+          ...state[table],
+          filterSettings: {
+            ...state[table].filterSettings,
+            [filterId]: sameSettings,
+          },
         },
       }
     }
@@ -46,11 +52,14 @@ export default (state={
       const [valueId, filterSetting] = data
       return {
         ...state,
-        filterSettings: {
-          ...state.filterSettings,
-          [filterId]: {
-            ...state.filterSettings[filterId],
-            [valueId]: filterSetting,
+        [table]: {
+          ...state[table],
+          filterSettings: {
+            ...state[table].filterSettings,
+            [filterId]: {
+              ...state[table].filterSettings[filterId],
+              [valueId]: filterSetting,
+            },
           },
         },
       }
@@ -61,15 +70,17 @@ export default (state={
 
 /* SELECTORS */
 
-export const getFilterSetting = ({ filter: { filterSettings } }, { filterId }) => ({
-  filterSetting: filterSettings[filterId],
+export const getFilterSetting = ({ filter }, { table, filterId }) => ({
+  filterSetting: filter[table].filterSettings[filterId],
 })
 
 export const getFieldValues = ({ tables }, { table, filterField }) => ({
   fieldValues: memoBind(fCC, 'compileFiltering', [table], [tables])[filterField]
 })
 
-export const getFilterApplied = ({ tables, filter: { filterSettings, initialized } }, { table }) => {
+export const getFiltersApplied = ({ tables, filter }, { table }) => {
+  const { [table]: filterStatus = { filterSettings: {}, initialized: false } } = filter
+  const { filterSettings, initialized } = filterStatus
   const fieldValues = memoBind(fCC, 'compileFiltering', [table], [tables])
   if (initialized) {
     return {

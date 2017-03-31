@@ -3,8 +3,7 @@ import { connect } from 'react-redux'
 import Markdown from 'react-markdown'
 import { Link } from 'react-router'
 import Alternative from 'Alternative.jsx'
-import { fetchData } from 'server.js'
-import { getDoc } from 'doc.js'
+import { getDoc, needDoc, changedDoc, fetchDoc } from 'doc.js'
 
 const RouterLink = ({ children, href }) => (
   href.match(/^(https?:)?\/\//)
@@ -14,14 +13,12 @@ const RouterLink = ({ children, href }) => (
 
 class DocMd extends Component {
   render() {
-    const {props: { docName, data } } = this
+    const {props: { docName, text } } = this
     const controlPlacement = control => <p style={{float: 'right'}} >{control}</p>
     const control1 = handler => <a className="control fa fa-hand-o-down" href="#" title="markdown source" onClick={handler} />
     const control2 = handler => <a className="control fa fa-file-code-o" href="#" title="formatted" onClick={handler} />
 
-    if (data == null) {
-      return <div>{`No document ${docName}`}</div>
-    }
+    if (needDoc({ text })) {return <div>{`No document ${docName}`}</div>}
     return (
       <div style={{paddingLeft: '0.5em'}} >
         <Alternative
@@ -31,13 +28,13 @@ class DocMd extends Component {
           alternatives={[(
             <div key="fmt" >
               <Markdown
-                source={data}
+                source={text}
                 renderers={{Link: RouterLink}}
               />
             </div>
           ), (
             <div key="src" >
-              <pre className="md-source" >{data}</pre>
+              <pre className="md-source" >{text}</pre>
             </div>
           )]}
         />
@@ -45,10 +42,15 @@ class DocMd extends Component {
     )
   }
   componentDidMount() {
-    const {props: { docDir, docName, docExt, fetch } } = this
-    const path = `${docDir}/${docName}.${docExt}`
-    fetch({ type: 'fetchDoc', contentType: 'json', path, desc: `document ${docName}` })
+    const { props, props: { fetch } } = this
+    fetch(props)
+  }
+  componentDidUpdate(prevProps) {
+    const { props, props: { fetch } } = this
+    if (changedDoc(props, prevProps)) {
+      fetch(props)
+    }
   }
 }
 
-export default connect(getDoc, { fetch: fetchData })(DocMd)
+export default connect(getDoc, { fetch: fetchDoc })(DocMd)

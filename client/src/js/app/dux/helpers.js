@@ -1,4 +1,4 @@
-export default function memoBind(thisArg, funcName, keyArgs, extraArgs) {
+export function memoBind(thisArg, funcName, keyArgs, extraArgs) {
   if (typeof thisArg !== 'object' || !thisArg) {
     throw new TypeError('Invalid thisArg parameter.')
   }
@@ -20,3 +20,15 @@ export default function memoBind(thisArg, funcName, keyArgs, extraArgs) {
   }
   return cache[memoKey]
 }
+
+export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
+  let result = false
+  if (oldProps == null) {
+    if (need(newProps)) {result = true}
+  }
+  else {
+    if (keyPropNames.some(a => newProps[a] != oldProps[a]) && need(newProps)) {result = true}
+  }
+  return result
+}
+

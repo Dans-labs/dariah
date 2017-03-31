@@ -1,7 +1,12 @@
+import { fetchData } from 'server.js'
+
 /* ACTIONS */
 /*
- * Actions are dispatch in the process of fetching data from the server
+ * Most actions call fetchData, which will dispatch the ultimate fetch action.
  */
+export const fetchMe = () => (
+  fetchData({ type: 'fetchMe', contentType: 'db', path: '/who/ami', desc: 'me' })
+)
 
 /* REDUCER */
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { changeFacet, getFilterSetting } from 'filter.js'
 
-const Facet = ({ filterId, valueId, valueRep, filterSetting, handle }) => {
+const Facet = ({ table, filterId, valueId, valueRep, filterSetting, handle }) => {
   const { [valueId]: isOn } = filterSetting
   return (
   <span>
@@ -10,7 +10,7 @@ const Facet = ({ filterId, valueId, valueRep, filterSetting, handle }) => {
       type="checkbox"
       checked={isOn}
       className="facet"
-      onChange={() => handle(filterId, valueId, !isOn)}
+      onChange={() => handle(table, filterId, valueId, !isOn)}
     />
     {` ${valueRep}`}
   </span>

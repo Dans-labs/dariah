@@ -4,7 +4,7 @@ import ItemList from 'ItemList.jsx'
 import Filter from 'Filter.jsx'
 import Pane from 'Pane.jsx'
 
-import { setupFiltering, getFilterApplied } from 'filter.js'
+import { setupFiltering, getFiltersApplied } from 'filter.js'
 
 class FilterCompute extends Component {
   constructor(props) {
@@ -36,4 +36,4 @@ class FilterCompute extends Component {
   }
 }
 
-export default connect(getFilterApplied, { init: setupFiltering })(FilterCompute)
+export default connect(getFiltersApplied, { init: setupFiltering })(FilterCompute)

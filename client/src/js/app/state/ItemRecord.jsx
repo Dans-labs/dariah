@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { fetchData } from 'server.js'
-import { getTables } from 'tables.js'
+import { getTables, needValues, changedItem, fetchItem } from 'tables.js'
 
 import ItemField from 'ItemField.jsx'
 
@@ -48,7 +47,7 @@ class ItemRecord extends Component {
     const {
       props: { tables, table, eId },
     } = this
-    if (this.needValues()) {
+    if (needValues(tables, table, eId)) {
       return <div />
     }
 
@@ -79,31 +78,17 @@ class ItemRecord extends Component {
       </div>
     )
   }
-  fetchEntity() {
-    const { props: { table, eId, ownOnly, fetch } } = this
-    if (this.needValues()) {
-      fetch({
-        type: 'fetchItem',
-        contentType: 'db',
-        path: `/view?table=${table}&id=${eId}${ownOnly ? '&own=true' : ''}`,
-        desc: `${table} record ${eId}`,
-        table,
-      })
-    }
-  }
-  needValues() {
-    const { props: { tables, table, eId } } = this
-    return (tables == null || tables[table] == null || tables[table].entities[eId] == null || !tables[table].entities[eId].complete)
-  }
   componentDidMount() {
-    if (this.needValues()) {this.fetchEntity()}
+    const { props, props: { fetch } } = this
+    fetch(props)
   }
   componentDidUpdate(prevProps) {
-    const { table: prevTable, eId: prevEId } = prevProps
-    const { props: { table, eId } } = this
-    if ((table != prevTable || eId != prevEId) && this.needValues()) {this.fetchEntity()}
+    const { props, props: { fetch } } = this
+    if (changedItem(props, prevProps)) {
+      fetch(props)
+    }
   }
 }
 
-export default connect(getTables, { fetch: fetchData })(ItemRecord)
+export default connect(getTables, { fetch: fetchItem })(ItemRecord)
 
