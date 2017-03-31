@@ -23,9 +23,7 @@ const userAsString = ({ _id: valId }, user) => {
     const mayLoginPart = mayLogin ? ` active=${mayLogin} ` : ''
     valRep = [namePart, eppnPart, authorityPart, mayLoginPart].filter(x => x).join('; ')
   }
-  else {
-    valRep = 'UNKNOWN'
-  }
+  else {valRep = 'UNKNOWN'}
   return valRep
 }
 
@@ -35,9 +33,7 @@ const countryAsString = ({ _id: valId }, country) => {
     const { values: { name, iso } } = entity
     return `${iso}: ${name}`
   }
-  else {
-    return 'UNKNOWN'
-  }
+  else {return 'UNKNOWN'}
 }
 
 const valueAsString = (value, { valType, convert, initial, user, country }) => {
@@ -45,21 +41,13 @@ const valueAsString = (value, { valType, convert, initial, user, country }) => {
   switch (valType) {
     case 'rel': {
       switch (convert) {
-        case 'user': {
-          return userAsString(value, user)
-        }
-        case 'country': {
-          return countryAsString(value, country)
-        }
+        case 'user': return userAsString(value, user)
+        case 'country': return countryAsString(value, country)
         default: return value.value
       }
     }
-    case 'datetime': {
-      return trimDate(value)
-    }
-    default: {
-      return value
-    }
+    case 'datetime': return trimDate(value)
+    default: return value
   }
 }
 

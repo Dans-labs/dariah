@@ -45,9 +45,7 @@ const ItemHead = ({ table, values, title, inplace }) => {
           />
         ) : (
           <NavLink className="nav" to={`/${table}/mylist/${eId}`} >
-            <span>
-              {entityHead}
-            </span>
+            <span>{entityHead}</span>
           </NavLink>
         )
       }

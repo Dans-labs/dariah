@@ -13,12 +13,8 @@ class Window extends Component {
     resize()
   }, 1000)
 
-  componentDidMount() {
-    window.addEventListener("resize", this.newWindowSize)
-  }
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.newWindowSize)
-  }
+  componentDidMount() {window.addEventListener("resize", this.newWindowSize)}
+  componentWillUnmount() {window.removeEventListener("resize", this.newWindowSize)}
 }
 
 export default connect(getWinDim, { resize: changeWinDim })(Window)

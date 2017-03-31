@@ -14,7 +14,7 @@ class Notification extends Component {
   render() {
     const { props: { notifications, lastMsg, lastNote, lastKind, busy, show, display, clear } } = this
     const highlight = lastNote > -1
-    const busyBlocks = new Array((busy < 1) ? 1 : busy).fill(1)
+    const busyBlocks = new Array((busy < 0) ? 0 : busy).fill(1)
     return (
       <div>
         <p className="msg-spinner" >
@@ -57,12 +57,9 @@ class Notification extends Component {
       </div>
     )
   }
-  componentDidMount() {
-    this.setView()
-  }
-  componentDidUpdate() {
-    this.setView()
-  }
+  componentDidMount() {this.setView()}
+  componentDidUpdate() {this.setView()}
+
   setView(on) {
     const { props: { show } } = this
     if (show) {this.setScroll()}

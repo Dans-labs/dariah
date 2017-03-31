@@ -44,12 +44,8 @@ class ItemRecord extends Component {
   }
 
   render() {
-    const {
-      props: { tables, table, eId },
-    } = this
-    if (needValues(tables, table, eId)) {
-      return <div />
-    }
+    const { props: { tables, table, eId } } = this
+    if (needValues(tables, table, eId)) {return <div />}
 
     const entity = this.getEntity()
     const { perm: perm } = entity
@@ -72,9 +68,7 @@ class ItemRecord extends Component {
             ) : null,
           ] : null}
         </p>
-        <div>
-          {fragments}
-        </div>
+        <div>{fragments}</div>
       </div>
     )
   }
