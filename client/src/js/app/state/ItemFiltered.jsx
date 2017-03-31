@@ -18,13 +18,13 @@ class ItemFiltered extends Component {
   componentDidMount() {
     const { props: { params: { table }, tables, fetch, } } = this
     if (tables == null || tables[table] == null) {
-      fetch({ type: 'fetchTable', contentType: 'db', path: `/list?table=${table}`, desc: `${table} table}`, table })
+      fetch({ type: 'fetchTable', contentType: 'db', path: `/list?table=${table}`, desc: `${table} table`, table })
     }
     if (tables == null || tables.country == null) {
-      fetch({ type: 'fetchTable', contentType: 'db', path: `/member_country`, desc: `country table}`, table: 'country' })
+      fetch({ type: 'fetchTable', contentType: 'db', path: `/member_country`, desc: `country table`, table: 'country' })
     }
     if (tables == null || tables.user == null) {
-      fetch({ type: 'fetchTable', contentType: 'db', path: `/user`, desc: `user table}`, table: 'user' })
+      fetch({ type: 'fetchTable', contentType: 'db', path: `/user`, desc: `user table`, table: 'user' })
     }
   }
 }

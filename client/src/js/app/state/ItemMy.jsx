@@ -47,13 +47,13 @@ class ItemMy extends Component {
       },
     } = this
     if (tables == null || tables[table] == null || tables[table].my == null) {
-      fetch({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)}`, table })
+      fetch({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)`, table })
     }
     if (tables == null || tables.country == null) {
-      fetch({ type: 'fetchTable', contentType: 'db', path: `/member_country`, desc: `country table}`, table: 'country' })
+      fetch({ type: 'fetchTable', contentType: 'db', path: `/member_country`, desc: `country table`, table: 'country' })
     }
     if (tables == null || tables.user == null) {
-      fetch({ type: 'fetchTable', contentType: 'db', path: `/user`, desc: `user table}`, table: 'user' })
+      fetch({ type: 'fetchTable', contentType: 'db', path: `/user`, desc: `user table`, table: 'user' })
     }
   }
 }

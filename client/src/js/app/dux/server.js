@@ -25,8 +25,8 @@ const rootUrl = '/api/'
  */
 
 export const fetchData = task => dispatch => {
-  const { type, path, contentType } = task
-  dispatch(ask(task))
+  const { type, path, contentType, desc } = task
+  dispatch(ask(desc))
   dispatch({ ...task, data: null })
 
   const settings = {credentials: 'same-origin'}
@@ -35,16 +35,16 @@ export const fetchData = task => dispatch => {
   .then(json => {
     const { msgs, good, data } = json
     if (good) {
-      dispatch(succeed(task))
+      dispatch(succeed(desc))
       dispatch({ ...task, data })
     }
     else {
-      dispatch(err(task, msgs))
+      dispatch(err(desc, msgs))
     }
   })
   .catch(error => {
       console.err(error)
-      dispatch(err(task, [{kind: 'error', text: error}]))
+      dispatch(err(desc, [{kind: 'error', text: error}]))
   })
 }
 
