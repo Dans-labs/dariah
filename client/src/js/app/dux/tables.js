@@ -106,7 +106,7 @@ export const changedItem = (newProps, oldProps) => (
   propsChanged(newProps, needValues, oldProps, ['table', 'eId'])
 )
 
-const repUser = (valId, { user }) => {
+const repUser = ({ user }, valId) => {
   let valRep
   const { entities: { [valId]: entity } } = user
   if (entity) {
@@ -128,7 +128,7 @@ const repUser = (valId, { user }) => {
   return valRep
 }
 
-const repCountry = (valId, { country }) => {
+const repCountry = ({ country }, valId) => {
   const { entities: { [valId]: entity } } = country
   if (entity) {
     const { values: { name, iso } } = entity
@@ -137,10 +137,20 @@ const repCountry = (valId, { country }) => {
   else {return 'UNKNOWN'}
 }
 
+const repValue = rel => (tables, valId) => {
+  const { [rel]: { entities: { [valId]: entity } } } = tables
+  if (entity) {
+    const { values: { rep } } = entity
+    return rep
+  }
+  else {return 'UNKNOWN'}
+}
+
 const repMap = {
   user: repUser,
   country: repCountry,
+  default: repValue,
 }
 
-export const repr = (table, tables, valId) => repMap[table](valId, tables)
+export const repr = (tables, rel, valId) => (repMap[rel] || repMap.default(rel))(tables, valId)
 

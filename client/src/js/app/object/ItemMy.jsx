@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import RaisedButton from 'material-ui/RaisedButton'
 import { getTables, needTables, fetchTableMy } from 'tables.js'
 
 import ItemList from 'ItemList.jsx'
@@ -16,10 +17,7 @@ class ItemMy extends Component {
           <p>
             {`${my.length} items `}
             {(perm != null && perm.insert) ? (
-              <span
-                className="fa fa-plus button-large insert"
-                title="New item"
-              />
+              <RaisedButton label="new" />
             ) : null}
           </p>
           <ItemList table={table} title={title} filteredData={my} inplace={false} />

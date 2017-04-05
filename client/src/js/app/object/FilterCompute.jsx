@@ -10,7 +10,7 @@ class FilterCompute extends Component {
   constructor(props) {
     super()
     const { tables, table, initialized, init } = props
-    if (!initialized) {init(table, tables)}
+    if (!initialized) {init(tables, table)}
   }
   render() {
     const { props: { initialized } } = this

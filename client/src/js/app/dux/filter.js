@@ -1,5 +1,5 @@
 import { memoBind } from 'helpers.js'
-import { repr } from tables.js
+import { repr } from 'tables.js'
 
 /* ACTIONS */
 
@@ -7,9 +7,9 @@ export const changeFulltext = (table, filterId, searchString) => ({ type: 'fullt
 export const changeFacet = (table, filterId, valueId, onOff) => ({ type: 'facet', table, filterId, data: [valueId, onOff] })
 export const changeFacetAll = (table, filterId, onOff) => ({ type: 'facetAll', table, filterId, data: onOff })
 
-export const setupFiltering = (table, tables) => dispatch => {
-  const fieldValues = memoBind(fCC, 'compileFiltering', [table], [tables])
-  const filterSettings = memoBind(fCC, 'initFiltering', [table], [tables, fieldValues])
+export const setupFiltering = (tables, table) => dispatch => {
+  const fieldValues = memoBind(fCC, 'compileFiltering', [table], [tables, table])
+  const filterSettings = memoBind(fCC, 'initFiltering', [table], [tables, table, fieldValues])
   dispatch({ type: 'setupFiltering', table, filterSettings })
 }
 
@@ -76,20 +76,20 @@ export const getFilterSetting = ({ filter }, { table, filterId }) => ({
 })
 
 export const getFieldValues = ({ tables }, { table, filterField }) => ({
-  fieldValues: memoBind(fCC, 'compileFiltering', [table], [tables])[filterField]
+  fieldValues: memoBind(fCC, 'compileFiltering', [table], [tables, table])[filterField]
 })
 
 export const getFiltersApplied = ({ tables, filter }, { table }) => {
   const { [table]: filterStatus = { filterSettings: {}, initialized: false } } = filter
   const { filterSettings, initialized } = filterStatus
-  const fieldValues = memoBind(fCC, 'compileFiltering', [table], [tables])
+  const fieldValues = memoBind(fCC, 'compileFiltering', [table], [tables, table])
   if (initialized) {
     return {
       tables,
       initialized,
       fieldValues,
       filterSettings,
-      ...computeFiltering(table, tables, fieldValues, filterSettings),
+      ...computeFiltering(tables, table, fieldValues, filterSettings),
     }
   }
   else {
@@ -104,28 +104,30 @@ export const getFiltersApplied = ({ tables, filter }, { table }) => {
 /* HELPERS */
 
 class FilterCompileCache {
-  compileFiltering = (table, tables) => {
+  compileFiltering = (tables, table) => {
     const { [table]: { entities, order, valueLists, fields, filterList, fieldSpecs } } = tables
     const presentFilterList = filterList.filter(x => fields[x.field])
     const filterFields = presentFilterList.filter(x => x.type !== 'FullText').map(x => x.field)
     const fieldValues = {}
     for (const field of filterFields) {
-      const { [field]: { valType } = fieldSpecs 
+      const { [field]: { valType } } = fieldSpecs 
       const { [field]: vals } = valueLists
       const fFieldValues = {['']: '-none-'}
       const orderedVals = Object.keys(vals).sort()
-      if ((typeof valType == 'string') || ( valType.values == 'values')) {
-        orderedVals.forEach((v,i) => {fFieldValues[i] = v}
+      if (typeof valType == 'string') {
+        orderedVals.forEach((v,i) => {fFieldValues[i] = v})
       }
       else {
-        const { values: table } = valType
-        orderedVals.forEach(v => {fFieldValues[v] = repr(table, tables, v)} 
+        const { values: rel } = valType
+        orderedVals.forEach(v => {
+          fFieldValues[v] = repr(tables, rel, v)
+        }) 
       }
       fieldValues[field] = fFieldValues
     }
     return fieldValues
   }
-  initFiltering = (table, tables, fieldValues) => {
+  initFiltering = (tables, table, fieldValues) => {
     const { [table]: { entities, order, fields, filterList } } = tables
     const presentFilterList = filterList.filter(x => fields[x.field])
     const filterSettings = {}
@@ -144,17 +146,26 @@ class FilterCompileCache {
 }
 const fCC = new FilterCompileCache()
 
-const computeFiltering = (table, tables, fieldValues, filterSettings) => {
-  const { [table]: { entities, order, fields, filterList } } = tables
+
+const computeFiltering = (tables, table, fieldValues, filterSettings) => {
+  const { [table]: { entities, order, fields, fieldSpecs, filterList } } = tables
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterChecks = {}
   const otherFilteredData = {}
-  presentFilterList.forEach((filterSpec, filterId) => {
-    filterChecks[filterId] = (
+
+  const makeFilterCheck= (filterSpec, filterId) => {
+    const { field } = filterSpec
+    const { [filterId]: filterSetting } = filterSettings
+    const { [field]: fieldSpec } = fieldSpecs
+    return (
       filterSpec.type === 'FullText' ?
-        fulltextCheck(table, tables) :
-        facetCheck
-    )(filterSpec.field, filterSettings[filterId])
+          fulltextCheck :
+          facetCheck
+      )(tables, field, fieldSpec, filterSetting)
+  }
+
+  presentFilterList.forEach((filterSpec, filterId) => {
+    filterChecks[filterId] = makeFilterCheck(filterSpec, filterId)
     otherFilteredData[filterId] = []
   })
   const filteredData = []
@@ -193,7 +204,10 @@ const computeFiltering = (table, tables, fieldValues, filterSettings) => {
   }
   const amounts = {}
   presentFilterList.forEach(({ field, type }, filterId) => {
-    amounts[filterId] = type === 'FullText' ? null : countFacets(field, fieldValues[field], otherFilteredData[filterId], entities)
+    const { [field]: fieldSpec } = fieldSpecs
+    amounts[filterId] = type === 'FullText' ? null : countFacets(
+      tables, field, fieldSpec, fieldValues[field], otherFilteredData[filterId], entities
+    )
   })
   const filteredAmountOthers = {}
   Object.entries(otherFilteredData).forEach(([filterId, x]) => {filteredAmountOthers[filterId] = x.length})
@@ -204,55 +218,69 @@ const computeFiltering = (table, tables, fieldValues, filterSettings) => {
   }
 }
 
-const getUnpack = (table, tables, field, fieldSpec) => {
-  const { [field]: { valType, multiple } = fieldSpecs 
+const getUnpack = (tables, fieldSpec, asString=false) => {
+  const { valType, multiple } = fieldSpec 
   let unpack;
-  if ((typeof valType == 'string') || (valType.values == 'values')) {
-    if (multiple) {
-      unpack = v => (v == null)?'':v.join(' ')
-    }
-    else {
-      unpack = v => (v == null)?'':v
-    }
+  if (typeof valType == 'string') {
+    unpack = multiple ? (
+      asString ? (
+        v => (v == null) ? '' : v.join(' ')
+      ) : (
+        v => (v == null) ? [] : v
+      )
+    ) : (
+      asString ? (
+        v => (v == null) ? '' : v
+      ) : (
+        v => (v == null) ? [] : [v]
+      )
+    )
   }
   else {
-    const { values: table } = valType
-    if (multiple) {
-      unpack = v => (v == null)?'':v.map(v => repr(table, tables, v).join(' ')
-    }
-    else {
-      unpack = v => (v == null)?'':repr(table, tables, v)
-    }
+    const { values: rel } = valType
+    unpack = multiple ? (
+      asString ? (
+        v => (v == null) ? '' : v.map(v => repr(tables, rel, v).join(' '))
+      ) : (
+        v => (v == null) ? [] : v
+      )
+    ) : (
+      asString ? (
+        v => (v == null) ? '' : repr(tables, rel, v)
+      ) : (
+        v => (v == null) ? [] : [v]
+      )
+    )
+  }
+  return unpack
+}
+
+const fulltextCheck = (tables, field, fieldSpec, term) => {
+  const unpack = getUnpack(tables, fieldSpec, true)
+  const search = term.toLowerCase()
+  if (search == null || search == '') {
+    return () => true
+  }
+  return entity => {
+    const { values: { [field]: val } } = entity
+    const rep = unpack(val)
+    return rep != null && rep.toLowerCase().indexOf(search) !== -1
   }
 }
 
-const fulltextCheck = (table, tables) => {
-  const { [table]: { fieldSpecs: { [field]: fieldSpec } } } = tables
-  const unpack = getUnpack(table, tables, field, fieldSpec)
-  return (field, term) => {
-    const search = term.toLowerCase()
-    if (search == null || search == '') {
-      return () => true
-    }
-    return entity => {
-      const { values: { [field]: val } } = entity
-      const rep = unpack(val)
-      return rep != null && rep.toLowerCase().indexOf(search) !== -1
-    }
-  }
-}
-
-const facetCheck = (field, facetSettings) => {
+const facetCheck = (tables, field, fieldSpec, facetSettings) => {
+  const unpack = getUnpack(tables, fieldSpec)
   if (facetSettings.size === 0) {
     return () => false
   }
   return entity => {
-    const { values: { [field]: fieldVals } } = entity
-    if (fieldVals == null || fieldVals.length == 0) {
+    const { values: { [field]: val } } = entity
+    const rep = unpack(val)
+    if (rep.length == 0) {
       return facetSettings['']
     }
-    for (const {_id: valueId} of fieldVals) {
-      if (facetSettings[valueId]) {
+    for (const r of rep) {
+      if (facetSettings[r]) {
         return true
       }
     }
@@ -260,19 +288,19 @@ const facetCheck = (field, facetSettings) => {
   }
 }
 
-const countFacets = (field, fieldValues, filteredData, entities) => {
+const countFacets = (tables, field, fieldSpec, fieldValues, filteredData, entities) => {
+  const unpack = getUnpack(tables, fieldSpec)
   const facetAmounts = {}
-  Object.keys(fieldValues).forEach(valueId => {
-    facetAmounts[valueId] = 0
-  })
+  Object.keys(fieldValues).forEach(r => {facetAmounts[r] = 0})
   for (const eId of filteredData) {
-    const { values: { [field]: fieldVals } } = entities[eId]
-    if (fieldVals == null || fieldVals.length == 0) {
+    const { [eId]: { values: { [field]: val } } } = entities
+    const rep = unpack(val)
+    if (rep.length == 0) {
       facetAmounts[''] += 1
     }
     else {
-      for (const {_id: valueId} of fieldVals) {
-        facetAmounts[valueId] += 1
+      for (const r of rep) {
+        facetAmounts[r] += 1
       }
     }
   }

@@ -1,4 +1,4 @@
-export function memoBind(thisArg, funcName, keyArgs, extraArgs) {
+export function memoBind(thisArg, funcName, keyArgs, allArgs) {
   if (typeof thisArg !== 'object' || !thisArg) {
     throw new TypeError('Invalid thisArg parameter.')
   }
@@ -16,7 +16,7 @@ export function memoBind(thisArg, funcName, keyArgs, extraArgs) {
 
   const memoKey = JSON.stringify(keyArgs)
   if (cache[memoKey] == null) {
-    cache[memoKey] = func.apply(thisArg, [...keyArgs, ...(extraArgs || [])])
+    cache[memoKey] = func.apply(thisArg, allArgs)
   }
   return cache[memoKey]
 }
