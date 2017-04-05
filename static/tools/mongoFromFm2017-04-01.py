@@ -219,9 +219,8 @@ class FMConvert(object):
             if v != None and (fmult <= 1 or v != ''): newValue.append(v)
         if len(newValue) == 0:
             defValue = self.DEFAULT_VALUES.get(t, {}).get(fname, None)
-            if defValue != None: newValue = [defValue]
-        if fmult == 1:
-            newValue = None if len(newValue) == 0 else newValue[0]
+            if defValue != None:
+                newValue = [defValue]
         return newValue
 
     def showFields(self):
@@ -272,10 +271,8 @@ class FMConvert(object):
             for (f, fo) in self.DECOMPOSE_FIELDS[mt].items():
                 self.allFields[mt][fo] = self.allFields[mt][f]
                 self.allFields[mt][f] = [self.allFields[mt][f][0], 1]
-            for (f, t) in self.FIELD_TYPE.get(mt, {}).items():
+            for (f, t) in self.FIELD_TYPE[mt].items():
                 self.allFields[mt][f][0] = t
-            for (f, m) in self.FIELD_MULTIPLE.get(mt, {}).items():
-                self.allFields[mt][f][1] = m
 
     def readFmData(self):
         for mt in self.MAIN_TABLES:
@@ -338,33 +335,43 @@ class FMConvert(object):
                     for mf in mfs: del row[mf]
 
     def readLists(self):
-        valueLists = collections.defaultdict(set)
-        for mt in self.VALUE_LISTS:
-            rows = self.allData[mt]
-            for f in self.VALUE_LISTS[mt]:
-                path = '{}/{}/{}.txt'.format(self.FM_DIR, mt, f)
-                data = set()
-                if os.path.exists(path):
-                    with open(path) as fh:
-                        for line in fh:
-                            data.add(line.strip())
-                else:
-                    for row in rows:
-                        values = row.get(f, [])
-                        if type(values) is not list:
-                            values = [values]
-                        for val in values:
-                            data.add(val)
-                valueLists[f] |= data
-        for (f, valueSet) in valueLists.items():
-            self.valueDict[f] = dict((i+1, x) for (i, x) in enumerate(sorted(valueSet)))
-            self.allFields[f] = dict(
+        valueLists = dict()
+        for path in glob('{}/*.txt'.format(self.FM_DIR)):
+            tname = basename(splitext(path)[0])
+            data = []
+            with open(path) as fh:
+                for line in fh:
+                    data.append(line.rstrip().split('\t'))
+            valueLists[tname] = data
+
+        for (vList, data) in valueLists.items():
+            if vList == 'countryExtra':
+                mapping = dict((x[0], x[1:]) for x in data)
+            else:
+                mapping = dict((i+1, x[0]) for (i, x) in enumerate(data))
+            self.valueDict[vList] = mapping
+            self.allFields[vList] = dict(
                 _id=('id', 1),
-                rep=('string', 1),
+                value=('string', 1),
             )
+        
+        for mt in self.allData:
+            fs = self.MAKE_VALUE_LISTS.get(mt, set())
+            for f in fs:
+                valSet = set()
+                for row in self.allData[mt]:
+                    values = row.get(f, [])
+                    if type(values) is not list:
+                        values = [values]
+                    valSet |= set(values)
+                self.valueDict[f] = dict((i+1, x) for (i, x) in enumerate(sorted(valSet)))
+                self.allFields[f] = dict(
+                    _id=('id', 1),
+                    value=('string', 1),
+                )
 
     def countryTable(self):
-        extraInfo = self.countryExtra
+        extraInfo = self.valueDict['countryExtra']
         idMapping = dict()
 
         for row in self.allData['country']:
@@ -373,14 +380,15 @@ class FMConvert(object):
             iso = row['iso']
             row['_id'] = self.mongo.newId()
             idMapping[iso] = row['_id']
-            thisInfo = extraInfo[iso]
-            row['latitude'] = thisInfo['latitude']
-            row['longitude'] = thisInfo['longitude']
+            (name, lat, long) = extraInfo[iso]
+            row['latitude'] = lat
+            row['longitude'] = long
 
         for row in self.allData['contrib']:
-            if row['country'] != None:
-                iso = row['country']
-                row['country'] = idMapping[iso]
+            newValue = []
+            for iso in row['country']:
+                newValue.append(dict(_id=idMapping[iso], iso=iso, value=extraInfo[iso][0]))
+            row['country'] = newValue
         
         self.allFields['country']['_id'] = ('id', 1)
         self.allFields['country']['iso'] = ('string', 1)
@@ -394,15 +402,17 @@ class FMConvert(object):
         users = collections.defaultdict(set)
         eppnSet = set()
         for c in self.allData['contrib']:
-            crsPre = [c.get(field, None) for field in ['creator', 'modifiedBy']]
-            crs = [x for x in crsPre if x != None]
+            crs = c.get('creator', []) + c.get('modifiedBy', [])
             for cr in crs:
                 eppnSet.add(cr)
         idMapping = dict((eppn, self.mongo.newId()) for eppn in sorted(eppnSet))
         for c in self.allData['contrib']:
-            c['creator'] = idMapping[c['creator']]
-            if 'modifiedBy' not in c: c['modifiedBy'] = []
-            else: c['modifiedBy'] = [idMapping[c['modifiedBy']]]
+            c['creator'] = [dict(_id=idMapping[cr]) for cr in c['creator']]
+
+            if 'modifiedBy' not in c:
+                c['modifiedBy'] = []
+            else:
+                c['modifiedBy'] = [dict(_id=idMapping[cr]) for cr in c['modifiedBy']]
 
         users = dict((i, eppn) for (eppn, i) in idMapping.items())
         for (i, eppn) in sorted(users.items()):
@@ -448,45 +458,56 @@ class FMConvert(object):
                 relInfo = self.valueDict[fAs]
                 if not fAs in relIndex:
                     idMapping = dict((i, self.mongo.newId()) for i in relInfo)
-                    self.allData[fAs] = [dict(_id=idMapping[i], rep=v) for (i, v) in relInfo.items()]
+                    self.allData[fAs] = [dict(_id=idMapping[i], value=v) for (i, v) in relInfo.items()]
                     relIndex[fAs] = dict((norm(v), (idMapping[i], v)) for (i, v) in relInfo.items())
-                (ftype, fmult) = self.allFields[mt][f]
                 for row in rows:
                     newValue = []
-                    for v in (row[f] if fmult > 1 else [row[f]] if row[f] != None else []):
+                    for v in row[f]:
                         rnv = norm(v)
                         (i, nv) = relIndex[fAs].get(rnv, ("-1", None))
                         if nv == None:
                             target = self.MOVE_MISSING[mt]
-                            (ttype, tmult) = self.allFields[mt][target]
-                            if target not in row or row[target] == None:
-                                row[target] = [] if tmult > 1 else ''
-                            if tmult == 1:
-                                row[target] += '\nMOVED FROM {}: {}'.format(f, v)
-                            else:
-                                row[target].append('MOVED FROM {}: {}'.format(f, v))
-                        else:
-                            if fmult > 1: newValue.append(i)
-                            else: newValue = i
+                            if target not in row: row[target] = ['']
+                            row[target][0] += '\nMOVED FROM {}: {}'.format(f, v)
+                        else: newValue.append(dict(_id=i, value=nv))
                     row[f] = newValue 
 
     def testTweaks(self):
         for (table, test) in self.testOwner.items():
             my = self.uidMapping[test['owner']]
             search = test['search']
-            (stype, smult) = self.allFields[table][search]
             field = test['field']
             mine = test['documents']
             for row in self.allData[table]:
                 value = row.get(search, [None])
-                if smult > 1:
-                    if len(value) == 0: value = [None]
-                    if value[0] in mine:
-                        row[field] = [my]
-                else:
-                    if value in mine:
-                        row[field] = my
+                if len(value) == 0: value = [None]
+                if value[0] in mine:
+                    row[field] = [dict(_id=my)]
 
+    def legacyConvert(self):
+        for (item, mapping) in self.CONVERSIONS.items():
+            (mainTable, table) = item.split('-')
+            oldTable = '{}Legacy'.format(table)
+            self.allData[oldTable] = self.allData[table]
+            self.allFields[oldTable] = self.allFields[table]
+            self.allData[table] = []
+            newValues = set()
+            for vals in mapping.values():
+                for val in vals: newValues.add(val)
+            newValueList = sorted(newValues)
+            newValueIndex = dict((newVal, self.mongo.newId()) for newVal in newValueList)
+            self.allData[table] = [dict(_id=newValueIndex[nv], value=nv) for nv in newValueList]
+            fullMapping = dict()
+            for (ov, newVals) in mapping.items():
+                for nv in newVals:
+                    fullMapping.setdefault(ov, []).append(dict(_id=newValueIndex[nv], value=nv))
+            for row in self.allData[mainTable]:
+                oldValues = row.get(table, [])
+                newValues = []
+                for ov in oldValues: newValues.extend(fullMapping[ov['value']])
+                row[oldTable] = oldValues
+                row[table] = newValues
+        
     def importMongo(self):
         client = MongoClient()
         client.drop_database('dariah')
@@ -555,6 +576,7 @@ class FMConvert(object):
         self.userTable()
         self.relTables()
         self.testTweaks()
+        self.legacyConvert()
         self.importMongo()
         #self.showData()
         #self.showMoney()

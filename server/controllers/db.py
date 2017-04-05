@@ -156,24 +156,11 @@ class DbAccess(object):
         fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
 
-        values = list(_DBM['values'].find(dict(table=table), dict(values=True)))
-        for vl in values:
-            for f in vl:
-                if (field != None and f != field) or f not in getFields: continue
-                for v in vl[f]:
-                    valueLists.setdefault(f, {})[v] = True
-        skimFields = [f for (f, fSpec) in fieldSpecs.items() if type(fSpec['valType']) is dict and fSpec['valType']['values'] == 'values']  
-        for f in skimFields:
-            if (field != None and f != field) or f not in getFields: continue
-            values = list(_DBM[table].distinct(f))
-            for v in values:
-                valueLists.setdefault(f, {})[v] = True
         relFields = [
             f for (f, fSpec) in fieldSpecs.items()\
                 if (field == None or f == field) and\
                 f in getFields and\
-                type(fSpec['valType']) is dict and\
-                fSpec['valType']['values'] != 'values'
+                type(fSpec['valType']) is dict
         ]  
         relTables = {fieldSpecs[f]['valType']['values'] for f in relFields}
         tables = dict()

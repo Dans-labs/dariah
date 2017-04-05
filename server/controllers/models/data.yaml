@@ -288,7 +288,7 @@ tables:
       year:
         label: Year
         valType:
-          values: values
+          values: year
           allowNew: true
         multiple: false
         validation:
@@ -301,7 +301,7 @@ tables:
       vcc:
         label: VCC
         valType:
-          values: values
+          values: vcc
           allowNew: false
         multiple: true
         validation:
@@ -311,7 +311,7 @@ tables:
       discipline:
         label: Disciplines
         valType:
-          values: values
+          values: discipline
           allowNew: true
         multiple: true
         validation:
@@ -321,7 +321,7 @@ tables:
       keyword:
         label: Keywords
         valType:
-          values: values
+          values: keyword
           allowNew: true
         multiple: true
         validation:
@@ -331,7 +331,7 @@ tables:
       typeContribution:
         label: Type
         valType:
-          values: values
+          values: typeContribution
           allowNew: false
         multiple: false
         validation:
@@ -341,7 +341,7 @@ tables:
       typeContributionOther:
         label: Type
         valType:
-          values: values
+          values: typeContribution
           allowNew: true
         multiple: true
         validation:
@@ -351,7 +351,7 @@ tables:
       tadirahObject:
         label: Object(s)
         valType:
-          values: values
+          values: tadirahObject
           allowNew: false
         multiple: true
         validation:
@@ -361,7 +361,7 @@ tables:
       tadirahActivity:
         label: Activity(ies)
         valType:
-          values: values
+          values: tadirahActivity
           allowNew: false
         multiple: true
         validation:
@@ -371,7 +371,7 @@ tables:
       tadirahTechnique:
         label: Technique(s)
         valType:
-          values: values
+          values: tadirahTechnique
           allowNew: false
         multiple: true
         validation:
@@ -387,7 +387,7 @@ tables:
       - field: country
         label: country
         type: EUMap
-        maxCols: 3
+        maxCols: 2
         expanded: true
       - field: vcc
         label: vcc
