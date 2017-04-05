@@ -13,7 +13,7 @@ const rootUrl = '/api/'
  */
 
 export const fetchData = task => dispatch => {
-  const { type, path, contentType, desc } = task
+  const { path, contentType, desc } = task
   dispatch(ask(desc))
   dispatch({ ...task, data: null })
 

@@ -38,7 +38,7 @@ class ItemRecord extends Component {
   }
 
   getEntity = () => {
-    const { props: { tables, table, eId  } } = this
+    const { props: { tables, table, eId } } = this
     const { [table]: { entities: { [eId]: entity } } } = tables
     return entity
   }
@@ -48,17 +48,17 @@ class ItemRecord extends Component {
     if (needValues(tables, table, eId)) {return <div />}
 
     const entity = this.getEntity()
-    const { perm: perm } = entity
+    const { perm } = entity
     const { fragments, hasEditable } = this.parseFields()
     return (
       <div className="widget-medium" >
-        <p>record in {table}</p>
+        <p>{`record in ${table}`}</p>
         <p>
           {hasEditable ? [
             <span
               key="save"
               className={`button-large`}
-            >Save</span>,
+            >{'Save'}</span>,
             perm.delete ? (
               <span
                 key="delete"

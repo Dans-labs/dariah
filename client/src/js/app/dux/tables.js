@@ -12,21 +12,13 @@ export const fetchTable = (table) => (
 export const fetchTableMy = (table) => (
   fetchData({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)`, table })
 )
-export const fetchCountries = () => (
-  fetchData({ type: 'fetchTable', contentType: 'db', path: `/member_country`, desc: `country table`, table: 'country' })
-)
-export const fetchUsers = () => (
-  fetchData({ type: 'fetchTable', contentType: 'db', path: `/user`, desc: `user table`, table: 'user' })
-)
 export const fetchItem = (props) => {
-  const { tables, table, eId, ownOnly, fetch } = props
-  const { [table]: { entities, title } } = tables
-  const { [eId]: { values: { [title]: eHead } } } = entities
+  const { table, eId, ownOnly } = props
   return fetchData({
     type: 'fetchItem',
     contentType: 'db',
     path: `/view?table=${table}&id=${eId}${ownOnly ? '&own=true' : ''}`,
-    desc: `${table} record ${eHead}`,
+    desc: `${table} record ${eId}`,
     table,
   })
 }
@@ -37,10 +29,9 @@ export default (state={}, { type, path, data, table }) => {
   switch (type) {
     case 'fetchTable': {
       if (data == null) {return { ...state, [table]: null }}
-      return {
-        ...state,
-        [table]: data,
-      }
+      const newState = { ...state }
+      for (const t in data) {newState[t] = data[t]}
+      return newState
     }
     case 'fetchTableMy': {
       if (data == null) {
@@ -53,9 +44,10 @@ export default (state={}, { type, path, data, table }) => {
           }
         }
       }
-      const { entities, order, ...rest } = data
+      const { [table]: { entities, order, ...rest }, ...otherTables } = data
       return {
         ...state,
+        ...otherTables,
         [table]: {
           ...state[table],
           ...rest,
@@ -89,10 +81,6 @@ export default (state={}, { type, path, data, table }) => {
 
 export const getTables = ({ tables }) => ({ tables })
 
-export const getCountry = ({ tables: { country } }) => ({ country })
-
-export const getUser = ({ tables: { user } }) => ({ user })
-
 export const getTableFilters =  ({ tables }, { table }) => {
   const { [table]: { fields, filterList } } = tables
   return { fields, filterList }
@@ -117,3 +105,42 @@ export const needValues = (tables, table, eId) => (
 export const changedItem = (newProps, oldProps) => (
   propsChanged(newProps, needValues, oldProps, ['table', 'eId'])
 )
+
+const repUser = (valId, { user }) => {
+  let valRep
+  const { entities: { [valId]: entity } } = user
+  if (entity) {
+    const { values: { eppn, firstName, lastName, emailPre, authority, mayLogin } } = entity
+    const email = emailPre || ''
+    let linkText = [firstName || '', lastName || ''].filter(x => x).join(' ')
+    if (linkText == '') {linkText = email}
+    const namePart = (linkText && email) ? (
+      `[${linkText}](mailto:${email})`
+    ) : (
+      linkText + email
+    )
+    const eppnPart = eppn ? ` eppn=${eppn} ` : ''
+    const authorityPart = authority ? ` authenticated by=${authority} ` : ''
+    const mayLoginPart = mayLogin ? ` active=${mayLogin} ` : ''
+    valRep = [namePart, eppnPart, authorityPart, mayLoginPart].filter(x => x).join('; ')
+  }
+  else {valRep = 'UNKNOWN'}
+  return valRep
+}
+
+const repCountry = (valId, { country }) => {
+  const { entities: { [valId]: entity } } = country
+  if (entity) {
+    const { values: { name, iso } } = entity
+    return `${iso}: ${name}`
+  }
+  else {return 'UNKNOWN'}
+}
+
+const repMap = {
+  user: repUser,
+  country: repCountry,
+}
+
+export const repr = (table, tables, valId) => repMap[table](valId, tables)
+

@@ -13,7 +13,7 @@ import Doc from 'Doc.jsx'
 import NotFound from 'NotFound.jsx'
 
 import configureStore from 'configureStore.js'
-import rootReducer from 'reducers.js'
+import rootReducer from 'rootReducer.js'
 
 const store = configureStore(rootReducer)
 

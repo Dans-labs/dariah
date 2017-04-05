@@ -10,9 +10,21 @@ class Notification extends Component {
   refDom = label => dom => {
     if (dom) {this.dom[label] = dom}
   }
+  handleBox = () => {
+    const { props: { show, display } } = this
+    display(!show)
+  }
+  handleHide = () => {
+    const { props: { display } } = this
+    display(false)
+  }
+  handleClear = () => {
+    const { props: { clear } } = this
+    clear()
+  }
 
   render() {
-    const { props: { notifications, lastMsg, lastNote, lastKind, busy, show, display, clear } } = this
+    const { props: { notifications, lastNote, lastKind, busy, show } } = this
     const highlight = lastNote > -1
     const busyBlocks = new Array((busy < 0) ? 0 : busy).fill(1)
     return (
@@ -25,15 +37,15 @@ class Notification extends Component {
             { busyBlocks.map((b, i) => <span key={i} className="msg-dot fa fa-caret-left" />) }
             <span
               className={`fa fa-${busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}
-              onClick={() => display(!show)}
+              onClick={this.handleBox}
             />
           </span>
         </p>
-        {show? (
+        {show ? (
           <div
             ref={this.refDom('notbox')}
             className="msg-box"
-            onClick={() => display(false)}
+            onClick={this.handleHide}
           >{
             (notifications).map((msg, i) => (
               <p
@@ -49,18 +61,18 @@ class Notification extends Component {
                 href="#"
                 title="clear messages"
                 className="control fa fa-trash"
-                onClick={() => clear()}
+                onClick={this.handleClear}
               />
             </p>
           </div>
-        ): null}
+        ) : null}
       </div>
     )
   }
   componentDidMount() {this.setView()}
   componentDidUpdate() {this.setView()}
 
-  setView(on) {
+  setView() {
     const { props: { show } } = this
     if (show) {this.setScroll()}
   }

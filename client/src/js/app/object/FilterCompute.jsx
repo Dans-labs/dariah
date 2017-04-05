@@ -14,7 +14,7 @@ class FilterCompute extends Component {
   }
   render() {
     const { props: { initialized } } = this
-    if (!initialized) {return <div/>}
+    if (!initialized) {return <div />}
     const { props: { tables, table, filteredData, filteredAmountOthers, amounts} } = this
     const { [table]: { order, title } } = tables
     return (

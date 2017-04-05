@@ -44,17 +44,22 @@ const pathsApp = globby.sync([`${pathApp}/*`, `!${pathApp}/*.jsx`])
 
 const mDependencies = globby.sync('*.js', {cwd: pathLib})
 const vDependencies = [
+  'leaflet',
+  'lodash.isequal',
+  'material-ui',
 	'react',
   'react-addons-update',
   'react-dom',
   'react-markdown',
+  'react-tap-event-plugin',
   'react-router',
   'react-redux',
   'redux',
   'redux-thunk',
   'redux-logger',
-  'leaflet',
-  'whatwg-fetch'
+  'redux-form',
+  'redux-form-material-ui',
+  'whatwg-fetch',
 ]
 
 const watchAppPaths = [`${pathApp}/**/*.js`, `${pathApp}/**/*.jsx`]

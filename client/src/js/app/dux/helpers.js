@@ -32,3 +32,12 @@ export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
   return result
 }
 
+export const combineSelectors = function() {
+  return (state, props) => {
+    const result = {}
+    for (const selector of arguments) {
+      Object.assign(result, selector(state, props))
+    }
+    return result
+  }
+}

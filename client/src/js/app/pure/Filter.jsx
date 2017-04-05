@@ -14,20 +14,13 @@ const filterClass = {
 }
 
 const Filter = ({
-  tables,
-  table,
-  fields,
-  filterList, 
-  filteredAmount, filteredAmountOthers,
-  amounts,
+  table, fields,
+  filterList, filteredAmount, filteredAmountOthers, amounts,
 }) => (
   <div>
     {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
       const { type } = filter
       const { [type]: Fclass } = filterClass
-      if (false && type != 'FullText') {
-        return <p key={filterId}>{type}</p>
-      }
       return (
         <Fclass
           key={filterId}

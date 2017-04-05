@@ -44,9 +44,9 @@ $action-text: #000044;
     border-color: $action-border;
     white-space: nowrap;
 }
-.button-large { @include sizing(medium, 6, 2) }
-.button-medium { @include sizing(medium, 4, 1) }
-.button-small { @include sizing(small, 2, 0 ) }
+.button-large { @include sizing(medium, 6px, 2) }
+.button-medium { @include sizing(medium, 4px, 1) }
+.button-small { @include sizing(small, 2px, 0 ) }
 
 .link {
     @include action();
@@ -192,7 +192,7 @@ $special-back: #ffeeff;
     cursor: pointer;
     background-color: #eeeeee;
     border: 2px solid #aaaaaa;
-    border-radius: 8;
+    border-radius: 8px;
     font-size: small;
 }
 .msg-spinner {

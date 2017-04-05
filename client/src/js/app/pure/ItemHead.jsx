@@ -4,16 +4,7 @@ import ItemRecord from 'ItemRecord.jsx'
 import NavLink from 'NavLink.jsx'
 
 const ItemHead = ({ table, values, title, inplace }) => {
-  const { _id: eId, [title]: entityHeadPre } = values
-  let entityHead
-  if (!entityHeadPre) {entityHead = '-empty-'}
-  else {
-    [entityHead] = entityHeadPre
-    if (typeof entityHead == 'object') {
-      const { value } = entityHead
-      entityHead = value
-    }
-  }
+  const { _id: eId, [title]: entityHead = '-empty-' } = values
 
   const control1 = handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />)
   const control2 = handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />)

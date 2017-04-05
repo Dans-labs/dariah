@@ -1,4 +1,5 @@
 import { memoBind } from 'helpers.js'
+import { repr } from tables.js
 
 /* ACTIONS */
 
@@ -104,24 +105,23 @@ export const getFiltersApplied = ({ tables, filter }, { table }) => {
 
 class FilterCompileCache {
   compileFiltering = (table, tables) => {
-    const { [table]: { entities, order, fields, filterList } } = tables
+    const { [table]: { entities, order, valueLists, fields, filterList, fieldSpecs } } = tables
     const presentFilterList = filterList.filter(x => fields[x.field])
     const filterFields = presentFilterList.filter(x => x.type !== 'FullText').map(x => x.field)
     const fieldValues = {}
-    for (const f of filterFields) {
-      fieldValues[f] = {['']: '-none-'}
-    }
-    for (const eId of order) {
-      const entity = entities[eId]
-      for (const field of filterFields) {
-        const fFieldValues = fieldValues[field]
-        const { values: { [field]: efValue } } = entity
-        if (efValue != null && efValue.length !== 0) {
-          for (const {_id: valueId, value: valueRep} of efValue) {
-            fFieldValues[valueId] = valueRep
-          }
-        }
+    for (const field of filterFields) {
+      const { [field]: { valType } = fieldSpecs 
+      const { [field]: vals } = valueLists
+      const fFieldValues = {['']: '-none-'}
+      const orderedVals = Object.keys(vals).sort()
+      if ((typeof valType == 'string') || ( valType.values == 'values')) {
+        orderedVals.forEach((v,i) => {fFieldValues[i] = v}
       }
+      else {
+        const { values: table } = valType
+        orderedVals.forEach(v => {fFieldValues[v] = repr(table, tables, v)} 
+      }
+      fieldValues[field] = fFieldValues
     }
     return fieldValues
   }
@@ -150,7 +150,11 @@ const computeFiltering = (table, tables, fieldValues, filterSettings) => {
   const filterChecks = {}
   const otherFilteredData = {}
   presentFilterList.forEach((filterSpec, filterId) => {
-    filterChecks[filterId] = (filterSpec.type === 'FullText' ? fulltextCheck : facetCheck)(filterSpec.field, filterSettings[filterId])
+    filterChecks[filterId] = (
+      filterSpec.type === 'FullText' ?
+        fulltextCheck(table, tables) :
+        facetCheck
+    )(filterSpec.field, filterSettings[filterId])
     otherFilteredData[filterId] = []
   })
   const filteredData = []
@@ -200,15 +204,41 @@ const computeFiltering = (table, tables, fieldValues, filterSettings) => {
   }
 }
 
-const fulltextCheck = (field, term) => {
-  const search = term.toLowerCase()
-  if (search == null || search == '') {
-    return () => true
+const getUnpack = (table, tables, field, fieldSpec) => {
+  const { [field]: { valType, multiple } = fieldSpecs 
+  let unpack;
+  if ((typeof valType == 'string') || (valType.values == 'values')) {
+    if (multiple) {
+      unpack = v => (v == null)?'':v.join(' ')
+    }
+    else {
+      unpack = v => (v == null)?'':v
+    }
   }
-  return entity => {
-    let { values: { [field]: val } } = entity
-    val = (val != null) ? val[0] : val
-    return val != null && val.toLowerCase().indexOf(search) !== -1
+  else {
+    const { values: table } = valType
+    if (multiple) {
+      unpack = v => (v == null)?'':v.map(v => repr(table, tables, v).join(' ')
+    }
+    else {
+      unpack = v => (v == null)?'':repr(table, tables, v)
+    }
+  }
+}
+
+const fulltextCheck = (table, tables) => {
+  const { [table]: { fieldSpecs: { [field]: fieldSpec } } } = tables
+  const unpack = getUnpack(table, tables, field, fieldSpec)
+  return (field, term) => {
+    const search = term.toLowerCase()
+    if (search == null || search == '') {
+      return () => true
+    }
+    return entity => {
+      const { values: { [field]: val } } = entity
+      const rep = unpack(val)
+      return rep != null && rep.toLowerCase().indexOf(search) !== -1
+    }
   }
 }
 

@@ -56,22 +56,16 @@ methods:
   mod:
     desc: modify (insert/update/delete) an item
     call: own
-  member_country:
+  country:
     desc: member countries
     call: public
   user:
     desc: users
     call: own
-  value_table:
-    desc: value lists from separate collection
-    call: public
-  value_skim:
-    desc: value lists extracted from row data
-    call: public
 
 owners:
   user:     _id
-  contrib:  creator._id
+  contrib:  creator
 
 tables:
   user:

@@ -4,7 +4,7 @@ import NavLink from 'NavLink.jsx'
 import Pane from 'Pane.jsx'
 import { getWinDim } from 'win.js'
 
-const SubApp = ({params: { table }, children, height, width }) => (
+const SubApp = ({params: { table }, children }) => (
   <div>
     <Pane format="nav sized" position="left">
       {(table == 'contrib') ? (

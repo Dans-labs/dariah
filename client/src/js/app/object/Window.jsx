@@ -1,4 +1,4 @@
-import { Component, PropTypes, Children } from 'react'
+import { Component, Children } from 'react'
 import { connect } from 'react-redux'
 import throttle from 'lodash/throttle'
 import { getWinDim, changeWinDim } from 'win.js'
@@ -8,7 +8,7 @@ class Window extends Component {
     const { props: { children } } = this
     return Children.only(children)
   }
-  newWindowSize = throttle(event => {
+  newWindowSize = throttle(() => {
     const { props: { resize } } = this
     resize()
   }, 1000)

@@ -3,8 +3,6 @@ generic:
   createdBy: creator
   modDate: dateModified
   modBy: modifiedBy
-  idField: _id
-  valField: value
 
 tables:
   user:
@@ -143,7 +141,6 @@ tables:
       - country
       - vcc
       - typeContribution
-      - typeContributionLegacy
       - description
       - costTotal
       - costDescription
@@ -228,7 +225,7 @@ tables:
       description:
         label: Description
         valType: textarea
-        multiple: true
+        multiple: false
         validation:
           nonEmpty: true
         convert: markdown
@@ -256,142 +253,129 @@ tables:
 
       creator:
         label: creator
-        valType: rel
+        valType:
+          values: user
+          allowNew: false
         multiple: false
         validation:
           nonEmpty: true
-        convert: user
-        allowNew: false
-        getValues: /user
-        idOnly: true
         appearance: {}
 
       modifiedBy:
         label: modified by
-        valType: rel
+        valType:
+          values: user
+          allowNew: false
         multiple: true
         validation:
           nonEmpty: false
-        convert: user
-        allowNew: false
-        getValues: /user
-        idOnly: true
         appearance:
           reverse: true
           cutoff: 1
 
       country:
         label: Country(ies)
-        valType: rel
+        valType:
+          values: country
+          select:
+            isMember: true
+          allowNew: false
         multiple: false
         validation:
           nonEmpty: true
-        convert: country
-        allowNew: false
-        getValues: /member_country
-        idOnly: false
         appearance: {}
 
       year:
         label: Year
-        valType: rel
+        valType:
+          values: values
+          allowNew: true
         multiple: false
         validation:
           nonEmpty: true
           min: 2000
           max: 2100
           step: 1
-        allowNew: true
-        getValues: /value_skim?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       vcc:
         label: VCC
-        valType: rel
+        valType:
+          values: values
+          allowNew: false
         multiple: true
         validation:
           nonEmpty: true
-        allowNew: false
-        getValues: /value_table?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       discipline:
         label: Disciplines
-        valType: rel
+        valType:
+          values: values
+          allowNew: true
         multiple: true
         validation:
           nonEmpty: true
-        allowNew: true
-        getValues: /value_skim?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       keyword:
         label: Keywords
-        valType: rel
+        valType:
+          values: values
+          allowNew: true
         multiple: true
         validation:
           nonEmpty: true
-        allowNew: true
-        getValues: /value_skim?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       typeContribution:
         label: Type
-        valType: rel
-        multiple: true
-        validation:
-          nonEmpty: true
-        allowNew: false
-        getValues: /value_table?table={table}&field={field}
-        idOnly: false
-        appearance: {}
-
-      typeContributionLegacy:
-        label: Type (legacy)
-        valType: rel
+        valType:
+          values: values
+          allowNew: false
         multiple: false
         validation:
           nonEmpty: true
-        allowNew: false
-        getValues: /value_skim?table={table}&field={field}
-        idOnly: false
+        appearance: {}
+
+      typeContributionOther:
+        label: Type
+        valType:
+          values: values
+          allowNew: true
+        multiple: true
+        validation:
+          nonEmpty: true
         appearance: {}
 
       tadirahObject:
         label: Object(s)
-        valType: rel
+        valType:
+          values: values
+          allowNew: false
         multiple: true
         validation:
           nonEmpty: false
-        allowNew: false
-        getValues: /value_table?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       tadirahActivity:
         label: Activity(ies)
-        valType: rel
+        valType:
+          values: values
+          allowNew: false
         multiple: true
         validation:
           nonEmpty: false
-        allowNew: false
-        getValues: /value_table?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       tadirahTechnique:
         label: Technique(s)
-        valType: rel
+        valType:
+          values: values
+          allowNew: false
         multiple: true
         validation:
           nonEmpty: false
-        allowNew: false
-        getValues: /value_table?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
     filters:

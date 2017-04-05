@@ -60,10 +60,6 @@ class PermApi(object):
         if may == -1 and isOwn == False: may = 0
         return may if asInt else (may != 0)
 
-    def _fail(self, text):
-        self.msgs.append(dict(kind='error', text=text))
-        return (False, False)
-
     def _orderLevels(self, levs):
         rank = self.rank
         return sorted(levs, key=lambda lv: rank[lv]) 

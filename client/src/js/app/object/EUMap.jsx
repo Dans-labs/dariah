@@ -4,8 +4,8 @@ import ByValue from 'ByValue.jsx'
 import L from 'leaflet'
 import {countryBorders} from 'europe.geo.js'
 import { getFilterSetting } from 'filter.js'
-import { getCountry } from 'tables.js'
-import { combineSelectors } from 'reducers.js'
+import { getTables } from 'tables.js'
+import { combineSelectors } from 'helpers.js'
 
 const mapOptions = {
   HEIGHT: 250,
@@ -63,7 +63,7 @@ class EUMap extends Component {
   }
   setMap = dom => {if (dom) {this.dom = dom}}
   render() {
-    const { props: { country, ...byValueProps }, setMap } = this
+    const { props: { tables, ...byValueProps }, setMap } = this
     return (
       <div>
         <div
@@ -76,7 +76,7 @@ class EUMap extends Component {
 
   componentDidMount() {
     const {
-      props: { filterSetting, filteredAmountOthers, amounts, country },
+      props: { filterSetting, filteredAmountOthers, amounts, tables: { country } },
       dom,
     } = this
     const { HEIGHT, MAP_CENTER, ZOOM_INIT, MAP_BOUNDS, MARKER_COLOR, MARKER_SHAPE, COUNTRY_STYLE } = mapOptions
@@ -98,8 +98,8 @@ class EUMap extends Component {
       onEachFeature: feature => {
         if (this.inDariah(feature)) {
           const { properties: { iso2, lat, lng } } = feature
-          const _id = this.idFromIso[iso2]
-          const isOn = filterSetting[_id]
+          const { idFromIso: { [iso2]: _id } } = this
+          const { [_id]: isOn } = filterSetting
           const marker = L.circleMarker([lat, lng], {
             ...MARKER_COLOR[isOn],
             radius: computeRadius(_id, filteredAmountOthers, amounts),
@@ -118,8 +118,8 @@ class EUMap extends Component {
     const { props: { filterSetting, filteredAmountOthers, amounts } } = this
     const { MARKER_COLOR } = mapOptions
     Object.entries(this.features).forEach(([iso2, marker]) => {
-      const _id = this.idFromIso[iso2]
-      const isOn = filterSetting[_id]
+      const { idFromIso: { [iso2]: _id } } = this
+      const { [_id]: isOn } = filterSetting
       marker.setRadius(computeRadius(_id, filteredAmountOthers, amounts))
       marker.setStyle(MARKER_COLOR[isOn])
     })
@@ -128,4 +128,4 @@ class EUMap extends Component {
 
 EUMap.displayName = 'EUMap'
 
-export default connect(combineSelectors(getCountry, getFilterSetting))(EUMap)
+export default connect(combineSelectors(getTables, getFilterSetting))(EUMap)

@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import Stat from 'Stat.jsx'
 import { changeFulltext, getFilterSetting } from 'filter.js'
 
+const handleChange = (handle, table, filterId) => event => handle(table, filterId, event.target.value)
 
 const FullText = ({
   table,
@@ -18,7 +19,7 @@ const FullText = ({
         className="search"
         placeholder={`search in ${filterLabel}`}
         value={filterSetting}
-        onChange={event => handle(table, filterId, event.target.value)}
+        onChange={handleChange(handle, table, filterId)}
       />{' '}
       <Stat subTotal={filteredAmount} total={filteredAmountOthers} />
     </p>

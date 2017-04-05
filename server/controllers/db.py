@@ -47,64 +47,69 @@ class DbAccess(object):
     def userAdd(self, record): _DBM.user.insert_one(record)
     def userMod(self, record): _DBM.user.update_one({'eppn': record['eppn']}, {'$set': record})
 
-    def validate(self, values, fieldSpecs):
-        valType = fieldSpecs['valType']
-        fvalidation = fieldSpecs['validation']
-        nonEmpty = fvalidation.get('nonEmpty', False)
-        idField = self.DM.generic['idField']
-        valField = self.DM.generic['valField']
+    def validate(self, table, itemValues, uFields):
+        fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in itemValues)
+        valItemValues = dict()
+        for (f, values) in itemValues.items():
+            valType = fieldSpecs[f]['valType']
+            multiple = fieldSpecs[f]['multiple']
+            fvalidation = fieldSpecs[f]['validation']
+            nonEmpty = fvalidation.get('nonEmpty', False)
 
-        if values == None: return (not nonEmpty, [])
-        if valType == 'datetime':
-            valValues = [dtm(v) for v in values]
-        elif valType == 'rel':
-            seenIds = set()
-            seenVals = set()
+            if multiple: values = [] if values == None else values
+            else: values = [values] if values != None else []
+            valid = True
             valValues = []
-            for v in values:
-                vId = v.get(idField, None)
-                vVal = v.get(valField, None)
-                if v == None or vId in seenIds or (vVal != None and vVal) in seenVals: continue
-                seenIds.add(vId)
-                seenVals.add(vVal)
-                valValues.append(dict((k, oid(m) if k == idField else m) for (k, m) in v.items()))
-        else:
-            valValues = [v for v in values]
-        return (True, valValues)
+            msgs = []
+            if f not in uFields:
+                valid = False
+                msgs.append([dict(kind='error', text='table {} field {} not accessible'.format(table, field))])
+            elif values == []: 
+                if nonEmpty:
+                    valid = False
+                    msgs.append([dict(kind='error', text='table {} field {} may not be empty'.format(table, field))])
+            elif type(valType) is str:
+                if valType == 'datetime':
+                    valValues = [dtm(v) for v in values]
+                else:
+                    valValues = [v for v in values]
+            else: 
+                (good, thisMsgs, tables, valueLists) = self.getValueLists(table, noTables=True)
+                if not good:
+                    valid = False
+                    msgs.extend(thisMsgs)
+                else:
+                    allowNew = valType['allowNew']
+                    if not allowNew:
+                        for v in values:
+                            if v not in valueLists.get(f, {}):
+                                valid = False
+                                msgs.append([dict(kind='error', text='table {} field {}: Unknown value "{}"'.format(table, field, v))])
+                            else:
+                                valValues.append[v]
 
+            if not multiple: valValues = None if valValues == [] else valValues[0]
+            valItemValues[f] = (valid, valValues)
+        return valItemValues
 
-    def getValues(self, controller, table, field, action):
+    def getList(
+            self, controller, table, action,
+            rFilter=None, sort=None, titleOnly=False,
+            withValueLists=False, withFilters=False,
+        ):
         Perm = self.Perm
-        idField = self.DM.generic['idField']
-        (good, result) = Perm.getPerm(controller, table, action)
-        if not good:
-            return self._stop(text=result)
-        (rowFilter, fieldFilter) = result
-        if field not in fieldFilter:
-            return self._stop(text='no visible field {} in {}'.format(field, table))
-        documents = list(_DBM[table].distinct(field))
-        data = dict(
-            order=[d[idField] for d in documents],
-            entities=dict((str(d[idField]), d) for d in documents),
-        )
-        return self._stop(data=data)
-
-    def getList(self, controller, table, action, rFilter=None, sort=None, titleOnly=False, withFilters=False):
-        Perm = self.Perm
-        idField = self.DM.generic['idField']
         title = self.DM.tables.get(table, {}).get('title', None)
         (mayInsert, iFields) = Perm.may(table, 'insert')
         perm = dict(insert=mayInsert)
-        none = dict(order=[], entities={}, fields={}, perm={})
+        none = {table: dict(order=[], entities={}, fields={}, perm={})}
         (good, result) = Perm.getPerm(controller, table, action)
         if not good:
-            return self._stop(data=none, text=result)
+            return self.stop(data=none, text=result)
         (rowFilter, fieldFilter) = result
         fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
         if titleOnly:
             filters = {f['field'] for f in self.DM.tables[table].get('filters', None)}
-            print(filters)
             getFields = set(fieldFilter)
             for f in getFields:
                 if f != title and (filters == None or f not in filters): del fieldFilter[f] 
@@ -116,35 +121,96 @@ class DbAccess(object):
             (sortField, sortDir) = sort
             sortField = self.DM.tables[table][sortField[1:]] if sortField[0] == '*' else sortField
             documents = list(_DBM[table].find(rowFilter, fieldFilter).sort(sortField, sortDir))
-        data = dict(
-            order=[d[idField] for d in documents],
-            entities=dict((str(d[idField]), dict(values=d, complete=not titleOnly)) for d in documents),
-            fields=fieldFilter,
-            title=title,
-            perm=perm,
-            fieldOrder=fieldOrder,
-            fieldSpecs=fieldSpecs,
-        )
+        order=[d['_id'] for d in documents]
+        entities=dict((str(d['_id']), dict(values=d, complete=not titleOnly)) for d in documents)
+        if withValueLists:
+            (good, thisMsgs, tables, valueLists) = self.getValueLists(table)
+            if not good:
+                return self.stop(data=none, msgs=thisMsgs)
+
+        data = {
+            table: dict(
+                order=order,
+                entities=entities,
+                fields=fieldFilter,
+                valueLists=valueLists,
+                title=title,
+                perm=perm,
+                fieldOrder=fieldOrder,
+                fieldSpecs=fieldSpecs,
+            )
+        }
+        for (t, tdata) in tables.items():
+            data[t] = tdata
         if withFilters:
-            data['filterList'] = self.DM.tables[table]['filters']
-        return self._stop(data=data)
+            data[table]['filterList'] = self.DM.tables[table]['filters']
+        return self.stop(data=data)
+
+    def getValueLists(self, table, field=None, noTables=False):
+        Perm = self.Perm
+        (good, result) = Perm.getPerm('list', table, 'read')
+        valueLists = {}
+        if not good: return dict()
+        (rowFilter, fieldFilter) = result
+        getFields = set(fieldFilter)
+        fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
+        fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
+
+        values = list(_DBM['values'].find(dict(table=table), dict(values=True)))
+        for vl in values:
+            for f in vl:
+                if (field != None and f != field) or f not in getFields: continue
+                for v in vl[f]:
+                    valueLists.setdefault(f, {})[v] = True
+        skimFields = [f for (f, fSpec) in fieldSpecs.items() if type(fSpec['valType']) is dict and fSpec['valType']['values'] == 'values']  
+        for f in skimFields:
+            if (field != None and f != field) or f not in getFields: continue
+            values = list(_DBM[table].distinct(f))
+            for v in values:
+                valueLists.setdefault(f, {})[v] = True
+        relFields = [
+            f for (f, fSpec) in fieldSpecs.items()\
+                if (field == None or f == field) and\
+                f in getFields and\
+                type(fSpec['valType']) is dict and\
+                fSpec['valType']['values'] != 'values'
+        ]  
+        relTables = {fieldSpecs[f]['valType']['values'] for f in relFields}
+        tables = dict()
+        msgs = []
+        good = True
+        if not noTables:
+            for t in relTables:
+                result = self.getList('list', t, 'read', withValueLists=True)
+                if result['good']:
+                    tables[t] = result['data'][t]
+                else:
+                    msgs.extend(result['msgs'])
+                    good = False
+
+        for f in relFields:
+            fSpec = fieldSpecs[f]['valType']
+            t = fSpec['values']
+            select = fSpec.get('select', {})
+            rows = list(_DBM[t].find(select, dict(_id=True)))
+            for row in rows: valueLists.setdefault(f, {})[str(row['_id'])] = True
+        return (good, msgs, tables, valueLists if field == None else valueLists[field])
 
     def getItem(self, controller, table, ident, action):
         Perm = self.Perm
-        idField = self.DM.generic['idField']
         none = {}
         (good, result) = Perm.getPerm(controller, table, action)
         if not good:
-            return self._stop(text=result)
+            return self.stop(text=result)
         (rowFilter, fieldFilter) = result
         fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
-        rowFilter.update({idField: oid(ident)})
+        rowFilter.update({'_id': oid(ident)})
         documents = list(_DBM[table].find(rowFilter, fieldFilter))
 
         ldoc = len(documents)
         if ldoc == 0:
-            return self._stop(data=none, text='{} item does not exist'.format(table))
+            return self.stop(data=none, text='{} item does not exist'.format(table))
         document = documents[0]
         (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
         (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
@@ -152,15 +218,14 @@ class DbAccess(object):
         fillIn = 'getValues'
         for (fName, specs) in fieldSpecs.items():
             if fillIn in specs: specs[fillIn] = specs[fillIn].format(table=table, field=fName) 
-        return self._stop(data=dict(values=document, complete=True, perm=perm, fields=fieldFilter))
+        return self.stop(data=dict(values=document, complete=True, perm=perm, fields=fieldFilter))
 
     def modList(self, controller, table, action):
-        idField = self.DM.generic['idField']
         Perm = self.Perm
         (good, result) = Perm.getPerm(controller, table, action)
         none = '' if action == 'insert' else {}
         if not good:
-            return self._stop(data=none, text=result)
+            return self.stop(data=none, text=result)
 
         (rowFilter, fieldFilter) = result
 
@@ -173,63 +238,61 @@ class DbAccess(object):
             insertVals = {
                 title: ['no title'],
                 createdDate: [now()],
-                createdBy: [{idField: self.uid}],
+                createdBy: [{'_id': self.uid}],
                 modDate: [now()],
-                modBy: [{idField: self.uid}],
+                modBy: [{'_id': self.uid}],
             }
             result = _DBM[table].insert_one(insertVals)
-            return self._stop(data=result.inserted_id)
+            return self.stop(data=result.inserted_id)
 
         elif action == 'delete':
             newData = request.json
-            ident = newData.get(idField, None)
+            ident = newData.get('_id', None)
             if ident == None:
-                return self._stop(data=none, text='Not specified which item to delete')
-            rowFilter.update({idField: oid(ident)})
-            documents = list(_DBM[table].find(rowFilter, {idField: True}))
+                return self.stop(data=none, text='Not specified which item to delete')
+            rowFilter.update({'_id': oid(ident)})
+            documents = list(_DBM[table].find(rowFilter, {'_id': True}))
             if len(documents) != 1:
-                return self._stop(data=none, text='Unidentified item to delete')
+                return self.stop(data=none, text='Unidentified item to delete')
             document = documents[0]
             (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
             if not mayDelete:
-                return self._stop(data=none, text='Not allowed to delete this item')
+                return self.stop(data=none, text='Not allowed to delete this item')
             else:
                 _DBM[table].delete_one(rowFilter)
-                return self._stop(data={idField: ident})
+                return self.stop(data={'_id': ident})
 
         elif action == 'update':
             newData = request.json
-            ident = newData.get(idField, None)
+            ident = newData.get('_id', None)
             if ident == None:
-                return self._stop(data=none, text='Not specified which item to update')
-            name = newData.get('name', None)
-            if name == None:
-                return self._stop(data=none, text='Not specified which field to update')
-            rowFilter.update({idField: oid(ident)})
+                return self.stop(data=none, text='Not specified which item to update')
+            rowFilter.update({'_id': oid(ident)})
             documents = list(_DBM[table].find(rowFilter))
             if len(documents) != 1:
-                return self._stop(data=none, text='Unidentified item to update')
+                return self.stop(data=none, text='Unidentified item to update')
             document = documents[0]
             (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
             if not mayUpdate:
-                return self._stop(data=none, text='Not allowed to update this item')
-            if not name in uFields:
-                return self._stop(data=none, text='Not allowed to update field {} this item'.format(name))
-            newValues = newData.get('values', None)
-            fieldSpecs = self.DM.tables[table]['fieldSpecs'].get(name, None)
+                return self.stop(data=none, text='Not allowed to update this item')
+            newValues = dict(x for x in newData.get('values', {}).items())
+            valItemValues = self.validate(table, newValues, uFields)
+            if any(not valid for (f, (valid, vals)) in valItemValues):
+                fields = ','.join(f for (f, (valid, vals)) in valItemValues if not valid)
+                return self.stop(data=none, text='Validation errors in {}'.format(fields))
+            fieldSpecs = self.DM.tables[table]['fieldSpecs'].get(field, None)
             if fieldSpecs == None:
-                return self._stop(data=none, text='field {} has unknown type'.format(name))
-            (valid, valValues) = self.validate(newValues, fieldSpecs)
+                return self.stop(data=none, text='field {} has unknown type'.format(field))
             if not valid:
-                documents = list(_DBM[table].find(rowFilter, {name: True}))
+                documents = list(_DBM[table].find(rowFilter, {field: True}))
                 if len(documents) != 1:
-                    return self._stop(data=none, text='error during update of field {}'.format(name))
+                    return self.stop(data=none, text='error during update of field {}'.format(field))
                 document = documents[0]
-                values = document.get(name, [])
+                values = document.get(field, [])
                 return dict(
-                    data={name: values},
+                    data={field: values},
                     good=True,
-                    msgs=[dict(kind='warning', text='restored field {} because validation failed'.format(name))],
+                    msgs=[dict(kind='warning', text='restored field {} because validation failed'.format(field))],
                 )
             else:
                 modDate = self.DM.generic['modDate']
@@ -239,22 +302,23 @@ class DbAccess(object):
                     changeVals.update({
                         '$push': {
                             modDate: now(),
-                            modBy: {idField: self.uid},
+                            modBy: {'_id': self.uid},
                         },
                     })
                 _DBM[table].update_one(rowFilter, changeVals)
                 documents = list(_DBM[table].find(rowFilter, {name: True, modDate: True, modBy: True}))
                 if len(documents) != 1:
-                    return self._stop(data=none, text='item not properly identified after update')
+                    return self.stop(data=none, text='item not properly identified after update')
                 document = documents[0]
                 changedVals = {
                     name: document[name],
                     modDate: document[modDate],
                     modBy: document[modBy],
                 }
-                return self._stop(data=changedVals)
+                return self.stop(data=changedVals)
 
-    def _stop(self, data=None, text=None):
-        good = text == None
-        msgs = [] if good else [dict(kind='error', text=text)]
+    def stop(self, data=None, text=None, msgs=None):
+        good = text == None and msgs == None
+        msgs = [] if good else [dict(kind='error', text=text)] if msgs == None else msgs
         return dict(data=data, msgs=msgs, good=good)
+

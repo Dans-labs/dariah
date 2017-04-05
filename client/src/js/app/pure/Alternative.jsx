@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { getAlt, nextAlt } from 'alter.js'
 
 const handleNext = ({ tag, alternatives, initial, next }) => event => {
-  event.preventDefault();
+  event.preventDefault()
   next(tag, alternatives.length, initial)
 }
 

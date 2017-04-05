@@ -8,10 +8,10 @@ import { getFieldValues, placeFacets } from 'filter.js'
 
 const ByValue = ({
   table,
-  filterId, filterField, filterLabel,
+  filterId, filterLabel,
   fieldValues,
   filteredAmount, filteredAmountOthers,
-  amounts, maxCols, 
+  amounts, maxCols,
   expanded,
 }) => {
   const rows = placeFacets(fieldValues, maxCols)
