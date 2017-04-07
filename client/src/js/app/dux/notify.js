@@ -1,3 +1,5 @@
+import mergeWith from 'lodash/mergewith'
+
 /* ACTIONS */
 
 export const ask =     (desc)       => ({ type: 'async', status: 'pending', desc })
@@ -17,52 +19,45 @@ export default (state = { items: [], busy: 0, show: false }, { type, desc, statu
       const extraMsgs = msgs || []
       switch (status) {
         case 'pending': {
-          return {
-            ...state, items: [
-              ...items,
+          return mergeWith({}, state, {
+            items: [
               ...extraMsgs,
-              { kind: 'special', text: `waiting for ${desc}` },
+              { kind: 'special', text: `waiting for ${desc}`}
             ],
             busy: busy + 1,
-          }
+          }, addItems)
         }
         case 'success': {
-          return {
-            ...state,
+          return mergeWith({}, state, {
             items: [
-              ...items,
               ...extraMsgs,
               { kind: 'info', text: `${desc} ok` },
             ],
             busy: busy - 1,
-          }
+          }, addItems)
         }
         
         case 'error': {
-          return {
-            ...state,
+          return mergeWith({}, state, {
             items: [
-              ...items,
               ...extraMsgs,
               { kind: 'error', text: `${desc} failed` },
             ],
             busy: busy - 1,
             show: true,
-          }
+          }, addItems)
         }
         default: return state
       }
     }
     case 'msgs': {
       const { items } = state
-      return {
-        ...state,
+      return mergeWith({}, state, {
         items: [
-          ...items,
           ...msgs,
         ],
         show: true,
-      }
+      }, addItems)
     }
     case 'clear': {
       return {
@@ -106,4 +101,10 @@ export const getNotifications = ({ notify }) => {
 }
 
 /* HELPERS */
+
+const addItems = (objValue, srcValue, key) => {
+  if (key == 'items') {
+    return (objValue == null) ? srcValue : objValue.concat(srcValue)
+  }
+}
 

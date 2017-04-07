@@ -1,3 +1,4 @@
+import mergeWith from 'lodash/mergewith'
 import { fetchData } from 'server.js'
 import { propsChanged } from 'helpers.js'
 
@@ -28,50 +29,17 @@ export const fetchItem = (props) => {
 export default (state={}, { type, path, data, table }) => {
   switch (type) {
     case 'fetchTable': {
-      if (data == null) {return { ...state, [table]: null }}
-      const newState = { ...state }
-      for (const t in data) {newState[t] = data[t]}
-      return newState
+      if (data == null) {return state}
+      return mergeWith({}, state, data, setComplete)
     }
     case 'fetchTableMy': {
-      if (data == null) {
-        if (state[table] == null) { return { ...state, [table]: null }}
-        return {
-          ...state,
-          [table]: {
-            ...state[table],
-            my: null,
-          }
-        }
-      }
-      const { [table]: { entities, order, ...rest }, ...otherTables } = data
-      return {
-        ...state,
-        ...otherTables,
-        [table]: {
-          ...state[table],
-          ...rest,
-          my: order,
-          entities: {
-            ...(state[table] || {}).entities,
-            ...entities,
-          },
-        },
-      }
+      if (data == null) {return state}
+      return mergeWith({}, state, data, setComplete)
     }
     case 'fetchItem': {
       if (data == null) {return state}
       const { values: { _id } } = data
-      return {
-        ...state,
-        [table]: {
-          ...state[table],
-          entities: {
-            ...state[table].entities,
-            [_id]: data,
-          },
-        },
-      }
+      return mergeWith({}, state, { [table]: { entities: { [_id]: data } } }, setComplete)
     }
     default: return state
   }
@@ -88,6 +56,10 @@ export const getTableFilters =  ({ tables }, { table }) => {
 
 /* HELPERS */
 
+const setComplete = (newValue, oldValue, key) => {
+  if (key == 'complete') {return newValue || oldValue}
+}
+
 export const needTables = (tables, tableNames, my=false) => {
   if (tables == null) {return true}
   const tNames = (!Array.isArray(tableNames)) ? [tableNames] : tableNames
@@ -98,9 +70,11 @@ export const needTables = (tables, tableNames, my=false) => {
   ))
 }
 
-export const needValues = (tables, table, eId) => (
-  tables == null || tables[table] == null || tables[table].entities[eId] == null || !tables[table].entities[eId].complete
-)
+export const needValues = ({ tables, table, eId }) => {
+  const missing = tables == null || tables[table] == null || tables[table].entities[eId] == null
+  const complete = !missing && tables[table].entities[eId].complete
+  return tables == null || tables[table] == null || tables[table].entities[eId] == null || !tables[table].entities[eId].complete
+}
 
 export const changedItem = (newProps, oldProps) => (
   propsChanged(newProps, needValues, oldProps, ['table', 'eId'])

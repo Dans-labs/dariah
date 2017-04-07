@@ -1,14 +1,15 @@
-import gulp        from 'gulp'
-import browserify  from 'browserify'
-import babelify    from 'babelify'
-import source      from 'vinyl-source-stream'
-import buffer      from 'vinyl-buffer'
-import uglify      from 'gulp-uglify'
-import sass        from 'gulp-sass'
-import sourcemaps  from 'gulp-sourcemaps'
-import eslint      from 'gulp-eslint'
-import jsdoc       from 'gulp-jsdoc3'
-import globby      from 'globby'
+import gulp         from 'gulp'
+import browserify   from 'browserify'
+import babelify     from 'babelify'
+import source       from 'vinyl-source-stream'
+import buffer       from 'vinyl-buffer'
+import uglify       from 'gulp-uglify'
+import sass         from 'gulp-sass'
+import autoprefixer from 'gulp-autoprefixer'
+import sourcemaps   from 'gulp-sourcemaps'
+import eslint       from 'gulp-eslint'
+import jsdoc        from 'gulp-jsdoc3'
+import globby       from 'globby'
  
 /* Config settings */
 
@@ -45,20 +46,17 @@ const pathsApp = globby.sync([`${pathApp}/*`, `!${pathApp}/*.jsx`])
 const mDependencies = globby.sync('*.js', {cwd: pathLib})
 const vDependencies = [
   'leaflet',
-  'lodash.isequal',
-  'material-ui',
+  'lodash',
 	'react',
   'react-addons-update',
   'react-dom',
   'react-markdown',
-  'react-tap-event-plugin',
   'react-router',
   'react-redux',
   'redux',
   'redux-thunk',
   'redux-logger',
   'redux-form',
-  'redux-form-material-ui',
   'whatwg-fetch',
 ]
 
@@ -134,6 +132,7 @@ function transformCss({
   } = {}) {
   return gulp.src([src])
     .pipe(sass({outputStyle}).on('error', sass.logError))
+    .pipe(autoprefixer())
     .pipe(gulp.dest(dst))
 }
 

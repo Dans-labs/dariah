@@ -1,3 +1,4 @@
+import merge from 'lodash/merge'
 import { memoBind } from 'helpers.js'
 import { repr } from 'tables.js'
 
@@ -18,52 +19,20 @@ export const setupFiltering = (tables, table) => dispatch => {
 export default (state={}, { type, table, filterId, data, filterSettings }) => {
   switch (type) {
     case 'setupFiltering': {
-      return {
-        ...state,
-        [table]: { filterSettings, initialized: true }
-      }
+      return merge({}, state, { [table]: { filterSettings, initialized: true } })
     }
     case 'fulltext': {
-      return {
-        ...state,
-        [table]: {
-          ...state[table],
-          filterSettings: {
-            ...state[table].filterSettings,
-            [filterId]: data,
-          },
-        },
-      }
+      return merge({}, state, { [table]: { filterSettings: { [filterId]: data } } })
     }
     case 'facetAll': {
+      const { [table]: { filterSettings: { [filterId]: facets } } } = state
       const sameSettings = {}
-      Object.keys(state.filterSettings[filterId]).forEach(valueId => {sameSettings[valueId] = data})
-      return {
-        ...state,
-        [table]: {
-          ...state[table],
-          filterSettings: {
-            ...state[table].filterSettings,
-            [filterId]: sameSettings,
-          },
-        },
-      }
+      Object.keys(facets).forEach(valueId => {sameSettings[valueId] = data})
+      return merge({}, state, { [table]: { filterSettings: { [filterId]: sameSettings } } })
     }
     case 'facet': {
       const [valueId, filterSetting] = data
-      return {
-        ...state,
-        [table]: {
-          ...state[table],
-          filterSettings: {
-            ...state[table].filterSettings,
-            [filterId]: {
-              ...state[table].filterSettings[filterId],
-              [valueId]: filterSetting,
-            },
-          },
-        },
-      }
+      return merge({}, state, { [table]: { filterSettings: { [filterId]: { [valueId]: filterSetting } } } })
     }
     default: return state
   }
@@ -180,12 +149,8 @@ const computeFiltering = (tables, table, fieldValues, filterSettings) => {
         const pass = filterCheck(entity)
         if (!pass) {
           v = false
-          if (theOneFail === null) {
-            theOneFail = filterId
-          }
-          else {
-            discard = true
-          }
+          if (theOneFail === null) {theOneFail = filterId}
+          else {discard = true}
         }
       }
     })
@@ -197,9 +162,7 @@ const computeFiltering = (tables, table, fieldValues, filterSettings) => {
           otherFilteredData[filterId].push(_id)
         })
       }
-      else {
-        otherFilteredData[theOneFail].push(_id)
-      }
+      else {otherFilteredData[theOneFail].push(_id)}
     }
   }
   const amounts = {}

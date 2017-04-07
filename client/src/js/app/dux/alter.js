@@ -1,3 +1,5 @@
+import merge from 'lodash/merge'
+
 /* ACTIONS */
 
 export const nextAlt = (tag, nAlts, initial) => ({ type: 'nextAlt', tag, nAlts, initial })
@@ -9,7 +11,7 @@ export default (state = {}, { type, tag, initial, nAlts }) => {
     case 'nextAlt': {
       const { [tag]: oldAlt = (initial || 0) } = state
       const newAlt = (oldAlt + 1) % nAlts
-      return { ...state, [tag]: newAlt }
+      return merge({}, state, { [tag]: newAlt })
     }
     default: return state
   }
@@ -23,5 +25,4 @@ export const getAlt = ({ alter }, { tag, initial }) => {
 }
 
 /* HELPERS */
-
 

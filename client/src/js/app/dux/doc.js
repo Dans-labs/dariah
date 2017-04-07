@@ -1,3 +1,5 @@
+import merge from 'lodash/merge'
+
 import { fetchData } from 'server.js'
 import { propsChanged } from 'helpers.js'
 
@@ -17,8 +19,8 @@ export const fetchDoc = (props) => {
 export default (state = {}, { type, path, data }) => {
   switch (type) {
     case 'fetchDoc': {
-      if (data == null) {return { ...state, [path]: null }}
-      return { ...state, [path]: data }
+      if (data == null) {return state}
+      return merge({}, state, { [path]: data })
     }
     default: return state
   }

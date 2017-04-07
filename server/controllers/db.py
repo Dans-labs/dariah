@@ -96,6 +96,7 @@ class DbAccess(object):
             self, controller, table, action,
             rFilter=None, sort=None, titleOnly=False,
             withValueLists=False, withFilters=False,
+            my=False,
         ):
         Perm = self.Perm
         title = self.DM.tables.get(table, {}).get('title', None)
@@ -128,18 +129,21 @@ class DbAccess(object):
             if not good:
                 return self.stop(data=none, msgs=thisMsgs)
 
-        data = {
-            table: dict(
-                order=order,
-                entities=entities,
-                fields=fieldFilter,
-                valueLists=valueLists,
-                title=title,
-                perm=perm,
-                fieldOrder=fieldOrder,
-                fieldSpecs=fieldSpecs,
-            )
-        }
+        result = dict(
+            entities=entities,
+            fields=fieldFilter,
+            valueLists=valueLists,
+            title=title,
+            perm=perm,
+            fieldOrder=fieldOrder,
+            fieldSpecs=fieldSpecs,
+        )
+        if my:
+            result['my'] = order
+        else:
+            result['order'] = order
+
+        data = {table: result}
         for (t, tdata) in tables.items():
             data[t] = tdata
         if withFilters:

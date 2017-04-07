@@ -45,7 +45,7 @@ class ItemRecord extends Component {
 
   render() {
     const { props: { tables, table, eId } } = this
-    if (needValues(tables, table, eId)) {return <div />}
+    if (needValues({ tables, table, eId })) {return <div />}
 
     const entity = this.getEntity()
     const { perm } = entity
@@ -74,13 +74,11 @@ class ItemRecord extends Component {
   }
   componentDidMount() {
     const { props, props: { fetch } } = this
-    fetch(props)
+    if (changedItem(props, null)) {fetch(props)}
   }
   componentDidUpdate(prevProps) {
     const { props, props: { fetch } } = this
-    if (changedItem(props, prevProps)) {
-      fetch(props)
-    }
+    if (changedItem(props, prevProps)) {fetch(props)}
   }
 }
 

@@ -22,7 +22,6 @@
     <link rel="manifest" href="/static/favicons/manifest.json">
     <link rel="mask-icon" href="/static/favicons/safari-pinned-tab.svg" color="#5bbad5">
     <link rel="shortcut icon" href="/static/favicons/favicon.ico">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="msapplication-TileImage" content="/static/favicons/mstile-144x144.png">
     <meta name="msapplication-config" content="/static/favicons/browserconfig.xml">
