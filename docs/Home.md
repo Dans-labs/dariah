@@ -1,6 +1,7 @@
 <a name="top">
 
-![logo](static/images/inkind_logo.png)
+![logo](../static/images/inkind_logo.png)
+https://github.com/Dans-labs/dariah/raw/master/docs/static/images/inkind_logo.png
 
 # DARIAH contribution tool
 
