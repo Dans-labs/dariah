@@ -1,6 +1,6 @@
 # ES6 Documentation references.
 
-## ES6
+## General
 
 We use
 [EcmaScript 6, also known as ES6, also known as ES2015, also known as Javascript](https://babeljs.io/learn-es2015/)
@@ -42,8 +42,13 @@ The typical way to use a promise is
 
 This is virtually the only occurrence in our code where we use Promise syntax.
 
-[External documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise|Promise)
+[External documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 ---
-[Previous](Home) -
-[Next](React)
+[Previous - Urls](Urls.md) -
+[Up](Home.md) -
+[Next - React](React.md)
+
+---
+[repo](https://github.com/Dans-labs/dariah) -
+[website](https://dariah-beta.dans.knaw.nl/)

@@ -201,3 +201,12 @@ Most of the styling is defined in the JSX, but there are a few CSS style files, 
 For example, we use the open source mapping library
 [leaflet](http://leafletjs.com),
 which comes with a plain style file.
+
+---
+[Previous - Components](Components.md) -
+[Up](Home.md) -
+[Next - Home](Home.md)
+
+---
+[repo](https://github.com/Dans-labs/dariah) -
+[website](https://dariah-beta.dans.knaw.nl/)

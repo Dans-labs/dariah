@@ -77,8 +77,6 @@ export default (state = { items: [], busy: 0, show: false }, { type, desc, statu
 
 /* SELECTORS */
 
-export const getNotify = ({ notify }) => ({ notify })
-
 export const getNotifications = ({ notify }) => {
   const { items, busy, show } = notify
   let lastNote = -1
