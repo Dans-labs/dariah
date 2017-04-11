@@ -57,44 +57,6 @@ textarea {
 .input.textarea {
   width: 100%; }
 
-div.select {
-  display: inline-block; }
-
-div.option-popup {
-  padding-bottom: 2em; }
-
-div.options {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  height: 6em;
-  overflow: auto;
-  resize: both;
-  border: 1px solid #aaaa66;
-  border-radius: 3px;
-  background-color: #ffffee;
-  clear: both; }
-
-p.option {
-  color: #0000bb;
-  cursor: pointer;
-  color: #0000bb;
-  background-color: #ffffee; }
-
-p.option.selected {
-  background-color: #ffff88;
-  border: 1px solid #aaaa66; }
-
-p.option-type, p.option-head, p.option {
-  margin: 0 0 0 0;
-  padding: 1 3 1 3; }
-
-p.option-type input {
-  margin: 0 0 0 0;
-  padding: 1 3 1 3;
-  border-radius: 3px; }
-
 /* signal coloring: error-warning-good-info */
 .error {
   color: #ee0000;

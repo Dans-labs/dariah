@@ -13,7 +13,7 @@ Object.defineProperty(exports,'__esModule',{value:true});exports.getAlt=exports.
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {Object.defineProperty(exports,'__esModule',{value:true});var _redux=__webpack_require__("../node_modules/redux/es/index.js");var _reduxThunk=__webpack_require__("../node_modules/redux-thunk/lib/index.js");var _reduxThunk2=_interopRequireDefault(_reduxThunk);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}var configureStore=function configureStore(reducer){var middlewares=[_reduxThunk2.default];var storeComponents=[reducer];if(process.env.NODE_ENV==='development'){var _require=__webpack_require__("../node_modules/redux-logger/lib/index.js"),createLogger=_require.createLogger;middlewares.push(createLogger());storeComponents.push(window.__REDUX_DEVTOOLS_EXTENSION__&&window.__REDUX_DEVTOOLS_EXTENSION__())}storeComponents.push(_redux.applyMiddleware.apply(undefined,middlewares));var store=_redux.createStore.apply(undefined,storeComponents);return store};exports.default=configureStore;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__("../node_modules/process/browser.js")))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__("../node_modules/node-libs-browser/node_modules/process/browser.js")))
 
 /***/ }),
 
