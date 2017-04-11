@@ -205,7 +205,6 @@ which comes with a plain style file.
 ---
 [Previous - Components](Components.md) -
 [Up](Home.md) -
-[Next - Home](Home.md)
 
 ---
 [repo](https://github.com/Dans-labs/dariah) -

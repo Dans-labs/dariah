@@ -1,109 +1,12 @@
 # Components
 
-## CheckboxI
+These are the [React](React.md) components, that make up the
+part of the app that is visible in the browser.
+They lean on the [dux](Dux.md) that work for them in the background.
 
-Displays a *collective* checkbox for a filter with many facets.
+# Alternative
 
-Clicking on this box will collectively check and uncheck all associate
-checkboxes.
-
-This checkbox can have an indeterminate state, if some but not all
-of the associate checkboxes are checked.
-
-We have to resort to a [DOM](React.md#dom) manipulation after rendering to get the
-indeterminate state across.
-
-## DocMd
-
-Component to show
-[MarkDown](https://guides.github.com/features/mastering-markdown/)
-text, coming from files on the server.
-The conversion to HTML is done client side,
-and the user gets a control to switch between MarkDown source and
-formatted HTML.
-
-A handler for links in the MarkDown source.
-It makes it possible to write MarkDown documents with
-internal links to this application.
-
-A full link (with protocol `http`(`s`) is translated to a
-plain HTML `a` element, so it will leave this application.
-
-Other links are translated to Link elements for the
-
-
-## EUMap
-
-A complex component!
-It is a facet filter for the field country,
-and it contains a map of Europe, visualizing by means of markers,
-how the filter result is distributed over the DARIAH countries.
-
-Both ingredients of this component are brought together not by
-class extension but by functional composition.
-
-The country facet filter is a true react [component](React.md#react-components).
-
-The map is a [Leaflet](http://leafletjs.com) module on a blank pane,
-with a [geojson](../client/js/lib/europe.geo.js) file of country boundaries laid out on it.
-The map is not react aware, it will be rendered in its own div.
-
-Remember that the results of filter computation descend from a stateful
-parent into the present component.
-So, whenever we receive new props, we manipulate the leaflet map and adjust
-the markers on it.
-More precisely, since we do not have to manipulate state, we put the marker updates
-in the [componentDidMount()](React.md#componentdidmount)
-and [componentDidUpdate()](React.md#componentdidupdate)
-[life cycle methods](React.md#life-cycle) of React.
-At those moments we know that the [DOM](React.md#dom) elements that must be rendered have mounted,
-so the map exists, and we can put the markers there.
-
-### Compute Marker Radius
-
-When we know the filter results per country, we can put markers on them
-with a radius in proportion to their scores.
-However, if the scores are very far apart, either the small markers get invisible,
-or the big markers get too big.
-We mitigate this effect, by using proportional radii only for values below a certain
-threshold (LEVEL_OFF). For higher values we essentiall take the square root.
-
-## FilterCompute
-
-Parent component of all filters.
-The filter state (`filterSettings`) are maintained here.
-
-## ItemFiltered
-
-Displays the list of items in the right column, but
-only those that have passed all the filters, which are displayed in the
-left column.
-
-## ItemMy
-
-## The list of "my" items
-
-Displays the list of items of the current user in the left column,
-with a details/edit view in the right column.
-
-## ItemRecord
-
-Displays all fields that the user is allowed to read.
-With a control to edit the record.
-
-## Login
-
-The main task of Login is to fetch the current authentication status:
-is there an authenticated user, and if so, what is his/her name?
-
-## Notification
-
-Component that receives notifications and displays them in a
-little div with fixed position on the screen.
-
-## Window
-
-## Alternative
+**Dux:** [Alter](Dux.md#alter)
 
 Displays one of a list of alternatives and
 let the user cycle through the alternatives.
@@ -145,9 +48,11 @@ In this way the caller can fine tune how exactly the control appears in relation
 the alternative component.
 @returns {Fragment} The chosen alternative with its control.
 
-## App
+# App
 
-### Top level interface component
+**Dux:** [Win](Dux.md#win)
+
+## Top level interface component
 
 As far as the web page is concerned, this is the top level component.
 Technically, there are only
@@ -155,20 +60,28 @@ some [router](React.md#routing) components
 and ultimately the [Redux](React#redux) *Provider*
 [component](React.md#react-components) above it.
 
-### Permanent navigation widget
+## Permanent navigation widget
 
 `App` is always in view and consists of the
 * top navigation bar (with logo, [Login](#login), and [Notification](#notification))
 * right navigation bar (with navigation links to the components of the app
   and documentation).
 
-## ByValue
+# Backoffice
+
+**Pure**
+
+## Backoffice functions
+
+# ByValue
+
+**Dux:** [Filter](Dux.md#filter)
 
 A widget by which the user can click the facets associated with one field.
 There is also a collective checkbox, by which the user can check or uncheck all facets in one go.
 All values that occur are displayed, with statistics in the form *subtotal of total*.
 
-### Note on performance
+## Note on performance
 There is a subtlety here.
 When we have the facets, we want to lay them out in a grid.
 That work needs only be done upon construction,
@@ -186,14 +99,122 @@ The computation inside [placeFacets](Filter.md#placefacets)
 is just a little bit of juggling with tiny datastructures, so the fragment is constructed in no time.
 See [Reconciliation](React.md#reconciliation).
 
-## Facet
+# CheckboxI
+
+**LifeCycle**
+
+**Dux:** [Filter](Dux.md#filter)
+
+Displays a *collective* checkbox for a filter with many facets.
+
+Clicking on this box will collectively check and uncheck all associate
+checkboxes.
+
+This checkbox can have an indeterminate state, if some but not all
+of the associate checkboxes are checked.
+
+We have to resort to a [DOM](React.md#dom) manipulation after rendering to get the
+indeterminate state across.
+
+# Doc
+
+**Pure**
+
+The document types that can be handled by the Doc component.
+`md` stands for MarkDown.
+Displays a document. Depending of the type of document, a specialized
+Doc class will be invoked.
+
+# DocHtml
+
+**Pure**
+
+Displays an HTML document by linking to it in an IFRAME.
+
+# DocMd
+
+**LifeCycle**
+
+**Dux:** [Doc](Dux.md#Doc)
+
+Component to show
+[MarkDown](https://guides.github.com/features/mastering-markdown/)
+text, coming from files on the server.
+The conversion to HTML is done client side,
+and the user gets a control to switch between MarkDown source and
+formatted HTML.
+
+A handler for links in the MarkDown source.
+It makes it possible to write MarkDown documents with
+internal links to this application.
+
+A full link (with protocol `http`(`s`) is translated to a
+plain HTML `a` element, so it will leave this application.
+
+Other links are translated to Link elements for the
+
+# DocPdf
+
+**Pure**
+
+Displays a PDF document by linking to it in an OBJECT.
+
+**NB:** On iOS this does not work well, only the first page of the PDF gets shown,
+we work around it by just displaying a link to open the PDF in a new tab.
+We only do that when we detect an iOS browser.
+
+# EUMap
+
+**LifeCycle**
+
+**Dux:** [Filter](Dux.md#filter)
+
+A complex component!
+It is a facet filter for the field country,
+and it contains a map of Europe, visualizing by means of markers,
+how the filter result is distributed over the DARIAH countries.
+
+Both ingredients of this component are brought together not by
+class extension but by functional composition.
+
+The country facet filter is a true react [component](React.md#react-components).
+
+The map is a [Leaflet](http://leafletjs.com) module on a blank pane,
+with a [geojson](../client/js/lib/europe.geo.js) file of country boundaries laid out on it.
+The map is not react aware, it will be rendered in its own div.
+
+Remember that the results of filter computation descend from a stateful
+parent into the present component.
+So, whenever we receive new props, we manipulate the leaflet map and adjust
+the markers on it.
+More precisely, since we do not have to manipulate state, we put the marker updates
+in the [componentDidMount()](React.md#componentdidmount)
+and [componentDidUpdate()](React.md#componentdidupdate)
+[life cycle methods](React.md#life-cycle) of React.
+At those moments we know that the [DOM](React.md#dom) elements that must be rendered have mounted,
+so the map exists, and we can put the markers there.
+
+## Compute Marker Radius
+
+When we know the filter results per country, we can put markers on them
+with a radius in proportion to their scores.
+However, if the scores are very far apart, either the small markers get invisible,
+or the big markers get too big.
+We mitigate this effect, by using proportional radii only for values below a certain
+threshold (LEVEL_OFF). For higher values we essentiall take the square root.
+
+# Facet
+
+**Dux:** [Filter](Dux.md#filter)
 
 Displays a single facet. Just a checkbox and a value representation.
 The clicks received by the checkbox are passed upwards by means of a callback.
 
 Note that we use the strategy of [controlled components](React.md#controlled-component) here.
 
-## Filter
+# Filter
+
+**Dux:** [Filter](Dux.md#filter)
 
 ## Filter inventory
 
@@ -217,7 +238,18 @@ and calls it with the appropriate props.
 Whereas the incoming props contain information for all filters,
 each individual child filter is passed the relevant slice only.
 
-## FullText
+# FilterCompute
+
+**LifeCycle**
+
+**Dux:** [Filter](Dux.md#filter)
+
+Parent component of all filters.
+The filter state (`filterSettings`) are maintained here.
+
+# FullText
+
+**Dux:** [Filter](Dux.md#filter)
 
 Displays a full text search input field.
 The characters entered in this field are passed upwards by means of a callback.
@@ -226,79 +258,132 @@ Not only the full text search, but also all other filters are computed upon each
 
 Note that we use the strategy of [controlled components](React.md#controlled-component) here.
 
-## ItemField
+# ItemField
 
-## ItemList
+**Dux:** [Tables](Dux.md#tables)
 
-Displays the list of items as a table.
-Only the rows that have passed all filters.
+# ItemFiltered
 
-## Pane
+**LifeCycle**
 
-## SubApp
+**Dux:** [Tables](Dux.md#tables)
 
-## Nearly top level interface component
+Displays the list of items in the right column, but
+only those that have passed all the filters, which are displayed in the
+left column.
 
-This is a component just below [App](#app).
+# ItemHead
 
-## Backoffice
-
-## Backoffice functions
-
-## Doc
-
-The document types that can be handled by the Doc component.
-`md` stands for MarkDown.
-Displays a document. Depending of the type of document, a specialized
-Doc class will be invoked.
-
-## DocHtml
-
-Displays an HTML document by linking to it in an IFRAME.
-
-## DocPdf
-
-Displays a PDF document by linking to it in an OBJECT.
-
-**NB:** On iOS this does not work well, only the first page of the PDF gets shown,
-we work around it by just displaying a link to open the PDF in a new tab.
-We only do that when we detect an iOS browser.
-
-## ItemHead
+**Pure**
 
 Displays an item heading in a table row.
 With a control to view the whole records.
 Only the fields that the user is allowed to view.
 
-## ItemRecordPre
+# ItemList
+
+**Dux:** [Tables](Dux.md#tables)
+
+Displays the list of items as a table.
+Only the rows that have passed all filters.
+
+# ItemMy
+
+**LifeCycle**
+
+**Dux:** [Tables](Dux.md#tables)
+
+## The list of "my" items
+
+Displays the list of items of the current user in the left column,
+with a details/edit view in the right column.
+
+# ItemRecord
+
+**LifeCycle**
+
+**Dux:** [Tables](Dux.md#tables)
+
+Displays all fields that the user is allowed to read.
+With a control to edit the record.
+
+# ItemRecordPre
+
+**Pure**
 
 Prepare the way to load an item view of an item.
 Needed when you want to navigate to a specific item
 by means of the Router.
 
-## NavLink
+# Login
+
+**LifeCycle**
+
+**Dux:** [Me](Dux.md#me)
+
+The main task of Login is to fetch the current authentication status:
+is there an authenticated user, and if so, what is his/her name?
+
+# NavLink
+
+**Pure**
 
 Displays a navigation link that is sensitive to routing.
 
-## NotFound
+# NotFound
+
+**Pure**
 
 Displays a 404 if no
 [route](React.md#routing) matches.
 
-## Root
+# Notification
 
-## Stat
+**LifeCycle**
+
+**Dux:** [Notify](Dux.md#notify)
+
+Component that receives notifications and displays them in a
+little div with fixed position on the screen.
+
+# Pane
+
+**Dux:** [Win](Dux.md#win)
+
+# Root
+
+**Pure**
+
+# Stat
+
+**Pure**
 
 Displays a string of the form *subTotal* `of` *total*.
 If one of the two is missing, the `of` will not display.
 
-## Static
+# Static
 
 ## Navigation links to static resources
 
 [Previous - Me](Me.md) -
 [Up](Home.md) -
 [Next - Deploy](Deploy.md)
+
+# SubApp
+
+**Pure**
+
+**Dux:** [Win](Dux.md#win)
+
+## Nearly top level interface component
+
+This is a component just below [App](#app).
+
+# Window
+
+**LifeCycle**
+
+**Dux:** [Win](Dux.md#win)
 
 ---
 [repo](https://github.com/Dans-labs/dariah) -

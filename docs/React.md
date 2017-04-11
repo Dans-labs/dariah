@@ -26,7 +26,7 @@ If a component needs to store the effects of the outside worlds
 (incoming server data or user interaction), it is stateful.
 If the component does not need [lifecycle](life-cycle) methods, it can be programmed
 as a pure function that will be connected to the Redux state
-by means of a simple binding: connect.
+by means of a simple binding: [connect](#connect).
 
 We put all these components in a directory called **state**.
 
@@ -408,7 +408,7 @@ With Redux, this is not a problem, because state is severed from components.
 ---
 [Previous - ES6](ES6md) -
 [Up](Home.md) -
-[Next - Filter](Filter.md)
+[Next - Dux](Dux.md)
 
 ---
 [repo](https://github.com/Dans-labs/dariah) -
