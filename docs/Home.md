@@ -22,7 +22,7 @@ This is the technical documentation for the DARIAH contribution tool.
 [Dux](Dux.md) | [LifeCycle](React.md#life-cycle) | [Connected](React.md#connect) | [Pure](React.md#pure-components) 
 ---|---|---|---
 [Filter](Dux.md#filter) | [CheckboxI](Components.md#checkboxi)          |            |
-                        | [EUMap](Components.md#eumap)                  |            |      
+-                       | [EUMap](Components.md#eumap)                  |            |      
                         | [FilterCompute](Components.md#filtercompute)  |            |
                         | [ItemFiltered](Components.md#itemfiltered)    |            |
                         |               | [ByValue](Components.md#byvalue)           |
