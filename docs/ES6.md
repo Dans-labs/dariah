@@ -14,7 +14,7 @@ It is taken care of by the build tool of our choice:
 Our source code conforms to a number of style guides, which are enforced by
 [eslint](http://eslint.org).
 There are many options and choices, ours are
-[here](client/eslint.yaml).
+[here](../client/eslint.yaml).
 
 We highlight a few concepts in ES6 that we make use of.
 
@@ -38,7 +38,7 @@ The typical way to use a promise is
   )
 ```
 
-**Example**: [server.js](/dariah/client/src/js/app/dux/server.js)
+**Example**: [server.js](../client/src/js/app/dux/server.js)
 
 This is virtually the only occurrence in our code where we use Promise syntax.
 
