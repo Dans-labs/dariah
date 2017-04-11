@@ -3,10 +3,136 @@ generic:
   createdBy: creator
   modDate: dateModified
   modBy: modifiedBy
-  idField: _id
-  valField: value
 
 tables:
+  user:
+    title: eppn
+    fieldOrder:
+      - eppn
+      - email
+      - firstName
+      - lastName
+      - mayLogin
+      - authority
+      - dateModified
+      - dateLastLogin
+      - statusLastLogin
+    fieldSpecs: 
+      eppn:
+        label: Eppn
+        valType: text
+        multiple: false
+        validation:
+            nonEmpty: true
+        initial: N.N.
+        appearance: {}
+      email:
+        label: Email
+        valType: email
+        multiple: false
+        validation:
+            nonEmpty: false
+        initial: email
+        appearance: {}
+      firstName:
+        label: First name
+        valType: text
+        multiple: false
+        validation:
+            nonEmpty: false
+        initial: First name
+        appearance: {}
+      lastName:
+        label: Last name
+        valType: text
+        multiple: false
+        validation:
+            nonEmpty: false
+        initial: Last name
+        appearance: {}
+      mayLogin:
+        label: Login allowed
+        valType: bool
+        multiple: false
+        validation:
+            nonEmpty: false
+        initial: true
+        appearance: {}
+      dateModified:
+        label: modified on
+        valType: datetime
+        multiple: true
+        validation:
+          nonEmpty: false
+        appearance:
+          reverse: true
+          cutoff: 1
+      dateLastLogin:
+        label: last logged in on
+        valType: datetime
+        multiple: false
+        validation:
+          nonEmpty: false
+        appearance: {}
+      statusLastLogin:
+        label: Status last login
+        valType: text
+        multiple: false
+        validation:
+            nonEmpty: false
+        initial: status
+        appearance: {}
+
+  country:
+    title: name
+    fieldOrder:
+      - iso2
+      - name
+      - isMember
+      - latitude
+      - longitude
+    fieldSpecs:
+      iso2:
+        label: ISO(2)
+        valType: text
+        multiple: false
+        validation:
+            nonEmpty: true
+        initial: XY
+        appearance: {}
+      name:
+        label: Name
+        valType: text
+        multiple: false
+        validation:
+            nonEmpty: true
+        initial: ...land
+        appearance: {}
+      isMember:
+        label: Is DARIAH member
+        valType: bool
+        multiple: false
+        validation:
+            nonEmpty: false
+        initial: true
+        appearance: {}
+      latitude:
+        label: Latitude
+        valType: number
+        multiple: false
+        validation:
+            nonEmpty: false
+        initial: 0.0
+        appearance: {}
+      longitude:
+        label: Longitude
+        valType: number
+        multiple: false
+        validation:
+            nonEmpty: false
+        initial: 0.0
+        appearance: {}
+
   contrib:
     title: title
     fieldOrder: 
@@ -15,7 +141,6 @@ tables:
       - country
       - vcc
       - typeContribution
-      - typeContributionLegacy
       - description
       - costTotal
       - costDescription
@@ -100,7 +225,7 @@ tables:
       description:
         label: Description
         valType: textarea
-        multiple: true
+        multiple: false
         validation:
           nonEmpty: true
         convert: markdown
@@ -128,142 +253,129 @@ tables:
 
       creator:
         label: creator
-        valType: rel
+        valType:
+          values: user
+          allowNew: false
         multiple: false
         validation:
           nonEmpty: true
-        convert: user
-        allowNew: false
-        getValues: /user
-        idOnly: true
         appearance: {}
 
       modifiedBy:
         label: modified by
-        valType: rel
+        valType:
+          values: user
+          allowNew: false
         multiple: true
         validation:
           nonEmpty: false
-        convert: user
-        allowNew: false
-        getValues: /user
-        idOnly: true
         appearance:
           reverse: true
           cutoff: 1
 
       country:
         label: Country(ies)
-        valType: rel
+        valType:
+          values: country
+          select:
+            isMember: true
+          allowNew: false
         multiple: false
         validation:
           nonEmpty: true
-        convert: country
-        allowNew: false
-        getValues: /member_country
-        idOnly: false
         appearance: {}
 
       year:
         label: Year
-        valType: rel
+        valType:
+          values: year
+          allowNew: true
         multiple: false
         validation:
           nonEmpty: true
           min: 2000
           max: 2100
           step: 1
-        allowNew: true
-        getValues: /value_skim?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       vcc:
         label: VCC
-        valType: rel
+        valType:
+          values: vcc
+          allowNew: false
         multiple: true
         validation:
           nonEmpty: true
-        allowNew: false
-        getValues: /value_table?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       discipline:
         label: Disciplines
-        valType: rel
+        valType:
+          values: discipline
+          allowNew: true
         multiple: true
         validation:
           nonEmpty: true
-        allowNew: true
-        getValues: /value_skim?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       keyword:
         label: Keywords
-        valType: rel
+        valType:
+          values: keyword
+          allowNew: true
         multiple: true
         validation:
           nonEmpty: true
-        allowNew: true
-        getValues: /value_skim?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       typeContribution:
         label: Type
-        valType: rel
-        multiple: true
-        validation:
-          nonEmpty: true
-        allowNew: false
-        getValues: /value_table?table={table}&field={field}
-        idOnly: false
-        appearance: {}
-
-      typeContributionLegacy:
-        label: Type (legacy)
-        valType: rel
+        valType:
+          values: typeContribution
+          allowNew: false
         multiple: false
         validation:
           nonEmpty: true
-        allowNew: false
-        getValues: /value_skim?table={table}&field={field}
-        idOnly: false
+        appearance: {}
+
+      typeContributionOther:
+        label: Type
+        valType:
+          values: typeContribution
+          allowNew: true
+        multiple: true
+        validation:
+          nonEmpty: true
         appearance: {}
 
       tadirahObject:
         label: Object(s)
-        valType: rel
+        valType:
+          values: tadirahObject
+          allowNew: false
         multiple: true
         validation:
           nonEmpty: false
-        allowNew: false
-        getValues: /value_table?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       tadirahActivity:
         label: Activity(ies)
-        valType: rel
+        valType:
+          values: tadirahActivity
+          allowNew: false
         multiple: true
         validation:
           nonEmpty: false
-        allowNew: false
-        getValues: /value_table?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
       tadirahTechnique:
         label: Technique(s)
-        valType: rel
+        valType:
+          values: tadirahTechnique
+          allowNew: false
         multiple: true
         validation:
           nonEmpty: false
-        allowNew: false
-        getValues: /value_table?table={table}&field={field}
-        idOnly: false
         appearance: {}
 
     filters:
@@ -275,7 +387,7 @@ tables:
       - field: country
         label: country
         type: EUMap
-        maxCols: 3
+        maxCols: 2
         expanded: true
       - field: vcc
         label: vcc

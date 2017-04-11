@@ -73,6 +73,196 @@ inGroup:
     authority: DARIAH
     group: office
 
+countryExtra:
+  AT:
+    name: Austria
+    latitude: 47.7
+    longitude: 15.11
+  BE:
+    name: Belgium
+    latitude: 51.3
+    longitude: 3.1
+  HR:
+    name: Croatia
+    latitude: 44.7
+    longitude: 15.6
+  CY:
+    name: Cyprus
+    latitude: 35.0
+    longitude: 32.8
+  CZ:
+    name: Czech Republic
+    latitude: 49.8
+    longitude: 15.2
+  DK:
+    name: Denmark
+    latitude: 55.6
+    longitude: 11.0
+  EE:
+    name: Estonia
+    latitude: 59.0
+    longitude: 25.0
+  FR:
+    name: France
+    latitude: 46.5
+    longitude: 1.9
+  DE:
+    name: Germany
+    latitude: 51.0
+    longitude: 10.4
+  GR:
+    name: Greece
+    latitude: 38.0
+    longitude: 23.8
+  HU:
+    name: Hungary
+    latitude: 46.9
+    longitude: 19.8
+  IE:
+    name: Ireland
+    latitude: 53.1
+    longitude: -8.4
+  IT:
+    name: Italy
+    latitude: 41.6
+    longitude: 13.0
+  LV:
+    name: Latvia
+    latitude: 56.9
+    longitude: 26.8
+  LT:
+    name: Lithuania
+    latitude: 55.2
+    longitude: 24.9
+  LU:
+    name: Luxembourg
+    latitude: 49.6
+    longitude: 6.1
+  MT:
+    name: Malta
+    latitude: 35.9
+    longitude: 14.4
+  NL:
+    name: Netherlands
+    latitude: 52.8
+    longitude: 5.8
+  PL:
+    name: Poland
+    latitude: 52.3
+    longitude: 19.8
+  PT:
+    name: Portugal
+    latitude: 38.7
+    longitude: -9.0
+  RS:
+    name: Serbia
+    latitude: 44.0
+    longitude: 20.8
+  SK:
+    name: Slovakia
+    latitude: 48.8
+    longitude: 19.9
+  SI:
+    name: Slovenia
+    latitude: 46.2
+    longitude: 14.4
+  CH:
+    name: Switzerland
+    latitude: 46.9
+    longitude: 8.3
+  GB:
+    name: United Kingdom
+    latitude: 52.9
+    longitude: -1.8
+  AL:
+    name: Albania
+    latitude: 41.1
+    longitude: 19.9
+  AD:
+    name: Andorra
+    latitude: 42.5
+    longitude: 1.6
+  BY:
+    name: Belarus
+    latitude: 53.8
+    longitude: 29.2
+  BA:
+    name: Bosnia and Herzegovina
+    latitude: 44.2
+    longitude: 18.2
+  BG:
+    name: Bulgaria
+    latitude: 42.9
+    longitude: 26.5
+  FI:
+    name: Finland
+    latitude: 63.3
+    longitude: 27.6
+  GE:
+    name: Georgia
+    latitude: 41.66
+    longitude: 43.68
+  IS:
+    name: Iceland
+    latitude: 65.0
+    longitude: -18.8
+  SM:
+    name: San Marino
+    latitude: 43.8
+    longitude: 12.3
+  KS:
+    name: Kosovo
+    latitude: 43.2
+    longitude: 21.9
+  LI:
+    name: Liechtenstein
+    latitude: 47.2
+    longitude: 9.4
+  MK:
+    name: Macedonia
+    latitude: 41.6
+    longitude: 21.8
+  MD:
+    name: Moldova
+    latitude: 47.3
+    longitude: 28.7
+  MC:
+    name: Monaco
+    latitude: 43.7
+    longitude: 7.4
+  ME:
+    name: Montenegro
+    latitude: 42.3
+    longitude: 19.2
+  NO:
+    name: Norway
+    latitude: 62.0
+    longitude: 7.1
+  RO:
+    name: Romania
+    latitude: 45.8
+    longitude: 24.8
+  RU:
+    name: Russian Federation
+    latitude: 55.6
+    longitude: 37.7
+  ES:
+    name: Spain
+    latitude: 39.8
+    longitude: -3.4
+  SE:
+    name: Sweden
+    latitude: 59.5
+    longitude: 16.1
+  TR:
+    name: Turkey
+    latitude: 40.0
+    longitude: 32.8
+  UA:
+    name: Ukraine
+    latitude: 49.3
+    longitude: 32.6
+
 testOwner:
   contrib:
     owner: dirk
@@ -210,6 +400,10 @@ FIELD_TYPE:
   country:
     isMember: bool
 
+FIELD_MULTIPLE:
+  contrib:
+    dateModified: 2
+
 DEFAULT_VALUES:
   contrib:
     dateCreated: datetime(2000,1,1,0,0,0)
@@ -232,17 +426,11 @@ MOVE_FIELDS:
       ? vccDisApproval
   country: {}
 
-MAKE_VALUE_LISTS:
-  contrib:
-    !!set
-    ? keyword
-    ? year
-
 VALUE_LISTS:
   contrib:
     !!set
-    ? discipline
     ? keyword
+    ? discipline
     ? tadirahActivity
     ? tadirahObject
     ? tadirahTechnique
@@ -288,36 +476,3 @@ BOOL_VALUES:
     - '0'
     - 'NULL'
 
-CONVERSIONS:
-  contrib-typeContribution:
-    Access:
-    - access to resources
-    Expertise: 
-    - support services
-    - consulting
-    Interoperability: 
-    - processing services
-    Content Hosting:
-    - hosting services
-    - access to resources
-    - access to software
-    Tools and Software:
-    - processing services
-    - software development
-    Event: 
-    - event
-    Training: 
-    - event
-    Summer School: 
-    - event
-    Cooperation: 
-    - consulting
-    Educational Resources: 
-    - access to resources
-    Data:
-    - access to resources
-    - resource creation
-    DARIAH Coordination: 
-    - dariah coordination
-    Workshop: 
-    - event

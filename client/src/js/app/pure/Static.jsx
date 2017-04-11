@@ -1,23 +1,7 @@
 import React from 'react'
+
 import NavLink from 'NavLink.jsx'
 
-/**
- * **purely functional** {@link external:Component|Component}
- *
- * ## Navigation links to static resources
- *
- * As far as the web page is concerned, this is the top level component.
- * Technically, there are only
- * some {@link external:Routing|router} components
- * and ultimately the {@link Provider}
- * {@link external:Component|component} above it.
- *
- *
- * @class
- * @param {Component[]} children The children of this component as specified in the
- * {@link external:Routing|route} where App is called
- * @returns {Fragment}
-*/
 const Static = () => (
   <span className="small" >
     <NavLink to="/docs/about.md" >{'About'}</NavLink>

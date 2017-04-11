@@ -4,7 +4,6 @@ from glob import glob
 roots = sys.argv[1:]
 
 def doRoot(root):
-    print(root)
     for path in glob('{}/*.yaml'.format(root)):
         fName = os.path.splitext(os.path.basename(path))[0]
         model = fName[0].upper()+fName[1:]

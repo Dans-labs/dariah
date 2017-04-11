@@ -27,12 +27,13 @@
     <meta name="msapplication-config" content="/static/favicons/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
-    <link rel="stylesheet" href="/static/css/main.css"/>
+    <link rel="stylesheet" href="/static/css/leaflet.css"/>
+    <link rel="stylesheet" href="/static/dist/main.css"/>
     </head>
     <body>
         <div id="body"/>
-        <script src="/static/js/framework.js"></script>
-        <script src="/static/js/lib.js"></script>
-        <script src="/static/js/app.js"></script>
+        <script src="/static/dist/framework.js"></script>
+        <script src="/static/dist/lib.js"></script>
+        <script src="/static/dist/app.js"></script>
     </body>
 </html>

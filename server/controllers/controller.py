@@ -10,23 +10,17 @@ class Controller(object):
         self.DB.Perm = Perm
         self.DB.uid = Perm.getUid()
         method = getattr(self, controller, None)
-        return method(controller) if callable(method) else self._fail(
+        return method(controller) if callable(method) else self.DB.stop(
             text='wrong method: {}'.format(controller),
         )
 
-    def member_country(self, name):
-        return self.DB.getList(name, 'country', 'read', rFilter={'isMember': True})
-
-    def user(self, name):
-        return self.DB.getList(name, 'user', 'read')
-
     def list(self, name):
         table = getq('table')
-        return self.DB.getList(name, table, 'read', withFields=True, sort=('*title', 1), withFilters=True)
+        return self.DB.getList(name, table, 'read', sort=('*title', 1), titleOnly=True, withFilters=True, withValueLists=True)
 
     def my(self, name):
         table = getq('table')
-        return self.DB.getList(name, table, 'read', withFields=True, sort=('*title', 1), withFilters=False)
+        return self.DB.getList(name, table, 'read', sort=('*title', 1), titleOnly=True, withFilters=True, withValueLists=True, my=True)
 
     def view(self, name):
         table = getq('table')
@@ -37,15 +31,4 @@ class Controller(object):
         table = getq('table')
         action = getq('action')
         return self.DB.modList(name, table, action)
-
-    def value_table(self, name):
-        table = getq('table')
-        field = getq('field')
-        return self.DB.getList(name, field, 'read')
-
-    def value_skim(self, name):
-        table = getq('table')
-        field = getq('field')
-        return self.DB.getValues(name, table, field, 'read')
-
 

@@ -5,7 +5,7 @@ from bottle import static_file
 STATIC_ROOT = '../../static/'
 
 origins = {
-    'tech': '../../client/',
+    'tech': '../../static/',
 }
 
 def determine_origin(path):

@@ -1,0 +1,323 @@
+locations:
+  BASE_DIR: ~/Documents/DANS/projects/has/dacs
+  FM_DIR: >-
+    {b}/fm
+  EXPORT_DIR: ~/Downloads
+  EXPORT_ORIG: >-
+    {e}/contribFromFileMaker.xlsx
+  EXPORT_MONGO: >-
+    {e}/contribInMongoDB.xlsx
+
+xml:
+  FMNS: >-
+    {http://www.filemaker.com/fmpxmlresult}
+
+testUsers:
+  - eppn: suzan
+    email: suzan@test.eu
+    firstName: Suzan
+    lastName: Karelse
+    mayLogin: true
+    authority: local
+  - eppn: marie
+    email: marie@test.eu
+    firstName: Marie
+    lastName: Pieterse
+    mayLogin: true
+    authority: local
+  - eppn: gertjan
+    email: gertjan@test.eu
+    firstName: Gert-Jan
+    lastName: Klein-Holgerink
+    mayLogin: false
+    authority: local
+  - eppn: lisa
+    email: lisa@test.eu
+    firstName: Lisa
+    lastName: de Leeuw
+    mayLogin: true
+    authority: local
+  - eppn: dirk
+    email: dirk@test.eu
+    firstName: Dirk
+    lastName: Roorda
+    mayLogin: true
+    authority: local
+
+inGroup:
+  - eppn: dirk
+    authority: local
+    group: system
+  - eppn: lisa
+    authority: local
+    group: office
+  - eppn: suzan
+    authority: local
+    group: auth
+  - eppn: marie
+    authority: local
+    group: auth
+  - eppn: gertjan
+    authority: local
+    group: auth
+  - eppn: DirkRoorda@dariah.eu
+    authority: DARIAH
+    group: system
+  - eppn: LisaDeLeeuw@dariah.eu
+    authority: DARIAH
+    group: office
+  - eppn: CarstenThiel@dariah.eu
+    authority: DARIAH
+    group: system
+  - eppn: PaulinRibbe@dariah.eu
+    authority: DARIAH
+    group: office
+
+testOwner:
+  contrib:
+    owner: dirk
+    search: title
+    field: creator
+    documents:
+      !!set
+      ? 3DHOP
+      ? AAI
+
+MAIN_TABLES:
+- contrib
+- country
+
+SKIP_FIELDS:
+  contrib:
+  - dateandtime_ciozero
+  - ikid
+  - ikid_base
+  - find_country_id
+  - find_type
+  - gnewpassword
+  - gnewpassword2
+  - goldpassword
+  - help_description
+  - help_text
+  - message
+  - message_allert
+  - teller
+  - total_costs_total
+  - whois
+  country: {}
+
+MERGE_FIELDS:
+  contrib:
+    academic_entity_url:
+    - academic_entity_url_2
+    contribution_url:
+    - contribution_url_2
+    contact_person_mail:
+    - contact_person_mail_2
+    type_of_inkind:
+    - other_type_of_inkind
+    vcc11_name:
+    - vcc12_name
+    - vcc21_name
+    - vcc22_name
+    - vcc31_name
+    - vcc32_name
+    - vcc41_name
+    - vcc42_name
+    vcc_head_decision_vcc11:
+    - vcc_head_decision_vcc12
+    - vcc_head_decision_vcc21
+    - vcc_head_decision_vcc22
+    - vcc_head_decision_vcc31
+    - vcc_head_decision_vcc32
+    - vcc_head_decision_vcc41
+    - vcc_head_decision_vcc42
+  country: {}
+
+MAP_FIELDS:
+  contrib:
+    approved: approved
+    academic_entity_url: urlAcademic
+    contribution_url: urlContribution
+    contact_person_mail: contactPersonEmail
+    contact_person_name: contactPersonName
+    costs_description: costDescription
+    costs_total: costTotal
+    country: country
+    creation_date_time: dateCreated
+    creator: creator
+    dateandtime_approval: dateApproved
+    dateandtime_cioapproval: dateApprovedCIO
+    description_of_contribution: description
+    disciplines_associated: discipline
+    last_modifier: modifiedBy
+    modification_date_time: dateModified
+    other_keywords: keyword
+    submit: submitted
+    tadirah_research_activities: tadirahActivity
+    tadirah_research_objects: tadirahObject
+    tadirah_research_techniques: tadirahTechnique
+    title: title
+    total_costs_total: costTotalTotal
+    type_of_inkind: typeContribution
+    vcc: vcc
+    vcc11_name: reviewerName
+    vcc_head_decision: vccDecision
+    vcc_head_decision_vcc11: reviewerDecision
+    vcchead_approval: vccApproval
+    vcchead_disapproval: vccDisApproval
+    year: year
+  country:
+    countrycode: iso
+    countryname: name
+    member_dariah: isMember
+
+SPLIT_FIELDS:
+  contrib:
+    discipline: generic
+    keyword: genericComma
+    typeContribution: generic
+    tadirahActivity: generic
+    tadirahObject: generic
+    tadirahTechnique: generic
+    vcc: generic
+  country: {}
+
+HACK_FIELDS:
+  contrib:
+    tadirahActivity: stripNum
+  country: {}
+
+DECOMPOSE_FIELDS:
+  contrib:
+    typeContribution: typeContributionOther
+  country: {}
+
+FIELD_TYPE:
+  contrib:
+    costTotal: valuta
+    dateCreated: datetime
+    dateModified: datetime
+    dateApproved: datetime
+    dateApprovedCIO: datetime
+    contactPersonEmail: email
+    submitted: bool
+    approved: bool
+    reviewerDecision: bool
+    vccApproval: bool
+    vccDecision: bool
+    vccDisApproval: bool
+  country:
+    isMember: bool
+
+DEFAULT_VALUES:
+  contrib:
+    dateCreated: datetime(2000,1,1,0,0,0)
+    creator: admin
+    type_of_inkind: General
+  country: {}
+
+MOVE_FIELDS:
+  contrib:
+    assessment:
+      !!set
+      ? approved
+      ? dateApproved
+      ? dateApprovedCIO
+      ? submitted
+      ? reviewerName
+      ? reviewerDecision
+      ? vccDecision
+      ? vccApproval
+      ? vccDisApproval
+  country: {}
+
+MAKE_VALUE_LISTS:
+  contrib:
+    !!set
+    ? keyword
+    ? year
+
+VALUE_LISTS:
+  contrib:
+    !!set
+    ? discipline
+    ? keyword
+    ? tadirahActivity
+    ? tadirahObject
+    ? tadirahTechnique
+    ? typeContribution
+    ? typeContributionOther:typeContribution
+    ? vcc
+    ? year
+
+MOVE_MISSING:
+  contrib: description
+
+TYPES:
+  !!set
+  ? bool
+  ? number
+  ? decimal
+  ? text
+  ? valuta
+  ? email
+  ? date
+  ? datetime
+
+NULL_VALUES:
+  -  http://
+  -  https://
+  -  '@'
+
+BOOL_VALUES:
+  True:
+    - true
+    - 1
+    - 'Yes'
+    - 'YES'
+    - 'yes'
+    - '1'
+  False:
+    - false
+    - 0
+    - null
+    - 'No'
+    - 'NO'
+    - 'no'
+    - '0'
+    - 'NULL'
+
+CONVERSIONS:
+  contrib-typeContribution:
+    Access:
+    - access to resources
+    Expertise: 
+    - support services
+    - consulting
+    Interoperability: 
+    - processing services
+    Content Hosting:
+    - hosting services
+    - access to resources
+    - access to software
+    Tools and Software:
+    - processing services
+    - software development
+    Event: 
+    - event
+    Training: 
+    - event
+    Summer School: 
+    - event
+    Cooperation: 
+    - consulting
+    Educational Resources: 
+    - access to resources
+    Data:
+    - access to resources
+    - resource creation
+    DARIAH Coordination: 
+    - dariah coordination
+    Workshop: 
+    - event

@@ -56,22 +56,16 @@ methods:
   mod:
     desc: modify (insert/update/delete) an item
     call: own
-  member_country:
+  country:
     desc: member countries
     call: public
   user:
     desc: users
     call: own
-  value_table:
-    desc: value lists from separate collection
-    call: public
-  value_skim:
-    desc: value lists extracted from row data
-    call: public
 
 owners:
   user:     _id
-  contrib:  creator._id
+  contrib:  creator
 
 tables:
   user:
@@ -169,47 +163,47 @@ fields:
       update: office
 
   vcc:
-    value:
+    rep:
       read:   public
       update: office
 
   year:
-    value:
+    rep:
       read:   public
       update: office
 
   discipline:
-    value:
+    rep:
       read:   public
       update: office
 
   keyword:
-    value:
+    rep:
       read:   public
       update: office
 
   typeContribution:
-    value:
+    rep:
       read:   public
       update: office
 
   typeContributionLegacy:
-    value:
+    rep:
       read:   office
       update: office
 
   tadirahActivity:
-    value:
+    rep:
       read:   public
       update: office
 
   tadirahObject:
-    value:
+    rep:
       read:   public
       update: office
 
   tadirahTechnique:
-    value:
+    rep:
       read:   public
       update: office
 
