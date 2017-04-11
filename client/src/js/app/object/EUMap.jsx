@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import ByValue from 'ByValue.jsx'
 import L from 'leaflet'
+
 import {countryBorders} from 'europe.geo.js'
 import { getFilterSetting } from 'filter.js'
 import { getTables } from 'tables.js'
 import { combineSelectors } from 'helpers.js'
+
+import ByValue from 'ByValue.jsx'
 
 const mapOptions = {
   HEIGHT: 250,

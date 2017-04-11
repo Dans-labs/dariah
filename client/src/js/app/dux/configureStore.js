@@ -1,7 +1,10 @@
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 
-const configureStore = (reducer) => {
+/* global process */
+/* global require */
+
+const configureStore = reducer => {
   const middlewares = [thunkMiddleware]
   const storeComponents = [reducer]
   if (process.env.NODE_ENV === `development`) {

@@ -10,7 +10,7 @@ export const fetchMe = () => (
 
 /* REDUCER */
 
-export default (state = {}, { type, path, data }) => {
+export default (state = {}, { type, data }) => {
   switch (type) {
     case 'fetchMe': {
       if (data == null) {return {}}

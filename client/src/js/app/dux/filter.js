@@ -1,6 +1,7 @@
 import merge from 'lodash/merge'
+
 import { memoBind } from 'helpers.js'
-import { repr } from 'tables.js'
+import { repRelated } from 'tables.js'
 
 /* ACTIONS */
 
@@ -16,7 +17,7 @@ export const setupFiltering = (tables, table) => dispatch => {
 
 /* REDUCER */
 
-export default (state={}, { type, table, filterId, data, filterSettings }) => {
+export default (state = {}, { type, table, filterId, data, filterSettings }) => {
   switch (type) {
     case 'setupFiltering': {
       return merge({}, state, { [table]: { filterSettings, initialized: true } })
@@ -45,7 +46,7 @@ export const getFilterSetting = ({ filter }, { table, filterId }) => ({
 })
 
 export const getFieldValues = ({ tables }, { table, filterField }) => ({
-  fieldValues: memoBind(fCC, 'compileFiltering', [table], [tables, table])[filterField]
+  fieldValues: memoBind(fCC, 'compileFiltering', [table], [tables, table])[filterField],
 })
 
 export const getFiltersApplied = ({ tables, filter }, { table }) => {
@@ -74,30 +75,30 @@ export const getFiltersApplied = ({ tables, filter }, { table }) => {
 
 class FilterCompileCache {
   compileFiltering = (tables, table) => {
-    const { [table]: { entities, order, valueLists, fields, filterList, fieldSpecs } } = tables
+    const { [table]: { valueLists, fields, filterList, fieldSpecs } } = tables
     const presentFilterList = filterList.filter(x => fields[x.field])
     const filterFields = presentFilterList.filter(x => x.type !== 'FullText').map(x => x.field)
     const fieldValues = {}
     for (const field of filterFields) {
-      const { [field]: { valType } } = fieldSpecs 
+      const { [field]: { valType } } = fieldSpecs
       const { [field]: vals } = valueLists
-      const fFieldValues = {['']: '-none-'}
+      const fFieldValues = {'': '-none-'}
       const orderedVals = Object.keys(vals).sort()
       if (typeof valType == 'string') {
-        orderedVals.forEach((v,i) => {fFieldValues[i] = v})
+        orderedVals.forEach((v, i) => {fFieldValues[i] = v})
       }
       else {
         const { values: rel } = valType
         orderedVals.forEach(v => {
-          fFieldValues[v] = repr(tables, rel, v)
-        }) 
+          fFieldValues[v] = repRelated(tables, rel, v)
+        })
       }
       fieldValues[field] = fFieldValues
     }
     return fieldValues
   }
   initFiltering = (tables, table, fieldValues) => {
-    const { [table]: { entities, order, fields, filterList } } = tables
+    const { [table]: { fields, filterList } } = tables
     const presentFilterList = filterList.filter(x => fields[x.field])
     const filterSettings = {}
     presentFilterList.forEach((filterSpec, filterId) => {
@@ -122,7 +123,7 @@ const computeFiltering = (tables, table, fieldValues, filterSettings) => {
   const filterChecks = {}
   const otherFilteredData = {}
 
-  const makeFilterCheck= (filterSpec, filterId) => {
+  const makeFilterCheck = (filterSpec, filterId) => {
     const { field } = filterSpec
     const { [filterId]: filterSetting } = filterSettings
     const { [field]: fieldSpec } = fieldSpecs
@@ -140,7 +141,7 @@ const computeFiltering = (tables, table, fieldValues, filterSettings) => {
   const filteredData = []
 
   for (const eId of order) {
-    const entity = entities[eId]
+    const { [eId]: entity } = entities
     let theOneFail = null
     let v = true
     let discard = false
@@ -173,7 +174,9 @@ const computeFiltering = (tables, table, fieldValues, filterSettings) => {
     )
   })
   const filteredAmountOthers = {}
-  Object.entries(otherFilteredData).forEach(([filterId, x]) => {filteredAmountOthers[filterId] = x.length})
+  Object.entries(otherFilteredData).forEach(([filterId, x]) => {
+    filteredAmountOthers[filterId] = x.length
+  })
   return {
     filteredData,
     filteredAmountOthers,
@@ -181,9 +184,9 @@ const computeFiltering = (tables, table, fieldValues, filterSettings) => {
   }
 }
 
-const getUnpack = (tables, fieldSpec, asString=false) => {
-  const { valType, multiple } = fieldSpec 
-  let unpack;
+const getUnpack = (tables, fieldSpec, asString = false) => {
+  const { valType, multiple } = fieldSpec
+  let unpack
   if (typeof valType == 'string') {
     unpack = multiple ? (
       asString ? (
@@ -203,13 +206,13 @@ const getUnpack = (tables, fieldSpec, asString=false) => {
     const { values: rel } = valType
     unpack = multiple ? (
       asString ? (
-        v => (v == null) ? '' : v.map(v => repr(tables, rel, v).join(' '))
+        v => (v == null) ? '' : v.map(v => repRelated(tables, rel, v).join(' '))
       ) : (
         v => (v == null) ? [] : v
       )
     ) : (
       asString ? (
-        v => (v == null) ? '' : repr(tables, rel, v)
+        v => (v == null) ? '' : repRelated(tables, rel, v)
       ) : (
         v => (v == null) ? [] : [v]
       )
@@ -292,8 +295,8 @@ export const placeFacets = (fieldValues, maxCols) => {
 export const testAllChecks = filterSettings => {
   let allTrue = true
   let allFalse = true
-  for (const [valueId, valueRep] of Object.entries(filterSettings)) {
-    if (valueRep) {allFalse = false}
+  for (const valueEntry of Object.entries(filterSettings)) {
+    if (valueEntry[1]) {allFalse = false}
     else {allTrue = false}
   }
   return { allTrue, allFalse }

@@ -31,7 +31,7 @@ export const fetchData = task => dispatch => {
     }
   })
   .catch(error => {
-      dispatch(err(desc, [{kind: 'error', text: error.toString()}]))
+    dispatch(err(desc, [{kind: 'error', text: error.toString()}]))
   })
 }
 

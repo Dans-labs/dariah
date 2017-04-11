@@ -12,7 +12,7 @@ export function memoBind(thisArg, funcName, keyArgs, allArgs) {
   if (thisArg._memCache[funcName] == null) {
     thisArg._memCache[funcName] = {}
   }
-  const cache = thisArg._memCache[funcName]
+  const { _memCache: { [funcName]: cache } } = thisArg
 
   const memoKey = JSON.stringify(keyArgs)
   if (cache[memoKey] == null) {
@@ -32,10 +32,10 @@ export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
   return result
 }
 
-export const combineSelectors = function() {
+export const combineSelectors = function(...selectors) {
   return (state, props) => {
     const result = {}
-    for (const selector of arguments) {
+    for (const selector of selectors) {
       Object.assign(result, selector(state, props))
     }
     return result

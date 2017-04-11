@@ -2,27 +2,27 @@ import mergeWith from 'lodash/mergewith'
 
 /* ACTIONS */
 
-export const ask =     (desc)       => ({ type: 'async', status: 'pending', desc })
-export const err =     (desc, msgs) => ({ type: 'async', status: 'error',   desc, msgs })
-export const succeed = (desc)       => ({ type: 'async', status: 'success', desc })
+export const ask = desc => ({ type: 'async', status: 'pending', desc })
+export const err = (desc, msgs) => ({ type: 'async', status: 'error', desc, msgs })
+export const succeed = desc => ({ type: 'async', status: 'success', desc })
 
-export const notify =  (msgs)       => ({ type: 'msgs', msgs })
-export const clear  =  ()           => ({ type: 'clear' })
-export const display = (onOff)      => ({ type: 'display', onOff })
+export const notify = msgs => ({ type: 'msgs', msgs })
+export const clear = () => ({ type: 'clear' })
+export const display = onOff => ({ type: 'display', onOff })
 
 /* REDUCER */
 
 export default (state = { items: [], busy: 0, show: false }, { type, desc, status, msgs, onOff }) => {
   switch (type) {
     case 'async': {
-      const { items, busy, show } = state
+      const { busy } = state
       const extraMsgs = msgs || []
       switch (status) {
         case 'pending': {
           return mergeWith({}, state, {
             items: [
               ...extraMsgs,
-              { kind: 'special', text: `waiting for ${desc}`}
+              { kind: 'special', text: `waiting for ${desc}`},
             ],
             busy: busy + 1,
           }, addItems)
@@ -36,7 +36,7 @@ export default (state = { items: [], busy: 0, show: false }, { type, desc, statu
             busy: busy - 1,
           }, addItems)
         }
-        
+
         case 'error': {
           return mergeWith({}, state, {
             items: [
@@ -51,7 +51,6 @@ export default (state = { items: [], busy: 0, show: false }, { type, desc, statu
       }
     }
     case 'msgs': {
-      const { items } = state
       return mergeWith({}, state, {
         items: [
           ...msgs,
@@ -63,7 +62,7 @@ export default (state = { items: [], busy: 0, show: false }, { type, desc, statu
       return {
         ...state,
         items: [],
-        show: false
+        show: false,
       }
     }
     case 'display': {
@@ -85,7 +84,7 @@ export const getNotifications = ({ notify }) => {
   let lastNote = -1
   let lastKind = ''
   items.forEach((item, i) => {
-    const { kind, text } = item
+    const { kind } = item
     if (kind == 'error') {
       lastNote = i
       lastKind = 'error'

@@ -2,6 +2,9 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Router, Route, Redirect, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
 
+import configureStore from 'configureStore.js'
+import rootReducer from 'rootReducer.js'
+
 import Root from 'Root.jsx'
 import App from 'App.jsx'
 import SubApp from 'SubApp.jsx'
@@ -12,14 +15,11 @@ import ItemRecordPre from 'ItemRecordPre.jsx'
 import Doc from 'Doc.jsx'
 import NotFound from 'NotFound.jsx'
 
-import configureStore from 'configureStore.js'
-import rootReducer from 'rootReducer.js'
-
 const store = configureStore(rootReducer)
 
 render(
   <Root store={store}>
-    <Router history={browserHistory} >
+    <Router history={browserHistory}>
       <Redirect from="/about" to="/docs/about.md" />
       <Redirect from="/docs/about" to="/docs/about.md" />
       <Redirect from="/about.md" to="/docs/about.md" />

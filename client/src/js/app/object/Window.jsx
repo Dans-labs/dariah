@@ -1,6 +1,7 @@
 import { Component, Children } from 'react'
 import { connect } from 'react-redux'
 import throttle from 'lodash/throttle'
+
 import { getWinDim, changeWinDim } from 'win.js'
 
 class Window extends Component {

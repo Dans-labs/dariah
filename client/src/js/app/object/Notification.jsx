@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+
 import { getNotifications, clear, display } from 'notify.js'
 
 class Notification extends Component {

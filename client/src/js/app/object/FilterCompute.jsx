@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+
+import { setupFiltering, getFiltersApplied } from 'filter.js'
+
 import ItemList from 'ItemList.jsx'
 import Filter from 'Filter.jsx'
 import Pane from 'Pane.jsx'
 
-import { setupFiltering, getFiltersApplied } from 'filter.js'
 
 class FilterCompute extends Component {
   constructor(props) {

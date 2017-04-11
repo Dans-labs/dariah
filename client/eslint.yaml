@@ -214,7 +214,7 @@ rules:
     - error
     - array: true
       object: true
-    - enforceForRenamedProperties: true
+    - enforceForRenamedProperties: false
   prefer-rest-params: error
   prefer-spread: error
   prefer-template: error

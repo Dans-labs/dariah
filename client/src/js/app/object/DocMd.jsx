@@ -2,8 +2,10 @@ import React, {Component} from 'react'
 import { connect } from 'react-redux'
 import Markdown from 'react-markdown'
 import { Link } from 'react-router'
-import Alternative from 'Alternative.jsx'
+
 import { getDoc, needDoc, changedDoc, fetchDoc } from 'doc.js'
+
+import Alternative from 'Alternative.jsx'
 
 const RouterLink = ({ children, href }) => (
   href.match(/^(https?:)?\/\//)

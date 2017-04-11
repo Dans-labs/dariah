@@ -1,4 +1,5 @@
 import mergeWith from 'lodash/mergewith'
+
 import { fetchData } from 'server.js'
 import { propsChanged } from 'helpers.js'
 
@@ -7,13 +8,13 @@ import { propsChanged } from 'helpers.js'
  * Most actions call fetchData, which will dispatch the ultimate fetch action.
  */
 
-export const fetchTable = (table) => (
+export const fetchTable = table => (
   fetchData({ type: 'fetchTable', contentType: 'db', path: `/list?table=${table}`, desc: `${table} table`, table })
 )
-export const fetchTableMy = (table) => (
+export const fetchTableMy = table => (
   fetchData({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)`, table })
 )
-export const fetchItem = (props) => {
+export const fetchItem = props => {
   const { table, eId, ownOnly } = props
   return fetchData({
     type: 'fetchItem',
@@ -26,7 +27,7 @@ export const fetchItem = (props) => {
 
 /* REDUCER */
 
-export default (state={}, { type, path, data, table }) => {
+export default (state = {}, { type, data, table }) => {
   switch (type) {
     case 'fetchTable': {
       if (data == null) {return state}
@@ -49,7 +50,7 @@ export default (state={}, { type, path, data, table }) => {
 
 export const getTables = ({ tables }) => ({ tables })
 
-export const getTableFilters =  ({ tables }, { table }) => {
+export const getTableFilters = ({ tables }, { table }) => {
   const { [table]: { fields, filterList } } = tables
   return { fields, filterList }
 }
@@ -60,7 +61,7 @@ const setComplete = (newValue, oldValue, key) => {
   if (key == 'complete') {return newValue || oldValue}
 }
 
-export const needTables = (tables, tableNames, my=false) => {
+export const needTables = (tables, tableNames, my = false) => {
   if (tables == null) {return true}
   const tNames = (!Array.isArray(tableNames)) ? [tableNames] : tableNames
   return tNames.some(table => (
@@ -70,11 +71,9 @@ export const needTables = (tables, tableNames, my=false) => {
   ))
 }
 
-export const needValues = ({ tables, table, eId }) => {
-  const missing = tables == null || tables[table] == null || tables[table].entities[eId] == null
-  const complete = !missing && tables[table].entities[eId].complete
-  return tables == null || tables[table] == null || tables[table].entities[eId] == null || !tables[table].entities[eId].complete
-}
+export const needValues = ({ tables, table, eId }) => (
+  tables == null || tables[table] == null || tables[table].entities[eId] == null || !tables[table].entities[eId].complete
+)
 
 export const changedItem = (newProps, oldProps) => (
   propsChanged(newProps, needValues, oldProps, ['table', 'eId'])
@@ -126,5 +125,22 @@ const repMap = {
   default: repValue,
 }
 
-export const repr = (tables, rel, valId) => (repMap[rel] || repMap.default(rel))(tables, valId)
+export const repRelated = (tables, rel, valId) => (repMap[rel] || repMap.default(rel))(tables, valId)
+
+const trimDate = text => ((text == null) ? '' : text.replace(/\.[0-9]+/, ''))
+
+export const repr = (tables, table, valType, value) => {
+  if (value == null) {return ''}
+  if (typeof valType == 'string') {
+    switch (valType) {
+      case 'datetime': return trimDate(value)
+      default: return value
+    }
+  }
+  else {
+    const { values: rel } = valType
+    return repRelated(tables, rel, value)
+  }
+}
+
 

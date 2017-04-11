@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import FilterCompute from 'FilterCompute.jsx'
 import { getTables, needTables, fetchTable } from 'tables.js'
+
+import FilterCompute from 'FilterCompute.jsx'
 
 class ItemFiltered extends Component {
   render() {

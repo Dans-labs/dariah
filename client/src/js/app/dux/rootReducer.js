@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux'
+
 import win from 'win.js'
 import notify from 'notify.js'
 import doc from 'doc.js'
