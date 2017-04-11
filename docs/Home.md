@@ -30,6 +30,7 @@ This is the technical documentation for the DARIAH contribution tool.
 |                        |               | [Filter](Components.md#filter)             |
 |                        |               | [FullText](Components.md#fulltext)         |
 |                        |               |           | [Stat](Components.md#stat)     
+
 |[Tables](Dux.md#tables) | [ItemFiltered](Components.md#itemfiltered)    |            |
 |                        | [ItemMy](Components.md#itemmy)                |            |
 |                        | [ItemRecord](Components.md#itemrecord)        |            |
@@ -38,19 +39,25 @@ This is the technical documentation for the DARIAH contribution tool.
 |                        |               |           | [Backoffice](Components.md#backoffice)
 |                        |               |           | [ItemHead](Components.md#itemhead)
 |                        |               |           | [ItemRecordPre](Components.md#itemrecordpre)
+
 |[Me](Dux.md#me)         |[Login](Components.md#login)                   |            |
+
 |[Doc](Dux.md#doc)       |[DocMd](Components.md#docmd)                   |            |
 |                        |               |           | [Doc](Components.md#doc)
 |                        |               |           | [DocHtml](Components.md#dochtml)
 |                        |               |           | [DocPdf](Components.md#docpdf)
+
 |[Notify](Dux.md#notify) |[Notification](Components.md#notification)     |            |
+
 |[Win](Dux.md#win)       |[Window](Components.md#window)                 |            |
 |                        |               | [App](Components.md#app)      |
 |                        |               | [Pane](Components.md#pane)    |
 |                        |               | [SubApp](Components.md#subapp)|
 |                        |               |           | [Root](Components.md#root)
 |                        |               |           | [Static](Components.md#static)
+
 |[Alter](Dux.md#alter)   |               | [Alternative](Components.md#alternative)   |
+
 |[Routing](React.md#routing) |           |           | [NavLink](Components.md#navlink)
 |                        |               |           | [NotFound](Components.md#notfound)
 
