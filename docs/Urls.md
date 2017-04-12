@@ -54,8 +54,11 @@ maps these urls to specific controllers that fetch and assemble the requested da
 
 ---
 [Previous - Home](Home.md) -
-[Up](Home.md) -
 [Next - ES6](ES6.md)
+
+---
+[TOC](TOC.md) -
+[Home](Home.md) -
 
 ---
 [repo](https://github.com/Dans-labs/dariah) -
