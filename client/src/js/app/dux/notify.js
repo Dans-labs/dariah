@@ -2,10 +2,6 @@ import mergeWith from 'lodash/mergewith'
 
 /* ACTIONS */
 
-export const ask = desc => ({ type: 'async', status: 'pending', desc })
-export const err = (desc, msgs) => ({ type: 'async', status: 'error', desc, msgs })
-export const succeed = desc => ({ type: 'async', status: 'success', desc })
-
 export const notify = msgs => ({ type: 'msgs', msgs })
 export const clear = () => ({ type: 'clear' })
 export const display = onOff => ({ type: 'display', onOff })

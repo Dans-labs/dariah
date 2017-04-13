@@ -1,14 +1,16 @@
-# Urls for client and server
+---
+title: Routing
+---
 
 # Client
 
 ## Entry point
 
 At the client side, the app starts in
-[main](../client/src/js/app/main.jsx).
+[main](Components#main).
 
 The first priority is to create a
-[Redux](React#redux) *Provider* component, which will be ancestor to all other components.
+Redux [Provider](React#redux) component, which will be ancestor to all other components.
 
 ## Routing
 The second priority is to set up the routes configuration, i.e. the way urls give rise to activating certain components.
@@ -24,8 +26,8 @@ and the diagram visualizes the same logic.
 
 ## Fall-back behaviour
 The server responds to any url with sending the
-[index](../server/controllers/views/index.tpl)
-page, which also causes the bundled app in [dist](../static/dist) to load.
+[index]({{site.repBase}}/server/controllers/views/index.tpl)
+page, which also causes the bundled app in [dist]({{site.repBase}}/static/dist) to load.
 
 The server's rules are very simple:
 no matter what the url, respond with the whole app.
@@ -49,17 +51,5 @@ If the url points to `/api/`,
 the server will respond in a variety of ways, depending on the rest of the url.
 By means of these `/api/` urls the client can ask for additional data services, from file system or database.
 The server side routing in
-[index.py](../server/controllers/index.py)
+[index.py]({{site.repBase}}/server/controllers/index.py)
 maps these urls to specific controllers that fetch and assemble the requested data.
-
----
-[Previous - Home](Home.md) -
-[Next - ES6](ES6.md)
-
----
-[TOC](TOC.md) -
-[Home](Home.md) -
-
----
-[repo](https://github.com/Dans-labs/dariah) -
-[website](https://dariah-beta.dans.knaw.nl/)

@@ -5,7 +5,7 @@ import L from 'leaflet'
 import {countryBorders} from 'europe.geo.js'
 import { getFilterSetting } from 'filter.js'
 import { getTables } from 'tables.js'
-import { combineSelectors } from 'helpers.js'
+import { combineSelectors } from 'root.js'
 
 import ByValue from 'ByValue.jsx'
 

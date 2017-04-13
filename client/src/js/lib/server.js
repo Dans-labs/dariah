@@ -1,16 +1,10 @@
 import 'whatwg-fetch'
 
-import { ask, err, succeed } from 'notify.js'
-
 const rootUrl = '/api/'
 
-/* ACTIONS */
-/*
- * Generic action to fetch data from the server.
- * The query is configured by the task object.
- * It can be used for database queries or file content.
- * During request, notify actions will be dispatched.
- */
+const ask = desc => ({ type: 'async', status: 'pending', desc })
+const err = (desc, msgs) => ({ type: 'async', status: 'error', desc, msgs })
+const succeed = desc => ({ type: 'async', status: 'success', desc })
 
 export const fetchData = task => dispatch => {
   const { path, contentType, desc } = task
@@ -34,18 +28,4 @@ export const fetchData = task => dispatch => {
     dispatch(err(desc, [{kind: 'error', text: error.toString()}]))
   })
 }
-
-/* REDUCER */
-/*
- * no dedicated reducer.
- * Results of actions will be reduced by dedicated reducers.
- */
-
-/* SELECTORS */
-/*
- * no dedicated selectors.
- * See the selectors corresponding to the dedicated reducers.
- */
-
-/* HELPERS */
 

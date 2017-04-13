@@ -1,6 +1,6 @@
 import merge from 'lodash/merge'
 
-import { memoBind } from 'helpers.js'
+import { memoBind } from 'memo.js'
 import { repRelated } from 'tables.js'
 
 /* ACTIONS */

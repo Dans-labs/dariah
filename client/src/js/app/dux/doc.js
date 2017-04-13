@@ -1,7 +1,7 @@
 import merge from 'lodash/merge'
 
 import { fetchData } from 'server.js'
-import { propsChanged } from 'helpers.js'
+import { propsChanged } from 'utils.js'
 
 /* ACTIONS */
 /*

@@ -18,211 +18,212 @@ env:
 
 rules:
   react/display-name: off
-  react/jsx-no-duplicate-props: error
-  react/jsx-no-undef: error
-  react/jsx-uses-react: error
-  react/jsx-uses-vars: error
-  react/no-deprecated: error
-  react/no-direct-mutation-state: error
-  react/no-find-dom-node: error
-  react/no-is-mounted: error
-  react/no-unknown-property: error
-  react/no-render-return-value: error
+  react/jsx-no-duplicate-props: warn
+  react/jsx-no-undef: warn
+  react/jsx-uses-react: warn
+  react/jsx-uses-vars: warn
+  react/no-deprecated: warn
+  react/no-direct-mutation-state: warn
+  react/no-find-dom-node: warn
+  react/no-is-mounted: warn
+  react/no-unknown-property: warn
+  react/no-render-return-value: warn
   react/prop-types: off
-  react/react-in-jsx-scope: error
-  react/require-render-return: error
+  react/react-in-jsx-scope: warn
+  react/require-render-return: warn
 
   react/no-array-index-key: off
   react/no-did-mount-set-state:
-    - error
+    - warn
     - disallow-in-func
   react/no-did-update-set-state:
-    - error
+    - warn
     - disallow-in-func
   react/no-multi-comp:
-    - error
+    - warn
     - ignoreStateless: true
   react/no-set-state: off
-  react/no-string-refs: error
-  react/no-unescaped-entities: error
-  react/no-unused-prop-types: error
+  react/no-string-refs: warn
+  react/no-unescaped-entities: warn
+  react/no-unused-prop-types: warn
   react/prefer-es6-class: 
-    - error
+    - warn
     - always
-  react/prefer-stateless-function: error
+  react/prefer-stateless-function: warn
   react/require-default-props: off
   react/require-optimization: off
-  react/self-closing-comp: error
+  react/self-closing-comp: warn
   react/sort-comp: off
   react/sort-prop-types: off
-  react/style-prop-object: error
-  react/void-dom-elements-no-children: error
+  react/style-prop-object: warn
+  react/void-dom-elements-no-children: warn
   react/jsx-boolean-value:
-    - error
+    - warn
     - always
   react/jsx-closing-bracket-location: 
-    - error
+    - warn
     - tag-aligned
   react/jsx-curly-spacing: 
-    - error
+    - warn
     - never
   react/jsx-equals-spacing: 
-    - error
+    - warn
     - never
   react/jsx-filename-extension: off
   react/jsx-first-prop-new-line: 
-    - error
+    - warn
     - multiline-multiprop
   react/jsx-handler-names:
-    - error
+    - warn
     - eventHandlerPrefix: handle
       eventHandlerPropPrefix: on
   react/jsx-indent:
-    - error
+    - warn
     - 2
   react/jsx-indent-props: off
-  react/jsx-key: error
+  react/jsx-key: warn
   react/jsx-max-props-per-line:
-    - error
+    - warn
     - maximum: 1
       when: multiline
-  react/jsx-no-bind: error
-  react/jsx-no-comment-textnodes: error
-  react/jsx-no-literals: error
-  react/jsx-no-target-blank: error
-  react/jsx-pascal-case: error
+  react/jsx-no-bind: warn
+  react/jsx-no-comment-textnodes: warn
+  react/jsx-no-literals: warn
+  react/jsx-no-target-blank: warn
+  react/jsx-pascal-case: warn
   react/jsx-sort-props:
-    - error
+    - warn
     - callbacksLast: true
       noSortAlphabetically: true
   react/jsx-space-before-closing:
-    - error
+    - warn
     - always
   react/jsx-tag-spacing:
-    - error
+    - warn
     - closingSlash: never
       beforeSelfClosing: always
       afterOpening: never
   react/jsx-wrap-multilines: off
 
   block-spacing:
-    - error
+    - warn
     - never
   curly:
-    - error
+    - warn
     - all
   no-unneeded-ternary:
-    - error
+    - warn
     - defaultAssignment: false
   no-unused-vars:
     - warn
     - ignoreRestSiblings: true
-  no-implicit-globals: error
+  no-implicit-globals: warn
   no-invalid-this: off
-  no-loop-func: error
-  no-multi-spaces: error
-  no-new: error
-  no-param-reassign: error
+  no-loop-func: warn
+  no-multi-spaces: warn
+  no-new: warn
+  no-param-reassign: warn
   no-return-assign:
-    - error
+    - warn
     - always
-  no-sequences: error
-  no-unused-expressions: error
-  no-useless-concat: error
-  no-useless-escape: error
+  no-sequences: warn
+  no-unused-expressions: warn
+  no-useless-concat: warn
+  no-useless-escape: warn
   camelcase:
-    - error
+    - warn
     - properties: always
   comma-dangle:
-    - error
+    - warn
     - arrays: always-multiline
       objects: always-multiline
       imports: always-multiline
       exports: always-multiline
       functions: only-multiline
   comma-spacing:
-    - error
+    - warn
     - before: false
       after: true
   computed-property-spacing:
-    - error
+    - warn
     - never
   indent:
-    - error
+    - warn
     - 2
     - SwitchCase: 1
   jsx-quotes:
-    - error
+    - warn
     - prefer-double
   key-spacing:
-    - error
+    - warn
     - beforeColon: false
       afterColon: true
       mode: strict
   keyword-spacing:
-    - error
+    - warn
     - before: true
       after: true
-  no-trailing-spaces: error
+  no-trailing-spaces: warn
   object-curly-newline: off
   semi:
-    - error
+    - warn
     - never
-  semi-spacing: error
+  semi-spacing: warn
   space-before-blocks:
-    - error
+    - warn
     - always
   space-before-function-paren:
-    - error
+    - warn
     - never
   space-in-parens:
-    - error
+    - warn
     - never
-  space-infix-ops: error
+  space-infix-ops: warn
   space-unary-ops:
-    - error
+    - warn
     - words: true
       nonwords: false
 
-  no-template-curly-in-string: error
-  no-unsafe-negation: error
+  no-template-curly-in-string: warn
+  no-unsafe-negation: warn
   valid-jsdoc: off
   arrow-body-style:
-    - error
+    - warn
     - as-needed
   arrow-parens:
-    - error
+    - warn
     - as-needed
   arrow-spacing:
-    - error
+    - warn
     - before: true
       after: true
-  no-duplicate-imports: error
-  no-useless-computed-key: error
-  no-useless-constructor: error
-  no-useless-rename: error
-  no-var: error
+  no-duplicate-imports: warn
+  no-useless-computed-key: warn
+  no-useless-constructor: warn
+  no-useless-rename: warn
+  no-var: warn
   object-shorthand:
-    - error
+    - warn
     - always
-  prefer-arrow-callback: error
+  prefer-arrow-callback: warn
   prefer-const:
-    - error
+    - warn
     - destructuring: any
       ignoreReadBeforeAssign: false
   prefer-destructuring:
-    - error
+    - warn
     - array: true
       object: true
     - enforceForRenamedProperties: false
-  prefer-rest-params: error
-  prefer-spread: error
-  prefer-template: error
+  prefer-rest-params: warn
+  prefer-spread: warn
+  prefer-template: warn
   rest-spread-spacing:
-    - error
+    - warn
     - never
   template-curly-spacing:
-    - error
+    - warn
     - never
+  no-console: warn
 
 extends: "eslint:recommended"

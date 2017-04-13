@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import { withParams } from 'utils.js'
 import { getTables, needTables, fetchTableMy } from 'tables.js'
 
 import ItemList from 'ItemList.jsx'
@@ -8,7 +9,7 @@ import Pane from 'Pane.jsx'
 
 class ItemMy extends Component {
   render() {
-    const { props: { params: { table }, tables, children } } = this
+    const { props: { table, tables, children } } = this
     if (needTables(tables, table, true) || needTables(tables, ['country', 'user'])) {return <div />}
     const { [table]: { title, perm, my } } = tables
     return (
@@ -29,10 +30,10 @@ class ItemMy extends Component {
     )
   }
   componentDidMount() {
-    const { props: { params: { table }, tables, fetch } } = this
+    const { props: { table, tables, fetch } } = this
     if (needTables(tables, table, true)) {fetch(table)}
   }
 }
 
-export default connect(getTables, { fetch: fetchTableMy })(ItemMy)
+export default connect(getTables, { fetch: fetchTableMy })(withParams(ItemMy))
 

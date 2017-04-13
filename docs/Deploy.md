@@ -1,8 +1,6 @@
-![logo](/static/images/inkind_logo.png)
-
-# DARIAH Contrib Tool - Deployment
-
-2016-10-18 Dirk Roorda
+---
+title: Deployment
+---
 
 # Basic information
 
@@ -75,7 +73,7 @@ The absolute location is not important. Here we assume everything resides in `/o
           - `dump.sh` dump the mongodb as set of bson files
           - `load.sh` load a set of *.bson* files into mongodb
           - `compose_countries` tool to tweak a map of European countries, 
-            result in `/client/src/js/helpers/europe.geo.js`
+            result in `/client/src/js/lib/europe.geo.js`
       - `client`
         - `node_modules` javascript dependencies
         - `package.json` npm config file
@@ -90,7 +88,7 @@ The absolute location is not important. Here we assume everything resides in `/o
           - `js`
             - `components`
               - `*.jsx` client-side code in JSX
-            - `helpers`
+            - `lib`
               - `*.js` client-side code and data in ES6
             - `main.jsx` client-side entry-point for the javascript
           - `css`				
@@ -196,16 +194,8 @@ The client application is a
 [React](https://facebook.github.io/react/)
 component. The source code is in `client/src`.
 It is a set of components in JSX, (a react enhancement of Javascript), and the javascript itself is ES6.
-There are also a few auxiliary functions in helpers, all in plain ES6.
+There are also a few auxiliary functions in *lib*, all in plain ES6.
 Most of the styling is defined in the JSX, but there are a few CSS style files, either in SASS, or in plain CSS.
 For example, we use the open source mapping library
 [leaflet](http://leafletjs.com),
 which comes with a plain style file.
-
----
-[Previous - Components](Components.md) -
-[Up](Home.md) -
-
----
-[repo](https://github.com/Dans-labs/dariah) -
-[website](https://dariah-beta.dans.knaw.nl/)

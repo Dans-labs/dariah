@@ -1,3 +1,7 @@
+---
+title: React
+---
+
 # React Documentation references.
 
 ## React Components
@@ -19,7 +23,7 @@ a static template, it can be (and will be) coded as a pure function.
 
 We put all these components in a directory called **pure**.
 
-[Example: Stat](../client/src/js/app/pure/Stat.jsx).
+[Example: Stat]({{site.appBase}}/pure/Stat.jsx).
 
 ## Simple Stateful components
 If a component needs to store the effects of the outside worlds
@@ -30,7 +34,7 @@ by means of a simple binding: [connect](#connect).
 
 We put all these components in a directory called **state**.
 
-[Example: Facet](../client/src/js/app/state/Facet.jsx).
+[Example: Facet]({{site.appBase}}/state/Facet.jsx).
 
 ## Complex components
 If a component has to handle the DOM after it has been constructed,
@@ -41,13 +45,13 @@ then we need to program the component as a class with so-called
 
 We put all these components in a directory called **object**.
 
-[Example: ItemFiltered](../client/src/js/app/object/ItemFiltered.jsx).
+[Example: ItemFiltered]({{site.appBase}}/object/ItemFiltered.jsx).
 
 
 ## React Processing Concepts
 
 React renders updates to
-[components](React.md#react-components)
+[components](#react-components)
 very efficiently.
 The
 [render()](#render)
@@ -63,10 +67,6 @@ Once the new fragment has been constructed, a clever, React-internal
 process called **reconciliation** is carried out, which computes the minimum
 number of update actions that have to be applied to the previous, real DOM
 incarnation of the component, to change it to match the new fragment.
-
-As an example where we rely on the efficiency of reconciliation,
-see
-[ByValue](../client/src/js/app/state/ByValue.jsx).
 
 ### MiniDOM
 
@@ -149,7 +149,7 @@ But our code will not use it explicitly, only through Redux.
 
 ### Life Cycle
 The main function of a
-[component](React.md#react-components)
+[component](#react-components)
 is to act as a template to be [rendered](#render).
 But if there is additional work to be done, this can be hooked up at various
 stages in the component's lifecycle.
@@ -160,7 +160,7 @@ Most stages occur during (re)rendering, and there is a stage of construction and
 #### Constructor
 
 When a
-[component](React.md#react-components)
+[component](#react-components)
 is being
 [rendered](https://facebook.github.io/react/docs/react-component.html#render)
 this is the method to construct the corresponding React class.
@@ -172,7 +172,7 @@ It will set up the
 #### componentDidMount
 
 When a
-[component](React.md#react-components)
+[component](#react-components)
 has been added to the DOM
 this method will be called just after.
 This is the recommended time to fetch data for this component, if needed.
@@ -183,7 +183,7 @@ This is the recommended time to fetch data for this component, if needed.
 #### componentDidUpdate
 
 When a
-[component](React.md#react-components)
+[component](#react-components)
 has been updated due to receiving new properties,
 this method will be called just after.
 If DOM manipulations are needed to complete the rendering, this is
@@ -199,7 +199,7 @@ call it in this method and in [componentDidMount()](#componentdidmount).
 #### componentWillMount
 
 When a
-[component](React.md#react-components)
+[component](#react-components)
 will be added to the DOM,
 this method will be called just before.
 This is the first thing that happens after [constructor()](#constructor).
@@ -209,7 +209,7 @@ This is the first thing that happens after [constructor()](#constructor).
 #### componentWillReceiveProps
 
 When a
-[component](React.md#react-components)
+[component](#react-components)
 is about to receive new props (as part of the update process),
 this method will be called just before.
 The new props are passed with it, so that it is possible to execute
@@ -219,7 +219,7 @@ actions dependent on whether pros have changed.
 
 #### componentWillUnmount
 When a
-[component](React.md#react-components)
+[component](#react-components)
 will be removed from the DOM,
 this method will be called just before.
 If we want to save state, we can hook it up here.
@@ -229,7 +229,7 @@ If we want to save state, we can hook it up here.
 #### render
 
 The main function of a
-[component](React.md#react-components)
+[component](#react-components)
 is to act as a template to be rendered.
 During rendering the template will be used as a set of instructions to build a real DOM
 somewhere on the actual web page.
@@ -268,7 +268,7 @@ whose properties are dependent on this state, are rerendered automatically
 
 ### Local State
 
-The vanilla React way is that [components](React.md#react-components)
+The vanilla React way is that [components](#react-components)
 have their own state, which only they can modify through
 [setState](https://facebook.github.io/react/docs/react-component.html#setstate).
 
@@ -296,7 +296,9 @@ A widely used approach to *central* state is [Redux](#redux).
 #### Redux
 
 Redux is a popular implementation of the idea that [state](#state) is centralized
-and all components have to subscribe to a state provider, the store.
+and all components have to subscribe to a state
+[Provider](https://github.com/reactjs/react-redux/blob/master/docs/api.md#provider-store),
+the store.
 
 * If a component needs to update the state, it dispatches an action to the store.
 * So-called *reducers* translate the action into a state update.
@@ -330,7 +332,7 @@ Every duck manages a slice of the state has four sections:
 * Reducer: a single function that translates all relevant actions into updates of its slice of the state
 * Selectors: functions that grab data from the state in order to offer it to [connected](#connect) components
 * Helpers: functions that contain additional logic, especially for selectors. See for an example
-  [filter](../client/src/js/app/dux/filter.js). 
+  [filter](Dux#filter). 
 
 ##### Merge
 
@@ -346,7 +348,7 @@ Most reducers use it.
 
 These functions take an object, and transform it on the bases of an other object, precisely as needed for our purposes.
 And if a little tweak is needed for certain keys of the state, `mergeWith()` provides a hook for that.
-See [notify.js](../client/src/js/app/dux/notify.js), the function `addItem()`.
+See [notify.js]({{site.appBase}}/dux/notify.js), the function `addItem()`.
 There, if the old state has an array of items, and we need to append some items, we create a new array, consisting of the 
 items of the orginal array, with the new items concatenated after them.
 
@@ -355,7 +357,7 @@ items of the orginal array, with the new items concatenated after them.
 Redux and the ducks streamline very much how components deal with the centralized store.
 The central function is Redux *connect()*.
 
-[External documentation](https://github.com/reactjs/react-redux/blob/master/docs/api.md#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options)
+[External documentation](https://github.com/reactjs/react-redux/blob/master/docs/api#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options)
 
 If a component X needs state, we can create a *connected* component Xc from X.
 Connected means: connected to the state.
@@ -388,7 +390,7 @@ the url and the part of your app that should be active in response to it.
 ```
 
 The router and its routes are basically React
-[components](React.md#react-components).
+[components](#react-components).
 But they come loaded with some extra behaviour.
 Basically, when a route is rendered, it checks its `path` attribute with the current url.
 If it matches, it renders itself. Otherwise, it does not mount, or if it was mounted,
@@ -396,7 +398,7 @@ it will unmount.
 
 Several tricks are employed to make this a really useful library.
 See the
-[API docs](https://github.com/ReactTraining/react-router/blob/master/docs/API.md#route).
+[API docs](https://github.com/ReactTraining/react-router/blob/master/docs/API#route).
 However, precisely because of this repeated mounting and unmounting
 caused by routing events, the need arises for components to save their states.
 Especially the ones with a costly state.
@@ -404,12 +406,3 @@ Here is another reason why local state becomes cumbersome.
 With Redux, this is not a problem, because state is severed from components.
 
 [External documentation](https://github.com/ReactTraining/react-router)
-
----
-[Previous - ES6](ES6md) -
-[Up](Home.md) -
-[Next - Dux](Dux.md)
-
----
-[repo](https://github.com/Dans-labs/dariah) -
-[website](https://dariah-beta.dans.knaw.nl/)

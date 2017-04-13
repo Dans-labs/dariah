@@ -21,23 +21,4 @@ export function memoBind(thisArg, funcName, keyArgs, allArgs) {
   return cache[memoKey]
 }
 
-export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
-  let result = false
-  if (oldProps == null) {
-    if (need(newProps)) {result = true}
-  }
-  else {
-    if (keyPropNames.some(a => newProps[a] != oldProps[a]) && need(newProps)) {result = true}
-  }
-  return result
-}
 
-export const combineSelectors = function(...selectors) {
-  return (state, props) => {
-    const result = {}
-    for (const selector of selectors) {
-      Object.assign(result, selector(state, props))
-    }
-    return result
-  }
-}

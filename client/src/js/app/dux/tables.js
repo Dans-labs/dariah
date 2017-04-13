@@ -1,7 +1,7 @@
 import mergeWith from 'lodash/mergewith'
 
 import { fetchData } from 'server.js'
-import { propsChanged } from 'helpers.js'
+import { propsChanged } from 'utils.js'
 
 /* ACTIONS */
 /*
@@ -15,11 +15,11 @@ export const fetchTableMy = table => (
   fetchData({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)`, table })
 )
 export const fetchItem = props => {
-  const { table, eId, ownOnly } = props
+  const { table, eId } = props
   return fetchData({
     type: 'fetchItem',
     contentType: 'db',
-    path: `/view?table=${table}&id=${eId}${ownOnly ? '&own=true' : ''}`,
+    path: `/view?table=${table}&id=${eId}`,
     desc: `${table} record ${eId}`,
     table,
   })

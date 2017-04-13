@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import { withParams } from 'utils.js'
 import { getTables, needValues, changedItem, fetchItem } from 'tables.js'
 
 import ItemField from 'ItemField.jsx'
@@ -82,5 +83,5 @@ class ItemRecord extends Component {
   }
 }
 
-export default connect(getTables, { fetch: fetchItem })(ItemRecord)
+export default connect(getTables, { fetch: fetchItem })(withParams(ItemRecord))
 

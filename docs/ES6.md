@@ -1,6 +1,8 @@
-# ES6 Documentation references.
+---
+title: ES6
+---
 
-## General
+# General
 
 We use
 [EcmaScript 6, also known as ES6, also known as ES2015, also known as Javascript](https://babeljs.io/learn-es2015/)
@@ -14,11 +16,11 @@ It is taken care of by the build tool of our choice:
 Our source code conforms to a number of style guides, which are enforced by
 [eslint](http://eslint.org).
 There are many options and choices, ours are
-[here](../client/eslint.yaml).
+[here]({{site.repBase}}/client/eslint.yaml).
 
 We highlight a few concepts in ES6 that we make use of.
 
-## Promise
+# Promise
 
 *Promise* is an ES6 datastructure to contain the result of an asynchronous function.
 It has as state that is either *pending*, *failed* or *resolved*.
@@ -38,17 +40,8 @@ The typical way to use a promise is
   )
 ```
 
-**Example**: [server.js](../client/src/js/app/dux/server.js)
+**Example**: [server.js]({{site.libBase}}/server.js)
 
 This is virtually the only occurrence in our code where we use Promise syntax.
 
 [External documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-
----
-[Previous - Urls](Urls.md) -
-[Up](Home.md) -
-[Next - React](React.md)
-
----
-[repo](https://github.com/Dans-labs/dariah) -
-[website](https://dariah-beta.dans.knaw.nl/)

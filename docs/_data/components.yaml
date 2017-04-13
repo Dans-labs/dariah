@@ -1,0 +1,104 @@
+- dux: alter
+  methods:
+  - method: lifecycle
+    components:
+  - method: connected
+    components:
+    - Alternative
+  - method: pure
+    components:
+- dux: doc
+  methods:
+  - method: lifecycle
+    components:
+    - DocMd
+  - method: connected
+    components:
+  - method: pure
+    components:
+    - Doc
+    - DocHtml
+    - DocPdf
+- dux: filter
+  methods:
+  - method: lifecycle
+    components:
+    - CheckboxI
+    - EUMap
+    - FilterCompute
+    - ItemFiltered
+  - method: connected
+    components:
+    - ByValue
+    - Facet
+    - Filter
+    - FullText
+  - method: pure
+    components:
+    - Stat
+- dux: me
+  methods:
+  - method: lifecycle
+    components:
+    - Login
+  - method: connected
+    components:
+  - method: pure
+    components:
+- dux: notify
+  methods:
+  - method: lifecycle
+    components:
+    - Notification
+  - method: connected
+    components:
+  - method: pure
+    components:
+- dux: root
+  methods:
+  - method: lifecycle
+    components:
+  - method: connected
+    components:
+    - main
+  - method: pure
+    components:
+    - Root
+- dux: tables
+  methods:
+  - method: lifecycle
+    components:
+    - ItemFiltered
+    - ItemMy
+    - ItemRecord
+  - method: connected
+    components:
+    - ItemField
+    - ItemList
+  - method: pure
+    components:
+    - Backoffice
+    - ItemHead
+- dux: win
+  methods:
+  - method: lifecycle
+    components:
+    - Window
+  - method: connected
+    components:
+    - App
+    - Pane
+    - SubApp
+  - method: pure
+    components:
+- dux: __none__
+  methods:
+  - method: lifecycle
+    components:
+  - method: connected
+    components:
+  - method: pure
+    components:
+    - Static
+    - NavLink
+    - NotFound

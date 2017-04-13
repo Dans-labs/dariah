@@ -37,7 +37,10 @@ module.exports = {
           'babel-loader',
           {
             loader: 'eslint-loader',
-            options: { configFile: 'eslint.yaml' },
+            options: {
+              configFile: 'eslint.yaml',
+              failOnError: false,
+            },
           },
         ],
       },
@@ -90,6 +93,11 @@ module.exports = {
     new ExtractTextPlugin({
       filename: 'main.css',
       allChunks: true,
+    }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')
+      }
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),

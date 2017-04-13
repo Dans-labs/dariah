@@ -1,6 +1,8 @@
 import React from 'react'
 
-const Backoffice = ({ params: { func } }) => {
+import { withParams } from 'utils.js'
+
+const Backoffice = ({ func }) => {
   const headings = {
     type: 'Contribution types',
     assess: 'Assessment criteria',
@@ -21,6 +23,6 @@ const Backoffice = ({ params: { func } }) => {
   )
 }
 
-export default Backoffice
+export default withParams(Backoffice)
 
 

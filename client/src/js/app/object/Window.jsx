@@ -2,7 +2,7 @@ import { Component, Children } from 'react'
 import { connect } from 'react-redux'
 import throttle from 'lodash/throttle'
 
-import { getWinDim, changeWinDim } from 'win.js'
+import { changeWinDim } from 'win.js'
 
 class Window extends Component {
   render() {
@@ -18,4 +18,4 @@ class Window extends Component {
   componentWillUnmount() {window.removeEventListener("resize", this.newWindowSize)}
 }
 
-export default connect(getWinDim, { resize: changeWinDim })(Window)
+export default connect(null, { resize: changeWinDim })(Window)

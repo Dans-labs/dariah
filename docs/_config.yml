@@ -1,1 +1,39 @@
+title: DARIAH Contribution Tool Tech Doc
+tagline: Building in-kinds
+email: dirk.roorda@dans.knaw.nl
+description: > 
+  The tech design of the DARIAH Contribution Tool.
+
+baseurl: /dariah
+url: "https://dariah-beta.dans.knaw.nl/" 
+github_username:  dirkroorda
+
+staff:
+    - name: Dirk Roorda
+      email: dirk.roorda@dans.knaw.nl
+      hide: false
+      institute: DANS
+      url: https://dans.knaw.nl/nl
+
+repos:
+    - name: dariah
+      url: https://github.com/Dans-labs/dariah
+      desc: DARIAH contribution tool
+
+web:
+    - name: Contributions
+      url: https://dariah-beta.dans.knaw.nl/
+      desc: DARIAH contribution tool
+
+# Build settings
+markdown: kramdown
 theme: jekyll-theme-minimal
+gems:
+  - jekyll-feed
+exclude:
+  - Gemfile
+  - Gemfile.lock
+
+appBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/app
+libBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/lib
+repBase: https://github.com/Dans-labs/dariah/blob/master

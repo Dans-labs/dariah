@@ -19,7 +19,6 @@ const App = ({ children, height, width }) => {
           title="information about this site"
         />
         <NavLink to="/contrib" >{'Contributions'}</NavLink>
-        <span>{'yw'}</span>
         <NavLink to="/backoffice" >{'Backoffice'}</NavLink>
         <Static />
         <span className="resize" title={text}>{text}</span>

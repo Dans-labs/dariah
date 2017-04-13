@@ -1,12 +1,11 @@
 import React from 'react'
-import { connect } from 'react-redux'
 
-import { getWinDim } from 'win.js'
+import { withParams } from 'utils.js'
 
 import NavLink from 'NavLink.jsx'
 import Pane from 'Pane.jsx'
 
-const SubApp = ({params: { table }, children }) => (
+const SubApp = ({ table, children }) => (
   <div>
     <Pane format="nav sized" position="left">
       {(table == 'contrib') ? (
@@ -28,4 +27,4 @@ const SubApp = ({params: { table }, children }) => (
   </div>
 )
 
-export default connect(getWinDim)(SubApp)
+export default withParams(SubApp)

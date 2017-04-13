@@ -2,23 +2,18 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Router, Route, Redirect, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
 
-import configureStore from 'configureStore.js'
-import rootReducer from 'rootReducer.js'
-
 import Root from 'Root.jsx'
 import App from 'App.jsx'
 import SubApp from 'SubApp.jsx'
 import Backoffice from 'Backoffice.jsx'
 import ItemFiltered from 'ItemFiltered.jsx'
 import ItemMy from 'ItemMy.jsx'
-import ItemRecordPre from 'ItemRecordPre.jsx'
+import ItemRecord from 'ItemRecord.jsx'
 import Doc from 'Doc.jsx'
 import NotFound from 'NotFound.jsx'
 
-const store = configureStore(rootReducer)
-
 render(
-  <Root store={store}>
+  <Root>
     <Router history={browserHistory}>
       <Redirect from="/about" to="/docs/about.md" />
       <Redirect from="/docs/about" to="/docs/about.md" />
@@ -35,7 +30,7 @@ render(
         <Route path=":table" component={SubApp} >
           <Route path="list" component={ItemFiltered} />
           <Route path="mylist" component={ItemMy} >
-            <Route path=":eId" component={ItemRecordPre} ownOnly={true} />
+            <Route path=":eId" component={ItemRecord} />
           </Route>
           <Route path=":func" component={Backoffice} />
         </Route>
