@@ -6,8 +6,7 @@ const Static = () => (
   <span className="small" >
     <NavLink to="/docs/about.md" >{'About'}</NavLink>
     <NavLink to="/tech/docs/design.pdf" >{'diagrams'}</NavLink>
-    <NavLink to="/tech/docs/deploy.md" >{'deploy'}</NavLink>
-    <a href="/api/file/tech/docs/gen/index.html" target="_blank" rel="noopener noreferrer" >{'tech doc'}</a>
+    <a href="https://dans-labs.github.io/dariah/" target="_blank" rel="noopener noreferrer" >{'tech doc'}</a>
   </span>
 )
 
