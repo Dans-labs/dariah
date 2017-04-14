@@ -1,3 +1,5 @@
+#!/bin/sh
+
 cd ~/github/dariah/client
 if [[ "$1" == "dev" ]]; then
     export NODE_ENV="development"
