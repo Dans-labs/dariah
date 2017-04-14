@@ -183,8 +183,9 @@ class DbAccess(object):
             fSpec = fieldSpecs[f]['valType']
             t = fSpec['values']
             select = fSpec.get('select', {})
-            rows = list(_DBM[t].find(select, dict(_id=True)))
-            for row in rows: valueLists.setdefault(f, {})[str(row['_id'])] = True
+            valueOrder = self.DM.tables.get(t, {}).get('sort', self.DM.generic['sort'])
+            rows = [str(row['_id']) for row in _DBM[t].find(select, dict(_id=True)).sort(valueOrder)]
+            valueLists[f] = rows
         return (good, msgs, tables, valueLists if field == None else valueLists[field])
 
     def getItem(self, controller, table, ident, action):

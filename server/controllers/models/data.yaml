@@ -3,10 +3,16 @@ generic:
   createdBy: creator
   modDate: dateModified
   modBy: modifiedBy
+  sort:
+    - [rep, 1]
 
 tables:
   user:
     title: eppn
+    sort:
+      - [lastName, 1]
+      - [firstName, 1]
+      - [eppn, 1]
     fieldOrder:
       - eppn
       - email
@@ -85,6 +91,8 @@ tables:
 
   country:
     title: name
+    sort:
+      - [name, 1]
     fieldOrder:
       - iso2
       - name
@@ -135,6 +143,9 @@ tables:
 
   contrib:
     title: title
+    sort:
+      - [title, 1]
+      - [dateCreated, -1]
     fieldOrder: 
       - title
       - year

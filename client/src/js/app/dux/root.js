@@ -1,5 +1,6 @@
 import { combineReducers, createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
+import { reducer as form } from 'redux-form'
 
 import win from 'win.js'
 import notify from 'notify.js'
@@ -44,6 +45,7 @@ export default configureStore(combineReducers({
   me,
   filter,
   alter,
+  form,
 }))
 
 /* SELECTORS */

@@ -1,41 +1,132 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Field, reduxForm } from 'redux-form'
 
+import { memoBind } from 'memo.js'
 import { withParams } from 'utils.js'
-import { getTables, needValues, changedItem, fetchItem } from 'tables.js'
+import { getTables, needValues, changedItem, fetchItem, repr } from 'tables.js'
 
-import ItemField from 'ItemField.jsx'
+import RelSelect from 'RelSelect.jsx'
+
+const ItemForm = reduxForm()(
+  ({ fragments, handleSubmit }) => (
+    <form
+      onSubmit={handleSubmit}
+    >
+      <p>
+        <button
+          className={`button-large`}
+        >{'Save'}</button>
+      </p>
+      <div>{fragments}</div>
+    </form>
+  )
+)
 
 class ItemRecord extends Component {
-  parseFields() {
+  handleSubmit = values => {
+    console.warn(values)
+  }
+
+  selectWidget = (name, options) => (props) =>
+    <RelSelect
+      options={options}
+      {...props}
+    />
+
+  makeFragmentRead = name => {
+    const { props: { tables, table } } = this
+    const { [table]: { fieldSpecs } } = tables
+    const entity = this.getEntity()
+    const { values } = entity
+    const { [name]: myValues } = values
+    const { [name]: { valType } } = fieldSpecs
+    return myValues.map((value, i) => (
+      <span key={i}>{(i != 0) ? ' | ' : ''}
+        <span>{repr(tables, table, valType, value)}</span>
+      </span>
+    ))
+  }
+  makeFragmentEdit = name => {
+    const { props: { tables, table } } = this
+    const { [table]: { fieldSpecs, valueLists } } = tables
+    const entity = this.getEntity()
+    const { [name]: { valType, multiple } } = fieldSpecs
+    if (typeof valType == 'string') {
+      return (
+        <Field
+          name={name}
+          component="input"
+          type="text"
+        />
+      )
+    }
+    else {
+      const { allowNew } = valType
+      const options = valueLists[name].map(_id => [_id, repr(tables, table, valType, _id)])
+      const { values } = entity
+      const { [name]: myValues } = values
+      return (
+        <span>{
+          !multiple ? null :
+          myValues.map((value, i) => (
+            <span key={i}>{(i != 0) ? ' | ' : ''}
+              <span>{repr(tables, table, valType, value)}</span>
+            </span>
+          ))
+        }{' '}
+          <Field
+            name={`${name}_!_other`}
+            component={memoBind(this, 'selectWidget', [name], [name, options])}
+          />
+          {' '}
+          {
+            allowNew ?
+              <Field
+                name={`${name}_!_new`}
+                component="input"
+                type="text"
+              /> :
+            null
+          }
+        </span>
+      )
+    }
+  }
+
+  makeForm() {
     const { props: { tables, table, eId } } = this
     const { [table]: { fieldSpecs, fieldOrder } } = tables
     const entity = this.getEntity()
     const { perm, fields, values } = entity
+    const form = `${table}-${eId}`
 
     const fragments = []
-    let hasEditable = false
+    const hasEditable = fieldOrder.some(name => perm.update[name])
     for (const name of fieldOrder) {
       const { [name]: f } = fields
       if (f == null) {continue}
-      const { [name]: { label, initial, ...specs } } = fieldSpecs
+      const { [name]: { label } } = fieldSpecs
       const { update: { [name]: editable } } = perm
-      if (editable) {hasEditable = true}
+      const theFragment = (editable) ?
+        this.makeFragmentEdit(name) :
+        this.makeFragmentRead(name)
       fragments.push(
-        <ItemField
-          key={name}
-          table={table}
-          eId={eId}
-          editable={!!editable}
-          name={name}
-          label={label}
-          values={values[name]}
-          initial={initial}
-          {...specs}
-        />
+        <div key={name}>
+          <label><b>{`${label}:`}</b></label>{' '}
+          {theFragment}
+        </div>
       )
     }
-    return {fragments, hasEditable}
+    const itemForm = hasEditable ?
+      <ItemForm
+        form={form}
+        fragments={fragments}
+        initialValues={values}
+        onSubmit={this.handleSubmit}
+      /> :
+      <div>{fragments}</div>
+    return {itemForm, hasEditable}
   }
 
   getEntity = () => {
@@ -50,26 +141,20 @@ class ItemRecord extends Component {
 
     const entity = this.getEntity()
     const { perm } = entity
-    const { fragments, hasEditable } = this.parseFields()
+    const { itemForm, hasEditable } = this.makeForm()
     return (
       <div className="widget-medium" >
-        <p>{`record in ${table}`}</p>
-        <p>
-          {hasEditable ? [
+        <div>{
+          hasEditable && perm.delete ?
             <span
-              key="save"
-              className={`button-large`}
-            >{'Save'}</span>,
-            perm.delete ? (
-              <span
-                key="delete"
-                className={'fa fa-trash button-large delete'}
-                title="delete this item"
-              />
-            ) : null,
-          ] : null}
-        </p>
-        <div>{fragments}</div>
+              key="delete"
+              className={'fa fa-trash button-large delete'}
+              title="delete this item"
+            /> :
+          null
+        }
+        </div>
+        {itemForm}
       </div>
     )
   }

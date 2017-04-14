@@ -83,13 +83,12 @@ class FilterCompileCache {
       const { [field]: { valType } } = fieldSpecs
       const { [field]: vals } = valueLists
       const fFieldValues = {'': '-none-'}
-      const orderedVals = Object.keys(vals).sort()
       if (typeof valType == 'string') {
-        orderedVals.forEach((v, i) => {fFieldValues[i] = v})
+        vals.forEach((v, i) => {fFieldValues[i] = v})
       }
       else {
         const { values: rel } = valType
-        orderedVals.forEach(v => {
+        vals.forEach(v => {
           fFieldValues[v] = repRelated(tables, rel, v)
         })
       }
