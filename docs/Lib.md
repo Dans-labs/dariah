@@ -1,3 +1,7 @@
+---
+title: Library
+---
+
 # europe.geo
 **source** [europe.geo]({{site.libBase}}/europe.geo.js)
 

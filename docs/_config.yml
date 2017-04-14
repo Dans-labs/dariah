@@ -1,10 +1,12 @@
-title: DARIAH Contribution Tool Tech Doc
+title: DARIAH Contribution Tool (Tech Doc)
 tagline: Building in-kinds
 email: dirk.roorda@dans.knaw.nl
 description: > 
-  The tech design of the DARIAH Contribution Tool.
+  The technical design of the DARIAH Contribution Tool.
 
 baseurl: /dariah
+logo: /images/inkind_logo.png
+
 url: "https://dariah-beta.dans.knaw.nl/" 
 github_username:  dirkroorda
 
@@ -21,9 +23,9 @@ repos:
       desc: DARIAH contribution tool
 
 web:
-    - name: Contributions
-      url: https://dariah-beta.dans.knaw.nl/
-      desc: DARIAH contribution tool
+    name: DARIAH contribution tool
+    url: https://dariah-beta.dans.knaw.nl/
+    desc: Registry of DARIAH inkind-contributions, with assessments and reviews.
 
 # Build settings
 markdown: kramdown

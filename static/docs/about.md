@@ -30,3 +30,6 @@ Here are your opportunities to mine that information, analyse it and visualize i
 
 ### Contact
 Mail: [dirk.roorda@dans.knaw.nl](mailto:dirk.roorda@dans.knaw.nl)
+
+### Technical documentation
+[Github](https://dans-labs.github.io/dariah/)

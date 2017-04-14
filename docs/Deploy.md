@@ -6,7 +6,9 @@ title: Deployment
 
 **source code** GitHub repository [Dans-labs/dariah](https://github.com/Dans-labs/dariah)
 
-**server** dariah-beta.dans.knaw.nl
+**tech doc** GitHub Pages [dans-labs.github.io/dariah](https://dans-labs.github.io/dariah/)
+
+**server** [dariah-beta.dans.knaw.nl](https://dariah-beta.dans.knaw.nl)
 
 **database** Mongodb via pymongo (no connection information needed)
 
@@ -28,10 +30,19 @@ This connection is defined in the default config file (for contents, see *defaul
   - ...
 
 The *client* code is done in 
-[React](https://facebook.github.io/react/) and this the shape of a structured set of components in
-[JSX](https://facebook.github.io/react/docs/introducing-jsx.html), plus some helper
-functions in plain Javascript
+[React](https://facebook.github.io/react/)
+using the
+[JSX](https://facebook.github.io/react/docs/introducing-jsx.html)
+idiom.
+We have added
+[Redux](http://redux.js.org)
+to the mix and various other libraries, obtained through 
+[npm](https://www.npmjs.com).
+Everything is glued together by means of modern Javascript:
 [ES6 = ES2015](https://babeljs.io/docs/learn-es2015/).
+The build tool is
+[Webpack](https://webpack.js.org).
+All hand written code is monitored syntactically and stylistically by [eslint](http://eslint.org).
 
 We make use of the DARIAH infrastructure for *user authentication* 
 [AAI](https://wiki.de.dariah.eu/display/publicde/DARIAH+AAI+Documentation)
@@ -59,13 +70,14 @@ The absolute location is not important. Here we assume everything resides in `/o
           - `requirements.txt` the list of python packages needed; to be installed with `pip3`
           - `default_example.conf` example config file for Apache httpd server
       - `static` (static files, css, javascript, fonts, etc)
-        - `css` stylesheets built from `client/src/css`
-        - `js` javascript built from `client/src/js`
+        - `css` fixed stylesheets
+        - `dist` javascript and css built from `client/src`
         - `favicons`
         - `images`
         - `fonts`
         - `docs`
           - `design.pdf` notes on the design of this web app
+          - `deploy.md` this document (!)
         - `tools` These files are not active in the web scenarios, except for documentation. 
             They are helpers to prepare the data for the app.
           - `update.sh` script to deploy updates of the web app. Pulls code from the github repo, restarts httpd.
@@ -78,20 +90,18 @@ The absolute location is not important. Here we assume everything resides in `/o
         - `node_modules` javascript dependencies
         - `package.json` npm config file
         - `README.md` short description for humans
-        - `gulpfile.babel.js` config file for gulp, the build tool
-        - `gulp_dev.sh` script for development builds
-        - `gulp_prod.sh` script for production builds
-        - `index.html` html entry-point for the client side app
+        - `webpack.config.js` config file for webpack, the build tool
+        - `build.sh` script for building, with parameters for development, development server, or production
+        - `index.html` soft link to ../server/controllers/views/index.tpl, the entry html that holds the whole app
         - `src`
           - `css`
             - `*.scss`, `*.css` (plain CSS and SASS stylesheets)				
           - `js`
-            - `components`
+            - `app`
               - `*.jsx` client-side code in JSX
             - `lib`
               - `*.js` client-side code and data in ES6
             - `main.jsx` client-side entry-point for the javascript
-          - `css`				
 
 # Technology
 ## Server
