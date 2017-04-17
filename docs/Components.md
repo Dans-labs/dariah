@@ -6,16 +6,16 @@ These are the [React](React) components, that make up the
 part of the app that is visible in the browser.
 They lean on the [dux](Dux) that work for them in the background.
 
-# main
-**Source** [main]({{site.appBase}}/main.jsx) **connected to** [root](Dux#root)
+Click on the names in the titles to view their source code on Github.
 
+[main]({{site.appBase}}/main.jsx) `connected via` [root](Dux#root)
+=============================================================================================
 Entry point of the client side app.
 Contains the [routing](Routing), wrapped in a [Root](#root) component, that
 sets up the store in which the central state lives.
 
-# Alternative
-**Source** [main]({{site.appBase}}/state/Alternative.jsx) **connected to:** [alter](Dux#alter)
-
+[Alternative]({{site.appBase}}/state/Alternative.jsx) `connected via` [alter](Dux#alter)
+=============================================================================================
 Displays one of a list of alternatives and
 let the user cycle through the alternatives.
 
@@ -61,8 +61,8 @@ the alternative component.
 ###### `initial` number 
 The index of the initial alternative.
 
-# App
-**Source** [main]({{site.appBase}}/state/App.jsx) **connected to** [win](Dux#win)
+[App]({{site.appBase}}/state/App.jsx) `connected via` [win](Dux#win)
+=============================================================================================
 
 As far as the logic of the web page is concerned, this is the top level component.
 
@@ -76,16 +76,14 @@ As far as the logic of the web page is concerned, this is the top level componen
 The height and width of the main window.
 It is only used to display the height and the width somewhere on the screen.
 
-# Backoffice
-**Source** [main]({{site.appBase}}/pure/Backoffice.jsx) **presents** [tables](Dux#tables)
-
+[Backoffice]({{site.appBase}}/pure/Backoffice.jsx) `presents` [tables](Dux#tables)
+=============================================================================================
 Gives access to backoffice functions, i.e. management of tables that support the business logic of the app.
 
 A lot has to be implemented here.
 
-# ByValue
-**Source** [main]({{site.appBase}}/state/ByValue.jsx) **connected to** [filter](Dux#filter)
-
+[ByValue]({{site.appBase}}/state/ByValue.jsx) `connected via` [filter](Dux#filter)
+=============================================================================================
 A widget by which the user can click the [facet](#facet)s associated with one field.
 There is also a [collective checkbox](#checkboxi), by which the user can check or uncheck all facets in one go.
 All values that occur are displayed, with statistics in the form *subtotal of total*.
@@ -130,9 +128,8 @@ The computation inside [placeFacets](Filter#placefacets)
 is just a little bit of juggling with tiny datastructures, so the fragment is constructed in no time.
 See [Reconciliation](React#reconciliation).
 
-# CheckboxI
-**Source** [main]({{site.appBase}}/object/LifeCycle.jsx) **LifeCycle** **connected to** [filter](Dux#filter)
-
+[CheckboxI]({{site.appBase}}/object/CheckboxI.jsx) `(life cycle)` `connected via` [filter](Dux#filter)
+=============================================================================================
 Displays a *collective* checkbox for a [facet filter](#ByValue) with many facets.
 
 Clicking on this box will collectively check and uncheck all associate
@@ -151,9 +148,8 @@ of the associate checkboxes are checked.
 We have to resort to a [DOM](React#dom) manipulation after rendering to get the
 indeterminate state across.
 
-# Doc
-**Source** [main]({{site.appBase}}/pure/Doc.jsx) **presents** [doc](Dux#doc)
-
+[Doc]({{site.appBase}}/pure/Doc.jsx) `presents` [doc](Dux#doc)
+=============================================================================================
 Handles the display of documents.
 Depending on the type of document (markdown, html, pdf) it delegates work
 to specialized document components: [DocMd](#docmd), [DocHtml](#dochtml) and
@@ -165,18 +161,16 @@ From this object the property `pathname` will be read, which will be split
 into directory, file and extension parts.
 The extension is used to switch to the component for that type of documents.
 
-# DocHtml
-**Source** [main]({{site.appBase}}/pure/DocHtml.jsx) **presents** [doc](Dux#doc)
-
+[DocHtml]({{site.appBase}}/pure/DocHtml.jsx) `presents` [doc](Dux#doc)
+=============================================================================================
 Displays an HTML document by linking to it in an IFRAME.
 
 #### Props
 ###### `docDir`, `docName`, `docExt` string
 The directory, filename and extension of the document container.
 
-# DocMd
-**Source** [main]({{site.appBase}}/object/DocMd.jsx) **LifeCycle** **connected to** [doc](Dux#doc)
-
+[DocMd]({{site.appBase}}/object/DocMd.jsx) `(life cycle)` `connected via` [doc](Dux#doc)
+=============================================================================================
 Component to show
 [MarkDown](https://guides.github.com/features/mastering-markdown/)
 text, coming from files on the server.
@@ -202,9 +196,8 @@ internal links to this application.
 A full link (with protocol `http`(`s`) is translated to a
 plain HTML `a` element, so clicking it will leave this application.
 
-# DocPdf
-**Source** [main]({{site.appBase}}/pure/DocPdf.jsx) **presents** [doc](Dux#doc)
-
+[DocPdf]({{site.appBase}}/pure/DocPdf.jsx) `presents` [doc](Dux#doc)
+=============================================================================================
 Displays a PDF document by linking to it in an OBJECT.
 
 **NB:** On iOS this does not work well, only the first page of the PDF gets shown,
@@ -214,9 +207,8 @@ We only do that when we detect an iOS browser.
 ###### `docDir`, `docName`, `docExt` string
 The directory, filename and extension of the document container.
 
-# EUMap
-**Source** [main]({{site.appBase}}/object/EUMap.jsx) **LifeCycle** **connected to** [filter](Dux#filter)
-
+[EUMap]({{site.appBase}}/object/EUMap.jsx) `(life cycle)` `connected via` [filter](Dux#filter)
+=============================================================================================
 A complex component!
 It is a facet filter for the field *country*, using [ByValue](#byvalue) for that.
 It also contains a map of Europe, visualizing by means of markers,
@@ -245,9 +237,8 @@ or the big markers get too big.
 We mitigate this effect, by using proportional radii only for values below a certain
 threshold (`LEVEL_OFF`). For higher values we essentiall take the square root.
 
-# Facet
-**Source** [main]({{site.appBase}}/state/Facet.jsx) **connected to** [filter](Dux#filter)
-
+[Facet]({{site.appBase}}/state/Facet.jsx) `connected via` [filter](Dux#filter)
+=============================================================================================
 Displays a single facet. Just a checkbox and a value representation.
 The clicks received by the checkbox are passed upwards by means of a callback.
 
@@ -272,8 +263,8 @@ Callback to be invoked when the facet is clicked.
 
 Note that we use the strategy of [controlled components](React#controlled-component) here.
 
-# Filter
-**Source** [main]({{site.appBase}}/state/Filter.jsx) **connected to** [filter](Dux#filter)
+[Filter]({{site.appBase}}/state/Filter.jsx) `connected via` [filter](Dux#filter)
+=============================================================================================
 
 A control to filter a list of items.
 The following types of filters are implemented.
@@ -303,10 +294,8 @@ This information comes from the [tables](Dux#tables) part of the state.
 ###### `filteredAmount` object, `filteredAmountOthers` object, `amounts` object
 The results of [applying](Dux#getfiltersapplied) the filters.
 
-# FilterCompute
-
-**Source** [main]({{site.appBase}}/object/FilterCompute.jsx) **LifeCycle** **connected to** [filter](Dux#filter)
-
+[FilterCompute]({{site.appBase}}/object/FilterCompute.jsx) `(life cycle)` `connected via` [filter](Dux#filter)
+=============================================================================================
 Parent component of a table and all its filters.
 The table must be present.
 Fetching tables is done by other components, such as
@@ -325,10 +314,8 @@ Whether the filters have been initialized.
 ###### `init` function is [setupFiltering](Dux#setupfiltering)
 Callback to initialize filtering.
 
-# FullText
-
-**Source** [main]({{site.appBase}}/state/FullText.jsx) **connected to** [filter](Dux#filter)
-
+[FullText]({{site.appBase}}/state/FullText.jsx) `connected via` [filter](Dux#filter)
+=============================================================================================
 Displays a full text search input field.
 The characters entered in this field are passed upwards by means of a callback.
 This is incremental search.
@@ -355,9 +342,8 @@ Callback to be invoked when the user is typing the search string.
 
 Note that we use the strategy of [controlled components](React#controlled-component) here.
 
-# ItemField
-**Source** [main]({{site.appBase}}/state/ItemField.jsx) **connected to** [tables](Dux#tables)
-
+[ItemField]({{site.appBase}}/state/ItemField.jsx) `connected via` [tables](Dux#tables)
+=============================================================================================
 Manages the display and editing of a single field.
 
 #### Props
@@ -382,9 +368,8 @@ contains the name of the related table where the value can be found.
 ###### `multiple` bool
 Whether the multiple values are allowed or just a single value.
 
-# ItemFiltered
-**Source** [main]({{site.appBase}}/object/ItemFiltered.jsx) **LifeCycle** **connected to** [tables](Dux#tables)
-
+[ItemFiltered]({{site.appBase}}/object/ItemFiltered.jsx) `(life cycle)` `connected via` [tables](Dux#tables)
+=============================================================================================
 Manages a table. Responsible for fetching data from the server.
 The display of the (filtered) table is left to other components,
 such as [FilterCompute](#filtercompute).
@@ -399,9 +384,8 @@ The name of the table in question.
 ###### `fetch` function is [fetchTable](Dux#fetchtable)
 Callback to fetch table data and metadata from the server.
 
-# ItemHead
-**Source** [main]({{site.appBase}}/pure/ItemHead.jsx) **presents** [tables](Dux#tables)
-
+[ItemHead]({{site.appBase}}/pure/ItemHead.jsx) `presents` [tables](Dux#tables)
+=============================================================================================
 Displays an item heading in a table row.
 With a control to view the whole records.
 Only the fields that the user is allowed to view.
@@ -423,9 +407,8 @@ Whether the title can be expanded to the full record by the user.
 records are not expanded. But if you set the initial alternative to expanded, all
 records will be fetched one by one, which is hugely inefficient!
 
-# ItemList
-**Source** [main]({{site.appBase}}/state/ItemList.jsx) **connected to** [tables](Dux#tables)
-
+[ItemList]({{site.appBase}}/state/ItemList.jsx) `connected via` [tables](Dux#tables)
+=============================================================================================
 Displays a list of items from a table.
 If filters are active on that table, this component is meant to just display the
 filtered items.
@@ -447,9 +430,8 @@ The full information of the records will be looked up from `tables` in the state
 ###### `inplace` bool
 Whether the title can be expanded to the full record by the user.
 
-# ItemMy
-**Source** [main]({{site.appBase}}/object/ItemMy.jsx) **LifeCycle** **connected to** [tables](Dux#tables)
-
+[ItemMy]({{site.appBase}}/object/ItemMy.jsx) `(life cycle)` `connected via` [tables](Dux#tables)
+=============================================================================================
 Displays the list of items of the current user in the left [Pane](#pane),
 with a details/edit view in the right one.
 
@@ -470,9 +452,8 @@ This component is very much like [ItemFiltered](#itemfiltered) as far a data fet
 The main differences are that there is no filtering, and the list of records is
 separated from the detail view.
 
-# ItemRecord
-**Source** [main]({{site.appBase}}/object/(ItemRecord.jsx) **LifeCycle** **connected to** [tables](Dux#tables)
-
+[ItemRecord]({{site.appBase}}/object/(ItemRecord.jsx) `(life cycle)` `connected via` [tables](Dux#tables)
+=============================================================================================
 Displays all fields that the user is allowed to read.
 Also controls editing the record.
 
@@ -489,9 +470,8 @@ Entity id of this record.
 ###### `fetch` function is [fetchItem](Dux#fetchitem)
 Callback to fetch entity data from the server.
 
-# Login
-**Source** [main]({{site.appBase}}/object/Login.jsx) **LifeCycle** **connected to** [me](Dux#me)
-
+[Login]({{site.appBase}}/object/Login.jsx) `(life cycle)` `connected via` [me](Dux#me)
+=============================================================================================
 The main task of Login is to fetch the current authentication status:
 is there an authenticated user, and if so, what is his/her name?
 
@@ -502,9 +482,8 @@ The information about the currently logged-in user, fetched from the server.
 ###### `fetch` function is [fetchMe](Dux#fetchme)
 Callback to fetch user information from the server.
 
-# NavLink
-**Source** [main]({{site.appBase}}/pure/NavLink.jsx) **presents** __none__
-
+[NavLink]({{site.appBase}}/pure/NavLink.jsx) `presents` __none__
+=============================================================================================
 Displays a navigation link that is sensitive to routing.
 That means: it is a link that can activate a component, and, when clicked,
 it will become highlighted.
@@ -513,9 +492,8 @@ it will become highlighted.
 ###### activeClassName
 The CSS class to be used when the navigation link has been clicked.
 
-# NotFound
-**Source** [main]({{site.appBase}}/pure/NotFound.jsx) **presents** __none__
-
+[NotFound]({{site.appBase}}/pure/NotFound.jsx) `presents` __none__
+=============================================================================================
 Displays a 404 if no
 [route](React#routing) in [main](#main) matches.
 
@@ -523,9 +501,8 @@ Displays a 404 if no
 ###### `splat` string
 The text to display on the 404 page.
 
-# Notification
-**Source** [main]({{site.appBase}}/object/Notification.jsx) **LifeCycle** **connected to** [notify](Dux#notify)
-
+[Notification]({{site.appBase}}/object/Notification.jsx) `(life cycle)` `connected via` [notify](Dux#notify)
+=============================================================================================
 Component that receives notifications and displays them in a
 little panel with fixed position on the screen.
 The panel is hidden by default and pops up if there is an important notification.
@@ -557,9 +534,8 @@ Callback by which the list of notifications can be cleared.
 ###### `display` function is [display](Dux#display)
 Callback to be invoked when the user clicks the panel or the progress indicator to hide and show the notifications panel.
 
-# Pane
-**Source** [main]({{site.appBase}}/object/Win.jsx) **connected to** [win](Dux#win)
-
+[Pane]({{site.appBase}}/object/Win.jsx) `connected via` [win](Dux#win)
+=============================================================================================
 A dedicated piece of real screen estate, with a certain formatting and a size proportional to the dimensions of the browser window. The dimensions of the pane will be adapted when the browser window is being resized.
 
 #### Props
@@ -573,9 +549,8 @@ See [columnStyle](Dux#columnstyle) for the range of possibilities here.
 ###### `height`, `width` number from [getWinDim](Dux#getwindim)
 The current height and width of the screen.
 
-# Root
-**Source** [main]({{site.appBase}}/pure/Root.jsx)  **presents** [root](Dux#root)
-
+[Root]({{site.appBase}}/pure/Root.jsx)  `presents` [root](Dux#root)
+=============================================================================================
 Top-level wrapping component to set up the central store. It does so
 by configuring the store, calling [configureStore](Dux#root), and passing
 it to the special [Provider](React#redux) component of Redux.
@@ -586,26 +561,23 @@ detecting some global UI events.
 #### Props
 Except for the standard prop `children`, there are no props.
 
-# Stat
-**Source** [main]({{site.appBase}}/pure/Stat.jsx)  **presents** [filter](Dux#filter)
-
+[Stat]({{site.appBase}}/pure/Stat.jsx)  `presents` [filter](Dux#filter)
+=============================================================================================
 Displays a string of the form *subTotal* `of` *total*.
 If one of the two is missing, the `of` will not display.
 
 #### Props
 ###### `subtotal`, `total` number
 
-# Static
-**Source** [main]({{site.appBase}}/pure/Static.jsx) **presents** __none__
-
+[Static]({{site.appBase}}/pure/Static.jsx) `presents` __none__
+=============================================================================================
 Fixed navigation links to some static resources.
 
 #### Props
 None.
 
-# SubApp
-**Source** [main]({{site.appBase}}/state/SubApp.jsx) **presents** [win](Dux#win)
-
+[SubApp]({{site.appBase}}/state/SubApp.jsx) `presents` [win](Dux#win)
+=============================================================================================
 This is one of the components just below [App](#app).
 It contains a set of panes and navigation links to main subcomponents to
 display in those panes.
@@ -615,9 +587,8 @@ display in those panes.
 The name of the table of entities that is central to the subcomponent that
 is displayed in the panes.
 
-# Window
-**Source** [main]({{site.appBase}}/object/Window.jsx) **LifeCycle** **connected to** [win](Dux#win)
-
+[Window]({{site.appBase}}/object/Window.jsx) `(life cycle)` `connected via` [win](Dux#win)
+=============================================================================================
 Detects window resize events and passes the resulting height and width of
 the main window to the state.
 

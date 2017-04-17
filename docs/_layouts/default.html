@@ -33,15 +33,17 @@
             <table>
                 <tbody>
             {% for method in dux.methods %}
+                {% if method.components.size %}
                     <tr>
                         <th>{{ method.method }}</th>
                         <td>
-                {% for comp in method.components %}
-                    {% assign comp_down = comp | downcase %}
-                    <a href="{{ '/Components.html#' | append:comp_down | relative_url }}">{{ comp }}</a>
-                {% endfor %}
+                    {% for comp in method.components %}
+                        {% assign comp_down = comp | downcase %}
+                            <a href="{{ '/Components.html#' | append:comp_down | relative_url }}">{{ comp }}</a>
+                    {% endfor %}
                         </td>
                     </tr>
+                {% endif %}
             {% endfor %}
                 </tbody>
             </table>

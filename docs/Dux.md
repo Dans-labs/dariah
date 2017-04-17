@@ -21,9 +21,8 @@ This app contains the following dux:
 * [tables](#tables)
 * [win](#win)
 
-# alter
-**source** [alter.js]({{site.appBase}}/dux/alter.js)
-
+[alter]({{site.appBase}}/dux/alter.js)
+=============================================================================================
 Hides and shows material on the user interface.
 It is a bit more general than that: you can supply *n* alternatives and *n* controls,
 and let the user cycle through the alternatives by clicking the controls.
@@ -37,52 +36,58 @@ There is no meaningful state initialization.
 By default, the first choice is alternative 0.
 But a component may specify an other initial value.
 
-## Actions
+Actions
+---------------------------------------------------------------------------
 ### nextAlt()
 Only one action, with the instruction to go to the next alternative.
 In the payload of this action is also the total number of alternatives (in order go to the first
 alternative again after all the others), and an optional initial value.
 If there is not yet a state for this instantiation, the initial value will be used to start from.
 
-## Reducer
+Reducer
+---------------------------------------------------------------------------
 Increases the index of the alternative by one, cyclically, and puts it under the right key in the state..
 
-## Selectors
+Selectors
+---------------------------------------------------------------------------
 ### getAlt()
 Delivers the number of the current alternative, or the initial value (from the
 props of the connected component) or 0.
 
-## Helpers
+Helpers
+---------------------------------------------------------------------------
 No Helpers.
 
-# doc
-**source** [doc.js]({{site.appBase}}/dux/doc.js)
-
+[doc]({{site.appBase}}/dux/doc.js)
+=============================================================================================
 Manages MarkDown documents. Fetches raw source from the server and stores it into the state, under
 a key, which is the path information of the document.
 The [DocMd](Components#docmd) provides a widget for such documents.
 
-## Actions
+Actions
+---------------------------------------------------------------------------
 ### fetchDoc()
 Fetches a document from the server asynchronously.
 
-## Reducer
+Reducer
+---------------------------------------------------------------------------
 Stores the fetched raw document source into the state.
 
-## Selectors
+Selectors
+---------------------------------------------------------------------------
 ### getDoc()
 Retrieves the stored data for the specified document.
 
-## Helpers
+Helpers
+---------------------------------------------------------------------------
 ### needDoc()
 Check whether a component contains the data for its document.
 
 ### changedDoc()
 Check whether a component has new props in such a way that a new document should be fetched.
 
-# filter
-**source** [filter.js]({{site.appBase}}/dux/filter.js)
-
+[filter]({{site.appBase}}/dux/filter.js)
+=============================================================================================
 Displays the list of items in the right column, but
 only those that have passed all the filters, which are displayed in the
 left column.
@@ -95,7 +100,8 @@ On top of that, there is a visualization in the form of a map of European countr
 with markers having a radius indicative of the number of filtered items
 by that country.
 
-## Actions
+Actions
+---------------------------------------------------------------------------
 ### changeFulltext()
 Responds to a change in the search text in a
 [FullText](Components#fulltext)
@@ -122,11 +128,13 @@ The initialization accomplishes the following things:
   will be written to the state. This is the information that will be influenced
   by subsequent user clicks.
 
-## Reducer
+Reducer
+---------------------------------------------------------------------------
 Transforms the state in response to dispatched tickets, notably the `filterSettings` slice.
 Well, it is a bit more complicated, because every table has its own filterSettings.
 
-## Selectors
+Selectors
+---------------------------------------------------------------------------
 Filter information is being translated from the state to props that can be consumed by components.
 All the actual filter work is done here, but because it is rather complex, we have outsourced it to the *helpers*.
 
@@ -171,7 +179,8 @@ So this function delivers exactly that: `filteredData`, `filteredAmountOthers`, 
 
 It is also a costly function, but it does neet to be invoked upon each rendering caused by a click or a key press.
 
-## Helpers
+Helpers
+---------------------------------------------------------------------------
 ### compileFiltering()
 Computes facet values from the records of a table.
 
@@ -189,9 +198,8 @@ This table can be presented to the user.
 Looks if all facets are checked, or all unchecked, of none of both.
 Used to steer the *collective* checkbox that governs all facets.
 
-# me
-**Source** [me.js]({{site.appBase}}/dux/me.js).
-
+[me]({{site.appBase}}/dux/me.js).
+=============================================================================================
 Powers the login widget, top right on the screen, realized by the component
 [Login](Components#login).
 
@@ -216,29 +224,32 @@ is there an authenticated user, and if so, what is his/her name?
 in any form in this app. So the client does not know who the user is, except by asking the server.
 The current user can be retrieved by `/api/db/who/ami`.
 
-## Actions
+Actions
+---------------------------------------------------------------------------
 ### fetchMe()
 Fetches data about *me*, the logged in user.
 It is actually handled by the helper 
 [server](Lib#server).
 
-## Reducer
+Reducer
+---------------------------------------------------------------------------
 Transforms the state in response to dispatched ticket, notably the `me` slice.
 It just contains the known attributes of a single user, the one that is logged in.
 
-## Selectors
+Selectors
+---------------------------------------------------------------------------
 ### getMe()
 Plainly hand over the attributes of the currently logged in user.
 At the moment only the
 [Login](Components#login)
 component is interested in it.
 
-## Helpers
+Helpers
+---------------------------------------------------------------------------
 No helpers.
 
-# notify
-**source** [notify.js]({{site.appBase}}/dux/notify.js)
-
+[notify]({{site.appBase}}/dux/notify.js)
+=============================================================================================
 Powers the notification widget, top right on the screen, realized by the component
 [Notification](Components#notification).
 
@@ -254,7 +265,8 @@ The user can click away the panel and hide the messages.
 
 ![diag](design/design.005.jpeg)
 
-## Actions
+Actions
+---------------------------------------------------------------------------
 ### notify()
 Issues its payload, which consists of an array of messages, as notifications.
 
@@ -270,45 +282,50 @@ The helper function [fetchData](Lib#server) can issue notifications.
 These notifications are given a the type `async` and convey a status `pending`,
 `success`, or `error`.
 
-## Reducer
+Reducer
+---------------------------------------------------------------------------
 Transforms the state in response to dispatched ticket, notably the `notify` slice.
 The state maintains a counter `busy`, which is the number of currently asynchronously pending operations. A notification widget can show a progress spinner if `busy > 0`.
 
-## Selectors
+Selectors
+---------------------------------------------------------------------------
 The notification widget gets the notifications from the state, including `busy` and `show`, the latter
 indicating whether the notification panel should be hidden or not.
 For the convenience of the [Notification](Components#notification) component,
 the index of the last important notification message is also computed, and its kind.
 
-## Helpers
+Helpers
+---------------------------------------------------------------------------
 ### addItem()
 A helper for the reducer, to add items to an array.
 
-# root
-**source** [root.js]({{site.appBase}}/dux/root.js)
-
+[root]({{site.appBase}}/dux/root.js)
+=============================================================================================
 Top level management of the state: initialization and combination of all the other dux.
 
-## Actions
+Actions
+---------------------------------------------------------------------------
 ### configureStore()
 Root does not have proper actions of its own.
 But it does set up the store, and passes it on to the [main](Components#main) component.
 
-## Reducer
+Reducer
+---------------------------------------------------------------------------
 Combines all slices of the state and combines all reducers that work their own slice of the state
 into the *root reducer*, that operates on the whole state.
 
-## Selectors
+Selectors
+---------------------------------------------------------------------------
 ### combineSelectors()
 Utility function to combine several selectors.
 Handy for components that use several slices of the state.
 
-## Helpers
+Helpers
+---------------------------------------------------------------------------
 No helpers.
 
-# tables
-**source** [tables.js]({{site.appBase}}/dux/tables.js)
-
+[tables]({{site.appBase}}/dux/tables.js)
+=============================================================================================
 Manages database data from the server.
 It keeps a normalized copy of the data.
 When different components fetch the bits and pieces they need, it all lands here, properly organized.
@@ -323,7 +340,8 @@ In particular, tables specify which filters can be used on which fields.
 This filter setup is not hardwired into the client app, but comes from the server, where it is configured in 
 the data model, a set of *yaml* files.
 
-## Actions
+Actions
+---------------------------------------------------------------------------
 ### fetchTable()
 Fetches a complete table, but only the title fields and the fields needed for filtering.
 
@@ -338,7 +356,8 @@ The server decides which fields I am allowed to retrieve.
 If fields refer to other tables for their values, the above actions will
 fetch these tables as well.
 
-## Reducer
+Reducer
+---------------------------------------------------------------------------
 The actions above potentially receive overlapping data.
 The reducer takes care that all gets sorted out, and that every bit ends up in its proper place.
 
@@ -349,7 +368,7 @@ If only *my* rows are being retrieved, there is an alternative array, called `my
 the ids of the retrieved intities in the right order.
 
 Next to the entity and order information there is field type information.
-There is also inforamtion about permissions (read, insert, delete, update).
+There is also information about permissions (read, insert, delete, update).
 
 The entities themselves have a `values` object, with all the field values, keyed by field name.
 Next to the values there is an attribute `complete` that tells whether
@@ -377,11 +396,13 @@ makes this a breeze.
 Have a look again at the [reducer source code]({{site.appBase}}/dux/tables.js) and
 see how straightforward it is to code one of the most tricky reducers in this app.
 
-## Selectors
+Selectors
+---------------------------------------------------------------------------
 ### getTables()
 Just get all the table information in a prop called `tables`.
 
-## Helpers
+Helpers
+---------------------------------------------------------------------------
 ### needTables()
 Checks a list of table names to see if sufficient data is available in the state.
 
@@ -400,16 +421,16 @@ Makes a streamlined string representation out of a field value. It looks up ids
 in related value list tables, and applies special formatting to fields that
 refer to users and to countries.
 
-# win
-**Source** [win.js]({{site.appBase}}/dux/win.js)
-
+[win]({{site.appBase}}/dux/win.js)
+=============================================================================================
 Reacts to window resizing by the user.
 It will recompute the sizes of several [Pane](Components#pane)s on the screen,
 so that everything stays in relatively good proportions on a single screen.
 
 ![diag](design/design.004.jpeg)
 
-## Actions
+Actions
+---------------------------------------------------------------------------
 ### changeWinDim()
 Responds to window resizing, as set up in
 [Window](Components#window).
@@ -418,15 +439,18 @@ Note that the event emitter in
 [Window](Components#window)
 is being throttled, so that it does not run too frequently during the actual resizing.
 
-## Reducer
+Reducer
+---------------------------------------------------------------------------
 Transforms the state in response to dispatched ticket, notably the `win` slice.
 
-## Selectors
+Selectors
+---------------------------------------------------------------------------
 ### getWinDim()
 Reads the `height` and `width` from the state and transports them as props with
 the same name.
 
-## Helpers
+Helpers
+---------------------------------------------------------------------------
 ### initWinDim()
 Based on the actual window size, it computes the sizes of designated areas on the screen.
 

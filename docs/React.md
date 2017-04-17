@@ -3,9 +3,7 @@ title: React
 ---
 
 # React Documentation references.
-
-## React Components
-
+## [React Components](https://facebook.github.io/react/docs/react-component.html)
 React components represent pieces of the web page and their functionality.
 Components are organized hierarchically.
 Components can be parametrized by *properties*, which parents pass to children.
@@ -14,8 +12,6 @@ A component acts as a template instruction to build a piece of DOM.
 Components can be programmed as classes or as functions.
 
 In this app we distinguish between three *capability levels* of components.
-
-[External documentation](https://facebook.github.io/react/docs/react-component.html)
 
 ## Pure components
 If a component knows how to build the DOM, purely on the basis of its properties and
@@ -47,9 +43,7 @@ We put all these components in a directory called **object**.
 
 [Example: ItemFiltered]({{site.appBase}}/object/ItemFiltered.jsx).
 
-
 ## React Processing Concepts
-
 React renders updates to
 [components](#react-components)
 very efficiently.
@@ -62,14 +56,12 @@ So, after an update, it is not costly to recompute the fragment
 for that component completely, because the DOM is not touched.
 
 ### Reconciliation
-
 Once the new fragment has been constructed, a clever, React-internal
 process called **reconciliation** is carried out, which computes the minimum
 number of update actions that have to be applied to the previous, real DOM
 incarnation of the component, to change it to match the new fragment.
 
 ### MiniDOM
-
 A compact internal representation of the
 [DOM](#dom), made from React *elements*.
 
@@ -100,16 +92,13 @@ fast Javascript currently is.
 
 This is one of the reasons that a niche for React exists, with its [MiniDOM](#minidom).
 
-### Fragment
+### [Fragment](https://facebook.github.io/react/docs/rendering-elements.html)
 A fragment is such a mixture of properly nested React elements and components.
 It is part of the React's toolkit to manage DOM manipulations efficiently.
 
 See [Reconciliation](#reconciliation).
 
-[External documentation](https://facebook.github.io/react/docs/rendering-elements.html)
-
-### PropTypes
-
+### [PropTypes](https://facebook.github.io/react/docs/typechecking-with-proptypes.html)
 Type checking for React Components is done by *PropTypes*.
 
 Proptype checking in react only happens in development mode.
@@ -133,10 +122,7 @@ or as
 const { props: { foo, bar} } = this
 ```
 
-[External documentation](https://facebook.github.io/react/docs/typechecking-with-proptypes.html)
-
-### Context
-
+### [Context](https://facebook.github.io/react/docs/context.html)
 React mechanism to pass data directly  from ancestors to deep descendants.
 The React documentation
 considers context as a brittle part of itself, and warns
@@ -145,9 +131,7 @@ against over-use. At the same time,
 depends critically on it, so I consider it safe to use.
 But our code will not use it explicitly, only through Redux.
 
-[External documentation](https://facebook.github.io/react/docs/context.html)
-
-### Life Cycle
+### [Life Cycle](https://facebook.github.io/react/docs/react-component.html#the-component-lifecycle)
 The main function of a
 [component](#react-components)
 is to act as a template to be [rendered](#render).
@@ -155,9 +139,7 @@ But if there is additional work to be done, this can be hooked up at various
 stages in the component's lifecycle.
 Most stages occur during (re)rendering, and there is a stage of construction and unmounting.
 
-[External documentation](https://facebook.github.io/react/docs/react-component.html#the-component-lifecycle)
-
-#### Constructor
+#### [Constructor](https://facebook.github.io/react/docs/react-component.html#constructor)
 
 When a
 [component](#react-components)
@@ -167,21 +149,14 @@ this is the method to construct the corresponding React class.
 It will set up the
 [state](#state).
 
-[External documentation](https://facebook.github.io/react/docs/react-component.html#constructor)
-
-#### componentDidMount
-
+#### [componentDidMount](https://facebook.github.io/react/docs/react-component.html#componentdidmount)
 When a
 [component](#react-components)
 has been added to the DOM
 this method will be called just after.
 This is the recommended time to fetch data for this component, if needed.
 
-[External documentation](https://facebook.github.io/react/docs/react-component.html#componentdidmount)
-
-
-#### componentDidUpdate
-
+#### [componentDidUpdate](https://facebook.github.io/react/docs/react-component.html#componentdidupdate)
 When a
 [component](#react-components)
 has been updated due to receiving new properties,
@@ -193,21 +168,14 @@ the place to do it.
 is also needed initially, it is handy to write a function for it and
 call it in this method and in [componentDidMount()](#componentdidmount).
 
-@external componentDidUpdate
-[External documentation](https://facebook.github.io/react/docs/react-component.html#componentdidupdate)
-
-#### componentWillMount
-
+#### [componentWillMount](https://facebook.github.io/react/docs/react-component.html#componentwillmount)
 When a
 [component](#react-components)
 will be added to the DOM,
 this method will be called just before.
 This is the first thing that happens after [constructor()](#constructor).
 
-[External documentation](https://facebook.github.io/react/docs/react-component.html#componentwillmount)
-
-#### componentWillReceiveProps
-
+#### [componentWillReceiveProps](https://facebook.github.io/react/docs/react-component.html#componentwillreceiveprops)
 When a
 [component](#react-components)
 is about to receive new props (as part of the update process),
@@ -215,29 +183,21 @@ this method will be called just before.
 The new props are passed with it, so that it is possible to execute
 actions dependent on whether pros have changed.
 
-[External documentation](https://facebook.github.io/react/docs/react-component.html#componentwillreceiveprops)
-
-#### componentWillUnmount
+#### [componentWillUnmount](https://facebook.github.io/react/docs/react-component.html#componentwillunmount)
 When a
 [component](#react-components)
 will be removed from the DOM,
 this method will be called just before.
 If we want to save state, we can hook it up here.
 
-[External documentation](https://facebook.github.io/react/docs/react-component.html#componentwillunmount)
-
-#### render
-
+#### [render](https://facebook.github.io/react/docs/react-component.html#render)
 The main function of a
 [component](#react-components)
 is to act as a template to be rendered.
 During rendering the template will be used as a set of instructions to build a real DOM
 somewhere on the actual web page.
 
-[External documentation](https://facebook.github.io/react/docs/react-component.html#render)
-
-### Controlled Component
-
+### [Controlled Component](https://facebook.github.io/react/docs/forms.html)
 For elements that can receive user input (forms, inputs, etc) there is the option
 to handle input in a way controlled by React, and not by the default HTML behaviour.
 
@@ -246,10 +206,7 @@ but a callback is called, a parent component executes it, state gets updated, st
 trickle down as property updates to child elements, and the checkbox in question is told
 to be checked (or unchecked).
 
-[External documentation](https://facebook.github.io/react/docs/forms.html)
-
-## State
-
+## [State](https://facebook.github.io/react/docs/state-and-lifecycle.html)
 There are two main reasons for a component to maintain state:
 
 * getting external data
@@ -258,8 +215,6 @@ There are two main reasons for a component to maintain state:
 In both cases, something happens in the outside world that must be remembered.
 Components remember these things in their
 [state](#state), which only they can update.
-
-[External documentation](https://facebook.github.io/react/docs/state-and-lifecycle.html)
 They can compute derived data from their state and pass that as properties
 to their children.
 State updates trigger these computations automatically, and children
@@ -267,7 +222,6 @@ whose properties are dependent on this state, are rerendered automatically
 (and economically).
 
 ### Local State
-
 The vanilla React way is that [components](#react-components)
 have their own state, which only they can modify through
 [setState](https://facebook.github.io/react/docs/react-component.html#setstate).
@@ -290,11 +244,9 @@ which can be avoided by a central state as a single source of truth.
 So in this app, we have left the path of local state, and embraced *central state*.
 
 ### Central State
-
 A widely used approach to *central* state is [Redux](#redux).
 
-#### Redux
-
+#### [Redux](http://redux.js.org/docs/api/index.html)
 Redux is a popular implementation of the idea that [state](#state) is centralized
 and all components have to subscribe to a state
 [Provider](https://github.com/reactjs/react-redux/blob/master/docs/api.md#provider-store),
@@ -304,18 +256,15 @@ the store.
 * So-called *reducers* translate the action into a state update.
 * And then the component can re-render.
 
-[External documentation](https://github.com/reactjs/react-redux)
-[Redux guide](http://redux.js.org/docs/api/index.html)
-
 Using Redux requires a lot of extra code in actions and reducers,
 which get separated from the components for which it is used.
 
 However, there is a way to do it nicely.
 There is a way of writing *idiomatic* redux, beautifully advocated by its creator,
 Dan Abramov, in [30 videos](https://egghead.io/courses/getting-started-with-redux).
-and that is by means of *ducks* (we call them *dux*).
-
-[External documentation](https://github.com/erikras/ducks-modular-redux).
+and that is by means of
+[ducks](https://github.com/erikras/ducks-modular-redux).
+(we call them *dux*).
 
 We divide the state into segments that are responsible for well-described tasks, such as
 
@@ -335,7 +284,6 @@ Every duck manages a slice of the state has four sections:
   [filter](Dux#filter). 
 
 ##### Merge
-
 When a reducer transforms a state, it must happen in such a way that
 * unaffected parts of the state do not change,
 * all intermediate objects between the toplevel state and a changed leaf are fresh objects.
@@ -352,12 +300,9 @@ See [notify.js]({{site.appBase}}/dux/notify.js), the function `addItem()`.
 There, if the old state has an array of items, and we need to append some items, we create a new array, consisting of the 
 items of the orginal array, with the new items concatenated after them.
 
-##### Connect
-
+##### [Connect](https://github.com/reactjs/react-redux/blob/master/docs/api#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options)
 Redux and the ducks streamline very much how components deal with the centralized store.
 The central function is Redux *connect()*.
-
-[External documentation](https://github.com/reactjs/react-redux/blob/master/docs/api#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options)
 
 If a component X needs state, we can create a *connected* component Xc from X.
 Connected means: connected to the state.
@@ -376,8 +321,8 @@ The new component Xc has extra props:
   and dispatched, which in turn will lead to a state change.
  
 ## Routing
-
-React-router is a convenient library to manage the connection between
+[React-router](https://github.com/ReactTraining/react-router)
+is a convenient library to manage the connection between
 the url and the part of your app that should be active in response to it.
 
 ```
@@ -404,5 +349,3 @@ caused by routing events, the need arises for components to save their states.
 Especially the ones with a costly state.
 Here is another reason why local state becomes cumbersome.
 With Redux, this is not a problem, because state is severed from components.
-
-[External documentation](https://github.com/ReactTraining/react-router)

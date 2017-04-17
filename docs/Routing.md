@@ -2,8 +2,8 @@
 title: Routing
 ---
 
-# Client
-
+Client
+=============================================================================================
 ## Entry point
 
 At the client side, the app starts in
@@ -18,7 +18,8 @@ The second priority is to set up the routes configuration, i.e. the way urls giv
 
 We are still talking about *client* side routing.
 
-# Server
+Server
+=============================================================================================
 At the *server* there are other rules that link urls to behaviour.
 
 Here are a few rules that capture how routing works in a Single Page App (SPA) like this,
@@ -46,7 +47,6 @@ i.e. a file under `/static/`, the server will respond with the file contents.
 Otherwise there was no way to serve the static javascript app in the first place.
 
 ### Api
-
 If the url points to `/api/`,
 the server will respond in a variety of ways, depending on the rest of the url.
 By means of these `/api/` urls the client can ask for additional data services, from file system or database.

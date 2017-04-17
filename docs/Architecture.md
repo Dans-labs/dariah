@@ -3,7 +3,6 @@ title: Architecture
 ---
 
 # Introduction
-
 This app consists of many [React](React) components.
 By default React components have a private state where they can store everything that changes
 in their life course. That is: user interaction and server data.
@@ -17,11 +16,9 @@ Redux itself is a very small library, under 600 lines of code, but using it will
 all your React components, especially if you use Redux in an idiomatic way.
 
 # Overview
-
 ![diag](design/design.007.jpeg)
 
 # Components and Dux
-
 In Redux, every component has read access to the state, and indirect write access by dispatching *actions*.
 The state is held in a store and the store manages all access to the state.
 When actions are dispatched to the store, the store calls a *reducer*,
@@ -73,7 +70,6 @@ But the reducer is the linking pin between the actions and the state, so it real
 one file.
 
 # The dux of this app
-
 Currently, these are the dux of this app:
 
 * [alter](Dux#alter): show/hide, cycle through $n$ alternative representations of a piece of user interface;

@@ -28,7 +28,7 @@ class ItemRecord extends Component {
     console.warn(values)
   }
 
-  selectWidget = (name, options) => (props) =>
+  selectWidget = (name, options) => props =>
     <RelSelect
       options={options}
       {...props}
