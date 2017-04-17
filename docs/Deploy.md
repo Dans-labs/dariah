@@ -59,13 +59,23 @@ The absolute location is not important. Here we assume everything resides in `/o
   - `shibboleth`
   - `web-apps`
     - `dariah`
+      - `README.md` short description for humans
       - `server`
         - `controllers` routes and controllers
-          - `app.py` entry point
-          - `data.py` json data from mongodb
-          - `login.py` handle user data and the login process
+          - `index.py` entry point
+          - `db.py` json data from mongodb
+          - `file.py` json data from file system
+          - `auth.py` handle the login process
+          - `user.py` handle the user data
+          - `perm.py` permission control
+          - `models` yaml files and python files generated on the basis of the yaml files
+            - `data.yaml` the data model
+            - `perm.yaml` the permissions model
+          - `views` html templates
+            - `index.tpl` the html template of the single page
         - `serve.py` wsgi entry-point for apache
         - `serve.sh` local development server
+        - `confyg.py` converts yaml model files into python modules
         - `config`
           - `requirements.txt` the list of python packages needed; to be installed with `pip3`
           - `default_example.conf` example config file for Apache httpd server
@@ -77,11 +87,12 @@ The absolute location is not important. Here we assume everything resides in `/o
         - `fonts`
         - `docs`
           - `design.pdf` notes on the design of this web app
-          - `deploy.md` this document (!)
+          - `about.md` "about" text of the contribution tool
         - `tools` These files are not active in the web scenarios, except for documentation. 
             They are helpers to prepare the data for the app.
           - `update.sh` script to deploy updates of the web app. Pulls code from the github repo, restarts httpd.
           - `from_filemaker.ipynb` Jupyter notebook for legacy data conversion
+          - `mongoFromFm.py` Stand-alone definitive data conversion from FileMaker original to MongoDb
           - `dump.sh` dump the mongodb as set of bson files
           - `load.sh` load a set of *.bson* files into mongodb
           - `compose_countries` tool to tweak a map of European countries, 
@@ -89,7 +100,6 @@ The absolute location is not important. Here we assume everything resides in `/o
       - `client`
         - `node_modules` javascript dependencies
         - `package.json` npm config file
-        - `README.md` short description for humans
         - `webpack.config.js` config file for webpack, the build tool
         - `build.sh` script for building, with parameters for development, development server, or production
         - `index.html` soft link to ../server/controllers/views/index.tpl, the entry html that holds the whole app
@@ -98,10 +108,16 @@ The absolute location is not important. Here we assume everything resides in `/o
             - `*.scss`, `*.css` (plain CSS and SASS stylesheets)				
           - `js`
             - `app`
-              - `*.jsx` client-side code in JSX
+              - `dux` connectors between React components and the Redux state. Plain ES6.
+                Every duck handles a specific concern of the app.
+                All contain the following sections: *actions*, *reducer*, *selectors*, *helpers*.
+              - `object`, `state`, `pure`: React components in `*.jsx` files. The ones in `pure` are functions
+                 without side effects; the ones in `state` are programmed as pure functions, but an enhanced version that
+                 is connected to the redux state is being exported; the ones in `object` are programmed as classes with
+                 life cycle methods of React.
+              - `main.jsx` client-side entry-point for the javascript
             - `lib`
               - `*.js` client-side code and data in ES6
-            - `main.jsx` client-side entry-point for the javascript
 
 # Technology
 ## Server
@@ -169,6 +185,8 @@ Whenever you save a python source file, the server reloads itself.
 
 ## Client
 ### Installation
+This is only needed on machines where you want to develop the client application.
+If you merely want to run the app, this is not needed.
 
 Install **nodejs** from its
 [download page](https://nodejs.org/en/download/).
@@ -179,33 +197,28 @@ Then install all javascript dependencies in one go by executing
 
 ### Building
 The JSX and ES6 of client components and helpers will be bundled with other javascript sources from `node_modules`. 
+The result ends up in `static/dist`.
 Javascript from other sources, such as
 [leaflet](http://leafletjs.com),
 resides in `static/js` and will be included directly by the main html file `index.html`.
 
-The build tool is **gulp**.
+The build tool is **webpack**.
 You can perform builds, by saying, in the `client` directory
 
-    ./gulp_dev.sh
+    webpack 
 
 or
 
-    ./gulp_prod.sh
+    webpack-dev-server
 
-It will browserify the javascript, apply babel transformations from ES6 and JSX to browser compatibele Javascript.
-It will bundle, minify, and provide source maps.
-I have configured two tasks: for developent and for production.
-The development task skips minification, and continues to watch for changes
-so that when you work, builds will happen whenever you save source files.
-The production task runs once, and does perform minification.
+or
 
-### Running
-The client application is a
-[React](https://facebook.github.io/react/)
-component. The source code is in `client/src`.
-It is a set of components in JSX, (a react enhancement of Javascript), and the javascript itself is ES6.
-There are also a few auxiliary functions in *lib*, all in plain ES6.
-Most of the styling is defined in the JSX, but there are a few CSS style files, either in SASS, or in plain CSS.
-For example, we use the open source mapping library
-[leaflet](http://leafletjs.com),
-which comes with a plain style file.
+    webpack -p 
+
+The first one produces a development build.
+
+The second one starts op a development server, and produces an incremental development build on every saved change\
+in the source code, with hot-reloading of react modules.
+
+The third one provides a minified production build.
+

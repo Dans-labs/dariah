@@ -198,7 +198,7 @@ This table can be presented to the user.
 Looks if all facets are checked, or all unchecked, of none of both.
 Used to steer the *collective* checkbox that governs all facets.
 
-[me]({{site.appBase}}/dux/me.js).
+[me]({{site.appBase}}/dux/me.js)
 =============================================================================================
 Powers the login widget, top right on the screen, realized by the component
 [Login](Components#login).
