@@ -224,6 +224,9 @@ rules:
   template-curly-spacing:
     - warn
     - never
-  no-console: warn
+  no-console:
+    - warn
+    - allow:
+      - error
 
 extends: "eslint:recommended"

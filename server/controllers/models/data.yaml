@@ -28,48 +28,36 @@ tables:
         label: Eppn
         valType: text
         multiple: false
-        validation:
-            nonEmpty: true
         initial: N.N.
         appearance: {}
       email:
         label: Email
         valType: email
         multiple: false
-        validation:
-            nonEmpty: false
         initial: email
         appearance: {}
       firstName:
         label: First name
         valType: text
         multiple: false
-        validation:
-            nonEmpty: false
         initial: First name
         appearance: {}
       lastName:
         label: Last name
         valType: text
         multiple: false
-        validation:
-            nonEmpty: false
         initial: Last name
         appearance: {}
       mayLogin:
         label: Login allowed
         valType: bool
         multiple: false
-        validation:
-            nonEmpty: false
         initial: true
         appearance: {}
       dateModified:
         label: modified on
         valType: datetime
         multiple: true
-        validation:
-          nonEmpty: false
         appearance:
           reverse: true
           cutoff: 1
@@ -77,15 +65,11 @@ tables:
         label: last logged in on
         valType: datetime
         multiple: false
-        validation:
-          nonEmpty: false
         appearance: {}
       statusLastLogin:
         label: Status last login
         valType: text
         multiple: false
-        validation:
-            nonEmpty: false
         initial: status
         appearance: {}
 
@@ -104,40 +88,30 @@ tables:
         label: ISO(2)
         valType: text
         multiple: false
-        validation:
-            nonEmpty: true
         initial: XY
         appearance: {}
       name:
         label: Name
         valType: text
         multiple: false
-        validation:
-            nonEmpty: true
         initial: ...land
         appearance: {}
       isMember:
         label: Is DARIAH member
         valType: bool
         multiple: false
-        validation:
-            nonEmpty: false
         initial: true
         appearance: {}
       latitude:
         label: Latitude
         valType: number
         multiple: false
-        validation:
-            nonEmpty: false
         initial: 0.0
         appearance: {}
       longitude:
         label: Longitude
         valType: number
         multiple: false
-        validation:
-            nonEmpty: false
         initial: 0.0
         appearance: {}
 
@@ -174,8 +148,6 @@ tables:
         label: Title
         valType: text
         multiple: false
-        validation:
-            nonEmpty: true
         initial: title
         appearance: {}
 
@@ -183,16 +155,12 @@ tables:
         label: created on
         valType: datetime
         multiple: false
-        validation:
-            nonEmpty: true
         appearance: {}
 
       dateModified:
         label: modified on
         valType: datetime
         multiple: true
-        validation:
-          nonEmpty: false
         appearance:
           reverse: true
           cutoff: 1
@@ -201,8 +169,6 @@ tables:
         label: contact person
         valType: text
         multiple: false
-        validation:
-          nonEmpty: true
         initial: First_name Last_name
         appearance: {}
 
@@ -210,8 +176,6 @@ tables:
         label: contact email
         valType: email
         multiple: true
-        validation:
-          nonEmpty: true
         initial: name@myinstitute.org
         appearance: {}
 
@@ -219,8 +183,6 @@ tables:
         label: Contribution url
         valType: url
         multiple: true
-        validation:
-          nonEmpty: true
         initial: www.mycontrib.org
         appearance: {}
 
@@ -228,8 +190,6 @@ tables:
         label: Academic url
         valType: url
         multiple: true
-        validation:
-          nonEmpty: true
         initial: www.myinstitute.org
         appearance: {}
 
@@ -237,8 +197,6 @@ tables:
         label: Description
         valType: textarea
         multiple: false
-        validation:
-          nonEmpty: true
         convert: markdown
         initial: This contribution is about ...
         appearance: {}
@@ -247,16 +205,12 @@ tables:
         label: cost (total)
         valType: number
         multiple: false
-        validation:
-          nonEmpty: true
         initial: € 1000
         appearance: {}
 
       costDescription:
         label: cost (description)
         valType: textarea
-        validation:
-          nonEmpty: true
         convert: markdown
         multiple: false
         initial: The costs of this contribution can be broken down as follows ...
@@ -268,8 +222,6 @@ tables:
           values: user
           allowNew: false
         multiple: false
-        validation:
-          nonEmpty: true
         appearance: {}
 
       modifiedBy:
@@ -278,8 +230,6 @@ tables:
           values: user
           allowNew: false
         multiple: true
-        validation:
-          nonEmpty: false
         appearance:
           reverse: true
           cutoff: 1
@@ -292,8 +242,6 @@ tables:
             isMember: true
           allowNew: false
         multiple: false
-        validation:
-          nonEmpty: true
         appearance: {}
 
       year:
@@ -302,11 +250,6 @@ tables:
           values: year
           allowNew: true
         multiple: false
-        validation:
-          nonEmpty: true
-          min: 2000
-          max: 2100
-          step: 1
         appearance: {}
 
       vcc:
@@ -315,8 +258,6 @@ tables:
           values: vcc
           allowNew: false
         multiple: true
-        validation:
-          nonEmpty: true
         appearance: {}
 
       discipline:
@@ -325,8 +266,6 @@ tables:
           values: discipline
           allowNew: true
         multiple: true
-        validation:
-          nonEmpty: true
         appearance: {}
 
       keyword:
@@ -335,8 +274,6 @@ tables:
           values: keyword
           allowNew: true
         multiple: true
-        validation:
-          nonEmpty: true
         appearance: {}
 
       typeContribution:
@@ -345,8 +282,6 @@ tables:
           values: typeContribution
           allowNew: false
         multiple: false
-        validation:
-          nonEmpty: true
         appearance: {}
 
       typeContributionOther:
@@ -355,8 +290,6 @@ tables:
           values: typeContribution
           allowNew: true
         multiple: true
-        validation:
-          nonEmpty: true
         appearance: {}
 
       tadirahObject:
@@ -365,8 +298,6 @@ tables:
           values: tadirahObject
           allowNew: false
         multiple: true
-        validation:
-          nonEmpty: false
         appearance: {}
 
       tadirahActivity:
@@ -375,8 +306,6 @@ tables:
           values: tadirahActivity
           allowNew: false
         multiple: true
-        validation:
-          nonEmpty: false
         appearance: {}
 
       tadirahTechnique:
@@ -385,8 +314,6 @@ tables:
           values: tadirahTechnique
           allowNew: false
         multiple: true
-        validation:
-          nonEmpty: false
         appearance: {}
 
     filters:

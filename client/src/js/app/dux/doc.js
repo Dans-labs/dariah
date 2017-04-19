@@ -1,17 +1,17 @@
 import merge from 'lodash/merge'
 
-import { fetchData } from 'server.js'
+import { accessData } from 'server.js'
 import { propsChanged } from 'utils.js'
 
 /* ACTIONS */
 /*
- * Most actions call fetchData, which will dispatch the ultimate fetch action.
+ * Most actions call accessData, which will dispatch the ultimate fetch action.
  */
 
 export const fetchDoc = props => {
   const { docDir, docName, docExt } = props
   const path = `${docDir}/${docName}.${docExt}`
-  return fetchData({ type: 'fetchDoc', contentType: 'json', path, desc: `document ${docName}` })
+  return accessData({ type: 'fetchDoc', contentType: 'json', path, desc: `document ${docName}` })
 }
 
 /* REDUCER */

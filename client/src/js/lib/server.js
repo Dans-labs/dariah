@@ -6,12 +6,22 @@ const ask = desc => ({ type: 'async', status: 'pending', desc })
 const err = (desc, msgs) => ({ type: 'async', status: 'error', desc, msgs })
 const succeed = desc => ({ type: 'async', status: 'success', desc })
 
-export const fetchData = task => dispatch => {
-  const { path, contentType, desc } = task
+export const accessData = task => dispatch => {
+  const { path, contentType, desc, sendData } = task
   dispatch(ask(desc))
-  dispatch({ ...task, data: null })
+  dispatch(task)
 
-  const settings = {credentials: 'same-origin'}
+  let settings = { credentials: 'same-origin' }
+  if (sendData != null) {
+    settings = {
+      ...settings,
+      method: 'POST',
+      body: JSON.stringify(sendData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  }
   fetch(`${rootUrl}${contentType}${path}`, settings)
   .then(response => response.json())
   .then(json => {

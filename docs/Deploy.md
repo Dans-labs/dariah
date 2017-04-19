@@ -60,6 +60,7 @@ The absolute location is not important. Here we assume everything resides in `/o
   - `web-apps`
     - `dariah`
       - `README.md` short description for humans
+      - `build.sh` script for building, with parameters for development, development server, or production
       - `server`
         - `controllers` routes and controllers
           - `index.py` entry point
@@ -101,7 +102,6 @@ The absolute location is not important. Here we assume everything resides in `/o
         - `node_modules` javascript dependencies
         - `package.json` npm config file
         - `webpack.config.js` config file for webpack, the build tool
-        - `build.sh` script for building, with parameters for development, development server, or production
         - `index.html` soft link to ../server/controllers/views/index.tpl, the entry html that holds the whole app
         - `src`
           - `css`

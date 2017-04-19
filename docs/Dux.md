@@ -278,7 +278,7 @@ Turns the visibility of notification panel on or off.
 
 Other components can issue notifactions easily, either by importing these
 actions, or by dispatching the right actions themselves.
-The helper function [fetchData](Lib#server) can issue notifications.
+The helper function [accessData](Lib#server) can issue notifications.
 These notifications are given a the type `async` and convey a status `pending`,
 `success`, or `error`.
 

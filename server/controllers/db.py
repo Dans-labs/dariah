@@ -51,10 +51,11 @@ class DbAccess(object):
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in itemValues)
         valItemValues = dict()
         for (f, values) in itemValues.items():
+            if f == '_id':
+                valItemValues[f] = (True, oid(values))
+                continue
             valType = fieldSpecs[f]['valType']
             multiple = fieldSpecs[f]['multiple']
-            fvalidation = fieldSpecs[f]['validation']
-            nonEmpty = fvalidation.get('nonEmpty', False)
 
             if multiple: values = [] if values == None else values
             else: values = [values] if values != None else []
@@ -63,11 +64,7 @@ class DbAccess(object):
             msgs = []
             if f not in uFields:
                 valid = False
-                msgs.append([dict(kind='error', text='table {} field {} not accessible'.format(table, field))])
-            elif values == []: 
-                if nonEmpty:
-                    valid = False
-                    msgs.append([dict(kind='error', text='table {} field {} may not be empty'.format(table, field))])
+                msgs.append([dict(kind='error', text='table {} field {} not accessible'.format(table, f))])
             elif type(valType) is str:
                 if valType == 'datetime':
                     valValues = [dtm(v) for v in values]
@@ -80,13 +77,16 @@ class DbAccess(object):
                     msgs.extend(thisMsgs)
                 else:
                     allowNew = valType['allowNew']
-                    if not allowNew:
-                        for v in values:
-                            if v not in valueLists.get(f, {}):
+                    for v in values:
+                        if v not in valueLists.get(f, {}):
+                            if not allowNew:
                                 valid = False
-                                msgs.append([dict(kind='error', text='table {} field {}: Unknown value "{}"'.format(table, field, v))])
+                                msgs.append([dict(kind='error', text='table {} field {}: Unknown value "{}"'.format(table, f, v))])
                             else:
-                                valValues.append[v]
+                                result = _DBM[f].insert_one(dict(rep=v))
+                                valValues.append(result.inserted_id)
+                        else:
+                            valValues.append(oid(v))
 
             if not multiple: valValues = None if valValues == [] else valValues[0]
             valItemValues[f] = (valid, valValues)
@@ -269,45 +269,12 @@ class DbAccess(object):
                 return self.stop(data=none, text='Not allowed to update this item')
             newValues = dict(x for x in newData.get('values', {}).items())
             valItemValues = self.validate(table, newValues, uFields)
-            if any(not valid for (f, (valid, vals)) in valItemValues):
-                fields = ','.join(f for (f, (valid, vals)) in valItemValues if not valid)
+            if any(not valid for (f, (valid, vals)) in valItemValues.items()):
+                fields = ','.join(f for (f, (valid, vals)) in valItemValues.items() if not valid)
                 return self.stop(data=none, text='Validation errors in {}'.format(fields))
-            fieldSpecs = self.DM.tables[table]['fieldSpecs'].get(field, None)
-            if fieldSpecs == None:
-                return self.stop(data=none, text='field {} has unknown type'.format(field))
-            if not valid:
-                documents = list(_DBM[table].find(rowFilter, {field: True}))
-                if len(documents) != 1:
-                    return self.stop(data=none, text='error during update of field {}'.format(field))
-                document = documents[0]
-                values = document.get(field, [])
-                return dict(
-                    data={field: values},
-                    good=True,
-                    msgs=[dict(kind='warning', text='restored field {} because validation failed'.format(field))],
-                )
-            else:
-                modDate = self.DM.generic['modDate']
-                modBy = self.DM.generic['modBy']
-                changeVals = {'$set': {name: valValues} }
-                if name != modDate and name != modBy:
-                    changeVals.update({
-                        '$push': {
-                            modDate: now(),
-                            modBy: {'_id': self.uid},
-                        },
-                    })
-                _DBM[table].update_one(rowFilter, changeVals)
-                documents = list(_DBM[table].find(rowFilter, {name: True, modDate: True, modBy: True}))
-                if len(documents) != 1:
-                    return self.stop(data=none, text='item not properly identified after update')
-                document = documents[0]
-                changedVals = {
-                    name: document[name],
-                    modDate: document[modDate],
-                    modBy: document[modBy],
-                }
-                return self.stop(data=changedVals)
+            updateValues = dict((f, val) for (f, (valid, val)) in valItemValues.items())
+            _DBM[table].update_one(rowFilter, {'$set': updateValues })
+            return self.stop(data=dict(values=updateValues))
 
     def stop(self, data=None, text=None, msgs=None):
         good = text == None and msgs == None

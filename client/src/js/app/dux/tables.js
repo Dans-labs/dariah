@@ -1,26 +1,39 @@
 import mergeWith from 'lodash/mergewith'
+import merge from 'lodash/merge'
 
-import { fetchData } from 'server.js'
+import { accessData } from 'server.js'
 import { propsChanged } from 'utils.js'
 
 /* ACTIONS */
 /*
- * Most actions call fetchData, which will dispatch the ultimate fetch action.
+ * Most actions call accessData, which will dispatch the ultimate fetch action.
  */
 
 export const fetchTable = table => (
-  fetchData({ type: 'fetchTable', contentType: 'db', path: `/list?table=${table}`, desc: `${table} table`, table })
+  accessData({ type: 'fetchTable', contentType: 'db', path: `/list?table=${table}`, desc: `${table} table`, table })
 )
 export const fetchTableMy = table => (
-  fetchData({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)`, table })
+  accessData({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)`, table })
 )
 export const fetchItem = props => {
   const { table, eId } = props
-  return fetchData({
+  return accessData({
     type: 'fetchItem',
     contentType: 'db',
     path: `/view?table=${table}&id=${eId}`,
     desc: `${table} record ${eId}`,
+    table,
+  })
+}
+
+export const modItem = props => {
+  const { table, eId, values } = props
+  return accessData({
+    type: 'sendItem',
+    contentType: 'db',
+    path: `/mod?table=${table}&action=update`,
+    desc: `${table} update record ${eId}`,
+    sendData: { _id: eId, values },
     table,
   })
 }
@@ -41,6 +54,11 @@ export default (state = {}, { type, data, table }) => {
       if (data == null) {return state}
       const { values: { _id } } = data
       return mergeWith({}, state, { [table]: { entities: { [_id]: data } } }, setComplete)
+    }
+    case 'sendItem': {
+      if (data == null) {return state}
+      const { values: { _id } } = data
+      return merge({}, state, { [table]: { entities: { [_id]: data } } })
     }
     default: return state
   }

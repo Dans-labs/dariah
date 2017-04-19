@@ -24,8 +24,8 @@ Whatever the case, it delivers the result.
 
 [server]({{site.libBase}}/server.js)
 =============================================================================================
-## fetchData(task)
-Asynchronous action to fetch data from the server.
+## accessData(task)
+Asynchronous action to fetch data from the server, and also to send data to it.
 
 A `task` object specifies what to fetch, and can contain data
 to send to the server.

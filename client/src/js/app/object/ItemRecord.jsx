@@ -1,14 +1,18 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Field, reduxForm } from 'redux-form'
+import Select, { Creatable } from 'react-select'
 
 import { memoBind } from 'memo.js'
 import { withParams } from 'utils.js'
-import { getTables, needValues, changedItem, fetchItem, repr } from 'tables.js'
+import { getTables, needValues, changedItem, fetchItem, modItem, repr } from 'tables.js'
 
-import RelSelect from 'RelSelect.jsx'
-
-const ItemForm = reduxForm()(
+const makeItemForm = initialValues => reduxForm({
+  destroyOnUnmount: false,
+  enableReinitialize: true,
+  keepDirtyOnReinitialize: true,
+  initialValues,
+})(
   ({ fragments, handleSubmit }) => (
     <form
       onSubmit={handleSubmit}
@@ -25,14 +29,43 @@ const ItemForm = reduxForm()(
 
 class ItemRecord extends Component {
   handleSubmit = values => {
-    console.warn(values)
+    const { props: { table, eId, mod } } = this
+    mod({ table, eId, values })
+  }
+  updateVal = (multi, onChange) => newVal => {
+    const cleanVal = multi ?
+      newVal.map(x => x.value) :
+      newVal.value
+    onChange(cleanVal)
   }
 
-  selectWidget = (name, options) => props =>
-    <RelSelect
-      options={options}
-      {...props}
-    />
+  selectWidget = ({ allowNew, multi, ...restParams }, options) => props => {
+    const custom = {
+      autosize: true,
+    }
+    const { input: { value, onChange } } = props
+    return allowNew ? (
+      <Creatable
+        options={options}
+        value={value}
+        multi={multi}
+        {...restParams}
+        {...custom}
+        {...props}
+        onChange={this.updateVal(multi, onChange)}
+      />
+    ) : (
+      <Select
+        options={options}
+        value={value}
+        multi={multi}
+        {...restParams}
+        {...custom}
+        {...props}
+        onChange={this.updateVal(multi, onChange)}
+      />
+    )
+  }
 
   makeFragmentRead = name => {
     const { props: { tables, table } } = this
@@ -50,7 +83,6 @@ class ItemRecord extends Component {
   makeFragmentEdit = name => {
     const { props: { tables, table } } = this
     const { [table]: { fieldSpecs, valueLists } } = tables
-    const entity = this.getEntity()
     const { [name]: { valType, multiple } } = fieldSpecs
     if (typeof valType == 'string') {
       return (
@@ -63,32 +95,20 @@ class ItemRecord extends Component {
     }
     else {
       const { allowNew } = valType
-      const options = valueLists[name].map(_id => [_id, repr(tables, table, valType, _id)])
-      const { values } = entity
-      const { [name]: myValues } = values
+      const options = valueLists[name].map(_id => ({ value: _id, label: repr(tables, table, valType, _id) }))
+      const params = {
+        name,
+        multi: multiple,
+        allowNew,
+        noResultsText: '--none--',
+      }
+      const SelectComp = memoBind(this, 'selectWidget', [name], [params, options])
       return (
-        <span>{
-          !multiple ? null :
-          myValues.map((value, i) => (
-            <span key={i}>{(i != 0) ? ' | ' : ''}
-              <span>{repr(tables, table, valType, value)}</span>
-            </span>
-          ))
-        }{' '}
+        <span>
           <Field
-            name={`${name}_!_other`}
-            component={memoBind(this, 'selectWidget', [name], [name, options])}
+            name={name}
+            component={SelectComp}
           />
-          {' '}
-          {
-            allowNew ?
-              <Field
-                name={`${name}_!_new`}
-                component="input"
-                type="text"
-              /> :
-            null
-          }
         </span>
       )
     }
@@ -118,11 +138,11 @@ class ItemRecord extends Component {
         </div>
       )
     }
+    const ItemForm = makeItemForm(values)
     const itemForm = hasEditable ?
       <ItemForm
         form={form}
         fragments={fragments}
-        initialValues={values}
         onSubmit={this.handleSubmit}
       /> :
       <div>{fragments}</div>
@@ -168,5 +188,5 @@ class ItemRecord extends Component {
   }
 }
 
-export default connect(getTables, { fetch: fetchItem })(withParams(ItemRecord))
+export default connect(getTables, { fetch: fetchItem, mod: modItem })(withParams(ItemRecord))
 
