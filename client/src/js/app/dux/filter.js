@@ -1,5 +1,6 @@
 import merge from 'lodash/merge'
 
+import { makeReducer } from 'utils.js'
 import { memoBind } from 'memo.js'
 import { repRelated } from 'tables.js'
 
@@ -17,27 +18,26 @@ export const setupFiltering = (tables, table) => dispatch => {
 
 /* REDUCER */
 
-export default (state = {}, { type, table, filterId, data, filterSettings }) => {
-  switch (type) {
-    case 'setupFiltering': {
-      return merge({}, state, { [table]: { filterSettings, initialized: true } })
-    }
-    case 'fulltext': {
-      return merge({}, state, { [table]: { filterSettings: { [filterId]: data } } })
-    }
-    case 'facetAll': {
-      const { [table]: { filterSettings: { [filterId]: facets } } } = state
-      const sameSettings = {}
-      Object.keys(facets).forEach(valueId => {sameSettings[valueId] = data})
-      return merge({}, state, { [table]: { filterSettings: { [filterId]: sameSettings } } })
-    }
-    case 'facet': {
-      const [valueId, filterSetting] = data
-      return merge({}, state, { [table]: { filterSettings: { [filterId]: { [valueId]: filterSetting } } } })
-    }
-    default: return state
-  }
+const flows = {
+  setupFiltering(state, { table, filterSettings }) {
+    return merge({}, state, { [table]: { filterSettings, initialized: true } })
+  },
+  fulltext(state, { table, filterId, data }) {
+    return merge({}, state, { [table]: { filterSettings: { [filterId]: data } } })
+  },
+  facetAll(state, { table, filterId, data }) {
+    const { [table]: { filterSettings: { [filterId]: facets } } } = state
+    const sameSettings = {}
+    Object.keys(facets).forEach(valueId => {sameSettings[valueId] = data})
+    return merge({}, state, { [table]: { filterSettings: { [filterId]: sameSettings } } })
+  },
+  facet(state, { table, filterId, data }) {
+    const [valueId, filterSetting] = data
+    return merge({}, state, { [table]: { filterSettings: { [filterId]: { [valueId]: filterSetting } } } })
+  },
 }
+
+export default makeReducer(flows)
 
 /* SELECTORS */
 
@@ -114,7 +114,6 @@ class FilterCompileCache {
   }
 }
 const fCC = new FilterCompileCache()
-
 
 const computeFiltering = (tables, table, fieldValues, filterSettings) => {
   const { [table]: { entities, order, fields, fieldSpecs, filterList } } = tables

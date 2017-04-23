@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router'
 
 import { withParams } from 'utils.js'
 import { getTables, needTables, fetchTableMy } from 'tables.js'
@@ -18,7 +19,9 @@ class ItemMy extends Component {
           <p>
             {`${my.length} items `}
             {(perm != null && perm.insert) ? (
-              <span className="fa fa-plus" title="new contribution" />
+              <Link to={`/${table}/mylist/new`}>
+                <span className="fa fa-plus" title="new contribution" />
+              </Link>
             ) : null}
           </p>
           <ItemList table={table} title={title} filteredData={my} inplace={false} />
@@ -30,7 +33,11 @@ class ItemMy extends Component {
     )
   }
   componentDidMount() {
-    const { props: { table, tables, fetch } } = this
+    const { props: { tables, table, fetch } } = this
+    if (needTables(tables, table, true)) {fetch(table)}
+  }
+  componentDidUpdate() {
+    const { props: { tables, table, fetch } } = this
     if (needTables(tables, table, true)) {fetch(table)}
   }
 }

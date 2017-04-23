@@ -196,6 +196,16 @@ $special-back: #ffeeff;
     background-color: $error-back;
 }
 
+/* edit status */
+.edit-action {
+    @include action();
+    @include sizing(medium, 6px, 2)
+    background-color: $warning-back;
+}
+.edit-noaction {
+    background-color: $warning-back;
+}
+
 /* tags */
 
 $tag-back: #fafafa;

@@ -15,3 +15,12 @@ export const withParams = Component => ({ params, route, ...props }) => {
   const allProps = { ...props, ...params, ...route }
   return <Component {...allProps} />
 }
+
+const empty = {}
+
+export const makeReducer = (flows, init = empty) => (state = init, action) => {
+  const { type } = action
+  const { [type]: flow } = flows
+  return flow ? flow(state, action) : state
+}
+

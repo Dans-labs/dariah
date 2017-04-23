@@ -1,7 +1,7 @@
 import merge from 'lodash/merge'
 
 import { accessData } from 'server.js'
-import { propsChanged } from 'utils.js'
+import { propsChanged, makeReducer } from 'utils.js'
 
 /* ACTIONS */
 /*
@@ -16,15 +16,14 @@ export const fetchDoc = props => {
 
 /* REDUCER */
 
-export default (state = {}, { type, path, data }) => {
-  switch (type) {
-    case 'fetchDoc': {
-      if (data == null) {return state}
-      return merge({}, state, { [path]: data })
-    }
-    default: return state
-  }
+const flows = {
+  fetchDoc(state, { path, data }) {
+    if (data == null) {return state}
+    return merge({}, state, { [path]: data })
+  },
 }
+
+export default makeReducer(flows)
 
 /* SELECTORS */
 

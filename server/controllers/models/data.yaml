@@ -29,49 +29,39 @@ tables:
         valType: text
         multiple: false
         initial: N.N.
-        appearance: {}
       email:
         label: Email
         valType: email
         multiple: false
         initial: email
-        appearance: {}
       firstName:
         label: First name
         valType: text
         multiple: false
         initial: First name
-        appearance: {}
       lastName:
         label: Last name
         valType: text
         multiple: false
         initial: Last name
-        appearance: {}
       mayLogin:
         label: Login allowed
         valType: bool
         multiple: false
         initial: true
-        appearance: {}
       dateModified:
         label: modified on
         valType: datetime
         multiple: true
-        appearance:
-          reverse: true
-          cutoff: 1
       dateLastLogin:
         label: last logged in on
         valType: datetime
         multiple: false
-        appearance: {}
       statusLastLogin:
         label: Status last login
         valType: text
         multiple: false
         initial: status
-        appearance: {}
 
   country:
     title: name
@@ -89,31 +79,26 @@ tables:
         valType: text
         multiple: false
         initial: XY
-        appearance: {}
       name:
         label: Name
         valType: text
         multiple: false
         initial: ...land
-        appearance: {}
       isMember:
         label: Is DARIAH member
         valType: bool
         multiple: false
         initial: true
-        appearance: {}
       latitude:
         label: Latitude
         valType: number
         multiple: false
         initial: 0.0
-        appearance: {}
       longitude:
         label: Longitude
         valType: number
         multiple: false
         initial: 0.0
-        appearance: {}
 
   contrib:
     title: title
@@ -149,49 +134,40 @@ tables:
         valType: text
         multiple: false
         initial: title
-        appearance: {}
 
       dateCreated:
         label: created on
         valType: datetime
         multiple: false
-        appearance: {}
 
       dateModified:
         label: modified on
         valType: datetime
         multiple: true
-        appearance:
-          reverse: true
-          cutoff: 1
 
       contactPersonName:
         label: contact person
         valType: text
         multiple: false
         initial: First_name Last_name
-        appearance: {}
 
       contactPersonEmail:
         label: contact email
         valType: email
         multiple: true
         initial: name@myinstitute.org
-        appearance: {}
 
       urlContribution:
         label: Contribution url
         valType: url
         multiple: true
         initial: www.mycontrib.org
-        appearance: {}
 
       urlAcademic:
         label: Academic url
         valType: url
         multiple: true
         initial: www.myinstitute.org
-        appearance: {}
 
       description:
         label: Description
@@ -199,14 +175,12 @@ tables:
         multiple: false
         convert: markdown
         initial: This contribution is about ...
-        appearance: {}
 
       costTotal:
         label: cost (total)
         valType: number
         multiple: false
         initial: € 1000
-        appearance: {}
 
       costDescription:
         label: cost (description)
@@ -214,7 +188,6 @@ tables:
         convert: markdown
         multiple: false
         initial: The costs of this contribution can be broken down as follows ...
-        appearance: {}
 
       creator:
         label: creator
@@ -222,7 +195,6 @@ tables:
           values: user
           allowNew: false
         multiple: false
-        appearance: {}
 
       modifiedBy:
         label: modified by
@@ -230,9 +202,6 @@ tables:
           values: user
           allowNew: false
         multiple: true
-        appearance:
-          reverse: true
-          cutoff: 1
 
       country:
         label: Country(ies)
@@ -242,7 +211,6 @@ tables:
             isMember: true
           allowNew: false
         multiple: false
-        appearance: {}
 
       year:
         label: Year
@@ -250,7 +218,6 @@ tables:
           values: year
           allowNew: true
         multiple: false
-        appearance: {}
 
       vcc:
         label: VCC
@@ -258,7 +225,6 @@ tables:
           values: vcc
           allowNew: false
         multiple: true
-        appearance: {}
 
       discipline:
         label: Disciplines
@@ -266,7 +232,6 @@ tables:
           values: discipline
           allowNew: true
         multiple: true
-        appearance: {}
 
       keyword:
         label: Keywords
@@ -274,7 +239,6 @@ tables:
           values: keyword
           allowNew: true
         multiple: true
-        appearance: {}
 
       typeContribution:
         label: Type
@@ -282,7 +246,6 @@ tables:
           values: typeContribution
           allowNew: false
         multiple: false
-        appearance: {}
 
       typeContributionOther:
         label: Type
@@ -290,7 +253,6 @@ tables:
           values: typeContribution
           allowNew: true
         multiple: true
-        appearance: {}
 
       tadirahObject:
         label: Object(s)
@@ -298,7 +260,6 @@ tables:
           values: tadirahObject
           allowNew: false
         multiple: true
-        appearance: {}
 
       tadirahActivity:
         label: Activity(ies)
@@ -306,7 +267,6 @@ tables:
           values: tadirahActivity
           allowNew: false
         multiple: true
-        appearance: {}
 
       tadirahTechnique:
         label: Technique(s)
@@ -314,7 +274,6 @@ tables:
           values: tadirahTechnique
           allowNew: false
         multiple: true
-        appearance: {}
 
     filters:
       - field: title

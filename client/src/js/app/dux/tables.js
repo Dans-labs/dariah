@@ -2,7 +2,7 @@ import mergeWith from 'lodash/mergewith'
 import merge from 'lodash/merge'
 
 import { accessData } from 'server.js'
-import { propsChanged } from 'utils.js'
+import { propsChanged, makeReducer } from 'utils.js'
 
 /* ACTIONS */
 /*
@@ -15,54 +15,87 @@ export const fetchTable = table => (
 export const fetchTableMy = table => (
   accessData({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)`, table })
 )
-export const fetchItem = props => {
-  const { table, eId } = props
-  return accessData({
-    type: 'fetchItem',
-    contentType: 'db',
-    path: `/view?table=${table}&id=${eId}`,
-    desc: `${table} record ${eId}`,
-    table,
-  })
-}
+export const fetchItem = (table, eId) => accessData({
+  type: 'fetchItem',
+  contentType: 'db',
+  path: `/view?table=${table}&id=${eId}`,
+  desc: `${table} record ${eId}`,
+  table,
+})
 
-export const modItem = props => {
-  const { table, eId, values } = props
-  return accessData({
-    type: 'sendItem',
-    contentType: 'db',
-    path: `/mod?table=${table}&action=update`,
-    desc: `${table} update record ${eId}`,
-    sendData: { _id: eId, values },
-    table,
-  })
-}
+export const modItem = (table, eId, values) => accessData({
+  type: 'modItem',
+  contentType: 'db',
+  path: `/mod?table=${table}&action=update`,
+  desc: `${table} update record ${eId}`,
+  sendData: { _id: eId, values },
+  table,
+})
+
+export const insertItem = table => accessData({
+  type: 'newItem',
+  contentType: 'db',
+  path: `/mod?table=${table}&action=insert`,
+  desc: `${table} insert new record`,
+  table,
+})
+
+export const delItem = (table, eId) => accessData({
+  type: 'delItem',
+  contentType: 'db',
+  path: `/mod?table=${table}&action=delete`,
+  desc: `${table} delete record ${eId}`,
+  sendData: { _id: eId },
+  table,
+})
 
 /* REDUCER */
 
-export default (state = {}, { type, data, table }) => {
-  switch (type) {
-    case 'fetchTable': {
-      if (data == null) {return state}
-      return mergeWith({}, state, data, setComplete)
+const flows = {
+  fetchTable(state, { data }) {
+    if (data == null) {return state}
+    return mergeWith({}, state, data, setComplete)
+  },
+  fetchTableMy(state, { data }) {
+    if (data == null) {return state}
+    return mergeWith({}, state, data, setComplete)
+  },
+  fetchItem(state, { data, table }) {
+    if (data == null) {return state}
+    const { values: { _id } } = data
+    const newState = merge({}, state, { [table]: { entities: { [_id]: data } } })
+    newState[table].entities[_id].values = data.values
+    return newState
+  },
+  modItem(state, { data, table }) {
+    if (data == null) {return state}
+    const { values: { _id } } = data
+    const newState = merge({}, state, { [table]: { entities: { [_id]: data } } })
+    newState[table].entities[_id].values = data.values
+    return newState
+  },
+  newItem(state, { data, table }) {
+    if (data == null) {return state}
+    const { values: { _id } } = data
+    return mergeWith({}, state, { [table]: { lastInserted: _id, entities: { [_id]: data }, my: [_id] } }, addMy)
+  },
+  delItem(state, { data, table }) {
+    if (data == null) {return state}
+    const _id = data
+    const { [table]: { entities: { [_id]: del, ...otherEntities }, my } } = state
+    const otherMy = my.filter(x => x != _id)
+    return {
+      ...state,
+      [table]: {
+        ...state[table],
+        entities: otherEntities,
+        my: otherMy,
+      },
     }
-    case 'fetchTableMy': {
-      if (data == null) {return state}
-      return mergeWith({}, state, data, setComplete)
-    }
-    case 'fetchItem': {
-      if (data == null) {return state}
-      const { values: { _id } } = data
-      return mergeWith({}, state, { [table]: { entities: { [_id]: data } } }, setComplete)
-    }
-    case 'sendItem': {
-      if (data == null) {return state}
-      const { values: { _id } } = data
-      return merge({}, state, { [table]: { entities: { [_id]: data } } })
-    }
-    default: return state
-  }
+  },
 }
+
+export default makeReducer(flows)
 
 /* SELECTORS */
 
@@ -79,9 +112,15 @@ const setComplete = (newValue, oldValue, key) => {
   if (key == 'complete') {return newValue || oldValue}
 }
 
+const addMy = (objValue, srcValue, key) => {
+  if (key == 'my') {
+    return (objValue == null) ? srcValue : objValue.concat(srcValue)
+  }
+}
+
 export const needTables = (tables, tableNames, my = false) => {
   if (tables == null) {return true}
-  const tNames = (!Array.isArray(tableNames)) ? [tableNames] : tableNames
+  const tNames = (Array.isArray(tableNames)) ? tableNames : [tableNames]
   return tNames.some(table => (
     tables[table] == null ||
     (my && tables[table].my == null) ||

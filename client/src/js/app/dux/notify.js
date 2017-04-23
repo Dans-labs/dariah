@@ -1,4 +1,5 @@
 import mergeWith from 'lodash/mergewith'
+import { makeReducer } from 'utils.js'
 
 /* ACTIONS */
 
@@ -8,68 +9,68 @@ export const display = onOff => ({ type: 'display', onOff })
 
 /* REDUCER */
 
-export default (state = { items: [], busy: 0, show: false }, { type, desc, status, msgs, onOff }) => {
-  switch (type) {
-    case 'async': {
-      const { busy } = state
-      const extraMsgs = msgs || []
-      switch (status) {
-        case 'pending': {
-          return mergeWith({}, state, {
-            items: [
-              ...extraMsgs,
-              { kind: 'special', text: `waiting for ${desc}`},
-            ],
-            busy: busy + 1,
-          }, addItems)
-        }
-        case 'success': {
-          return mergeWith({}, state, {
-            items: [
-              ...extraMsgs,
-              { kind: 'info', text: `${desc} ok` },
-            ],
-            busy: busy - 1,
-          }, addItems)
-        }
-
-        case 'error': {
-          return mergeWith({}, state, {
-            items: [
-              ...extraMsgs,
-              { kind: 'error', text: `${desc} failed` },
-            ],
-            busy: busy - 1,
-            show: true,
-          }, addItems)
-        }
-        default: return state
-      }
-    }
-    case 'msgs': {
-      return mergeWith({}, state, {
-        items: [
-          ...msgs,
-        ],
-        show: true,
-      }, addItems)
-    }
-    case 'clear': {
-      return {
-        ...state,
-        items: [],
-        show: false,
-      }
-    }
-    case 'display': {
-      return {
-        ...state,
-        show: onOff,
-      }
-    }
-    default: return state
-  }
+const subFlows = {
+  pending(state, { desc, busy, extraMsgs }) {
+    return mergeWith({}, state, {
+      items: [
+        ...extraMsgs,
+        { kind: 'special', text: `waiting for ${desc}`},
+      ],
+      busy: busy + 1,
+    }, addItems)
+  },
+  success(state, { desc, busy, extraMsgs }) {
+    return mergeWith({}, state, {
+      items: [
+        ...extraMsgs,
+        { kind: 'info', text: `${desc} ok` },
+      ],
+      busy: busy - 1,
+    }, addItems)
+  },
+  error(state, { desc, busy, extraMsgs }) {
+    return mergeWith({}, state, {
+      items: [
+        ...extraMsgs,
+        { kind: 'error', text: `${desc} failed` },
+      ],
+      busy: busy - 1,
+      show: true,
+    }, addItems)
+  },
 }
+
+const flows = {
+  async(state, { msgs, status, desc }) {
+    const { busy } = state
+    const extraMsgs = msgs || []
+    const { [status]: subFlow } = subFlows
+    return subFlow ? subFlow(state, { extraMsgs, desc, busy }) : state
+  },
+  msgs(state, { msgs }) {
+    return mergeWith({}, state, {
+      items: [
+        ...msgs,
+      ],
+      show: true,
+    }, addItems)
+  },
+  clear(state) {
+    return {
+      ...state,
+      items: [],
+      show: false,
+    }
+  },
+  display(state, { onOff }) {
+    return {
+      ...state,
+      show: onOff,
+    }
+  },
+}
+
+export default makeReducer(flows, { items: [], busy: 0, show: false })
 
 /* SELECTORS */
 

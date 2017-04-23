@@ -8,6 +8,9 @@ with the same slice of the state.
 We have organized dux as follows:
 
 * one file that contains its *actions*, *reducer*, *selectors* and *helpers*.
+* the reducer is programmed as an object of *flows*. For each action,
+  there is a flow with the same name, which is a function that produces
+  a new state on the basis of that action.
 * a number of React components that make use of these by importing them.
 
 This app contains the following dux:
@@ -285,7 +288,8 @@ These notifications are given a the type `async` and convey a status `pending`,
 Reducer
 ---------------------------------------------------------------------------
 Transforms the state in response to dispatched ticket, notably the `notify` slice.
-The state maintains a counter `busy`, which is the number of currently asynchronously pending operations. A notification widget can show a progress spinner if `busy > 0`.
+The state maintains a counter `busy`, which is the number of currently asynchronously pending operations.
+A notification widget can show a progress spinner if `busy > 0`.
 
 Selectors
 ---------------------------------------------------------------------------

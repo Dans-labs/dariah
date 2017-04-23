@@ -6,6 +6,8 @@ const ask = desc => ({ type: 'async', status: 'pending', desc })
 const err = (desc, msgs) => ({ type: 'async', status: 'error', desc, msgs })
 const succeed = desc => ({ type: 'async', status: 'success', desc })
 
+/* global process */
+
 export const accessData = task => dispatch => {
   const { path, contentType, desc, sendData } = task
   dispatch(ask(desc))
@@ -35,7 +37,7 @@ export const accessData = task => dispatch => {
     }
   })
   .catch(error => {
-    console.error(error)
+    if (process.env.NODE_ENV === `development`) {console.error(error)}
     dispatch(err(desc, [{kind: 'error', text: error.toString()}]))
   })
 }

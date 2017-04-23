@@ -1,3 +1,5 @@
+import { makeReducer } from 'utils.js'
+
 /* ACTIONS */
 
 export const changeWinDim = () => dispatch => {
@@ -6,25 +8,22 @@ export const changeWinDim = () => dispatch => {
 
 /* REDUCER */
 
-export default (state = initWinDim(), { type, height, width }) => {
-  switch (type) {
-    case 'windim': {
-      return { height, width }
-    }
-    default: return state
-  }
+const flows = {
+  windim(state, { height, width }) {return { height, width }},
 }
+
+const initWinDim = () => {
+  const { innerHeight: height, innerWidth: width } = window
+  return { height, width }
+}
+
+export default makeReducer(flows, initWinDim())
 
 /* SELECTORS */
 
 export const getWinDim = ({ win: { height, width } }) => ({ height, width })
 
 /* HELPERS */
-
-const initWinDim = () => {
-  const { innerHeight: height, innerWidth: width } = window
-  return { height, width }
-}
 
 const scrollBarWidth = 40
 const leftMargin = 0

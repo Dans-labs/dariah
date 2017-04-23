@@ -1,4 +1,5 @@
 import { accessData } from 'server.js'
+import { makeReducer } from 'utils.js'
 
 /* ACTIONS */
 /*
@@ -10,15 +11,14 @@ export const fetchMe = () => (
 
 /* REDUCER */
 
-export default (state = {}, { type, data }) => {
-  switch (type) {
-    case 'fetchMe': {
-      if (data == null) {return {}}
-      return { ...data }
-    }
-    default: return state
-  }
+const flows = {
+  fetchMe(state, { data }) {
+    if (data == null) {return {}}
+    return { ...data }
+  },
 }
+
+export default makeReducer(flows)
 
 /* SELECTORS */
 

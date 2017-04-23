@@ -13,8 +13,11 @@ def dtm(isostr):
     try:
         date = datetime.strptime(isostr, "%Y-%m-%dT%H:%M:%S.%f")
     except:
-        date = datetime.strptime(isostr, "%Y-%m-%dT%H:%M:%S")
-    return date
+        try:
+            date = datetime.strptime(isostr, "%Y-%m-%dT%H:%M:%S")
+        except Exception as err:
+            return ('{}'.format(err), isostr)
+    return ('', date)
 
 def json_string(obj):
     if isinstance(obj, datetime):
@@ -52,7 +55,7 @@ class DbAccess(object):
         valItemValues = dict()
         for (f, values) in itemValues.items():
             if f == '_id':
-                valItemValues[f] = (True, oid(values))
+                valItemValues[f] = (True, [], oid(values))
                 continue
             valType = fieldSpecs[f]['valType']
             multiple = fieldSpecs[f]['multiple']
@@ -64,10 +67,20 @@ class DbAccess(object):
             msgs = []
             if f not in uFields:
                 valid = False
-                msgs.append([dict(kind='error', text='table {} field {} not accessible'.format(table, f))])
+                msgs.append(dict(kind='error', text='table {} field {} not accessible'.format(table, f)))
             elif type(valType) is str:
                 if valType == 'datetime':
-                    valValues = [dtm(v) for v in values]
+                    good = True
+                    valValues = []
+                    for v in values:
+                        (err, dv) = dtm(v)
+                        if err:
+                            good = False
+                            msgs.append(dict(kind='error', text='table {} field {} not a valid datetime [{}] ({})'.format(table, f, dv, err)))
+                        else:
+                            valValues.append(dv)
+                    if not good:
+                        valid = False
                 else:
                     valValues = [v for v in values]
             else: 
@@ -81,7 +94,7 @@ class DbAccess(object):
                         if v not in valueLists.get(f, {}):
                             if not allowNew:
                                 valid = False
-                                msgs.append([dict(kind='error', text='table {} field {}: Unknown value "{}"'.format(table, f, v))])
+                                msgs.append(dict(kind='error', text='table {} field {}: Unknown value "{}"'.format(table, f, v)))
                             else:
                                 result = _DBM[f].insert_one(dict(rep=v))
                                 valValues.append(result.inserted_id)
@@ -89,7 +102,7 @@ class DbAccess(object):
                             valValues.append(oid(v))
 
             if not multiple: valValues = None if valValues == [] else valValues[0]
-            valItemValues[f] = (valid, valValues)
+            valItemValues[f] = (valid, msgs, valValues)
         return valItemValues
 
     def getList(
@@ -102,7 +115,8 @@ class DbAccess(object):
         title = self.DM.tables.get(table, {}).get('title', None)
         (mayInsert, iFields) = Perm.may(table, 'insert')
         perm = dict(insert=mayInsert)
-        none = {table: dict(order=[], entities={}, fields={}, perm={})}
+        orderKey = 'my' if my else 'order' 
+        none = {table: {orderKey: [], 'entities': {}, 'fields': {}, 'perm': {}}}
         (good, result) = Perm.getPerm(controller, table, action)
         if not good:
             return self.stop(data=none, text=result)
@@ -207,9 +221,6 @@ class DbAccess(object):
         (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
         (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
         perm = dict(update=uFields, delete=mayDelete)
-        fillIn = 'getValues'
-        for (fName, specs) in fieldSpecs.items():
-            if fillIn in specs: specs[fillIn] = specs[fillIn].format(table=table, field=fName) 
         return self.stop(data=dict(values=document, complete=True, perm=perm, fields=fieldFilter))
 
     def modList(self, controller, table, action):
@@ -227,15 +238,25 @@ class DbAccess(object):
             modBy = self.DM.generic['modBy']
             createdDate = self.DM.generic['createdDate']
             createdBy = self.DM.generic['createdBy']
-            insertVals = {
-                title: ['no title'],
-                createdDate: [now()],
-                createdBy: [{'_id': self.uid}],
+            insertValues = {
+                title: 'no title',
+                createdDate: now(),
+                createdBy: self.uid,
                 modDate: [now()],
-                modBy: [{'_id': self.uid}],
+                modBy: [self.uid],
             }
-            result = _DBM[table].insert_one(insertVals)
-            return self.stop(data=result.inserted_id)
+            result = _DBM[table].insert_one(insertValues)
+            ident = result.inserted_id
+            (good, (readRowFilter, readFieldFilter)) = Perm.getPerm(controller, table, 'read')
+            documents = list(_DBM[table].find(dict(_id=ident), readFieldFilter))
+            ldoc = len(documents)
+            if ldoc == 0:
+                return self.stop(data=none, text='failed to insert new item into {}'.format(table))
+            document = documents[0]
+            (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
+            (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
+            perm = dict(update=uFields, delete=mayDelete)
+            return self.stop(data=dict(values=document, complete=True, perm=perm, fields=readFieldFilter))
 
         elif action == 'delete':
             newData = request.json
@@ -252,7 +273,7 @@ class DbAccess(object):
                 return self.stop(data=none, text='Not allowed to delete this item')
             else:
                 _DBM[table].delete_one(rowFilter)
-                return self.stop(data={'_id': ident})
+                return self.stop(data=str(ident))
 
         elif action == 'update':
             newData = request.json
@@ -269,10 +290,21 @@ class DbAccess(object):
                 return self.stop(data=none, text='Not allowed to update this item')
             newValues = dict(x for x in newData.get('values', {}).items())
             valItemValues = self.validate(table, newValues, uFields)
-            if any(not valid for (f, (valid, vals)) in valItemValues.items()):
-                fields = ','.join(f for (f, (valid, vals)) in valItemValues.items() if not valid)
-                return self.stop(data=none, text='Validation errors in {}'.format(fields))
-            updateValues = dict((f, val) for (f, (valid, val)) in valItemValues.items())
+            validationMsgs = []
+            updateValues = dict()
+            stop = False
+            for (f, (valid, msgs, vals)) in sorted(valItemValues.items()):
+                if valid:
+                    updateValues[f] = vals
+                else:
+                    stop = True
+                    validationMsgs.extend(msgs)
+            if stop:
+                return self.stop(data=none, msgs=validationMsgs)
+            modDate = self.DM.generic['modDate']
+            modBy = self.DM.generic['modBy']
+            updateValues[modDate].append(now())
+            updateValues[modBy].append(self.uid)
             _DBM[table].update_one(rowFilter, {'$set': updateValues })
             return self.stop(data=dict(values=updateValues))
 

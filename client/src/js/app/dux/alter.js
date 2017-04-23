@@ -1,4 +1,5 @@
 import merge from 'lodash/merge'
+import { makeReducer } from 'utils.js'
 
 /* ACTIONS */
 
@@ -6,16 +7,15 @@ export const nextAlt = (tag, nAlts, initial) => ({ type: 'nextAlt', tag, nAlts, 
 
 /* REDUCER */
 
-export default (state = {}, { type, tag, initial, nAlts }) => {
-  switch (type) {
-    case 'nextAlt': {
-      const { [tag]: oldAlt = (initial || 0) } = state
-      const newAlt = (oldAlt + 1) % nAlts
-      return merge({}, state, { [tag]: newAlt })
-    }
-    default: return state
-  }
+const flows = {
+  nextAlt(state, { tag, initial, nAlts }) {
+    const { [tag]: oldAlt = (initial || 0) } = state
+    const newAlt = (oldAlt + 1) % nAlts
+    return merge({}, state, { [tag]: newAlt })
+  },
 }
+
+export default makeReducer(flows)
 
 /* SELECTORS */
 

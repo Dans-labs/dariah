@@ -24,7 +24,7 @@ Crash course in modern Javascript, [ES6](ES6) and [React+Redux](React).
 How server and client react to the urls that are being passed around: [Routing](Routing).
 
 ## Division of labour
-How the dozens of React components are structured around a hand ful of slices of the *state*,
+How the dozens of React components are structured around a handful of slices of the *state*,
 the single source of truth for the whole app when it lives in the browser.
 It is all a matter of [Architecture](Architecture).
 
