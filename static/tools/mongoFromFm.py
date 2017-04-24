@@ -535,6 +535,7 @@ class FMConvert(object):
         workbook.close()
 
     def run(self):
+        isDevel = len(sys.argv) > 1 and sys.argv[1] == 'development'
         self.moneyWarnings = {}
         self.moneyNotes = {}
         self.valueDict = dict()
@@ -554,11 +555,11 @@ class FMConvert(object):
         self.countryTable()
         self.userTable()
         self.relTables()
-        self.testTweaks()
+        if isDevel: self.testTweaks()
         self.importMongo()
         #self.showData()
         #self.showMoney()
-        self.exportXlsx()
+        if isDevel: self.exportXlsx()
 
 FMConvert().run()
 

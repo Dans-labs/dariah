@@ -39,6 +39,7 @@ authorize:
 
 actions:
   insert: create item
+  list:   read item title
   read:   read item
   update: update item
   delete: delete item
@@ -69,56 +70,67 @@ owners:
 
 tables:
   user:
+    list:   public
     read:   own
     update: office
     insert: office
     delete: office
   country:
+    list:   public
     read:   public
     update: office
     insert: office
     delete: office
   contrib:
+    list:   public
     read:   public
     update: own
     insert: auth
     delete: own
   vcc:
+    list:   public
     read:   public
     update: office
     insert: public
     delete: office
   year:
+    list:   public
     read:   public
     update: office
     insert: public
     delete: office
   discipline:
+    list:   public
     read:   public
     update: office
     insert: office
     delete: office
   keyword:
+    list:   public
     read:   public
     update: office
     insert: public
     delete: office
   typeContribution:
+    list:   public
     read:   public
     update: office
     insert: office
     delete: office
   tadirahActivity:
+    list:   public
     read:   public
     update: office
     insert: office
     delete: office
   tadirahObject:
+    list:   public
     read:   public
     update: office
     insert: office
     delete: office
   tadirahTechnique:
+    list:   public
     read:   public
     update: office
     insert: office
@@ -127,151 +139,193 @@ tables:
 fields:
   user:
     firstName:
+      list:   public
       read:   public
       update: office
     lastName:
+      list:   public
       read:   public
       update: office
     email:
+      list:   auth
       read:   auth
       update: office
     eppn:
+      list:   own
       read:   own
       update: office
     mayLogin:
+      list:   own
       read:   own
       update: office
     authority:
+      list:   public
       read:   public
       update: office
 
   country:
     name:
+      list:   public
       read:   public
       update: office
     iso:
+      list:   public
       read:   public
       update: office
     isMember:
+      list:   public
       read:   public
       update: office
     latitude:
+      list:   public
       read:   public
       update: office
     longitude:
+      list:   public
       read:   public
       update: office
 
   vcc:
     rep:
+      list:   public
       read:   public
       update: office
 
   year:
     rep:
+      list:   public
       read:   public
       update: office
 
   discipline:
     rep:
+      list:   public
       read:   public
       update: office
 
   keyword:
     rep:
+      list:   public
       read:   public
       update: office
 
   typeContribution:
     rep:
+      list:   public
       read:   public
       update: office
 
   typeContributionLegacy:
     rep:
+      list:   public
       read:   office
       update: office
 
   tadirahActivity:
     rep:
+      list:   public
       read:   public
       update: office
 
   tadirahObject:
     rep:
+      list:   public
       read:   public
       update: office
 
   tadirahTechnique:
     rep:
+      list:   public
       read:   public
       update: office
 
   contrib:
     title:
+      list:   public
       read:   public
       update: own
     typeContribution:
+      list:   public
       read:   public
       update: own
     typeContributionLegacy:
+      list:   office
       read:   office
       update: system
     vcc:
+      list:   public
       read:   public
       update: own
     country:
+      list:   public
       read:   public
       update: office
     creator:
+      list:   public
       read:   public
       update: office
     contactPersonName:
+      list:   public
       read:   public
       update: own
     contactPersonEmail:
+      list:   auth
       read:   auth
       update: own
     description:
+      list:   auth
       read:   public
       update: own
     costTotal:
+      list:   auth
       read:   auth
       update: own
     costDescription:
+      list:   auth
       read:   auth
       update: own
     year:
+      list:   public
       read:   public
       update: own
     dateCreated:
+      list:   public
       read:   public
       update: office
     modifiedBy:
+      list:   auth
       read:   auth
       update: system
     dateModified:
+      list:   public
       read:   public
       update: system
     urlAcademic:
+      list:   public
       read:   public
       update: own
     urlContribution:
+      list:   public
       read:   public
       update: own
     tadirahActivity:
+      list:   public
       read:   public
       update: own
     tadirahObject:
+      list:   public
       read:   public
       update: own
     tadirahTechnique:
+      list:   public
       read:   public
       update: own
     discipline:
+      list:   public
       read:   public
       update: own
     keyword:
+      list:   public
       read:   public
       update: own
 

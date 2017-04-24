@@ -12,6 +12,9 @@ elif [[ "$1" == "serve" ]]; then
     cd client
     export NODE_ENV="development"
     webpack-dev-server
+elif [[ "$1" == "data" ]]; then
+    cd static/tools
+    python3 mongoFromFm.py development
 elif [[ "$1" == "prod" ]]; then
     push client
     pushd ../docs
@@ -32,10 +35,9 @@ elif [[ "$1" == "shipcode" ]]; then
     git commit -m "ship: $2"
     git push origin master
 elif [[ "$1" == "shipdata" ]]; then
-    static/tools/dump.sh
-elif [[ "$1" == "data" ]]; then
     cd static/tools
-    python3 mongoFromFm.py
+    python3 mongoFromFm.py production
+    ./dump.sh
 else
     echo "Unknown argument '$1'"
 fi

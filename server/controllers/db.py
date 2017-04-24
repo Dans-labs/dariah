@@ -174,9 +174,9 @@ class DbAccess(object):
 
     def getValueLists(self, table, field=None, noTables=False):
         Perm = self.Perm
-        (good, result) = Perm.getPerm('list', table, 'read')
+        (good, result) = Perm.getPerm('list', table, 'list')
         valueLists = {}
-        if not good: return dict()
+        if not good: return (False, [], dict(), dict())
         (rowFilter, fieldFilter) = result
         getFields = set(fieldFilter)
         fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
@@ -194,7 +194,7 @@ class DbAccess(object):
         good = True
         if not noTables:
             for t in relTables:
-                result = self.getList('list', t, 'read', withValueLists=True)
+                result = self.getList('list', t, 'list', withValueLists=True)
                 if result['good']:
                     tables[t] = result['data'][t]
                 else:
