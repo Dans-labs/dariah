@@ -42,10 +42,10 @@ If the props are sufficiently changed, it uses the `need` function to
 finally determine whether the change should result in an action.
 
 ## withParams(Component)
-Higher order function that turn a Component (which is a function) into
+Higher order function that turns a Component (which is a function) into
 another component.
 
-The outgoing component is identical to the incoming component, except
+The outgoing component is identical to the incoming one, except
 that you can offer the outgoing component its properties in a slightly
 different form. Instead of offering properties `foo`, `bar`, it is also
 possible to offer it property `{ params: { foo, bar } }`.
@@ -62,3 +62,15 @@ In the first case, it receives some properties as `params`.
 When we write our components, we do not want to care about this, hence
 we wrap them as `withParams(Component)`.
 
+## makeComponent(Component, props)
+Higher order function that turns a Component (which is a function) into
+another component.
+
+The outgoing component is identical to the incoming one, except
+that the `props` are injected as extra properties to the outgoing component.
+
+This function is used in [ItemForm](Components#itemform), where input widgets
+are passed as components to the form machinery.
+The one that passes the widget through, is not the parent of the widget, but
+has properties relevant to its functioning. 
+So it has to inject them.

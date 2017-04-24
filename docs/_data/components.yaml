@@ -73,7 +73,7 @@
     - ItemRecord
   - method: connected
     components:
-    - ItemField
+    - ItemForm
     - ItemList
   - method: pure
     components:

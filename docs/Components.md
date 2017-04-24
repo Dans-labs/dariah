@@ -372,34 +372,6 @@ Callback to be invoked when the user is typing the search string.
 
 Note that we use the strategy of [controlled components](React#controlled-component) here.
 
-[ItemField]({{site.appBase}}/state/ItemField.jsx)
-=============================================================================================
-connected via [tables](Dux#tables)
-
-Manages the display and editing of a single field.
-
-#### Props
-###### `tables` object from [getTables](Dux#gettables)
-Where all information that has been fetched into tables can be found.
-
-###### `table` string
-The name of the table in question.
-
-###### `label` string
-A label to be displayed on the interface.
-
-###### `values` any
-The value of the field. It can be anything, a string or number or date, an object,
-or an array of multiple such things.
-
-###### `valType` string or object
-Information about the type of the value.
-Either a string with the type, such as `string` or `datetime`, or an object that
-contains the name of the related table where the value can be found.
-
-###### `multiple` bool
-Whether the multiple values are allowed or just a single value.
-
 [ItemFiltered]({{site.appBase}}/object/ItemFiltered.jsx)
 =============================================================================================
 (life cycle) connected via [tables](Dux#tables)
@@ -417,6 +389,67 @@ The name of the table in question.
 
 ###### `fetch` function is [fetchTable](Dux#fetchtable)
 Callback to fetch table data and metadata from the server.
+
+[ItemForm]({{site.appBase}}/state/ItemForm.jsx)
+=============================================================================================
+connected via [tables](Dux#tables)
+
+Manages the display and editing of a single record.
+
+#### Props
+###### `tables` object from [getTables](Dux#gettables)
+Where all information that has been fetched into tables can be found.
+
+###### `table` string
+The name of the table in question.
+
+##### `eId` string
+Entity id of this record.
+
+###### `values` any
+The value of the field. It can be anything, a string or number or date, an object,
+or an array of multiple such things.
+
+###### `valType` string or object
+Information about the type of the value.
+Either a string with the type, such as `string` or `datetime`, or an object that
+contains the name of the related table where the value can be found.
+
+###### `multiple` bool
+Whether the multiple values are allowed or just a single value.
+
+###### `mod` function is [modItem](Dux#moditem)
+Callback to send the updates to the current record to the database.
+
+We use [redux-form](http://redux-form.com/6.6.3/) as machinery for displaying forms,
+filling them out, submitting them, sending the values to the database, validating and normalizing
+values.
+
+Although [redux-form] has an awesome functionality, it is far from trivial to get it integrated.
+
+The work horses are `<Field />` components, and `<FieldArray />` components for fields with 
+multiple values.
+These elements can be put in an arbitrary component, under a `<form/>` element.
+The resulting component is enhanced by the `reduxForm()` function.
+
+The basic flow is this:
+
+* we read the values of a record from the state and pass them to the redux-form component as initial values;
+* reduxForm manages its own slice of the state (`form`) and has its onw set of actions to respond
+  to user interactions;
+* when the user interacts with the form, the work ends up in the `form` slice of the state;
+* until the user submits the form:
+  * the current values are sent to the database, and the updated reocrd is read back from the database
+  * the updates values are passed to the form as new initial values
+  * the form re-initializes itself, and the user can start again;
+* when the user interrupts editing the form, and switches to another component, nothing is lost:
+  * the edits are saved on the state
+  * when the form is mounted again, not only the initial values are fetched back, but also
+    the edit state is reapplied.
+
+Hence it is easy to edit two forms at the same time, which can be handy if (s)he edits two
+contributions that need to have a consistent wording.
+ 
 
 [ItemHead]({{site.appBase}}/pure/ItemHead.jsx)
 =============================================================================================
@@ -496,8 +529,9 @@ separated from the detail view.
 =============================================================================================
 (life cycle) connected via [tables](Dux#tables)
 
-Displays all fields that the user is allowed to read.
-Also controls editing the record.
+Container for a single record in a table.
+This component is responsible for the database actions of fetching, inserting and deleting,
+but not form input.
 
 #### Props
 ###### `tables` object from [getTables](Dux#gettables)
@@ -511,6 +545,13 @@ Entity id of this record.
 
 ###### `fetch` function is [fetchItem](Dux#fetchitem)
 Callback to fetch entity data from the server.
+
+###### `insert` function is [insertItem](Dux#insertitem)
+Callback to insert a create a new record in the database.
+This will become the current record in view.
+
+###### `del` function is [delItem](Dux#delitem)
+Callback to delete the current record from the database.
 
 [Login]({{site.appBase}}/object/Login.jsx)
 =============================================================================================
