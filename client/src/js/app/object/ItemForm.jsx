@@ -2,17 +2,113 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Field, FieldArray, reduxForm } from 'redux-form'
 import Select, { Creatable } from 'react-select'
+import Markdown from 'react-markdown'
 
 import { memoBind } from 'memo.js'
 import { getTables, modItem, repr } from 'tables.js'
+import { makeComponent } from 'utils.js'
+
+import Alternative from 'Alternative.jsx'
+
+const theClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : ''
+
+const textAreaControlPlacement = control => <p className="stick" >{control}</p>
+const textAreaControl1 = handler => <span className="button-medium fa fa-pencil" onClick={handler} />
+const textAreaControl2 = handler => <span className="button-medium fa fa-hand-o-down" onClick={handler} />
+
+const MarkDownArea = ({ table, eId, meta: { dirty, invalid, error }, input: { name, value }, input }) => (
+  <Alternative
+    tag={`md_${table}_${eId}_${name}`}
+    controlPlacement={textAreaControlPlacement}
+    controls={[textAreaControl1, textAreaControl2]}
+    className="md-field"
+    alternatives={[
+      <Markdown
+        className={theClass(dirty, invalid)}
+        key="fmt"
+        source={value}
+      />,
+      <span key="src" >
+        <textarea
+          className={`input ${theClass(dirty, invalid)}`}
+          {...input}
+          wrap="soft"
+        />
+        {error && <span className="invalid diag">{error}</span>}
+      </span>,
+    ]}
+    initial={1}
+  />
+)
+
+const Input = props => {
+  const { meta: { dirty, invalid, error }, input, type } = props
+  return (
+    <span>
+      <input type={type} className={theClass(dirty, invalid)} {...input} />
+      {error && <span className="invalid diag">{error}</span>}
+    </span>
+  )
+}
 
 const valTypeMap = {
-  text: { component: 'input', type: 'input' },
-  datetime: { component: 'input', type: 'input' },
-  email: { component: 'input', type: 'email' },
-  url: { component: 'input', type: 'url' },
-  textarea: { component: 'textarea' },
+  text: { component: Input, type: 'text' },
+  datetime: { component: Input, type: 'text' },
+  email: { component: Input, type: 'text' },
+  url: { component: Input, type: 'text' },
+  textarea: { component: MarkDownArea, type: 'text' },
 }
+const validation = {
+  datetime(val) {
+    let times
+    try {
+      times = new Date(val)
+    }
+    catch (error) {
+      return `not a valid date/time - ${error}`
+    }
+    if (isNaN(times)) {
+      return `not a valid date/time`
+    }
+  },
+  url(val) {
+    if (!val.match(/^https?:\/\//)) {
+      return `urls should start with http:// or https://`
+    }
+  },
+  email(val) {
+    if (val.match(/[^@a-zA-Z0-9_.-]/)) {
+      return `email addresses may only contain alphanumeric characters, - _ and .`
+    }
+    if (!val.match(/@/)) {
+      return `email addresses must contain one @` 
+    }
+    if (val.match(/@.*@/)) {
+      return `email addresses must contain exactly one @` 
+    }
+    if (!val.match(/@[^.]+\.[^.]+.*$/)) {
+      return `email addresses must end with a domain` 
+    }
+  },
+  number(val) {
+    if (isNaN(val)) {
+      return `value must be a number`
+    }
+  },
+}
+
+const normalization = {
+  datetime(val) {
+    try {
+      const times = new Date(val)
+      return times.toISOString()
+    }
+    catch (error) {
+      return val
+    }
+  },
+}
+
 const { text: DEFAULT_TYPE } = valTypeMap
 
 const fieldRemove = (fields, i) => () => {
@@ -20,38 +116,39 @@ const fieldRemove = (fields, i) => () => {
 }
 const fieldPush = fields => () => {fields.push()}
 
-const renderMulti = ({ component, type }) => ({ fields }) => (
-  <ul>
+const renderMulti = ({ component, type, validate, normalize }) => ({ fields, meta: { dirty, invalid, error } }) => (
+  <div className={theClass(dirty, invalid)}>
     {fields.map((name, i) =>
-      <li key={i}>
-        <button
-          type="button"
+      <p key={i}>
+        <span
+          className="button-small fa fa-close"
           title="remove"
-          className="fa fa-close"
           onClick={fieldRemove(fields, i)}
         />
         <Field
           name={name}
           type={type}
           component={component}
+          validate={validate}
+          normalize={normalize}
           label={i}
         />
-      </li>
+      </p>
     )}
-    <li>
-      <button
-        type="button"
-        className="fa fa-plus"
+    <p>
+      <span
+        className="button-small fa fa-plus"
         onClick={fieldPush(fields)}
       />
-    </li>
-  </ul>
+    </p>
+    {error && <p className="invalid diag">{error}</p>}
+  </div>
 )
 
 class ItemForm extends Component {
-  handleSubmit = values => {
+  toDb = values => {
     const { props: { table, eId, mod } } = this
-    mod(table, eId, values)
+    return mod(table, eId, values)
   }
   handleSubmitSuccess = () => {
     const { props: reset } = this
@@ -67,9 +164,11 @@ class ItemForm extends Component {
     const custom = {
       autosize: true,
     }
-    const { input: { value, onChange } } = props
+    const { input: { value, onChange }, meta: { dirty, invalid } } = props
+    const className = theClass(dirty, invalid)
     return allowNew ? (
       <Creatable
+        className={className}
         options={options}
         value={value}
         multi={multi}
@@ -80,6 +179,7 @@ class ItemForm extends Component {
       />
     ) : (
       <Select
+        className={className}
         options={options}
         value={value}
         multi={multi}
@@ -105,16 +205,23 @@ class ItemForm extends Component {
     return <span>{myRepr}</span>
   }
   makeFragmentEdit = name => {
-    const { props: { tables, table, untouch } } = this
+    const { props: { tables, table } } = this
     const { [table]: { fieldSpecs, valueLists } } = tables
     const { [name]: { valType, multiple } } = fieldSpecs
     if (typeof valType == 'string') {
       const { [valType]: typing = DEFAULT_TYPE } = valTypeMap
+      const { type } = typing
+      let { component } = typing
+      if (typeof component != 'string') {
+        component = makeComponent(component, { name, type, ...this.props })
+      }
+      const { [valType]: validate } = validation
+      const { [valType]: normalize } = normalization
       if (multiple) {
         return (
           <FieldArray
             name={name}
-            component={renderMulti(typing, untouch)}
+            component={renderMulti({ component, type, validate, normalize })}
           />
         )
       }
@@ -122,7 +229,10 @@ class ItemForm extends Component {
         return (
           <Field
             name={name}
-            {...typing}
+            component={component}
+            type={type}
+            validate={validate}
+            normalize={normalize}
           />
         )
       }
@@ -166,13 +276,13 @@ class ItemForm extends Component {
   }
 
   render() {
-    const { props: { dirty, submitting, reset, handleSubmit } } = this
+    const { props: { dirty, invalid, error, submitting, reset, handleSubmit } } = this
     const fragments = this.makeFragments()
     return (
-      <form onSubmit={handleSubmit(this.handleSubmit)} >
+      <form onSubmit={handleSubmit(this.toDb)} >
         <p>
           {
-            (dirty && !submitting) ? (
+            (dirty && !invalid && !submitting) ? (
               <button type="submit" className={'button-large edit-action'} >{'Save'}</button>
             ) : null
           }
@@ -195,15 +305,18 @@ class ItemForm extends Component {
             ) : null
           }
         </p>
-        <div>{
+        {error && <p className="invalid diag">{error}</p>}
+        <table className="fragments">
+          <tbody>{
           fragments.map(({ name, label, fragment }) => (
-            <div key={name} >
-              <label><b>{`${label}:`}</b></label>{' '}
-              {fragment}
-            </div>
+            <tr key={name} >
+              <th><label>{`${label}:`}</label></th>
+              <td>{fragment}</td>
+            </tr>
           ))
         }
-        </div>
+          </tbody>
+        </table>
       </form>
     )
   }

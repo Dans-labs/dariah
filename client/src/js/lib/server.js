@@ -1,4 +1,5 @@
 import 'whatwg-fetch'
+import { SubmissionError } from 'redux-form'
 
 const rootUrl = '/api/'
 
@@ -24,7 +25,7 @@ export const accessData = task => dispatch => {
       },
     }
   }
-  fetch(`${rootUrl}${contentType}${path}`, settings)
+  return fetch(`${rootUrl}${contentType}${path}`, settings)
   .then(response => response.json())
   .then(json => {
     const { msgs, good, data } = json
@@ -34,11 +35,19 @@ export const accessData = task => dispatch => {
     }
     else {
       dispatch(err(desc, msgs))
+      if (data) {
+        throw new SubmissionError(data)
+      }
     }
   })
   .catch(error => {
     if (process.env.NODE_ENV === `development`) {console.error(error)}
-    dispatch(err(desc, [{kind: 'error', text: error.toString()}]))
+    if (error instanceof SubmissionError) {
+      throw error
+    }
+    else {
+      dispatch(err(desc, [{kind: 'error', text: error.toString()}]))
+    }
   })
 }
 

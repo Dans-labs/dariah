@@ -10,6 +10,7 @@ def oid(oidstr):
 def now(): return datetime.utcnow()
 
 def dtm(isostr):
+    isostr = isostr.rstrip('Z')
     try:
         date = datetime.strptime(isostr, "%Y-%m-%dT%H:%M:%S.%f")
     except:
@@ -55,7 +56,7 @@ class DbAccess(object):
         valItemValues = dict()
         for (f, values) in itemValues.items():
             if f == '_id':
-                valItemValues[f] = (True, [], oid(values))
+                valItemValues[f] = (True, {}, [], oid(values))
                 continue
             valType = fieldSpecs[f]['valType']
             multiple = fieldSpecs[f]['multiple']
@@ -64,10 +65,11 @@ class DbAccess(object):
             else: values = [values] if values != None else []
             valid = True
             valValues = []
+            diags = []
             msgs = []
             if f not in uFields:
                 valid = False
-                msgs.append(dict(kind='error', text='table {} field {} not accessible'.format(table, f)))
+                diags.append('{} not accessible'.format(f))
             elif type(valType) is str:
                 if valType == 'datetime':
                     good = True
@@ -76,8 +78,9 @@ class DbAccess(object):
                         (err, dv) = dtm(v)
                         if err:
                             good = False
-                            msgs.append(dict(kind='error', text='table {} field {} not a valid datetime [{}] ({})'.format(table, f, dv, err)))
+                            diags.append('not a valid datetime [{}] ({})'.format(dv, err))
                         else:
+                            diags.append(None)
                             valValues.append(dv)
                     if not good:
                         valid = False
@@ -87,6 +90,7 @@ class DbAccess(object):
                 (good, thisMsgs, tables, valueLists) = self.getValueLists(table, noTables=True)
                 if not good:
                     valid = False
+                    diags.append('Could not get the valuelists')
                     msgs.extend(thisMsgs)
                 else:
                     allowNew = valType['allowNew']
@@ -94,15 +98,19 @@ class DbAccess(object):
                         if v not in valueLists.get(f, {}):
                             if not allowNew:
                                 valid = False
-                                msgs.append(dict(kind='error', text='table {} field {}: Unknown value "{}"'.format(table, f, v)))
+                                diags.append('Unknown value "{}"'.format(v))
                             else:
                                 result = _DBM[f].insert_one(dict(rep=v))
                                 valValues.append(result.inserted_id)
+                                diags.append(None)
                         else:
                             valValues.append(oid(v))
+                            diags.append(None)
 
-            if not multiple: valValues = None if valValues == [] else valValues[0]
-            valItemValues[f] = (valid, msgs, valValues)
+            if not multiple:
+                valValues = None if valValues == [] else valValues[0]
+                diags = None if diags == [] else diags[0]
+            valItemValues[f] = (valid, diags, msgs, valValues)
         return valItemValues
 
     def getList(
@@ -291,16 +299,21 @@ class DbAccess(object):
             newValues = dict(x for x in newData.get('values', {}).items())
             valItemValues = self.validate(table, newValues, uFields)
             validationMsgs = []
+            validationDiags = {}
             updateValues = dict()
             stop = False
-            for (f, (valid, msgs, vals)) in sorted(valItemValues.items()):
+            for (f, (valid, diags, msgs, vals)) in sorted(valItemValues.items()):
                 if valid:
                     updateValues[f] = vals
                 else:
                     stop = True
                     validationMsgs.extend(msgs)
+                    validationDiags[f] = diags
             if stop:
-                return self.stop(data=none, msgs=validationMsgs)
+                invalidFields = ', '.join(sorted(validationDiags))
+                validationDiags['_error'] = 'invalid values in fields {}'.format(invalidFields)
+                validationMsgs.append(dict(kind='warning', text='table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)))
+                return self.stop(data=validationDiags, msgs=validationMsgs)
             modDate = self.DM.generic['modDate']
             modBy = self.DM.generic['modBy']
             updateValues[modDate].append(now())

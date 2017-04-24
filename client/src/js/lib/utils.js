@@ -24,3 +24,5 @@ export const makeReducer = (flows, init = empty) => (state = init, action) => {
   return flow ? flow(state, action) : state
 }
 
+export const makeComponent = (Component, boundProps) => props => <Component {...boundProps} {...props} />
+

@@ -8,8 +8,8 @@ const handleNext = ({ tag, alternatives, initial, next }) => event => {
   next(tag, alternatives.length, initial)
 }
 
-const Alternative = ({ controlPlacement, controls, alt, alternatives, ...rest }) => (
-  <div>
+const Alternative = ({ controlPlacement, controls, alt, alternatives, className, ...rest }) => (
+  <div className={className}>
     {controlPlacement(controls[alt](handleNext({ alternatives, ...rest })))}
     {alternatives[alt]}
   </div>
