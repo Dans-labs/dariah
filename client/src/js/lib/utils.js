@@ -1,5 +1,7 @@
 import React from 'react'
 
+const empty = {}
+
 export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
   let result = false
   if (oldProps == null) {
@@ -15,8 +17,7 @@ export const withParams = Component => ({ params, route, ...props }) => {
   const allProps = { ...props, ...params, ...route }
   return <Component {...allProps} />
 }
-
-const empty = {}
+export const makeComponent = (Component, boundProps) => props => <Component {...boundProps} {...props} />
 
 export const makeReducer = (flows, init = empty) => (state = init, action) => {
   const { type } = action
@@ -24,5 +25,4 @@ export const makeReducer = (flows, init = empty) => (state = init, action) => {
   return flow ? flow(state, action) : state
 }
 
-export const makeComponent = (Component, boundProps) => props => <Component {...boundProps} {...props} />
 

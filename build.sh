@@ -16,13 +16,22 @@ elif [[ "$1" == "data" ]]; then
     cd static/tools
     python3 mongoFromFm.py development
 elif [[ "$1" == "prod" ]]; then
-    push client
+    pushd client
     pushd ../docs
     bundle exec jekyll build
     popd
     export NODE_ENV="production"
     webpack -p
     popd
+elif [[ "$1" == "shipdocs" ]]; then
+    pushd client
+    pushd ../docs
+    bundle exec jekyll build
+    popd
+    popd
+    git add --all .
+    git commit -m "docs: $2"
+    git push origin master
 elif [[ "$1" == "shipcode" ]]; then
     pushd client
     pushd ../docs
