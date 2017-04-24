@@ -38,7 +38,10 @@ const ByValue = ({
           controls={[control1, control2]}
           initial={expanded ? 0 : 1}
           alternatives={[
-            (<table key="table" >
+            (<table
+              key="table"
+              className="facets"
+             >
               <tbody>
                 {rows.map((entity, i) => (
                   <tr key={i} >

@@ -79,6 +79,8 @@ $action-text: #000044;
 }
 input {
     @include actiontext();
+}
+.fragments input {
     width: 100%;
 }
 input.dirty {
@@ -328,9 +330,11 @@ $widget-high-back: #444444;
     padding-left: 0em;
     width: 100%;
 }
+table.facets {
+    width: 100%;
+}
 table.fragments {
     border-collapse: collapse;
-    width: 100%;
 }
 table.fragments th {
     vertical-align: top;

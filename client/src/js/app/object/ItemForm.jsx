@@ -81,13 +81,13 @@ const validation = {
       return `email addresses may only contain alphanumeric characters, - _ and .`
     }
     if (!val.match(/@/)) {
-      return `email addresses must contain one @` 
+      return `email addresses must contain one @`
     }
     if (val.match(/@.*@/)) {
-      return `email addresses must contain exactly one @` 
+      return `email addresses must contain exactly one @`
     }
     if (!val.match(/@[^.]+\.[^.]+.*$/)) {
-      return `email addresses must end with a domain` 
+      return `email addresses must end with a domain`
     }
   },
   number(val) {
@@ -191,9 +191,8 @@ class ItemForm extends Component {
     )
   }
   makeFragmentRead = name => {
-    const { props: { tables, table } } = this
+    const { props: { tables, table, initialValues: { [name]: myValues } } } = this
     const { [table]: { fieldSpecs } } = tables
-    const { initialValues: { [name]: myValues } } = this
     const { [name]: { valType, multiple } } = fieldSpecs
     let myRepr
     if (multiple) {
@@ -262,50 +261,57 @@ class ItemForm extends Component {
     const { [table]: { fieldSpecs, fieldOrder } } = tables
 
     const fragments = []
+    let hasEditable = false
     for (const name of fieldOrder) {
       const { [name]: f } = fields
       if (f == null) {continue}
       const { [name]: { label } } = fieldSpecs
       const { update: { [name]: editable } } = perm
+      if (editable) {hasEditable = true}
       const theFragment = (editable) ?
         this.makeFragmentEdit(name) :
         this.makeFragmentRead(name)
       fragments.push({ name, label, fragment: theFragment })
     }
-    return fragments
+    return { fragments, hasEditable }
   }
 
   render() {
     const { props: { dirty, invalid, error, submitting, reset, handleSubmit } } = this
-    const fragments = this.makeFragments()
+    const { fragments, hasEditable } = this.makeFragments()
     return (
       <form onSubmit={handleSubmit(this.toDb)} >
-        <p>
-          {
-            (dirty && !invalid && !submitting) ? (
-              <button type="submit" className={'button-large edit-action'} >{'Save'}</button>
-            ) : null
-          }
-          {' '}
-          {
-            (dirty && !submitting) ? (
-              <button type="button" className={'button-large'} onClick={reset} >{'Reset'}</button>
-            ) : null
-          }
-          {' '}
-          {
-            (!dirty && !submitting) ? (
-              <span className="good" >{'no changes'}</span>
-            ) : null
-          }
-          {' '}
-          {
-            (submitting) ? (
-              <span className="special" >{'saving ...'}</span>
-            ) : null
-          }
-        </p>
-        {error && <p className="invalid diag">{error}</p>}
+        {hasEditable ? (
+          <div>
+            <p>
+              {
+                (dirty && !invalid && !submitting) ? (
+                  <button type="submit" className={'button-large edit-action'} >{'Save'}</button>
+                ) : null
+              }
+              {' '}
+              {
+                (dirty && !submitting) ? (
+                  <button type="button" className={'button-large'} onClick={reset} >{'Reset'}</button>
+                ) : null
+              }
+              {' '}
+              {
+                (!dirty && !submitting) ? (
+                  <span className="good" >{'no changes'}</span>
+                ) : null
+              }
+              {' '}
+              {
+                (submitting) ? (
+                  <span className="special" >{'saving ...'}</span>
+                ) : null
+              }
+            </p>
+            {error && <p className="invalid diag">{error}</p>}
+          </div>
+          ) : null
+        }
         <table className="fragments">
           <tbody>{
           fragments.map(({ name, label, fragment }) => (
