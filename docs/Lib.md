@@ -12,6 +12,21 @@ format.
 See this [Jupyter notebook](https://github.com/Dans-labs/dariah/blob/master/static/tools/country_compose/countries.ipynb)
 to see where this data comes from and how it has been tweaked for this website.
 
+[fields]({{site.libBase}}/fields.js)
+=============================================================================================
+## getValType(valType)
+For a given value type, such as `text`, `url`, `number`, return a component and subtype
+for handling the input of such values, e.g. `<input type="url" />`.
+
+## validation
+An object with validation functions, named after the types of the values they validate.
+All functions take a value, and return undefined if the value passes validation or is itself undefined.
+If a value does not pass validation, a simple string expressing the reason is returned.
+
+## normalization
+An object with normalization functions, named after the types of the values they normalize.
+All functions take a value, and return a normalized value.
+
 [memo]({{site.libBase}}/memo.js)
 =============================================================================================
 ## memoBind(thisArg, funcName, keyArgs, allArgs)
@@ -35,6 +50,11 @@ During request, [notify](Dux#notify) actions will be dispatched.
 
 [utils]({{site.libBase}}/utils.js)
 =============================================================================================
+## editClass(dirty, invalid)
+Returns the proper css class for styling content that is being edited, depending on the state it may be in:
+`dirty`: a changed value that has not been saved to the database yet, and/or
+`invalid`: a value that does not pass validation.
+
 ## propsChanged(newProps, need, oldProps, keyPropNames)
 Determines whether `newProps` differ significantly from `oldProps`, based on 
 the props with `keyPropNames` only.
@@ -74,3 +94,9 @@ are passed as components to the form machinery.
 The one that passes the widget through, is not the parent of the widget, but
 has properties relevant to its functioning. 
 So it has to inject them.
+
+## makeReducer(flows, init)
+Given an object of *flows* and an initial state, returns a *reducer* function.
+The *flows* is an object with functions, named after *actions*.
+These functions define how a new state must be produced when an action has been
+*dispatched*.

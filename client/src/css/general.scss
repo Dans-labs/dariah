@@ -83,6 +83,13 @@ input {
 .fragments input {
     width: 100%;
 }
+.fragments .multi input {
+    width: 90%;
+}
+p.multi {
+    padding: 0;
+    margin: 0;
+}
 input.dirty {
     @include actiontextdirty();
 }

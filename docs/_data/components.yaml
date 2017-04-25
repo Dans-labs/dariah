@@ -73,12 +73,18 @@
     - ItemRecord
   - method: connected
     components:
+    - FieldEdit
+    - FieldRead
     - ItemForm
     - ItemList
   - method: pure
     components:
     - Backoffice
     - ItemHead
+    - Input
+    - InputMultiple
+    - MarkDownArea
+    - SelectR
 - dux: win
   methods:
   - method: lifecycle

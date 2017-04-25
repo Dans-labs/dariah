@@ -273,7 +273,7 @@ fields:
       read:   auth
       update: own
     description:
-      list:   auth
+      list:   public
       read:   public
       update: own
     costTotal:

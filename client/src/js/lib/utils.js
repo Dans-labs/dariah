@@ -1,6 +1,6 @@
 import React from 'react'
 
-const empty = {}
+export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : ''
 
 export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
   let result = false
@@ -19,7 +19,7 @@ export const withParams = Component => ({ params, route, ...props }) => {
 }
 export const makeComponent = (Component, boundProps) => props => <Component {...boundProps} {...props} />
 
-export const makeReducer = (flows, init = empty) => (state = init, action) => {
+export const makeReducer = (flows, init = {}) => (state = init, action) => {
   const { type } = action
   const { [type]: flow } = flows
   return flow ? flow(state, action) : state

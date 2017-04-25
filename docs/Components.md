@@ -287,10 +287,80 @@ Callback to be invoked when the facet is clicked.
 
 Note that we use the strategy of [controlled components](React#controlled-component) here.
 
+[FieldEdit]({{site.appBase}}/state/FieldEdit.jsx)
+=============================================================================================
+connected via [tables](Dux#tables)
+
+Edit control for an editable field.
+Depending on the type of the field and the multiplicity, it presents
+the right control.
+Basically, this component produces one or more 
+[Field](http://redux-form.com/6.6.3/docs/api/Field.md/) 
+or
+[FieldArray](http://redux-form.com/6.6.3/docs/api/FieldArray.md/)
+components (which are provided by *redux-form*. 
+
+Note that we do not pass the actual values to these components.
+They know how to get the current values from the state, and what actions
+must be dispatched to change them.
+
+However, both `<Field />` and `<FieldArray />` still do not actully present
+the edit control. They only do the plumbing.
+
+For the actual presentation, you can plugin a component of choice.
+We will use `<input type="..." />`, `<textarea>...</textarea>` elements and
+the powerful [react-select](https://github.com/JedWatson/react-select) component.
+In order to use it, we wrap it in [SelectR](#selectr).
+
+We enhance *textareas* by offering markdown previews of their content.
+See [MarkDownArea](#markdownarea).
+
+We wrap multiple *input*s in [InputMulti](#inputmulti) and single inputs
+in [Input](#input).
+The extra level of wrapping of these presentational components is needed
+for showing validation errors.
+
+#### Props
+###### `name` string
+The name of this field.
+
+###### `tables` object from [getTables](Dux#gettables)
+Where all information that has been fetched into tables can be found.
+
+###### `table` string
+The name of the table in question.
+
+###### ...props any
+There are many more props that get passed to `FieldEdit`. 
+They have been injected by the wrapper
+[reduxForm()](http://redux-form.com/6.6.3/docs/api/ReduxForm.md/) into
+[ItemForm](#itemform), the parent of this component, and they are just passed
+on to *Field* and *FieldArray*, so that they can do their magic.
+
+[FieldRead]({{site.appBase}}/state/FieldRead.jsx)
+=============================================================================================
+connected via [tables](Dux#tables)
+
+Presents the value(s) of a read-only field, based on *initial values*.
+Note that value of type `textarea` will be rendered as formatted markdown.
+
+#### Props
+###### `name` string
+The name of this field.
+
+###### `tables` object from [getTables](Dux#gettables)
+Where all information that has been fetched into tables can be found.
+
+###### `table` string
+The name of the table in question.
+
+###### `myValues` any
+The actual value for this field.
+It could be a string, a number, or an object, or even an array of such things.
+
 [Filter]({{site.appBase}}/state/Filter.jsx)
 =============================================================================================
 connected via [filter](Dux#filter)
-
 
 A control to filter a list of items.
 The following types of filters are implemented.
@@ -372,6 +442,73 @@ Callback to be invoked when the user is typing the search string.
 
 Note that we use the strategy of [controlled components](React#controlled-component) here.
 
+[Input]({{site.appBase}}/pure/Input.jsx)
+=============================================================================================
+presents [tables](Dux#tables)
+
+Shows an `<input type="..." />` control, and shows validation errors if the value entered
+by the user does not validate.
+
+It is a [controlled component](React#controlled-component).
+
+#### Props
+###### `meta` object
+Contains attributes related to validation and edit state; is the value changed and unsaved,
+invalid, and of so, for what reason?
+
+###### `input` object
+Contains attributes related to the actual value that is being held.
+These attributes are passed verbatim to the underlying `<input />`.
+
+###### `type` string
+The *type* of `<input type="..." />`. It will go to the place of the dots.
+
+[InputMultiple]({{site.appBase}}/pure/InputMultiple.jsx)
+=============================================================================================
+presents [tables](Dux#tables)
+
+Renders a sequence of
+[Field](http://redux-form.com/6.6.3/docs/api/Field.md/) 
+components on behalf of a
+[FieldArray](http://redux-form.com/6.6.3/docs/api/FieldArray.md/)
+component.
+There are controls to remove values, and to add fresh, empty values.
+
+Validation and normalization are done per individual *Field*.
+
+It is a [controlled component](React#controlled-component).
+
+#### Props
+###### `component` function
+The edit component that has to be rendered multiple times.
+
+###### `type` string
+The *type* of `<input type="..." />` (in case `component` is `input`.
+It will go to the place of the dots.
+
+###### `validate` function
+Validation function. Takes a value and return undefined if all is well, and otherwise a reason why not.
+
+###### `normalize` function
+Transforms the entered value into a normalized value for saving.
+
+###### `fields` array
+The names of the individual fields.
+If the collective name of this field is `foo`, than this array contains
+`foo[0]`, `foo[1]`, etc, as many as their are values. These names are just strings.
+
+###### `meta` object
+Contains attributes related to validation and edit state; is the value changed and unsaved,
+invalid, and of so, for what reason?
+
+###### ...props any
+There are many more props that must be passed to `Field`. 
+They have been injected by the wrapper
+[reduxForm()](http://redux-form.com/6.6.3/docs/api/ReduxForm.md/) into
+[ItemForm](#itemform), the uncle (`InputMulti` is passed as attribute to `Field` which is
+a child of [FieldEdit](#fieldedit)) of this component, and they are just passed
+on to *Field* and *FieldArray*, so that they can do their magic.
+
 [ItemFiltered]({{site.appBase}}/object/ItemFiltered.jsx)
 =============================================================================================
 (life cycle) connected via [tables](Dux#tables)
@@ -395,37 +532,13 @@ Callback to fetch table data and metadata from the server.
 connected via [tables](Dux#tables)
 
 Manages the display and editing of a single record.
-
-#### Props
-###### `tables` object from [getTables](Dux#gettables)
-Where all information that has been fetched into tables can be found.
-
-###### `table` string
-The name of the table in question.
-
-##### `eId` string
-Entity id of this record.
-
-###### `values` any
-The value of the field. It can be anything, a string or number or date, an object,
-or an array of multiple such things.
-
-###### `valType` string or object
-Information about the type of the value.
-Either a string with the type, such as `string` or `datetime`, or an object that
-contains the name of the related table where the value can be found.
-
-###### `multiple` bool
-Whether the multiple values are allowed or just a single value.
-
-###### `mod` function is [modItem](Dux#moditem)
-Callback to send the updates to the current record to the database.
+The component also shows *save* and *reset* buttons (if appropriate).
 
 We use [redux-form](http://redux-form.com/6.6.3/) as machinery for displaying forms,
 filling them out, submitting them, sending the values to the database, validating and normalizing
 values.
 
-Although [redux-form] has an awesome functionality, it is far from trivial to get it integrated.
+Although *redux-form* has an awesome functionality, it is far from trivial to get it integrated.
 
 The work horses are `<Field />` components, and `<FieldArray />` components for fields with 
 multiple values.
@@ -434,22 +547,95 @@ The resulting component is enhanced by the `reduxForm()` function.
 
 The basic flow is this:
 
-* we read the values of a record from the state and pass them to the redux-form component as initial values;
-* reduxForm manages its own slice of the state (`form`) and has its onw set of actions to respond
+* we read the values of a record from the state and pass them to the redux-form component as *initial values*;
+* *redux-form* manages its own slice of the state (`form`) and has its own set of actions to respond
   to user interactions;
 * when the user interacts with the form, the work ends up in the `form` slice of the state;
-* until the user submits the form:
-  * the current values are sent to the database, and the updated reocrd is read back from the database
-  * the updates values are passed to the form as new initial values
+* until the user *submits* the form:
+  * the current values are sent to the database, and the updated record is read back from the database;
+  * the updated values are passed to the form as new initial values
   * the form re-initializes itself, and the user can start again;
 * when the user interrupts editing the form, and switches to another component, nothing is lost:
-  * the edits are saved on the state
+  * the edits are saved in the state;
   * when the form is mounted again, not only the initial values are fetched back, but also
-    the edit state is reapplied.
+    the edit state is restored.
 
 Hence it is easy to edit two forms at the same time, which can be handy if (s)he edits two
 contributions that need to have a consistent wording.
- 
+It is also possible to edit the same records in multiple components on the interface.
+Both refer to the same underlying state.
+
+#### Props
+###### `tables` object from [getTables](Dux#gettables)
+Where all information that has been fetched into tables can be found.
+
+###### `table` string
+The name of the table in question.
+
+###### `eId` string
+Entity id of this record.
+
+###### initialValues
+An object with the initial values of all fields that are being managed by the form as a whole.
+
+###### `mod` function is [modItem](Dux#moditem)
+Callback to send the updates to the current record to the database.
+
+###### `perm` object
+Permissions that the current user holds for this record (list, read, update, delete).
+
+###### `fields` object
+Object that contains all the fields in this record as keys. 
+These are the fields that the user is permitted to see.
+
+#####$ `form` string
+Key to find the data of this form in the state, in the `form` slice, where *redux-form*
+controls it. We use a key in the form *tableName*`-`*entityId*.
+
+These are all the properties that `ItemForm` gets from its parent and from its connection with the
+state.
+But we wrap `ItemForm` in `reduxForm()` and this will inject a number of other properties
+into it.
+We list the few that we visibly use. There are more injected properties, and these we pass carefully
+on to other components.
+
+###### dirty
+Whether the form contains changed, unsaved values in any of its fields.
+
+###### invalid
+Whether the form contains invalid, values in any of its fields.
+The form uses two kinds of validation:
+
+* synchronous: on every keystroke, the current value will be subjected to a validation function
+* on submit: the submitted values will be validated on the server, and if that fails, the reasons
+  for failure will be reported in exactly the same way as for synchronous validation.
+
+###### error
+Object that contains the reasons for validation errors.
+
+###### submitting
+Whether a submit action of the form is pending. 
+
+###### reset
+A function that can reset the form.
+Resetting means: changing all edited values back to the initialValues.
+
+###### handleSubmit
+A function that is invoked when the form is submitted.
+This function handles all the *redux-form* machinery that is needed.
+It also calls a function that you can pass to it as first argument.
+We pass it our `toDb(table, eId, mod)` function.
+This is a function that takes a `values` object, and calls `mod(table, eId, values)`,
+where `mod` is the function that dispatches a server action: the `values` are sent
+to the server, where they are used to update the record `eId` in `table`.  
+
+## Implementation
+The construction of the actual fields is done by a function `makeFields()`, that
+generates an array of fragments, one for each field.
+An editable field will be handled by a
+[`<FieldEdit />](#fieldedit) component,
+and a read-only field by a
+[`<FieldRead />](#fieldRead) component.
 
 [ItemHead]({{site.appBase}}/pure/ItemHead.jsx)
 =============================================================================================
@@ -567,6 +753,32 @@ The information about the currently logged-in user, fetched from the server.
 ###### `fetch` function is [fetchMe](Dux#fetchme)
 Callback to fetch user information from the server.
 
+[MarkDownArea]({{site.appBase}}/pure/MarkDownArea.jsx)
+=============================================================================================
+presents [tables](Dux#tables)
+
+An edit control for bigger chunks of text.
+It is basically a `<textarea>...</textarea>` but it is enhanced to convert to the text
+to markdown and to display a formatted preview of the text.
+What is saved to the database is the raw markdown. 
+The formatted text is ephemeral, its only function is for the pleasure of the user.
+Note that in read-only view these values will be also rendered as formatted text.
+
+#### Props
+###### `table` string
+The name of the table in question.
+
+##### `eId` string
+Entity id of this record.
+
+###### `meta` object
+Contains attributes related to validation and edit state; is the value changed and unsaved,
+invalid, and of so, for what reason?
+
+###### `input` object
+Contains attributes related to the actual value that is being held.
+These attributes are passed verbatim to the underlying `<input />`.
+
 [NavLink]({{site.appBase}}/pure/NavLink.jsx)
 =============================================================================================
 presents __none__
@@ -655,6 +867,55 @@ detecting some global UI events.
 
 #### Props
 Except for the standard prop `children`, there are no props.
+
+[SelectR]({{site.appBase}}/pure/SelectR.jsx)
+=============================================================================================
+presents [tables](Dux#tables)
+
+This is a wrapper around [react-select](https://github.com/JedWatson/react-select).
+The vanilla `<select><option/></select>` machinery of HTML is not good enough for our purposes.
+We have to deal with large lists of options, multi-selectable, and sometimes new options
+may be created and sometimes not.
+
+#### Props
+###### `options` array
+Contains the options to select from.
+Every option is an object with `value` and `label` members.
+The `value` is what goes into the field value if the option is selected.
+The `label` is a representation of the value that is displayed to the user.
+
+###### `allowNew` boolean
+Whether the user may type a new option.
+
+###### `multi` boolean
+Whether the select list allows multiple selections or only single selections.
+
+###### `input: { value, onChange }`
+`value` is the current selection. 
+
+`onChange` is a callback, coming from the *redux-form* [Field](http://redux-form.com/6.6.3/docs/api/Field.md/).
+
+###### `handle` function
+This is passed by [FieldEdit](#fieldedit) as the `onChange` callback for *react-select*.
+
+This is the plumbing between *react-select* and *redux-form*:
+
+* the user clicks an option;
+* *react-select* fires `handle` (which is passed to it under the name `onChange`);
+* `handle` takes the selected value, transforms it into a *clean* value.
+  (the value that *react-select* passes to `handle` comes in the shape of `{ value, label }`, or an array
+  of such items. What we need is only the `value` or an array there of); 
+* `handle` is also given the *redux-form* `onChange` callback, which it will now fire with
+  the clean value(s);
+* by this callback *redux-form* does its thing with the new value, such as reducing it into the state, 
+  and setting the `dirty` and `invalid` properties.
+
+###### `meta: { dirty, invalid }`
+These properties come from *redux-form* and will be used to style parts of *react-select*, so
+that the edit status and validity of the value that the user is typing is hinted to him.
+
+###### `...props`
+Additional customization settings targeted to the *react-select* machinery.
 
 [Stat]({{site.appBase}}/pure/Stat.jsx)
 =============================================================================================
