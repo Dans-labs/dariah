@@ -15,25 +15,25 @@ const makeFields = ({ tables, table, fields, perm, ...props }) => {
 
   const fragments = []
   let hasEditable = false
-  for (const name of fieldOrder) {
-    const { [name]: f } = fields
+  for (const field of fieldOrder) {
+    const { [field]: f } = fields
     if (f == null) {continue}
-    const { [name]: { label } } = fieldSpecs
-    const { update: { [name]: editable } } = perm
-    const { [name]: myValues } = initialValues
+    const { [field]: { label } } = fieldSpecs
+    const { update: { [field]: editable } } = perm
+    const { [field]: myValues } = initialValues
     if (editable) {hasEditable = true}
     const theField = (editable) ?
       <FieldEdit
-        name={name}
+        field={field}
         table={table}
         {...props}
       /> :
       <FieldRead
-        name={name}
+        field={field}
         table={table}
         myValues={myValues}
       />
-    fragments.push({ name, label, fragment: theField })
+    fragments.push({ field, label, fragment: theField })
   }
   return { fragments, hasEditable }
 }
@@ -76,8 +76,8 @@ const ItemForm = props => {
       }
       <table className="fragments">
         <tbody>{
-        fragments.map(({ name, label, fragment }) => (
-          <tr key={name} >
+        fragments.map(({ field, label, fragment }) => (
+          <tr key={field} >
             <th><label>{`${label}:`}</label></th>
             <td>{fragment}</td>
           </tr>

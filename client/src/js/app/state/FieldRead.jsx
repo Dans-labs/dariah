@@ -4,9 +4,9 @@ import Markdown from 'react-markdown'
 
 import { getTables, repr } from 'tables.js'
 
-const FieldRead = ({ name, tables, table, myValues }) => {
+const FieldRead = ({ field, tables, table, myValues }) => {
   const { [table]: { fieldSpecs } } = tables
-  const { [name]: { valType, multiple } } = fieldSpecs
+  const { [field]: { valType, multiple } } = fieldSpecs
   if (valType == 'textarea') {
     if (myValues == null || (multiple && myValues.length == 0)) {return ''}
     else {

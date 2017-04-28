@@ -52,6 +52,7 @@ export default configureStore(combineReducers({
 
 /* SELECTORS */
 
+/*
 export const combineSelectors = function(...selectors) {
   return (state, props) => {
     const result = {}
@@ -61,6 +62,7 @@ export const combineSelectors = function(...selectors) {
     return result
   }
 }
+*/
 
 /* HELPERS */
 

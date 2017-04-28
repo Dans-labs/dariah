@@ -1,5 +1,6 @@
 import mergeWith from 'lodash/mergewith'
 import merge from 'lodash/merge'
+import { createSelector } from 'reselect'
 
 import { accessData } from 'server.js'
 import { propsChanged, makeReducer } from 'utils.js'
@@ -112,6 +113,32 @@ export const getTableFilters = ({ tables }, { table }) => {
   const { [table]: { fields, filterList } } = tables
   return { fields, filterList }
 }
+
+const getValueList = ({ tables }, { table, field }) => {
+  const { [table]: { valueLists, fieldSpecs } } = tables
+  const { [field]: { valType } } = fieldSpecs
+  if (valueLists == null) {
+    return { valType, table }
+  }
+  const { [field]: valueList } = valueLists
+  return { valType, valueList, table }
+}
+
+const computeOptions = ({ tables }, { valType, valueList, table }) => {
+  if (valueList == null) {
+    return { options: [], optionLookup: {} }
+  }
+  const options = valueList.map(val => ({ value: val, label: repr(tables, table, valType, val) }))
+  const optionLookup = {}
+  options.forEach(({ value: val, label: lab }) => {optionLookup[val] = lab})
+  return { options, optionLookup }
+}
+
+export const getOptions = createSelector(
+  getTables,
+  getValueList,
+  computeOptions,
+)
 
 /* HELPERS */
 

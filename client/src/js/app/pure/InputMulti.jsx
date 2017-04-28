@@ -9,10 +9,10 @@ const fieldPush = memoize(fields => () => {fields.push()})
 
 const InputMulti = ({ component, type, validate, normalize, fields, meta: { dirty, invalid, error }, ...props }) => (
   <div className={editClass(dirty, invalid)}>
-    {fields.map((name, i) =>
+    {fields.map((field, i) =>
       <p key={i} className="multi">
         <Field
-          name={name}
+          name={field}
           type={type}
           component={component}
           validate={validate}

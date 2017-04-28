@@ -1,4 +1,5 @@
 import React from 'react'
+import { createSelector } from 'reselect'
 
 export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : ''
 
@@ -24,5 +25,8 @@ export const makeReducer = (flows, init = {}) => (state = init, action) => {
   const { [type]: flow } = flows
   return flow ? flow(state, action) : state
 }
+
+const mergeObject = (...objects) => Object.assign({}, ...objects)
+export const combineSelectors = (...selectors) => createSelector(...selectors, mergeObject)
 
 

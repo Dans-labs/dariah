@@ -302,7 +302,8 @@ const countFacets = (tables, field, fieldSpec, fieldValues, filteredData, entiti
   return facetAmounts
 }
 
-const sortEntries = (x, y) => (x[1] || '').localeCompare(y[1])
+const INTL = new Intl.Collator('en', { sensitivity: 'base' })
+const sortEntries = (x, y) => INTL.compare(x[1], y[1])
 
 export const placeFacets = (fieldValues, maxCols) => {
   if (fieldValues == null) {return []}
