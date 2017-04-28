@@ -346,6 +346,7 @@ Helpers
 
 Manages database data from the server.
 It keeps a normalized copy of the data.
+
 [tables]({{site.appBase}}/dux/tables.js)
 =============================================================================================
 Manages database data from the server.
