@@ -88,8 +88,8 @@ const flows = {
     if (data == null) {return state}
     const _id = data
     const { [table]: { entities: { [_id]: del, ...otherEntities }, my, order } } = state
-    const otherMy = my.filter(x => x != _id)
-    const otherOrder = order.filter(x => x != _id)
+    const otherMy = (my == null) ? null : my.filter(x => x != _id)
+    const otherOrder = (order == null) ? null : order.filter(x => x != _id)
     return {
       ...state,
       [table]: {
