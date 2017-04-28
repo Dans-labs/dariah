@@ -3,14 +3,14 @@ import { connect } from 'react-redux'
 
 import { getAlt, nextAlt } from 'alter.js'
 
-const handleNext = ({ tag, alternatives, initial, next }) => event => {
+const handleNext = (tag, alternatives, initial, next) => event => {
   event.preventDefault()
   next(tag, alternatives.length, initial)
 }
 
-const Alternative = ({ controlPlacement, controls, alt, alternatives, className, ...rest }) => (
+const Alternative = ({ controlPlacement, controls, alt, alternatives, className, tag, initial, next }) => (
   <div className={className}>
-    {controlPlacement(controls[alt](handleNext({ alternatives, ...rest })))}
+    {controlPlacement(controls[alt](handleNext(tag, alternatives, initial, next)))}
     {alternatives[alt]}
   </div>
 )

@@ -3,10 +3,12 @@ class PermApi(object):
         self.PM = PM
         self.userInfo = auth.userInfo
         self.uid = self.userInfo.get('_id', None)
+        self.eppn = self.userInfo.get('eppn', None)
         self.group = self.userInfo['group']
         self.rank = dict((lev, n) for (n, lev) in enumerate(self.PM.levels))
 
     def getUid(self): return self.uid
+    def getEppn(self): return self.eppn
     def getGroup(self): return self.group
 
     def getPerm(self, controller, table, action):

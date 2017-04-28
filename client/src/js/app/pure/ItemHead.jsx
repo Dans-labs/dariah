@@ -1,6 +1,8 @@
 import React from 'react'
 import { reduxForm } from 'redux-form'
 
+import { memoize } from 'memo.js'
+
 import Alternative from 'Alternative.jsx'
 import ItemRecord from 'ItemRecord.jsx'
 import NavLink from 'NavLink.jsx'
@@ -18,19 +20,21 @@ const MyItemHead = reduxForm({
   keepDirtyOnReinitialize: true,
 })(MyItemHeadPure)
 
+const control1 = handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />)
+const control2 = handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />)
+const controlPlacement = memoize(entityHead => control => (
+  <p>
+    {control}
+    <span>
+      {entityHead}
+    </span>
+  </p>
+))
+
+const controls = [control1, control2]
+
 const ItemHead = ({ table, values, title, inplace }) => {
   const { _id: eId, [title]: entityHead = '-empty-' } = values
-
-  const control1 = handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />)
-  const control2 = handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />)
-  const controlPlacement = control => (
-    <p>
-      {control}
-      <span>
-        {entityHead}
-      </span>
-    </p>
-  )
 
   return (
     <tr id={eId} >
@@ -38,8 +42,8 @@ const ItemHead = ({ table, values, title, inplace }) => {
         inplace ? (
           <Alternative
             tag={`${table}_${eId}`}
-            controlPlacement={controlPlacement}
-            controls={[control1, control2]}
+            controlPlacement={controlPlacement(entityHead)}
+            controls={controls}
             alternatives={[(
               <ItemRecord
                 key="show"

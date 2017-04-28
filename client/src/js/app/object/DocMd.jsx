@@ -13,12 +13,14 @@ const RouterLink = ({ children, href }) => (
     : <Link to={href} >{children}</Link>
 )
 
+const controlPlacement = control => <p style={{float: 'right'}} >{control}</p>
+const control1 = handler => <a className="control fa fa-hand-o-down" href="#" title="markdown source" onClick={handler} />
+const control2 = handler => <a className="control fa fa-file-code-o" href="#" title="formatted" onClick={handler} />
+const controls = [control1, control2]
+
 class DocMd extends Component {
   render() {
     const {props: { docName, text } } = this
-    const controlPlacement = control => <p style={{float: 'right'}} >{control}</p>
-    const control1 = handler => <a className="control fa fa-hand-o-down" href="#" title="markdown source" onClick={handler} />
-    const control2 = handler => <a className="control fa fa-file-code-o" href="#" title="formatted" onClick={handler} />
 
     if (needDoc({ text })) {return <div>{`No document ${docName}`}</div>}
     return (
@@ -26,7 +28,7 @@ class DocMd extends Component {
         <Alternative
           tag={docName}
           controlPlacement={controlPlacement}
-          controls={[control1, control2]}
+          controls={controls}
           alternatives={[(
             <div key="fmt" >
               <Markdown

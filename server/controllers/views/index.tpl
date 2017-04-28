@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="/static/css/leaflet.css"/>
     <link rel="stylesheet" href="/static/dist/main.css"/>
+    <link rel="stylesheet" href="/static/dist/mselect.css"/>
     </head>
     <body>
         <div id="body"/>

@@ -1,24 +1,61 @@
-export function memoBind(thisArg, funcName, keyArgs, allArgs) {
-  if (typeof thisArg !== 'object' || !thisArg) {
-    throw new TypeError('Invalid thisArg parameter.')
-  }
+/* global process */
 
-  const { [funcName]: func } = thisArg
-  if (typeof func !== 'function') {
-    throw new TypeError(`'${funcName}' is not a function.`)
+export function memoize(f) {
+  const memCache = {}
+  let retrieved
+  let computed
+  if (process.env.NODE_ENV === `development`) {
+    retrieved = 0
+    computed = 0
   }
-
-  if (thisArg._memCache == null) {thisArg._memCache = {}}
-  if (thisArg._memCache[funcName] == null) {
-    thisArg._memCache[funcName] = {}
+  const memoF = (...fArgs) => {
+    if (process.env.NODE_ENV === `development`) {
+      if (fArgs.length == 0) {
+        const Console = console
+        Console.warn(`Computed: ${computed} x`)
+        Console.warn(`Retrieved: ${retrieved} x`)
+        return
+      }
+    }
+    const memoKey = JSON.stringify(fArgs)
+    let { [memoKey]: result } = memCache
+    if (result == null) {
+      result = f.apply({}, fArgs)
+      memCache[memoKey] = result
+      if (process.env.NODE_ENV === `development`) {
+        computed += 1
+      }
+    }
+    else {
+      if (process.env.NODE_ENV === `development`) {
+        retrieved += 1
+      }
+    }
+    return result
   }
-  const { _memCache: { [funcName]: cache } } = thisArg
-
-  const memoKey = JSON.stringify(keyArgs)
-  if (cache[memoKey] == null) {
-    cache[memoKey] = func.apply(thisArg, allArgs)
-  }
-  return cache[memoKey]
+  return memoF
 }
 
+export function memoizeOld(f) {
+  const memCache = {}
+  const memoF = (keyArgs, allArgs) => {
+    const memoKey = JSON.stringify(keyArgs)
+    let { [memoKey]: result } = memCache
+    if (result == null) {
+      result = f.apply({}, allArgs)
+      memCache[memoKey] = result
+    }
+    return result
+  }
+  return memoF
+}
 
+export const levelOneEq = (a, b) => {
+  if (typeof a != typeof b) {return false}
+  if (typeof a == 'object') {
+    const ka = Object.keys(a)
+    if (ka.length != Object.keys(b).length) {return false}
+    return ka.every(k => a[k] === b[k])
+  }
+  return a === b
+}

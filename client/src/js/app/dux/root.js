@@ -9,6 +9,7 @@ import tables from 'tables.js'
 import me from 'me.js'
 import filter from 'filter.js'
 import alter from 'alter.js'
+import select from 'select.js'
 
 /* ACTIONS */
 
@@ -46,6 +47,7 @@ export default configureStore(combineReducers({
   filter,
   alter,
   form,
+  select,
 }))
 
 /* SELECTORS */

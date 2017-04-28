@@ -1,12 +1,11 @@
 import React from 'react'
 import { Field } from 'redux-form'
 
+import { memoize } from 'memo.js'
 import { editClass } from 'utils.js'
 
-const fieldRemove = (fields, i) => () => {
-  fields.remove(i)
-}
-const fieldPush = fields => () => {fields.push()}
+const fieldRemove = memoize((fields, i) => () => {fields.remove(i)})
+const fieldPush = memoize(fields => () => {fields.push()})
 
 const InputMulti = ({ component, type, validate, normalize, fields, meta: { dirty, invalid, error }, ...props }) => (
   <div className={editClass(dirty, invalid)}>

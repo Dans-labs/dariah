@@ -292,13 +292,9 @@ fields:
       list:   public
       read:   public
       update: office
-    modifiedBy:
+    modified:
       list:   auth
       read:   auth
-      update: system
-    dateModified:
-      list:   public
-      read:   public
       update: system
     urlAcademic:
       list:   public

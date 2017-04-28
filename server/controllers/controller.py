@@ -9,6 +9,7 @@ class Controller(object):
     def data(self, controller, Perm):
         self.DB.Perm = Perm
         self.DB.uid = Perm.getUid()
+        self.DB.eppn = Perm.getEppn()
         method = getattr(self, controller, None)
         return method(controller) if callable(method) else self.DB.stop(
             text='wrong method: {}'.format(controller),

@@ -1,9 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { memoize } from 'memo.js'
 import { changeFacet, getFilterSetting } from 'filter.js'
 
-const handleChange = (handle, table, filterId, valueId, isOn) => () => handle(table, filterId, valueId, !isOn)
+const handleChange = memoize((handle, table, filterId, valueId, isOn) => () => handle(table, filterId, valueId, !isOn))
 
 const Facet = ({ table, filterId, valueId, valueRep, filterSetting, handle }) => {
   const { [valueId]: isOn } = filterSetting

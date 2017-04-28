@@ -54,6 +54,7 @@ class DbAccess(object):
     def validate(self, table, itemValues, uFields):
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in itemValues)
         valItemValues = dict()
+        newValues = []
         for (f, values) in itemValues.items():
             if f == '_id':
                 valItemValues[f] = (True, {}, [], oid(values))
@@ -94,6 +95,7 @@ class DbAccess(object):
                     msgs.extend(thisMsgs)
                 else:
                     allowNew = valType['allowNew']
+                    relTable = valType['values']
                     for v in values:
                         if v not in valueLists.get(f, {}):
                             if not allowNew:
@@ -101,7 +103,9 @@ class DbAccess(object):
                                 diags.append('Unknown value "{}"'.format(v))
                             else:
                                 result = _DBM[f].insert_one(dict(rep=v))
+                                _id = result.inserted_id
                                 valValues.append(result.inserted_id)
+                                newValues.append(dict(_id=_id, rep=v, relTable=relTable, field=f))
                                 diags.append(None)
                         else:
                             valValues.append(oid(v))
@@ -111,7 +115,7 @@ class DbAccess(object):
                 valValues = None if valValues == [] else valValues[0]
                 diags = None if diags == [] else diags[0]
             valItemValues[f] = (valid, diags, msgs, valValues)
-        return valItemValues
+        return (valItemValues, newValues)
 
     def getList(
             self, controller, table, action,
@@ -242,16 +246,16 @@ class DbAccess(object):
 
         if action == 'insert':
             title = self.DM.tables[table]['title']
-            modDate = self.DM.generic['modDate']
-            modBy = self.DM.generic['modBy']
+            modified = self.DM.generic['modified']
+            modDate = now()
+            modBy = self.eppn
             createdDate = self.DM.generic['createdDate']
             createdBy = self.DM.generic['createdBy']
             insertValues = {
                 title: 'no title',
                 createdDate: now(),
-                createdBy: self.uid,
-                modDate: [now()],
-                modBy: [self.uid],
+                createdBy: self.eppn,
+                modified: ['{} on {}'.format(modBy, modDate)],
             }
             result = _DBM[table].insert_one(insertValues)
             ident = result.inserted_id
@@ -297,7 +301,7 @@ class DbAccess(object):
             if not mayUpdate:
                 return self.stop(data=none, text='Not allowed to update this item')
             newValues = dict(x for x in newData.get('values', {}).items())
-            valItemValues = self.validate(table, newValues, uFields)
+            (valItemValues, newValues) = self.validate(table, newValues, uFields)
             validationMsgs = []
             validationDiags = {}
             updateValues = dict()
@@ -314,12 +318,12 @@ class DbAccess(object):
                 validationDiags['_error'] = 'invalid values in fields {}'.format(invalidFields)
                 validationMsgs.append(dict(kind='warning', text='table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)))
                 return self.stop(data=validationDiags, msgs=validationMsgs)
-            modDate = self.DM.generic['modDate']
-            modBy = self.DM.generic['modBy']
-            updateValues[modDate].append(now())
-            updateValues[modBy].append(self.uid)
+            modified = self.DM.generic['modified']
+            modDate = now()
+            modBy = self.eppn
+            updateValues[modified].append('{} on {}'.format(modBy, modDate))
             _DBM[table].update_one(rowFilter, {'$set': updateValues })
-            return self.stop(data=dict(values=updateValues))
+            return self.stop(data=dict(values=updateValues, newValues=newValues))
 
     def stop(self, data=None, text=None, msgs=None):
         good = text == None and msgs == None

@@ -69,9 +69,14 @@ const flows = {
   },
   modItem(state, { data, table }) {
     if (data == null) {return state}
-    const { values: { _id } } = data
+    const { values: { _id }, newValues } = data
     const newState = merge({}, state, { [table]: { entities: { [_id]: data } } })
     newState[table].entities[_id].values = data.values
+
+    for (const { _id, rep, relTable, field } of newValues) {
+      newState[relTable].entities[_id] = { values: { _id, rep } }
+      newState[table].valueLists[field].unshift(_id)
+    }
     return newState
   },
   newItem(state, { data, table }) {
@@ -82,13 +87,15 @@ const flows = {
   delItem(state, { data, table }) {
     if (data == null) {return state}
     const _id = data
-    const { [table]: { entities: { [_id]: del, ...otherEntities }, my } } = state
+    const { [table]: { entities: { [_id]: del, ...otherEntities }, my, order } } = state
     const otherMy = my.filter(x => x != _id)
+    const otherOrder = order.filter(x => x != _id)
     return {
       ...state,
       [table]: {
         ...state[table],
         entities: otherEntities,
+        order: otherOrder,
         my: otherMy,
       },
     }

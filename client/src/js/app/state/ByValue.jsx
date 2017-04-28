@@ -1,12 +1,27 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { memoize } from 'memo.js'
 import { getFieldValues, placeFacets } from 'filter.js'
 
 import Facet from 'Facet.jsx'
 import CheckboxI from 'CheckboxI.jsx'
 import Stat from 'Stat.jsx'
 import Alternative from 'Alternative.jsx'
+
+const control1 = handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />)
+const control2 = handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />)
+const controls = [control1, control2]
+const controlPlacement = memoize((table, filterId, filterLabel, filteredAmount, filteredAmountOthers) => control => (
+  <p className="facet" >
+    <CheckboxI
+      table={table}
+      filterId={filterId}
+    /> {filterLabel}{' '}
+    <Stat subTotal={filteredAmount} total={filteredAmountOthers} />{' '}
+    {control}
+  </p>
+))
 
 const ByValue = ({
   table,
@@ -17,25 +32,13 @@ const ByValue = ({
   expanded,
 }) => {
   const rows = placeFacets(fieldValues, maxCols)
-  const control1 = handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />)
-  const control2 = handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />)
-  const controlPlacement = control => (
-    <p className="facet" >
-      <CheckboxI
-        table={table}
-        filterId={filterId}
-      /> {filterLabel}{' '}
-      <Stat subTotal={filteredAmount} total={filteredAmountOthers} />{' '}
-      {control}
-    </p>
-  )
   return (
     <div className="facet" >{
       rows === null ? (<p>{' -no facets '}</p>) : (
         <Alternative
           tag={`${table}_${filterId}`}
-          controlPlacement={controlPlacement}
-          controls={[control1, control2]}
+          controlPlacement={controlPlacement(table, filterId, filterLabel, filteredAmount, filteredAmountOthers)}
+          controls={controls}
           initial={expanded ? 0 : 1}
           alternatives={[
             (<table

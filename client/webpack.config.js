@@ -2,12 +2,15 @@ const webpack = require('webpack')
 const autoprefixer = require('autoprefixer')
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const extractCSS = new ExtractTextPlugin('main.css')
+//const extractLESS = new ExtractTextPlugin('mselect.css')
 
 module.exports = {
   context: __dirname + '/src',
   entry: {
     app: './js/app/main.jsx',
     main: './css/main.scss',
+    //mselect: 'react-select/less/default.less',
     _hrp: 'react-hot-loader/patch',
     _wpds: 'webpack-dev-server/client?http://localhost:8080',
     _who: 'webpack/hot/only-dev-server',
@@ -31,6 +34,27 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.gif?$/,
+        loader: 'url-loader',
+        options: {
+          mimetype: 'image/png',
+        },
+      },
+      {
+        test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
+        loader: 'url-loader',
+        options: {
+          mimetype: 'application/font-woff',
+        },
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?v=[0-9].[0-9].[0-9])?$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+        },
+      },
+      {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         use: [
@@ -46,7 +70,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract([
+        use: extractCSS.extract([
           {
             loader: 'css-loader',
             options: { minimize: false },
@@ -59,7 +83,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        use: ExtractTextPlugin.extract([
+        use: extractCSS.extract([
           {
             loader: 'css-loader',
             options: { minimize: false },
@@ -71,6 +95,20 @@ module.exports = {
           { loader: 'sass-loader' },
         ]),
       },
+      /*{
+        test: /\.less/,
+        use: extractLESS.extract([
+          {
+            loader: 'css-loader',
+            options: { minimize: false },
+          },
+          {
+            loader: 'postcss-loader',
+            options: { plugins: [autoprefixer] },
+          },
+          { loader: 'less-loader' },
+        ]),
+      },*/
     ]
   },
   plugins: [
@@ -90,10 +128,8 @@ module.exports = {
         return module.context && module.context.indexOf('node_modules') !== -1;
       },
     }),
-    new ExtractTextPlugin({
-      filename: 'main.css',
-      allChunks: true,
-    }),
+    extractCSS,
+    //extractLESS,
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')

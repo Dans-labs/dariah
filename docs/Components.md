@@ -540,10 +540,15 @@ values.
 
 Although *redux-form* has an awesome functionality, it is far from trivial to get it integrated.
 
-The work horses are `<Field />` components, and `<FieldArray />` components for fields with 
-multiple values.
+The work horses are the
+[Field](http://redux-form.com/6.6.3/docs/api/Field.md/) 
+and
+[FieldArray](http://redux-form.com/6.6.3/docs/api/FieldArray.md/)
+components.
+
 These elements can be put in an arbitrary component, under a `<form/>` element.
-The resulting component is enhanced by the `reduxForm()` function.
+The resulting component is enhanced by the
+[reduxForm()](http://redux-form.com/6.6.3/docs/api/ReduxForm.md/) function.
 
 The basic flow is this:
 
@@ -588,7 +593,7 @@ Permissions that the current user holds for this record (list, read, update, del
 Object that contains all the fields in this record as keys. 
 These are the fields that the user is permitted to see.
 
-#####$ `form` string
+###### `form` string
 Key to find the data of this form in the state, in the `form` slice, where *redux-form*
 controls it. We use a key in the form *tableName*`-`*entityId*.
 
@@ -599,10 +604,10 @@ into it.
 We list the few that we visibly use. There are more injected properties, and these we pass carefully
 on to other components.
 
-###### dirty
+###### `dirty` boolean
 Whether the form contains changed, unsaved values in any of its fields.
 
-###### invalid
+###### `invalid` boolean
 Whether the form contains invalid, values in any of its fields.
 The form uses two kinds of validation:
 
@@ -610,17 +615,17 @@ The form uses two kinds of validation:
 * on submit: the submitted values will be validated on the server, and if that fails, the reasons
   for failure will be reported in exactly the same way as for synchronous validation.
 
-###### error
+###### `error` object
 Object that contains the reasons for validation errors.
 
-###### submitting
+###### `submitting` boolean
 Whether a submit action of the form is pending. 
 
-###### reset
+###### `reset` boolean
 A function that can reset the form.
 Resetting means: changing all edited values back to the initialValues.
 
-###### handleSubmit
+###### `handleSubmit` function
 A function that is invoked when the form is submitted.
 This function handles all the *redux-form* machinery that is needed.
 It also calls a function that you can pass to it as first argument.

@@ -5,15 +5,16 @@ import { editClass } from 'utils.js'
 
 import Alternative from 'Alternative.jsx'
 
-const textAreaControlPlacement = control => <p className="stick" >{control}</p>
-const textAreaControl1 = handler => <span className="button-medium fa fa-pencil" onClick={handler} />
-const textAreaControl2 = handler => <span className="button-medium fa fa-hand-o-down" onClick={handler} />
+const controlPlacement = control => <p className="stick" >{control}</p>
+const control1 = handler => <span className="button-medium fa fa-pencil" onClick={handler} />
+const control2 = handler => <span className="button-medium fa fa-hand-o-down" onClick={handler} />
+const controls = [control1, control2]
 
 const MarkDownArea = ({ table, eId, meta: { dirty, invalid, error }, input: { name, value }, input }) => (
   <Alternative
     tag={`md_${table}_${eId}_${name}`}
-    controlPlacement={textAreaControlPlacement}
-    controls={[textAreaControl1, textAreaControl2]}
+    controlPlacement={controlPlacement}
+    controls={controls}
     className="md-field"
     alternatives={[
       <Markdown

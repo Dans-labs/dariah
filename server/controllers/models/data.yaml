@@ -1,8 +1,7 @@
 generic:
   createdDate: dateCreated
   createdBy: creator
-  modDate: dateModified
-  modBy: modifiedBy
+  modified: modified
   sort:
     - [rep, 1]
 
@@ -120,8 +119,7 @@ tables:
       - urlAcademic
       - creator
       - dateCreated
-      - dateModified
-      - modifiedBy
+      - modified
       - tadirahObject
       - tadirahActivity
       - tadirahTechnique
@@ -140,9 +138,9 @@ tables:
         valType: datetime
         multiple: false
 
-      dateModified:
-        label: modified on
-        valType: datetime
+      modified:
+        label: modified
+        valType: text
         multiple: true
 
       contactPersonName:
@@ -195,13 +193,6 @@ tables:
           values: user
           allowNew: false
         multiple: false
-
-      modifiedBy:
-        label: modified by
-        valType:
-          values: user
-          allowNew: false
-        multiple: true
 
       country:
         label: Country(ies)

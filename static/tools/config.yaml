@@ -387,7 +387,7 @@ FIELD_TYPE:
   contrib:
     costTotal: valuta
     dateCreated: datetime
-    dateModified: datetime
+    dateModified: datetimeiso
     dateApproved: datetime
     dateApprovedCIO: datetime
     contactPersonEmail: email
@@ -402,7 +402,7 @@ FIELD_TYPE:
 
 FIELD_MULTIPLE:
   contrib:
-    dateModified: 2
+    dateModified: 1
 
 DEFAULT_VALUES:
   contrib:

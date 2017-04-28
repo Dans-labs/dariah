@@ -83,6 +83,15 @@ def dtm(v_raw, i, t, fname):
         return v_raw
     return datetime(*map(int, re.split('[:T-]', DATETIME_PATTERN.sub(datetime_repl, v_raw))))
 
+def dtmiso(v_raw, i, t, fname):
+    if not DATETIME_PATTERN.match(v_raw):
+        warning(
+            'table `{}` field `{}` record {}: not a valid date time: "{}"'.format(
+                t, fname, i, v_raw
+        ))
+        return v_raw
+    return DATETIME_PATTERN.sub(datetime_repl, v_raw)
+
 def num(v_raw, i, t, fname):
     if type(v_raw) is int: return v_raw
     if v_raw.isdigit(): return int(v_raw)
@@ -215,6 +224,7 @@ class FMConvert(object):
             elif ftype == 'valuta': v = self.money(v_raw, i, t, fname)
             elif ftype == 'date': v = dt(v_raw, i, t, fname)
             elif ftype == 'datetime': v = dtm(v_raw, i, t, fname)
+            elif ftype == 'datetimeiso': v = dtmiso(v_raw, i, t, fname)
             else: v = v_raw
             if v != None and (fmult <= 1 or v != ''): newValue.append(v)
         if len(newValue) == 0:
@@ -394,15 +404,13 @@ class FMConvert(object):
         users = collections.defaultdict(set)
         eppnSet = set()
         for c in self.allData['contrib']:
-            crsPre = [c.get(field, None) for field in ['creator', 'modifiedBy']]
+            crsPre = [c.get(field, None) for field in ['creator']]
             crs = [x for x in crsPre if x != None]
             for cr in crs:
                 eppnSet.add(cr)
         idMapping = dict((eppn, self.mongo.newId()) for eppn in sorted(eppnSet))
         for c in self.allData['contrib']:
             c['creator'] = idMapping[c['creator']]
-            if 'modifiedBy' not in c: c['modifiedBy'] = []
-            else: c['modifiedBy'] = [idMapping[c['modifiedBy']]]
 
         users = dict((i, eppn) for (eppn, i) in idMapping.items())
         for (i, eppn) in sorted(users.items()):
@@ -432,6 +440,16 @@ class FMConvert(object):
             group=('string', 1),
         )
         self.uidMapping.update(idMapping)
+
+    def provenance(self):
+        for c in self.allData['contrib']:
+            c['modified'] = ['{} on {}'.format(c['modifiedBy'], c['dateModified'])]
+            del c['modifiedBy']
+            del c['dateModified']
+            print(c['modified'])
+        self.allFields['contrib']['modified'] = ('string', 2)
+        del self.allFields['contrib']['modifiedBy']
+        del self.allFields['contrib']['dateModified']
 
     def relTables(self):
         def norm(x): return x.strip().lower()
@@ -554,6 +572,7 @@ class FMConvert(object):
         self.moveFields()
         self.countryTable()
         self.userTable()
+        self.provenance()
         self.relTables()
         if isDevel: self.testTweaks()
         self.importMongo()

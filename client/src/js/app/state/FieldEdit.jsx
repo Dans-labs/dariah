@@ -7,14 +7,8 @@ import { validation, normalization, getValType } from 'fields.js'
 import { getTables, repr } from 'tables.js'
 
 import InputMulti from 'InputMulti.jsx'
-import SelectR from 'SelectR.jsx'
-
-const handleUpdate = (multi, onChange) => newVal => {
-  const cleanVal = multi ?
-    newVal.map(x => x.value) :
-    newVal.value
-  onChange(cleanVal)
-}
+//import SelectR from 'SelectR.jsx'
+import RelSelect from 'RelSelect.jsx'
 
 const FieldEdit = ({ name, tables, table, ...props }) => {
   const { [table]: { fieldSpecs, valueLists } } = tables
@@ -59,19 +53,24 @@ const FieldEdit = ({ name, tables, table, ...props }) => {
   }
   else {
     const { allowNew } = valType
-    const options = valueLists[name].map(_id => ({ value: _id, label: repr(tables, table, valType, _id) }))
+    const { [name]: valueList } = valueLists
+    const options = valueList.map(option => ({ value: option, label: repr(tables, table, valType, option) }))
+    const { eId } = props
+    const tag = `${table}-${eId}-${name}`
     const params = {
+      table,
+      eId,
       name,
-      multi: multiple,
+      tag,
+      valueList,
+      multiple,
       allowNew,
-      noResultsText: '--none--',
-      handle: handleUpdate,
     }
     return (
       <span>
         <Field
           name={name}
-          component={makeComponent(SelectR, { options, ...params })}
+          component={makeComponent(RelSelect, { options, ...params })}
         />
       </span>
     )

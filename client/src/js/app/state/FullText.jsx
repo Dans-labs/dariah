@@ -1,11 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { memoize } from 'memo.js'
 import { changeFulltext, getFilterSetting } from 'filter.js'
 
 import Stat from 'Stat.jsx'
 
-const handleChange = (handle, table, filterId) => event => handle(table, filterId, event.target.value)
+const handleChange = memoize((handle, table, filterId) => event => handle(table, filterId, event.target.value))
 
 const FullText = ({
   table,

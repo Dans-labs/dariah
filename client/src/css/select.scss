@@ -1,0 +1,34 @@
+div.select {
+    display: inline-block;
+}
+div.option-popup {
+    padding-bottom: 2em;
+}
+div.options {
+    height: 6em;
+    overflow: auto;
+    resize: both;
+    border: 1px solid $action-border;
+    border-radius: 3px;
+    background-color: $action-back;
+    clear: both;
+}
+p.option {
+    @include action();
+    color: $action-fore;
+    background-color: $action-back;
+}
+p.option.selected {
+    background-color: $action-high;
+    border: 1px solid $action-border;
+}
+p.option-type, p.option-head, p.option {
+    margin: 0 0 0 0;
+    padding: 1 3 1 3;
+}
+p.option-type input {
+    margin: 0 0 0 0;
+    padding: 1 3 1 3;
+    border-radius: 3px;
+}
+
