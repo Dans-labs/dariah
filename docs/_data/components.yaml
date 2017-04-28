@@ -64,6 +64,15 @@
   - method: pure
     components:
     - Root
+- dux: select
+  methods:
+  - method: lifecycle
+    components:
+    - RelSelect
+  - method: connected
+    components:
+  - method: pure
+    components:
 - dux: tables
   methods:
   - method: lifecycle

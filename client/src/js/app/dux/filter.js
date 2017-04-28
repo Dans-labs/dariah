@@ -302,9 +302,11 @@ const countFacets = (tables, field, fieldSpec, fieldValues, filteredData, entiti
   return facetAmounts
 }
 
+const sortEntries = (x, y) => (x[1] || '').localeCompare(y[1])
+
 export const placeFacets = (fieldValues, maxCols) => {
   if (fieldValues == null) {return []}
-  const facets = Object.entries(fieldValues).sort((x, y) => x[1].localeCompare(y[1]))
+  const facets = Object.entries(fieldValues).sort(sortEntries)
   if (facets.length == 0) {return []}
   const rows = []
   const { length: lf } = facets
