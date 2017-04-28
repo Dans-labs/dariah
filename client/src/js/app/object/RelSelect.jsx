@@ -67,7 +67,7 @@ class RelSelect extends Component {
 
   renderTags() {
     const { lookup, props: { input: { value } } } = this
-    return value.map(val => {
+    return (value || []).map(val => {
       const { [val]: lab } = lookup
       return (
         <span key={val} >

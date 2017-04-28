@@ -254,7 +254,7 @@ class DbAccess(object):
             insertValues = {
                 title: 'no title',
                 createdDate: now(),
-                createdBy: self.eppn,
+                createdBy: self.uid,
                 modified: ['{} on {}'.format(modBy, modDate)],
             }
             result = _DBM[table].insert_one(insertValues)
