@@ -15,7 +15,7 @@ class RelSelect extends Component {
     super(props)
     const { options } = props
     this.lookup = {}
-    options.forEach(({ value: val, label }) => {this.lookup[val] = label})
+    options.forEach(({ value: val, label: lab }) => {this.lookup[val] = lab})
   }
   handlePopUp = () => {
     const { props: { tag, togglePU } } = this
@@ -47,11 +47,10 @@ class RelSelect extends Component {
     }
   }
   addVal = label => () => {
-    const { lookup, props: { input: { value, onChange } } } = this
+    const { props: { input: { value, onChange } } } = this
     const { [label]: rep } = this
     const exists = rep != null || value.includes(label)
     if (!exists) {
-      lookup[label] = label
       const newValue = [label, ...value]
       onChange(newValue)
     }
@@ -68,7 +67,7 @@ class RelSelect extends Component {
   renderTags() {
     const { lookup, props: { input: { value } } } = this
     return (value || []).map(val => {
-      const { [val]: lab } = lookup
+      const { [val]: lab = val } = lookup
       return (
         <span key={val} >
           <span className="tag-medium" >{lab}{' '}
@@ -83,7 +82,11 @@ class RelSelect extends Component {
   }
   renderHead() {
     const { lookup, props: { multiple, input: {value }, popUp } } = this
-    const label = multiple ? '' : lookup[value]
+    let label = ''
+    if (!multiple) {
+      const { [value]: lab = value } = lookup
+      label = lab
+    }
     const icon = popUp ? 'arrow-up' : 'arrow-down'
     return (
       <p className="option-head tag-medium" >
