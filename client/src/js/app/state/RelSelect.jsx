@@ -50,22 +50,24 @@ const Tags = ({ tag, optionLookup, value, onChange, togglePU }) => (
     className="tags"
     onClick={handlePopUp(tag, togglePU)}
   >{
-    (value || []).map(val => {
-      const { [val]: lab = val } = optionLookup
-      return (
-        <span
-          key={val}
-          className="tag"
-        >
+    (value != null && value.length) ?
+      value.map(val => {
+        const { [val]: lab = val } = optionLookup
+        return (
           <span
-            className="button-tag"
-            onClick={removeVal(value, onChange, val)}
-          >{'×'}</span>{' '}
-          <span>{lab}</span>
-        </span>
-      )
-    })
-  }{' '}
+            key={val}
+            className="tag"
+          >
+            <span
+              className="button-tag"
+              onClick={removeVal(value, onChange, val)}
+            >{'×'}</span>{' '}
+            <span>{lab}</span>
+          </span>
+        )
+      }) :
+      <span className="tag">{'click to enter values'}</span>
+  }
   </div>
 )
 
@@ -73,6 +75,9 @@ const Head = ({ optionLookup, value, tag, togglePU }) => {
   let label = ''
   const { [value]: lab = value } = optionLookup
   label = lab
+  if (value == '') {
+    label = 'click to enter a value'
+  }
   return (
     <span
       className={`option-head tag`}
