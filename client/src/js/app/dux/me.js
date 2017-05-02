@@ -1,5 +1,5 @@
-import { accessData } from 'server.js'
-import { makeReducer } from 'utils.js'
+import { accessData } from 'server'
+import { makeReducer } from 'utils'
 
 /* ACTIONS */
 /*

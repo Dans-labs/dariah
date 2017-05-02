@@ -1,5 +1,5 @@
-import Input from 'Input.jsx'
-import MarkDownArea from 'MarkDownArea.jsx'
+import Input from 'Input'
+import MarkDownArea from 'MarkDownArea'
 
 const valTypes = {
   text: { component: Input, type: 'text' },

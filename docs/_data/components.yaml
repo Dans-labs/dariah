@@ -7,7 +7,7 @@
     - Alternative
   - method: pure
     components:
-- dux: doc
+- dux: docs
   methods:
   - method: lifecycle
     components:
@@ -19,7 +19,7 @@
     - Doc
     - DocHtml
     - DocPdf
-- dux: filter
+- dux: filters
   methods:
   - method: lifecycle
     components:
@@ -54,7 +54,7 @@
     components:
   - method: pure
     components:
-- dux: root
+- dux: roots
   methods:
   - method: lifecycle
     components:

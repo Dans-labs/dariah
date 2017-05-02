@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { editClass } from 'utils.js'
+import { editClass } from 'utils'
 
 const Input = ({ meta: { dirty, invalid, error }, input, type }) => (
   <span>

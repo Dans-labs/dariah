@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Markdown from 'react-markdown'
 
-import { getTables, repr } from 'tables.js'
+import { getTables, repr } from 'tables'
 
 const FieldRead = ({ field, tables, table, myValues }) => {
   const { [table]: { fieldSpecs } } = tables

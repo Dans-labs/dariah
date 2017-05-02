@@ -1,4 +1,4 @@
-import { makeReducer } from 'utils.js'
+import { makeReducer } from 'utils'
 
 /* ACTIONS */
 

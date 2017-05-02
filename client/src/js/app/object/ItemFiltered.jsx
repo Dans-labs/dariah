@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { withParams } from 'utils.js'
-import { getTables, needTables, fetchTable } from 'tables.js'
+import { withParams } from 'utils'
+import { getTables, needTables, fetchTable } from 'tables'
 
-import FilterCompute from 'FilterCompute.jsx'
+import FilterCompute from 'FilterCompute'
 
 class ItemFiltered extends Component {
   render() {

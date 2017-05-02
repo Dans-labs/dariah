@@ -1,7 +1,12 @@
 /* imports */
 
-@import 'general';
+@import 'functions';
+@import 'widgets';
+@import 'clickables';
+@import 'notification';
+@import 'editing';
+@import 'documents';
 @import 'page';
 @import 'nav';
 @import 'filtering';
-@import 'select'
+@import 'RelSelect';

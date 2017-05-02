@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getTables } from 'tables.js'
+import { getTables } from 'tables'
 
-import ItemHead from 'ItemHead.jsx'
+import ItemHead from 'ItemHead'
 
 const ItemList = ({ tables, table, title, filteredData, inplace }) => {
   const { [table]: { entities } } = tables

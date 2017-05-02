@@ -281,7 +281,7 @@ Every duck manages a slice of the state has four sections:
 * Reducer: a single function that translates all relevant actions into updates of its slice of the state
 * Selectors: functions that grab data from the state in order to offer it to [connected](#connect) components
 * Helpers: functions that contain additional logic, especially for selectors. See for an example
-  [filter](Dux#filter). 
+  [filters](Dux#filters). 
 
 ##### Merge
 When a reducer transforms a state, it must happen in such a way that

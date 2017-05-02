@@ -1,0 +1,41 @@
+$widget-fixed-fore: #226622; 
+$widget-fixed-back: #eeeeee; 
+$widget-border: #aaaaaa; 
+$widget-varia-fore: #000000; 
+$widget-varia-back: #ffffff; 
+$widget-high-fore: #ffffff; 
+$widget-high-back: #444444; 
+
+.hidden {
+    color: $widget-fixed-back;
+}
+.widget-large,.widget-medium,.widget-small  {
+    color: $widget-fixed-fore;
+    background-color: $widget-fixed-back;
+    border-color: $widget-border;
+}
+.widget-large { @include sizing(medium, 6, 2) }
+.widget-medium { @include sizing(medium, 4, 1) }
+.widget-small { @include sizing(small, 2, 0) }
+
+.fixed-large,.fixed-medium,.fixed-small  {
+    color: $widget-fixed-fore;
+    background-color: $widget-fixed-back;
+}
+.fixed-large { @include sizing2(large, 1ex, 1em, 0) }
+.fixed-medium { @include sizing2(medium, 0.5ex, 0.5em, 0) }
+.fixed-small { @include sizing2(small, 0, 0.2em, 0) }
+
+.label {
+    @include sizing2(medium, 0.5ex, 0.5em, 0)
+    font-weight: bold;
+}
+
+.varia-large,.varia-medium,.varia-small  {
+    color: $widget-varia-fore;
+    background-color: $widget-varia-back;
+}
+.varia-large { @include sizing2(large, 1ex, 1em, 0) }
+.varia-medium { @include sizing2(medium, 0.5ex, 0.5em, 0) }
+.varia-small { @include sizing2(small, 0, 0.2em, 0) }
+

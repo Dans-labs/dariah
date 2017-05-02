@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { withParams } from 'utils.js'
-import { getTables, needValues, changedItem, fetchItem, insertItem, delItem } from 'tables.js'
+import { withParams } from 'utils'
+import { getTables, needValues, changedItem, fetchItem, insertItem, delItem } from 'tables'
 
-import ItemForm from 'ItemForm.jsx'
+import ItemForm from 'ItemForm'
 
 const NEW = 'new'
 

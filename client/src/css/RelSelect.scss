@@ -6,14 +6,14 @@ $options-back: rgba(245, 245, 245, 0.8);
 $options-border: rgba(150, 150, 100, 0.5);
 $typing-fore: rgba(40, 40, 40, 0.9);
 $typing-back: rgba(255, 255, 255, 0.9);
-$opt-fore: rgba(0, 0, 0, 0.8);
-$opt-back: rgba(200, 200, 200, 0.2);
-$opthover-fore: rgba(0, 60, 0, 0.9);
-$opthover-back: rgba(160, 200, 160, 0.4);
+$opt-fore: rgba(80, 0, 0, 0.9);
+$opt-back: rgba(255, 220, 220, 0.6);
+$opthover-fore: rgba(80, 80, 0, 0.9);
+$opthover-back: rgba(255, 255, 220, 0.6);
 $opthover-border: rgba(0, 255, 0, 0.95);
-$tag-fore: rgba(0, 60, 0, 0.9);
-$tag-back: rgba(160, 200, 160, 0.6);
-$tag-back-var: rgba(240, 255, 240, 0.9);
+$tag-fore: rgba(0, 80, 0, 0.9);
+$tag-back: rgba(220, 255, 220, 0.6);
+$tag-back-var: rgba(220, 240, 220, 0.9);
 $tag-border: rgba(160, 200, 160, 0.7);
 $newtag-fore: rgba(0, 0, 255, 0.9);
 $newtag-back: rgba(255, 255, 160, 0.7);
@@ -23,7 +23,7 @@ div.select {
     width: 100%;
     max-width: 100%;
 }
-div.select.multi {
+div.select.multiselect {
     background-color: $select-back;
 }
 .options {

@@ -2,7 +2,7 @@ import { Component, Children } from 'react'
 import { connect } from 'react-redux'
 import throttle from 'lodash/throttle'
 
-import { changeWinDim } from 'win.js'
+import { changeWinDim } from 'win'
 
 class Window extends Component {
   render() {

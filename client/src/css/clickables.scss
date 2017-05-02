@@ -1,0 +1,42 @@
+$action-back: #ffffee;
+$action-high: #ffff88;
+$action-fore: #0000bb;
+$action-border: #aaaa66;
+$action-text: #000044;
+
+@mixin action() {
+    color: $action-fore;
+    cursor: pointer;
+}
+@mixin actiontextdirty() {
+    color: $action-text;
+    background-color: #ffff88;
+    font-size: large;
+    font-family: monospace;
+}
+@mixin actiontextinvalid() {
+    color: #aa0000;
+    background-color: #ffdddd;
+    font-size: large;
+    font-family: monospace;
+}
+@mixin actiontext() {
+    color: $action-text;
+    background-color: #ffffff;
+    font-size: large;
+    font-family: monospace;
+}
+
+.button-large,.button-medium,.button-small  {
+    @include action();
+    background-color: $action-back;
+    border-color: $action-border;
+    white-space: nowrap;
+}
+.button-large { @include sizing(medium, 6px, 2) }
+.button-medium { @include sizing(medium, 4px, 1) }
+.button-small { @include sizing(small, 2px, 0 ) }
+
+.link {
+    @include action();
+}

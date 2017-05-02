@@ -2,13 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Field, FieldArray } from 'redux-form'
 
-import { makeComponent } from 'utils.js'
-import { validation, normalization, getValType } from 'fields.js'
-import { getTables } from 'tables.js'
+import { makeComponent } from 'utils'
+import { validation, normalization, getValType } from 'fields'
+import { getTables } from 'tables'
 
-import InputMulti from 'InputMulti.jsx'
-//import SelectR from 'SelectR.jsx'
-import RelSelect from 'RelSelect.jsx'
+import InputMulti from 'InputMulti'
+import RelSelect from 'RelSelect'
 
 const FieldEdit = ({ field, tables, table, ...props }) => {
   const { [table]: { fieldSpecs } } = tables

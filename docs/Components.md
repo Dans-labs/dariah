@@ -10,10 +10,10 @@ Click on the names in the titles to view their source code on Github.
 
 [main]({{site.appBase}}/main.jsx)
 =============================================================================================
-connected via [root](Dux#root)
+connected via [roots](Dux#roots)
 
 Entry point of the client side app.
-Contains the [routing](Routing), wrapped in a [Root](#root) component, that
+Contains the [routing](Routing), wrapped in a [Root](#roots) component, that
 sets up the store in which the central state lives.
 
 [Alternative]({{site.appBase}}/state/Alternative.jsx)
@@ -92,7 +92,7 @@ A lot has to be implemented here.
 
 [ByValue]({{site.appBase}}/state/ByValue.jsx)
 =============================================================================================
-connected via [filter](Dux#filter)
+connected via [filters](Dux#filters)
 
 A widget by which the user can click the [facet](#facet)s associated with one field.
 There is also a [collective checkbox](#checkboxi), by which the user can check or uncheck all facets in one go.
@@ -140,7 +140,7 @@ See [Reconciliation](React#reconciliation).
 
 [CheckboxI]({{site.appBase}}/object/CheckboxI.jsx)
 =============================================================================================
-(life cycle) connected via [filter](Dux#filter)
+(life cycle) connected via [filters](Dux#filters)
 
 Displays a *collective* checkbox for a [facet filter](#ByValue) with many facets.
 
@@ -162,7 +162,7 @@ indeterminate state across.
 
 [Doc]({{site.appBase}}/pure/Doc.jsx)
 =============================================================================================
-presents [doc](Dux#doc)
+presents [docs](Dux#docs)
 
 Handles the display of documents.
 Depending on the type of document (markdown, html, pdf) it delegates work
@@ -177,7 +177,7 @@ The extension is used to switch to the component for that type of documents.
 
 [DocHtml]({{site.appBase}}/pure/DocHtml.jsx)
 =============================================================================================
-presents [doc](Dux#doc)
+presents [docs](Dux#docs)
 
 Displays an HTML document by linking to it in an IFRAME.
 
@@ -187,7 +187,7 @@ The directory, filename and extension of the document container.
 
 [DocMd]({{site.appBase}}/object/DocMd.jsx)
 =============================================================================================
-(life cycle) connected via [doc](Dux#doc)
+(life cycle) connected via [docs](Dux#docs)
 
 Component to show
 [MarkDown](https://guides.github.com/features/mastering-markdown/)
@@ -216,7 +216,7 @@ plain HTML `a` element, so clicking it will leave this application.
 
 [DocPdf]({{site.appBase}}/pure/DocPdf.jsx)
 =============================================================================================
-presents [doc](Dux#doc)
+presents [docs](Dux#docs)
 
 Displays a PDF document by linking to it in an OBJECT.
 
@@ -229,7 +229,7 @@ The directory, filename and extension of the document container.
 
 [EUMap]({{site.appBase}}/object/EUMap.jsx)
 =============================================================================================
-(life cycle) connected via [filter](Dux#filter)
+(life cycle) connected via [filters](Dux#filters)
 
 A complex component!
 It is a facet filter for the field *country*, using [ByValue](#byvalue) for that.
@@ -261,7 +261,7 @@ threshold (`LEVEL_OFF`). For higher values we essentiall take the square root.
 
 [Facet]({{site.appBase}}/state/Facet.jsx)
 =============================================================================================
-connected via [filter](Dux#filter)
+connected via [filters](Dux#filters)
 
 Displays a single facet. Just a checkbox and a value representation.
 The clicks received by the checkbox are passed upwards by means of a callback.
@@ -360,7 +360,7 @@ It could be a string, a number, or an object, or even an array of such things.
 
 [Filter]({{site.appBase}}/state/Filter.jsx)
 =============================================================================================
-connected via [filter](Dux#filter)
+connected via [filters](Dux#filters)
 
 A control to filter a list of items.
 The following types of filters are implemented.
@@ -392,7 +392,7 @@ The results of [applying](Dux#getfiltersapplied) the filters.
 
 [FilterCompute]({{site.appBase}}/object/FilterCompute.jsx)
 =============================================================================================
-(life cycle) connected via [filter](Dux#filter)
+(life cycle) connected via [filters](Dux#filters)
 
 Parent component of a table and all its filters.
 The table must be present.
@@ -414,7 +414,7 @@ Callback to initialize filtering.
 
 [FullText]({{site.appBase}}/state/FullText.jsx)
 =============================================================================================
-connected via [filter](Dux#filter)
+connected via [filters](Dux#filters)
 
 Displays a full text search input field.
 The characters entered in this field are passed upwards by means of a callback.
@@ -859,12 +859,16 @@ See [columnStyle](Dux#columnstyle) for the range of possibilities here.
 ###### `height`, `width` number from [getWinDim](Dux#getwindim)
 The current height and width of the screen.
 
+[RelSelect]({{site.appBase}}/state/RelSelect.jsx)
+=============================================================================================
+presents [tables](Dux#tables)
+
 [Root]({{site.appBase}}/pure/Root.jsx)
 =============================================================================================
- presents [root](Dux#root)
+ presents [roots](Dux#roots)
 
 Top-level wrapping component to set up the central store. It does so
-by configuring the store, calling [configureStore](Dux#root), and passing
+by configuring the store, calling [configureStore](Dux#roots), and passing
 it to the special [Provider](React#redux) component of Redux.
 
 Then it wraps the whole remaining app in a [Window](#window) component for 
@@ -924,7 +928,7 @@ Additional customization settings targeted to the *react-select* machinery.
 
 [Stat]({{site.appBase}}/pure/Stat.jsx)
 =============================================================================================
- presents [filter](Dux#filter)
+ presents [filters](Dux#filters)
 
 Displays a string of the form *subTotal* `of` *total*.
 If one of the two is missing, the `of` will not display.

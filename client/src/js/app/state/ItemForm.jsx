@@ -2,10 +2,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 
-import { getTables, modItem } from 'tables.js'
+import { getTables, modItem } from 'tables'
 
-import FieldRead from 'FieldRead.jsx'
-import FieldEdit from 'FieldEdit.jsx'
+import FieldRead from 'FieldRead'
+import FieldEdit from 'FieldEdit'
 
 const toDb = (table, eId, mod) => values => mod(table, eId, values)
 

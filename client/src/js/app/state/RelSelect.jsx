@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { combineSelectors } from 'utils.js'
+import { combineSelectors } from 'utils'
 
-import { getSelect, setSearch, setPopUp, togglePopUp } from 'select.js'
-import { getOptions } from 'tables.js'
+import { getSelect, setSearch, setPopUp, togglePopUp } from 'select'
+import { getOptions } from 'tables'
 
 const RelOption = ({ label, selected, onHit }) => (
   <p
@@ -133,7 +133,7 @@ const RelSelect = ({
   multiple, allowNew, popUp, search, togglePU, setPU, setS,
 }) => (
   <div
-    className={`select ${multiple ? 'multi' : ''}`}
+    className={`select ${multiple ? 'multiselect' : ''}`}
   >
     {multiple ?
       <Tags

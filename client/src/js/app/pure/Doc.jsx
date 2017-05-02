@@ -1,9 +1,9 @@
 import React from 'react'
 
-import DocMd from 'DocMd.jsx'
-import DocPdf from 'DocPdf.jsx'
-import DocHtml from 'DocHtml.jsx'
-import NotFound from 'NotFound.jsx'
+import DocMd from 'DocMd'
+import DocPdf from 'DocPdf'
+import DocHtml from 'DocHtml'
+import NotFound from 'NotFound'
 
 const docType = {
   md: DocMd,

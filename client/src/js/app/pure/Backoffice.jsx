@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { withParams } from 'utils.js'
+import { withParams } from 'utils'
 
 const Backoffice = ({ func }) => {
   const headings = {

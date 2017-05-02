@@ -16,11 +16,11 @@ We have organized dux as follows:
 This app contains the following dux:
 
 * [alter](#alter)
-* [doc](#doc)
-* [filter](#filter)
+* [docs](#docs)
+* [filters](#filters)
 * [me](#me)
 * [notify](#notify)
-* [root](#root)
+* [roots](#roots)
 * [select](#select)
 * [tables](#tables)
 * [win](#win)
@@ -62,7 +62,7 @@ Helpers
 ---------------------------------------------------------------------------
 No Helpers.
 
-[doc]({{site.appBase}}/dux/doc.js)
+[docs]({{site.appBase}}/dux/docs.js)
 =============================================================================================
 Manages MarkDown documents. Fetches raw source from the server and stores it into the state, under
 a key, which is the path information of the document.
@@ -90,7 +90,7 @@ Check whether a component contains the data for its document.
 ### changedDoc()
 Check whether a component has new props in such a way that a new document should be fetched.
 
-[filter]({{site.appBase}}/dux/filter.js)
+[filters]({{site.appBase}}/dux/filters.js)
 =============================================================================================
 Displays the list of items in the right column, but
 only those that have passed all the filters, which are displayed in the
@@ -304,14 +304,14 @@ Helpers
 ### addItem()
 A helper for the reducer, to add items to an array.
 
-[root]({{site.appBase}}/dux/root.js)
+[roots]({{site.appBase}}/dux/roots.js)
 =============================================================================================
 Top level management of the state: initialization and combination of all the other dux.
 
 Actions
 ---------------------------------------------------------------------------
 ### configureStore()
-Root does not have proper actions of its own.
+`Root` does not have proper actions of its own.
 But it does set up the store, and passes it on to the [main](Components#main) component.
 
 Reducer

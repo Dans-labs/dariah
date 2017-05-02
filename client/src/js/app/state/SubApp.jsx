@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { withParams } from 'utils.js'
+import { withParams } from 'utils'
 
-import NavLink from 'NavLink.jsx'
-import Pane from 'Pane.jsx'
+import NavLink from 'NavLink'
+import Pane from 'Pane'
 
 const SubApp = ({ table, children }) => (
   <div>

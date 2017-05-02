@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getWinDim, columnStyle } from 'win.js'
+import { getWinDim, columnStyle } from 'win'
 
 const Pane = ({ format, position, children, height, width }) => (
   <div

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { memoize } from 'memo.js'
-import { getFieldValues, placeFacets } from 'filter.js'
+import { getFieldValues, placeFacets } from 'filters.js'
 
 import Facet from 'Facet.jsx'
 import CheckboxI from 'CheckboxI.jsx'

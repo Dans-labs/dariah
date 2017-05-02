@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
-import { withParams } from 'utils.js'
-import { getTables, needTables, fetchTableMy } from 'tables.js'
+import { withParams } from 'utils'
+import { getTables, needTables, fetchTableMy } from 'tables'
 
-import ItemList from 'ItemList.jsx'
-import Pane from 'Pane.jsx'
+import ItemList from 'ItemList'
+import Pane from 'Pane'
 
 class ItemMy extends Component {
   render() {

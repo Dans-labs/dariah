@@ -1,7 +1,7 @@
 import merge from 'lodash/merge'
 
-import { accessData } from 'server.js'
-import { propsChanged, makeReducer } from 'utils.js'
+import { accessData } from 'server'
+import { propsChanged, makeReducer } from 'utils'
 
 /* ACTIONS */
 /*
@@ -27,8 +27,8 @@ export default makeReducer(flows)
 
 /* SELECTORS */
 
-export const getDoc = ({ doc }, { docDir, docName, docExt }) => ({
-  text: doc[`${docDir}/${docName}.${docExt}`],
+export const getDoc = ({ docs }, { docDir, docName, docExt }) => ({
+  text: docs[`${docDir}/${docName}.${docExt}`],
 })
 
 /* HELPERS */

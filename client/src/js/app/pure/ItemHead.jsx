@@ -1,11 +1,11 @@
 import React from 'react'
 import { reduxForm } from 'redux-form'
 
-import { memoize } from 'memo.js'
+import { memoize } from 'memo'
 
-import Alternative from 'Alternative.jsx'
-import ItemRecord from 'ItemRecord.jsx'
-import NavLink from 'NavLink.jsx'
+import Alternative from 'Alternative'
+import ItemRecord from 'ItemRecord'
+import NavLink from 'NavLink'
 
 const MyItemHeadPure = ({ table, eId, entityHead, dirty }) => (
   <NavLink className={'nav'} to={`/${table}/mylist/${eId}`} >

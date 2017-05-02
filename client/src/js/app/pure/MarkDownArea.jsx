@@ -1,9 +1,9 @@
 import React from 'react'
 import Markdown from 'react-markdown'
 
-import { editClass } from 'utils.js'
+import { editClass } from 'utils'
 
-import Alternative from 'Alternative.jsx'
+import Alternative from 'Alternative'
 
 const controlPlacement = control => <p className="stick" >{control}</p>
 const control1 = handler => <span className="button-medium fa fa-pencil" onClick={handler} />

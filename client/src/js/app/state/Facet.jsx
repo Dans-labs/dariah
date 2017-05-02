@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { memoize } from 'memo.js'
-import { changeFacet, getFilterSetting } from 'filter.js'
+import { memoize } from 'memo'
+import { changeFacet, getFilterSetting } from 'filters'
 
 const handleChange = memoize((handle, table, filterId, valueId, isOn) => () => handle(table, filterId, valueId, !isOn))
 

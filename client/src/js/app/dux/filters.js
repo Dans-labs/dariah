@@ -1,9 +1,9 @@
 import merge from 'lodash/merge'
 import { createSelectorCreator, defaultMemoize } from 'reselect'
 
-import { makeReducer } from 'utils.js'
-import { levelOneEq } from 'memo.js'
-import { repRelated } from 'tables.js'
+import { makeReducer } from 'utils'
+import { levelOneEq } from 'memo'
+import { repRelated } from 'tables'
 
 /* ACTIONS */
 
@@ -185,12 +185,12 @@ const getFiltersInitialized = createLevelOneSelector(
   initFiltering,
 )
 
-export const getFilterSetting = ({ filter }, { table, filterId }) => ({
-  filterSetting: filter[table].filterSettings[filterId],
+export const getFilterSetting = ({ filters }, { table, filterId }) => ({
+  filterSetting: filters[table].filterSettings[filterId],
 })
 
-export const getFiltersApplied = ({ tables, filter }, { table }) => {
-  const { [table]: filterStatus = { filterSettings: {}, initialized: false } } = filter
+export const getFiltersApplied = ({ tables, filters }, { table }) => {
+  const { [table]: filterStatus = { filterSettings: {}, initialized: false } } = filters
   const { filterSettings, initialized } = filterStatus
   const fieldValues = getFiltersCompiled({ tables }, { table })
   if (initialized) {

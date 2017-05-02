@@ -75,11 +75,11 @@ so it really makes sense to have all four things in one file.
 Currently, these are the dux of this app:
 
 * [alter](Dux#alter): show/hide, cycle through *n* alternative representations of a piece of user interface;
-* [doc](Dux#doc): fetch documents, especially markdown ones, and show them in two representations: source and formatted;
-* [filter](Dux#filter): the machinery of faceted and full text filtering of entities from tables;
+* [docs](Dux#docs): fetch documents, especially markdown ones, and show them in two representations: source and formatted;
+* [filters](Dux#filters): the machinery of faceted and full text filtering of entities from tables;
 * [me](Dux#me): data about the currently logged-in user;
 * [notify](Dux#notify): the notification system;
-* [root](Dux#root): combining all the other dux;
+* [roots](Dux#roots): combining all the other dux;
 * [tables](Dux#tables): manage all database data that has been fetched from the server;
 * [win](Dux#win): react to the resizing of the browser window.
 

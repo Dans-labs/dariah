@@ -1,6 +1,6 @@
 import React from 'react'
 
-import NavLink from 'NavLink.jsx'
+import NavLink from 'NavLink'
 
 const Static = () => (
   <span className="small" >

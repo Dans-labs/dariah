@@ -1,5 +1,5 @@
 import merge from 'lodash/merge'
-import { makeReducer } from 'utils.js'
+import { makeReducer } from 'utils'
 
 /* ACTIONS */
 

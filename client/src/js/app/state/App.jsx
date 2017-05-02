@@ -1,12 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getWinDim } from 'win.js'
+import { getWinDim } from 'win'
 
-import Login from 'Login.jsx'
-import NavLink from 'NavLink.jsx'
-import Static from 'Static.jsx'
-import Notification from 'Notification.jsx'
+import Login from 'Login'
+import NavLink from 'NavLink'
+import Static from 'Static'
+import Notification from 'Notification'
 
 const App = ({ children, height, width }) => {
   const text = `${width} x ${height}`

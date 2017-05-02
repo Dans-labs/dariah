@@ -1,8 +1,8 @@
 import React from 'react'
 import { Field } from 'redux-form'
 
-import { memoize } from 'memo.js'
-import { editClass } from 'utils.js'
+import { memoize } from 'memo'
+import { editClass } from 'utils'
 
 const fieldRemove = memoize((fields, i) => () => {fields.remove(i)})
 const fieldPush = memoize(fields => () => {fields.push()})

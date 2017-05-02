@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { changeFacetAll, getFilterSetting, testAllChecks } from 'filter.js'
+import { changeFacetAll, getFilterSetting, testAllChecks } from 'filters'
 
 const indeterminate = states => !states.allTrue && !states.allFalse
 

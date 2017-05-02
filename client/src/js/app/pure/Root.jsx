@@ -1,8 +1,8 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 
-import store from 'root.js'
-import Window from 'Window.jsx'
+import store from 'roots'
+import Window from 'Window'
 
 const Root = ({ children }) => (
   <Provider store={store}>

@@ -2,14 +2,14 @@ import { combineReducers, createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import { reducer as form } from 'redux-form'
 
-import win from 'win.js'
-import notify from 'notify.js'
-import doc from 'doc.js'
-import tables from 'tables.js'
-import me from 'me.js'
-import filter from 'filter.js'
-import alter from 'alter.js'
-import select from 'select.js'
+import win from 'win'
+import notify from 'notify'
+import docs from 'docs'
+import tables from 'tables'
+import me from 'me'
+import filters from 'filters'
+import alter from 'alter'
+import select from 'select'
 
 /* ACTIONS */
 
@@ -41,10 +41,10 @@ const configureStore = reducer => {
 export default configureStore(combineReducers({
   win,
   notify,
-  doc,
+  docs,
   tables,
   me,
-  filter,
+  filters,
   alter,
   form,
   select,

@@ -1,0 +1,103 @@
+.dirty {
+    background-color: #ffff88;
+}
+.invalid {
+    color: #aa0000;
+    background-color: #ffdddd;
+}
+.invalid.diag {
+    color: #ffffff;
+    background-color: #dd0000;
+    font-size: small;
+    display: block;
+    padding: 1ex;
+}
+input {
+    @include actiontext();
+}
+p.multi {
+    padding: 0;
+    margin: 0;
+}
+input.dirty {
+    @include actiontextdirty();
+}
+input.invalid {
+    @include actiontextinvalid();
+}
+textarea {
+    @include actiontext();
+    width: 100%;
+    height: 10em;
+}
+textarea.dirty {
+    @include actiontextdirty();
+}
+textarea.invalid {
+    @include actiontextinvalid();
+}
+
+.reason {
+    vertical-align: top;
+    color: $error-fore;
+    background-color: $error-back;
+}
+.input.invalid {
+    color: $action-text;
+    background-color: $error-back;
+}
+
+/* edit status */
+.edit-action {
+    @include action();
+    @include sizing(medium, 6px, 2)
+    background-color: $warning-back;
+}
+.edit-noaction {
+    background-color: $warning-back;
+}
+
+/* values */
+
+.values {
+    line-height: 1.5;
+}
+
+.left {
+}
+.right {
+    float: right;
+}
+.stick {
+    float: left;
+    overflow: visible;
+    position: relative;
+    width: 0em;
+    height: 0em;
+    top: -2em;
+    left: -1em;
+}
+.md-field {
+    margin-left: 0em;
+    padding-left: 0em;
+    width: 100%;
+}
+table.fragments {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+}
+table.fragments th {
+    vertical-align: top;
+    text-align: right;
+    padding: 1em 0.5ex 1em 0;
+    border-bottom: 2px solid #dddddd;
+    background-color: $widget-fixed-back; 
+}
+table.fragments td {
+    vertical-align: top;
+    text-align: left;
+    padding: 1em 0 1em 0.5ex;
+    border-bottom: 2px solid #dddddd;
+    background-color: #fafafa; 
+}

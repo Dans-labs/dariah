@@ -1,11 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getTableFilters } from 'tables.js'
+import { getTableFilters } from 'tables'
 
-import FullText from 'FullText.jsx'
-import ByValue from 'ByValue.jsx'
-import EUMap from 'EUMap.jsx'
+import FullText from 'FullText'
+import ByValue from 'ByValue'
+import EUMap from 'EUMap'
 
 const filterClass = {
   FullText,

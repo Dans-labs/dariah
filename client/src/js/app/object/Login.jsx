@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
 
-import { getMe, fetchMe } from 'me.js'
+import { getMe, fetchMe } from 'me'
 
 class Login extends Component {
   render() {

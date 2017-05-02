@@ -2,8 +2,8 @@ import mergeWith from 'lodash/mergewith'
 import merge from 'lodash/merge'
 import { createSelector } from 'reselect'
 
-import { accessData } from 'server.js'
-import { propsChanged, makeReducer } from 'utils.js'
+import { accessData } from 'server'
+import { propsChanged, makeReducer } from 'utils'
 
 /* ACTIONS */
 /*
