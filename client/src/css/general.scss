@@ -80,12 +80,6 @@ $action-text: #000044;
 input {
     @include actiontext();
 }
-.fragments input {
-    width: 100%;
-}
-.fragments .multi input {
-    width: 90%;
-}
 p.multi {
     padding: 0;
     margin: 0;
@@ -253,22 +247,6 @@ $special-back: #ffeeff;
     background-color: $warning-back;
 }
 
-/* tags */
-
-$tag-back: #fafafa;
-$tag-fore: #008800;
-$tag-border: #888888;
-
-.tag-large,.tag-medium,.tag-small  {
-    color: $tag-fore;
-    background-color: $tag-back;
-    border-color: $tag-border;
-    white-space: nowrap;
-}
-.tag-large { @include sizing(medium, 6, 2) }
-.tag-medium { @include sizing(medium, 4, 1) }
-.tag-small { @include sizing(small, 2, 0) }
-
 /* values */
 
 .values {
@@ -342,6 +320,8 @@ table.facets {
 }
 table.fragments {
     border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
 }
 table.fragments th {
     vertical-align: top;

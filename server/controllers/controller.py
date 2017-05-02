@@ -17,11 +17,11 @@ class Controller(object):
 
     def list(self, name):
         table = getq('table')
-        return self.DB.getList(name, table, 'list', sort=('*title', 1), titleOnly=True, withFilters=True, withValueLists=True)
+        return self.DB.getList(name, table, 'list', titleOnly=True, withFilters=True, withValueLists=True)
 
     def my(self, name):
         table = getq('table')
-        return self.DB.getList(name, table, 'list', sort=('*title', 1), titleOnly=True, withFilters=True, withValueLists=True, my=True)
+        return self.DB.getList(name, table, 'list', titleOnly=True, withFilters=True, withValueLists=True, my=True)
 
     def view(self, name):
         table = getq('table')

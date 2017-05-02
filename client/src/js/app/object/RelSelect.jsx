@@ -7,24 +7,28 @@ import { getOptions } from 'tables.js'
 
 const RelOption = ({ label, selected, onHit }) => (
   <p
-    className={`option ${selected}`}
-    onClick={onHit}
+    className={`option tag ${selected ? 'selected' : ''}`}
+    onClick={selected ? null : onHit}
   >{label}</p>
 )
 
 const handlePopUp = (tag, togglePU) => () => togglePU(tag)
+const handleSetPopUp = (tag, onOff, setPU) => () => setPU(tag, onOff)
 const handleSearch = (tag, setS) => event => setS(tag, event.target.value)
-const removeVal = (value, onChange, val) => () => {
+const handleClear = (tag, setS) => () => setS(tag, '')
+
+const removeVal = (value, onChange, val) => event => {
+  event.stopPropagation()
   if (value.includes(val)) {
     const newValue = value.filter(v => v != val)
     onChange(newValue)
   }
 }
-const addVal = (optionLookup, value, onChange, label) => () => {
+const addVal = (optionLookup, multiple, value, onChange, label) => () => {
   const { [label]: rep } = optionLookup
   const exists = rep != null || value.includes(label)
   if (!exists) {
-    const newValue = [label, ...value]
+    const newValue = multiple ? [label, ...value] : label
     onChange(newValue)
   }
 }
@@ -41,76 +45,85 @@ const changeSel = (tag, multiple, value, onChange, setPU, val) => () => {
   }
 }
 
-const Tags = ({ optionLookup, value, onChange }) => (
-  <div>{
+const Tags = ({ tag, optionLookup, value, onChange, togglePU }) => (
+  <div
+    className="tags"
+    onClick={handlePopUp(tag, togglePU)}
+  >{
     (value || []).map(val => {
       const { [val]: lab = val } = optionLookup
       return (
-        <span key={val} >
-          <span className="tag-medium" >{lab}{' '}
-            <span
-              className="button-small fa fa-close"
-              onClick={removeVal(value, onChange, val)}
-            />
-          </span>{' '}
+        <span
+          key={val}
+          className="tag"
+        >
+          <span
+            className="button-tag"
+            onClick={removeVal(value, onChange, val)}
+          >{'×'}</span>{' '}
+          <span>{lab}</span>
         </span>
       )
     })
-  }
+  }{' '}
   </div>
 )
 
-const Head = ({ optionLookup, multiple, value, popUp, tag, togglePU }) => {
+const Head = ({ optionLookup, value, tag, togglePU }) => {
   let label = ''
-  if (!multiple) {
-    const { [value]: lab = value } = optionLookup
-    label = lab
-  }
-  const icon = popUp ? 'arrow-up' : 'arrow-down'
+  const { [value]: lab = value } = optionLookup
+  label = lab
   return (
-    <p className="option-head tag-medium" >
-      <span>{label}</span>
-      <span
-        className={`button-small fa fa-${icon}`}
-        onClick={handlePopUp(tag, togglePU)}
-      />
-    </p>
+    <span
+      className={`option-head tag`}
+      onClick={handlePopUp(tag, togglePU)}
+    >{label}</span>
   )
 }
 
-const Typing = ({ tag, optionLookup, allowNew, value, onChange, search, setS }) => (
-  <p className="option-type" >
+const Typing = ({ tag, search, setS, setPU }) => (
+  <span className="option-type" >
     <input
+      className="invisible"
       type="text"
-      placeholder="search..."
-      value={search}
+      placeholder={'filter ...'}
+      value={search || ''}
+      onFocus={handleSetPopUp(tag, true, setPU)}
       onChange={handleSearch(tag, setS)}
     />
-    {(allowNew && search != '') ? (
+    {search ?
       <span
-        className="button-small fa fa-plus-square"
-        onClick={addVal(optionLookup, value, onChange, search)}
-      />
-    ) : null}
-  </p>
+        className="button-tag"
+        onClick={handleClear(tag, setS)}
+      >{'×'}</span> : null
+    }
+  </span>
 )
 
-const Options = ({ tag, multiple, options, value, onChange, search, setPU }) => {
+const Options = ({ tag, optionLookup, multiple, allowNew, options, value, onChange, search, setPU }) => {
   const pat = search.toLowerCase()
-  const unselectedOptions = options.filter(({ value: val }) => !value.includes(val))
   return (
-    <div className="options" >{
-      unselectedOptions.map(({ value: val, label: lab }) => (
-        pat == null || pat == '' || lab == null || lab.toLowerCase().indexOf(pat) !== -1
-      ) ? (
-        <RelOption
-          key={val}
-          label={lab}
-          selected={val == value}
-          onHit={changeSel(tag, multiple, value, onChange, setPU, val)}
-        />
-      ) : null)
-    }</div>
+    <div className="options" >
+      {(allowNew && search) ? (
+        <span
+          className="new tag"
+          onClick={addVal(optionLookup, multiple, value, onChange, search)}
+        >{search}</span>
+      ) : null}
+      {
+        options.map(({ value: val, label: lab }) => (
+          (!multiple || !value.includes(val)) &&
+          (pat == null || pat == '' || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
+        ) ? (
+          <RelOption
+            key={val}
+            label={lab}
+            selected={(multiple && value.includes(val)) || (!multiple && value == val)}
+            onHit={changeSel(tag, multiple, value, onChange, setPU, val)}
+          />
+        ) : null)
+      }
+    </div>
   )
 }
 
@@ -119,43 +132,45 @@ const RelSelect = ({
   input: { value, onChange },
   multiple, allowNew, popUp, search, togglePU, setPU, setS,
 }) => (
-  <div className="select" >
+  <div
+    className={`select ${multiple ? 'multi' : ''}`}
+  >
     {multiple ?
       <Tags
         optionLookup={optionLookup}
         value={value}
+        tag={tag}
+        togglePU={togglePU}
         onChange={onChange}
+      /> :
+      <Head
+        optionLookup={optionLookup}
+        value={value}
+        popUp={popUp}
+        tag={tag}
+        togglePU={togglePU}
+      />
+    }
+    {popUp ?
+      <Typing
+        tag={tag}
+        search={search}
+        setS={setS}
+        setPU={setPU}
       /> : null
     }
-    <Head
-      optionLookup={optionLookup}
-      multiple={multiple}
-      value={value}
-      popUp={popUp}
-      tag={tag}
-      togglePU={togglePU}
-    />
-    {(popUp) ? (
-      <div className="option-popup" >
-        <Typing
-          tag={tag}
-          optionLookup={optionLookup}
-          allowNew={allowNew}
-          value={value}
-          search={search}
-          setS={setS}
-          onChange={onChange}
-        />
-        <Options
-          tag={tag}
-          options={options}
-          multiple={multiple}
-          value={value}
-          search={search}
-          setPU={setPU}
-          onChange={onChange}
-        />
-      </div>) : null
+    {popUp ?
+      <Options
+        tag={tag}
+        optionLookup={optionLookup}
+        options={options}
+        multiple={multiple}
+        allowNew={allowNew}
+        value={value}
+        search={search}
+        setPU={setPU}
+        onChange={onChange}
+      /> : null
     }
   </div>
 )

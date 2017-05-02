@@ -277,6 +277,10 @@ MAIN_TABLES:
 - contrib
 - country
 
+SORT_FIELDS:
+  contrib:
+    title: sort
+
 SKIP_FIELDS:
   contrib:
   - dateandtime_ciozero

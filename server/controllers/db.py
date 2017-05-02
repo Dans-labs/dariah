@@ -119,12 +119,14 @@ class DbAccess(object):
 
     def getList(
             self, controller, table, action,
-            rFilter=None, sort=None, titleOnly=False,
+            rFilter=None, titleOnly=False,
             withValueLists=False, withFilters=False,
             my=False,
         ):
         Perm = self.Perm
-        title = self.DM.tables.get(table, {}).get('title', None)
+        tableInfo = self.DM.tables.get(table, {})
+        title = tableInfo.get('title', None)
+        sort =  tableInfo.get('sort', None)
         (mayInsert, iFields) = Perm.may(table, 'insert')
         perm = dict(insert=mayInsert)
         orderKey = 'my' if my else 'order' 
@@ -145,9 +147,7 @@ class DbAccess(object):
         if sort == None:
             documents = list(_DBM[table].find(rowFilter, fieldFilter))
         else:
-            (sortField, sortDir) = sort
-            sortField = self.DM.tables[table][sortField[1:]] if sortField[0] == '*' else sortField
-            documents = list(_DBM[table].find(rowFilter, fieldFilter).sort(sortField, sortDir))
+            documents = list(_DBM[table].find(rowFilter, fieldFilter).sort(sort))
         order=[d['_id'] for d in documents]
         entities=dict((str(d['_id']), dict(values=d, complete=not titleOnly)) for d in documents)
         if withValueLists:
