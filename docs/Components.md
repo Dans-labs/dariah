@@ -309,8 +309,7 @@ the edit control. They only do the plumbing.
 
 For the actual presentation, you can plugin a component of choice.
 We will use `<input type="..." />`, `<textarea>...</textarea>` elements and
-the powerful [react-select](https://github.com/JedWatson/react-select) component.
-In order to use it, we wrap it in [SelectR](#selectr).
+our own custom component [RelSelect](#relselect) for multiselect controls.
 
 We enhance *textareas* by offering markdown previews of their content.
 See [MarkDownArea](#markdownarea).
@@ -861,7 +860,15 @@ The current height and width of the screen.
 
 [RelSelect]({{site.appBase}}/state/RelSelect.jsx)
 =============================================================================================
-presents [tables](Dux#tables)
+presents [select](Dux#select)
+
+An implementation of multiselect widgets. 
+There is a fairly complete [react-select](https://github.com/JedWatson/react-select) component on Github.
+However, it has some flaws that prevents a successful usage of it in our app.
+That is why I have written this component.
+
+The capabilities of this widget are:
+
 
 [Root]({{site.appBase}}/pure/Root.jsx)
 =============================================================================================

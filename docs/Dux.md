@@ -294,6 +294,7 @@ A notification widget can show a progress spinner if `busy > 0`.
 
 Selectors
 ---------------------------------------------------------------------------
+### getNotifications()
 The notification widget gets the notifications from the state, including `busy` and `show`, the latter
 indicating whether the notification panel should be hidden or not.
 For the convenience of the [Notification](Components#notification) component,
@@ -331,21 +332,37 @@ No helpers.
 
 [select]({{site.appBase}}/dux/select.js)
 =============================================================================================
+Manages the UI-state of the [RelSelect](Components#relselect) component. 
+Every *RelSelect* instance must be identified by a tag, so that the states of the select controls
+do not get confused. The most obvious choice for a tag value is a composition of the table name,
+the entity id, and the field name.
 
 Actions
 ---------------------------------------------------------------------------
+### setSearch()
+When a user types something in the search input field associated with the select control,
+the search string is sent to the state.
+
+### setPopUp()
+Parts of the interface of the select widget will pop up after a user action, or disappear after an other user action.
+This action sets the *popped up state* categorically to *true* or *false*, depending on a parameter.
+
+### togglePopUp()
+Toggles the popped up state of the relevant part of the widget.
 
 Reducer
 ---------------------------------------------------------------------------
+Straightforward merge of the payload of pop up actions and search string updates into the state.
 
 Selectors
 ---------------------------------------------------------------------------
+### getSelect()
+Retrieves all state information of a *specific* select control, i.e. an instance identified by a tag.
 
 Helpers
 ---------------------------------------------------------------------------
-
-Manages database data from the server.
-It keeps a normalized copy of the data.
+### initSelect()
+Initializes the state for a specific select control. This is an initialization *per tag*.
 
 [tables]({{site.appBase}}/dux/tables.js)
 =============================================================================================

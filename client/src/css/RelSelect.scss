@@ -17,6 +17,8 @@ $tag-back-var: rgba(220, 240, 220, 0.9);
 $tag-border: rgba(160, 200, 160, 0.7);
 $newtag-fore: rgba(0, 0, 255, 0.9);
 $newtag-back: rgba(255, 255, 160, 0.7);
+$emptytag-fore: rgba(0, 0, 255, 0.9);
+$emptytag-back: rgba(255, 255, 160, 0.4);
 
 div.select {
     display: inline-block;
@@ -84,7 +86,10 @@ input .invisible {
     color: $newtag-fore;
     background-color: $newtag-back;
 }
-
+.tag.empty {
+    color: $emptytag-fore;
+    background-color: $emptytag-back;
+}
 .option.tag {
     color: $opt-fore;
     background-color: $opt-back;

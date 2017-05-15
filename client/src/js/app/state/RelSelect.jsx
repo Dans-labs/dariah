@@ -66,21 +66,23 @@ const Tags = ({ tag, optionLookup, value, onChange, togglePU }) => (
           </span>
         )
       }) :
-      <span className="tag">{'click to enter values'}</span>
+      <span className="tag empty">{'click to enter values'}</span>
   }
   </div>
 )
 
 const Head = ({ optionLookup, value, tag, togglePU }) => {
   let label = ''
+  let classes = 'option-head tag'
   const { [value]: lab = value } = optionLookup
   label = lab
   if (value == '') {
     label = 'click to enter a value'
+    classes += ' new'
   }
   return (
     <span
-      className={`option-head tag`}
+      className={classes}
       onClick={handlePopUp(tag, togglePU)}
     >{label}</span>
   )
