@@ -36,20 +36,6 @@ export function memoize(f) {
   return memoF
 }
 
-export function memoizeOld(f) {
-  const memCache = {}
-  const memoF = (keyArgs, allArgs) => {
-    const memoKey = JSON.stringify(keyArgs)
-    let { [memoKey]: result } = memCache
-    if (result == null) {
-      result = f.apply({}, allArgs)
-      memCache[memoKey] = result
-    }
-    return result
-  }
-  return memoF
-}
-
 export const levelOneEq = (a, b) => {
   if (typeof a != typeof b) {return false}
   if (typeof a == 'object') {

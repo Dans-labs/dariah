@@ -298,7 +298,7 @@ Basically, this component produces one or more
 [Field](http://redux-form.com/6.6.3/docs/api/Field.md/) 
 or
 [FieldArray](http://redux-form.com/6.6.3/docs/api/FieldArray.md/)
-components (which are provided by *redux-form*. 
+components (which are provided by [redux-form](https://redux-form.com/6.6.3/). 
 
 Note that we do not pass the actual values to these components.
 They know how to get the current values from the state, and what actions
@@ -462,7 +462,7 @@ These attributes are passed verbatim to the underlying `<input />`.
 ###### `type` string
 The *type* of `<input type="..." />`. It will go to the place of the dots.
 
-[InputMultiple]({{site.appBase}}/pure/InputMultiple.jsx)
+[InputMulti]({{site.appBase}}/pure/InputMulti.jsx)
 =============================================================================================
 presents [tables](Dux#tables)
 
@@ -626,7 +626,7 @@ Resetting means: changing all edited values back to the initialValues.
 
 ###### `handleSubmit` function
 A function that is invoked when the form is submitted.
-This function handles all the *redux-form* machinery that is needed.
+This function handles all the [redux-form](https://redux-form.com/6.6.3/) machinery that is needed.
 It also calls a function that you can pass to it as first argument.
 We pass it our `toDb(table, eId, mod)` function.
 This is a function that takes a `values` object, and calls `mod(table, eId, values)`,
@@ -869,6 +869,13 @@ That is why I have written this component.
 
 The capabilities of this widget are:
 
+* single select or multiselect, depending on the property `multiple`;
+* fixed list of values or the possibility to create new values on the fly, depending on the prop `allowNew`;
+* options can be filtered by a full text filter;
+* only one copy of an option can be chosen;
+* selected options are removed from the list of selectable options;
+* plays well with [Redux-Form](https://redux-form.com/6.6.3/);
+
 
 [Root]({{site.appBase}}/pure/Root.jsx)
 =============================================================================================
@@ -883,55 +890,6 @@ detecting some global UI events.
 
 #### Props
 Except for the standard prop `children`, there are no props.
-
-[SelectR]({{site.appBase}}/pure/SelectR.jsx)
-=============================================================================================
-presents [tables](Dux#tables)
-
-This is a wrapper around [react-select](https://github.com/JedWatson/react-select).
-The vanilla `<select><option/></select>` machinery of HTML is not good enough for our purposes.
-We have to deal with large lists of options, multi-selectable, and sometimes new options
-may be created and sometimes not.
-
-#### Props
-###### `options` array
-Contains the options to select from.
-Every option is an object with `value` and `label` members.
-The `value` is what goes into the field value if the option is selected.
-The `label` is a representation of the value that is displayed to the user.
-
-###### `allowNew` boolean
-Whether the user may type a new option.
-
-###### `multi` boolean
-Whether the select list allows multiple selections or only single selections.
-
-###### `input: { value, onChange }`
-`value` is the current selection. 
-
-`onChange` is a callback, coming from the *redux-form* [Field](http://redux-form.com/6.6.3/docs/api/Field.md/).
-
-###### `handle` function
-This is passed by [FieldEdit](#fieldedit) as the `onChange` callback for *react-select*.
-
-This is the plumbing between *react-select* and *redux-form*:
-
-* the user clicks an option;
-* *react-select* fires `handle` (which is passed to it under the name `onChange`);
-* `handle` takes the selected value, transforms it into a *clean* value.
-  (the value that *react-select* passes to `handle` comes in the shape of `{ value, label }`, or an array
-  of such items. What we need is only the `value` or an array there of); 
-* `handle` is also given the *redux-form* `onChange` callback, which it will now fire with
-  the clean value(s);
-* by this callback *redux-form* does its thing with the new value, such as reducing it into the state, 
-  and setting the `dirty` and `invalid` properties.
-
-###### `meta: { dirty, invalid }`
-These properties come from *redux-form* and will be used to style parts of *react-select*, so
-that the edit status and validity of the value that the user is typing is hinted to him.
-
-###### `...props`
-Additional customization settings targeted to the *react-select* machinery.
 
 [Stat]({{site.appBase}}/pure/Stat.jsx)
 =============================================================================================
