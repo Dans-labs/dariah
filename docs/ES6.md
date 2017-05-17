@@ -198,8 +198,7 @@ that everything that is changed, is copied shallowly to a new object, and every 
 the same object.
 
 However, if what has changed is really deeply nested, there are better methods to achieve is, e.g. 
-[lodash merge](https://lodash.com/docs/#merge)
-This hint is given [here](http://redux.js.org/docs/recipes/reducers/UpdatingNormalizedData.html).
+[lodash merge](https://lodash.com/docs/#merge).
 
 # [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 *Promise* is an ES6 datastructure to contain the result of an asynchronous function.

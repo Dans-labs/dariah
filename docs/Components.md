@@ -862,6 +862,8 @@ The current height and width of the screen.
 =============================================================================================
 presents [select](Dux#select)
 
+![diag](design/design.009.jpeg)
+
 An implementation of multiselect widgets. 
 There is a fairly complete [react-select](https://github.com/JedWatson/react-select) component on Github.
 However, it has some flaws that prevents a successful usage of it in our app.

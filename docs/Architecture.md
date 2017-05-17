@@ -48,6 +48,7 @@ Such a *duck* ties in very well with the way that React components can be connec
 The idiomatic approach is to write your component as a pure, stateless function, even if it needs state.
 When it does need to read the state, assume that your component will receive that information as *properties*.
 And when it needs to modify the state, assume that it will receive callbacks, also as *properties*, to dispatch actions.
+See also [connect](React#connect).
 
 # Dux as glue between components and the state
 If you have written your component, say `MyComp`, and you need a piece of the state `mySlice` that is provided by a *selector*
@@ -80,6 +81,7 @@ Currently, these are the dux of this app:
 * [me](Dux#me): data about the currently logged-in user;
 * [notify](Dux#notify): the notification system;
 * [roots](Dux#roots): combining all the other dux;
+* [select](Dux#select): the state of all multiselect widgets in the app;
 * [tables](Dux#tables): manage all database data that has been fetched from the server;
 * [win](Dux#win): react to the resizing of the browser window.
 

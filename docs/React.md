@@ -2,9 +2,9 @@
 title: React
 ---
 
-# React Documentation references.
-## [React Components](https://facebook.github.io/react/docs/react-component.html)
-React components represent pieces of the web page and their functionality.
+# React Components
+[React Components](https://facebook.github.io/react/docs/react-component.html)
+represent pieces of the web page and their functionality.
 Components are organized hierarchically.
 Components can be parametrized by *properties*, which parents pass to children.
 A component acts as a template instruction to build a piece of DOM.
@@ -81,7 +81,6 @@ with React components, which look nearly the same in **jsx**:
  </p>
 ```
 ### DOM
-
 DOM is an abbreviation for
 [Document Object Model](https://developer.mozilla.org/en-US/docs/Web/API/document).
 The DOM is what the browser gets in memory once it has loaded an HTML document.
@@ -92,14 +91,17 @@ fast Javascript currently is.
 
 This is one of the reasons that a niche for React exists, with its [MiniDOM](#minidom).
 
-### [Fragment](https://facebook.github.io/react/docs/rendering-elements.html)
-A fragment is such a mixture of properly nested React elements and components.
+### Fragment
+A [fragment](https://facebook.github.io/react/docs/rendering-elements.html)
+is such a mixture of properly nested React elements and components.
 It is part of the React's toolkit to manage DOM manipulations efficiently.
 
 See [Reconciliation](#reconciliation).
 
-### [PropTypes](https://facebook.github.io/react/docs/typechecking-with-proptypes.html)
-Type checking for React Components is done by *PropTypes*.
+## Property management
+### PropTypes
+[PropTypes](https://facebook.github.io/react/docs/typechecking-with-proptypes.html)
+are a means to do type checking for React Components is done by *PropTypes*.
 
 Proptype checking in react only happens in development mode.
 React checks whether the named props that are passed to a component
@@ -122,8 +124,9 @@ or as
 const { props: { foo, bar} } = this
 ```
 
-### [Context](https://facebook.github.io/react/docs/context.html)
-React mechanism to pass data directly  from ancestors to deep descendants.
+### Context
+[Context](https://facebook.github.io/react/docs/context.html)
+is a React mechanism to pass data directly  from ancestors to deep descendants.
 The React documentation
 considers context as a brittle part of itself, and warns
 against over-use. At the same time,
@@ -131,86 +134,104 @@ against over-use. At the same time,
 depends critically on it, so I consider it safe to use.
 But our code will not use it explicitly, only through Redux.
 
-### [Life Cycle](https://facebook.github.io/react/docs/react-component.html#the-component-lifecycle)
+## Component management
+###  Life Cycle
 The main function of a
 [component](#react-components)
 is to act as a template to be [rendered](#render).
 But if there is additional work to be done, this can be hooked up at various
-stages in the component's lifecycle.
+stages in the component's
+[lifecycle](https://facebook.github.io/react/docs/react-component.html#the-component-lifecycle).
 Most stages occur during (re)rendering, and there is a stage of construction and unmounting.
 
-#### [Constructor](https://facebook.github.io/react/docs/react-component.html#constructor)
-
+### Constructor
 When a
 [component](#react-components)
 is being
 [rendered](https://facebook.github.io/react/docs/react-component.html#render)
-this is the method to construct the corresponding React class.
+the
+[constructor](https://facebook.github.io/react/docs/react-component.html#constructor)
+is the method to construct the corresponding React class.
 It will set up the
 [state](#state).
 
-#### [componentDidMount](https://facebook.github.io/react/docs/react-component.html#componentdidmount)
+### componentDidMount
 When a
 [component](#react-components)
 has been added to the DOM
-this method will be called just after.
+its method
+[componentDidMount](https://facebook.github.io/react/docs/react-component.html#componentdidmount)
+will be called just after.
 This is the recommended time to fetch data for this component, if needed.
 
-#### [componentDidUpdate](https://facebook.github.io/react/docs/react-component.html#componentdidupdate)
+### componentDidUpdate
 When a
 [component](#react-components)
 has been updated due to receiving new properties,
-this method will be called just after.
-If DOM manipulations are needed to complete the rendering, this is
-the place to do it.
+its method
+[componentDidUpdate](https://facebook.github.io/react/docs/react-component.html#componentdidupdate)
+will be called just after.
+If DOM manipulations are needed to complete the rendering, this is the place to do it.
 
 **NB:** This will not called upon initial rendering, so if the DOM manipulation
 is also needed initially, it is handy to write a function for it and
 call it in this method and in [componentDidMount()](#componentdidmount).
 
-#### [componentWillMount](https://facebook.github.io/react/docs/react-component.html#componentwillmount)
+### componentWillMount
 When a
 [component](#react-components)
 will be added to the DOM,
-this method will be called just before.
+its method
+[componentWillMount](https://facebook.github.io/react/docs/react-component.html#componentwillmount)
+will be called just before.
 This is the first thing that happens after [constructor()](#constructor).
 
-#### [componentWillReceiveProps](https://facebook.github.io/react/docs/react-component.html#componentwillreceiveprops)
+### componentWillReceiveProps
 When a
 [component](#react-components)
 is about to receive new props (as part of the update process),
-this method will be called just before.
+its method
+[componentWillReceiveProps](https://facebook.github.io/react/docs/react-component.html#componentwillreceiveprops)
+will be called just before.
 The new props are passed with it, so that it is possible to execute
 actions dependent on whether pros have changed.
 
-#### [componentWillUnmount](https://facebook.github.io/react/docs/react-component.html#componentwillunmount)
+### componentWillUnMount
 When a
 [component](#react-components)
 will be removed from the DOM,
-this method will be called just before.
+its method
+[componentWillUnmount](https://facebook.github.io/react/docs/react-component.html#componentwillunmount)
+will be called just before.
 If we want to save state, we can hook it up here.
 
-#### [render](https://facebook.github.io/react/docs/react-component.html#render)
+### render
 The main function of a
 [component](#react-components)
 is to act as a template to be rendered.
+Its method
+[render](https://facebook.github.io/react/docs/react-component.html#render)
+constructs the template to be rendered.
 During rendering the template will be used as a set of instructions to build a real DOM
 somewhere on the actual web page.
 
-### [Controlled Component](https://facebook.github.io/react/docs/forms.html)
+## Controlled Component
 For elements that can receive user input (forms, inputs, etc) there is the option
 to handle input in a way controlled by React, and not by the default HTML behaviour.
+We say that those elements are used as
+[controlled Components](https://facebook.github.io/react/docs/forms.html).
 
 So when a user clicks a checkbox, the check is not managed by the browser,
 but a callback is called, a parent component executes it, state gets updated, state changes
 trickle down as property updates to child elements, and the checkbox in question is told
 to be checked (or unchecked).
 
-## [State](https://facebook.github.io/react/docs/state-and-lifecycle.html)
-There are two main reasons for a component to maintain state:
+## State
+There are two main reasons for a component to maintain
+[state](https://facebook.github.io/react/docs/state-and-lifecycle.html):
 
-* getting external data
-* reacting to user events
+* getting external data,
+* reacting to user events.
 
 In both cases, something happens in the outside world that must be remembered.
 Components remember these things in their
@@ -246,8 +267,9 @@ So in this app, we have left the path of local state, and embraced *central stat
 ### Central State
 A widely used approach to *central* state is [Redux](#redux).
 
-#### [Redux](http://redux.js.org/docs/api/index.html)
-Redux is a popular implementation of the idea that [state](#state) is centralized
+# Redux
+[Redux](http://redux.js.org/docs/api/index.html)
+is a popular implementation of the idea that [state](#state) is centralized
 and all components have to subscribe to a state
 [Provider](https://github.com/reactjs/react-redux/blob/master/docs/api.md#provider-store),
 the store.
@@ -283,7 +305,7 @@ Every duck manages a slice of the state has four sections:
 * Helpers: functions that contain additional logic, especially for selectors. See for an example
   [filters](Dux#filters). 
 
-##### Merge
+## Merge
 When a reducer transforms a state, it must happen in such a way that
 * unaffected parts of the state do not change,
 * all intermediate objects between the toplevel state and a changed leaf are fresh objects.
@@ -293,6 +315,8 @@ The handiest way to achieve this is to use
 and
 [lodash mergeWith](https://lodash.com/docs/#mergewith).
 Most reducers use it.
+The hint to use lodash functions for this is given
+[here](http://redux.js.org/docs/recipes/reducers/UpdatingNormalizedData.html).
 
 These functions take an object, and transform it on the bases of an other object, precisely as needed for our purposes.
 And if a little tweak is needed for certain keys of the state, `mergeWith()` provides a hook for that.
@@ -300,9 +324,39 @@ See [notify.js]({{site.appBase}}/dux/notify.js), the function `addItem()`.
 There, if the old state has an array of items, and we need to append some items, we create a new array, consisting of the 
 items of the orginal array, with the new items concatenated after them.
 
-##### [Connect](https://github.com/reactjs/react-redux/blob/master/docs/api#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options)
+## Select
+The opposite of merging data into the state is selecting data from the state.
+Our components need bits and pieces of the state in order to know what they should render.
+To this end, we write *selector* functions, that return suitable slices of the state.
+In some cases, selecting the data requires quite a bit of computation, especially when the data in the state
+is *normalized* and the component needs denormalized data.
+Or, in the case of faceted browsing, the items to show must be computed from the list of items in the table slice of the state,
+combined with the current filter settings from the filter slice of the state.
+
+Here we encounter a potential performance problem. 
+Sometimes components will be re-rendered even if their piece of the state as not changed.
+Or, if it has changed, it is often the case that the derived data that the component needs, has not changed.
+In general, if we do nothing about it, the computations in selectors will be executed more often than necessary.
+
+The method to deal with this is memoization.
+The redux documentation suggests the [reselect](https://github.com/reactjs/reselect) library
+[here](http://redux.js.org/docs/recipes/ComputingDerivedData.html).
+Reselect facilitates the fabrication of selectors that remember their last output in combination with the parameters passed to it.
+If such a selector is called repeatedly with the same arguments, it will fetch the computed result from its cache after 
+from the second time it is called onwards.
+
+We use this library in the dux
+[filters]({{site.appBase}}/dux/filters.js)
+and
+[tables]({{site.appBase}}/dux/tables.js)
+
+However, we will also encounter cases where we need more complete memoization, so that functions
+have a cache for their results given multiple sets of parameters. See [memo](Lib#memo).
+
+## Connect
 Redux and the ducks streamline very much how components deal with the centralized store.
-The central function is Redux *connect()*.
+The central function is Redux
+[connect](https://github.com/reactjs/react-redux/blob/master/docs/api#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options).
 
 If a component X needs state, we can create a *connected* component Xc from X.
 Connected means: connected to the state.
@@ -319,8 +373,10 @@ The new component Xc has extra props:
   This returns a props object of action creator functions. Xc can use these
   where a callback is needed. When such a function is called, the action will be created
   and dispatched, which in turn will lead to a state change.
+
+See also [Architecture](Architecture#overview).
  
-## Routing
+# Routing
 [React-router](https://github.com/ReactTraining/react-router)
 is a convenient library to manage the connection between
 the url and the part of your app that should be active in response to it.

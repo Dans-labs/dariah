@@ -6,9 +6,10 @@ import { editClass } from 'utils'
 import Alternative from 'Alternative'
 
 const controlPlacement = control => <p className="stick" >{control}</p>
-const control1 = handler => <span className="button-medium fa fa-pencil" onClick={handler} />
-const control2 = handler => <span className="button-medium fa fa-hand-o-down" onClick={handler} />
-const controls = [control1, control2]
+const controls = [
+  handler => <span className="button-medium fa fa-pencil" onClick={handler} />,
+  handler => <span className="button-medium fa fa-hand-o-down" onClick={handler} />,
+]
 
 const MarkDownArea = ({ table, eId, meta: { dirty, invalid, error }, input: { name, value }, input }) => (
   <Alternative

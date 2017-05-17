@@ -18,6 +18,7 @@ export const withParams = Component => ({ params, route, ...props }) => {
   const allProps = { ...props, ...params, ...route }
   return <Component {...allProps} />
 }
+
 export const makeComponent = (Component, boundProps) => props => <Component {...boundProps} {...props} />
 
 export const makeReducer = (flows, init = {}) => (state = init, action) => {

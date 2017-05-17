@@ -12,11 +12,13 @@ const RouterLink = ({ children, href }) => (
     ? <a href={href} >{children}</a>
     : <Link to={href} >{children}</Link>
 )
+const renderers = { Link: RouterLink }
 
 const controlPlacement = control => <p style={{float: 'right'}} >{control}</p>
-const control1 = handler => <a className="control fa fa-hand-o-down" href="#" title="markdown source" onClick={handler} />
-const control2 = handler => <a className="control fa fa-file-code-o" href="#" title="formatted" onClick={handler} />
-const controls = [control1, control2]
+const controls = [
+  handler => <a className="control fa fa-hand-o-down" href="#" title="markdown source" onClick={handler} />,
+  handler => <a className="control fa fa-file-code-o" href="#" title="formatted" onClick={handler} />,
+]
 
 class DocMd extends Component {
   render() {
@@ -33,7 +35,7 @@ class DocMd extends Component {
             <div key="fmt" >
               <Markdown
                 source={text}
-                renderers={{Link: RouterLink}}
+                renderers={renderers}
               />
             </div>
           ), (

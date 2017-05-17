@@ -9,9 +9,10 @@ import CheckboxI from 'CheckboxI.jsx'
 import Stat from 'Stat.jsx'
 import Alternative from 'Alternative.jsx'
 
-const control1 = handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />)
-const control2 = handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />)
-const controls = [control1, control2]
+const controls = [
+  handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />),
+  handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />),
+]
 const controlPlacement = memoize((table, filterId, filterLabel, filteredAmount, filteredAmountOthers) => control => (
   <p className="facet" >
     <CheckboxI
@@ -53,7 +54,7 @@ const ByValue = ({
                         return <td key={j} />
                       }
                       const [valueId, valueRep] = f
-                      const facetClass = (j == 0) ? "facet" : "facet mid"
+                      const facetClass = (j == 0) ? 'facet' : 'facet mid'
                       return [(
                         <td
                          key={valueId}

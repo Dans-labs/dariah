@@ -20,8 +20,10 @@ const MyItemHead = reduxForm({
   keepDirtyOnReinitialize: true,
 })(MyItemHeadPure)
 
-const control1 = handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />)
-const control2 = handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />)
+const controls = [
+  handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />),
+  handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />),
+]
 const controlPlacement = memoize(entityHead => control => (
   <p>
     {control}
@@ -31,7 +33,6 @@ const controlPlacement = memoize(entityHead => control => (
   </p>
 ))
 
-const controls = [control1, control2]
 
 const ItemHead = ({ table, values, title, inplace }) => {
   const { _id: eId, [title]: entityHead = '-empty-' } = values

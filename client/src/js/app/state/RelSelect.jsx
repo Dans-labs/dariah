@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { combineSelectors } from 'utils'
+import { memoize } from 'memo.js'
 
 import { getSelect, setSearch, setPopUp, togglePopUp } from 'select'
 import { getOptions } from 'tables'
@@ -12,10 +13,10 @@ const RelOption = ({ label, selected, onHit }) => (
   >{label}</p>
 )
 
-const handlePopUp = (tag, togglePU) => () => togglePU(tag)
-const handleSetPopUp = (tag, onOff, setPU) => () => setPU(tag, onOff)
-const handleSearch = (tag, setS) => event => setS(tag, event.target.value)
-const handleClear = (tag, setS) => () => setS(tag, '')
+const handlePopUp = memoize((tag, togglePU) => () => togglePU(tag))
+const handleSetPopUp = memoize((tag, onOff, setPU) => () => setPU(tag, onOff))
+const handleSearch = memoize((tag, setS) => event => setS(tag, event.target.value))
+const handleClear = memoize((tag, setS) => () => setS(tag, ''))
 
 const removeVal = (value, onChange, val) => event => {
   event.stopPropagation()

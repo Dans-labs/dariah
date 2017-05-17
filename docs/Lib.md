@@ -29,13 +29,35 @@ All functions take a value, and return a normalized value.
 
 [memo]({{site.libBase}}/memo.js)
 =============================================================================================
-## memoBind(thisArg, funcName, keyArgs, allArgs)
-Assumes that `funcName` is a method of class/object `thisArg`, taking as
-arguments `allArgs` (which is a sequence of variable length).
+## memoize(f)
+Turns the function `f` into a memoized function `memF` that yields the same results
+for the same parameters.
+It stores computed results under a key dependent on the parameters for which the result
+is computed. When the function is called with the same parmeters again, it delivers its
+result from cache, rather than to recompute it.
 
-When it is called it computes the result and stores it under a key based
-on `keyArgs`, unless it finds an old value under that key.
-Whatever the case, it delivers the result.
+In development mode, if you call the memoized function without arguments, 
+it sends usage information to the console: the number of times it has computed
+a result and the number of times it has retrieved a result from cache.
+
+In many cases, the 
+[reselect](https://github.com/reactjs/reselect)
+library is all we need for the memoization of *selector functions*.
+However, if you want to bind a callback function to concrete arguments, e.g. in
+[InputMulti]({{site.appBase}}/pure/InputMulti.jsx),
+you need more powerful memoization, such as `memoize` here.
+
+[levelOneEq]({{site.libBase}}/memo.js)
+The
+[reselect](https://github.com/reactjs/reselect)
+library allows you to create selectors from others, and the result is an object
+of selection results. Whenever the combined selector is called, a new object
+is created. But the members of this object are quite often the same as the previous time
+the combined selector is called.
+We can customize the
+[selector creation factory](https://github.com/reactjs/reselect#createselectorcreatormemoize-memoizeoptions)
+by passing it an equality function that does not mind that the outer object has changed.
+`levelOneEq` is that function.
 
 [server]({{site.libBase}}/server.js)
 =============================================================================================
@@ -52,8 +74,9 @@ During request, [notify](Dux#notify) actions will be dispatched.
 =============================================================================================
 ## editClass(dirty, invalid)
 Returns the proper css class for styling content that is being edited, depending on the state it may be in:
-`dirty`: a changed value that has not been saved to the database yet, and/or
-`invalid`: a value that does not pass validation.
+
+* `dirty`: a changed value that has not been saved to the database yet, and/or
+* `invalid`: a value that does not pass validation.
 
 ## propsChanged(newProps, need, oldProps, keyPropNames)
 Determines whether `newProps` differ significantly from `oldProps`, based on 
@@ -100,3 +123,9 @@ Given an object of *flows* and an initial state, returns a *reducer* function.
 The *flows* is an object with functions, named after *actions*.
 These functions define how a new state must be produced when an action has been
 *dispatched*.
+
+## combineSelectors(...selectors)
+Given a list of *selector* functions, creates a combined selector that returns
+an object containing the results of the individual selectors.
+This function uses the *reselect's*
+[createSelector](https://github.com/reactjs/reselect#createselectorinputselectors--inputselectors-resultfunc).
