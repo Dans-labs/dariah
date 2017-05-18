@@ -112,7 +112,12 @@ const Options = ({ tag, optionLookup, multiple, allowNew, options, value, onChan
   const pat = search.toLowerCase()
   return (
     <div className="options" >
-      {(allowNew && search) ? (
+      {(
+        allowNew &&
+        search &&
+        !options.some(({ label }) => label == search) &&
+        !value.includes(search)
+      ) ? (
         <span
           className="new tag"
           onClick={addVal(optionLookup, multiple, value, onChange, search)}

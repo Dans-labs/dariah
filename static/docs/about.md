@@ -6,11 +6,14 @@ Your saved work will be deleted later without notice.**
 
 ### What is the DARIAH contribution tool?
 
-This is a [system](/contrib) to assess the tools that have been contributed to the DARIAH infrastructure by its national members.
+This is a [system](/contrib) to assess the tools that have been contributed to
+the DARIAH infrastructure by its national members.
 These tools constitute the in-kind contributions of the member states to the European DARIAH ERIC.
 The purpose of the assessment is to establish the quality and value of the contributed tools.
-It is important to know how much effort has gone into the creation, maintenance and delivery of the tool.
-But also the satisfaction of the parties that use the tool are an important indicator of the value of the tool.
+It is important to know how much effort has gone into the creation,
+maintenance and delivery of the tool.
+But also the satisfaction of the parties that use the tool
+are an important indicator of the value of the tool.
 
 ### Browse Contributions
 

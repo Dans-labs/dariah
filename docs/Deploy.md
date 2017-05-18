@@ -60,7 +60,7 @@ The absolute location is not important. Here we assume everything resides in `/o
   - `web-apps`
     - `dariah`
       - `README.md` short description for humans
-      - `build.sh` script for building, with parameters for development, development server, or production
+      - `build.sh` script for build/development tasks, the options are documented inside, or run it without arguments for help
       - `server`
         - `controllers` routes and controllers
           - `index.py` entry point
@@ -75,7 +75,6 @@ The absolute location is not important. Here we assume everything resides in `/o
           - `views` html templates
             - `index.tpl` the html template of the single page
         - `serve.py` wsgi entry-point for apache
-        - `serve.sh` local development server
         - `confyg.py` converts yaml model files into python modules
         - `config`
           - `requirements.txt` the list of python packages needed; to be installed with `pip3`

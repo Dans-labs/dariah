@@ -1,8 +1,31 @@
 #!/bin/sh
 
-cd ~/github/dariah
+root=`pwd`
 
-if [[ "$1" == "docs" ]]; then
+if [[ "$1" == "devenv" ]]; then
+    # documentation server
+    pushd docs
+    bundle exec jekyll serve &
+    echo $! > $root/.procDoc 
+    popd
+    # hot module reload client app builder and server
+    pushd client
+    export NODE_ENV="development"; webpack-dev-server &
+    echo $! > $root/.procHot 
+    popd
+    # development webserver
+	pushd server
+    python3 confyg.py controllers/models
+    pushd controllers
+    export REGIME=devel; python3 -m bottle --debug --reload --bind localhost:8001 index:app
+elif [[ "$1" == "stop" ]]; then
+    pkill -P `cat $root/.procDoc`
+    kill `cat $root/.procDoc`
+    rm $root/.procDoc
+    pkill -P `cat $root/.procHot`
+    kill `cat $root/.procHot`
+    rm $root/.procHot
+elif [[ "$1" == "docs" ]]; then
     cd docs
     bundle exec jekyll serve
 elif [[ "$1" == "dev" ]]; then
@@ -10,6 +33,12 @@ elif [[ "$1" == "dev" ]]; then
     export NODE_ENV="development"
     webpack
 elif [[ "$1" == "serve" ]]; then
+	cd server
+    python3 confyg.py controllers/models
+    cd controllers
+    export REGIME=devel
+    python3 -m bottle --debug --reload --bind localhost:8001 index:app
+elif [[ "$1" == "hot" ]]; then
     cd client
     export NODE_ENV="development"
     webpack-dev-server
@@ -54,9 +83,12 @@ else
     fi
     echo "./build.sh <task>"
     echo "    where <task> is one of:"
+    echo "devenv: start development services: webserver, docserver, client app server"
+    echo "stop: stop development services: webserver, docserver, client app server"
+    echo "serve: start the bottle webserver"
     echo "docs: build and serve github pages documentation locally"
     echo "dev: build the client (js and sass and css)"
-    echo "serve: build the client and serve it locally with hot module reload"
+    echo "hot: build the client and serve it locally with hot module reload"
     echo "data: convert the data from FileMaker and import it into MongoDB"
     echo "prod: make a production build of the client app; also build docs"
     echo "shipdocs: build the docs, commit them to the repo, and push them to github"

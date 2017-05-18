@@ -25,6 +25,7 @@ fi
 
 cd $ADIR/$APP
 git pull origin master
+python3 -m compileall server
 
 if [ $ON_CLARIN ]; then
     service httpd start
