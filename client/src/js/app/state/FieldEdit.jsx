@@ -2,37 +2,31 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Field, FieldArray } from 'redux-form'
 
-import { makeComponent } from 'utils'
 import { validation, normalization, getValType } from 'fields'
 import { getTables } from 'tables'
 
 import InputMulti from 'InputMulti'
 import RelSelect from 'RelSelect'
 
-const FieldEdit = ({ field, tables, table, ...props }) => {
+const FieldEdit = ({ field, tables, table, eId, ...props }) => {
   const { [table]: { fieldSpecs } } = tables
   const { [field]: { valType, multiple } } = fieldSpecs
   if (typeof valType == 'string') {
     const typing = getValType(valType)
-    const { type } = typing
-    let { component } = typing
-    if (typeof component != 'string') {
-      component = makeComponent(component, { field, type, ...props })
-    }
+    const { component, type } = typing
     const { [valType]: validate } = validation
     const { [valType]: normalize } = normalization
     if (multiple) {
       return (
         <FieldArray
           name={field}
-          component={
-            makeComponent(InputMulti, {
-              component,
-              type,
-              validate,
-              normalize,
-            })
-          }
+          component={InputMulti}
+          componentSingle={component}
+          validateSingle={validate}
+          normalizeSingle={normalize}
+          table={table}
+          eId={eId}
+          type={type}
           {...props}
         />
       )
@@ -42,9 +36,11 @@ const FieldEdit = ({ field, tables, table, ...props }) => {
         <Field
           name={field}
           component={component}
-          type={type}
           validate={validate}
           normalize={normalize}
+          table={table}
+          eId={eId}
+          type={type}
           {...props}
         />
       )
@@ -52,21 +48,19 @@ const FieldEdit = ({ field, tables, table, ...props }) => {
   }
   else {
     const { allowNew } = valType
-    const { eId } = props
     const tag = `${table}-${eId}-${field}`
-    const params = {
-      table,
-      eId,
-      field,
-      tag,
-      multiple,
-      allowNew,
-    }
     return (
       <span>
         <Field
           name={field}
-          component={makeComponent(RelSelect, { ...params })}
+          component={RelSelect}
+          tag={tag}
+          field={field}
+          multiple={multiple}
+          allowNew={allowNew}
+          table={table}
+          eId={eId}
+          {...props}
         />
       </span>
     )

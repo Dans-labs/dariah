@@ -47,10 +47,16 @@ class ItemRecord extends Component {
           perm={perm}
           fields={fields}
           form={`${table}-${eId}`}
+          key={`${table}-${eId}`}
         />
       </div>
     )
-
+    /* Note the key prop passed to ItemForm.
+     * If you do not pass it, you get bugs caused by the mounting and unmounting of this component
+     * due to react-router navigation.
+     * In essence, the callback onChange that redux-form passes to input components, becomes bound to the wrong form!
+     * This workaround is documented here: https://github.com/erikras/redux-form/issues/2886
+    */
   }
   gotoNewItem() {
     const { props: { tables, table, router, insert } } = this

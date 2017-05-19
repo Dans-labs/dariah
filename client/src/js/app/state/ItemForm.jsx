@@ -2,12 +2,14 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 
+import { memoize } from 'memo'
+
 import { getTables, modItem } from 'tables'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
 
-const toDb = (table, eId, mod) => values => mod(table, eId, values)
+const toDb = memoize((table, eId, mod) => values => mod(table, eId, values))
 
 const makeFields = ({ tables, table, fields, perm, ...props }) => {
   const { initialValues } = props

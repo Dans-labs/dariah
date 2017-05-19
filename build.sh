@@ -91,7 +91,7 @@ else
     echo "hot: build the client and serve it locally with hot module reload"
     echo "data: convert the data from FileMaker and import it into MongoDB"
     echo "prod: make a production build of the client app; also build docs"
-    echo "shipdocs: build the docs, commit them to the repo, and push them to github"
-    echo "shipcode: make a production build, build the docs, commit to the repo, and push to github"
+    echo "shipdocs: build the docs, commit them to the repo, and push them to github. Supply a commit message!"
+    echo "shipcode: make a production build, build the docs, commit to the repo, and push to github. Supply a commit message!"
     echo "shipdata: convert the data from FileMaker, import them into Mongo, and scp them to the server" 
 fi

@@ -105,19 +105,6 @@ In the first case, it receives some properties as `params`.
 When we write our components, we do not want to care about this, hence
 we wrap them as `withParams(Component)`.
 
-## makeComponent(Component, props)
-Higher order function that turns a Component (which is a function) into
-another component.
-
-The outgoing component is identical to the incoming one, except
-that the `props` are injected as extra properties to the outgoing component.
-
-This function is used in [ItemForm](Components#itemform), where input widgets
-are passed as components to the form machinery.
-The one that passes the widget through, is not the parent of the widget, but
-has properties relevant to its functioning. 
-So it has to inject them.
-
 ## makeReducer(flows, init)
 Given an object of *flows* and an initial state, returns a *reducer* function.
 The *flows* is an object with functions, named after *actions*.

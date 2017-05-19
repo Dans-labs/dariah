@@ -336,6 +336,50 @@ They have been injected by the wrapper
 [ItemForm](#itemform), the parent of this component, and they are just passed
 on to *Field* and *FieldArray*, so that they can do their magic.
 
+#### Caution
+In order to get everything working correctly, two problems had to be solved.
+Both turned out to be related to Redux-Form.
+
+* The component that you pass to the `component` prop of `Field` and `FieldArray`
+  must not be dynamically composed in the `render()` function that produces `Field(Array)`.
+  Because in that case, the `Field(Array)` is re-rendered too often,
+  and effect for the user is that he loses focus after entering the first character, which is 
+  *very* annoying.
+
+  So, the value for `component` must be a static function. 
+  But what if this function needs dynamically determined arguments?
+  How can they be passed to it?
+  The solution is simple: pass them as props to `Field(Array)`, and they will be passed
+  on to the component function by redux-form.
+
+  This is actually documented in the redux-form docs. You need 
+  [this](http://redux-form.com/6.7.0/docs/api/Field.md/), section **2. A stateless function**
+
+  > You must define the stateless function outside of your render() method,
+  or else it will be recreated on every render and will force the Field to rerender
+  because its component prop will be different.
+  If you are defining your stateless function inside of render(),
+  it will not only be slower, but your input will lose focus
+  whenever the entire form component rerenders.
+
+  and
+  
+  [this](http://redux-form.com/6.7.0/docs/api/Field.md/#props):
+
+  > Any custom props passed to Field will be merged into the props object
+  on the same level as the input and meta objects.
+
+* When navigating between forms for several records, the `onChange` callback,
+  that should be bound to the proper form, becomes bound to the wrong form.
+  As far as I can see, all other things work as expected, so it was difficult to see
+  why this occurred. The explanation is in a 
+  [Github issue](https://github.com/erikras/redux-form/issues/2886).
+  Summarized: the construction of the `onChange` function is effectively memoized.
+  It is determined upon mounting of the component, but not on updating it.
+  The workaround is easy: add an extra key property to the form.
+  Another cause for the same problem I encountered in [InputMulti](Components#inputmulti),
+  where I had memoized the callbacks for adding and removing values to/from a sequence.
+
 [FieldRead]({{site.appBase}}/state/FieldRead.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)

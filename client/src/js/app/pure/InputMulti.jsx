@@ -1,23 +1,38 @@
 import React from 'react'
 import { Field } from 'redux-form'
 
-import { memoize } from 'memo'
 import { editClass } from 'utils'
 
-const fieldRemove = memoize((fields, i) => () => {fields.remove(i)})
-const fieldPush = memoize(fields => () => {fields.push()})
+const fieldRemove = (fields, i) => () => {fields.remove(i)}
+const fieldPush = fields => () => {fields.push()}
+/* N.B.
+ * fieldRemove and fieldPush MUST NOT be memoized.
+ * Otherwise they may become bound to the wrong form.
+ * This happens if you navigate with react-router between forms.
+ */
 
-const InputMulti = ({ component, type, validate, normalize, fields, meta: { dirty, invalid, error }, ...props }) => (
-  <div className={editClass(dirty, invalid)}>
+const InputMulti = ({
+  componentSingle, validateSingle, normalizeSingle,
+  meta: { dirty, invalid, error },
+  fields, table, eId, name,
+  ...props
+}) => (
+  <div
+    className={editClass(dirty, invalid)}
+  >
     {fields.map((field, i) =>
-      <p key={i} className="multi">
+      <p
+        key={field}
+        className="multi"
+      >
         <Field
           name={field}
-          type={type}
-          component={component}
-          validate={validate}
-          normalize={normalize}
+          component={componentSingle}
+          validate={validateSingle}
+          normalize={normalizeSingle}
           label={i}
+          table={table}
+          eId={eId}
           {...props}
         />
         <span
