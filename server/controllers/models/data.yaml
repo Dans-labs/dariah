@@ -27,27 +27,22 @@ tables:
         label: Eppn
         valType: text
         multiple: false
-        initial: N.N.
       email:
         label: Email
         valType: email
         multiple: false
-        initial: email
       firstName:
         label: First name
         valType: text
         multiple: false
-        initial: First name
       lastName:
         label: Last name
         valType: text
         multiple: false
-        initial: Last name
       mayLogin:
         label: Login allowed
         valType: bool
         multiple: false
-        initial: true
       dateModified:
         label: modified on
         valType: datetime
@@ -60,7 +55,6 @@ tables:
         label: Status last login
         valType: text
         multiple: false
-        initial: status
 
   country:
     title: name
@@ -77,32 +71,27 @@ tables:
         label: ISO(2)
         valType: text
         multiple: false
-        initial: XY
       name:
         label: Name
         valType: text
         multiple: false
-        initial: ...land
       isMember:
         label: Is DARIAH member
         valType: bool
         multiple: false
-        initial: true
       latitude:
         label: Latitude
         valType: number
         multiple: false
-        initial: 0.0
       longitude:
         label: Longitude
         valType: number
         multiple: false
-        initial: 0.0
 
   contrib:
     title: title
     sort:
-      - [sort, 1]
+      - [title, 1]
       - [dateCreated, -1]
     fieldOrder: 
       - title
@@ -131,7 +120,6 @@ tables:
         label: Title
         valType: text
         multiple: false
-        initial: title
 
       dateCreated:
         label: created on
@@ -147,45 +135,36 @@ tables:
         label: contact person
         valType: text
         multiple: false
-        initial: First_name Last_name
 
       contactPersonEmail:
         label: contact email
         valType: email
         multiple: true
-        initial: name@myinstitute.org
 
       urlContribution:
         label: Contribution url
         valType: url
         multiple: true
-        initial: www.mycontrib.org
 
       urlAcademic:
         label: Academic url
         valType: url
         multiple: true
-        initial: www.myinstitute.org
 
       description:
         label: Description
         valType: textarea
         multiple: false
-        convert: markdown
-        initial: This contribution is about ...
 
       costTotal:
         label: cost (total)
         valType: number
         multiple: false
-        initial: € 1000
 
       costDescription:
         label: cost (description)
         valType: textarea
-        convert: markdown
         multiple: false
-        initial: The costs of this contribution can be broken down as follows ...
 
       creator:
         label: creator
@@ -269,7 +248,7 @@ tables:
     filters:
       - field: title
         label: title
-        type: FullText
+        type: Fulltext
         maxCols: null
         expanded: null
       - field: country
@@ -317,4 +296,56 @@ tables:
         type: ByValue
         maxCols: 1
         expanded: false
+
+  package:
+    title: title
+    sort:
+      - [title, 1]
+      - [dateCreated, -1]
+    fieldOrder: 
+      - title
+      - startDate
+      - endDate
+      - notes
+      - dateCreated
+      - creator
+      - modified
+
+    fieldSpecs: 
+      title:
+        label: Title
+        valType: text
+        multiple: false
+
+      startDate:
+        label: start date
+        valType: datetime
+        multiple: false
+
+      endDate:
+        label: end date
+        valType: datetime
+        multiple: false
+
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+
+      creator:
+        label: creator
+        valType:
+          values: user
+          allowNew: false
+        multiple: false
+
+      modified:
+        label: modified
+        valType: text
+        multiple: true
+
+      notes:
+        label: Notes
+        valType: textarea
+        multiple: true
 

@@ -32,7 +32,7 @@
     - ByValue
     - Facet
     - Filter
-    - FullText
+    - Fulltext
   - method: pure
     components:
     - Stat
@@ -92,7 +92,7 @@
     - ItemHead
     - Input
     - InputMultiple
-    - MarkDownArea
+    - MarkdownArea
     - SelectR
 - dux: win
   methods:

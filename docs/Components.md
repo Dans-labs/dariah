@@ -28,7 +28,7 @@ Handy for:
 * view alternative representations of a resource, e.g.
 ```jsx
 [
-   <div>{MarkDownSource}</div>,
+   <div>{MarkdownSource}</div>,
    <div>{FormattedDoc}</div>
 ]
 ```
@@ -190,10 +190,10 @@ The directory, filename and extension of the document container.
 (life cycle) connected via [docs](Dux#docs)
 
 Component to show
-[MarkDown](https://guides.github.com/features/mastering-markdown/)
+[Markdown](https://guides.github.com/features/mastering-markdown/)
 text, coming from files on the server.
 The conversion to HTML is done client side,
-and the user gets a control to switch between MarkDown source and
+and the user gets a control to switch between Markdown source and
 formatted HTML.
 
 #### Props
@@ -208,7 +208,7 @@ Method to fetch the data from the server if needed.
 
 A function `RouterLink` is defined to wrap local links into `Link` components
 when transforming the markdown to html.
-It makes it possible to write MarkDown documents with
+It makes it possible to write Markdown documents with
 internal links to this application.
 
 A full link (with protocol `http`(`s`) is translated to a
@@ -312,7 +312,7 @@ We will use `<input type="..." />`, `<textarea>...</textarea>` elements and
 our own custom component [RelSelect](#relselect) for multiselect controls.
 
 We enhance *textareas* by offering markdown previews of their content.
-See [MarkDownArea](#markdownarea).
+See [MarkdownArea](#markdownarea).
 
 We wrap multiple *input*s in [InputMulti](#inputmulti) and single inputs
 in [Input](#input).
@@ -407,7 +407,7 @@ connected via [filters](Dux#filters)
 
 A control to filter a list of items.
 The following types of filters are implemented.
-* [FullText](#fulltext): Search in a textual field for a pattern.
+* [Fulltext](#fulltext): Search in a textual field for a pattern.
   The pattern is entered by the user,
   the search is incremental, after each keystroke the results are updated.
 * [ByValue](#byvalue): Faceted search for values of a specific field.
@@ -455,7 +455,7 @@ Whether the filters have been initialized.
 ###### `init` function is [setupFiltering](Dux#setupfiltering)
 Callback to initialize filtering.
 
-[FullText]({{site.appBase}}/state/FullText.jsx)
+[Fulltext]({{site.appBase}}/state/Fulltext.jsx)
 =============================================================================================
 connected via [filters](Dux#filters)
 
@@ -801,7 +801,7 @@ The information about the currently logged-in user, fetched from the server.
 ###### `fetch` function is [fetchMe](Dux#fetchme)
 Callback to fetch user information from the server.
 
-[MarkDownArea]({{site.appBase}}/pure/MarkDownArea.jsx)
+[MarkdownArea]({{site.appBase}}/pure/MarkdownArea.jsx)
 =============================================================================================
 presents [tables](Dux#tables)
 

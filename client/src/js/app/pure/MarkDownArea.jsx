@@ -11,7 +11,7 @@ const controls = [
   handler => <span className="button-medium fa fa-hand-o-down" onClick={handler} />,
 ]
 
-const MarkDownArea = ({ table, eId, meta: { dirty, invalid, error }, input: { name, value }, input }) => (
+const MarkdownArea = ({ table, eId, meta: { dirty, invalid, error }, input: { name, value }, input }) => (
   <Alternative
     tag={`md_${table}_${eId}_${name}`}
     controlPlacement={controlPlacement}
@@ -36,4 +36,4 @@ const MarkDownArea = ({ table, eId, meta: { dirty, invalid, error }, input: { na
   />
 )
 
-export default MarkDownArea
+export default MarkdownArea

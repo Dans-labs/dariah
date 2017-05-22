@@ -64,7 +64,7 @@ No Helpers.
 
 [docs]({{site.appBase}}/dux/docs.js)
 =============================================================================================
-Manages MarkDown documents. Fetches raw source from the server and stores it into the state, under
+Manages Markdown documents. Fetches raw source from the server and stores it into the state, under
 a key, which is the path information of the document.
 The [DocMd](Components#docmd) provides a widget for such documents.
 
@@ -108,7 +108,7 @@ Actions
 ---------------------------------------------------------------------------
 ### changeFulltext()
 Responds to a change in the search text in a
-[FullText](Components#fulltext)
+[Fulltext](Components#fulltext)
 search widget.
 
 ### changeFacet()
@@ -145,7 +145,7 @@ All the actual filter work is done here, but because it is rather complex, we ha
 ### getFilterSetting()
 Reads the current settings of a filter and injects it as `filterSettings` into
 the props of the receiving components, which are typically the filter widgets that receive user interaction:
-[FullText](Components#fulltext)
+[Fulltext](Components#fulltext)
 [Facet](Components#facet), and also
 [CheckboxI](Components#checkboxi),
 [EUMap](Components#eumap).

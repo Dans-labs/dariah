@@ -6,25 +6,16 @@ if [[ "$1" == "devenv" ]]; then
     # documentation server
     pushd docs
     bundle exec jekyll serve &
-    echo $! > $root/.procDoc 
     popd
     # hot module reload client app builder and server
     pushd client
     export NODE_ENV="development"; webpack-dev-server &
-    echo $! > $root/.procHot 
     popd
     # development webserver
 	pushd server
     python3 confyg.py controllers/models
     pushd controllers
     export REGIME=devel; python3 -m bottle --debug --reload --bind localhost:8001 index:app
-elif [[ "$1" == "stop" ]]; then
-    pkill -P `cat $root/.procDoc`
-    kill `cat $root/.procDoc`
-    rm $root/.procDoc
-    pkill -P `cat $root/.procHot`
-    kill `cat $root/.procHot`
-    rm $root/.procHot
 elif [[ "$1" == "docs" ]]; then
     cd docs
     bundle exec jekyll serve
@@ -84,7 +75,6 @@ else
     echo "./build.sh <task>"
     echo "    where <task> is one of:"
     echo "devenv: start development services: webserver, docserver, client app server"
-    echo "stop: stop development services: webserver, docserver, client app server"
     echo "serve: start the bottle webserver"
     echo "docs: build and serve github pages documentation locally"
     echo "dev: build the client (js and sass and css)"

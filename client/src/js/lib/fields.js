@@ -1,12 +1,12 @@
 import Input from 'Input'
-import MarkDownArea from 'MarkDownArea'
+import MarkdownArea from 'MarkdownArea'
 
 const valTypes = {
   text: { component: Input, type: 'text' },
   datetime: { component: Input, type: 'text' },
   email: { component: Input, type: 'text' },
   url: { component: Input, type: 'text' },
-  textarea: { component: MarkDownArea, type: 'text' },
+  textarea: { component: MarkdownArea, type: 'text' },
 }
 const { text: DEFAULT_TYPE } = valTypes
 

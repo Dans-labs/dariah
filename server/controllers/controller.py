@@ -17,16 +17,16 @@ class Controller(object):
 
     def list(self, name):
         table = getq('table')
-        return self.DB.getList(name, table, 'list', titleOnly=True, withFilters=True, withValueLists=True)
+        return self.DB.getList(name, table, titleOnly=True, withFilters=True, withValueLists=True)
 
     def my(self, name):
         table = getq('table')
-        return self.DB.getList(name, table, 'list', titleOnly=True, withFilters=True, withValueLists=True, my=True)
+        return self.DB.getList(name, table, titleOnly=True, withFilters=True, withValueLists=True, my=True)
 
     def view(self, name):
         table = getq('table')
         ident = getq('id')
-        return self.DB.getItem(name, table, ident, 'read')
+        return self.DB.getItem(name, table, ident)
 
     def mod(self, name):
         table = getq('table')

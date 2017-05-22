@@ -41,6 +41,14 @@ These are the pillars of connected pieces of labour, that support the individual
 I follow a [proposal by Erik Rasmussen](https://github.com/erikras/ducks-modular-redux) to call
 a modular Redux package a duck, and in the plural I call them **dux**, honouring the good work of Redux.
 
+## Backend
+At the server side we store the data in a [MongoDB](https://docs.mongodb.com).
+This data is server through a [Python-Bottle](http://bottlepy.org/docs/dev/) web framework.
+The authentication of users is outsourced to the DARIAH infrastructure, see
+[here](Dux#me). The authorization is defined by the [data model](Server#data-model) and
+[permission model](Server#permissions),
+which govern all data access.
+
 ## Deployment
 Here are the bits and pieces you have to do in order to get a working system out of this.
 

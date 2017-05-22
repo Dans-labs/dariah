@@ -8,7 +8,7 @@ import Stat from 'Stat'
 
 const handleChange = memoize((handle, table, filterId) => event => handle(table, filterId, event.target.value))
 
-const FullText = ({
+const Fulltext = ({
   table,
   filterId, filterField, filterLabel,
   filterSetting,
@@ -29,4 +29,4 @@ const FullText = ({
   </div>
 )
 
-export default connect(getFilterSetting, { handle: changeFulltext })(FullText)
+export default connect(getFilterSetting, { handle: changeFulltext })(Fulltext)

@@ -65,7 +65,7 @@ const getFilterData = ({ tables }, { table }) => {
 
 const compileFiltering = ({ valueLists, fields, filterList, fieldSpecs, ...relTables }) => {
   const presentFilterList = filterList.filter(x => fields[x.field])
-  const filterFields = presentFilterList.filter(x => x.type !== 'FullText').map(x => x.field)
+  const filterFields = presentFilterList.filter(x => x.type !== 'Fulltext').map(x => x.field)
   const fieldValues = {}
   for (const field of filterFields) {
     const { [field]: { valType } } = fieldSpecs
@@ -89,7 +89,7 @@ const initFiltering = ({ fields, filterList }, fieldValues) => {
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterSettings = {}
   presentFilterList.forEach((filterSpec, filterId) => {
-    if (filterSpec.type == 'FullText') {
+    if (filterSpec.type == 'Fulltext') {
       filterSettings[filterId] = ''
     }
     else {
@@ -112,7 +112,7 @@ const computeFiltering = (tables, table, fieldValues, filterSettings) => {
     const { [filterId]: filterSetting } = filterSettings
     const { [field]: fieldSpec } = fieldSpecs
     return (
-      filterSpec.type === 'FullText' ?
+      filterSpec.type === 'Fulltext' ?
           fulltextCheck :
           facetCheck
       )(tables, field, fieldSpec, filterSetting)
@@ -153,7 +153,7 @@ const computeFiltering = (tables, table, fieldValues, filterSettings) => {
   const amounts = {}
   presentFilterList.forEach(({ field, type }, filterId) => {
     const { [field]: fieldSpec } = fieldSpecs
-    amounts[filterId] = type === 'FullText' ? null : countFacets(
+    amounts[filterId] = type === 'Fulltext' ? null : countFacets(
       tables, field, fieldSpec, fieldValues[field], otherFilteredData[filterId], entities
     )
   })

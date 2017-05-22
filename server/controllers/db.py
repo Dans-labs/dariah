@@ -118,7 +118,7 @@ class DbAccess(object):
         return (valItemValues, newValues)
 
     def getList(
-            self, controller, table, action,
+            self, controller, table,
             rFilter=None, titleOnly=False,
             withValueLists=False, withFilters=False,
             my=False,
@@ -131,7 +131,7 @@ class DbAccess(object):
         perm = dict(insert=mayInsert)
         orderKey = 'my' if my else 'order' 
         none = {table: {orderKey: [], 'entities': {}, 'fields': {}, 'perm': {}}}
-        (good, result) = Perm.getPerm(controller, table, action)
+        (good, result) = Perm.getPerm(controller, table, 'list')
         if not good:
             return self.stop(data=none, text=result)
         (rowFilter, fieldFilter) = result
@@ -198,7 +198,7 @@ class DbAccess(object):
         good = True
         if not noTables:
             for t in relTables:
-                result = self.getList('list', t, 'list', withValueLists=True)
+                result = self.getList('list', t, withValueLists=True)
                 if result['good']:
                     tables[t] = result['data'][t]
                 else:
@@ -214,10 +214,10 @@ class DbAccess(object):
             valueLists[f] = rows
         return (good, msgs, tables, valueLists if field == None else valueLists[field])
 
-    def getItem(self, controller, table, ident, action):
+    def getItem(self, controller, table, ident):
         Perm = self.Perm
         none = {}
-        (good, result) = Perm.getPerm(controller, table, action)
+        (good, result) = Perm.getPerm(controller, table, 'read')
         if not good:
             return self.stop(text=result)
         (rowFilter, fieldFilter) = result
@@ -246,6 +246,7 @@ class DbAccess(object):
 
         if action == 'insert':
             title = self.DM.tables[table]['title']
+            sort = self.DM.tables[table]['sort']
             modified = self.DM.generic['modified']
             modDate = now()
             modBy = self.eppn

@@ -488,13 +488,6 @@ class FMConvert(object):
                             else: newValue = i
                     row[f] = newValue 
 
-    def sortFields(self):
-        for (mt, sortFields) in self.SORT_FIELDS.items():
-            for (fieldName, sortName) in sortFields.items():
-                for row in self.allData[mt]:
-                    value = row.get(fieldName, '')
-                    row[sortName] = '' if value == None else value.casefold()
-
     def testTweaks(self):
         for (table, test) in self.testOwner.items():
             my = self.uidMapping[test['owner']]
@@ -581,7 +574,6 @@ class FMConvert(object):
         self.userTable()
         self.provenance()
         self.relTables()
-        self.sortFields()
         if isDevel: self.testTweaks()
         self.importMongo()
         #self.showData()

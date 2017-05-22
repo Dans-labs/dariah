@@ -3,12 +3,12 @@ import { connect } from 'react-redux'
 
 import { getTableFilters } from 'tables'
 
-import FullText from 'FullText'
+import Fulltext from 'Fulltext'
 import ByValue from 'ByValue'
 import EUMap from 'EUMap'
 
 const filterClass = {
-  FullText,
+  Fulltext,
   EUMap,
   ByValue,
 }
