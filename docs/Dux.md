@@ -373,7 +373,7 @@ This reduces the amount of fetching that is needed, and it improves consistency,
 all data consuming components look at the same data.
 
 Principal data consuming components are [ItemFiltered](Components#itemfiltered) and
-[ItemMy](Components#itemmy).
+[Items](Components#itemmy).
 
 In order to do the job properly, a fair amount of metadata about tables and fields is also fetched and stored.
 In particular, tables specify which filters can be used on which fields.

@@ -69,6 +69,12 @@ owners:
   contrib:  creator
 
 tables:
+  package:
+    list:   office
+    read:   office
+    update: office
+    insert: office
+    delete: office
   user:
     list:   public
     read:   own
@@ -137,6 +143,36 @@ tables:
     delete: office
 
 fields:
+  package:
+    title:
+      list: office
+      read: office
+      update: office
+    startDate:
+      list: office
+      read: office
+      update: office
+    endDate:
+      list: office
+      read: office
+      update: office
+    dateCreated:
+      list: office
+      read: office
+      update: system
+    creator:
+      list: office
+      read: office
+      update: system
+    modified:
+      list: office
+      read: office
+      update: system
+    notes:
+      list: office
+      read: office
+      update: office
+
   user:
     firstName:
       list:   public

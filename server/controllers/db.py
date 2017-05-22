@@ -138,7 +138,7 @@ class DbAccess(object):
         fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
         if titleOnly:
-            filters = {f['field'] for f in self.DM.tables[table].get('filters', None)}
+            filters = {f['field'] for f in self.DM.tables[table].get('filters', [])}
             getFields = set(fieldFilter)
             for f in getFields:
                 if f != title and (filters == None or f not in filters): del fieldFilter[f] 
@@ -173,7 +173,7 @@ class DbAccess(object):
         for (t, tdata) in tables.items():
             data[t] = tdata
         if withFilters:
-            data[table]['filterList'] = self.DM.tables[table]['filters']
+            data[table]['filterList'] = self.DM.tables[table].get('filters', [])
         return self.stop(data=data)
 
     def getValueLists(self, table, field=None, noTables=False):

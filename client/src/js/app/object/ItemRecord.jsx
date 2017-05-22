@@ -59,10 +59,12 @@ class ItemRecord extends Component {
     */
   }
   gotoNewItem() {
-    const { props: { tables, table, router, insert } } = this
+    const { props: { tables, table, router, insert, select, location: { pathname } } } = this
     const { [table]: tableInfo } = tables
     if (tableInfo == null) {return}
-    const locBase = `/${table}/mylist`
+    const base = /^\/([^/]+)/.exec(pathname)[1]
+    const verb = (select == 'my') ? 'mylist' : 'list'
+    const locBase = `/${base}/${table}/${verb}`
     const { lastInserted = '' } = tableInfo
     const { prevInserted } = this
     if (prevInserted != null) {

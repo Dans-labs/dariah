@@ -5,7 +5,7 @@ import { getTables } from 'tables'
 
 import ItemHead from 'ItemHead'
 
-const ItemList = ({ tables, table, title, filteredData, inplace }) => {
+const ItemList = ({ tables, table, title, filteredData, inplace, base, verb }) => {
   const { [table]: { entities } } = tables
   return (
     <div>
@@ -14,7 +14,7 @@ const ItemList = ({ tables, table, title, filteredData, inplace }) => {
         filteredData.map(eId => {
           const { [eId]: { values } } = entities
           return (
-            <ItemHead key={eId} table={table} title={title} values={values} inplace={inplace} />
+            <ItemHead key={eId} table={table} title={title} values={values} inplace={inplace} base={base} verb={verb} />
           )
         })
         }</tbody>

@@ -513,6 +513,13 @@ class FMConvert(object):
             info(mt)
             db[mt].insert_many(rows)
 
+    def newTables(self):
+        client = MongoClient()
+        db = client.dariah
+        for nt in self.NEW_TABLES:
+            info('new table {}'.format(nt))
+            db.create_collection(nt)
+
     def exportXlsx(self):
         workbook = xlsxwriter.Workbook(self.EXPORT_ORIG, {'strings_to_urls': False})
         for mt in self.rawData:
@@ -576,6 +583,7 @@ class FMConvert(object):
         self.relTables()
         if isDevel: self.testTweaks()
         self.importMongo()
+        self.newTables()
         #self.showData()
         #self.showMoney()
         if isDevel: self.exportXlsx()

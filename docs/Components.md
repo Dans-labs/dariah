@@ -82,7 +82,7 @@ As far as the logic of the web page is concerned, this is the top level componen
 The height and width of the main window.
 It is only used to display the height and the width somewhere on the screen.
 
-[Backoffice]({{site.appBase}}/pure/Backoffice.jsx)
+[Backoffice]({{site.appBase}}/state/Backoffice.jsx)
 =============================================================================================
 presents [tables](Dux#tables)
 
@@ -735,7 +735,7 @@ The full information of the records will be looked up from `tables` in the state
 ###### `inplace` bool
 Whether the title can be expanded to the full record by the user.
 
-[ItemMy]({{site.appBase}}/object/ItemMy.jsx)
+[Items]({{site.appBase}}/object/Items.jsx)
 =============================================================================================
 (life cycle) connected via [tables](Dux#tables)
 

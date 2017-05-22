@@ -78,17 +78,17 @@
   - method: lifecycle
     components:
     - ItemFiltered
-    - ItemMy
+    - Items
     - ItemRecord
   - method: connected
     components:
+    - Backoffice
     - FieldEdit
     - FieldRead
     - ItemForm
     - ItemList
   - method: pure
     components:
-    - Backoffice
     - ItemHead
     - Input
     - InputMultiple

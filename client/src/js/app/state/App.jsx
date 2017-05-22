@@ -18,7 +18,7 @@ const App = ({ children, height, width }) => {
           src="/static/images/inkind_logo_small.png"
           title="information about this site"
         />
-        <NavLink to="/contrib" >{'Contributions'}</NavLink>
+        <NavLink to="/data/contrib" >{'Contributions'}</NavLink>
         <NavLink to="/backoffice" >{'Backoffice'}</NavLink>
         <Static />
         <span className="resize" title={text}>{text}</span>

@@ -277,6 +277,9 @@ MAIN_TABLES:
 - contrib
 - country
 
+NEW_TABLES:
+- package
+
 SKIP_FIELDS:
   contrib:
   - dateandtime_ciozero

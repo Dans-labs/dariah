@@ -7,8 +7,8 @@ import Alternative from 'Alternative'
 import ItemRecord from 'ItemRecord'
 import NavLink from 'NavLink'
 
-const MyItemHeadPure = ({ table, eId, entityHead, dirty }) => (
-  <NavLink className={'nav'} to={`/${table}/mylist/${eId}`} >
+const MyItemHeadPure = ({ table, eId, entityHead, dirty, base, verb }) => (
+  <NavLink className={'nav'} to={`/${base}/${table}/${verb}/${eId}`} >
     {dirty ? <span className="fa fa-pencil" /> : null}
     <span className={`${dirty ? 'warning' : ''}`} >{entityHead}</span>
   </NavLink>
@@ -34,7 +34,7 @@ const controlPlacement = memoize(entityHead => control => (
 ))
 
 
-const ItemHead = ({ table, values, title, inplace }) => {
+const ItemHead = ({ table, values, title, inplace, base, verb }) => {
   const { _id: eId, [title]: entityHead = '-empty-' } = values
 
   return (
@@ -60,6 +60,8 @@ const ItemHead = ({ table, values, title, inplace }) => {
             table={table}
             eId={eId}
             entityHead={entityHead}
+            base={base}
+            verb={verb}
           />
         )
       }

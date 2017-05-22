@@ -17,7 +17,7 @@ class Controller(object):
 
     def list(self, name):
         table = getq('table')
-        return self.DB.getList(name, table, titleOnly=True, withFilters=True, withValueLists=True)
+        return self.DB.getList(name, table, titleOnly=True, withFilters=True, withValueLists=True, my=False)
 
     def my(self, name):
         table = getq('table')

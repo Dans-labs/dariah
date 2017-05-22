@@ -212,7 +212,7 @@ rules:
       ignoreReadBeforeAssign: false
   prefer-destructuring:
     - warn
-    - array: true
+    - array: false
       object: true
     - enforceForRenamedProperties: false
   prefer-rest-params: warn
