@@ -70,8 +70,14 @@ owners:
 
 tables:
   package:
-    list:   office
-    read:   office
+    list:   public
+    read:   public
+    update: office
+    insert: office
+    delete: office
+  criteria:
+    list:   public
+    read:   public
     update: office
     insert: office
     delete: office
@@ -145,16 +151,20 @@ tables:
 fields:
   package:
     title:
-      list: office
-      read: office
+      list: public
+      read: public
       update: office
     startDate:
-      list: office
-      read: office
+      list: public
+      read: public
       update: office
     endDate:
-      list: office
-      read: office
+      list: public
+      read: public
+      update: office
+    notes:
+      list: public
+      read: public
       update: office
     dateCreated:
       list: office
@@ -168,10 +178,36 @@ fields:
       list: office
       read: office
       update: system
+
+  criteria:
+    key:
+      list: public
+      read: public
+      update: office
+    package:
+      list: public
+      read: public
+      update: office
+    criterion:
+      list: public
+      read: public
+      update: office
     notes:
+      list: public
+      read: public
+      update: office
+    dateCreated:
       list: office
       read: office
-      update: office
+      update: system
+    creator:
+      list: office
+      read: office
+      update: system
+    modified:
+      list: office
+      read: office
+      update: system
 
   user:
     firstName:

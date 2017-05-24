@@ -21,7 +21,7 @@ const InputMulti = ({
     className={editClass(dirty, invalid)}
   >
     {fields.map((field, i) =>
-      <p
+      <div
         key={field}
         className="multi"
       >
@@ -40,7 +40,7 @@ const InputMulti = ({
           title="remove"
           onClick={fieldRemove(fields, i)}
         />
-      </p>
+      </div>
     )}
     <p>
       <span

@@ -1,7 +1,7 @@
 import os
 import bottle
 from beaker.middleware import SessionMiddleware
-from user import UserApi
+from controllers.user import UserApi
 
 class AuthApi(UserApi):
     def __init__(self, DB, PM, secret_file):

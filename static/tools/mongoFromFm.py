@@ -26,7 +26,7 @@ from os.path import splitext, basename
 from functools import reduce
 from glob import glob
 from lxml import etree
-from datetime import datetime
+from datetime import datetime, date
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
@@ -82,6 +82,10 @@ def dtm(v_raw, i, t, fname):
         ))
         return v_raw
     return datetime(*map(int, re.split('[:T-]', DATETIME_PATTERN.sub(datetime_repl, v_raw))))
+
+def dti(v_iso): return date(*map(int, re.split('[-]', v_iso)))
+def dtmi(v_iso): return datetime(*map(int, re.split('[:T-]', v_iso)))
+def now(): return datetime.utcnow()
 
 def dtmiso(v_raw, i, t, fname):
     if not DATETIME_PATTERN.match(v_raw):
@@ -446,13 +450,13 @@ class FMConvert(object):
             c['modified'] = ['{} on {}'.format(c['modifiedBy'], c['dateModified'])]
             del c['modifiedBy']
             del c['dateModified']
-            print(c['modified'])
         self.allFields['contrib']['modified'] = ('string', 2)
         del self.allFields['contrib']['modifiedBy']
         del self.allFields['contrib']['dateModified']
 
+    def norm(self, x): return x.strip().lower()
+
     def relTables(self):
-        def norm(x): return x.strip().lower()
         
         relIndex = dict()
         for mt in sorted(self.VALUE_LISTS):
@@ -467,12 +471,12 @@ class FMConvert(object):
                 if not fAs in relIndex:
                     idMapping = dict((i, self.mongo.newId()) for i in relInfo)
                     self.allData[fAs] = [dict(_id=idMapping[i], rep=v) for (i, v) in relInfo.items()]
-                    relIndex[fAs] = dict((norm(v), (idMapping[i], v)) for (i, v) in relInfo.items())
+                    relIndex[fAs] = dict((self.norm(v), (idMapping[i], v)) for (i, v) in relInfo.items())
                 (ftype, fmult) = self.allFields[mt][f]
                 for row in rows:
                     newValue = []
                     for v in (row[f] if fmult > 1 else [row[f]] if row[f] != None else []):
-                        rnv = norm(v)
+                        rnv = self.norm(v)
                         (i, nv) = relIndex[fAs].get(rnv, ("-1", None))
                         if nv == None:
                             target = self.MOVE_MISSING[mt]
@@ -487,6 +491,7 @@ class FMConvert(object):
                             if fmult > 1: newValue.append(i)
                             else: newValue = i
                     row[f] = newValue 
+        self.relIndex = relIndex
 
     def testTweaks(self):
         for (table, test) in self.testOwner.items():
@@ -505,6 +510,42 @@ class FMConvert(object):
                     if value in mine:
                         row[field] = my
 
+    def backoffice(self, isDevel):
+        client = MongoClient()
+        db = client.dariah
+        self.backofficeTables = set()
+        if isDevel:
+            for table in self.BACKOFFICE:
+                bt = table['name']
+                self.backofficeTables.add(bt)
+                rows = table['rows']
+                self.allData[bt] = []
+                self.relIndex[bt] = dict()
+                for row in rows:
+                    _id = self.mongo.newId()
+                    newRow = dict()
+                    newRow['_id'] = _id
+                    ifield = 'key' if bt == 'criteria' else 'title'
+                    self.relIndex[bt][row[ifield]] = _id
+                    for (field, value) in row.items():
+                        if field in {'startDate', 'endDate'}:
+                            newRow[field] = value
+                        elif field in {'dateCreated'}:
+                            valueRep = now() if value == 'now' else value
+                            newRow[field] = valueRep
+                        elif field == 'creator':
+                            newRow[field] = self.uidMapping[value]
+                        elif field in {'typeContribution'}:
+                            newRow[field] = [self.relIndex[field][self.norm(val)][0] for val in value]
+                        elif field == 'package':
+                            newRow[field] = self.relIndex['package'][value]
+                        else: newRow[field] = value
+                    self.allData[bt].append(newRow)
+        else:
+            for table in self.BACKOFFICE:
+                bt = table['name']
+                self.allData[bt] = []
+
     def importMongo(self):
         client = MongoClient()
         client.drop_database('dariah')
@@ -512,13 +553,6 @@ class FMConvert(object):
         for (mt, rows) in self.allData.items():
             info(mt)
             db[mt].insert_many(rows)
-
-    def newTables(self):
-        client = MongoClient()
-        db = client.dariah
-        for nt in self.NEW_TABLES:
-            info('new table {}'.format(nt))
-            db.create_collection(nt)
 
     def exportXlsx(self):
         workbook = xlsxwriter.Workbook(self.EXPORT_ORIG, {'strings_to_urls': False})
@@ -537,6 +571,7 @@ class FMConvert(object):
         workbook = xlsxwriter.Workbook(self.EXPORT_MONGO, {'strings_to_urls': False})
         getName = lambda i: self.mongo.getName(i)
         for mt in self.allData:
+            if mt in self.backofficeTables: continue
             worksheet = workbook.add_worksheet(mt)
             fields = sorted(self.allFields[mt])
             for (f, field) in enumerate(fields):
@@ -582,8 +617,8 @@ class FMConvert(object):
         self.provenance()
         self.relTables()
         if isDevel: self.testTweaks()
+        self.backoffice(isDevel)
         self.importMongo()
-        self.newTables()
         #self.showData()
         #self.showMoney()
         if isDevel: self.exportXlsx()

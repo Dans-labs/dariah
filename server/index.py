@@ -1,11 +1,11 @@
 import bottle
 from bottle import post, get, route, response, view, template
 
-from db import DbAccess
-from file import FileApi
-from controller import Controller
-from auth import AuthApi
-from perm import PermApi
+from controllers.db import DbAccess
+from controllers.file import FileApi
+from controllers.controller import Controller
+from controllers.auth import AuthApi
+from controllers.perm import PermApi
 from models.data import DataModel
 from models.permission import PermissionModel
 

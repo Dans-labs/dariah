@@ -307,6 +307,7 @@ tables:
       - startDate
       - endDate
       - notes
+      - criteria
       - dateCreated
       - creator
       - modified
@@ -327,6 +328,19 @@ tables:
         valType: datetime
         multiple: false
 
+      notes:
+        label: Notes
+        valType: textarea
+        multiple: true
+
+      criteria:
+        label: Assessment criteria
+        valType:
+          details: criteria
+          linkField: packageId
+          allowNew: true
+        multiple: true
+
       dateCreated:
         label: created on
         valType: datetime
@@ -344,8 +358,64 @@ tables:
         valType: text
         multiple: true
 
+  criteria:
+    title: key
+    sort:
+      - [package, 1]
+      - [key, 1]
+    fieldOrder:
+      - key
+      - package
+      - contributionType
+      - criterion
+      - notes
+      - dateCreated
+      - creator
+      - modified
+
+    fieldSpecs:
+      key:
+        label: Key
+        valType: text
+        multiple: false
+
+      package:
+        label: Package
+        valType:
+          master: package
+        multiple: false
+
+      typeContribution:
+        label: Type
+        valType:
+          values: typeContribution
+          allowNew: true
+        multiple: true
+
+      criterion:
+        label: Criterion
+        valType: textarea
+        multiple: false
+
       notes:
         label: Notes
         valType: textarea
+        multiple: true
+
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+
+      creator:
+        label: creator
+        valType:
+          values: user
+          allowNew: false
+        multiple: false
+
+      modified:
+        label: modified
+        valType: text
         multiple: true
 

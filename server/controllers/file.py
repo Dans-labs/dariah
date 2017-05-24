@@ -2,10 +2,10 @@ import os
 
 from bottle import static_file
 
-STATIC_ROOT = '../../static/'
+STATIC_ROOT = '../static/'
 
 origins = {
-    'tech': '../../static/',
+    'tech': '../static/',
 }
 
 def determine_origin(path):

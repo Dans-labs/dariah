@@ -13,8 +13,7 @@ if [[ "$1" == "devenv" ]]; then
     popd
     # development webserver
 	pushd server
-    python3 confyg.py controllers/models
-    pushd controllers
+    python3 confyg.py models
     export REGIME=devel; python3 -m bottle --debug --reload --bind localhost:8001 index:app
 elif [[ "$1" == "docs" ]]; then
     cd docs
@@ -25,10 +24,8 @@ elif [[ "$1" == "dev" ]]; then
     webpack
 elif [[ "$1" == "serve" ]]; then
 	cd server
-    python3 confyg.py controllers/models
-    cd controllers
-    export REGIME=devel
-    python3 -m bottle --debug --reload --bind localhost:8001 index:app
+    python3 confyg.py models
+    export REGIME=devel; python3 -m bottle --debug --reload --bind localhost:8001 index:app
 elif [[ "$1" == "hot" ]]; then
     cd client
     export NODE_ENV="development"

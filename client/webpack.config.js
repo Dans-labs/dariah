@@ -3,14 +3,12 @@ const autoprefixer = require('autoprefixer')
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const extractCSS = new ExtractTextPlugin('main.css')
-//const extractLESS = new ExtractTextPlugin('mselect.css')
 
 module.exports = {
   context: __dirname + '/src',
   entry: {
     app: './js/app/main.jsx',
     main: './css/main.scss',
-    //mselect: 'react-select/less/default.less',
     _hrp: 'react-hot-loader/patch',
     _wpds: 'webpack-dev-server/client?http://localhost:8080',
     _who: 'webpack/hot/only-dev-server',
@@ -95,20 +93,6 @@ module.exports = {
           { loader: 'sass-loader' },
         ]),
       },
-      /*{
-        test: /\.less/,
-        use: extractLESS.extract([
-          {
-            loader: 'css-loader',
-            options: { minimize: false },
-          },
-          {
-            loader: 'postcss-loader',
-            options: { plugins: [autoprefixer] },
-          },
-          { loader: 'less-loader' },
-        ]),
-      },*/
     ]
   },
   plugins: [
@@ -129,7 +113,6 @@ module.exports = {
       },
     }),
     extractCSS,
-    //extractLESS,
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')

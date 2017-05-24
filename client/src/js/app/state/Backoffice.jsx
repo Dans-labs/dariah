@@ -9,8 +9,6 @@ const Backoffice = ({ children }) => (
   <div>
     <Pane format="nav sized" position="left">
       <div>
-        <p><NavLink to={`/backoffice/type/list`} >{'Types'}</NavLink></p>
-        <p><NavLink to={`/backoffice/assess/list`} >{'Criteria'}</NavLink></p>
         <p><NavLink to={`/backoffice/package/list`} >{'Packages'}</NavLink></p>
       </div>
     </Pane>
