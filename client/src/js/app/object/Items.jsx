@@ -11,10 +11,10 @@ import Pane from 'Pane'
 class Items extends Component {
   render() {
     const { props: { table, tables, children, select, location: { pathname } } } = this
-    //if (needTables(tables, table, true) || needTables(tables, ['country', 'user'])) {return <div />}
     const base = /^\/([^/]+)/.exec(pathname)[1]
     const verb = (select == 'my') ? 'mylist' : 'list'
-    if (needTables(tables, table, select == 'my')) {return <div />}
+    //if (needTables(tables, table, select == 'my')) {return <div />}
+    if (needTables(tables, table, true) || needTables(tables, ['country', 'user'])) {return <div />}
     const { [table]: { title, perm, my, order } } = tables
     const itemList = (select == 'my') ? my : order
     return (
