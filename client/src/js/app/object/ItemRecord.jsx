@@ -16,9 +16,11 @@ class ItemRecord extends Component {
   }
   handleDelete = event => {
     event.preventDefault()
-    const { props: { table, eId, del, router } } = this
+    const { props: { table, eId, del, router, select, location: { pathname } } } = this
     del(table, eId)
-    const locBase = `/${table}/mylist#`
+    const base = /^\/([^/]+)/.exec(pathname)[1]
+    const verb = (select == 'my') ? 'mylist' : 'list'
+    const locBase = `/${base}/${table}/${verb}`
     router.push(locBase)
   }
   render() {

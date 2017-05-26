@@ -169,7 +169,11 @@ export const needTables = (tables, table, my = false) => {
 }
 
 export const needValues = ({ tables, table, eId }) => (
-  tables == null || tables[table] == null || tables[table].entities[eId] == null || !tables[table].entities[eId].complete
+  tables == null ||
+    tables[table] == null ||
+    tables[table].entities[eId] == null ||
+    tables[table].entities[eId].perm == null ||
+    !tables[table].entities[eId].complete
 )
 
 export const changedItem = (newProps, oldProps) => (
