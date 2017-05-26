@@ -514,7 +514,7 @@ class FMConvert(object):
         client = MongoClient()
         db = client.dariah
         self.backofficeTables = set()
-        if isDevel:
+        if True or isDevel:
             for table in self.BACKOFFICE:
                 bt = table['name']
                 self.backofficeTables.add(bt)
@@ -544,7 +544,7 @@ class FMConvert(object):
         else:
             for table in self.BACKOFFICE:
                 bt = table['name']
-                self.allData[bt] = []
+                self.allData[bt] = [{}]
 
     def importMongo(self):
         client = MongoClient()

@@ -263,10 +263,6 @@ countryExtra:
     latitude: 49.3
     longitude: 32.6
 
-NEW_TABLES:
-- package
-- criteria
-
 BACKOFFICE:
   - name: package
     rows:
@@ -295,8 +291,37 @@ BACKOFFICE:
           - Access
         criterion: 'is data/access good?'
         notes:
-          - These are standards for *data*
-          - These are standards for *access*
+          - These are 2016-standards for *data*
+          - These are 2016-standards for *access*
+        dateCreated: now
+        creator: dirk
+      - key: c16-2
+        package: assess2016
+        typeContribution:
+          - Event
+        criterion: 'is the event organized periodically?'
+        notes:
+          - These are 2016-standards for *event*
+        dateCreated: now
+        creator: dirk
+      - key: c17-1
+        package: assess2017
+        typeContribution:
+          - Data
+          - Access
+        criterion: 'is data/access good?'
+        notes:
+          - These are 2017-standards for *data*
+          - These are 2017-standards for *access*
+        dateCreated: now
+        creator: dirk
+      - key: c17-2
+        package: assess2017
+        typeContribution:
+          - Event
+        criterion: 'is the event organized periodically?'
+        notes:
+          - These are 2017-standards for *event*
         dateCreated: now
         creator: dirk
 
