@@ -45,7 +45,7 @@ actions:
   delete: delete item
 
 methods:
-  my:
+  mylist:
     desc: list my items
     call: OWN
   list:
@@ -166,11 +166,11 @@ fields:
       list: public
       read: public
       update: office
-    dateCreated:
+    creator:
       list: office
       read: office
       update: system
-    creator:
+    dateCreated:
       list: office
       read: office
       update: system
@@ -196,11 +196,11 @@ fields:
       list: public
       read: public
       update: office
-    dateCreated:
+    creator:
       list: office
       read: office
       update: system
-    creator:
+    dateCreated:
       list: office
       read: office
       update: system
@@ -234,6 +234,18 @@ fields:
       list:   public
       read:   public
       update: office
+    creator:
+      list: office
+      read: office
+      update: system
+    dateCreated:
+      list: office
+      read: office
+      update: system
+    modified:
+      list: office
+      read: office
+      update: system
 
   country:
     name:
@@ -256,6 +268,18 @@ fields:
       list:   public
       read:   public
       update: office
+    creator:
+      list: office
+      read: office
+      update: system
+    dateCreated:
+      list: office
+      read: office
+      update: system
+    modified:
+      list: office
+      read: office
+      update: system
 
   vcc:
     rep:
@@ -332,10 +356,6 @@ fields:
       list:   public
       read:   public
       update: office
-    creator:
-      list:   public
-      read:   public
-      update: office
     contactPersonName:
       list:   public
       read:   public
@@ -360,14 +380,6 @@ fields:
       list:   public
       read:   public
       update: own
-    dateCreated:
-      list:   public
-      read:   public
-      update: office
-    modified:
-      list:   auth
-      read:   auth
-      update: system
     urlAcademic:
       list:   public
       read:   public
@@ -396,4 +408,16 @@ fields:
       list:   public
       read:   public
       update: own
+    creator:
+      list: public
+      read: public
+      update: office
+    dateCreated:
+      list: public
+      read: public
+      update: office
+    modified:
+      list: auth
+      read: auth
+      update: system
 

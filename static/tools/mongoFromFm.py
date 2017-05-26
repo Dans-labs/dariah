@@ -381,15 +381,29 @@ class FMConvert(object):
         extraInfo = self.countryExtra
         idMapping = dict()
 
+        seen = set()
         for row in self.allData['country']:
             for f in row:
                 if type(row[f]) is list: row[f] = row[f][0]
             iso = row['iso']
+            seen.add(iso)
             row['_id'] = self.mongo.newId()
             idMapping[iso] = row['_id']
             thisInfo = extraInfo[iso]
             row['latitude'] = thisInfo['latitude']
             row['longitude'] = thisInfo['longitude']
+        for (iso, info) in extraInfo.items():
+            if iso in seen: continue
+            _id = self.mongo.newId()
+            idMapping[iso] = _id
+            self.allData['country'].append(dict(
+                _id=_id,
+                iso=iso,
+                name=info['name'],
+                isMember=False,
+                latitude = info['latitude'],
+                longitude = info['longitude'],
+            ))
 
         for row in self.allData['contrib']:
             if row['country'] != None:
@@ -453,6 +467,14 @@ class FMConvert(object):
         self.allFields['contrib']['modified'] = ('string', 2)
         del self.allFields['contrib']['modifiedBy']
         del self.allFields['contrib']['dateModified']
+        creator = self.CREATOR
+        creatorId = self.uidMapping[creator]
+        created = now()
+        for mt in ('user', 'country', 'package', 'criteria'):
+            for c in self.allData[mt]:
+                c['creator'] = creatorId
+                c['dateCreated'] = created
+                c['modified'] = ['{} on {}'.format(creator, created)]
 
     def norm(self, x): return x.strip().lower()
 
@@ -614,10 +636,10 @@ class FMConvert(object):
         self.moveFields()
         self.countryTable()
         self.userTable()
-        self.provenance()
         self.relTables()
         if isDevel: self.testTweaks()
         self.backoffice(isDevel)
+        self.provenance()
         self.importMongo()
         #self.showData()
         #self.showMoney()

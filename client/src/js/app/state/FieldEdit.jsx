@@ -10,12 +10,12 @@ import RelSelect from 'RelSelect'
 
 const FieldEdit = ({ field, tables, table, eId, ...props }) => {
   const { [table]: { fieldSpecs } } = tables
-  const { [field]: { valType, multiple } } = fieldSpecs
+  const { [field]: { valType, valid, multiple } } = fieldSpecs
   if (typeof valType == 'string') {
     const typing = getValType(valType)
     const { component, type } = typing
-    const { [valType]: validate } = validation
-    const { [valType]: normalize } = normalization
+    const { [valid || valType]: validate } = validation
+    const { [valid || valType]: normalize } = normalization
     if (multiple) {
       return (
         <FieldArray

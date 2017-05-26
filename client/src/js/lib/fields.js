@@ -1,7 +1,10 @@
+import {countryBorders} from 'europe.geo'
+
 import Input from 'Input'
 import MarkdownArea from 'MarkdownArea'
 
 const valTypes = {
+  bool: { component: Input, type: 'checkbox' },
   text: { component: Input, type: 'text' },
   datetime: { component: Input, type: 'text' },
   email: { component: Input, type: 'text' },
@@ -14,6 +17,8 @@ export const getValType = valType => {
   const { [valType]: typing = DEFAULT_TYPE } = valTypes
   return typing
 }
+
+const iso2s = new Set(countryBorders.features.map(({ properties: { iso2 } }) => iso2))
 
 export const validation = {
   datetime(val) {
@@ -54,6 +59,12 @@ export const validation = {
     if (val == null) {return}
     if (isNaN(val)) {
       return `value must be a number`
+    }
+  },
+  isoCountry(val) {
+    if (val == null) {return}
+    if (!iso2s.has(val)) {
+      return `country code ${val} is not on the European map`
     }
   },
 }

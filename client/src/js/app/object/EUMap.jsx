@@ -64,6 +64,7 @@ class EUMap extends Component {
     this.features = {}
   }
   setMap = dom => {if (dom) {this.dom = dom}}
+
   render() {
     const { props: { tables, ...byValueProps }, setMap } = this
     return (
@@ -91,15 +92,17 @@ class EUMap extends Component {
     })
     const { order, entities } = country
     this.idFromIso = {}
+    this.inDariah = {}
     order.forEach(_id => {
-      const { [_id]: { values: { iso } } } = entities
+      const { [_id]: { values: { iso, isMember } } } = entities
       this.idFromIso[iso] = _id
+      this.inDariah[iso] = isMember
     })
     L.geoJSON(countryBorders, {
-      style: feature => COUNTRY_STYLE[this.inDariah(feature)],
+      style: feature => COUNTRY_STYLE[this.inDariah[feature.properties.iso2]],
       onEachFeature: feature => {
-        if (this.inDariah(feature)) {
-          const { properties: { iso2, lat, lng } } = feature
+        const { properties: { iso2, lat, lng } } = feature
+        if (this.inDariah[iso2]) {
           const { idFromIso: { [iso2]: _id } } = this
           const { [_id]: isOn } = filterSetting
           const marker = L.circleMarker([lat, lng], {
@@ -113,8 +116,6 @@ class EUMap extends Component {
       },
     }).addTo(this.map)
   }
-
-  inDariah = feature => !!this.idFromIso[feature.properties.iso2]
 
   componentDidUpdate() {
     const { props: { filterSetting, filteredAmountOthers, amounts } } = this

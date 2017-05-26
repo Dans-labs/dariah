@@ -122,6 +122,7 @@ class DbAccess(object):
             rFilter=None, titleOnly=False,
             withValueLists=False, withFilters=False,
             my=False,
+            grid=False,
         ):
         Perm = self.Perm
         tableInfo = self.DM.tables.get(table, {})
@@ -198,6 +199,7 @@ class DbAccess(object):
         good = True
         if not noTables:
             for t in relTables:
+                if t == table: continue
                 result = self.getList('list', t, withValueLists=True)
                 if result['good']:
                     tables[t] = result['data'][t]

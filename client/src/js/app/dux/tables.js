@@ -10,12 +10,14 @@ import { propsChanged, makeReducer } from 'utils'
  * Most actions call accessData, which will dispatch the ultimate fetch action.
  */
 
-export const fetchTable = table => (
-  accessData({ type: 'fetchTable', contentType: 'db', path: `/list?table=${table}`, desc: `${table} table`, table })
-)
-export const fetchTableMy = table => (
-  accessData({ type: 'fetchTableMy', contentType: 'db', path: `/my?table=${table}`, desc: `${table} table (my records)`, table })
-)
+export const fetchTable = (table, my, grid) => accessData({
+  type: 'fetchTable',
+  contentType: 'db',
+  path: `/${my ? 'my' : ''}list?table=${table}&grid=${grid}`,
+  desc: `${table} table`,
+  table,
+})
+
 export const fetchItem = (table, eId) => accessData({
   type: 'fetchItem',
   contentType: 'db',
@@ -54,10 +56,6 @@ export const delItem = (table, eId) => accessData({
 
 const flows = {
   fetchTable(state, { data }) {
-    if (data == null) {return state}
-    return mergeWith({}, state, data, setComplete)
-  },
-  fetchTableMy(state, { data }) {
     if (data == null) {return state}
     return mergeWith({}, state, data, setComplete)
   },
@@ -152,14 +150,22 @@ const addMy = (objValue, srcValue, key) => {
   }
 }
 
-export const needTables = (tables, tableNames, my = false) => {
-  if (tables == null) {return true}
-  const tNames = (Array.isArray(tableNames)) ? tableNames : [tableNames]
-  return tNames.some(table => (
-    tables[table] == null ||
-    (my && tables[table].my == null) ||
-    (!my && tables[table].order == null)
-  ))
+const hasTableData = (tables, table, key) => {
+  if (tables == null) {return false}
+  return tables[table] != null && tables[table][key] != null
+}
+
+export const needTables = (tables, table, my = false) => {
+  if (!hasTableData(tables, table, my ? 'my' : 'order')) {return true}
+  const { [table]: { fieldSpecs } } = tables
+  const relTables = Array.from(
+    new Set(
+      Object.entries(fieldSpecs).
+      filter(entry => (typeof entry[1].valType) == 'object').
+      map(entry => entry[1].valType.values)
+    )
+  )
+  return relTables.some(relTable => !hasTableData(tables, relTable, 'order'))
 }
 
 export const needValues = ({ tables, table, eId }) => (
@@ -225,6 +231,7 @@ export const repr = (tables, table, valType, value) => {
   if (typeof valType == 'string') {
     switch (valType) {
       case 'datetime': return trimDate(value)
+      case 'bool': return value ? 'Yes' : 'No'
       default: return value
     }
   }

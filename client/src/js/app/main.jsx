@@ -29,15 +29,16 @@ render(
         <Route path="tech/docs/:docFile" component={Doc} />
         <Route path="data" >
           <Route path=":table" component={SubApp} >
-            <Route path="list" component={ItemFiltered} />
-            <Route path="mylist" component={Items} select={'my'} >
+            <Route path="list" component={ItemFiltered} grid={false} />
+            <Route path="mylist" component={Items} select={'my'} grid={false} >
               <Route path=":eId" component={ItemRecord} select={'my'} />
             </Route>
           </Route>
         </Route>
         <Route path="backoffice" component={Backoffice} >
           <Route path=":table" >
-            <Route path="list" component={Items} select={'all'} >
+            <Route path="grid" component={Items} select={'all'} grid={true} />
+            <Route path="list" component={Items} select={'all'} grid={false} >
               <Route path=":eId" component={ItemRecord} select={'all'} />
             </Route>
           </Route>

@@ -19,9 +19,11 @@ tables:
       - lastName
       - mayLogin
       - authority
-      - dateModified
       - dateLastLogin
       - statusLastLogin
+      - creator
+      - dateCreated
+      - modified
     fieldSpecs: 
       eppn:
         label: Eppn
@@ -43,6 +45,10 @@ tables:
         label: Login allowed
         valType: bool
         multiple: false
+      authority:
+        label: Authentication authority
+        valType: text
+        multiple: false
       dateModified:
         label: modified on
         valType: datetime
@@ -55,21 +61,39 @@ tables:
         label: Status last login
         valType: text
         multiple: false
+      creator:
+        label: creator
+        valType:
+          values: user
+          allowNew: false
+        multiple: false
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+      modified:
+        label: modified
+        valType: text
+        multiple: true
 
   country:
     title: name
     sort:
       - [name, 1]
     fieldOrder:
-      - iso2
+      - iso
       - name
       - isMember
       - latitude
       - longitude
+      - creator
+      - dateCreated
+      - modified
     fieldSpecs:
-      iso2:
+      iso:
         label: ISO(2)
         valType: text
+        valid: isoCountry
         multiple: false
       name:
         label: Name
@@ -87,6 +111,20 @@ tables:
         label: Longitude
         valType: number
         multiple: false
+      creator:
+        label: creator
+        valType:
+          values: user
+          allowNew: false
+        multiple: false
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+      modified:
+        label: modified
+        valType: text
+        multiple: true
 
   contrib:
     title: title
@@ -106,73 +144,48 @@ tables:
       - contactPersonEmail
       - urlContribution
       - urlAcademic
-      - creator
-      - dateCreated
-      - modified
       - tadirahObject
       - tadirahActivity
       - tadirahTechnique
       - discipline
       - keyword
+      - creator
+      - dateCreated
+      - modified
 
     fieldSpecs: 
       title:
         label: Title
         valType: text
         multiple: false
-
-      dateCreated:
-        label: created on
-        valType: datetime
-        multiple: false
-
-      modified:
-        label: modified
-        valType: text
-        multiple: true
-
       contactPersonName:
         label: contact person
         valType: text
         multiple: false
-
       contactPersonEmail:
         label: contact email
         valType: email
         multiple: true
-
       urlContribution:
         label: Contribution url
         valType: url
         multiple: true
-
       urlAcademic:
         label: Academic url
         valType: url
         multiple: true
-
       description:
         label: Description
         valType: textarea
         multiple: false
-
       costTotal:
         label: cost (total)
         valType: number
         multiple: false
-
       costDescription:
         label: cost (description)
         valType: textarea
         multiple: false
-
-      creator:
-        label: creator
-        valType:
-          values: user
-          allowNew: false
-        multiple: false
-
       country:
         label: Country(ies)
         valType:
@@ -181,68 +194,73 @@ tables:
             isMember: true
           allowNew: false
         multiple: false
-
       year:
         label: Year
         valType:
           values: year
           allowNew: true
         multiple: false
-
       vcc:
         label: VCC
         valType:
           values: vcc
           allowNew: false
         multiple: true
-
       discipline:
         label: Disciplines
         valType:
           values: discipline
           allowNew: true
         multiple: true
-
       keyword:
         label: Keywords
         valType:
           values: keyword
           allowNew: true
         multiple: true
-
       typeContribution:
         label: Type
         valType:
           values: typeContribution
           allowNew: false
         multiple: false
-
       typeContributionOther:
         label: Type
         valType:
           values: typeContribution
           allowNew: true
         multiple: true
-
       tadirahObject:
         label: Object(s)
         valType:
           values: tadirahObject
           allowNew: false
         multiple: true
-
       tadirahActivity:
         label: Activity(ies)
         valType:
           values: tadirahActivity
           allowNew: false
         multiple: true
-
       tadirahTechnique:
         label: Technique(s)
         valType:
           values: tadirahTechnique
           allowNew: false
+        multiple: true
+      creator:
+        label: creator
+        valType:
+          values: user
+          allowNew: false
+        multiple: false
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+      modified:
+        label: modified
+        valType: text
         multiple: true
 
     filters:
@@ -308,8 +326,8 @@ tables:
       - endDate
       - notes
       - criteria
-      - dateCreated
       - creator
+      - dateCreated
       - modified
 
     fieldSpecs: 
@@ -317,22 +335,18 @@ tables:
         label: Title
         valType: text
         multiple: false
-
       startDate:
         label: start date
         valType: datetime
         multiple: false
-
       endDate:
         label: end date
         valType: datetime
         multiple: false
-
       notes:
         label: Notes
         valType: textarea
         multiple: true
-
       criteria:
         label: Assessment criteria
         valType:
@@ -340,19 +354,16 @@ tables:
           linkField: packageId
           allowNew: true
         multiple: true
-
-      dateCreated:
-        label: created on
-        valType: datetime
-        multiple: false
-
       creator:
         label: creator
         valType:
           values: user
           allowNew: false
         multiple: false
-
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
       modified:
         label: modified
         valType: text
@@ -369,8 +380,8 @@ tables:
       - contributionType
       - criterion
       - notes
-      - dateCreated
       - creator
+      - dateCreated
       - modified
 
     fieldSpecs:
@@ -378,42 +389,35 @@ tables:
         label: Key
         valType: text
         multiple: false
-
       package:
         label: Package
         valType:
           master: package
         multiple: false
-
       typeContribution:
         label: Type
         valType:
           values: typeContribution
           allowNew: true
         multiple: true
-
       criterion:
         label: Criterion
         valType: textarea
         multiple: false
-
       notes:
         label: Notes
         valType: textarea
         multiple: true
-
-      dateCreated:
-        label: created on
-        valType: datetime
-        multiple: false
-
       creator:
         label: creator
         valType:
           values: user
           allowNew: false
         multiple: false
-
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
       modified:
         label: modified
         valType: text
