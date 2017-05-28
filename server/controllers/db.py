@@ -155,8 +155,8 @@ class DbAccess(object):
             for d in documents:
                 (mayDelete, dFields) = Perm.may(table, 'delete', document=d)
                 (mayUpdate, uFields) = Perm.may(table, 'update', document=d)
-                perm = dict(update=uFields, delete=mayDelete)
-                entities[str(d['_id'])]['perm'] = perm
+                thisPerm = dict(update=uFields, delete=mayDelete)
+                entities[str(d['_id'])]['perm'] = thisPerm
         if withValueLists:
             (good, thisMsgs, tables, valueLists) = self.getValueLists(table)
             if not good:

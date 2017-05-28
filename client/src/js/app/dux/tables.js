@@ -36,12 +36,13 @@ export const modItem = (table, eId, values) => accessData({
   table,
 })
 
-export const insertItem = table => accessData({
+export const insertItem = (table, my) => accessData({
   type: 'newItem',
   contentType: 'db',
   path: `/mod?table=${table}&action=insert`,
   desc: `${table} insert new record`,
   table,
+  my,
 })
 
 export const delItem = (table, eId) => accessData({
@@ -79,10 +80,11 @@ const flows = {
     }
     return newState
   },
-  newItem(state, { data, table }) {
+  newItem(state, { data, table, my }) {
     if (data == null) {return state}
     const { values: { _id } } = data
-    return mergeWith({}, state, { [table]: { lastInserted: _id, entities: { [_id]: data }, my: [_id] } }, addMy)
+    const listKey = my ? 'my' : 'order'
+    return mergeWith({}, state, { [table]: { lastInserted: _id, entities: { [_id]: data }, [listKey]: [_id] } }, addKey(listKey))
   },
   delItem(state, { data, table }) {
     if (data == null) {return state}
@@ -147,9 +149,10 @@ const setComplete = (newValue, oldValue, key) => {
   if (key == 'complete') {return newValue || oldValue}
 }
 
-const addMy = (objValue, srcValue, key) => {
-  if (key == 'my') {
-    return (objValue == null) ? srcValue : objValue.concat(srcValue)
+const addKey = listKey => (objValue, srcValue, key) => {
+  if (key == listKey) {
+    //return (objValue == null) ? srcValue : objValue.concat(srcValue)
+    return (objValue == null) ? srcValue : srcValue.concat(objValue)
   }
 }
 

@@ -72,7 +72,7 @@ class ItemRecord extends Component {
     }
     else {
       this.prevInserted = lastInserted
-      insert(table)
+      insert(table, select == 'my')
     }
   }
   componentDidMount() {

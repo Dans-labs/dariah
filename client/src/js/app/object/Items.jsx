@@ -14,28 +14,24 @@ class Items extends Component {
     const { props: { table, tables, children, select, grid, location: { pathname } } } = this
     if (needTables(tables, table, select == 'my')) {return <div />}
     const base = /^\/([^/]+)/.exec(pathname)[1]
-    const verb = (select == 'my') ? 'mylist' : 'list'
+    const verb = `${(select == 'my') ? 'my' : ''}${grid ? 'grid' : 'list'}`
     const { [table]: { title, perm, my, order } } = tables
     const itemList = (select == 'my') ? my : order
-    const insertControl = (
-      <p>
-        {`${itemList.length} items `}
-        {(perm != null && perm.insert) ? (
-          <Link to={`/${base}/${table}/${verb}/new`}>
-            <span className="fa fa-plus" title={`new ${table}`} />
-          </Link>
-        ) : null}
-      </p>
-    )
     return (grid ? (
       <div>
-        {insertControl}
-        <ItemGrid table={table} title={title} filteredData={itemList} />
+        <ItemGrid table={table} title={title} filteredData={itemList} perm={perm} select={select} />
       </div>
     ) : (
       <div>
         <Pane format="nav sized" position="rightLeftNav">
-          {insertControl}
+          <p>
+            {`${itemList.length} items `}
+            {(perm != null && perm.insert) ? (
+              <Link to={`/${base}/${table}/${verb}/new`}>
+                <span className="fa fa-plus" title={`new ${table}`} />
+              </Link>
+            ) : null}
+          </p>
           <ItemList table={table} title={title} filteredData={itemList} inplace={false} base={base} verb={verb} />
         </Pane>
         <Pane format="sized" position="rightRightBody">

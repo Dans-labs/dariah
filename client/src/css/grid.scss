@@ -8,7 +8,7 @@
 .grid-head {
     display: inline-flex;
     flex-flow: row nowrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: baseline;
     align-content: flex-start;
 }
@@ -16,13 +16,17 @@
 .grid-row {
     display: inline-flex;
     flex-flow: row nowrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: baseline;
     align-content: flex-start;
 }
-
 .grid-cell {
 }
 .grid-head-cell {
     font-weight: bold;
+}
+.grid-status-cell {
+    flex-basis: 3em;
+    flex-grow: 0;
+    flex-shrink: 0;
 }

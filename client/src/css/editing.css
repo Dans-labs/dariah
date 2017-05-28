@@ -54,6 +54,21 @@ textarea.invalid {
     @include sizing(medium, 6px, 2)
     background-color: $warning-back;
 }
+.edit-action-small {
+    @include action();
+    @include sizing(small, 3px, 1)
+    background-color: $warning-back;
+}
+.reset-action {
+    @include action();
+    @include sizing(medium, 6px, 2)
+    color: $error-fore;
+}
+.reset-action-small {
+    @include action();
+    @include sizing(small, 3px, 1)
+    color: $error-fore;
+}
 .edit-noaction {
     background-color: $warning-back;
 }
