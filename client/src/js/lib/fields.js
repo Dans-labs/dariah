@@ -20,6 +20,30 @@ export const getValType = valType => {
 
 const iso2s = new Set(countryBorders.features.map(({ properties: { iso2 } }) => iso2))
 
+export const makeFields = ({ tables, table, fields, perm, ...props }) => {
+  const { initialValues } = props
+  const { [table]: { fieldSpecs, fieldOrder } } = tables
+
+  const fragments = []
+  let hasEditable = false
+  for (const field of fieldOrder) {
+    const { [field]: f } = fields
+    if (f == null) {continue}
+    const { [field]: { label } } = fieldSpecs
+    const { update: { [field]: editable } } = perm
+    const { [field]: myValues } = initialValues
+    if (editable) {hasEditable = true}
+    const theField = {
+      editable,
+      table,
+      myValues,
+      ...props,
+    }
+    fragments.push({ field, label, fragment: theField })
+  }
+  return { fragments, hasEditable }
+}
+
 export const validation = {
   datetime(val) {
     if (val == null) {return}

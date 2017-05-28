@@ -95,36 +95,60 @@ tables:
         valType: text
         valid: isoCountry
         multiple: false
+        grid:
+          width: 2em
       name:
         label: Name
         valType: text
         multiple: false
+        grid:
+          width: 10em
+          grow: 1
       isMember:
         label: Is DARIAH member
         valType: bool
         multiple: false
+        grid:
+          width: 2em
       latitude:
         label: Latitude
         valType: number
         multiple: false
+        grid:
+          width: 4em
+          grow: 0.5
+          shrink: 0.5
       longitude:
         label: Longitude
         valType: number
         multiple: false
+        grid:
+          width: 4em
+          grow: 0.5
+          shrink: 0.5
       creator:
         label: creator
         valType:
           values: user
           allowNew: false
         multiple: false
+        grid:
+          width: 10em
+          grow: 1
       dateCreated:
         label: created on
         valType: datetime
         multiple: false
+        grid:
+          width: 10em
+          grow: 1
       modified:
         label: modified
         valType: text
         multiple: true
+        grid:
+          width: 10em
+          grow: 1
 
   contrib:
     title: title

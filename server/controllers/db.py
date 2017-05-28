@@ -151,6 +151,12 @@ class DbAccess(object):
             documents = list(_DBM[table].find(rowFilter, fieldFilter).sort(sort))
         order=[d['_id'] for d in documents]
         entities=dict((str(d['_id']), dict(values=d, complete=not titleOnly)) for d in documents)
+        if grid:
+            for d in documents:
+                (mayDelete, dFields) = Perm.may(table, 'delete', document=d)
+                (mayUpdate, uFields) = Perm.may(table, 'update', document=d)
+                perm = dict(update=uFields, delete=mayDelete)
+                entities[str(d['_id'])]['perm'] = perm
         if withValueLists:
             (good, thisMsgs, tables, valueLists) = self.getValueLists(table)
             if not good:

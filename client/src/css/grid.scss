@@ -1,0 +1,28 @@
+.grid {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+
+.grid-head {
+    display: inline-flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: baseline;
+    align-content: flex-start;
+}
+
+.grid-row {
+    display: inline-flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: baseline;
+    align-content: flex-start;
+}
+
+.grid-cell {
+}
+.grid-head-cell {
+    font-weight: bold;
+}

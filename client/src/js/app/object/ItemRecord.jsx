@@ -9,11 +9,6 @@ import ItemForm from 'ItemForm'
 const NEW = 'new'
 
 class ItemRecord extends Component {
-  getEntity = () => {
-    const { props: { tables, table, eId } } = this
-    const { [table]: { entities: { [eId]: entity } } } = tables
-    return entity
-  }
   handleDelete = event => {
     event.preventDefault()
     const { props: { table, eId, del, router, select, location: { pathname } } } = this
@@ -27,8 +22,8 @@ class ItemRecord extends Component {
     const { props: { tables, table, eId } } = this
     if (needValues({ tables, table, eId })) {return <div />}
 
-    const entity = this.getEntity()
-    const { values: initialValues, perm, fields } = entity
+    const { [table]: { fields, entities: { [eId]: entity } } } = tables
+    const { values: initialValues, perm } = entity
     return (
       <div>
         <p>{

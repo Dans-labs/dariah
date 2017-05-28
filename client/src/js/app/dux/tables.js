@@ -4,6 +4,7 @@ import { createSelector } from 'reselect'
 
 import { accessData } from 'server'
 import { propsChanged, makeReducer } from 'utils'
+import { memoize } from 'memo'
 
 /* ACTIONS */
 /*
@@ -139,6 +140,8 @@ export const getOptions = createSelector(
 )
 
 /* HELPERS */
+
+export const toDb = memoize((table, eId, mod) => values => mod(table, eId, values))
 
 const setComplete = (newValue, oldValue, key) => {
   if (key == 'complete') {return newValue || oldValue}
