@@ -18,12 +18,12 @@ class Controller(object):
     def list(self, name):
         table = getq('table')
         grid = getq('grid')
-        return self.DB.getList(name, table, titleOnly=not grid, withFilters=True, withValueLists=True, my=False, grid=grid)
+        return self.DB.getList(name, table, titleOnly=not grid, my=False, grid=grid)
 
     def mylist(self, name):
         table = getq('table')
         grid = getq('grid')
-        return self.DB.getList(name, table, titleOnly=not grid, withFilters=True, withValueLists=True, my=True, grid=grid)
+        return self.DB.getList(name, table, titleOnly=not grid, my=True, grid=grid)
 
     def view(self, name):
         table = getq('table')

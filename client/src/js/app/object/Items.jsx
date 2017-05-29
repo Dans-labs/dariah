@@ -19,7 +19,7 @@ class Items extends Component {
     const itemList = (select == 'my') ? my : order
     return (grid ? (
       <div>
-        <ItemGrid table={table} title={title} filteredData={itemList} perm={perm} select={select} />
+        <ItemGrid table={table} filteredData={itemList} perm={perm} select={select} />
       </div>
     ) : (
       <div>

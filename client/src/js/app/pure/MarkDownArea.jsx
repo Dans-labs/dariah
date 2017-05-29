@@ -7,7 +7,7 @@ import Alternative from 'Alternative'
 
 const controlPlacement = control => <p className="stick" >{control}</p>
 const controls = [
-  handler => <span className="button-medium fa fa-pencil" onClick={handler} />,
+  handler => <span className="button-medium fa fa-pencil field-control" onClick={handler} />,
   handler => <span className="button-medium fa fa-hand-o-down" onClick={handler} />,
 ]
 
@@ -19,11 +19,11 @@ const MarkdownArea = ({ table, eId, meta: { dirty, invalid, error }, input: { na
     className="md-field"
     alternatives={[
       <Markdown
-        className={editClass(dirty, invalid)}
+        className={`${editClass(dirty, invalid)} field-content`}
         key="fmt"
         source={value}
       />,
-      <span key="src" >
+      <span key="src" className="field-content">
         <textarea
           className={`input ${editClass(dirty, invalid)}`}
           {...input}

@@ -1,8 +1,10 @@
-$action-back: #ffffee;
-$action-high: #ffff88;
-$action-fore: #0000bb;
-$action-border: #aaaa66;
-$action-text: #000044;
+$action-back: #ffffff;
+$action-high: #ffffee;
+$action-error-back: #ffdddd;
+$action-error-fore: #aa0000;
+$action-fore: #0000aa;
+$action-border: #fffffd;
+$action-text: #0000aa;
 
 @mixin action() {
     color: $action-fore;
@@ -10,19 +12,19 @@ $action-text: #000044;
 }
 @mixin actiontextdirty() {
     color: $action-text;
-    background-color: #ffff88;
+    background-color: $action-high;
     font-size: large;
     font-family: monospace;
 }
 @mixin actiontextinvalid() {
-    color: #aa0000;
-    background-color: #ffdddd;
+    color: $action-error-fore;
+    background-color: $action-error-back;
     font-size: large;
     font-family: monospace;
 }
 @mixin actiontext() {
     color: $action-text;
-    background-color: #ffffff;
+    background-color: $action-back;
     font-size: large;
     font-family: monospace;
 }

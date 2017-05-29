@@ -5,6 +5,7 @@ import { withParams } from 'utils'
 import { getTables, needValues, changedItem, fetchItem, insertItem, delItem } from 'tables'
 
 import ItemForm from 'ItemForm'
+import ItemGrid from 'ItemGrid'
 
 const NEW = 'new'
 
@@ -19,18 +20,35 @@ class ItemRecord extends Component {
     router.push(locBase)
   }
   render() {
-    const { props: { tables, table, eId } } = this
+    const { props: { tables, table, eId, select } } = this
     if (needValues({ tables, table, eId })) {return <div />}
 
-    const { [table]: { fields, entities: { [eId]: entity } } } = tables
+    const { [table]: { fields, details, entities: { [eId]: entity } } } = tables
     const { values: initialValues, perm } = entity
+    const detailTables = Object.entries(details || {}).map(([name, { label, table: detailTable, linkField }]) => {
+      const { [detailTable]: { perm: detailPerm, entities: detailEntities, my: detailMy, order: detailOrder } } = tables
+      const detailItems = (select == 'my') ? detailMy : detailOrder
+      const filteredData = detailItems.filter(_id => detailEntities[_id].values[linkField] == eId)
+      return (
+        <ItemGrid
+          key={`${name}-${eId}`}
+          gridTitle={label}
+          table={detailTable}
+          perm={detailPerm}
+          filteredData={filteredData}
+          select={select}
+          masterId={eId}
+          linkField={linkField}
+        />
+      )
+    })
     return (
       <div>
         <p>{
           perm.delete ?
             <span
               key="delete"
-              className={'fa fa-trash button-large delete'}
+              className={'fa fa-trash button-large error-o delete'}
               title="delete this item"
               onClick={this.handleDelete}
             /> :
@@ -46,6 +64,7 @@ class ItemRecord extends Component {
           form={`${table}-${eId}`}
           key={`${table}-${eId}`}
         />
+        {detailTables}
       </div>
     )
     /* Note the key prop passed to ItemForm.

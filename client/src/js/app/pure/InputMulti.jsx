@@ -18,13 +18,18 @@ const InputMulti = ({
   ...props
 }) => (
   <div
-    className={editClass(dirty, invalid)}
+    className={`${editClass(dirty, invalid)} multi-field`}
   >
     {fields.map((field, i) =>
       <div
         key={field}
-        className="multi"
+        className={'multi-content'}
       >
+        <span
+          className="button-small fa fa-close"
+          title="remove"
+          onClick={fieldRemove(fields, i)}
+        />
         <Field
           name={field}
           component={componentSingle}
@@ -35,19 +40,12 @@ const InputMulti = ({
           eId={eId}
           {...props}
         />
-        <span
-          className="button-small fa fa-close"
-          title="remove"
-          onClick={fieldRemove(fields, i)}
-        />
       </div>
     )}
-    <p>
-      <span
-        className="button-small fa fa-plus"
-        onClick={fieldPush(fields)}
-      />
-    </p>
+    <div
+      className={'button-small fa fa-plus multi-control'}
+      onClick={fieldPush(fields)}
+    />
     {error && <p className="invalid diag">{error}</p>}
   </div>
 )

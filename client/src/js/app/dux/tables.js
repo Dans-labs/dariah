@@ -36,11 +36,12 @@ export const modItem = (table, eId, values) => accessData({
   table,
 })
 
-export const insertItem = (table, my) => accessData({
+export const insertItem = (table, masterId = null, linkField = null, my) => accessData({
   type: 'newItem',
   contentType: 'db',
   path: `/mod?table=${table}&action=insert`,
   desc: `${table} insert new record`,
+  sendData: { masterId, linkField },
   table,
   my,
 })
@@ -167,20 +168,24 @@ export const needTables = (tables, table, my = false) => {
   const relTables = Array.from(
     new Set(
       Object.entries(fieldSpecs).
-      filter(entry => (typeof entry[1].valType) == 'object').
+      filter(entry => ((typeof entry[1].valType) == 'object') && entry[1].valType.values != null).
       map(entry => entry[1].valType.values)
     )
   )
   return relTables.some(relTable => !hasTableData(tables, relTable, 'order'))
 }
 
-export const needValues = ({ tables, table, eId }) => (
-  tables == null ||
+export const needValues = ({ tables, table, eId }) => {
+  if (tables == null ||
     tables[table] == null ||
     tables[table].entities[eId] == null ||
     tables[table].entities[eId].perm == null ||
-    !tables[table].entities[eId].complete
-)
+    !tables[table].entities[eId].complete) {
+    return true
+  }
+  const { [table]: { details } } = tables
+  return Object.values(details || {}).some(({ table: detailTable }) => needTables(tables, detailTable))
+}
 
 export const changedItem = (newProps, oldProps) => (
   propsChanged(newProps, needValues, oldProps, ['table', 'eId'])
@@ -218,9 +223,10 @@ const repCountry = ({ country }, valId) => {
 }
 
 const repValue = rel => (tables, valId) => {
-  const { [rel]: { entities: { [valId]: entity } } } = tables
+  const { [rel]: { title, entities: { [valId]: entity } } } = tables
+  const useTitle = title || 'rep'
   if (entity) {
-    const { values: { rep } } = entity
+    const { values: { [useTitle]: rep } } = entity
     return rep
   }
   else {return 'UNKNOWN'}

@@ -3,6 +3,37 @@ import { createSelector } from 'reselect'
 
 export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : ''
 
+export const editStatus = (dirty, invalid, submitting, reset, error) => (
+  <div>
+    {
+      (dirty && !invalid && !submitting) ? (
+        <button type="submit" className={'button-large edit-action'} >{'Save'}</button>
+      ) : null
+    }
+    {' '}
+    {
+      (dirty && !submitting) ? (
+        <button type="button" className={'button-large'} onClick={reset} >{'Reset'}</button>
+      ) : null
+    }
+    {' '}
+    {
+      (!dirty && !submitting) ? (
+        <span className="good-o fa fa-circle" title={'no changes'} />
+      ) : null
+    }
+    {' '}
+    {
+      (submitting) ? (
+        <span className="special-o fa fa-spinner fa-spin" title={'saving'} />
+      ) : null
+    }
+    {
+      error && <span className={'invalid diag'}>{error}</span>
+    }
+  </div>
+)
+
 export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
   let result = false
   if (oldProps == null) {

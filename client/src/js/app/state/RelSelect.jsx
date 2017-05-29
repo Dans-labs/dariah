@@ -111,7 +111,7 @@ const Typing = ({ tag, search, setS, setPU }) => (
 const Options = ({ tag, optionLookup, multiple, allowNew, options, value, onChange, search, setPU }) => {
   const pat = search.toLowerCase()
   return (
-    <div className="options" >
+    <div className={'options'} >
       {(
         allowNew &&
         search &&

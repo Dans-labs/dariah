@@ -371,13 +371,6 @@ tables:
         label: Notes
         valType: textarea
         multiple: true
-      criteria:
-        label: Assessment criteria
-        valType:
-          details: criteria
-          linkField: packageId
-          allowNew: true
-        multiple: true
       creator:
         label: creator
         valType:
@@ -392,6 +385,12 @@ tables:
         label: modified
         valType: text
         multiple: true
+
+    details:
+      criteria:
+        label: Assessment criteria
+        table: criteria
+        linkField: package
 
   criteria:
     title: key
@@ -416,7 +415,8 @@ tables:
       package:
         label: Package
         valType:
-          master: package
+          values: package
+          allowNew: true
         multiple: false
       typeContribution:
         label: Type

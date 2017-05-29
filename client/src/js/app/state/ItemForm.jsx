@@ -4,7 +4,7 @@ import { reduxForm } from 'redux-form'
 
 import { getTables, modItem, toDb } from 'tables'
 import { makeFields } from 'fields'
-import { onSubmitSuccess } from 'utils'
+import { onSubmitSuccess, editStatus } from 'utils'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
@@ -14,43 +14,15 @@ const ItemForm = props => {
   const { fragments, hasEditable } = makeFields(props)
   return (
     <form onSubmit={handleSubmit(toDb(table, eId, mod))} >
-      {hasEditable ? (
-        <div>
-          <p>
-            {
-              (dirty && !invalid && !submitting) ? (
-                <button type="submit" className={'button-large edit-action'} >{'Save'}</button>
-              ) : null
-            }
-            {' '}
-            {
-              (dirty && !submitting) ? (
-                <button type="button" className={'button-large'} onClick={reset} >{'Reset'}</button>
-              ) : null
-            }
-            {' '}
-            {
-              (!dirty && !submitting) ? (
-                <span className="good" >{'no changes'}</span>
-              ) : null
-            }
-            {' '}
-            {
-              (submitting) ? (
-                <span className="special" >{'saving ...'}</span>
-              ) : null
-            }
-          </p>
-          {error && <p className="invalid diag">{error}</p>}
-        </div>
-        ) : null
-      }
-      <table className="fragments">
-        <tbody>{
+      {hasEditable ? editStatus(dirty, invalid, submitting, reset, error) : null}
+      <div className={'grid fragments'}>{
         fragments.map(({ field, label, fragment: { editable, table, myValues, ...props } }) => (
-          <tr key={field} >
-            <th><label>{`${label}:`}</label></th>
-            <td>{ editable ?
+          <div
+            key={field}
+            className={'grid-row form'}
+          >
+            <div className={'grid-head-cell labelCol'}>{`${label}:`}</div>
+            <div className={'grid-cell valueCol'} >{ editable ?
               <FieldEdit
                 field={field}
                 table={table}
@@ -62,12 +34,11 @@ const ItemForm = props => {
                 myValues={myValues}
               />
             }
-            </td>
-          </tr>
+            </div>
+          </div>
         ))
       }
-        </tbody>
-      </table>
+      </div>
     </form>
   )
 }

@@ -4,7 +4,7 @@ import { reduxForm } from 'redux-form'
 
 import { getTables, modItem, delItem, toDb } from 'tables'
 import { makeFields } from 'fields'
-import { onSubmitSuccess } from 'utils'
+import { onSubmitSuccess, editStatus } from 'utils'
 import { memoize } from 'memo'
 
 import FieldRead from 'FieldRead'
@@ -21,36 +21,13 @@ const ItemRow = props => {
       onSubmit={handleSubmit(toDb(table, eId, mod))}
     >
       <div className="grid-status-cell">
+        {hasEditable ? editStatus(dirty, invalid, submitting, reset, error) : null}
         {
-          hasEditable ?
-            <div>
-              {
-                (dirty && !invalid && !submitting) ? (
-                  <button type="submit" className={'button-small edit-action-small fa fa-check'} />
-                  ) : null
-              }
-              {' '}
-              {
-                (dirty && !submitting) ? (
-                  <button type="button" className={'button-small reset-action-small fa fa-close'} onClick={reset} />
-                ) : null
-              }
-              {' '}
-              {
-                (!dirty && !submitting) ? (
-                  <span className={'good-o fa fa-circle'} />
-                ) : null
-              }
-              {' '}
-              {
-                (submitting) ? (
-                  <span className={'special-o fa fa-spinner fa-spin'} />
-                ) : null
-              }
-              {
-                error && <span className={'invalid diag'}>{error}</span>
-              }
-            </div> : null
+          perm.delete ? (
+            <div className="grid-cell">
+              <span className={'button-small error-o fa fa-trash'} onClick={delit(del, table, eId)} />
+            </div>
+          ) : null
         }
       </div>
       {
@@ -58,7 +35,7 @@ const ItemRow = props => {
           const { width, shrink, grow } = widths[i]
           return (
             <div
-                className="grid-cell"
+                className="grid-cell valueColGrid"
                 style={{
                   flexBasis: width,
                   flexShrink: shrink,
@@ -81,13 +58,6 @@ const ItemRow = props => {
             </div>
           )
         })
-      }
-      {
-        perm.delete ? (
-          <div className="grid-cell">
-            <span className={'button-small error fa fa-trash delete'} onClick={delit(del, table, eId)} />
-          </div>
-        ) : null
       }
     </form>
   )

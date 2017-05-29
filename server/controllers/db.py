@@ -88,11 +88,10 @@ class DbAccess(object):
                 else:
                     valValues = [v for v in values]
             else: 
-                (good, thisMsgs, tables, valueLists) = self.getValueLists(table, noTables=True)
-                if not good:
+                valueLists = self.getValueLists(table, {}, msgs, noTables=True)
+                if len(msgs):
                     valid = False
                     diags.append('Could not get the valuelists')
-                    msgs.extend(thisMsgs)
                 else:
                     allowNew = valType['allowNew']
                     relTable = valType['values']
@@ -117,13 +116,15 @@ class DbAccess(object):
             valItemValues[f] = (valid, diags, msgs, valValues)
         return (valItemValues, newValues)
 
-    def getList(
+    def _getList(
             self, controller, table,
+            data, msgs,
             rFilter=None, titleOnly=False,
-            withValueLists=False, withFilters=False,
+            withValueLists=True, withDetails=True, withFilters=True,
             my=False,
             grid=False,
         ):
+        if table in data: return
         Perm = self.Perm
         tableInfo = self.DM.tables.get(table, {})
         title = tableInfo.get('title', None)
@@ -134,8 +135,10 @@ class DbAccess(object):
         none = {table: {orderKey: [], 'entities': {}, 'fields': {}, 'perm': {}}}
         (good, result) = Perm.getPerm(controller, table, 'list')
         if not good:
-            return self.stop(data=none, text=result)
+            msgs.append(result)
+            return
         (rowFilter, fieldFilter) = result
+        details = self.DM.tables.get(table, {}).get('details', {})
         fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
         if titleOnly:
@@ -157,37 +160,50 @@ class DbAccess(object):
                 (mayUpdate, uFields) = Perm.may(table, 'update', document=d)
                 thisPerm = dict(update=uFields, delete=mayDelete)
                 entities[str(d['_id'])]['perm'] = thisPerm
-        if withValueLists:
-            (good, thisMsgs, tables, valueLists) = self.getValueLists(table)
-            if not good:
-                return self.stop(data=none, msgs=thisMsgs)
 
         result = dict(
             entities=entities,
             fields=fieldFilter,
-            valueLists=valueLists,
             title=title,
             perm=perm,
             fieldOrder=fieldOrder,
             fieldSpecs=fieldSpecs,
+            details=details
         )
-        if my:
-            result['my'] = order
-        else:
-            result['order'] = order
+        if my: result['my'] = order
+        else: result['order'] = order
 
-        data = {table: result}
-        for (t, tdata) in tables.items():
-            data[t] = tdata
-        if withFilters:
-            data[table]['filterList'] = self.DM.tables[table].get('filters', [])
-        return self.stop(data=data)
+        data[table] = result
+        if withFilters: data[table]['filterList'] = self.DM.tables[table].get('filters', [])
+        if withValueLists: result['valueLists'] = self.getValueLists(table, data, msgs)
+        if withDetails: self.getDetails(table, data, msgs)
+        return
 
-    def getValueLists(self, table, field=None, noTables=False):
+    def getList(
+            self, controller, table,
+            rFilter=None, titleOnly=False,
+            withValueLists=True, withDetails=True, withFilters=True,
+            my=False,
+            grid=False,
+        ):
+        data = {}
+        msgs = []
+        self._getList(
+            controller, table,
+            data,
+            msgs,
+            rFilter=rFilter, titleOnly=titleOnly,
+            withValueLists=withValueLists, withDetails=withDetails, withFilters=withFilters,
+            my=my,
+            grid=grid,
+        )
+        return self.stop(data=data, msgs=msgs)
+
+    def getValueLists(self, table, data, msgs, noTables=False):
         Perm = self.Perm
         (good, result) = Perm.getPerm('list', table, 'list')
         valueLists = {}
-        if not good: return (False, [], dict(), dict())
+        if not good: return dict()
         (rowFilter, fieldFilter) = result
         getFields = set(fieldFilter)
         fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
@@ -195,23 +211,14 @@ class DbAccess(object):
 
         relFields = [
             f for (f, fSpec) in fieldSpecs.items()\
-                if (field == None or f == field) and\
-                f in getFields and\
+                if f in getFields and\
                 type(fSpec['valType']) is dict
         ]  
         relTables = {fieldSpecs[f]['valType']['values'] for f in relFields}
-        tables = dict()
-        msgs = []
         good = True
         if not noTables:
             for t in relTables:
-                if t == table: continue
-                result = self.getList('list', t, withValueLists=True)
-                if result['good']:
-                    tables[t] = result['data'][t]
-                else:
-                    msgs.extend(result['msgs'])
-                    good = False
+                self._getList('list', t, data, msgs, withFilters=False, grid=True)
 
         for f in relFields:
             fSpec = fieldSpecs[f]['valType']
@@ -220,7 +227,15 @@ class DbAccess(object):
             valueOrder = self.DM.tables.get(t, {}).get('sort', self.DM.generic['sort'])
             rows = [str(row['_id']) for row in _DBM[t].find(select, dict(_id=True)).sort(valueOrder)]
             valueLists[f] = rows
-        return (good, msgs, tables, valueLists if field == None else valueLists[field])
+        return valueLists
+
+    def getDetails(self, table, data, msgs):
+        Perm = self.Perm
+        details = self.DM.tables.get(table, {}).get('details', {})
+        msgs = []
+        for (name, detailProps) in details.items():
+            t = detailProps['table']
+            self._getList('list', t, data, msgs, withFilters=False, grid=True)
 
     def getItem(self, controller, table, ident):
         Perm = self.Perm
@@ -253,6 +268,9 @@ class DbAccess(object):
         (rowFilter, fieldFilter) = result
 
         if action == 'insert':
+            newData = request.json
+            masterId = newData.get('masterId', None)
+            linkField = newData.get('linkField', None)
             title = self.DM.tables[table]['title']
             sort = self.DM.tables[table]['sort']
             modified = self.DM.generic['modified']
@@ -266,6 +284,8 @@ class DbAccess(object):
                 createdBy: self.uid,
                 modified: ['{} on {}'.format(modBy, modDate)],
             }
+            if masterId != None and linkField != None:
+                insertValues[linkField] = oid(masterId)
             result = _DBM[table].insert_one(insertValues)
             ident = result.inserted_id
             (good, (readRowFilter, readFieldFilter)) = Perm.getPerm(controller, table, 'read')
@@ -335,7 +355,8 @@ class DbAccess(object):
             return self.stop(data=dict(values=updateValues, newValues=newValues))
 
     def stop(self, data=None, text=None, msgs=None):
-        good = text == None and msgs == None
+        good = text == None and (msgs == None or len(msgs) == 0)
         msgs = [] if good else [dict(kind='error', text=text)] if msgs == None else msgs
+        data = None if not good else data
         return dict(data=data, msgs=msgs, good=good)
 

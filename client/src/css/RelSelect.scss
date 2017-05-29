@@ -1,20 +1,21 @@
-$select-back: rgba(255, 255, 225, 0.5);
+$select-back: rgba(255, 255, 255, 0.5);
 $select-high: rgba(255, 255, 128, 0.5);
 $select-fore: rgba(0, 0, 128, 0.9);
 $select-border: rgba(150, 150, 100, 0.5);
-$options-back: rgba(245, 245, 245, 0.8);
-$options-border: rgba(150, 150, 100, 0.5);
+$options-back: rgba(200, 200, 200, 0.8);
+$options-border: rgba(200, 200, 200, 0.5);
 $typing-fore: rgba(40, 40, 40, 0.9);
 $typing-back: rgba(255, 255, 255, 0.9);
 $opt-fore: rgba(80, 0, 0, 0.9);
-$opt-back: rgba(255, 220, 220, 0.6);
+$opt-back: rgba(250, 250, 250, 0.9);
+$opt-border: rgba(250, 250, 250, 0.9);
 $opthover-fore: rgba(80, 80, 0, 0.9);
 $opthover-back: rgba(255, 255, 220, 0.6);
 $opthover-border: rgba(0, 255, 0, 0.95);
 $tag-fore: rgba(0, 80, 0, 0.9);
-$tag-back: rgba(220, 255, 220, 0.6);
-$tag-back-var: rgba(220, 240, 220, 0.9);
-$tag-border: rgba(160, 200, 160, 0.7);
+$tag-back: rgba(220, 220, 220, 0.6);
+$tag-back-var: rgba(240, 240, 240, 0.9);
+$tag-border: rgba(220, 220, 220, 0.9);
 $newtag-fore: rgba(0, 0, 255, 0.9);
 $newtag-back: rgba(255, 255, 160, 0.7);
 $emptytag-fore: rgba(0, 0, 255, 0.9);
@@ -39,7 +40,7 @@ div.select.multiselect {
 .option {
     @include action();
     color: $select-fore;
-    background-color: $select-back;
+    background-color: $opt-border;
 }
 .option.selected {
     background-color: $select-high;
