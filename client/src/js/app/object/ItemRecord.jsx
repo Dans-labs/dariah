@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { withParams } from 'utils'
+import { withParams, editDelete } from 'utils'
 import { getTables, needValues, changedItem, fetchItem, insertItem, delItem } from 'tables'
 
 import ItemForm from 'ItemForm'
@@ -44,17 +44,7 @@ class ItemRecord extends Component {
     })
     return (
       <div>
-        <p>{
-          perm.delete ?
-            <span
-              key="delete"
-              className={'fa fa-trash button-large error-o delete'}
-              title="delete this item"
-              onClick={this.handleDelete}
-            /> :
-          null
-        }
-        </p>
+        {editDelete(perm, 'button-large', this.handleDelete)}
         <ItemForm
           table={table}
           eId={eId}

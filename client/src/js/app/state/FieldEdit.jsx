@@ -50,19 +50,17 @@ const FieldEdit = ({ field, tables, table, eId, ...props }) => {
     const { allowNew } = valType
     const tag = `${table}-${eId}-${field}`
     return (
-      <span>
-        <Field
-          name={field}
-          component={RelSelect}
-          tag={tag}
-          field={field}
-          multiple={multiple}
-          allowNew={allowNew}
-          table={table}
-          eId={eId}
-          {...props}
-        />
-      </span>
+      <Field
+        name={field}
+        component={RelSelect}
+        tag={tag}
+        field={field}
+        multiple={multiple}
+        allowNew={allowNew}
+        table={table}
+        eId={eId}
+        {...props}
+      />
     )
   }
 }

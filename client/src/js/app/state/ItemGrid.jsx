@@ -7,7 +7,7 @@ import { getTables, insertItem } from 'tables'
 
 import ItemRow from 'ItemRow'
 
-const insertit = memoize((insert, table, my, masterId, linkField) => () => insert(my, table, masterId, linkField))
+const insertit = memoize((insert, table, my, masterId, linkField) => () => insert(table, my, masterId, linkField))
 
 const ItemGrid = ({ tables, table, filteredData, perm: tablePerm, gridTitle, masterId, linkField, insert, select }) => {
   const theTitle = gridTitle ? `${gridTitle}: ` : ''
@@ -22,7 +22,11 @@ const ItemGrid = ({ tables, table, filteredData, perm: tablePerm, gridTitle, mas
       return { width: avLength, shrink: 0.5, grow: 1 }
     }
     const { width, grow, shrink } = grid
-    return { width: width || avLength, shrink: shrink || 0, grow: grow || 1 }
+    return {
+      width: (width == null) ? avLength : width,
+      shrink: (shrink == null) ? 0 : shrink,
+      grow: (grow == null) ? 0 : grow,
+    }
   })
   const rows = []
   for (const eId of filteredData) {

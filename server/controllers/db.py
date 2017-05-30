@@ -52,6 +52,7 @@ class DbAccess(object):
     def userMod(self, record): _DBM.user.update_one({'eppn': record['eppn']}, {'$set': record})
 
     def validate(self, table, itemValues, uFields):
+        modified = self.DM.generic['modified']
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in itemValues)
         valItemValues = dict()
         newValues = []
@@ -69,8 +70,12 @@ class DbAccess(object):
             diags = []
             msgs = []
             if f not in uFields:
-                valid = False
-                diags.append('{} not accessible'.format(f))
+# the field 'modified' is under system control.
+# if the current user has no update access, the received value is discarded.
+# later on, the system will append the correct value
+                if f != modified:
+                    valid = False
+                    diags.append('{} not accessible'.format(f))
             elif type(valType) is str:
                 if valType == 'datetime':
                     good = True
@@ -260,6 +265,7 @@ class DbAccess(object):
 
     def modList(self, controller, table, action):
         Perm = self.Perm
+        modified = self.DM.generic['modified']
         (good, result) = Perm.getPerm(controller, table, action)
         none = '' if action == 'insert' else {}
         if not good:
@@ -347,16 +353,20 @@ class DbAccess(object):
                 validationDiags['_error'] = 'invalid values in fields {}'.format(invalidFields)
                 validationMsgs.append(dict(kind='warning', text='table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)))
                 return self.stop(data=validationDiags, msgs=validationMsgs)
-            modified = self.DM.generic['modified']
             modDate = now()
             modBy = self.eppn
-            updateValues[modified].append('{} on {}'.format(modBy, modDate))
-            _DBM[table].update_one(rowFilter, {'$set': updateValues })
-            return self.stop(data=dict(values=updateValues, newValues=newValues))
+            updateSaveValues = updateValues
+            if modified not in updateValues:
+                updateSaveValues = {}
+                updateSaveValues.update(updateValues) # shallow copy of updateValues
+                updateSaveValues[modified] = document[modified] # add the modified field
+
+            updateSaveValues[modified].append('{} on {}'.format(modBy, modDate))
+            _DBM[table].update_one(rowFilter, {'$set': updateSaveValues }) # modified is updated in the database
+            return self.stop(data=dict(values=updateValues, newValues=newValues)) # but modified is not always returned
 
     def stop(self, data=None, text=None, msgs=None):
         good = text == None and (msgs == None or len(msgs) == 0)
         msgs = [] if good else [dict(kind='error', text=text)] if msgs == None else msgs
-        data = None if not good else data
         return dict(data=data, msgs=msgs, good=good)
 

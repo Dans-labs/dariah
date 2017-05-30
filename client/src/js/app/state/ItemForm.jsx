@@ -14,7 +14,7 @@ const ItemForm = props => {
   const { fragments, hasEditable } = makeFields(props)
   return (
     <form onSubmit={handleSubmit(toDb(table, eId, mod))} >
-      {hasEditable ? editStatus(dirty, invalid, submitting, reset, error) : null}
+      {editStatus(hasEditable, dirty, invalid, submitting, reset, error)}
       <div className={'grid fragments'}>{
         fragments.map(({ field, label, fragment: { editable, table, myValues, ...props } }) => (
           <div

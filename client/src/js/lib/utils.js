@@ -3,35 +3,43 @@ import { createSelector } from 'reselect'
 
 export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : ''
 
-export const editStatus = (dirty, invalid, submitting, reset, error) => (
-  <div>
-    {
-      (dirty && !invalid && !submitting) ? (
-        <button type="submit" className={'button-large edit-action'} >{'Save'}</button>
-      ) : null
-    }
-    {' '}
-    {
-      (dirty && !submitting) ? (
-        <button type="button" className={'button-large'} onClick={reset} >{'Reset'}</button>
-      ) : null
-    }
-    {' '}
-    {
-      (!dirty && !submitting) ? (
-        <span className="good-o fa fa-circle" title={'no changes'} />
-      ) : null
-    }
-    {' '}
-    {
-      (submitting) ? (
-        <span className="special-o fa fa-spinner fa-spin" title={'saving'} />
-      ) : null
-    }
-    {
-      error && <span className={'invalid diag'}>{error}</span>
-    }
-  </div>
+export const editStatus = (hasEditable, dirty, invalid, submitting, reset, error) => (
+  hasEditable ?
+    <div>
+      {
+        (dirty && !invalid && !submitting) ? (
+          <button type="submit" className={'button-large edit-action fa fa-check'} title={'save'} />
+        ) : null
+      }
+      {' '}
+      {
+        (dirty && !submitting) ? (
+          <button type="button" className={'button-large error-o fa fa-close'} title={'reset values to last saved'} onClick={reset} />
+        ) : null
+      }
+      {' '}
+      {
+        (!dirty && !submitting) ? (
+          <span className="good-o fa fa-circle" title={'no changes'} />
+        ) : null
+      }
+      {' '}
+      {
+        (submitting) ? (
+          <span className="special-o fa fa-spinner fa-spin" title={'saving'} />
+        ) : null
+      }
+      {
+        error && <span className={'invalid diag'}>{error}</span>
+      }
+    </div> :
+   null
+)
+
+export const editDelete = (perm, buttonClass, callBack) => (
+  perm.delete ? (
+    <div className={`grid-cell ${buttonClass} error-o fa fa-trash delete`} onClick={callBack} />
+  ) : null
 )
 
 export const propsChanged = (newProps, need, oldProps, keyPropNames) => {

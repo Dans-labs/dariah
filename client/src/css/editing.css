@@ -14,6 +14,7 @@
 }
 input {
     @include actiontext();
+    width: 95%;
     max-width: 95%;
     border: 0;
 }
@@ -177,4 +178,7 @@ textarea.invalid {
     border-bottom: 2px solid #dddddd; 
     background-color: #fafafa; 
     overflow: auto;
+}
+.delete {
+    float: right;
 }

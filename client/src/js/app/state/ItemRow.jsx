@@ -4,7 +4,7 @@ import { reduxForm } from 'redux-form'
 
 import { getTables, modItem, delItem, toDb } from 'tables'
 import { makeFields } from 'fields'
-import { onSubmitSuccess, editStatus } from 'utils'
+import { onSubmitSuccess, editStatus, editDelete } from 'utils'
 import { memoize } from 'memo'
 
 import FieldRead from 'FieldRead'
@@ -21,14 +21,8 @@ const ItemRow = props => {
       onSubmit={handleSubmit(toDb(table, eId, mod))}
     >
       <div className="grid-status-cell">
-        {hasEditable ? editStatus(dirty, invalid, submitting, reset, error) : null}
-        {
-          perm.delete ? (
-            <div className="grid-cell">
-              <span className={'button-small error-o fa fa-trash'} onClick={delit(del, table, eId)} />
-            </div>
-          ) : null
-        }
+        {editStatus(hasEditable, dirty, invalid, submitting, reset, error)}
+        {editDelete(perm, 'button-small', delit(del, table, eId))}
       </div>
       {
         fragments.map(({ field, label, fragment: { editable, table, myValues, ...props } }, i) => {

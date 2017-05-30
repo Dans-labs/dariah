@@ -269,16 +269,16 @@ fields:
       read:   public
       update: office
     creator:
-      list: office
-      read: office
+      list: system
+      read: system
       update: system
     dateCreated:
-      list: office
-      read: office
+      list: system
+      read: system
       update: system
     modified:
-      list: office
-      read: office
+      list: system
+      read: system
       update: system
 
   vcc:

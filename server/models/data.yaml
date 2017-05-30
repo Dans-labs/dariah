@@ -97,6 +97,7 @@ tables:
         multiple: false
         grid:
           width: 2em
+          grow: 0
       name:
         label: Name
         valType: text
@@ -109,7 +110,8 @@ tables:
         valType: bool
         multiple: false
         grid:
-          width: 2em
+          width: 4em
+          grow: 0
       latitude:
         label: Latitude
         valType: number
