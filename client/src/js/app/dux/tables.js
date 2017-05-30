@@ -36,7 +36,7 @@ export const modItem = (table, eId, values) => accessData({
   table,
 })
 
-export const insertItem = (table, masterId = null, linkField = null, my) => accessData({
+export const insertItem = (table, my, masterId = null, linkField = null) => accessData({
   type: 'newItem',
   contentType: 'db',
   path: `/mod?table=${table}&action=insert`,

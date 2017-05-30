@@ -7,7 +7,7 @@ import { getTables, insertItem } from 'tables'
 
 import ItemRow from 'ItemRow'
 
-const insertit = memoize((insert, table, masterId, linkField, my) => () => insert(table, masterId, linkField, my))
+const insertit = memoize((insert, table, my, masterId, linkField) => () => insert(my, table, masterId, linkField))
 
 const ItemGrid = ({ tables, table, filteredData, perm: tablePerm, gridTitle, masterId, linkField, insert, select }) => {
   const theTitle = gridTitle ? `${gridTitle}: ` : ''
@@ -65,7 +65,7 @@ const ItemGrid = ({ tables, table, filteredData, perm: tablePerm, gridTitle, mas
           <span
             className="fa fa-plus button-large"
             title={`new ${table}`}
-            onClick={insertit(insert, table, masterId, linkField, select == 'my')}
+            onClick={insertit(insert, table, select == 'my', masterId, linkField)}
           />
         ) : null}
       </p>
