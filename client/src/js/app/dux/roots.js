@@ -10,6 +10,7 @@ import me from 'me'
 import filters from 'filters'
 import alter from 'alter'
 import select from 'select'
+import grid from 'grid'
 
 /* ACTIONS */
 
@@ -63,21 +64,10 @@ export default configureStore(combineReducers({
   alter,
   form,
   select,
+  grid,
 }))
 
 /* SELECTORS */
-
-/*
-export const combineSelectors = function(...selectors) {
-  return (state, props) => {
-    const result = {}
-    for (const selector of selectors) {
-      Object.assign(result, selector(state, props))
-    }
-    return result
-  }
-}
-*/
 
 /* HELPERS */
 

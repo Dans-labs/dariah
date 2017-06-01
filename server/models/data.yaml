@@ -393,6 +393,7 @@ tables:
         label: Assessment criteria
         table: criteria
         linkField: package
+        mode: plain
 
   criteria:
     title: key
@@ -402,7 +403,7 @@ tables:
     fieldOrder:
       - key
       - package
-      - contributionType
+      - typeContribution
       - criterion
       - notes
       - creator

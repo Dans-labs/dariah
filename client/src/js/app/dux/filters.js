@@ -102,10 +102,10 @@ const initFiltering = ({ fields, filterList }, fieldValues) => {
 }
 
 const computeFiltering = (tables, table, fieldValues, filterSettings) => {
-  const { [table]: { entities, order, fields, fieldSpecs, filterList } } = tables
+  const { [table]: { entities, allIds, fields, fieldSpecs, filterList } } = tables
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterChecks = {}
-  const otherFilteredData = {}
+  const otherFilteredIds = {}
 
   const makeFilterCheck = (filterSpec, filterId) => {
     const { field } = filterSpec
@@ -120,11 +120,11 @@ const computeFiltering = (tables, table, fieldValues, filterSettings) => {
 
   presentFilterList.forEach((filterSpec, filterId) => {
     filterChecks[filterId] = makeFilterCheck(filterSpec, filterId)
-    otherFilteredData[filterId] = []
+    otherFilteredIds[filterId] = []
   })
-  const filteredData = []
+  const filteredIds = []
 
-  for (const eId of order) {
+  for (const eId of allIds) {
     const { [eId]: entity } = entities
     let theOneFail = null
     let v = true
@@ -142,27 +142,27 @@ const computeFiltering = (tables, table, fieldValues, filterSettings) => {
     if (!discard) {
       const { values: { _id } } = entity
       if (v) {
-        filteredData.push(_id)
+        filteredIds.push(_id)
         presentFilterList.forEach((filterSpec, filterId) => {
-          otherFilteredData[filterId].push(_id)
+          otherFilteredIds[filterId].push(_id)
         })
       }
-      else {otherFilteredData[theOneFail].push(_id)}
+      else {otherFilteredIds[theOneFail].push(_id)}
     }
   }
   const amounts = {}
   presentFilterList.forEach(({ field, type }, filterId) => {
     const { [field]: fieldSpec } = fieldSpecs
     amounts[filterId] = type === 'Fulltext' ? null : countFacets(
-      tables, field, fieldSpec, fieldValues[field], otherFilteredData[filterId], entities
+      tables, field, fieldSpec, fieldValues[field], otherFilteredIds[filterId], entities
     )
   })
   const filteredAmountOthers = {}
-  Object.entries(otherFilteredData).forEach(([filterId, x]) => {
+  Object.entries(otherFilteredIds).forEach(([filterId, x]) => {
     filteredAmountOthers[filterId] = x.length
   })
   return {
-    filteredData,
+    filteredIds,
     filteredAmountOthers,
     amounts,
   }
@@ -219,15 +219,15 @@ const getUnpack = (tables, fieldSpec, asString = false) => {
   if (typeof valType == 'string') {
     unpack = multiple ? (
       asString ? (
-        v => (v == null) ? '' : v.join(' ')
+        v => v == null ? '' : v.join(' ')
       ) : (
-        v => (v == null) ? [] : v
+        v => v == null ? [] : v
       )
     ) : (
       asString ? (
-        v => (v == null) ? '' : v
+        v => v == null ? '' : v
       ) : (
-        v => (v == null) ? [] : [v]
+        v => v == null ? [] : [v]
       )
     )
   }
@@ -235,15 +235,15 @@ const getUnpack = (tables, fieldSpec, asString = false) => {
     const { values: relTable } = valType
     unpack = multiple ? (
       asString ? (
-        v => (v == null) ? '' : v.map(v => repRelated(tables, relTable, v).join(' '))
+        v => v == null ? '' : v.map(v => repRelated(tables, relTable, v).join(' '))
       ) : (
-        v => (v == null) ? [] : v
+        v => v == null ? [] : v
       )
     ) : (
       asString ? (
-        v => (v == null) ? '' : repRelated(tables, relTable, v)
+        v => v == null ? '' : repRelated(tables, relTable, v)
       ) : (
-        v => (v == null) ? [] : [v]
+        v => v == null ? [] : [v]
       )
     )
   }
@@ -283,11 +283,11 @@ const facetCheck = (tables, field, fieldSpec, facetSettings) => {
   }
 }
 
-const countFacets = (tables, field, fieldSpec, fieldValues, filteredData, entities) => {
+const countFacets = (tables, field, fieldSpec, fieldValues, filteredIds, entities) => {
   const unpack = getUnpack(tables, fieldSpec)
   const facetAmounts = {}
   Object.keys(fieldValues).forEach(r => {facetAmounts[r] = 0})
-  for (const eId of filteredData) {
+  for (const eId of filteredIds) {
     const { [eId]: { values: { [field]: val } } } = entities
     const rep = unpack(val)
     if (rep.length == 0) {
@@ -311,13 +311,13 @@ export const placeFacets = (fieldValues, maxCols) => {
   if (facets.length == 0) {return []}
   const rows = []
   const { length: lf } = facets
-  const nrows = Math.floor(lf / maxCols) + ((lf % maxCols) ? 1 : 0)
-  const ncols = Math.floor(lf / nrows) + ((lf % nrows) ? 1 : 0)
+  const nrows = Math.floor(lf / maxCols) + (lf % maxCols ? 1 : 0)
+  const ncols = Math.floor(lf / nrows) + (lf % nrows ? 1 : 0)
   for (let r = 0; r < nrows; r++) {
     const row = []
     for (let c = 0; c < ncols; c++) {
       const f = nrows * c + r
-      row.push((f < lf) ? facets[f] : null)
+      row.push(f < lf ? facets[f] : null)
     }
     rows.push(row)
   }

@@ -22,7 +22,7 @@ class PermApi(object):
         rowFilter = self._rowSet(table, level) if action != 'insert' else True
         fieldFilter = self._fieldProjection(table, action) if action not in {'insert', 'delete'} else True
         if rowFilter == False or not fieldFilter:
-            return (False, None)
+            return (False, None) # this is not an error: the set of permitted rows/fields is just empty
         return (True, (rowFilter, fieldFilter))
 
     def may(self, table, action, document=None):

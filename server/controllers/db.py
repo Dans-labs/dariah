@@ -136,11 +136,11 @@ class DbAccess(object):
         sort =  tableInfo.get('sort', None)
         (mayInsert, iFields) = Perm.may(table, 'insert')
         perm = dict(insert=mayInsert)
-        orderKey = 'my' if my else 'order' 
+        orderKey = 'myIds' if my else 'allIds' 
         none = {table: {orderKey: [], 'entities': {}, 'fields': {}, 'perm': {}}}
         (good, result) = Perm.getPerm(controller, table, 'list')
         if not good:
-            msgs.append(result)
+            msgs.append(dict(kind='error', text=result or 'Cannot list {}'.format(table)))
             return
         (rowFilter, fieldFilter) = result
         details = self.DM.tables.get(table, {}).get('details', {})
@@ -157,7 +157,7 @@ class DbAccess(object):
             documents = list(_DBM[table].find(rowFilter, fieldFilter))
         else:
             documents = list(_DBM[table].find(rowFilter, fieldFilter).sort(sort))
-        order=[d['_id'] for d in documents]
+        allIds=[d['_id'] for d in documents]
         entities=dict((str(d['_id']), dict(values=d, complete=not titleOnly)) for d in documents)
         if grid:
             for d in documents:
@@ -173,10 +173,11 @@ class DbAccess(object):
             perm=perm,
             fieldOrder=fieldOrder,
             fieldSpecs=fieldSpecs,
-            details=details
+            details=details,
+            complete=grid,
         )
-        if my: result['my'] = order
-        else: result['order'] = order
+        if my: result['myIds'] = allIds
+        else: result['allIds'] = allIds
 
         data[table] = result
         if withFilters: data[table]['filterList'] = self.DM.tables[table].get('filters', [])
@@ -247,7 +248,7 @@ class DbAccess(object):
         none = {}
         (good, result) = Perm.getPerm(controller, table, 'read')
         if not good:
-            return self.stop(text=result)
+            return self.stop(text=result or 'Cannot read {}'.format(table))
         (rowFilter, fieldFilter) = result
         fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
@@ -269,7 +270,7 @@ class DbAccess(object):
         (good, result) = Perm.getPerm(controller, table, action)
         none = '' if action == 'insert' else {}
         if not good:
-            return self.stop(data=none, text=result)
+            return self.stop(data=none, text=result or 'Cannot do {} in table {}'.format(table, action))
 
         (rowFilter, fieldFilter) = result
 
@@ -294,7 +295,10 @@ class DbAccess(object):
                 insertValues[linkField] = oid(masterId)
             result = _DBM[table].insert_one(insertValues)
             ident = result.inserted_id
-            (good, (readRowFilter, readFieldFilter)) = Perm.getPerm(controller, table, 'read')
+            (readGood, readResult) = Perm.getPerm(controller, table, 'read')
+            if not readGood:
+                return self.stop(data=none, text=readResult or 'Cannot read table {}'.format(table))
+            (readRowFilter, readFieldFilter) = readResult
             documents = list(_DBM[table].find(dict(_id=ident), readFieldFilter))
             ldoc = len(documents)
             if ldoc == 0:

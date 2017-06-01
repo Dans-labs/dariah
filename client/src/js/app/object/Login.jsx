@@ -8,7 +8,7 @@ class Login extends Component {
     const { props: { me } } = this
     return (
       <span className="login" >{
-        me.eppn && Object.keys(me).length > 0 ? (
+        me.eppn ? (
           <span>
             <span className="fa fa-user" title={me.eppn} /><strong>{me.eppn.split('@')[0]}</strong>
             <span className="fa fa-hashtag" />{me.authority}{' '}

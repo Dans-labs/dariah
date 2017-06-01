@@ -1,6 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { combineSelectors } from 'utils'
+
+import { getMe } from 'me'
 import { getWinDim } from 'win'
 
 import Login from 'Login'
@@ -8,7 +11,7 @@ import NavLink from 'NavLink'
 import Static from 'Static'
 import Notification from 'Notification'
 
-const App = ({ children, height, width }) => {
+const App = ({ children, height, width, me }) => {
   const text = `${width} x ${height}`
   return (
     <div>
@@ -19,7 +22,11 @@ const App = ({ children, height, width }) => {
           title="information about this site"
         />
         <NavLink to="/data/contrib" >{'Contributions'}</NavLink>
-        <NavLink to="/backoffice" >{'Backoffice'}</NavLink>
+        {
+          me.eppn ?
+            <NavLink to="/backoffice" >{'Backoffice'}</NavLink> :
+            null
+        }
         <Static />
         <span className="resize" title={text}>{text}</span>
         <Login />
@@ -29,4 +36,6 @@ const App = ({ children, height, width }) => {
   )
 }
 
-export default connect(getWinDim)(App)
+const getInfo = combineSelectors(getWinDim, getMe)
+
+export default connect(getInfo)(App)

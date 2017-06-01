@@ -4,16 +4,17 @@ import { reduxForm } from 'redux-form'
 
 import { getTables, modItem, delItem, toDb } from 'tables'
 import { makeFields } from 'fields'
-import { onSubmitSuccess, editStatus, editDelete } from 'utils'
+import { onSubmitSuccess, editDelete } from 'utils'
 import { memoize } from 'memo'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
+import EditStatus from 'EditStatus'
 
 const delit = memoize((del, table, eId) => () => del(table, eId))
 
 const ItemRow = props => {
-  const { table, eId, perm, mod, del, dirty, invalid, error, submitting, reset, handleSubmit, widths } = props
+  const { table, eId, perm, mod, del, handleSubmit, widths } = props
   const { fragments, hasEditable } = makeFields(props)
   return (
     <form
@@ -21,8 +22,8 @@ const ItemRow = props => {
       onSubmit={handleSubmit(toDb(table, eId, mod))}
     >
       <div className="grid-status-cell">
-        {editStatus(hasEditable, dirty, invalid, submitting, reset, error)}
         {editDelete(perm, 'button-small', delit(del, table, eId))}
+        <EditStatus form={`${table}-${eId}`} hasEditable={hasEditable} canSubmit={true} />
       </div>
       {
         fragments.map(({ field, label, fragment: { editable, table, myValues, ...props } }, i) => {
@@ -57,7 +58,10 @@ const ItemRow = props => {
   )
 }
 
-export default connect(getTables, { mod: modItem, del: delItem })(reduxForm({
+export default connect(getTables, {
+  mod: modItem,
+  del: delItem,
+})(reduxForm({
   destroyOnUnmount: false,
   enableReinitialize: true,
   keepDirtyOnReinitialize: true,

@@ -4,6 +4,7 @@ import { makeReducer } from 'utils'
 /* ACTIONS */
 
 export const nextAlt = (tag, nAlts, initial) => ({ type: 'nextAlt', tag, nAlts, initial })
+export const setAlt = (tag, alt) => ({ type: 'setAlt', tag, alt })
 
 /* REDUCER */
 
@@ -12,6 +13,9 @@ const flows = {
     const { [tag]: oldAlt = (initial || 0) } = state
     const newAlt = (oldAlt + 1) % nAlts
     return merge({}, state, { [tag]: newAlt })
+  },
+  setAlt(state, { tag, alt }) {
+    return merge({}, state, { [tag]: alt })
   },
 }
 

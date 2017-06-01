@@ -6,9 +6,7 @@ import Root from 'Root'
 import App from 'App'
 import SubApp from 'SubApp'
 import Backoffice from 'Backoffice'
-import ItemFiltered from 'ItemFiltered'
-import Items from 'Items'
-import ItemRecord from 'ItemRecord'
+import ListContainer from 'ListContainer'
 import Doc from 'Doc'
 import NotFound from 'NotFound'
 
@@ -29,18 +27,14 @@ render(
         <Route path="tech/docs/:docFile" component={Doc} />
         <Route path="data" >
           <Route path=":table" component={SubApp} >
-            <Route path="list" component={ItemFiltered} grid={false} />
-            <Route path="mylist" component={Items} select={'my'} grid={false} >
-              <Route path=":eId" component={ItemRecord} select={'my'} />
-            </Route>
+            <Route path="list" component={ListContainer} mode={'filter'} />
+            <Route path="mylist" component={ListContainer} select={'myIds'} mode={'list'} />
           </Route>
         </Route>
         <Route path="backoffice" component={Backoffice} >
           <Route path=":table" >
-            <Route path="grid" component={Items} select={'all'} grid={true} />
-            <Route path="list" component={Items} select={'all'} grid={false} >
-              <Route path=":eId" component={ItemRecord} select={'all'} />
-            </Route>
+            <Route path="grid" component={ListContainer} select={'allIds'} mode={'grid'} />
+            <Route path="list" component={ListContainer} select={'allIds'} mode={'list'} />
           </Route>
         </Route>
       </Route>

@@ -192,6 +192,10 @@ fields:
       list: public
       read: public
       update: office
+    typeContribution:
+      list: public
+      read: public
+      update: office
     notes:
       list: public
       read: public

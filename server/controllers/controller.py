@@ -17,13 +17,13 @@ class Controller(object):
 
     def list(self, name):
         table = getq('table')
-        grid = getq('grid')
-        return self.DB.getList(name, table, titleOnly=grid=='false', my=False, grid=grid)
+        grid = getq('grid')=='true'
+        return self.DB.getList(name, table, titleOnly=not grid, my=False, grid=grid)
 
     def mylist(self, name):
         table = getq('table')
-        grid = getq('grid')
-        return self.DB.getList(name, table, titleOnly=grid=='false', my=True, grid=grid)
+        grid = getq('grid')=='true'
+        return self.DB.getList(name, table, titleOnly=not grid, my=True, grid=grid)
 
     def view(self, name):
         table = getq('table')

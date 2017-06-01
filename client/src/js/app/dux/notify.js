@@ -98,7 +98,7 @@ export const getNotifications = ({ notify }) => {
 
 const addItems = (objValue, srcValue, key) => {
   if (key == 'items') {
-    return (objValue == null) ? srcValue : objValue.concat(srcValue)
+    return objValue == null ? srcValue : objValue.concat(srcValue)
   }
 }
 

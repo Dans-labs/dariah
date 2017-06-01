@@ -13,7 +13,7 @@ const controls = [
 
 const MarkdownArea = ({ table, eId, meta: { dirty, invalid, error }, input: { name, value }, input }) => (
   <Alternative
-    tag={`md_${table}_${eId}_${name}`}
+    tag={`md-${table}-${eId}-${name}`}
     controlPlacement={controlPlacement}
     controls={controls}
     className="md-field"

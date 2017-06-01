@@ -1,16 +1,22 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
 import { withParams } from 'utils'
+import { getMe } from 'me'
 
 import NavLink from 'NavLink'
 import Pane from 'Pane'
 
-const SubApp = ({ table, children }) => (
+const SubApp = ({ table, me, children }) => (
   <div>
     <Pane format="nav sized" position="left">
       <div>
         <p><NavLink to={`/data/${table}/list`} >{'All items'}</NavLink></p>
-        <p><NavLink to={`/data/${table}/mylist`} >{'My work'}</NavLink></p>
+        {
+          me.eppn ?
+            <p><NavLink to={`/data/${table}/mylist`} >{'My work'}</NavLink></p> :
+            null
+        }
       </div>
     </Pane>
     <Pane format="sized" position="right">
@@ -19,4 +25,4 @@ const SubApp = ({ table, children }) => (
   </div>
 )
 
-export default withParams(SubApp)
+export default connect(getMe)(withParams(SubApp))

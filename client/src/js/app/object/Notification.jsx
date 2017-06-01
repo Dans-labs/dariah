@@ -27,7 +27,7 @@ class Notification extends Component {
   render() {
     const { props: { notifications, lastNote, lastKind, busy, show } } = this
     const highlight = lastNote > -1
-    const busyBlocks = new Array((busy < 0) ? 0 : busy).fill(1)
+    const busyBlocks = new Array(busy < 0 ? 0 : busy).fill(1)
     return (
       <div>
         <p className="msg-spinner" >
@@ -52,7 +52,7 @@ class Notification extends Component {
               <p
                 key={i}
                 ref={this.refDom(`m${i}`)}
-                className={`msg-line ${[msg.kind]}-o ${(msg.kind != 'info') ? 'msg-high' : ''}`}
+                className={`msg-line ${[msg.kind]}-o ${msg.kind != 'info' ? 'msg-high' : ''}`}
               >{msg.text}</p>
             ))
           }

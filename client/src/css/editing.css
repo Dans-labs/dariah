@@ -14,9 +14,11 @@
 }
 input {
     @include actiontext();
+    border: 0;
+}
+input[type="text"] {
     width: 95%;
     max-width: 95%;
-    border: 0;
 }
 input.dirty {
     @include actiontextdirty();
@@ -150,7 +152,7 @@ textarea.invalid {
     flex-grow: 0;
     overflow: auto;
 }
-.detailTitle {
+.listTitle {
     text-align: left;
     padding: 0.2em;
     background-color: $widget-fixed-back; 

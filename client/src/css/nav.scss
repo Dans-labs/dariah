@@ -39,6 +39,11 @@ div.nav {
     background-color: $widget-fixed-back;
     padding: 0;
 }
+a.active {
+    background-color: #eeeeee;
+    border: 1px solid $action-border;
+    border-radius: 2px;
+}
 .nav a.active,a.nav.active {
     background-color: $action-back;
     border: 1px solid $action-border;

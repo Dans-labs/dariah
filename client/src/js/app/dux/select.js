@@ -21,7 +21,7 @@ const flows = {
   togglePopUp(state, { tag }) {
     const init = initSelect(state, tag)
     const { [tag]: myState } = state
-    const newOnOff = (myState == null) ? true : !myState.popUp
+    const newOnOff = myState == null ? true : !myState.popUp
     return merge(init, state, { [tag]: { popUp: newOnOff } })
   },
 }
@@ -36,7 +36,7 @@ export const getSelect = ({ select }, { tag }) => ({ ...(select[tag] || {}) })
 
 const initSelect = (state, tag) => {
   const { [tag]: myState } = state
-  return (myState == null) ?
+  return myState == null ?
     { [tag]: { search: '', popUp: false } } :
     {}
 }

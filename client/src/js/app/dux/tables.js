@@ -3,7 +3,7 @@ import merge from 'lodash/merge'
 import { createSelector } from 'reselect'
 
 import { accessData } from 'server'
-import { propsChanged, makeReducer } from 'utils'
+import { makeReducer } from 'utils'
 import { memoize } from 'memo'
 
 /* ACTIONS */
@@ -11,10 +11,10 @@ import { memoize } from 'memo'
  * Most actions call accessData, which will dispatch the ultimate fetch action.
  */
 
-export const fetchTable = (table, my, grid) => accessData({
+export const fetchTable = (table, select = 'allIds', grid) => accessData({
   type: 'fetchTable',
   contentType: 'db',
-  path: `/${my ? 'my' : ''}list?table=${table}&grid=${grid}`,
+  path: `/${select == 'myIds' ? 'my' : ''}list?table=${table}&grid=${grid}`,
   desc: `${table} table`,
   table,
 })
@@ -36,14 +36,14 @@ export const modItem = (table, eId, values) => accessData({
   table,
 })
 
-export const insertItem = (table, my, masterId = null, linkField = null) => accessData({
-  type: 'newItem',
+export const insertItem = (table, select = 'allIds', masterId = null, linkField = null) => accessData({
+  type: 'insertItem',
   contentType: 'db',
   path: `/mod?table=${table}&action=insert`,
   desc: `${table} insert new record`,
   sendData: { masterId, linkField },
   table,
-  my,
+  select,
 })
 
 export const delItem = (table, eId) => accessData({
@@ -64,9 +64,10 @@ const flows = {
   },
   fetchItem(state, { data, table }) {
     if (data == null) {return state}
-    const { values: { _id } } = data
-    const newState = merge({}, state, { [table]: { entities: { [_id]: data } } })
-    newState[table].entities[_id].values = data.values
+    const { fields, ...restData } = data
+    const { values, values: { _id } } = restData
+    const newState = merge({}, state, { [table]: { fields, entities: { [_id]: restData } } })
+    newState[table].entities[_id].values = values
     return newState
   },
   modItem(state, { data, table }) {
@@ -81,25 +82,25 @@ const flows = {
     }
     return newState
   },
-  newItem(state, { data, table, my }) {
+  insertItem(state, { data, table, select }) {
     if (data == null) {return state}
-    const { values: { _id } } = data
-    const listKey = my ? 'my' : 'order'
-    return mergeWith({}, state, { [table]: { lastInserted: _id, entities: { [_id]: data }, [listKey]: [_id] } }, addKey(listKey))
+    const { fields, ...restData } = data
+    const { values: { _id } } = restData
+    return mergeWith({}, state, { [table]: { lastInserted: _id, fields, entities: { [_id]: data }, [select]: [_id] } }, addKey(select))
   },
   delItem(state, { data, table }) {
     if (data == null) {return state}
     const _id = data
-    const { [table]: { entities: { [_id]: del, ...otherEntities }, my, order } } = state
-    const otherMy = (my == null) ? null : my.filter(x => x != _id)
-    const otherOrder = (order == null) ? null : order.filter(x => x != _id)
+    const { [table]: { entities: { [_id]: del, ...otherEntities }, myIds, allIds } } = state
+    const otherMyIds = myIds == null ? null : myIds.filter(x => x != _id)
+    const otherAllIds = allIds == null ? null : allIds.filter(x => x != _id)
     return {
       ...state,
       [table]: {
         ...state[table],
         entities: otherEntities,
-        order: otherOrder,
-        my: otherMy,
+        allIds: otherAllIds,
+        myIds: otherMyIds,
       },
     }
   },
@@ -152,18 +153,18 @@ const setComplete = (newValue, oldValue, key) => {
 
 const addKey = listKey => (objValue, srcValue, key) => {
   if (key == listKey) {
-    //return (objValue == null) ? srcValue : objValue.concat(srcValue)
-    return (objValue == null) ? srcValue : srcValue.concat(objValue)
+    return objValue == null ? srcValue : srcValue.concat(objValue)
   }
 }
 
-const hasTableData = (tables, table, key) => {
+const hasTableKey = (tables, table, key, value = null) => {
   if (tables == null) {return false}
-  return tables[table] != null && tables[table][key] != null
+  return tables[table] != null && tables[table][key] != null && (value == null || tables[table][key] == value)
 }
 
-export const needTables = (tables, table, my = false) => {
-  if (!hasTableData(tables, table, my ? 'my' : 'order')) {return true}
+export const needTables = (tables, table, select = 'allIds', complete) => {
+  if (!hasTableKey(tables, table, select)) {return true}
+  if (complete && !hasTableKey(tables, table, 'complete', true)) {return true}
   const { [table]: { fieldSpecs } } = tables
   const relTables = Array.from(
     new Set(
@@ -172,7 +173,7 @@ export const needTables = (tables, table, my = false) => {
       map(entry => entry[1].valType.values)
     )
   )
-  return relTables.some(relTable => !hasTableData(tables, relTable, 'order'))
+  return relTables.some(relTable => !hasTableKey(tables, relTable, 'allIds'))
 }
 
 export const needValues = ({ tables, table, eId }) => {
@@ -184,12 +185,8 @@ export const needValues = ({ tables, table, eId }) => {
     return true
   }
   const { [table]: { details } } = tables
-  return Object.values(details || {}).some(({ table: detailTable }) => needTables(tables, detailTable))
+  return Object.values(details || {}).some(({ table: detailTable }) => needTables(tables, detailTable, false, false))
 }
-
-export const changedItem = (newProps, oldProps) => (
-  propsChanged(newProps, needValues, oldProps, ['table', 'eId'])
-)
 
 const repUser = ({ user }, valId) => {
   let valRep
@@ -199,7 +196,7 @@ const repUser = ({ user }, valId) => {
     const email = emailPre || ''
     let linkText = [firstName || '', lastName || ''].filter(x => x).join(' ')
     if (linkText == '') {linkText = email}
-    const namePart = (linkText && email) ? (
+    const namePart = linkText && email ? (
       `[${linkText}](mailto:${email})`
     ) : (
       linkText + email
@@ -240,7 +237,7 @@ const repMap = {
 
 export const repRelated = (tables, rel, valId) => (repMap[rel] || repMap.default(rel))(tables, valId)
 
-const trimDate = text => ((text == null) ? '' : text.replace(/\.[0-9]+/, ''))
+const trimDate = text => (text == null ? '' : text.replace(/\.[0-9]+/, ''))
 
 export const repr = (tables, table, valType, value) => {
   if (value == null) {return ''}
@@ -256,5 +253,4 @@ export const repr = (tables, table, valType, value) => {
     return repRelated(tables, rel, value)
   }
 }
-
 

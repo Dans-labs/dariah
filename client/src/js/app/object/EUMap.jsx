@@ -90,10 +90,10 @@ class EUMap extends Component {
       zoom: ZOOM_INIT,
       maxBounds: MAP_BOUNDS,
     })
-    const { order, entities } = country
+    const { allIds, entities } = country
     this.idFromIso = {}
     this.inDariah = {}
-    order.forEach(_id => {
+    allIds.forEach(_id => {
       const { [_id]: { values: { iso, isMember } } } = entities
       this.idFromIso[iso] = _id
       this.inDariah[iso] = isMember

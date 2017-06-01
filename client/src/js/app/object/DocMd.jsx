@@ -8,9 +8,9 @@ import { getDoc, needDoc, changedDoc, fetchDoc } from 'docs'
 import Alternative from 'Alternative'
 
 const RouterLink = ({ children, href }) => (
-  href.match(/^(https?:)?\/\//)
-    ? <a href={href} >{children}</a>
-    : <Link to={href} >{children}</Link>
+  href.match(/^(https?:)?\/\//) ?
+    <a href={href} >{children}</a> :
+    <Link to={href} >{children}</Link>
 )
 const renderers = { Link: RouterLink }
 

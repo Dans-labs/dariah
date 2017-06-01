@@ -37,7 +37,7 @@ const ByValue = ({
     <div className="facet" >{
       rows === null ? (<p>{' -no facets '}</p>) : (
         <Alternative
-          tag={`${table}_${filterId}`}
+          tag={`${table}-${filterId}`}
           controlPlacement={controlPlacement(table, filterId, filterLabel, filteredAmount, filteredAmountOthers)}
           controls={controls}
           initial={expanded ? 0 : 1}
@@ -54,7 +54,7 @@ const ByValue = ({
                         return <td key={j} />
                       }
                       const [valueId, valueRep] = f
-                      const facetClass = (j == 0) ? 'facet' : 'facet mid'
+                      const facetClass = j == 0 ? 'facet' : 'facet mid'
                       return [(
                         <td
                          key={valueId}

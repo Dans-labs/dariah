@@ -4,11 +4,11 @@ import { reduxForm } from 'redux-form'
 import { memoize } from 'memo'
 
 import Alternative from 'Alternative'
-import ItemRecord from 'ItemRecord'
+import ItemContainer from 'ItemContainer'
 import NavLink from 'NavLink'
 
 const MyItemHeadPure = ({ table, eId, entityHead, dirty, base, verb }) => (
-  <NavLink className={'nav'} to={`/${base}/${table}/${verb}/${eId}`} >
+  <NavLink className={'list'} to={`/${base}/${table}/${verb}/${eId}`} >
     {dirty ? <span className="fa fa-pencil" /> : null}
     <span className={`${dirty ? 'warning' : ''}`} >{entityHead}</span>
   </NavLink>
@@ -42,11 +42,11 @@ const ItemHead = ({ table, values, title, inplace, base, verb }) => {
       <td>{
         inplace ? (
           <Alternative
-            tag={`${table}_${eId}`}
+            tag={`${table}-${eId}`}
             controlPlacement={controlPlacement(entityHead)}
             controls={controls}
             alternatives={[(
-              <ItemRecord
+              <ItemContainer
                 key="show"
                 table={table}
                 eId={eId}
