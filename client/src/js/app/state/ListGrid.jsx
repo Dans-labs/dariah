@@ -25,9 +25,10 @@ const ListGrid = ({
   sortedData,
 }) => {
   const theHeading = heading ? `${heading}: ` : ''
-  const { [table]: { fields, fieldOrder, fieldSpecs, details, entities } } = tables
+  const { [table]: { fields, fieldOrder, fieldSpecs, details, detailOrder,  entities } } = tables
   const xfields = fields
   const { length: nFields } = fieldOrder
+  const nDetails = detailOrder != null ? detailOrder.length : 0
   const avLength = `${90 / nFields}%`
   const widths = fieldOrder.map(field => {
     const { [field]: { grid } } = fieldSpecs
@@ -40,7 +41,8 @@ const ListGrid = ({
       shrink: shrink == null ? 0 : shrink,
       grow: grow == null ? 0 : grow,
     }
-  })
+  }).concat(new Array(nDetails).fill({ width: avLength, shrink: 0.3, grow: 0.3 }))
+
   const rows = []
   for (const eId of sortedData) {
     const { [eId]: { values: initialValues, perm } } = entities
@@ -56,53 +58,6 @@ const ListGrid = ({
         form={`${table}-${eId}`}
       />
     )
-    Object.entries(details || {}).forEach(([name, { label, table: detailTable, linkField, mode }]) => {
-      const {
-        [detailTable]: {
-          title: detailTitle,
-          perm: detailPerm,
-          entities: detailEntities,
-          allIds: detailAllIds,
-        },
-      } = tables
-      const detailListIds = detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
-      rows.push(
-        <div key={`${name}-${eId}`} >
-          {
-            mode == 'grid' ?
-              <ListGrid
-                heading={label}
-                table={detailTable}
-                listIds={detailListIds}
-                perm={detailPerm}
-                tag={`${table}-${name}-${eId}`}
-                masterId={eId}
-                linkField={linkField}
-              /> :
-            mode == 'plain' ?
-              <ListPlain
-                heading={label}
-                table={detailTable}
-                listIds={detailListIds}
-                perm={detailPerm}
-                title={detailTitle}
-                inplace={true}
-                masterId={eId}
-                linkField={linkField}
-              /> :
-            mode == 'filter' ?
-              <ListFilter
-                heading={label}
-                table={detailTable}
-                listIds={detailListIds}
-                masterId={eId}
-                linkField={linkField}
-              /> :
-              <span>{`unknown display mode "${mode}" for item list`}</span>
-          }
-        </div>
-      )
-    })
   }
   return (
     <div>
@@ -162,6 +117,24 @@ const ListGrid = ({
                       /> :
                       null
                   }
+                </div>
+              )
+            })
+          }
+          {
+            (detailOrder || []).map((name, i) => {
+              const { width, shrink, grow } = widths[i]
+              return (
+                <div
+                  className="grid-head-cell labelColGrid"
+                  key={name}
+                  style={{
+                    flexBasis: width,
+                    flexShrink: shrink,
+                    flexGrow: grow,
+                    overflow: 'auto',
+                  }}
+                >{name}
                 </div>
               )
             })

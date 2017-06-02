@@ -164,6 +164,7 @@ textarea.invalid {
     padding: 0.2em 0.2em 0.2em 0.2em;
     background-color: $widget-fixed-back; 
     overflow: auto;
+    font-size: small;
 }
 .valueCol {
     text-align: left;
@@ -180,6 +181,9 @@ textarea.invalid {
     border-bottom: 2px solid #dddddd; 
     background-color: #fafafa; 
     overflow: auto;
+}
+.valueColGrid.editable {
+    background-color: #fafaff;
 }
 .delete {
     float: right;

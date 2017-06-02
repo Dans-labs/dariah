@@ -1,7 +1,7 @@
 import React from 'react'
 import { Field } from 'redux-form'
 
-import { editClass } from 'utils'
+import { editClass } from 'fields'
 
 const fieldRemove = (fields, i) => () => {fields.remove(i)}
 const fieldPush = fields => () => {fields.push()}

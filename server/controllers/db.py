@@ -44,6 +44,12 @@ class DbAccess(object):
         install(JSONPlugin(json_dumps=lambda body: json.dumps(body, default=json_string)))
         clientm = MongoClient()
         _DBM = clientm.dariah
+# the fields 'creator', 'dateCreated' and 'modified' are under system control.
+        self.SYSTEM_FIELDS = {
+            self.DM.generic['createdDate'],
+            self.DM.generic['createdBy'],
+            self.DM.generic['modified'],
+        }
 
     def userFind(self, eppn, authority): return _DBM.user.find_one({'eppn': eppn, 'authority': authority})
     def userLocal(self): return _DBM.user.find({'authority': 'local'})
@@ -70,10 +76,9 @@ class DbAccess(object):
             diags = []
             msgs = []
             if f not in uFields:
-# the field 'modified' is under system control.
-# if the current user has no update access, the received value is discarded.
+# if the current user has no update access to a system field, the received value is discarded.
 # later on, the system will append the correct value
-                if f != modified:
+                if f not in self.SYSTEM_FIELDS:
                     valid = False
                     diags.append('{} not accessible'.format(f))
             elif type(valType) is str:
@@ -144,6 +149,7 @@ class DbAccess(object):
             return
         (rowFilter, fieldFilter) = result
         details = self.DM.tables.get(table, {}).get('details', {})
+        detailOrder = self.DM.tables.get(table, {}).get('detailOrder', {})
         fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
         if titleOnly:
@@ -174,6 +180,7 @@ class DbAccess(object):
             fieldOrder=fieldOrder,
             fieldSpecs=fieldSpecs,
             details=details,
+            detailOrder=detailOrder,
             complete=grid,
         )
         if my: result['myIds'] = allIds
@@ -359,15 +366,15 @@ class DbAccess(object):
                 return self.stop(data=validationDiags, msgs=validationMsgs)
             modDate = now()
             modBy = self.eppn
-            updateSaveValues = updateValues
-            if modified not in updateValues:
-                updateSaveValues = {}
-                updateSaveValues.update(updateValues) # shallow copy of updateValues
-                updateSaveValues[modified] = document[modified] # add the modified field
+            updateSaveValues = {}
+            updateSaveValues.update(updateValues) # shallow copy of updateValues
+            for sysField in self.SYSTEM_FIELDS:
+                if sysField not in updateValues or updateValues[sysField] == None:
+                        updateSaveValues[sysField] = document[sysField] # add the system field
 
             updateSaveValues[modified].append('{} on {}'.format(modBy, modDate))
-            _DBM[table].update_one(rowFilter, {'$set': updateSaveValues }) # modified is updated in the database
-            return self.stop(data=dict(values=updateValues, newValues=newValues)) # but modified is not always returned
+            _DBM[table].update_one(rowFilter, {'$set': updateSaveValues }) # system values are updated in the database
+            return self.stop(data=dict(values=updateSaveValues, newValues=newValues)) # ??? but modified is not always returned
 
     def stop(self, data=None, text=None, msgs=None):
         good = text == None and (msgs == None or len(msgs) == 0)

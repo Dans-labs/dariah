@@ -1,14 +1,6 @@
 import React from 'react'
 import { createSelector } from 'reselect'
 
-export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : ''
-
-export const editDelete = (perm, buttonClass, callBack) => (
-  perm.delete ? (
-    <div className={`grid-cell ${buttonClass} error-o fa fa-trash delete`} onClick={callBack} />
-  ) : null
-)
-
 export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
   let result = false
   if (oldProps == null) {
@@ -33,16 +25,5 @@ export const makeReducer = (flows, init = {}) => (state = init, action) => {
 
 const mergeObject = (...objects) => Object.assign({}, ...objects)
 export const combineSelectors = (...selectors) => createSelector(...selectors, mergeObject)
-
-
-/* Workaround (6.6.3) for issue https://github.com/erikras/redux-form/issues/2841
- * We do a mostly unnecessary reset() after a successful submit.
- * There is bug in redux-form: if you remove a field from a field array, a spurious
- * empty field will be present after a submit.
- * This reset removes that field.
- *
- * Still needed in 6.7.0
- */
-export const onSubmitSuccess = (result, dispatch, { reset }) => reset()
 
 export const combineHandler = (f, g) => event => {f(event); g(event)}

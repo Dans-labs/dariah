@@ -3,13 +3,13 @@ import { connect } from 'react-redux'
 
 import { memoize } from 'memo'
 import { combineHandler } from 'utils'
+import { EditStatus } from 'fields'
 
 import { getTables, insertItem } from 'tables'
 import { nextAlt, setAlt } from 'alter'
 
 import Alternative from 'Alternative'
 import ItemContainer from 'ItemContainer'
-import EditStatus from 'EditStatus'
 
 const initial = 1
 
@@ -29,7 +29,7 @@ const getInit = memoize(
 const headingControlPlacement = control => <span>{control}</span>
 const headingControl = (next, table, eId, entityHead, hasEditable, active) => handler => (
   <span>
-    <EditStatus form={`${table}-${eId}`} hasEditable={hasEditable} canSubmit={false} />
+    <EditStatus form={`${table}-${eId}`} hasEditable={hasEditable} />
     <a
       className={active ? 'active' : 'control'}
       href="#"

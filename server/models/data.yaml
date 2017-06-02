@@ -388,6 +388,8 @@ tables:
         valType: text
         multiple: true
 
+    detailOrder:
+      - criteria
     details:
       criteria:
         label: Assessment criteria

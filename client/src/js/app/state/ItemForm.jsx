@@ -3,13 +3,11 @@ import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 
 import { getTables, modItem, delItem, toDb } from 'tables'
-import { makeFields } from 'fields'
-import { onSubmitSuccess, editDelete } from 'utils'
+import { makeFields, onSubmitSuccess, editStatus, editDelete } from 'fields'
 import { memoize } from 'memo'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
-import EditStatus from 'EditStatus'
 
 const deleteit = memoize((del, table, eId) => event => {
   event.preventDefault()
@@ -17,35 +15,48 @@ const deleteit = memoize((del, table, eId) => event => {
 })
 
 const ItemForm = props => {
-  const { table, eId, perm, mod, del, handleSubmit } = props
+  const { table, eId, perm, dirty, invalid, submitting, reset, error, mod, del, handleSubmit } = props
   const { fragments, hasEditable } = makeFields(props)
   return (
     <form onSubmit={handleSubmit(toDb(table, eId, mod))} >
       <div>
         {editDelete(perm, 'button-large', deleteit(del, table, eId))}
-        <EditStatus form={`${table}-${eId}`} hasEditable={hasEditable} canSubmit={true} />
+        {editStatus({ form: `${table}-${eId}`, hasEditable, dirty, invalid, submitting, reset, error })}
       </div>
       <div className={'grid fragments'}>{
-        fragments.map(({ field, label, fragment: { editable, table, myValues, ...props } }) => (
-          <div
-            key={field}
-            className={'grid-row form'}
-          >
-            <div className={'grid-head-cell labelCol'}>{`${label}:`}</div>
-            <div className={'grid-cell valueCol'} >{ editable ?
-              <FieldEdit
-                field={field}
-                table={table}
-                {...props}
-              /> :
-              <FieldRead
-                field={field}
-                table={table}
-                myValues={myValues}
-              />
-            }
+        fragments.map(({
+          name, field, label,
+          fragment: { editable, table, myValues, nDetails, ...props },
+        }) => (
+          name == null ?
+            <div
+              key={field}
+              className={'grid-row form'}
+            >
+              <div className={'grid-head-cell labelCol'}>{`${label}:`}</div>
+              <div className={'grid-cell valueCol'} >{editable ?
+                <FieldEdit
+                  field={field}
+                  table={table}
+                  {...props}
+                /> :
+                <FieldRead
+                  field={field}
+                  table={table}
+                  myValues={myValues}
+                />
+              }
+              </div>
+            </div> :
+            <div
+              key={name}
+              className={'grid-row form'}
+            >
+              <div className={'grid-head-cell labelCol'}>{`${label}:`}</div>
+              <div className={'grid-cell valueCol'} >
+                {`${nDetails} item${nDetails == 1 ? '' : 's' }`} 
+              </div>
             </div>
-          </div>
         ))
       }
       </div>

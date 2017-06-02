@@ -176,17 +176,13 @@ export const needTables = (tables, table, select = 'allIds', complete) => {
   return relTables.some(relTable => !hasTableKey(tables, relTable, 'allIds'))
 }
 
-export const needValues = ({ tables, table, eId }) => {
-  if (tables == null ||
-    tables[table] == null ||
-    tables[table].entities[eId] == null ||
-    tables[table].entities[eId].perm == null ||
-    !tables[table].entities[eId].complete) {
-    return true
-  }
-  const { [table]: { details } } = tables
-  return Object.values(details || {}).some(({ table: detailTable }) => needTables(tables, detailTable, false, false))
-}
+export const needValues = ({ tables, table, eId }) => (
+  tables == null ||
+  tables[table] == null ||
+  tables[table].entities[eId] == null ||
+  tables[table].entities[eId].perm == null ||
+  !tables[table].entities[eId].complete
+)
 
 const repUser = ({ user }, valId) => {
   let valRep

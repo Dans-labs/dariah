@@ -1,7 +1,7 @@
 import React from 'react'
 import Markdown from 'react-markdown'
 
-import { editClass } from 'utils'
+import { editClass } from 'fields'
 
 import Alternative from 'Alternative'
 

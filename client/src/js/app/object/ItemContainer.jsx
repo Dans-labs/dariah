@@ -13,8 +13,41 @@ class ItemContainer extends Component {
     const { props: { tables, table, eId } } = this
     if (needValues({ tables, table, eId })) {return <div />}
 
-    const { [table]: { fields, details, entities: { [eId]: entity } } } = tables
+    const { [table]: { fields, entities: { [eId]: entity } } } = tables
     const { values: initialValues, perm } = entity
+    return (
+      <div>
+        <ItemForm
+          table={table}
+          eId={eId}
+          form={`${table}-${eId}`}
+          key={`${table}-${eId}`}
+          initialValues={initialValues}
+          perm={perm}
+          fields={fields}
+        />
+      </div>
+    )
+    /* Note the key prop passed to ItemForm.
+     * If you do not pass it, you get bugs caused by the mounting and unmounting of this component
+     * due to react-router navigation.
+     * In essence, the callback onChange that redux-form passes to input components, becomes bound to the wrong form!
+     * This workaround is documented here: https://github.com/erikras/redux-form/issues/2886
+    */
+  }
+  componentDidMount() {
+    const { props: { tables, table, eId, fetch } } = this
+    if (needValues({ tables, table, eId })) {fetch(table, eId)}
+  }
+  componentDidUpdate() {
+    const { props: { tables, table, eId, fetch } } = this
+    if (needValues({ tables, table, eId })) {fetch(table, eId)}
+  }
+}
+
+export default connect(getTables, { fetch: fetchItem })(ItemContainer)
+
+  /*
     const detailTables = Object.entries(details || {}).map(([name, { label, table: detailTable, linkField, mode }]) => {
       const {
         [detailTable]: {
@@ -61,36 +94,4 @@ class ItemContainer extends Component {
         </div>
       )
     })
-    return (
-      <div>
-        <ItemForm
-          table={table}
-          eId={eId}
-          initialValues={initialValues}
-          perm={perm}
-          fields={fields}
-          form={`${table}-${eId}`}
-          key={`${table}-${eId}`}
-        />
-        {detailTables}
-      </div>
-    )
-    /* Note the key prop passed to ItemForm.
-     * If you do not pass it, you get bugs caused by the mounting and unmounting of this component
-     * due to react-router navigation.
-     * In essence, the callback onChange that redux-form passes to input components, becomes bound to the wrong form!
-     * This workaround is documented here: https://github.com/erikras/redux-form/issues/2886
     */
-  }
-  componentDidMount() {
-    const { props: { tables, table, eId, fetch } } = this
-    if (needValues({ tables, table, eId })) {fetch(table, eId)}
-  }
-  componentDidUpdate() {
-    const { props: { tables, table, eId, fetch } } = this
-    if (needValues({ tables, table, eId })) {fetch(table, eId)}
-  }
-}
-
-export default connect(getTables, { fetch: fetchItem })(ItemContainer)
-
