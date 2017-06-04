@@ -7,10 +7,8 @@ import { getSort, getSortedData, resetSort, addColumn, turnColumn, delColumn } f
 import { getTables, insertItem } from 'tables'
 
 import ItemRow from 'ItemRow'
-import ListPlain from 'ListPlain'
-import ListFilter from 'ListFilter'
 
-const insertit = memoize((insert, table, select, masterId, linkField) => () => insert(table, select, masterId, linkField))
+const insertit = memoize((insertItem, table, select, masterId, linkField) => () => insertItem(table, select, masterId, linkField))
 const resetit = memoize((reset, tag) => () => reset(tag))
 const addCit = memoize((addC, tag, column, direction) => () => addC(tag, column, direction))
 const turnCit = memoize((turnC, tag, column) => () => turnC(tag, column))
@@ -20,12 +18,12 @@ const ListGrid = ({
   heading,
   tables, table, listIds, select, perm: tablePerm,
   masterId, linkField,
-  insert,
+  insertItem,
   tag, sortSpec, reset, addC, turnC, delC,
   sortedData,
 }) => {
   const theHeading = heading ? `${heading}: ` : ''
-  const { [table]: { fields, fieldOrder, fieldSpecs, details, detailOrder,  entities } } = tables
+  const { [table]: { fields, fieldOrder, fieldSpecs, detailOrder, entities } } = tables
   const xfields = fields
   const { length: nFields } = fieldOrder
   const nDetails = detailOrder != null ? detailOrder.length : 0
@@ -33,7 +31,7 @@ const ListGrid = ({
   const widths = fieldOrder.map(field => {
     const { [field]: { grid } } = fieldSpecs
     if (grid == null) {
-      return { width: avLength, shrink: 0.5, grow: 1 }
+      return { width: avLength, shrink: 0, grow: 1 }
     }
     const { width, grow, shrink } = grid
     return {
@@ -41,7 +39,11 @@ const ListGrid = ({
       shrink: shrink == null ? 0 : shrink,
       grow: grow == null ? 0 : grow,
     }
-  }).concat(new Array(nDetails).fill({ width: avLength, shrink: 0.3, grow: 0.3 }))
+  }).concat(new Array(nDetails).fill({ width: avLength, shrink: 0, grow: 0.3 }))
+  const widthStyles = widths.map(({ width, grow, shrink }) => ({
+    flex: `${grow} ${shrink} ${width}`,
+    overflow: 'auto',
+  }))
 
   const rows = []
   for (const eId of sortedData) {
@@ -54,8 +56,7 @@ const ListGrid = ({
         initialValues={initialValues}
         perm={perm}
         fields={xfields}
-        widths={widths}
-        form={`${table}-${eId}`}
+        widthStyles={widthStyles}
       />
     )
   }
@@ -67,7 +68,7 @@ const ListGrid = ({
           <span
             className="fa fa-plus button-large"
             title={`new ${table}`}
-            onClick={insertit(insert, table, select, masterId, linkField)}
+            onClick={insertit(insertItem, table, select, masterId, linkField)}
           />
         ) : null}
       </p>
@@ -90,19 +91,14 @@ const ListGrid = ({
           <div className="grid-status-cell" />
           {
             fieldOrder.filter(field => field != linkField).map((field, i) => {
-              const { width, shrink, grow } = widths[i]
+              const widthStyle = widthStyles[i]
               const isSorted = sortSpec.find(x => x[0] == field)
               const direction = isSorted ? isSorted[1] : 0
               return (
                 <div
                   className="grid-head-cell labelColGrid"
                   key={field}
-                  style={{
-                    flexBasis: width,
-                    flexShrink: shrink,
-                    flexGrow: grow,
-                    overflow: 'auto',
-                  }}
+                  style={widthStyle}
                 >
                   {
                     direction ?
@@ -123,17 +119,12 @@ const ListGrid = ({
           }
           {
             (detailOrder || []).map((name, i) => {
-              const { width, shrink, grow } = widths[i]
+              const widthStyle = widthStyles[i]
               return (
                 <div
                   className="grid-head-cell labelColGrid"
                   key={name}
-                  style={{
-                    flexBasis: width,
-                    flexShrink: shrink,
-                    flexGrow: grow,
-                    overflow: 'auto',
-                  }}
+                  style={widthStyle}
                 >{name}
                 </div>
               )
@@ -149,6 +140,6 @@ const ListGrid = ({
 const getInfo = combineSelectors(getTables, getSort, getSortedData)
 
 export default connect(getInfo, {
-  insert: insertItem,
+  insertItem,
   reset: resetSort, addC: addColumn, turnC: turnColumn, delC: delColumn,
 })(ListGrid)

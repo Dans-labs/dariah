@@ -26,4 +26,4 @@ export const makeReducer = (flows, init = {}) => (state = init, action) => {
 const mergeObject = (...objects) => Object.assign({}, ...objects)
 export const combineSelectors = (...selectors) => createSelector(...selectors, mergeObject)
 
-export const combineHandler = (f, g) => event => {f(event); g(event)}
+//export const combineHandler = (f, g) => event => {f(event); g(event)}

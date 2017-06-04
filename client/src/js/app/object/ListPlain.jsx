@@ -2,66 +2,66 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { memoize } from 'memo'
-import { combineHandler } from 'utils'
 import { EditStatus } from 'fields'
 
 import { getTables, insertItem } from 'tables'
-import { nextAlt, setAlt } from 'alter'
 
-import Alternative from 'Alternative'
+import Alternative, { altNext, AltNext, altInit } from 'Alternative'
 import ItemContainer from 'ItemContainer'
 
 const initial = 1
 
-const bodyControls = [
-  () => null,
-  () => null,
-]
-const bodyControlPlacement = control => <span>{control}</span>
-
-const getNext = memoize(
-  (next, kind, table, eId) => () => next(`${kind}-${table}-${eId}`, bodyControls.length, initial)
+const bodyNext = memoize(
+  (table, eId) => nextAlt => nextAlt(`body-${table}-${eId}`, 2, initial)
 )
-const getInit = memoize(
-  (setA, kind, table, eId) => () => setA(`${kind}-${table}-${eId}`, initial)
+const bodyInit = memoize(
+  (table, eId) => setAlt => setAlt(`body-${table}-${eId}`, initial)
 )
 
-const headingControlPlacement = control => <span>{control}</span>
-const headingControl = (next, table, eId, entityHead, hasEditable, active) => handler => (
+const headingAlternative = (table, eId, entityHead, active) => (
   <span>
-    <EditStatus form={`${table}-${eId}`} hasEditable={hasEditable} />
-    <a
-      className={active ? 'active' : 'control'}
-      href="#"
-      onClick={combineHandler(handler, getNext(next, 'body', table, eId))}
+    <EditStatus form={`${table}-${eId}`} hasEditable={true} showNeutral={active} />
+    <AltNext
+      className={`link ${active ? 'active' : 'control'}`}
+      tag={`heading-${table}-${eId}`}
+      nAlternatives={2}
+      initial={initial}
+      extraActions={bodyNext(table, eId)}
     >
       <span className={`fa fa-angle-${active ? 'left' : 'right'}`} />
       {' '}{entityHead}
-    </a>
+    </AltNext>
   </span>
 )
-const headingControls = memoize((...params) => [
-  headingControl(...params, true),
-  headingControl(...params, false),
-])
 
-const headingAlternatives = ['', '']
+const headingAlternatives = memoize((...params) => [
+  headingAlternative(...params, true),
+  headingAlternative(...params, false),
+])
 
 class ListPlain extends Component {
   handleInsert = () => {
-    const { props: { table, select, masterId, linkField, insert } } = this
-    insert(table, select, masterId, linkField)
+    const { props: { table, select, masterId, linkField, insertItem } } = this
+    insertItem(table, select, masterId, linkField)
     this.gotoNew = true
   }
   gotoItem = eId => {
-    const { props: { table, next } } = this
-    getNext(next, 'heading', table, eId)()
-    getNext(next, 'body', table, eId)()
+    const { props: { table, dispatch } } = this
+    altNext({
+      tag: `heading-${table}-${eId}`,
+      nAlternatives: 2,
+      initial,
+      extraActions: bodyNext(table, eId),
+      dispatch,
+    })
   }
   closeItem = eId => {
-    const { props: { table, setA } } = this
-    getInit(setA, 'heading', table, eId)()
-    getInit(setA, 'body', table, eId)()
+    const { props: { table } } = this
+    altInit({
+      tag: `heading-${table}-${eId}`,
+      initial,
+      extraActions: bodyInit(table, eId),
+    })
   }
   handleCloseAll = memoize(items => () => {items.forEach(eId => {this.closeItem(eId)})})
 
@@ -69,7 +69,6 @@ class ListPlain extends Component {
     const {
       props: {
         tables, table, listIds, perm, title,
-        next,
       },
     } = this
     const headings = []
@@ -82,9 +81,7 @@ class ListPlain extends Component {
         <Alternative
           key={eId}
           tag={`heading-${table}-${eId}`}
-          controlPlacement={headingControlPlacement}
-          controls={headingControls(next, table, eId, entityHead)}
-          alternatives={headingAlternatives}
+          alternatives={headingAlternatives(table, eId, entityHead)}
           initial={initial}
         />
       )
@@ -92,8 +89,6 @@ class ListPlain extends Component {
         <Alternative
           key={eId}
           tag={`body-${table}-${eId}`}
-          controlPlacement={bodyControlPlacement}
-          controls={bodyControls}
           alternatives={[(
             <ItemContainer
               key="show"
@@ -155,7 +150,5 @@ class ListPlain extends Component {
 }
 
 export default connect(getTables, {
-  insert: insertItem,
-  next: nextAlt,
-  setA: setAlt,
+  insertItem,
 })(ListPlain)

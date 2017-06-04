@@ -4,38 +4,23 @@ import { connect } from 'react-redux'
 import { memoize } from 'memo'
 
 import { getTables } from 'tables'
-import { makeFields } from 'fields'
+import { makeFields, someEditable } from 'fields'
 
-import Alternative from 'Alternative'
+import Alternative, { AltNext } from 'Alternative'
 import FieldRead from 'FieldRead'
+import ItemForm from 'ItemForm'
 
-const editit = memoize(eId => event => {
-  event.preventDefault()
-})
-
-const controlPlacement = control => <span>{control}</span>
-
-const controls = [
-  () => null,
-  () => null,
-]
-
-const rowFields = (fragments, widths) => (
+const rowFields = (fragments, widthStyles) => (
   fragments.map(({
     name, field, label,
     fragment: { editable, table, myValues, nDetails },
   }, i) => {
-    const { width, shrink, grow } = widths[i]
+    const widthStyle = widthStyles[i]
     return (
       name == null ?
         <div
           className={`grid-cell valueColGrid ${editable ? 'editable' : ''}`}
-          style={{
-            flexBasis: width,
-            flexShrink: shrink,
-            flexGrow: grow,
-            overflow: 'auto',
-          }}
+          style={widthStyle}
           key={field}
         >
           <FieldRead
@@ -47,12 +32,7 @@ const rowFields = (fragments, widths) => (
         <div
           key={name}
           className={'grid-cell valueColGrid'}
-          style={{
-            flexBasis: width,
-            flexShrink: shrink,
-            flexGrow: grow,
-            overflow: 'auto',
-          }}
+          style={widthStyle}
         >
           {`${nDetails} item${nDetails == 1 ? '' : 's'}`}
         </div>
@@ -60,49 +40,59 @@ const rowFields = (fragments, widths) => (
   })
 )
 
-const editControl = memoize(eId => (
-  <a
-    href="#"
-    className={'fa fa-pencil'}
-    title={'open an edit form for this record'}
-    onClick={editit(eId)}
-  />
+const editControl = memoize((table, eId, mayUpdate, withRow) => (
+  mayUpdate ?
+    <AltNext
+      className={`link fa fa-${withRow ? 'pencil' : 'chevron-up'}`}
+      tag={`row-${table}-${eId}`}
+      nAlternatives={2}
+      initial={0}
+      title={`${withRow ? 'open an' : 'close the'}edit form for this record`}
+    /> :
+    null
 ))
 
 const ItemRow = ({
   tables, table, eId, initialValues, perm,
   fields,
-  widths,
-  form,
+  widthStyles,
 }) => {
-  const { fragments, hasEditable } = makeFields({
+  const hasEditable = someEditable({ tables, table, eId, fields, perm })
+  const fragments = makeFields({
     tables, table, eId, initialValues, perm,
     fields,
   })
+  const { update } = perm
   return hasEditable ?
     <Alternative
+      className={'grid-row'}
       tag={`row-${table}-${eId}`}
-      controlPlacement={controlPlacement}
-      controls={controls}
       alternatives={[
-      (
-        <div
-          key={'row'}
-          className="grid-row"
-        >
-          <div className="grid-status-cell" >
-            {editControl(eId)}
-          </div>
-          {rowFields(fragments, widths)}
-        </div>
-      ), (
-        <span key={'form'} />
-        )
+        [
+          <div key={'row-control'} className="grid-status-cell" >
+            {editControl(table, eId, update, true)}
+          </div>,
+          rowFields(fragments, widthStyles),
+        ], [
+          <div key={'form-control'} className="grid-status-cell" >
+            {editControl(table, eId, update, false)}
+          </div>,
+          <ItemForm
+            key={'form-body'}
+            table={table}
+            eId={eId}
+            form={`${table}-${eId}`}
+            initialValues={initialValues}
+            perm={perm}
+            fields={fields}
+            fragments={fragments}
+          />,
+        ],
       ]}
       initial={0}
     /> :
     <div className="grid-row" >
-      {rowFields(fragments, widths)}
+      {rowFields(fragments, widthStyles)}
     </div>
 }
 

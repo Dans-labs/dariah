@@ -4,9 +4,6 @@ import { connect } from 'react-redux'
 import { getTables, needValues, fetchItem } from 'tables'
 
 import ItemForm from 'ItemForm'
-import ListGrid from 'ListGrid'
-import ListPlain from 'ListPlain'
-import ListFilter from 'ListFilter'
 
 class ItemContainer extends Component {
   render() {

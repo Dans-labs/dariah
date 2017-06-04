@@ -5,7 +5,7 @@ import {countryBorders} from 'europe.geo'
 import Input from 'Input'
 import MarkdownArea from 'MarkdownArea'
 
-const editStatusGeneric = canSubmit => ({ hasEditable, dirty, invalid, submitting, reset, error }) => (
+const editStatusGeneric = canSubmit => ({ hasEditable, showNeutral, dirty, invalid, submitting, reset, error }) => (
   hasEditable ?
     <span>
       {
@@ -30,7 +30,7 @@ const editStatusGeneric = canSubmit => ({ hasEditable, dirty, invalid, submittin
           /> : null
       }
       {
-        (!dirty && !submitting) ?
+        (!dirty && !submitting && (canSubmit || showNeutral)) ?
           <span
             className={'good-o fa fa-circle'}
             title={'no changes'}
@@ -119,24 +119,34 @@ const detailFields = (tables, eId, details, detailOrder) => (
       },
     } = tables
     const detailListIds = detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
-    return { name, label, fragment: { editable: false, nDetails: detailListIds.length } }
+    return { name, label, table: detailTable, fragment: { editable: false, nDetails: detailListIds.length } }
   })
 )
+
+export const someEditable = ({ tables, table, fields, perm }) => {
+  const { [table]: { fieldOrder } } = tables
+
+  let hasEditable = false
+  for (const field of fieldOrder) {
+    const { [field]: f } = fields
+    if (f == null) {continue}
+    const { update: { [field]: editable } } = perm
+    if (editable) {hasEditable = true}
+  }
+  return hasEditable
+}
 
 export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
   const { initialValues } = props
   const { [table]: { fieldSpecs, fieldOrder, details, detailOrder } } = tables
-  console.warn(`MAKEFIELDS ${table}`, detailOrder)
 
   const fragments = []
-  let hasEditable = false
   for (const field of fieldOrder) {
     const { [field]: f } = fields
     if (f == null) {continue}
     const { [field]: { label } } = fieldSpecs
     const { update: { [field]: editable } } = perm
     const { [field]: myValues } = initialValues
-    if (editable) {hasEditable = true}
     const theField = {
       editable,
       table,
@@ -146,7 +156,7 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
     fragments.push({ field, label, fragment: theField })
   }
   fragments.push(...detailFields(tables, eId, details, detailOrder))
-  return { fragments, hasEditable }
+  return fragments
 }
 
 export const validation = {

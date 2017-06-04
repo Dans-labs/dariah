@@ -1,18 +1,59 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getAlt, nextAlt } from 'alter'
+import { memoize } from 'memo'
 
-const handleNext = (tag, alternatives, initial, next) => event => {
+import { getAlt, nextAlt, setAlt } from 'alter'
+
+const handleNext = memoize((tag, nAlternatives, initial, nextAlt, extraActions) => event => {
+  if (event) {event.preventDefault()}
+  nextAlt(tag, nAlternatives, initial)
+  if (extraActions) {extraActions(nextAlt)}
+})
+
+const handleInit = memoize((tag, initial, setAlt, extraActions) => event => {
   event.preventDefault()
-  next(tag, alternatives.length, initial)
-}
+  setAlt(tag, initial)
+  if (extraActions) {extraActions(setAlt)}
+})
 
-const Alternative = ({ controlPlacement, controls, alt, alternatives, className, tag, initial, next }) => (
+const Alternative = ({ controlPlacement, controls, alt, alternatives, className, tag, initial, nextAlt }) => (
   <div className={className}>
-    {controlPlacement(controls[alt](handleNext(tag, alternatives, initial, next)))}
+    {controlPlacement ?
+      controlPlacement(controls[alt](handleNext(tag, alternatives.length, initial, nextAlt))) :
+      null
+    }
     {alternatives[alt]}
   </div>
 )
 
-export default connect(getAlt, { next: nextAlt })(Alternative)
+export const altNext = ({ tag, nAlternatives, initial, nextAlt, extraActions, dispatch }) => (
+  handleNext(tag, nAlternatives, initial, (...params) => dispatch(nextAlt(...params)), extraActions)()
+)
+
+const AltNextPure = ({ className, children, tag, nAlternatives, initial, nextAlt, extraActions }) => (
+  <span
+    className={className}
+    onClick={handleNext(tag, nAlternatives, initial, nextAlt, extraActions)}
+  >
+    { children }
+  </span>
+)
+export const AltNext = connect(getAlt, { nextAlt })(AltNextPure)
+
+const altInitPure = ({ tag, initial, setAlt, extraActions }) => (
+  handleInit(tag, initial, setAlt, extraActions)()
+)
+export const altInit = connect(getAlt, { setAlt })(altInitPure)
+
+const AltInitPure = ({ className, children, tag, initial, setAlt, extraActions }) => (
+  <span
+    className={className}
+    onClick={handleInit(tag, initial, setAlt, extraActions)}
+  >
+    { children }
+  </span>
+)
+export const AltInit = connect(getAlt, { setAlt })(AltInitPure)
+
+export default connect(getAlt, { nextAlt })(Alternative)

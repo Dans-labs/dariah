@@ -119,7 +119,7 @@ tables:
         grid:
           width: 4em
           grow: 0.5
-          shrink: 0.5
+          shrink: 0
       longitude:
         label: Longitude
         valType: number
@@ -127,7 +127,7 @@ tables:
         grid:
           width: 4em
           grow: 0.5
-          shrink: 0.5
+          shrink: 0
       creator:
         label: creator
         valType:
@@ -395,7 +395,7 @@ tables:
         label: Assessment criteria
         table: criteria
         linkField: package
-        mode: plain
+        mode: list
 
   criteria:
     title: key

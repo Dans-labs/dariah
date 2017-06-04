@@ -149,7 +149,7 @@ class DbAccess(object):
             return
         (rowFilter, fieldFilter) = result
         details = self.DM.tables.get(table, {}).get('details', {})
-        detailOrder = self.DM.tables.get(table, {}).get('detailOrder', {})
+        detailOrder = self.DM.tables.get(table, {}).get('detailOrder', [])
         fieldOrder = [x for x in self.DM.tables.get(table, {}).get('fieldOrder', []) if x in fieldFilter]
         fieldSpecs = dict(x for x in self.DM.tables.get(table, {}).get('fieldSpecs', {}).items() if x[0] in fieldOrder)
         if titleOnly:
