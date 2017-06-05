@@ -10,8 +10,8 @@ import Stat from 'Stat.jsx'
 import Alternative from 'Alternative.jsx'
 
 const controls = [
-  handler => (<span className="button-small fa fa-chevron-down" onClick={handler} />),
-  handler => (<span className="button-small fa fa-chevron-right" onClick={handler} />),
+  handler => (<span className="button-small fa fa-angle-up" onClick={handler} />),
+  handler => (<span className="button-small fa fa-angle-down" onClick={handler} />),
 ]
 const controlPlacement = memoize((table, filterId, filterLabel, filteredAmount, filteredAmountOthers) => control => (
   <p className="facet" >

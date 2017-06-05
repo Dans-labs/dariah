@@ -1,5 +1,5 @@
 import mergeWith from 'lodash/mergewith'
-import { makeReducer } from 'utils'
+import { makeReducer, emptyA } from 'utils'
 
 /* ACTIONS */
 
@@ -43,7 +43,7 @@ const subFlows = {
 const flows = {
   async(state, { msgs, status, desc }) {
     const { busy } = state
-    const extraMsgs = msgs || []
+    const extraMsgs = msgs || emptyA
     const { [status]: subFlow } = subFlows
     return subFlow ? subFlow(state, { extraMsgs, desc, busy }) : state
   },
@@ -58,7 +58,7 @@ const flows = {
   clear(state) {
     return {
       ...state,
-      items: [],
+      items: emptyA,
       show: false,
     }
   },
@@ -70,7 +70,7 @@ const flows = {
   },
 }
 
-export default makeReducer(flows, { items: [], busy: 0, show: false })
+export default makeReducer(flows, { items: emptyA, busy: 0, show: false })
 
 /* SELECTORS */
 

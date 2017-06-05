@@ -1,5 +1,5 @@
 import { accessData } from 'server'
-import { makeReducer } from 'utils'
+import { makeReducer, emptyO } from 'utils'
 
 /* ACTIONS */
 /*
@@ -13,7 +13,7 @@ export const fetchMe = () => (
 
 const flows = {
   fetchMe(state, { data }) {
-    if (data == null) {return {}}
+    if (data == null) {return emptyO}
     return { ...data }
   },
 }

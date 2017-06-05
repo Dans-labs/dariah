@@ -3,33 +3,58 @@ import { connect } from 'react-redux'
 import isEqual from 'lodash/isequal'
 
 import { memoize } from 'memo'
-import { combineSelectors, emptyO } from 'utils'
+import { emptyO } from 'utils'
 import { EditStatus } from 'fields'
 
 import { getTables, insertItem } from 'tables'
-import { getAlts, nextAlt, setAlt } from 'alter'
 
+import Alternative, { AlternativeX, altNext, AltNext, altInit } from 'Alternative'
 import ItemContainer from 'ItemContainer'
 
 const initial = 0
 
-const handleNext = memoize((dispatch, tag) => () => dispatch(nextAlt(tag, 2, initial)))
+import Perf from 'react-addons-perf'
+window.Perf = Perf
+
+const headingAlternative = memoize((table, eId, entityHead, scroll, active) => {
+  const scrollProps = active ? { ref: scroll } : emptyO
+  return (
+    <span key={active} {...scrollProps} >
+      <EditStatus form={`${table}-${eId}`} hasEditable={true} showNeutral={active} />
+      <AltNext
+        className={`link ${active ? 'active' : 'control'}`}
+        tag={`${table}-${eId}`}
+        nAlternatives={2}
+        initial={initial}
+      >
+        <span className={`fa fa-angle-${active ? 'left' : 'right'}`} />
+        {' '}{entityHead}
+      </AltNext>
+    </span>
+  )
+})
 
 class ListPlain extends Component {
   handleInsert = () => {
-    const { props: { table, select, masterId, linkField, dispatch } } = this
-    dispatch(insertItem(table, select, masterId, linkField))
+    const { props: { table, select, masterId, linkField, insertItem } } = this
+    insertItem(table, select, masterId, linkField)
     this.gotoNew = true
   }
   gotoItem = eId => {
     const { props: { table, dispatch } } = this
-    const tag = `${table}-${eId}`
-    dispatch(nextAlt(tag, 2, initial))
+    altNext({
+      tag: `${table}-${eId}`,
+      nAlternatives: 2,
+      initial,
+      dispatch,
+    })
   }
   closeItem = eId => {
-    const { props: { table, dispatch } } = this
-    const tag = `${table}-${eId}`
-    dispatch(setAlt(tag, initial))
+    const { props: { table } } = this
+    altInit({
+      tag: `${table}-${eId}`,
+      initial,
+    })
   }
   handleCloseAll = memoize(items => () => {items.forEach(eId => {this.closeItem(eId)})})
 
@@ -38,9 +63,23 @@ class ListPlain extends Component {
       domElem.scrollIntoViewIfNeeded()
     }
   }
+  makeAlternative = memoize((table, eId, entityHead) => {
+    console.warn('MAKE ALTERNATIVE')
+    return alt => (
+      <div>
+        {headingAlternative(table, eId, entityHead, this.scroll, alt != 0)}
+        {alt == 1 ?
+          <ItemContainer
+            table={table}
+            eId={eId}
+          /> : null
+        }
+      </div>
+    )
+  })
 
   render() {
-    const { props: { tables, alter, table, listIds, perm, title, dispatch } } = this
+    const { props: { tables, table, listIds, perm, title } } = this
     const { [table]: { entities } } = tables
     //console.warn('LISTPLAIN RENDER', this.props)
     return (
@@ -59,29 +98,34 @@ class ListPlain extends Component {
           listIds.map(eId => {
             const { [eId]: { values } } = entities
             const { [title]: entityHead = '-empty-' } = values
-            const tag = `${table}-${eId}`
-            const { [tag]: alt = initial } = alter
-            const active = alt != initial
-            const scrollProps = active ? { ref: this.scroll } : emptyO
+            /*
             return (
-              <div key={eId} >
-                <span {...scrollProps} >
-                  {perm != null && perm.update ? <EditStatus form={tag} showNeutral={active} /> : null}
-                  <span
-                    className={'link'}
-                    onClick={handleNext(dispatch, tag)}
-                  >
-                    <span className={`fa fa-angle-${active ? 'left' : 'right'}`} />
-                    {' '}{entityHead}
-                  </span>
-                </span>
-                {active ?
-                  <ItemContainer
-                    table={table}
-                    eId={eId}
-                  /> : null
-                }
-              </div>
+              <Alternative
+                key={eId}
+                tag={`${table}-${eId}`}
+                alternatives={[
+                  <div key={false}>
+                    {headingAlternative(table, eId, entityHead, this.scroll, false)}
+                  </div>,
+                  <div key={true}>
+                    {headingAlternative(table, eId, entityHead, this.scroll, true)}
+                    <ItemContainer
+                      table={table}
+                      eId={eId}
+                    />
+                  </div>,
+                ]}
+                initial={initial}
+              />
+            )
+            */
+            return (
+              <AlternativeX
+                key={eId}
+                tag={`${table}-${eId}`}
+                alternatives={this.makeAlternative(table, eId, entityHead)}
+                initial={initial}
+              />
             )
           })
         }
@@ -133,6 +177,6 @@ class ListPlain extends Component {
   }
 }
 
-const getInfo = combineSelectors(getTables, getAlts)
-
-export default connect(getInfo)(ListPlain)
+export default connect(getTables, {
+  insertItem,
+})(ListPlain)

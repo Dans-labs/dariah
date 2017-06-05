@@ -25,6 +25,7 @@ class ListFilter extends Component {
       },
     } = this
     if (!initialized) {return <div />}
+    //console.warn(`LISTFILTER recomputations: ${getFiltersApplied.getMatchingSelector({}, { table }).recomputations()}`)
     const { [table]: { allIds, title } } = tables
     return (
       <div>
@@ -43,7 +44,6 @@ class ListFilter extends Component {
             table={table}
             listIds={filteredIds}
             title={title}
-            inplace={true}
             masterId={masterId}
             linkField={linkField}
           />

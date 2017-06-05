@@ -12,7 +12,9 @@ class ListContainer extends Component {
   render() {
     const { props: { table, tables, select, mode } } = this
     const grid = mode == 'grid'
+    //console.warn('LISTCONTAINER RENDER entry')
     if (needTables(tables, table, select, grid)) {return <div />}
+    //console.warn('LISTCONTAINER RENDER work')
     const { [table]: { title, perm, myIds, allIds } } = tables
     const listIds = select == 'myIds' ? myIds : allIds
     return (

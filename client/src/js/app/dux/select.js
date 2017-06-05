@@ -1,5 +1,5 @@
 import merge from 'lodash/merge'
-import { makeReducer } from 'utils'
+import { makeReducer, emptyO } from 'utils'
 
 /* ACTIONS */
 
@@ -26,11 +26,11 @@ const flows = {
   },
 }
 
-export default makeReducer(flows, {})
+export default makeReducer(flows, emptyO)
 
 /* SELECTORS */
 
-export const getSelect = ({ select }, { tag }) => ({ ...(select[tag] || {}) })
+export const getSelect = ({ select }, { tag }) => ({ ...(select[tag] || emptyO) })
 
 /* HELPERS */
 

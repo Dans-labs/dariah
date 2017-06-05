@@ -28,5 +28,7 @@ export const getAlt = ({ alter }, { tag, initial }) => {
   return { alt }
 }
 
+export const getAlts = ( {alter }) => ({ alter })
+
 /* HELPERS */
 

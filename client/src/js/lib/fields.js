@@ -5,62 +5,60 @@ import {countryBorders} from 'europe.geo'
 import Input from 'Input'
 import MarkdownArea from 'MarkdownArea'
 
-const editStatusGeneric = canSubmit => ({ hasEditable, showNeutral, dirty, invalid, submitting, reset, error }) => (
-  hasEditable ?
-    <span>
-      {
-        (dirty && !invalid && !submitting) ? (
-          canSubmit ?
-            <button
-              type="submit"
-              className={'button-large edit-action fa fa-check'}
-              title={'save'}
-            /> :
-            <span
-              className={'warning-o fa fa-pencil'}
-              title={'changed'}
-            />
-          ) : null
-      }
-      {
-        (dirty && invalid && !submitting) ?
+const editStatusGeneric = canSubmit => ({ showNeutral, dirty, invalid, submitting, reset, error }) => (
+  <span>
+    {
+      (dirty && !invalid && !submitting) ? (
+        canSubmit ?
+          <button
+            type="submit"
+            className={'button-large edit-action fa fa-check'}
+            title={'save'}
+          /> :
           <span
-            className={'error-o fa fa-exclamation-circle'}
-            title={'no changes'}
+            className={'warning-o fa fa-pencil'}
+            title={'changed'}
+          />
+        ) : null
+    }
+    {
+      (dirty && invalid && !submitting) ?
+        <span
+          className={'error-o fa fa-exclamation-circle'}
+          title={'invalid data'}
+        /> : null
+    }
+    {
+      (!dirty && !invalid && !submitting && showNeutral) ?
+        <span
+          className={'good-o fa fa-circle'}
+          title={'no changes'}
+        /> : null
+    }
+    {
+      submitting ?
+        <span
+          className={'special-o fa fa-spinner fa-spin'}
+          title={'saving'}
+        /> : null
+    }
+    {' '}
+    {
+      (dirty && !submitting) ? (
+        canSubmit ?
+          <button
+            type="button"
+            className={'button-large error-o fa fa-close'}
+            title={'reset values to last saved'}
+            onClick={reset}
           /> : null
-      }
-      {
-        (!dirty && !submitting && (canSubmit || showNeutral)) ?
-          <span
-            className={'good-o fa fa-circle'}
-            title={'no changes'}
-          /> : null
-      }
-      {
-        submitting ?
-          <span
-            className={'special-o fa fa-spinner fa-spin'}
-            title={'saving'}
-          /> : null
-      }
-      {' '}
-      {
-        (dirty && !submitting) ? (
-          canSubmit ?
-            <button
-              type="button"
-              className={'button-large error-o fa fa-close'}
-              title={'reset values to last saved'}
-              onClick={reset}
-            /> : null
-          ) : null
-      }
-      {' '}
-      {
-        error && canSubmit && <span className={'invalid diag'}>{error}</span>
-      }
-    </span> :
-   null
+        ) : null
+    }
+    {' '}
+    {
+      error && canSubmit && <span className={'invalid diag'}>{error}</span>
+    }
+  </span>
 )
 export const editStatus = editStatusGeneric(true)
 
@@ -109,20 +107,6 @@ export const getValType = valType => {
 
 const iso2s = new Set(countryBorders.features.map(({ properties: { iso2 } }) => iso2))
 
-const detailFields = (tables, eId, details, detailOrder) => (
-  (detailOrder || []).map(name => {
-    const { label, table: detailTable, linkField } = details[name]
-    const {
-      [detailTable]: {
-        entities: detailEntities,
-        allIds: detailAllIds,
-      },
-    } = tables
-    const detailListIds = detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
-    return { name, label, table: detailTable, fragment: { editable: false, nDetails: detailListIds.length } }
-  })
-)
-
 export const someEditable = ({ tables, table, fields, perm }) => {
   const { [table]: { fieldOrder } } = tables
 
@@ -138,7 +122,7 @@ export const someEditable = ({ tables, table, fields, perm }) => {
 
 export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
   const { initialValues } = props
-  const { [table]: { fieldSpecs, fieldOrder, details, detailOrder } } = tables
+  const { [table]: { fieldSpecs, fieldOrder } } = tables
 
   const fragments = []
   for (const field of fieldOrder) {
@@ -155,8 +139,26 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
     }
     fragments.push({ field, label, fragment: theField })
   }
-  fragments.push(...detailFields(tables, eId, details, detailOrder))
   return fragments
+}
+
+export const makeDetails = ({ tables, table, eId }) => {
+  const { [table]: { details, detailOrder } } = tables
+  return (detailOrder || []).map(name => {
+    const { label, table: detailTable, linkField } = details[name]
+    const {
+      [detailTable]: {
+        entities: detailEntities,
+        allIds: detailAllIds,
+      },
+    } = tables
+    const detailListIds = detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
+    return {
+      name, label,
+      table: detailTable,
+      nDetails: detailListIds.length,
+    }
+  })
 }
 
 export const validation = {

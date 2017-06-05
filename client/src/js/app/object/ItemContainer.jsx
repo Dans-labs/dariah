@@ -7,6 +7,7 @@ import ItemForm from 'ItemForm'
 
 class ItemContainer extends Component {
   render() {
+    //console.warn('ITEMCONTAINER RENDER')
     const { props: { tables, table, eId } } = this
     if (needValues({ tables, table, eId })) {return <div />}
 
@@ -43,52 +44,3 @@ class ItemContainer extends Component {
 }
 
 export default connect(getTables, { fetch: fetchItem })(ItemContainer)
-
-  /*
-    const detailTables = Object.entries(details || {}).map(([name, { label, table: detailTable, linkField, mode }]) => {
-      const {
-        [detailTable]: {
-          title: detailTitle,
-          perm: detailPerm,
-          entities: detailEntities,
-          allIds: detailAllIds,
-        },
-      } = tables
-      const detailListIds = detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
-      return (
-        <div key={`${name}-${eId}`} >
-          {
-            mode == 'list' ?
-              <ListPlain
-                heading={label}
-                table={detailTable}
-                listIds={detailListIds}
-                perm={detailPerm}
-                title={detailTitle}
-                inplace={true}
-                masterId={eId}
-                linkField={linkField}
-              /> :
-            mode == 'grid' ?
-              <ListGrid
-                heading={label}
-                table={detailTable}
-                listIds={detailListIds}
-                perm={detailPerm}
-                tag={`${table}-${name}-${eId}`}
-                masterId={eId}
-                linkField={linkField}
-              /> :
-            mode == 'filter' ?
-              <ListFilter
-                heading={label}
-                table={detailTable}
-                masterId={eId}
-                linkField={linkField}
-              /> :
-              <span>{`unknown display mode "${mode}" for item list`}</span>
-          }
-        </div>
-      )
-    })
-    */

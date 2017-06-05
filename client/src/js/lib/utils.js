@@ -1,6 +1,9 @@
 import React from 'react'
 import { createSelector } from 'reselect'
 
+export const emptyA = []
+export const emptyO = {}
+
 export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
   let result = false
   if (oldProps == null) {
@@ -17,7 +20,7 @@ export const withParams = Component => ({ params, route, ...props }) => {
   return <Component {...allProps} />
 }
 
-export const makeReducer = (flows, init = {}) => (state = init, action) => {
+export const makeReducer = (flows, init = emptyO) => (state = init, action) => {
   const { type } = action
   const { [type]: flow } = flows
   return flow ? flow(state, action) : state

@@ -2,6 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Markdown from 'react-markdown'
 
+import { emptyA } from 'utils'
+
 import { getTables, repr } from 'tables'
 
 const FieldRead = ({ field, tables, table, myValues }) => {
@@ -10,7 +12,7 @@ const FieldRead = ({ field, tables, table, myValues }) => {
   const isArea = valType == 'textarea'
   const sep = isArea ? '\n\n' : ' | '
   const myRepr = multiple ?
-    (myValues || []).map(value => repr(tables, table, valType, value)).join(sep) :
+    (myValues || emptyA).map(value => repr(tables, table, valType, value)).join(sep) :
     repr(tables, table, valType, myValues)
   return isArea ?
     <Markdown source={myRepr} /> :

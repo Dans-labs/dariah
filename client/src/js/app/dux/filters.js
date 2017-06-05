@@ -1,7 +1,8 @@
 import merge from 'lodash/merge'
 import { createSelectorCreator, defaultMemoize } from 'reselect'
+import createCachedSelector from 're-reselect'
 
-import { makeReducer } from 'utils'
+import { makeReducer, emptyO } from 'utils'
 import { levelOneEq } from 'memo'
 import { repRelated } from 'tables'
 
@@ -189,27 +190,34 @@ export const getFilterSetting = ({ filters }, { table, filterId }) => ({
   filterSetting: filters[table].filterSettings[filterId],
 })
 
-export const getFiltersApplied = ({ tables, filters }, { table }) => {
-  const { [table]: filterStatus = { filterSettings: {}, initialized: false } } = filters
+const getFiltersAppliedBase = ({ tables, filters, table }) => {
+  const { [table]: filterStatus = { filterSettings: emptyO, initialized: false } } = filters
   const { filterSettings, initialized } = filterStatus
   const fieldValues = getFiltersCompiled({ tables }, { table })
-  if (initialized) {
-    return {
+  //console.warn('GETFILTERSAPPLIEDBASE')
+  const result = initialized ?
+    {
       tables,
       initialized,
       fieldValues,
       filterSettings,
       ...computeFiltering(tables, table, fieldValues, filterSettings),
-    }
-  }
-  else {
-    return {
+    } :
+    {
       tables,
       initialized,
       fieldValues,
     }
-  }
+  //console.warn('GETFILTERSAPPLIED', result)
+  return result
 }
+
+const getFilterArgs = ({ tables, filters }, { table }) => ({ tables, table, filters })
+
+export const getFiltersApplied = createCachedSelector(
+  getFilterArgs,
+  getFiltersAppliedBase,
+)(({ tables, filters }, { table }) => table)
 
 /* HELPERS */
 

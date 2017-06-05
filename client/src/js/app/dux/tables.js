@@ -3,7 +3,7 @@ import merge from 'lodash/merge'
 import { createSelector } from 'reselect'
 
 import { accessData } from 'server'
-import { makeReducer } from 'utils'
+import { makeReducer, emptyA, emptyO } from 'utils'
 import { memoize } from 'memo'
 
 /* ACTIONS */
@@ -129,7 +129,7 @@ const getValueList = ({ tables }, { table, field }) => {
 
 const computeOptions = ({ tables }, { valType, valueList, table }) => {
   if (valueList == null) {
-    return { options: [], optionLookup: {} }
+    return { options: emptyA, optionLookup: emptyO }
   }
   const options = valueList.map(val => ({ value: val, label: repr(tables, table, valType, val) }))
   const optionLookup = {}

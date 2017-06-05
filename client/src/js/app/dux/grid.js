@@ -1,7 +1,7 @@
 import orderBy from 'lodash/orderby'
 import mapValues from 'lodash/mapvalues'
 import createCachedSelector from 're-reselect'
-import { makeReducer } from 'utils'
+import { makeReducer, emptyA, emptyO } from 'utils'
 
 import { getTables, repr } from 'tables'
 
@@ -16,23 +16,23 @@ export const delColumn = (tag, column) => ({ type: 'delColumn', tag, column })
 
 const flows = {
   resetSort(state, { tag }) {
-    return { ...state, [tag]: [] }
+    return { ...state, [tag]: emptyA }
   },
   addColumn(state, { tag, column, direction }) {
     const { [tag]: sortSpec } = state
-    return { ...state, [tag]: (sortSpec || []).filter(x => x[0] != column).concat([[column, direction]]) }
+    return { ...state, [tag]: (sortSpec || emptyA).filter(x => x[0] != column).concat([[column, direction]]) }
   },
   delColumn(state, { tag, column }) {
     const { [tag]: sortSpec } = state
-    return { ...state, [tag]: (sortSpec || []).filter(x => x[0] != column) }
+    return { ...state, [tag]: (sortSpec || emptyA).filter(x => x[0] != column) }
   },
   turnColumn(state, { tag, column }) {
     const { [tag]: sortSpec } = state
-    return { ...state, [tag]: (sortSpec || []).map(x => [x[0], x[0] == column ? -x[1] : x[1]]) }
+    return { ...state, [tag]: (sortSpec || emptyA).map(x => [x[0], x[0] == column ? -x[1] : x[1]]) }
   },
 }
 
-export default makeReducer(flows, {})
+export default makeReducer(flows, emptyO)
 
 /* SELECTORS */
 
@@ -44,7 +44,7 @@ const reprX = (tables, table) => {
     if (field == '_id') {return myValues}
     const { [field]: { valType, multiple } } = fieldSpecs
     return multiple ?
-      (myValues || []).map(value => repr(tables, table, valType, value)).join('|') :
+      (myValues || emptyA).map(value => repr(tables, table, valType, value)).join('|') :
       repr(tables, table, valType, myValues)
   }
 }
@@ -60,7 +60,7 @@ const sortData = ({ tables }, { table, listIds, sortSpec }) => {
 
 /* selectors for export */
 
-export const getSort = ({ grid }, { table, tag, listIds }) => ({ table, tag, listIds, sortSpec: grid[tag] || [] })
+export const getSort = ({ grid }, { table, tag, listIds }) => ({ table, tag, listIds, sortSpec: grid[tag] || emptyA })
 
 export const getSortedData = createCachedSelector(
   getTables,

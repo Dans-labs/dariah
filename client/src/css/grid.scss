@@ -41,24 +41,9 @@
 }
 .listGeneric {
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: column nowrap;
     justify-content: flex-start;
     align-content: flex-start;
-    overflow: auto;
-}
-.listHeadCol {
-    display: inline-flex;
-    flex-flow: column nowrap;
-    flex-basis: 15em;
-    flex-shrink: 1;
-    flex-grow: 0.5;
-    overflow: auto;
-}
-.listFormCol {
-    flex-flow: column nowrap;
-    flex-basis: 80%;
-    flex-shrink: 1;
-    flex-grow: 2;
     overflow: auto;
 }
 .sortspecs {
