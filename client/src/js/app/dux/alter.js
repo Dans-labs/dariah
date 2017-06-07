@@ -1,5 +1,5 @@
 import merge from 'lodash/merge'
-import { makeReducer } from 'utils'
+import { makeReducer, memoize, handle } from 'utils'
 
 /* ACTIONS */
 
@@ -28,7 +28,16 @@ export const getAlt = ({ alter }, { tag, initial }) => {
   return { alt }
 }
 
-export const getAlts = ( {alter }) => ({ alter })
+export const getAlts = ({alter }) => ({ alter })
 
 /* HELPERS */
 
+export const makeAlt = ({ alter, dispatch }, { tag, initial, nAlts }) => {
+  const { [tag]: alt = initial } = alter
+  return ({
+    alt,
+    nextAlt: handle(dispatch, nextAlt, tag, nAlts, initial),
+    initAlt: handle(dispatch, setAlt, tag, initial),
+    setAlt: memoize(alt => handle(dispatch, setAlt, tag, alt)),
+  })
+}

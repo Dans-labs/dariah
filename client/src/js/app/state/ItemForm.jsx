@@ -2,19 +2,15 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 
-import { getTables, modItem, delItem, toDb } from 'tables'
+import { getTables, delItem, toDb } from 'tables'
 import { makeFields, makeDetails, someEditable, onSubmitSuccess, editStatus, editDelete } from 'fields'
-import { memoize } from 'memo'
+import { handle } from 'utils'
+import { makeOptionStyles } from 'custom'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
 import ItemDetails from 'ItemDetails'
 import ItemDetailHeads from 'ItemDetailHeads'
-
-const deleteit = memoize((del, table, eId) => event => {
-  event.preventDefault()
-  del(table, eId)
-})
 
 const WrapForm = ({ children, submitFunction }) => (
   submitFunction ?
@@ -25,8 +21,9 @@ const WrapForm = ({ children, submitFunction }) => (
 const ItemForm = props => {
   const {
     table, eId, perm,
-    dirty, invalid, submitting, reset, error, mod, del,
+    dirty, invalid, submitting, reset, error,
     handleSubmit,
+    dispatch,
   } = props
   let { fieldFragments, detailFragments } = props
   if (fieldFragments == null) {fieldFragments = makeFields(props)}
@@ -34,9 +31,9 @@ const ItemForm = props => {
   const hasEditable = someEditable(props)
   return (
     <div>
-      <WrapForm submitFunction={hasEditable ? handleSubmit(toDb(table, eId, mod)) : null} >
+      <WrapForm submitFunction={hasEditable ? handleSubmit(toDb(table, eId, dispatch)) : null} >
         <div>
-          {editDelete(perm, 'button-large', deleteit(del, table, eId))}
+          {editDelete(perm, 'button-large', handle(dispatch, delItem, table, eId))}
           {hasEditable ? editStatus({
             form: `${table}-${eId}`,
             showNeutral: false,
@@ -84,10 +81,7 @@ const ItemForm = props => {
   )
 }
 
-export default connect(getTables, {
-  mod: modItem,
-  del: delItem,
-})(reduxForm({
+export default connect(getTables)(reduxForm({
   destroyOnUnmount: false,
   enableReinitialize: true,
   keepDirtyOnReinitialize: true,

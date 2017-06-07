@@ -23,10 +23,10 @@ class Login extends Component {
     )
   }
   componentDidMount() {
-    const { props: { fetch } } = this
-    fetch({ type: 'fetchMe', contentType: 'db', path: '/who/ami', desc: 'me' })
+    const { props: { dispatch } } = this
+    dispatch(fetchMe({ type: 'fetchMe', contentType: 'db', path: '/who/ami', desc: 'me' }))
   }
 }
 
-export default connect(getMe, { fetch: fetchMe })(Login)
+export default connect(getMe)(Login)
 

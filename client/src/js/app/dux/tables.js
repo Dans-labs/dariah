@@ -3,8 +3,7 @@ import merge from 'lodash/merge'
 import { createSelector } from 'reselect'
 
 import { accessData } from 'server'
-import { makeReducer, emptyA, emptyO } from 'utils'
-import { memoize } from 'memo'
+import { makeReducer, memoize, emptyA, emptyO } from 'utils'
 
 /* ACTIONS */
 /*
@@ -117,7 +116,7 @@ export const getTableFilters = ({ tables }, { table }) => {
   return { fields, filterList }
 }
 
-const getValueList = ({ tables }, { table, field }) => {
+export const getValueList = ({ tables }, { table, field }) => {
   const { [table]: { valueLists, fieldSpecs } } = tables
   const { [field]: { valType } } = fieldSpecs
   if (valueLists == null) {
@@ -145,7 +144,7 @@ export const getOptions = createSelector(
 
 /* HELPERS */
 
-export const toDb = memoize((table, eId, mod) => values => mod(table, eId, values))
+export const toDb = memoize((table, eId, dispatch) => values => dispatch(modItem(table, eId, values)))
 
 const setComplete = (newValue, oldValue, key) => {
   if (key == 'complete') {return newValue || oldValue}
@@ -182,6 +181,13 @@ export const needValues = ({ tables, table, eId }) => (
   tables[table].entities[eId] == null ||
   tables[table].entities[eId].perm == null ||
   !tables[table].entities[eId].complete
+)
+
+export const listValues = ({ tables, table, eId, field }) => (
+  tables == null ? emptyA :
+  tables[table] == null ? emptyA :
+  tables[table].entities[eId] == null ? emptyA :
+  new Set(tables[table].entities[eId][field])
 )
 
 const repUser = ({ user }, valId) => {

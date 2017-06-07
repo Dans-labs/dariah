@@ -12,9 +12,9 @@ class CheckboxI extends Component {
     this.dom.indeterminate = indeterminate(states)
   }
   handleCheck = () => {
-    const { props: {filterSetting, table, filterId, handle } } = this
+    const { props: {filterSetting, table, filterId, dispatch } } = this
     const states = testAllChecks(filterSetting)
-    return handle(table, filterId, this.dom.indeterminate || !states.allTrue)
+    return dispatch(changeFacetAll(table, filterId, this.dom.indeterminate || !states.allTrue))
   }
   setIndeterminate = domElem => {
     const { props: { filterSetting } } = this
@@ -38,4 +38,4 @@ class CheckboxI extends Component {
   }
 }
 
-export default connect(getFilterSetting, { handle: changeFacetAll })(CheckboxI)
+export default connect(getFilterSetting)(CheckboxI)

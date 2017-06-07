@@ -2,7 +2,11 @@
 
 root=`pwd`
 
-if [[ "$1" == "devenv" ]]; then
+if [[ "$1" == "test" ]]; then
+    cd client
+    export NODE_ENV="development"
+    npm test
+elif [[ "$1" == "devenv" ]]; then
     # documentation server
     pushd docs
     bundle exec jekyll serve &

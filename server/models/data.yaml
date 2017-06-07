@@ -350,6 +350,7 @@ tables:
       - title
       - startDate
       - endDate
+      - typeContribution
       - notes
       - criteria
       - creator
@@ -369,6 +370,12 @@ tables:
         label: end date
         valType: datetime
         multiple: false
+      typeContribution:
+        label: Type
+        valType:
+          values: typeContribution
+          allowNew: true
+        multiple: true
       notes:
         label: Notes
         valType: textarea
@@ -396,6 +403,7 @@ tables:
         table: criteria
         linkField: package
         mode: list
+        filtered: true
 
   criteria:
     title: key
@@ -452,3 +460,14 @@ tables:
         valType: text
         multiple: true
 
+    filters:
+      - field: key
+        label: key
+        type: Fulltext
+        maxCols: null
+        expanded: null
+      - field: typeContribution
+        label: type
+        type: ByValue
+        maxCols: 1
+        expanded: true

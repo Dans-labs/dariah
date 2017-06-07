@@ -1,32 +1,30 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { memoize } from 'memo'
+import { handlEV } from 'utils'
 import { changeFulltext, getFilterSetting } from 'filters'
 
 import Stat from 'Stat'
 
-const handleChange = memoize((handle, table, filterId) => event => handle(table, filterId, event.target.value))
-
 const Fulltext = ({
   table,
-  filterId, filterField, filterLabel,
+  filterId, filterLabel,
   filterSetting,
   filteredAmount, filteredAmountOthers,
-  handle,
+  dispatch,
 }) => (
   <div>
-    <p title={`Search in ${filterField}`} >
+    <p title={`Search in ${filterLabel}`} >
       <input
         type="text"
         className="search"
         placeholder={`search in ${filterLabel}`}
         value={filterSetting}
-        onChange={handleChange(handle, table, filterId)}
+        onChange={handlEV(dispatch, changeFulltext, table, filterId)}
       />{' '}
       <Stat subTotal={filteredAmount} total={filteredAmountOthers} />
     </p>
   </div>
 )
 
-export default connect(getFilterSetting, { handle: changeFulltext })(Fulltext)
+export default connect(getFilterSetting)(Fulltext)

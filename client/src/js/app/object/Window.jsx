@@ -10,12 +10,12 @@ class Window extends Component {
     return Children.only(children)
   }
   newWindowSize = throttle(() => {
-    const { props: { resize } } = this
-    resize()
+    const { props: { dispatch } } = this
+    dispatch(changeWinDim())
   }, 1000)
 
   componentDidMount() {window.addEventListener("resize", this.newWindowSize)}
   componentWillUnmount() {window.removeEventListener("resize", this.newWindowSize)}
 }
 
-export default connect(null, { resize: changeWinDim })(Window)
+export default connect()(Window)

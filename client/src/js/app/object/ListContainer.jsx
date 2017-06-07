@@ -10,49 +10,53 @@ import ListFilter from 'ListFilter'
 
 class ListContainer extends Component {
   render() {
-    const { props: { table, tables, select, mode } } = this
+    const { props: { table, tables, select, mode, filtered } } = this
     const grid = mode == 'grid'
-    //console.warn('LISTCONTAINER RENDER entry')
     if (needTables(tables, table, select, grid)) {return <div />}
-    //console.warn('LISTCONTAINER RENDER work')
     const { [table]: { title, perm, myIds, allIds } } = tables
     const listIds = select == 'myIds' ? myIds : allIds
     return (
-      mode == 'list' ?
-        <ListPlain
-          table={table}
-          listIds={listIds}
-          select={select}
-          perm={perm}
-          title={title}
-        /> :
-      mode == 'grid' ?
-        <ListGrid
-          table={table}
-          listIds={listIds}
-          select={select}
-          perm={perm}
-          tag={table}
-        /> :
-      mode == 'filter' ?
+      filtered ?
         <ListFilter
           table={table}
+          listIds={listIds}
+          perm={perm}
           select={select}
-        /> :
-        <span>{`unknown display mode "${mode}" for item list`}</span>
+          mode={mode}
+          title={title}
+          tag={table}
+        /> : (
+          mode == 'list' ?
+            <ListPlain
+              table={table}
+              listIds={listIds}
+              select={select}
+              perm={perm}
+              title={title}
+            /> :
+          mode == 'grid' ?
+            <ListGrid
+              table={table}
+              listIds={listIds}
+              select={select}
+              perm={perm}
+              tag={table}
+            /> :
+            <span>{`unknown display mode "${mode}" for item list`}</span>
+        )
     )
   }
   componentDidMount() {
-    const { props: { tables, table, select, mode, fetch } } = this
+    const { props: { tables, table, select, mode, dispatch } } = this
     const grid = mode == 'grid'
-    if (needTables(tables, table, select, grid)) {fetch(table, select, grid)}
+    if (needTables(tables, table, select, grid)) {dispatch(fetchTable(table, select, grid))}
   }
   componentDidUpdate() {
-    const { props: { tables, table, select, mode, fetch } } = this
+    const { props: { tables, table, select, mode, dispatch } } = this
     const grid = mode == 'grid'
-    if (needTables(tables, table, select, grid)) {fetch(table, select, grid)}
+    if (needTables(tables, table, select, grid)) {dispatch(fetchTable(table, select, grid))}
   }
 }
 
-export default connect(getTables, { fetch: fetchTable })(withParams(ListContainer))
+export default connect(getTables)(withParams(ListContainer))
 

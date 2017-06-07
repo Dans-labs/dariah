@@ -1,22 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { combineSelectors } from 'utils'
-import { memoize } from 'memo.js'
+import { combineSelectors, memoize, handle, handlEV } from 'utils'
 
 import { getSelect, setSearch, setPopUp, togglePopUp } from 'select'
 import { getOptions } from 'tables'
 
-const RelOption = ({ label, selected, onHit }) => (
+const RelOption = ({ label, xClass, selected, onHit }) => (
   <p
-    className={`option tag ${selected ? 'selected' : ''}`}
+    className={`option tag ${xClass} ${selected ? 'selected' : ''}`}
     onClick={selected ? null : onHit}
   >{label}</p>
 )
-
-const handlePopUp = memoize((tag, togglePU) => () => togglePU(tag))
-const handleSetPopUp = memoize((tag, onOff, setPU) => () => setPU(tag, onOff))
-const handleSearch = memoize((tag, setS) => event => setS(tag, event.target.value))
-const handleClear = memoize((tag, setS) => () => setS(tag, ''))
 
 const removeVal = (value, onChange, val) => event => {
   event.stopPropagation()
@@ -33,7 +27,7 @@ const addVal = (optionLookup, multiple, value, onChange, label) => () => {
     onChange(newValue)
   }
 }
-const changeSel = (tag, multiple, value, onChange, setPU, val) => () => {
+const changeSel = memoize((tag, multiple, value, val, onChange, dispatch) => () => {
   if (multiple) {
     if (!value.includes(val)) {
       const newValue = [...value, val]
@@ -42,25 +36,26 @@ const changeSel = (tag, multiple, value, onChange, setPU, val) => () => {
   }
   else {
     onChange(val)
-    setPU(tag, false)
+    dispatch(setPopUp(tag, false))
   }
-}
+})
 
-const Tags = ({ tag, optionLookup, value, onChange, togglePU }) => (
+const Tags = ({ tag, optionLookup, optionStyle, value, onChange, dispatch }) => (
   <div
     className="tags"
-    onClick={handlePopUp(tag, togglePU)}
+    onClick={handle(dispatch, togglePopUp, tag)}
   >{
     (value != null && value.length) ?
       value.map(val => {
         const { [val]: lab = val } = optionLookup
+        const { [val]: xClass = '' } = optionStyle
         return (
           <span
             key={val}
             className="tag"
           >
             <span
-              className="button-tag"
+              className={`button-tag ${xClass}`}
               onClick={removeVal(value, onChange, val)}
             >{'×'}</span>{' '}
             <span>{lab}</span>
@@ -72,43 +67,44 @@ const Tags = ({ tag, optionLookup, value, onChange, togglePU }) => (
   </div>
 )
 
-const Head = ({ optionLookup, value, tag, togglePU }) => {
+const Head = ({ optionLookup, optionStyle, value, tag, dispatch }) => {
   let label = ''
-  let classes = 'option-head tag'
   const { [value]: lab = value } = optionLookup
+  const { [value]: xClass = '' } = optionStyle
   label = lab
+  const classes = ['option-head', 'tag', xClass]
   if (value == '') {
     label = 'click to enter a value'
-    classes += ' new'
+    classes.push('new')
   }
   return (
     <span
-      className={classes}
-      onClick={handlePopUp(tag, togglePU)}
+      className={classes.join(' ')}
+      onClick={handle(dispatch, togglePopUp, tag)}
     >{label}</span>
   )
 }
 
-const Typing = ({ tag, search, setS, setPU }) => (
+const Typing = ({ tag, search, dispatch }) => (
   <span className="option-type" >
     <input
       className="invisible"
       type="text"
       placeholder={'filter ...'}
       value={search || ''}
-      onFocus={handleSetPopUp(tag, true, setPU)}
-      onChange={handleSearch(tag, setS)}
+      onFocus={handle(dispatch, setPopUp, tag, true)}
+      onChange={handlEV(dispatch, setSearch, tag)}
     />
     {search ?
       <span
         className="button-tag"
-        onClick={handleClear(tag, setS)}
+        onClick={handle(dispatch, setSearch, tag, '')}
       >{'×'}</span> : null
     }
   </span>
 )
 
-const Options = ({ tag, optionLookup, multiple, allowNew, options, value, onChange, search, setPU }) => {
+const Options = ({ tag, optionLookup, optionStyle, multiple, allowNew, options, value, onChange, search, dispatch }) => {
   const pat = search.toLowerCase()
   return (
     <div className={'options'} >
@@ -124,26 +120,35 @@ const Options = ({ tag, optionLookup, multiple, allowNew, options, value, onChan
         >{search}</span>
       ) : null}
       {
-        options.map(({ value: val, label: lab }) => (
-          (!multiple || !value.includes(val)) &&
-          (pat == null || pat == '' || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
-        ) ? (
-          <RelOption
-            key={val}
-            label={lab}
-            selected={(multiple && value.includes(val)) || (!multiple && value == val)}
-            onHit={changeSel(tag, multiple, value, onChange, setPU, val)}
-          />
-        ) : null)
+        options.map(({ value: val, label: lab }) => {
+          if (
+            (!multiple || !value.includes(val)) &&
+            (pat == null || pat == '' || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
+          ) {
+            const { [val]: xClass = '' } = optionStyle
+            return (
+              <RelOption
+                key={val}
+                label={lab}
+                xClass={xClass}
+                selected={(multiple && value.includes(val)) || (!multiple && value == val)}
+                onHit={changeSel(tag, multiple, value, val, onChange, dispatch)}
+              />
+            )
+          }
+          else {
+            return null
+          }
+        })
       }
     </div>
   )
 }
 
 const RelSelect = ({
-  tag, options, optionLookup,
+  tag, options, optionLookup, optionStyle = {},
   input: { value, onChange },
-  multiple, allowNew, popUp, search, togglePU, setPU, setS,
+  multiple, allowNew, popUp, search, dispatch,
 }) => (
   <div
     className={`select ${multiple ? 'multiselect' : ''}`}
@@ -151,37 +156,39 @@ const RelSelect = ({
     {multiple ?
       <Tags
         optionLookup={optionLookup}
+        optionStyle={optionStyle}
         value={value}
         tag={tag}
-        togglePU={togglePU}
+        dispatch={dispatch}
         onChange={onChange}
       /> :
       <Head
         optionLookup={optionLookup}
+        optionStyle={optionStyle}
         value={value}
         popUp={popUp}
         tag={tag}
-        togglePU={togglePU}
+        dispatch={dispatch}
       />
     }
     {popUp ?
       <Typing
         tag={tag}
         search={search}
-        setS={setS}
-        setPU={setPU}
+        dispatch={dispatch}
       /> : null
     }
     {popUp ?
       <Options
         tag={tag}
         optionLookup={optionLookup}
+        optionStyle={optionStyle}
         options={options}
         multiple={multiple}
         allowNew={allowNew}
         value={value}
         search={search}
-        setPU={setPU}
+        dispatch={dispatch}
         onChange={onChange}
       /> : null
     }
@@ -190,4 +197,4 @@ const RelSelect = ({
 
 const getSelectOptions = combineSelectors(getOptions, getSelect)
 
-export default connect(getSelectOptions, { setPU: setPopUp, togglePU: togglePopUp, setS: setSearch})(RelSelect)
+export default connect(getSelectOptions)(RelSelect)

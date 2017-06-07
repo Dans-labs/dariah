@@ -248,7 +248,7 @@ class DbAccess(object):
         msgs = []
         for (name, detailProps) in details.items():
             t = detailProps['table']
-            self._getList('list', t, data, msgs, withFilters=False, grid=True)
+            self._getList('list', t, data, msgs, withFilters=True, grid=True)
 
     def getItem(self, controller, table, ident):
         Perm = self.Perm

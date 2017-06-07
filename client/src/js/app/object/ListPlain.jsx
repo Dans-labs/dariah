@@ -2,18 +2,16 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import isEqual from 'lodash/isequal'
 
-import { memoize } from 'memo'
-import { combineSelectors, emptyO } from 'utils'
+import { combineSelectors, memoize, emptyO } from 'utils'
 import { EditStatus } from 'fields'
 
 import { getTables, insertItem } from 'tables'
-import { getAlts, nextAlt, setAlt } from 'alter'
+import { getAlts, makeAlt } from 'alter'
 
 import ItemContainer from 'ItemContainer'
 
 const initial = 0
-
-const handleNext = memoize((dispatch, tag) => () => dispatch(nextAlt(tag, 2, initial)))
+const nAlts = 2
 
 class ListPlain extends Component {
   handleInsert = () => {
@@ -22,14 +20,14 @@ class ListPlain extends Component {
     this.gotoNew = true
   }
   gotoItem = eId => {
-    const { props: { table, dispatch } } = this
-    const tag = `${table}-${eId}`
-    dispatch(nextAlt(tag, 2, initial))
+    const { props, props: { table } } = this
+    const { nextAlt } = makeAlt(props, { tag: `${table}-${eId}`, nAlts, initial })
+    nextAlt()
   }
   closeItem = eId => {
-    const { props: { table, dispatch } } = this
-    const tag = `${table}-${eId}`
-    dispatch(setAlt(tag, initial))
+    const { props, props: { table } } = this
+    const { initAlt } = makeAlt(props, { tag: `${table}-${eId}`, nAlts, initial })
+    initAlt()
   }
   handleCloseAll = memoize(items => () => {items.forEach(eId => {this.closeItem(eId)})})
 
@@ -40,9 +38,8 @@ class ListPlain extends Component {
   }
 
   render() {
-    const { props: { tables, alter, table, listIds, perm, title, dispatch } } = this
+    const { props, props: { tables, table, listIds, perm, title } } = this
     const { [table]: { entities } } = tables
-    //console.warn('LISTPLAIN RENDER', this.props)
     return (
       <div className={'listGeneric'} >
         <div>
@@ -57,21 +54,21 @@ class ListPlain extends Component {
         </div>
         {
           listIds.map(eId => {
-            const { [eId]: { values } } = entities
+            const { [eId]: { values, perm: ePerm } } = entities
             const { [title]: entityHead = '-empty-' } = values
             const tag = `${table}-${eId}`
-            const { [tag]: alt = initial } = alter
+            const { alt, nextAlt } = makeAlt(props, { tag, nAlts, initial })
             const active = alt != initial
             const scrollProps = active ? { ref: this.scroll } : emptyO
             return (
               <div key={eId} >
                 <span {...scrollProps} >
-                  {perm != null && perm.update ? <EditStatus form={tag} showNeutral={active} /> : null}
+                  {ePerm != null && ePerm.update ? <EditStatus form={tag} showNeutral={true} /> : null}
                   <span
                     className={'link'}
-                    onClick={handleNext(dispatch, tag)}
+                    onClick={nextAlt}
                   >
-                    <span className={`fa fa-angle-${active ? 'left' : 'right'}`} />
+                    <span className={`fa fa-angle-${active ? 'up' : 'down'}`} />
                     {' '}{entityHead}
                   </span>
                 </span>
@@ -109,26 +106,21 @@ class ListPlain extends Component {
     for (const prop in newProps) {
       if (prop != 'listIds') {
         if (newProps[prop] !== this.props[prop]) {
-          //console.warn(`LISTPLAIN SHOULDUPDATE because of ${prop}`)
           return true
         }
       }
       else {
         if (!isEqual(newProps[prop], this.props[prop])) {
-          //console.warn(`LISTPLAIN SHOULDUPDATE because of ${prop}`)
           return true
         }
       }
     }
-    //console.warn(`LISTPLAIN SHOULDUPDATE NO`)
     return false
   }
   componentDidMount() {
-    //console.warn('LISTPLAIN DIDMOUNT')
     this.gotoNewItem()
   }
   componentDidUpdate() {
-    //console.warn('LISTPLAIN DIDUPDATE')
     this.gotoNewItem()
   }
 }

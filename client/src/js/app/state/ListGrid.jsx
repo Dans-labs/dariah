@@ -1,26 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { memoize } from 'memo'
-import { combineSelectors } from 'utils'
+import { combineSelectors, handle } from 'utils'
 import { getSort, getSortedData, resetSort, addColumn, turnColumn, delColumn } from 'grid'
 import { getTables, insertItem } from 'tables'
 
 import ItemRow from 'ItemRow'
 
-const insertit = memoize((insertItem, table, select, masterId, linkField) => () => insertItem(table, select, masterId, linkField))
-const resetit = memoize((reset, tag) => () => reset(tag))
-const addCit = memoize((addC, tag, column, direction) => () => addC(tag, column, direction))
-const turnCit = memoize((turnC, tag, column) => () => turnC(tag, column))
-const delCit = memoize((delC, tag, column) => () => delC(tag, column))
-
 const ListGrid = ({
   heading,
   tables, table, listIds, select, perm: tablePerm,
   masterId, linkField,
-  insertItem,
-  tag, sortSpec, reset, addC, turnC, delC,
+  tag, sortSpec,
   sortedData,
+  dispatch,
 }) => {
   const theHeading = heading ? `${heading}: ` : ''
   const { [table]: { fields, fieldOrder, fieldSpecs, detailOrder, entities } } = tables
@@ -68,7 +61,7 @@ const ListGrid = ({
           <span
             className="fa fa-plus button-large"
             title={`new ${table}`}
-            onClick={insertit(insertItem, table, select, masterId, linkField)}
+            onClick={handle(dispatch, insertItem, table, select, masterId, linkField)}
           />
         ) : null}
       </p>
@@ -83,7 +76,11 @@ const ListGrid = ({
               </span>
             ))
           }
-          <span className={'fa fa-close button-small'} onClick={resetit(reset, tag)} />{' '}
+          <span
+            className={'fa fa-close button-small'}
+            title={'remove all sort options'}
+            onClick={handle(dispatch, resetSort, tag)}
+          />{' '}
         </p> : null
       }
       <div className="grid" >
@@ -102,14 +99,23 @@ const ListGrid = ({
                 >
                   {
                     direction ?
-                      <span className={'sorted button-small'} onClick={delCit(delC, tag, field)} >{field}</span> :
-                      <span className={'unsorted button-small'} onClick={addCit(addC, tag, field, 1)} >{field}</span>
+                      <span
+                        className={'sorted button-small'}
+                        title={'remove column from sort options'}
+                        onClick={handle(dispatch, delColumn, tag, field)}
+                      >{field}</span> :
+                      <span
+                        className={'unsorted button-small'}
+                        title={'sort on this column'}
+                        onClick={handle(dispatch, addColumn, tag, field, 1)}
+                      >{field}</span>
                   }
                   {
                     direction ?
                       <span
                         className={`sorted button-small fa fa-arrow-${direction == 1 ? 'up' : 'down'}`}
-                        onClick={turnCit(turnC, tag, field)}
+                        title={'change sort direction'}
+                        onClick={handle(dispatch, turnColumn, tag, field)}
                       /> :
                       null
                   }
@@ -139,7 +145,4 @@ const ListGrid = ({
 
 const getInfo = combineSelectors(getTables, getSort, getSortedData)
 
-export default connect(getInfo, {
-  insertItem,
-  reset: resetSort, addC: addColumn, turnC: turnColumn, delC: delColumn,
-})(ListGrid)
+export default connect(getInfo)(ListGrid)

@@ -17,26 +17,30 @@ const Filter = ({
   table, fields,
   filterList, filteredAmount, filteredAmountOthers, amounts,
 }) => (
-  <div>
-    {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
-      const { type } = filter
-      const { [type]: Fclass } = filterClass
-      return (
-        <Fclass
-          key={filterId}
-          table={table}
-          filterId={filterId}
-          filterField={filter.field}
-          filterLabel={filter.label}
-          maxCols={filter.maxCols}
-          filteredAmount={filteredAmount}
-          filteredAmountOthers={filteredAmountOthers[filterId]}
-          amounts={amounts[filterId]}
-          expanded={filter.expanded}
-        />
+  filterList == null ?
+    <div>
+      {'No filters for this list'}
+    </div> :
+    <div>
+      {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
+        const { type } = filter
+        const { [type]: Fclass } = filterClass
+        return (
+          <Fclass
+            key={filterId}
+            table={table}
+            filterId={filterId}
+            filterField={filter.field}
+            filterLabel={filter.label}
+            maxCols={filter.maxCols}
+            filteredAmount={filteredAmount}
+            filteredAmountOthers={filteredAmountOthers[filterId]}
+            amounts={amounts[filterId]}
+            expanded={filter.expanded}
+          />
+        )}
       )}
-    )}
-  </div>
+    </div>
 )
 
 export default connect(getTableFilters)(Filter)

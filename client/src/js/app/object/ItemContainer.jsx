@@ -7,7 +7,6 @@ import ItemForm from 'ItemForm'
 
 class ItemContainer extends Component {
   render() {
-    //console.warn('ITEMCONTAINER RENDER')
     const { props: { tables, table, eId } } = this
     if (needValues({ tables, table, eId })) {return <div />}
 
@@ -34,13 +33,13 @@ class ItemContainer extends Component {
     */
   }
   componentDidMount() {
-    const { props: { tables, table, eId, fetch } } = this
-    if (needValues({ tables, table, eId })) {fetch(table, eId)}
+    const { props: { tables, table, eId, dispatch } } = this
+    if (needValues({ tables, table, eId })) {dispatch(fetchItem(table, eId))}
   }
   componentDidUpdate() {
-    const { props: { tables, table, eId, fetch } } = this
-    if (needValues({ tables, table, eId })) {fetch(table, eId)}
+    const { props: { tables, table, eId, dispatch } } = this
+    if (needValues({ tables, table, eId })) {dispatch(fetchItem(table, eId))}
   }
 }
 
-export default connect(getTables, { fetch: fetchItem })(ItemContainer)
+export default connect(getTables)(ItemContainer)

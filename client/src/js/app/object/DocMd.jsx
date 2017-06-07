@@ -3,9 +3,10 @@ import { connect } from 'react-redux'
 import Markdown from 'react-markdown'
 import { Link } from 'react-router'
 
-import { getDoc, needDoc, changedDoc, fetchDoc } from 'docs'
+import { combineSelectors } from 'utils'
 
-import Alternative from 'Alternative'
+import { getDoc, needDoc, changedDoc, fetchDoc } from 'docs'
+import { getAlts, makeAlt } from 'alter'
 
 const RouterLink = ({ children, href }) => (
   href.match(/^(https?:)?\/\//) ?
@@ -14,49 +15,53 @@ const RouterLink = ({ children, href }) => (
 )
 const renderers = { Link: RouterLink }
 
-const controlPlacement = control => <p style={{float: 'right'}} >{control}</p>
-const controls = [
-  handler => <a className="control fa fa-hand-o-down" href="#" title="markdown source" onClick={handler} />,
-  handler => <a className="control fa fa-file-code-o" href="#" title="formatted" onClick={handler} />,
-]
-
 class DocMd extends Component {
   render() {
-    const {props: { docName, text } } = this
-
+    const {props, props: { docName, text } } = this
     if (needDoc({ text })) {return <div>{`No document ${docName}`}</div>}
+
+    const { alt, nextAlt } = makeAlt(props, {
+      tag: docName,
+      nAlts: 2,
+      initial: 0,
+    })
     return (
       <div style={{paddingLeft: '0.5em'}} >
-        <Alternative
-          tag={docName}
-          controlPlacement={controlPlacement}
-          controls={controls}
-          alternatives={[(
-            <div key="fmt" >
+        <p style={{float: 'right'}} >
+          <a
+            href="#"
+            className={`control fa fa-${alt == 0 ? 'hand-o-down' : 'file-code-o'}`}
+            title={`${alt == 0 ? 'markdown source' : 'formatted'}`}
+            onClick={nextAlt}
+          />
+        </p>
+        {
+          alt == 0 ?
+            <div>
               <Markdown
                 source={text}
                 renderers={renderers}
               />
-            </div>
-          ), (
-            <div key="src" >
+            </div> :
+            <div>
               <pre className="md-source" >{text}</pre>
             </div>
-          )]}
-        />
+        }
       </div>
     )
   }
   componentDidMount() {
-    const { props, props: { fetch } } = this
-    fetch(props)
+    const { props, props: {dispatch } } = this
+    dispatch(fetchDoc(props))
   }
   componentDidUpdate(prevProps) {
-    const { props, props: { fetch } } = this
+    const { props, props: {dispatch } } = this
     if (changedDoc(props, prevProps)) {
-      fetch(props)
+      dispatch(fetchDoc(props))
     }
   }
 }
 
-export default connect(getDoc, { fetch: fetchDoc })(DocMd)
+const getInfo = combineSelectors(getDoc, getAlts)
+
+export default connect(getInfo)(DocMd)

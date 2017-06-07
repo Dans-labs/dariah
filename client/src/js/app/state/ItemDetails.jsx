@@ -1,21 +1,22 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { emptyA } from 'utils'
+import { combineSelectors, emptyA } from 'utils'
 
 import { getTables } from 'tables'
-import Alternative from 'Alternative'
+import { getAlts, makeAlt } from 'alter'
+
 import ListGrid from 'ListGrid'
 import ListPlain from 'ListPlain'
 import ListFilter from 'ListFilter'
 
-const ItemDetails = ({ tables, table, eId }) => {
+const ItemDetails = ({ tables, table, eId, ...props }) => {
   const { [table]: { details, detailOrder } } = tables
   return (
     <div>
       {
         (detailOrder || emptyA).map(name => {
-          const { label, table: detailTable, linkField, mode } = details[name]
+          const { label, table: detailTable, linkField, mode, filtered } = details[name]
           const {
             [detailTable]: {
               title: detailTitle,
@@ -25,44 +26,50 @@ const ItemDetails = ({ tables, table, eId }) => {
             },
           } = tables
           const detailListIds = detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
+          const tag = `detail-${table}-${eId}-${name}`
+          const { alt } = makeAlt(props, { tag, nAlts: 2, initial: 1 })
           return (
-            <Alternative
-              key={name}
-              tag={`detail-${table}-${eId}-${name}`}
-              alternatives={[
-                mode == 'list' ?
-                  <ListPlain
-                    heading={label}
-                    table={detailTable}
-                    listIds={detailListIds}
-                    perm={detailPerm}
-                    title={detailTitle}
-                    masterId={eId}
-                    linkField={linkField}
-                  /> :
-                mode == 'grid' ?
-                  <ListGrid
-                    heading={label}
-                    table={detailTable}
-                    listIds={detailListIds}
-                    perm={detailPerm}
-                    tag={`${table}-${name}-${eId}`}
-                    masterId={eId}
-                    linkField={linkField}
-                  /> :
-                mode == 'filter' ?
-                  <ListFilter
-                    heading={label}
-                    table={detailTable}
-                    masterId={eId}
-                    linkField={linkField}
-                  /> :
-                  <span>{`unknown display mode "${mode}" for item list`}</span>
-                ,
-                '',
-              ]}
-              initial={1}
-            />
+            <div key={name}>
+              {
+                alt == 0 ? (
+                  filtered ?
+                    <ListFilter
+                      heading={label}
+                      table={detailTable}
+                      listIds={detailListIds}
+                      perm={detailPerm}
+                      select={'details'}
+                      mode={mode}
+                      title={detailTitle}
+                      tag={`${table}-${name}-${eId}`}
+                      masterId={eId}
+                      linkField={linkField}
+                    /> : (
+                      mode == 'list' ?
+                        <ListPlain
+                          heading={label}
+                          table={detailTable}
+                          listIds={detailListIds}
+                          perm={detailPerm}
+                          title={detailTitle}
+                          masterId={eId}
+                          linkField={linkField}
+                        /> :
+                      mode == 'grid' ?
+                        <ListGrid
+                          heading={label}
+                          table={detailTable}
+                          listIds={detailListIds}
+                          perm={detailPerm}
+                          tag={`${table}-${name}-${eId}`}
+                          masterId={eId}
+                          linkField={linkField}
+                        /> :
+                        <span>{`unknown display mode "${mode}" for item list`}</span>
+                    )
+                ) : ''
+              }
+            </div>
           )
         })
       }
@@ -70,5 +77,7 @@ const ItemDetails = ({ tables, table, eId }) => {
   )
 }
 
-export default connect(getTables)(ItemDetails)
+const getInfo = combineSelectors(getTables, getAlts)
+
+export default connect(getInfo)(ItemDetails)
 

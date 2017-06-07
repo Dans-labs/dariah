@@ -1,12 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { memoize } from 'memo'
+import { handlE } from 'utils'
 import { changeFacet, getFilterSetting } from 'filters'
 
-const handleChange = memoize((handle, table, filterId, valueId, isOn) => () => handle(table, filterId, valueId, !isOn))
-
-const Facet = ({ table, filterId, valueId, valueRep, filterSetting, handle }) => {
+const Facet = ({ table, filterId, valueId, valueRep, filterSetting, dispatch }) => {
   const { [valueId]: isOn } = filterSetting
   return (
     <span>
@@ -14,11 +12,11 @@ const Facet = ({ table, filterId, valueId, valueRep, filterSetting, handle }) =>
         type="checkbox"
         checked={isOn}
         className="facet"
-        onChange={handleChange(handle, table, filterId, valueId, isOn)}
+        onChange={handlE(dispatch, changeFacet, table, filterId, valueId, !isOn)}
       />
       {` ${valueRep}`}
     </span>
   )
 }
 
-export default connect(getFilterSetting, { handle: changeFacet })(Facet)
+export default connect(getFilterSetting)(Facet)

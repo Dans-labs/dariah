@@ -12,16 +12,16 @@ class Notification extends Component {
     if (dom) {this.dom[label] = dom}
   }
   handleBox = () => {
-    const { props: { show, display } } = this
-    display(!show)
+    const { props: { show, dispatch } } = this
+    dispatch(display(!show))
   }
   handleHide = () => {
-    const { props: { display } } = this
-    display(false)
+    const { props: { dispatch } } = this
+    dispatch(display(false))
   }
   handleClear = () => {
-    const { props: { clear } } = this
-    clear()
+    const { props: { dispatch } } = this
+    dispatch(clear())
   }
 
   render() {
@@ -94,4 +94,4 @@ class Notification extends Component {
   }
 }
 
-export default connect(getNotifications, { clear, display })(Notification)
+export default connect(getNotifications)(Notification)

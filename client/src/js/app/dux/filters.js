@@ -2,8 +2,7 @@ import merge from 'lodash/merge'
 import { createSelectorCreator, defaultMemoize } from 'reselect'
 import createCachedSelector from 're-reselect'
 
-import { makeReducer, emptyO } from 'utils'
-import { levelOneEq } from 'memo'
+import { makeReducer, levelOneEq, emptyO } from 'utils'
 import { repRelated } from 'tables'
 
 /* ACTIONS */
@@ -51,9 +50,9 @@ const createLevelOneSelector = createSelectorCreator(
 
 /* basic selectors */
 
-const getFilterData = ({ tables }, { table }) => {
+const getFilterData = ({ tables }, { table, select, listIds }) => {
   const { [table]: { valueLists, fields, filterList, fieldSpecs } } = tables
-  const selection = { valueLists, fields, filterList, fieldSpecs }
+  const selection = { tables, table, valueLists, fields, filterList, fieldSpecs, select, listIds }
   for (const field of Object.keys(valueLists)) {
     const { [field]: { valType: { values: relTable } } } = fieldSpecs
     const { [relTable]: relTableData } = tables
@@ -64,13 +63,46 @@ const getFilterData = ({ tables }, { table }) => {
 
 /* selector computers */
 
-const compileFiltering = ({ valueLists, fields, filterList, fieldSpecs, ...relTables }) => {
+const gatherValues = (tables, table, listIds, filterFields, fieldSpecs) => {
+  const theseValues = {}
+  const { [table]: { entities } } = tables
+  const records = listIds.map(eId => entities[eId].values)
+  for (const field of filterFields) {
+    const { [field]: { multiple } } = fieldSpecs
+    const valueSet = new Set()
+    for (const r of records) {
+      const { [field]: val } = r
+      if (val == null) {continue}
+      if (multiple) {for (const v of val) {valueSet.add(v)}}
+      else {valueSet.add(val)}
+    }
+    theseValues[field] = Array.from(new Set(valueSet))
+  }
+  return theseValues
+}
+const compileFiltering = ({
+  tables, table, valueLists,
+  select, listIds,
+  fields, filterList, fieldSpecs,
+  ...relTables
+}) => {
+  console.warn('LISTIDS', listIds)
+  if (filterList == null) {return emptyO}
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterFields = presentFilterList.filter(x => x.type !== 'Fulltext').map(x => x.field)
+  const these = select == 'details'
+  let theseValueLists = valueLists
+  console.warn('THESE', these)
+  if (these) {
+    theseValueLists = gatherValues(tables, table, listIds, filterFields, fieldSpecs)
+    console.warn('THESE', theseValueLists)
+  }
   const fieldValues = {}
   for (const field of filterFields) {
     const { [field]: { valType } } = fieldSpecs
-    const { [field]: vals } = valueLists
+    const { [field]: vals } = theseValueLists
+    console.warn('VALS', vals)
+    if (vals == null) {continue}
     const fFieldValues = {'': '-none-'}
     if (typeof valType == 'string') {
       vals.forEach((v, i) => {fFieldValues[i] = v})
@@ -83,10 +115,12 @@ const compileFiltering = ({ valueLists, fields, filterList, fieldSpecs, ...relTa
     }
     fieldValues[field] = fFieldValues
   }
+  console.warn('FIELDVALUES', fieldValues)
   return fieldValues
 }
 
 const initFiltering = ({ fields, filterList }, fieldValues) => {
+  if (filterList == null) {return emptyO}
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterSettings = {}
   presentFilterList.forEach((filterSpec, filterId) => {
@@ -104,6 +138,7 @@ const initFiltering = ({ fields, filterList }, fieldValues) => {
 
 const computeFiltering = (tables, table, fieldValues, filterSettings) => {
   const { [table]: { entities, allIds, fields, fieldSpecs, filterList } } = tables
+  if (filterList == null) {return { filteredIds: allIds }}
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterChecks = {}
   const otherFilteredIds = {}
@@ -190,34 +225,32 @@ export const getFilterSetting = ({ filters }, { table, filterId }) => ({
   filterSetting: filters[table].filterSettings[filterId],
 })
 
-const getFiltersAppliedBase = ({ tables, filters, table }) => {
+const getFiltersAppliedBase = ({ tables, filters, table, select, listIds }) => {
   const { [table]: filterStatus = { filterSettings: emptyO, initialized: false } } = filters
   const { filterSettings, initialized } = filterStatus
-  const fieldValues = getFiltersCompiled({ tables }, { table })
-  //console.warn('GETFILTERSAPPLIEDBASE')
+  const fieldValues = getFiltersCompiled({ tables }, { table, select, listIds })
   const result = initialized ?
-    {
+    ({
       tables,
       initialized,
       fieldValues,
       filterSettings,
       ...computeFiltering(tables, table, fieldValues, filterSettings),
-    } :
-    {
+    }) :
+    ({
       tables,
       initialized,
       fieldValues,
-    }
-  //console.warn('GETFILTERSAPPLIED', result)
+    })
   return result
 }
 
-const getFilterArgs = ({ tables, filters }, { table }) => ({ tables, table, filters })
+const getFilterArgs = ({ tables, filters }, { table, select, listIds }) => ({ tables, table, select, listIds, filters })
 
 export const getFiltersApplied = createCachedSelector(
   getFilterArgs,
   getFiltersAppliedBase,
-)(({ tables, filters }, { table }) => table)
+)(({ tables, filters }, { table, select }) => `${table}-${select}`)
 
 /* HELPERS */
 

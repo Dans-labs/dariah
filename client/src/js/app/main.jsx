@@ -27,7 +27,7 @@ render(
         <Route path="tech/docs/:docFile" component={Doc} />
         <Route path="data" >
           <Route path=":table" component={SubApp} >
-            <Route path="list" component={ListContainer} mode={'filter'} />
+            <Route path="list" component={ListContainer} select={'allIds'} mode={'list'} filtered={true} />
             <Route path="mylist" component={ListContainer} select={'myIds'} mode={'list'} />
           </Route>
         </Route>

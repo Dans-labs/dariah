@@ -44,6 +44,8 @@ const floatSpec = {
   rightLeftNav: 'left',
   rightRight: 'right',
   rightRightBody: 'right',
+  filter: 'left',
+  list: 'right',
 }
 
 export function columnStyle(kind, { height, width }) {
@@ -54,6 +56,8 @@ export function columnStyle(kind, { height, width }) {
     rightLeftNav: height - topHeight - topMargin,
     rightRight: height - topHeight - topMargin,
     rightRightBody: height - topHeight - topMargin,
+    filter: '100%',
+    list: '100%',
   }
   const { left, rightLeft, rightLeftNav } = divWidthSpec
   const divWidth = {
@@ -61,7 +65,14 @@ export function columnStyle(kind, { height, width }) {
     right: width - left - scrollBarWidth,
     rightRight: width - left - rightLeft - 2 * scrollBarWidth - leftMargin,
     rightRightBody: width - left - rightLeftNav - 2 * scrollBarWidth - leftMargin,
+    filter: '40%',
+    list: '58%',
   }
+
+  const styles = {}
+  if (divWidth[kind]) {styles.width = divWidth[kind]}
+  if (divHeight[kind]) {styles.height = divHeight[kind]}
+  if (floatSpec[kind]) {styles.float = floatSpec[kind]}
 
   return {
     width: divWidth[kind],

@@ -1,35 +1,41 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { combineSelectors } from 'utils'
 import { makeDetails } from 'fields'
 
 import { getTables } from 'tables'
+import { getAlts, makeAlt } from 'alter'
 
-import { AltNext } from 'Alternative'
-
-const ItemDetailHeads = ({ tables, table, eId, detailFragments }) => {
+const ItemDetailHeads = ({ tables, table, eId, detailFragments, ...props }) => {
   const theFragments = detailFragments == null ? makeDetails(tables, table, eId) : detailFragments
   return (
     <div className={'grid fragments'}>{
-      theFragments.map(({ name, label, nDetails }) => (
-        <div
-          key={name}
-          className={'grid-row form'}
-        >
-          <div className={'grid-head-cell labelCol'}>{`${label}:`}</div>
-          <AltNext
-            className={'link grid-cell valueCol'}
-            tag={`detail-${table}-${eId}-${name}`}
-            nAlternatives={2}
-            initial={1}
+      theFragments.map(({ name, label, nDetails }) => {
+        const tag = `detail-${table}-${eId}-${name}`
+        const { nextAlt } = makeAlt(props, { tag, nAlts: 2, initial: 1 })
+        return (
+          <div
+            key={name}
+            className={'grid-row form'}
           >
-            {`${nDetails} item${nDetails == 1 ? '' : 's'}`}
-          </AltNext>
-        </div>
-      ))
+            <div className={'grid-head-cell labelCol'} >{`${label}:`}</div>
+            <div className={'grid-cell valueCol'} >
+              <span
+                className={'link'}
+                onClick={nextAlt}
+              >
+                {`${nDetails} item${nDetails == 1 ? '' : 's'}`}
+              </span>
+            </div>
+          </div>
+        )
+      })
     }
     </div>
   )
 }
 
-export default connect(getTables)(ItemDetailHeads)
+const getInfo = combineSelectors(getTables, getAlts)
+
+export default connect(getInfo)(ItemDetailHeads)
