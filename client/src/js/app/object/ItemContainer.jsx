@@ -1,16 +1,16 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { getTables, needValues, fetchItem } from 'tables'
+import { getTable, needValues, fetchItem } from 'tables'
 
 import ItemForm from 'ItemForm'
 
 class ItemContainer extends Component {
   render() {
-    const { props: { tables, table, eId } } = this
-    if (needValues({ tables, table, eId })) {return <div />}
+    const { props: { tableData, table, eId } } = this
+    if (needValues({ tableData, eId })) {return <div />}
 
-    const { [table]: { fields, entities: { [eId]: entity } } } = tables
+    const { fields, entities: { [eId]: entity } } = tableData
     const { values: initialValues, perm } = entity
     return (
       <div>
@@ -33,13 +33,13 @@ class ItemContainer extends Component {
     */
   }
   componentDidMount() {
-    const { props: { tables, table, eId, dispatch } } = this
-    if (needValues({ tables, table, eId })) {dispatch(fetchItem(table, eId))}
+    const { props: { tableData, table, eId, dispatch } } = this
+    if (needValues({ tableData, eId })) {dispatch(fetchItem(table, eId))}
   }
   componentDidUpdate() {
-    const { props: { tables, table, eId, dispatch } } = this
-    if (needValues({ tables, table, eId })) {dispatch(fetchItem(table, eId))}
+    const { props: { tableData, table, eId, dispatch } } = this
+    if (needValues({ tableData, eId })) {dispatch(fetchItem(table, eId))}
   }
 }
 
-export default connect(getTables)(ItemContainer)
+export default connect(getTable)(ItemContainer)

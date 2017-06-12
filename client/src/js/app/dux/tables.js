@@ -3,14 +3,21 @@ import merge from 'lodash/merge'
 import { createSelector } from 'reselect'
 
 import { accessData } from 'server'
-import { makeReducer, memoize, emptyA, emptyO } from 'utils'
+import { memoize } from 'memo'
+import { makeReducer, emptyA, emptyO } from 'utils'
+
+/* DEFS */
+
+export const DETAILS = 'details'
+export const ALLIDS = 'allIds'
+export const MYIDS = 'myIds'
 
 /* ACTIONS */
 /*
  * Most actions call accessData, which will dispatch the ultimate fetch action.
  */
 
-export const fetchTable = (table, select = 'allIds', grid) => accessData({
+export const fetchTable = (table, select = ALLIDS, grid) => accessData({
   type: 'fetchTable',
   contentType: 'db',
   path: `/${select == 'myIds' ? 'my' : ''}list?table=${table}&grid=${grid}`,
@@ -35,7 +42,7 @@ export const modItem = (table, eId, values) => accessData({
   table,
 })
 
-export const insertItem = (table, select = 'allIds', masterId = null, linkField = null) => accessData({
+export const insertItem = (table, select = ALLIDS, masterId = null, linkField = null) => accessData({
   type: 'insertItem',
   contentType: 'db',
   path: `/mod?table=${table}&action=insert`,
@@ -111,6 +118,8 @@ export default makeReducer(flows)
 
 export const getTables = ({ tables }) => ({ tables })
 
+export const getTable = ({ tables }, { table }) => ({ tableData: tables[table] })
+
 export const getTableFilters = ({ tables }, { table }) => {
   const { [table]: { fields, filterList } } = tables
   return { fields, filterList }
@@ -158,13 +167,15 @@ const addKey = listKey => (objValue, srcValue, key) => {
 
 const hasTableKey = (tables, table, key, value = null) => {
   if (tables == null) {return false}
-  return tables[table] != null && tables[table][key] != null && (value == null || tables[table][key] == value)
+  const { [table]: tableData } = tables
+  if (tableData == null) {return false}
+  return tableData[key] != null && (value == null || tableData[key] == value)
 }
 
-export const needTables = (tables, table, select = 'allIds', complete) => {
+export const needTables = (tables, table, select = ALLIDS, complete) => {
   if (!hasTableKey(tables, table, select)) {return true}
   if (complete && !hasTableKey(tables, table, 'complete', true)) {return true}
-  const { [table]: { fieldSpecs } } = tables
+  const { [table]: fieldSpecs } = tables
   const relTables = Array.from(
     new Set(
       Object.entries(fieldSpecs).
@@ -172,25 +183,24 @@ export const needTables = (tables, table, select = 'allIds', complete) => {
       map(entry => entry[1].valType.values)
     )
   )
-  return relTables.some(relTable => !hasTableKey(tables, relTable, 'allIds'))
+  return relTables.some(relTable => !hasTableKey(tables, relTable, ALLIDS))
 }
 
-export const needValues = ({ tables, table, eId }) => (
-  tables == null ||
-  tables[table] == null ||
-  tables[table].entities[eId] == null ||
-  tables[table].entities[eId].perm == null ||
-  !tables[table].entities[eId].complete
+export const needValues = ({ tableData, eId }) => (
+  tableData == null ||
+  tableData.entities[eId] == null ||
+  tableData.entities[eId].perm == null ||
+  !tableData.entities[eId].complete
 )
 
-export const listValues = ({ tables, table, eId, field }) => (
+export const listValues = memoize(({ tables, table, eId, field }) => (
   tables == null ? emptyA :
   tables[table] == null ? emptyA :
   tables[table].entities[eId] == null ? emptyA :
   new Set(tables[table].entities[eId][field])
-)
+), emptyO)
 
-const repUser = ({ user }, valId) => {
+const repUser = memoize(({ user }, valId) => {
   let valRep
   const { entities: { [valId]: entity } } = user
   if (entity) {
@@ -210,7 +220,7 @@ const repUser = ({ user }, valId) => {
   }
   else {valRep = 'UNKNOWN'}
   return valRep
-}
+})
 
 const repCountry = ({ country }, valId) => {
   const { entities: { [valId]: entity } } = country

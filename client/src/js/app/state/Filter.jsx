@@ -14,7 +14,8 @@ const filterClass = {
 }
 
 const Filter = ({
-  table, fields,
+  table, filterTag, listIds,
+  fields,
   filterList, filteredAmount, filteredAmountOthers, amounts,
 }) => (
   filterList == null ?
@@ -29,6 +30,8 @@ const Filter = ({
           <Fclass
             key={filterId}
             table={table}
+            filterTag={filterTag}
+            listIds={listIds}
             filterId={filterId}
             filterField={filter.field}
             filterLabel={filter.label}

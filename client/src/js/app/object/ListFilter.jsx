@@ -1,47 +1,46 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { setupFiltering, getFiltersApplied } from 'filters'
+import { initFiltering, getFiltersApplied } from 'filters'
 
 import ListPlain from 'ListPlain'
 import ListGrid from 'ListGrid'
 import Filter from 'Filter'
-import Pane from 'Pane'
-
 
 class ListFilter extends Component {
   componentWillMount() {
-    const { tables, table, initialized, dispatch } = this.props
-    if (!initialized) {dispatch(setupFiltering(tables, table))}
+    const { props: { tableData, table, filterTag, listIds, dispatch } } = this
+    dispatch(initFiltering(tableData, table, filterTag, listIds))
   }
   render() {
     const {
       props: {
         heading,
-        tables, table,
+        tableData, table,
         perm,
-        select,
-        masterId, linkField,
+        select, masterId, linkField,
+        listIds,
         filteredIds, filteredAmountOthers, amounts,
-        initialized,
-        mode, title, tag,
+        mode, title,
+        filterTag, gridTag,
       },
     } = this
-    console.warn(`RENDER ${table} ${masterId}`, initialized)
-    if (!initialized) {return <div />}
-    const { [table]: { allIds } } = tables
+    if (filteredIds == null) {return <div />}
+    const { allIds } = tableData
     return (
-      <div>
-        <Pane format="sized" position="filter">
-          <p>{'Total '}<span className="good-o" >{allIds.length}</span></p>
+      <div className={'list-filter'}>
+        <div className={'filters'}>
+          <p>{'Total '}<span className="good-o" >{listIds.length}</span></p>
           <Filter
             table={table}
+            filterTag={filterTag}
+            listIds={listIds}
             filteredAmount={filteredIds.length}
             filteredAmountOthers={filteredAmountOthers}
             amounts={amounts}
           />
-        </Pane>
-        <Pane format="sized" position="list">
+        </div>
+        <div className={'list'}>
           {
             mode == 'list' ?
               <ListPlain
@@ -61,13 +60,13 @@ class ListFilter extends Component {
                 listIds={filteredIds}
                 perm={perm}
                 select={select}
-                tag={tag}
+                gridTag={gridTag}
                 masterId={masterId}
                 linkField={linkField}
               /> :
               <span>{`unknown display mode "${mode}" for item list`}</span>
           }
-        </Pane>
+        </div>
       </div>
     )
   }

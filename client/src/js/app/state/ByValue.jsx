@@ -10,7 +10,7 @@ import CheckboxI from 'CheckboxI'
 import Stat from 'Stat'
 
 const ByValue = ({
-  table,
+  table, filterTag,
   filterId, filterLabel,
   fieldValues,
   filteredAmount, filteredAmountOthers,
@@ -22,14 +22,15 @@ const ByValue = ({
   if (rows == null) {
     return <div className="facet" ><p>{' -no facets '}</p></div>
   }
-  const tag = `${table}-${filterId}`
-  const { alt, nextAlt } = makeAlt(props, { tag, nAlts: 2, initial: expanded ? 0 : 1 })
+  const alterTag = `${table}-${filterId}`
+  const { alt, nextAlt } = makeAlt(props, { alterTag, nAlts: 2, initial: expanded ? 0 : 1 })
   return (
     <div className="facet" >
       <p className="facet" >
         <CheckboxI
           table={table}
           filterId={filterId}
+          filterTag={filterTag}
         /> {filterLabel}{' '}
         <Stat subTotal={filteredAmount} total={filteredAmountOthers} />{' '}
         <span
@@ -59,6 +60,7 @@ const ByValue = ({
                       >
                         <Facet
                           table={table}
+                          filterTag={filterTag}
                           filterId={filterId}
                           valueId={valueId}
                           valueRep={valueRep}

@@ -48,12 +48,12 @@ const FieldEdit = ({ field, tables, table, eId, ...props }) => {
   }
   else {
     const { allowNew } = valType
-    const tag = `${table}-${eId}-${field}`
+    const selectTag = `${table}-${eId}-${field}`
     return (
       <Field
         name={field}
         component={RelSelect}
-        tag={tag}
+        selectTag={selectTag}
         field={field}
         multiple={multiple}
         allowNew={allowNew}

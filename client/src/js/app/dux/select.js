@@ -3,26 +3,26 @@ import { makeReducer, emptyO } from 'utils'
 
 /* ACTIONS */
 
-export const setSearch = (tag, search) => ({ type: 'setSearch', tag, search })
-export const setPopUp = (tag, onOff) => ({ type: 'setPopUp', tag, onOff })
-export const togglePopUp = tag => ({ type: 'togglePopUp', tag })
+export const setSearch = (selectTag, search) => ({ type: 'setSearch', selectTag, search })
+export const setPopUp = (selectTag, onOff) => ({ type: 'setPopUp', selectTag, onOff })
+export const togglePopUp = selectTag => ({ type: 'togglePopUp', selectTag })
 
 /* REDUCER */
 
 const flows = {
-  setSearch(state, { tag, search }) {
-    const init = initSelect(state, tag)
-    return merge(init, state, { [tag]: { search } })
+  setSearch(state, { selectTag, search }) {
+    const init = initSelect(state, selectTag)
+    return merge(init, state, { [selectTag]: { search } })
   },
-  setPopUp(state, { tag, onOff }) {
-    const init = initSelect(state, tag)
-    return merge(init, state, { [tag]: { popUp: onOff } })
+  setPopUp(state, { selectTag, onOff }) {
+    const init = initSelect(state, selectTag)
+    return merge(init, state, { [selectTag]: { popUp: onOff } })
   },
-  togglePopUp(state, { tag }) {
-    const init = initSelect(state, tag)
-    const { [tag]: myState } = state
+  togglePopUp(state, { selectTag }) {
+    const init = initSelect(state, selectTag)
+    const { [selectTag]: myState } = state
     const newOnOff = myState == null ? true : !myState.popUp
-    return merge(init, state, { [tag]: { popUp: newOnOff } })
+    return merge(init, state, { [selectTag]: { popUp: newOnOff } })
   },
 }
 
@@ -30,13 +30,13 @@ export default makeReducer(flows, emptyO)
 
 /* SELECTORS */
 
-export const getSelect = ({ select }, { tag }) => ({ ...(select[tag] || emptyO) })
+export const getSelect = ({ select }, { selectTag }) => ({ ...(select[selectTag] || emptyO) })
 
 /* HELPERS */
 
-const initSelect = (state, tag) => {
-  const { [tag]: myState } = state
+const initSelect = (state, selectTag) => {
+  const { [selectTag]: myState } = state
   return myState == null ?
-    { [tag]: { search: '', popUp: false } } :
+    { [selectTag]: { search: '', popUp: false } } :
     {}
 }

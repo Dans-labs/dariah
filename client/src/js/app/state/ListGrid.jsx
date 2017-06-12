@@ -3,20 +3,20 @@ import { connect } from 'react-redux'
 
 import { combineSelectors, handle } from 'utils'
 import { getSort, getSortedData, resetSort, addColumn, turnColumn, delColumn } from 'grid'
-import { getTables, insertItem } from 'tables'
+import { getTable, insertItem } from 'tables'
 
 import ItemRow from 'ItemRow'
 
 const ListGrid = ({
   heading,
-  tables, table, listIds, select, perm: tablePerm,
+  tableData, table, listIds, select, perm: tablePerm,
   masterId, linkField,
-  tag, sortSpec,
+  gridTag, sortSpec,
   sortedData,
   dispatch,
 }) => {
   const theHeading = heading ? `${heading}: ` : ''
-  const { [table]: { fields, fieldOrder, fieldSpecs, detailOrder, entities } } = tables
+  const { fields, fieldOrder, fieldSpecs, detailOrder, entities } = tableData
   const xfields = fields
   const { length: nFields } = fieldOrder
   const nDetails = detailOrder != null ? detailOrder.length : 0
@@ -37,6 +37,7 @@ const ListGrid = ({
     flex: `${grow} ${shrink} ${width}`,
     overflow: 'auto',
   }))
+  const nItemsRep = `${listIds.length} item${listIds.length == 1 ? '' : 's'} `
 
   const rows = []
   for (const eId of sortedData) {
@@ -56,7 +57,7 @@ const ListGrid = ({
   return (
     <div>
       <p>
-        <span className={'listTitle'}>{theHeading}</span>{`${listIds.length} items `}
+        <span className={'listTitle'}>{theHeading}</span>{nItemsRep}
         {(tablePerm != null && tablePerm.insert) ? (
           <span
             className="fa fa-plus button-large"
@@ -79,7 +80,7 @@ const ListGrid = ({
           <span
             className={'fa fa-close button-small'}
             title={'remove all sort options'}
-            onClick={handle(dispatch, resetSort, tag)}
+            onClick={handle(dispatch, resetSort, gridTag)}
           />{' '}
         </p> : null
       }
@@ -102,12 +103,12 @@ const ListGrid = ({
                       <span
                         className={'sorted button-small'}
                         title={'remove column from sort options'}
-                        onClick={handle(dispatch, delColumn, tag, field)}
+                        onClick={handle(dispatch, delColumn, gridTag, field)}
                       >{field}</span> :
                       <span
                         className={'unsorted button-small'}
                         title={'sort on this column'}
-                        onClick={handle(dispatch, addColumn, tag, field, 1)}
+                        onClick={handle(dispatch, addColumn, gridTag, field, 1)}
                       >{field}</span>
                   }
                   {
@@ -115,7 +116,7 @@ const ListGrid = ({
                       <span
                         className={`sorted button-small fa fa-arrow-${direction == 1 ? 'up' : 'down'}`}
                         title={'change sort direction'}
-                        onClick={handle(dispatch, turnColumn, tag, field)}
+                        onClick={handle(dispatch, turnColumn, gridTag, field)}
                       /> :
                       null
                   }
@@ -143,6 +144,6 @@ const ListGrid = ({
   )
 }
 
-const getInfo = combineSelectors(getTables, getSort, getSortedData)
+const getInfo = combineSelectors(getTable, getSort, getSortedData)
 
 export default connect(getInfo)(ListGrid)

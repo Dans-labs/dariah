@@ -12,7 +12,7 @@ export const display = onOff => ({ type: 'display', onOff })
 const subFlows = {
   pending(state, { desc, busy, extraMsgs }) {
     return mergeWith({}, state, {
-      items: [
+      notes: [
         ...extraMsgs,
         { kind: 'special', text: `waiting for ${desc}`},
       ],
@@ -21,7 +21,7 @@ const subFlows = {
   },
   success(state, { desc, busy, extraMsgs }) {
     return mergeWith({}, state, {
-      items: [
+      notes: [
         ...extraMsgs,
         { kind: 'info', text: `${desc} ok` },
       ],
@@ -30,7 +30,7 @@ const subFlows = {
   },
   error(state, { desc, busy, extraMsgs }) {
     return mergeWith({}, state, {
-      items: [
+      notes: [
         ...extraMsgs,
         { kind: 'error', text: `${desc} failed` },
       ],
@@ -49,7 +49,7 @@ const flows = {
   },
   msgs(state, { msgs }) {
     return mergeWith({}, state, {
-      items: [
+      notes: [
         ...msgs,
       ],
       show: true,
@@ -58,7 +58,7 @@ const flows = {
   clear(state) {
     return {
       ...state,
-      items: emptyA,
+      notes: emptyA,
       show: false,
     }
   },
@@ -70,16 +70,16 @@ const flows = {
   },
 }
 
-export default makeReducer(flows, { items: emptyA, busy: 0, show: false })
+export default makeReducer(flows, { notes: emptyA, busy: 0, show: false })
 
 /* SELECTORS */
 
 export const getNotifications = ({ notify }) => {
-  const { items, busy, show } = notify
+  const { notes, busy, show } = notify
   let lastNote = -1
   let lastKind = ''
-  items.forEach((item, i) => {
-    const { kind } = item
+  notes.forEach((note, i) => {
+    const { kind } = note
     if (kind == 'error') {
       lastNote = i
       lastKind = 'error'
@@ -91,13 +91,13 @@ export const getNotifications = ({ notify }) => {
       }
     }
   })
-  return { notifications: items, busy, show, lastMsg: items.length - 1, lastNote, lastKind }
+  return { notifications: notes, busy, show, lastMsg: notes.length - 1, lastNote, lastKind }
 }
 
 /* HELPERS */
 
 const addItems = (objValue, srcValue, key) => {
-  if (key == 'items') {
+  if (key == 'notes') {
     return objValue == null ? srcValue : objValue.concat(srcValue)
   }
 }

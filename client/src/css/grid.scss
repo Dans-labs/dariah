@@ -65,3 +65,83 @@
 }
 .unsorted {
 }
+div.backoffice {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+div.subApp {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+div.bar {
+    flex-basis: content;
+    flex-shrink: 1;
+    flex-grow: 0.5;
+    padding-right: 0.5em;
+    max-height: 100%;
+    overflow: auto;
+}
+div.details {
+    flex-basis: 70%;
+    flex-shrink: 1;
+    flex-grow: 1;
+    padding-left: 0.5em;
+    max-height: 100%;
+    overflow: auto;
+}
+div.list-filter {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+div.filters {
+    flex-basis: content;
+    flex-shrink: 1;
+    flex-grow: 1;
+    padding-right: 0.5em;
+    max-height: 100%;
+    overflow: auto;
+}
+div.list {
+    flex-basis: 50%;
+    flex-shrink: 1;
+    flex-grow: 1;
+    padding-left: 0.5em;
+    max-height: 100%;
+    overflow: auto;
+}
+div.fulltext {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-content: flex-start;
+    align-items: baseline;
+}
+div.fulltext .search {
+    flex-basis: 5em;
+    flex-shrink: 0.3;
+    flex-grow: 1;
+    overflow: auto;
+}
+div.fulltext .stat {
+    flex-basis: 5em;
+    flex-shrink: 0.2;
+    flex-grow: 0.5;
+    overflow: auto;
+    text-align: right;
+}
+.itemHead {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: baseline;
+}

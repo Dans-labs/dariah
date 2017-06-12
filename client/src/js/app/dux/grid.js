@@ -7,28 +7,28 @@ import { getTables, repr } from 'tables'
 
 /* ACTIONS */
 
-export const resetSort = tag => ({ type: 'resetSort', tag })
-export const addColumn = (tag, column, direction) => ({ type: 'addColumn', tag, column, direction })
-export const turnColumn = (tag, column) => ({ type: 'turnColumn', tag, column })
-export const delColumn = (tag, column) => ({ type: 'delColumn', tag, column })
+export const resetSort = gridTag => ({ type: 'resetSort', gridTag })
+export const addColumn = (gridTag, column, direction) => ({ type: 'addColumn', gridTag, column, direction })
+export const turnColumn = (gridTag, column) => ({ type: 'turnColumn', gridTag, column })
+export const delColumn = (gridTag, column) => ({ type: 'delColumn', gridTag, column })
 
 /* REDUCER */
 
 const flows = {
-  resetSort(state, { tag }) {
-    return { ...state, [tag]: emptyA }
+  resetSort(state, { gridTag }) {
+    return { ...state, [gridTag]: emptyA }
   },
-  addColumn(state, { tag, column, direction }) {
-    const { [tag]: sortSpec } = state
-    return { ...state, [tag]: (sortSpec || emptyA).filter(x => x[0] != column).concat([[column, direction]]) }
+  addColumn(state, { gridTag, column, direction }) {
+    const { [gridTag]: sortSpec } = state
+    return { ...state, [gridTag]: (sortSpec || emptyA).filter(x => x[0] != column).concat([[column, direction]]) }
   },
-  delColumn(state, { tag, column }) {
-    const { [tag]: sortSpec } = state
-    return { ...state, [tag]: (sortSpec || emptyA).filter(x => x[0] != column) }
+  delColumn(state, { gridTag, column }) {
+    const { [gridTag]: sortSpec } = state
+    return { ...state, [gridTag]: (sortSpec || emptyA).filter(x => x[0] != column) }
   },
-  turnColumn(state, { tag, column }) {
-    const { [tag]: sortSpec } = state
-    return { ...state, [tag]: (sortSpec || emptyA).map(x => [x[0], x[0] == column ? -x[1] : x[1]]) }
+  turnColumn(state, { gridTag, column }) {
+    const { [gridTag]: sortSpec } = state
+    return { ...state, [gridTag]: (sortSpec || emptyA).map(x => [x[0], x[0] == column ? -x[1] : x[1]]) }
   },
 }
 
@@ -60,13 +60,13 @@ const sortData = ({ tables }, { table, listIds, sortSpec }) => {
 
 /* selectors for export */
 
-export const getSort = ({ grid }, { table, tag, listIds }) => ({ table, tag, listIds, sortSpec: grid[tag] || emptyA })
+export const getSort = ({ grid }, { table, gridTag, listIds }) => ({ table, gridTag, listIds, sortSpec: grid[gridTag] || emptyA })
 
 export const getSortedData = createCachedSelector(
   getTables,
   getSort,
   sortData,
-)((state, { tag }) => tag)
+)((state, { gridTag }) => gridTag)
 
 /* HELPERS */
 

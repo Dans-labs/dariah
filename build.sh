@@ -5,7 +5,11 @@ root=`pwd`
 if [[ "$1" == "test" ]]; then
     cd client
     export NODE_ENV="development"
-    npm test
+    if [[ "$2" == "" ]]; then
+        npm test
+    else
+        npm run-script $2
+    fi
 elif [[ "$1" == "devenv" ]]; then
     # documentation server
     pushd docs

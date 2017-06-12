@@ -12,11 +12,11 @@ const editStatusGeneric = canSubmit => ({ showNeutral, dirty, invalid, submittin
         canSubmit ?
           <button
             type="submit"
-            className={'button-large edit-action fa fa-check'}
+            className={'button-large edit-action fa fa-fw fa-check'}
             title={'save'}
           /> :
           <span
-            className={'warning-o fa fa-pencil'}
+            className={'warning-o fa fa-fw fa-pencil'}
             title={'changed'}
           />
         ) : null
@@ -24,21 +24,28 @@ const editStatusGeneric = canSubmit => ({ showNeutral, dirty, invalid, submittin
     {
       (dirty && invalid && !submitting) ?
         <span
-          className={'error-o fa fa-exclamation-circle'}
+          className={'error-o fa fa-fw fa-exclamation-circle'}
+          title={'invalid data'}
+        /> : null
+    }
+    {
+      (!dirty && invalid && !submitting && showNeutral) ?
+        <span
+          className={'error-o fa fa-fw fa-exclamation-circle'}
           title={'invalid data'}
         /> : null
     }
     {
       (!dirty && !invalid && !submitting && showNeutral) ?
         <span
-          className={'good-o fa fa-circle'}
+          className={'good-o fa fa-fw fa-circle'}
           title={'no changes'}
         /> : null
     }
     {
       submitting ?
         <span
-          className={'special-o fa fa-spinner fa-spin'}
+          className={'special-o fa fa-fw fa-spinner fa-spin'}
           title={'saving'}
         /> : null
     }
@@ -48,7 +55,7 @@ const editStatusGeneric = canSubmit => ({ showNeutral, dirty, invalid, submittin
         canSubmit ?
           <button
             type="button"
-            className={'button-large error-o fa fa-close'}
+            className={'button-large error-o fa fa-fw fa-close'}
             title={'reset values to last saved'}
             onClick={reset}
           /> : null

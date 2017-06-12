@@ -5,23 +5,20 @@ import { withParams } from 'utils'
 import { getMe } from 'me'
 
 import NavLink from 'NavLink'
-import Pane from 'Pane'
 
 const SubApp = ({ table, me, children }) => (
-  <div>
-    <Pane format="nav sized" position="left">
-      <div>
-        <p><NavLink to={`/data/${table}/list`} >{'All items'}</NavLink></p>
-        {
-          me.eppn ?
-            <p><NavLink to={`/data/${table}/mylist`} >{'My work'}</NavLink></p> :
-            null
-        }
-      </div>
-    </Pane>
-    <Pane format="sized" position="right">
+  <div className={'subApp'} >
+    <div className={'nav bar'} >
+      <p><NavLink to={`/data/${table}/list`} >{'All items'}</NavLink></p>
+      {
+        me.eppn ?
+          <p><NavLink to={`/data/${table}/mylist`} >{'My work'}</NavLink></p> :
+          null
+      }
+    </div>
+    <div className={'details'} >
       { children }
-    </Pane>
+    </div>
   </div>
 )
 

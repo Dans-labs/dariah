@@ -21,7 +21,7 @@ class DocMd extends Component {
     if (needDoc({ text })) {return <div>{`No document ${docName}`}</div>}
 
     const { alt, nextAlt } = makeAlt(props, {
-      tag: docName,
+      alterTag: docName,
       nAlts: 2,
       initial: 0,
     })

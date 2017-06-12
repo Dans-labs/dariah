@@ -5,7 +5,7 @@ import L from 'leaflet'
 import {countryBorders} from 'europe.geo'
 import { getFilterSetting } from 'filters'
 import { getTables } from 'tables'
-import { combineSelectors } from 'utils'
+import { combineSelectors, emptyO } from 'utils'
 
 import ByValue from 'ByValue'
 
@@ -104,7 +104,7 @@ class EUMap extends Component {
         const { properties: { iso2, lat, lng } } = feature
         if (this.inDariah[iso2]) {
           const { idFromIso: { [iso2]: _id } } = this
-          const { [_id]: isOn } = filterSetting
+          const { [_id]: isOn = false } = filterSetting || emptyO
           const marker = L.circleMarker([lat, lng], {
             ...MARKER_COLOR[isOn],
             radius: computeRadius(_id, filteredAmountOthers, amounts),
@@ -122,7 +122,7 @@ class EUMap extends Component {
     const { MARKER_COLOR } = mapOptions
     Object.entries(this.features).forEach(([iso2, marker]) => {
       const { idFromIso: { [iso2]: _id } } = this
-      const { [_id]: isOn } = filterSetting
+      const { [_id]: isOn = false } = filterSetting || emptyO
       marker.setRadius(computeRadius(_id, filteredAmountOthers, amounts))
       marker.setStyle(MARKER_COLOR[isOn])
     })

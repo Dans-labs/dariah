@@ -18,7 +18,7 @@ const Doc = ({ location: { pathname: docPath } }) => {
   return DocClass == null ? (
     <NotFound splat={`document ${docPath}`} />
   ) : (
-    <DocClass docDir={docDir} docName={docName} docExt={docExt} tag={docName} />
+    <DocClass docDir={docDir} docName={docName} docExt={docExt} />
   )
 }
 

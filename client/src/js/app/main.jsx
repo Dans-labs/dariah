@@ -2,6 +2,8 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Router, Route, Redirect, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
 
+import { ALLIDS, MYIDS } from 'tables'
+
 import Root from 'Root'
 import App from 'App'
 import SubApp from 'SubApp'
@@ -27,14 +29,14 @@ render(
         <Route path="tech/docs/:docFile" component={Doc} />
         <Route path="data" >
           <Route path=":table" component={SubApp} >
-            <Route path="list" component={ListContainer} select={'allIds'} mode={'list'} filtered={true} />
-            <Route path="mylist" component={ListContainer} select={'myIds'} mode={'list'} />
+            <Route path="list" component={ListContainer} select={ALLIDS} mode={'list'} filtered={true} />
+            <Route path="mylist" component={ListContainer} select={MYIDS} mode={'list'} />
           </Route>
         </Route>
         <Route path="backoffice" component={Backoffice} >
           <Route path=":table" >
-            <Route path="grid" component={ListContainer} select={'allIds'} mode={'grid'} />
-            <Route path="list" component={ListContainer} select={'allIds'} mode={'list'} />
+            <Route path="grid" component={ListContainer} select={ALLIDS} mode={'grid'} />
+            <Route path="list" component={ListContainer} select={ALLIDS} mode={'list'} />
           </Route>
         </Route>
       </Route>

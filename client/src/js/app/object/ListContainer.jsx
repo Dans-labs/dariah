@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { withParams } from 'utils'
-import { getTables, needTables, fetchTable } from 'tables'
+import { getTables, needTables, fetchTable, MYIDS } from 'tables'
+import { makeTag } from 'filters'
 
 import ListGrid from 'ListGrid'
 import ListPlain from 'ListPlain'
@@ -10,11 +11,13 @@ import ListFilter from 'ListFilter'
 
 class ListContainer extends Component {
   render() {
-    const { props: { table, tables, select, mode, filtered } } = this
+    const { props: { tables, table, select, mode, filtered } } = this
     const grid = mode == 'grid'
     if (needTables(tables, table, select, grid)) {return <div />}
-    const { [table]: { title, perm, myIds, allIds } } = tables
-    const listIds = select == 'myIds' ? myIds : allIds
+    const { [table]: tableData } = tables
+    const { title, perm, myIds, allIds } = tableData
+    const listIds = select == MYIDS ? myIds : allIds
+    const filterTag = makeTag(select, null, null)
     return (
       filtered ?
         <ListFilter
@@ -24,7 +27,8 @@ class ListContainer extends Component {
           select={select}
           mode={mode}
           title={title}
-          tag={table}
+          filterTag={filterTag}
+          gridTag={table}
         /> : (
           mode == 'list' ?
             <ListPlain
@@ -40,7 +44,7 @@ class ListContainer extends Component {
               listIds={listIds}
               select={select}
               perm={perm}
-              tag={table}
+              gridTag={table}
             /> :
             <span>{`unknown display mode "${mode}" for item list`}</span>
         )

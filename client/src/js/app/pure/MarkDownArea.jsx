@@ -12,7 +12,7 @@ const MarkdownArea = ({
     ...props
 }) => {
   const { alt, nextAlt } = makeAlt(props, {
-    tag: `md-${table}-${eId}-${name}`,
+    alterTag: `md-${table}-${eId}-${name}`,
     nAlts: 2,
     initial: 0,
   })

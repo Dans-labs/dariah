@@ -1,4 +1,5 @@
-import { memoize, emptyF } from 'utils'
+import { memoize } from 'memo'
+import { emptyO, emptyF } from 'utils'
 
 import { getValueList, listValues } from 'tables'
 
@@ -40,4 +41,4 @@ export const makeProps = memoize((tables, table, field) => {
     })
     return newProps
   })
-})
+}, emptyO)

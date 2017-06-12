@@ -5,7 +5,7 @@ import { reduxForm } from 'redux-form'
 import { getTables, delItem, toDb } from 'tables'
 import { makeFields, makeDetails, someEditable, onSubmitSuccess, editStatus, editDelete } from 'fields'
 import { handle } from 'utils'
-import { makeOptionStyles } from 'custom'
+//import { makeOptionStyles } from 'custom'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'

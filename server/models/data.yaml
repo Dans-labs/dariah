@@ -461,11 +461,6 @@ tables:
         multiple: true
 
     filters:
-      - field: key
-        label: key
-        type: Fulltext
-        maxCols: null
-        expanded: null
       - field: typeContribution
         label: type
         type: ByValue
