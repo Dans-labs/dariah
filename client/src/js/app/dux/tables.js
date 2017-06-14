@@ -1,5 +1,5 @@
-import mergeWith from 'lodash/mergewith'
-import merge from 'lodash/merge'
+import { combineReducers } from 'redux'
+import update from 'immutability-helper'
 import { createSelector } from 'reselect'
 
 import { accessData } from 'server'
@@ -63,70 +63,169 @@ export const delItem = (table, eId) => accessData({
 
 /* REDUCER */
 
-const flows = {
+const updateItemWithFields = (state, table, _id, fields, values) => update(state, {
+  [table]: {
+    $apply: t => update(t || {}, {
+      entities: {
+        $apply: e => update(e || {}, {
+          [_id]: {
+            $apply: i => update(i || {}, {
+              values: {
+                $apply: vals => {
+                  let newVals = vals || {}
+                  fields.forEach(field => {
+                    newVals = update(newVals, {
+                      [field]: {
+                        $apply: val => {
+                          const newVal = values[field]
+                          return JSON.stringify(val) == JSON.stringify(newVal) ? val : newVal
+                        },
+                      },
+                    })
+                  })
+                  return newVals
+                },
+              },
+            }),
+          },
+        }),
+      },
+    }),
+  },
+})
+
+const updateItemValues = (state, table, _id, values) => update(state, {
+  [table]: {
+    $apply: t => update(t || {}, {
+      entities: {
+        $apply: e => update(e || {}, {
+          [_id]: {
+            $apply: i => update(i || {}, {
+              values: { $set: values },
+            }),
+          },
+        }),
+      },
+    }),
+  },
+})
+
+const updateItemWhole = (state, table, _id, data) => update(state, {
+  [table]: {
+    $apply: t => update(t || {}, {
+      entities: {
+        $apply: e => update(e || {}, {
+          [_id]: { $set: data },
+        }),
+      },
+    }),
+  },
+})
+
+const flowsCore = {
   fetchTable(state, { data }) {
     if (data == null) {return state}
-    return mergeWith({}, state, data, setComplete)
+    const { core } = data
+    return core == null ? state : update(state, { $merge: core })
   },
   fetchItem(state, { data, table }) {
     if (data == null) {return state}
-    const { fields, ...restData } = data
-    const { values, values: { _id } } = restData
-    const newState = merge({}, state, { [table]: { fields, entities: { [_id]: restData } } })
-    newState[table].entities[_id].values = values
-    return newState
+    const { [table]: tableData } = state
+    const { fields } = tableData
+    const { values, values: { _id } } = data
+    const useFields = ['_id', ...Object.keys(fields)]
+    return updateItemWithFields(state, table, _id, useFields, values)
   },
   modItem(state, { data, table }) {
     if (data == null) {return state}
-    const { values: { _id }, newValues } = data
-    const newState = merge({}, state, { [table]: { entities: { [_id]: data } } })
-    newState[table].entities[_id].values = data.values
-
+    const { newValues } = data
+    const { [table]: tableData } = state
+    const { fields } = tableData
+    const { values, values: { _id } } = data
+    const useFields = ['_id', ...Object.keys(fields)]
+    let newState = updateItemWithFields(state, table, _id, useFields, values)
+    const useRelFields = ['_id', 'rep']
     for (const { _id, rep, relTable, field } of newValues) {
-      newState[relTable].entities[_id] = { values: { _id, rep } }
-      newState[table].valueLists[field].unshift(_id)
+      newState = updateItemWithFields(state, relTable, _id, useRelFields, { _id, rep })
+      newState = update(newState, { [table]: { valueLists: { [field]: { $unshift: [_id] } } } })
     }
     return newState
   },
   insertItem(state, { data, table, select }) {
     if (data == null) {return state}
-    const { fields, ...restData } = data
-    const { values: { _id } } = restData
-    return mergeWith({}, state, { [table]: { lastInserted: _id, fields, entities: { [_id]: data }, [select]: [_id] } }, addKey(select))
+    const { [table]: tableData } = state
+    const { fields } = tableData
+    const { values, values: { _id } } = data
+    const useFields = ['_id', ...Object.keys(fields)]
+    const newState = updateItemWithFields(state, table, _id, useFields, values)
+    return update(newState, {
+      [table]: {
+        lastInserted: { $set: _id },
+        [select]: { $unshift: [_id] },
+      },
+    })
+  },
+  delItem(state, { data, table }) {
+    if (data == null) {return state}
+    const { [table]: { myIds, allIds } } = state
+    const _id = data
+    let newState = update(state, { [table]: { entities: { $unset: [_id] } } })
+    Object.entries({ myIds, allIds }).forEach(([name, list]) => {
+      if (list != null) {
+        const otherIds = list.filter(x => x != _id)
+        newState = update(newState, { [table]: { [name]: { $set: otherIds } } })
+      }
+    })
+    return newState
+  },
+}
+
+const flowsMore = {
+  fetchTable(state, { data }) {
+    if (data == null) {return state}
+    const { more } = data
+    return more == null ? state : update(state, { $merge: more })
+  },
+  fetchItem(state, { data, table }) {
+    if (data == null) {return state}
+    const { values: { _id } } = data
+    return updateItemWhole(state, table, _id, data)
+  },
+  modItem(state, { data, table }) {
+    if (data == null) {return state}
+    const { values, values: { _id } } = data
+    return updateItemValues(state, table, _id, values)
+  },
+  insertItem(state, { data, table }) {
+    if (data == null) {return state}
+    const { values: { _id } } = data
+    return updateItemWhole(state, table, _id, data)
   },
   delItem(state, { data, table }) {
     if (data == null) {return state}
     const _id = data
-    const { [table]: { entities: { [_id]: del, ...otherEntities }, myIds, allIds } } = state
-    const otherMyIds = myIds == null ? null : myIds.filter(x => x != _id)
-    const otherAllIds = allIds == null ? null : allIds.filter(x => x != _id)
-    return {
-      ...state,
-      [table]: {
-        ...state[table],
-        entities: otherEntities,
-        allIds: otherAllIds,
-        myIds: otherMyIds,
-      },
-    }
+    return update(state, { [table]: { entities: { $unset: [_id] } } })
   },
 }
 
-export default makeReducer(flows)
+const core = makeReducer(flowsCore, emptyO)
+const more = makeReducer(flowsMore, emptyO)
+export default combineReducers({ core, more })
 
 /* SELECTORS */
 
-export const getTables = ({ tables }) => ({ tables })
+export const getTables = ({ tables }) => ({ tables: tables.core })
 
-export const getTable = ({ tables }, { table }) => ({ tableData: tables[table] })
+export const getTable = ({ tables }, { table }) => ({ tableData: tables.core[table] })
+export const getTableMore = ({ tables }, { table }) => ({ tableData: tables.more[table] })
 
 export const getTableFilters = ({ tables }, { table }) => {
-  const { [table]: { fields, filterList } } = tables
+  const { core: { [table]: { fields, filterList } } } = tables
   return { fields, filterList }
 }
 
 export const getValueList = ({ tables }, { table, field }) => {
-  const { [table]: { valueLists, fieldSpecs } } = tables
+  const { core: { [table]: { valueLists, fieldSpecs } } } = tables
   const { [field]: { valType } } = fieldSpecs
   if (valueLists == null) {
     return { valType, table }
@@ -155,16 +254,6 @@ export const getOptions = createSelector(
 
 export const toDb = memoize((table, eId, dispatch) => values => dispatch(modItem(table, eId, values)))
 
-const setComplete = (newValue, oldValue, key) => {
-  if (key == 'complete') {return newValue || oldValue}
-}
-
-const addKey = listKey => (objValue, srcValue, key) => {
-  if (key == listKey) {
-    return objValue == null ? srcValue : srcValue.concat(objValue)
-  }
-}
-
 const hasTableKey = (tables, table, key, value = null) => {
   if (tables == null) {return false}
   const { [table]: tableData } = tables
@@ -188,9 +277,7 @@ export const needTables = (tables, table, select = ALLIDS, complete) => {
 
 export const needValues = ({ tableData, eId }) => (
   tableData == null ||
-  tableData.entities[eId] == null ||
-  tableData.entities[eId].perm == null ||
-  !tableData.entities[eId].complete
+  tableData.entities[eId] == null
 )
 
 export const listValues = memoize(({ tables, table, eId, field }) => (
@@ -200,9 +287,9 @@ export const listValues = memoize(({ tables, table, eId, field }) => (
   new Set(tables[table].entities[eId][field])
 ), emptyO)
 
-const repUser = memoize(({ user }, valId) => {
+const repUser = memoize((tables, valId) => {
   let valRep
-  const { entities: { [valId]: entity } } = user
+  const { user: { entities: { [valId]: entity } } } = tables
   if (entity) {
     const { values: { eppn, firstName, lastName, emailPre, authority, mayLogin } } = entity
     const email = emailPre || ''
@@ -222,8 +309,8 @@ const repUser = memoize(({ user }, valId) => {
   return valRep
 })
 
-const repCountry = ({ country }, valId) => {
-  const { entities: { [valId]: entity } } = country
+const repCountry = (tables, valId) => {
+  const { country: { entities: { [valId]: entity } } } = tables
   if (entity) {
     const { values: { name, iso } } = entity
     return `${iso}: ${name}`
@@ -231,8 +318,8 @@ const repCountry = ({ country }, valId) => {
   else {return 'UNKNOWN'}
 }
 
-const repValue = rel => (tables, valId) => {
-  const { [rel]: { title, entities: { [valId]: entity } } } = tables
+const repValue = relTable => (tables, valId) => {
+  const { [relTable]: { title, entities: { [valId]: entity } } } = tables
   const useTitle = title || 'rep'
   if (entity) {
     const { values: { [useTitle]: rep } } = entity
@@ -247,7 +334,7 @@ const repMap = {
   default: repValue,
 }
 
-export const repRelated = (tables, rel, valId) => (repMap[rel] || repMap.default(rel))(tables, valId)
+export const repRelated = (tables, relTable, valId) => (repMap[relTable] || repMap.default(relTable))(tables, valId)
 
 const trimDate = text => (text == null ? '' : text.replace(/\.[0-9]+/, ''))
 
@@ -261,8 +348,8 @@ export const repr = (tables, table, valType, value) => {
     }
   }
   else {
-    const { values: rel } = valType
-    return repRelated(tables, rel, value)
+    const { values: relTable } = valType
+    return repRelated(tables, relTable, value)
   }
 }
 

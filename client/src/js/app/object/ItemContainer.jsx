@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { getTable, needValues, fetchItem } from 'tables'
+import { getTableMore, needValues, fetchItem } from 'tables'
 
 import ItemForm from 'ItemForm'
 
@@ -10,8 +10,7 @@ class ItemContainer extends Component {
     const { props: { tableData, table, eId } } = this
     if (needValues({ tableData, eId })) {return <div />}
 
-    const { fields, entities: { [eId]: entity } } = tableData
-    const { values: initialValues, perm } = entity
+    const { entities: { [eId]: { fields, values: initialValues, perm } } } = tableData
     return (
       <div>
         <ItemForm
@@ -42,4 +41,4 @@ class ItemContainer extends Component {
   }
 }
 
-export default connect(getTable)(ItemContainer)
+export default connect(getTableMore)(ItemContainer)

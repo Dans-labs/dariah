@@ -2,13 +2,20 @@
 
 root=`pwd`
 
-if [[ "$1" == "test" ]]; then
+if [[ "$1" == "module" ]]; then
+    cd client
+    if [[ "$2" == "" ]]; then
+        npm install
+    else
+        npm install --save-dev $2
+    fi
+elif [[ "$1" == "test" ]]; then
     cd client
     export NODE_ENV="development"
     if [[ "$2" == "" ]]; then
-        npm test
+        npm test  'test/**/*.js'
     else
-        npm run-script $2
+        npm test test/$2.js
     fi
 elif [[ "$1" == "devenv" ]]; then
     # documentation server

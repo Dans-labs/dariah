@@ -16,7 +16,7 @@ class ListFilter extends Component {
     const {
       props: {
         heading,
-        tableData, table,
+        table,
         perm,
         select, masterId, linkField,
         listIds,
@@ -26,7 +26,6 @@ class ListFilter extends Component {
       },
     } = this
     if (filteredIds == null) {return <div />}
-    const { allIds } = tableData
     return (
       <div className={'list-filter'}>
         <div className={'filters'}>

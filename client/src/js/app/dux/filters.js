@@ -3,7 +3,7 @@ import pickBy from 'lodash/pickby'
 
 import { memoize } from 'memo'
 import { makeReducer, emptyO } from 'utils'
-import { repRelated, DETAILS } from 'tables'
+import { getTables, getTable, repRelated, DETAILS } from 'tables'
 
 /* ACTIONS */
 
@@ -12,7 +12,7 @@ export const changeFacet = (table, filterTag, filterId, valueId, onOff) => ({ ty
 export const changeFacetAll = (table, filterTag, filterId, onOff) => ({ type: 'facetAll', table, filterTag, filterId, data: onOff })
 
 export const initFiltering = (tableData, table, filterTag, listIds) => {
-  const fieldIds = compileFieldIds({ tableData, filterTag, listIds })
+  const fieldIds = compileFieldIds(tableData, filterTag, listIds)
   return { type: 'initFiltering', tableData, table, filterTag, fieldIds }
 }
 
@@ -61,9 +61,20 @@ const gatherIds = memoize((tableData, listIds, filterFields, fieldSpecs) => {
     theseIds[field] = Array.from(new Set(valueSet))
   }
   return theseIds
-}, emptyO)
+}, emptyO, { debug: 'gatherIds' })
 
-const compileFieldIds = memoize(({ tableData, filterTag, listIds }) => {
+const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField) => {
+  const { [filterField]: { valType } } = fieldSpecs
+  if (fieldIds == null) {return emptyO}
+  const fieldValues = {'': '-none-'}
+  const { values: relTable } = valType
+  fieldIds.forEach(_id => {
+    fieldValues[_id] = repRelated(tables, relTable, _id)
+  })
+  return fieldValues
+}, emptyO, { debug: 'gatherValues' })
+
+const compileFieldIds = memoize((tableData, filterTag, listIds) => {
   if (tableData == null) {return emptyO}
   const { valueLists, fields, filterList, fieldSpecs } = tableData
   if (filterList == null) {return emptyO}
@@ -73,7 +84,7 @@ const compileFieldIds = memoize(({ tableData, filterTag, listIds }) => {
   return these ?
     gatherIds(tableData, listIds, filterFields, fieldSpecs) :
     pickBy(valueLists, (value, key) => filterFields.includes(key))
-}, emptyO)
+}, emptyO, { debug: 'compileFieldIds' })
 
 const initFilterSettings = memoize((tableData, filterData, filterTag, fieldIds) => {
   if (tableData == null) {return emptyO}
@@ -98,7 +109,7 @@ const initFilterSettings = memoize((tableData, filterData, filterTag, fieldIds) 
     }
   })
   return newFilterSettings
-}, { 3: -1 })
+}, emptyO, { debug: 'initFilterSettings' })
 
 const computeFiltering = memoize((tables, table, listIds, fieldIds, filterSettings) => {
   if (filterSettings == null) {return emptyO}
@@ -139,14 +150,13 @@ const computeFiltering = memoize((tables, table, listIds, fieldIds, filterSettin
       }
     })
     if (!discard) {
-      const { values: { _id } } = entity
       if (v) {
-        filteredIds.push(_id)
+        filteredIds.push(eId)
         presentFilterList.forEach((filterSpec, filterId) => {
-          otherFilteredIds[filterId].push(_id)
+          otherFilteredIds[filterId].push(eId)
         })
       }
-      else {otherFilteredIds[theOneFail].push(_id)}
+      else {otherFilteredIds[theOneFail].push(eId)}
     }
   }
   const amounts = {}
@@ -165,47 +175,42 @@ const computeFiltering = memoize((tables, table, listIds, fieldIds, filterSettin
     filteredAmountOthers,
     amounts,
   }
-}, { 3: -1 })
+}, emptyO, { debug: 'computeFiltering' })
 
 /* selectors for export */
 
-export const getFieldValues = memoize(({ tables }, { table, filterTag, listIds, filterField }) => {
-  const { [table]: tableData } = tables
+export const getFieldValues = (state, { table, filterTag, listIds, filterField }) => {
+  const { tables } = getTables(state)
+  const { tableData } = getTable(state, { table })
   if (tableData == null) {return emptyO}
   const { fieldSpecs } = tableData
-  const fieldIds = compileFieldIds({ tableData, filterTag, listIds })[filterField]
+  const fieldIds = compileFieldIds(tableData, filterTag, listIds)[filterField]
 
-  const { [filterField]: { valType } } = fieldSpecs
-  if (fieldIds == null) {return emptyO}
-  const fieldValues = {'': '-none-'}
-  const { values: relTable } = valType
-  fieldIds.forEach(_id => {
-    fieldValues[_id] = repRelated(tables, relTable, _id)
-  })
-  return { fieldValues }
-}, emptyO)
+  return { fieldValues: gatherValues(tables, fieldSpecs, fieldIds, filterField) }
+}
 
-export const getFilterSetting = memoize(({ filters }, { table, filterTag, filterId }) => {
+export const getFilterSetting = ({ filters }, { table, filterTag, filterId }) => {
   const { [table]: filterData } = filters
   if (filterData == null) {return emptyO}
   const { [filterTag]: filterSettings = emptyO } = filterData
   const { [filterId]: filterSetting } = filterSettings
   return { filterSetting }
-}, emptyO)
+}
 
-export const getFiltersApplied = memoize(({ tables, filters }, { table, filterTag, listIds }) => {
-  const { [table]: tableData } = tables
-  const { [table]: filterData = emptyO } = filters
+export const getFiltersApplied = (state, { table, filterTag, listIds }) => {
+  const { tableData } = getTable(state, { table })
+  const { filters: { [table]: filterData = emptyO } } = state
   if (tableData == null) {return emptyO}
-  const fieldIds = compileFieldIds({ tableData, filterTag, listIds })
+  const fieldIds = compileFieldIds(tableData, filterTag, listIds)
   const { [filterTag]: filterSettings } = filterData
   if (filterSettings == null) {return { tableData }}
+  const { tables } = getTables(state)
   return {
     tableData,
     filterSettings,
     ...computeFiltering(tables, table, listIds, fieldIds, filterSettings),
   }
-}, emptyO)
+}
 
 /* HELPERS */
 
@@ -261,7 +266,7 @@ const fulltextCheck = memoize((tables, field, fieldSpec, term) => {
     const rep = unpack(val)
     return rep != null && rep.toLowerCase().indexOf(search) !== -1
   }
-}, {})
+}, emptyO, { debug: fulltextCheck })
 
 const facetCheck = memoize((tables, field, fieldSpec, facetSettings) => {
   const unpack = getUnpack(tables, fieldSpec)
@@ -281,9 +286,9 @@ const facetCheck = memoize((tables, field, fieldSpec, facetSettings) => {
     }
     return false
   }
-}, {})
+}, emptyO, { debug: facetCheck })
 
-const countFacets = (tables, field, fieldSpec, fieldIds, filteredIds, entities) => {
+const countFacets = memoize((tables, field, fieldSpec, fieldIds, filteredIds, entities) => {
   const unpack = getUnpack(tables, fieldSpec)
   const facetAmounts = {}
   fieldIds.forEach(_id => {facetAmounts[_id] = 0})
@@ -300,7 +305,7 @@ const countFacets = (tables, field, fieldSpec, fieldIds, filteredIds, entities) 
     }
   }
   return facetAmounts
-}
+}, emptyO, { debug: 'countFacets' })
 
 const INTL = new Intl.Collator('en', { sensitivity: 'base' })
 const sortEntries = (x, y) => INTL.compare(x[1], y[1])
@@ -322,7 +327,7 @@ export const placeFacets = memoize((fieldValues, maxCols) => {
     rows.push(row)
   }
   return rows
-})
+}, emptyO, { debug: 'placeFacets' })
 
 export const testAllChecks = filterSetting => {
   let allTrue = true

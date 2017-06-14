@@ -46,8 +46,6 @@ function memoizeOld(f) {
   return memoF
 }
 
-const tm = tdelta => `${(tdelta[0] * 1000000000 + tdelta[1])/1000000000} s`
-
 /* Do different functions share the same cache?
  */
 

@@ -1,4 +1,3 @@
-
 /* levels
  *
  * For small values, JSON.stringify is the most efficient.
@@ -56,6 +55,31 @@
  *
  */
 
+/* Config
+ * clearCache: time in seconds that a key is being retained in the memCache
+ * debug: if a string: shows this string when keys are retrieved, computed, and cleared, via Console.warn
+ *  Only in development mode!
+ */
+
+/* global process */
+
+let debugStyle
+if (process.env.NODE_ENV === `development`) {
+  debugStyle = {
+    key: true,
+    fName: true,
+    fArgs: true,
+    fResult: true,
+    retrieved: false,
+    computed: true,
+    cleared: true,
+    whiteList: {
+      nothing: true,
+      //compileFieldIds: true,
+    },
+  }
+}
+
 export const memoize = (f, levels, config) => {
   let retrieved = 0
   let computed = 0
@@ -68,13 +92,36 @@ export const memoize = (f, levels, config) => {
   const useLevels = levels || {}
   const useConfig = config || {}
 
+  /* Report action in development mode
+   */
+  let report
+  if (process.env.NODE_ENV === `development`) {
+    report = (key, action, fArgs, fResult) => {
+      const { debug: fName } = useConfig
+      const { whiteList, whiteList: { [fName]: passes } } = debugStyle
+      const nWhite = Object.keys(whiteList).length
+      if (fName != null && (passes || nWhite == 0) && debugStyle[action]) {
+        const Console = console
+        Console.warn(
+          `${action} ${debugStyle.fName ? fName : ''}`,
+          debugStyle.key ? key : '',
+          debugStyle.fArgs ? fArgs : '',
+          debugStyle.fResult ? fResult : '',
+        )
+      }
+    }
+  }
   /* clear a cacheItem after a fixed amount of time after it has been created
    */
 
   const clearCache = key => {
     delete memCache[key]
     cleared++
+    if (process.env.NODE_ENV === `development`) {
+      report(key, 'cleared')
+    }
   }
+
 
   const resolveArg = fArg => {
     const fArgType = typeof fArg
@@ -128,9 +175,17 @@ export const memoize = (f, levels, config) => {
       result = f.apply({}, fArgs)
       memCache[memoKey] = result
       computed += 1
+      if (process.env.NODE_ENV === `development`) {
+        report(memoKey, 'computed', fArgs, result)
+      }
       setTimeout(() => clearCache(memoKey), (useConfig.clearCache || 1800) * 1000)
     }
-    else {retrieved += 1}
+    else {
+      retrieved += 1
+      if (process.env.NODE_ENV === `development`) {
+        report(memoKey, 'retrieved', fArgs, result)
+      }
+    }
     return result
   }
   return memoF
