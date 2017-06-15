@@ -1,7 +1,8 @@
-import merge from 'lodash/merge'
+import update from 'immutability-helper'
 
 import { memoize } from 'memo'
-import { makeReducer, handle } from 'utils'
+import { makeReducer } from 'utils'
+import { handle } from 'handle'
 
 /* ACTIONS */
 
@@ -14,10 +15,10 @@ const flows = {
   nextAlt(state, { alterTag, initial, nAlts }) {
     const { [alterTag]: oldAlt = (initial || 0) } = state
     const newAlt = (oldAlt + 1) % nAlts
-    return merge({}, state, { [alterTag]: newAlt })
+    return update(state, { [alterTag]: { $set: newAlt } })
   },
   setAlt(state, { alterTag, alt }) {
-    return merge({}, state, { [alterTag]: alt })
+    return update(state, { [alterTag]: { $set: alt } })
   },
 }
 
@@ -30,7 +31,7 @@ export const getAlt = ({ alter }, { alterTag, initial }) => {
   return { alt }
 }
 
-export const getAlts = ({alter }) => ({ alter })
+export const getAlts = ({ alter }) => ({ alter })
 
 /* HELPERS */
 

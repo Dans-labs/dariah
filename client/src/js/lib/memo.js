@@ -1,3 +1,5 @@
+import { jString } from 'utils'
+
 /* levels
  *
  * For small values, JSON.stringify is the most efficient.
@@ -66,15 +68,15 @@
 let debugStyle
 if (process.env.NODE_ENV === `development`) {
   debugStyle = {
-    key: true,
+    key: false,
     fName: true,
-    fArgs: true,
-    fResult: true,
+    fArgs: false,
+    fResult: false,
     retrieved: false,
     computed: true,
     cleared: true,
     whiteList: {
-      nothing: true,
+      //nothing: true,
       //compileFieldIds: true,
     },
   }
@@ -140,7 +142,7 @@ export const memoize = (f, levels, config) => {
     else {return [false, fArg]}
   }
   const resolveToLevel = (fArg, level) => {
-    if (level == -1) {return JSON.stringify(fArg)}
+    if (level == -1) {return jString(fArg)}
     if (level == 0) {return resolveArg(fArg)}
     const fArgType = typeof fArg
     if (fArgType != 'object') {return resolveArg(fArg)}
@@ -167,9 +169,9 @@ export const memoize = (f, levels, config) => {
      * and an object arg is translated to [true, objMap.get(arg)].
      * So there will not be clashes between real integer arguments and integers coming form keyMaps.
      */
-    const memoKey = levels == null ?
-      JSON.stringify(fArgs) :
-      JSON.stringify(fArgs.map((fArg, i) => resolveToLevel(fArg, useLevels[i] || 0)))
+    const memoKey = levels == null
+    ? jString(fArgs)
+    : jString(fArgs.map((fArg, i) => resolveToLevel(fArg, useLevels[i] || 0)))
     let { [memoKey]: result } = memCache
     if (result == null) {
       result = f.apply({}, fArgs)

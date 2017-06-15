@@ -18,37 +18,34 @@ class ListContainer extends Component {
     const { title, perm, myIds, allIds } = tableData
     const listIds = select == MYIDS ? myIds : allIds
     const filterTag = makeTag(select, null, null)
-    return (
-      filtered ?
-        <ListFilter
+    return filtered
+    ? <ListFilter
+        table={table}
+        listIds={listIds}
+        perm={perm}
+        select={select}
+        mode={mode}
+        title={title}
+        filterTag={filterTag}
+        gridTag={table}
+      />
+    : mode == 'list'
+      ? <ListPlain
           table={table}
           listIds={listIds}
-          perm={perm}
           select={select}
-          mode={mode}
+          perm={perm}
           title={title}
-          filterTag={filterTag}
-          gridTag={table}
-        /> : (
-          mode == 'list' ?
-            <ListPlain
-              table={table}
-              listIds={listIds}
-              select={select}
-              perm={perm}
-              title={title}
-            /> :
-          mode == 'grid' ?
-            <ListGrid
-              table={table}
-              listIds={listIds}
-              select={select}
-              perm={perm}
-              gridTag={table}
-            /> :
-            <span>{`unknown display mode "${mode}" for item list`}</span>
-        )
-    )
+        />
+      : mode == 'grid'
+        ? <ListGrid
+            table={table}
+            listIds={listIds}
+            select={select}
+            perm={perm}
+            gridTag={table}
+          />
+        : <span>{`unknown display mode "${mode}" for item list`}</span>
   }
   componentDidMount() {
     const { props: { tables, table, select, mode, dispatch } } = this

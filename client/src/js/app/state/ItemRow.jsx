@@ -55,13 +55,13 @@ const putDetailFragments = (props, table, eId, detailFragments, widthStyles, nFi
 })
 
 const editControl = memoize((nextAlt, table, eId, mayUpdate, withRow) => (
-  mayUpdate ?
-    <span
+  mayUpdate
+  ? <span
       className={`link fa fa-angle-${withRow ? 'down' : 'up'}`}
       title={`${withRow ? 'open an' : 'close the'}edit form for this record`}
       onClick={nextAlt}
-    /> :
-    null
+    />
+  : null
 ))
 
 const ItemRow = ({
@@ -82,11 +82,11 @@ const ItemRow = ({
   const { alt, nextAlt } = makeAlt(props, { alterTag, nAlts: 2, initial: 0 })
   const formTag = `${table}-${eId}`
   const { [formTag]: form } = forms
-  return hasEditable ?
-    <div>
+  return hasEditable
+  ? <div>
       {
-        alt == 0 ?
-          <div>
+        alt == 0
+        ? <div>
             <div className={'grid-row'}>
               <div className="grid-status-cell" >
                 {editControl(nextAlt, table, eId, update, true)}
@@ -96,8 +96,8 @@ const ItemRow = ({
               {putDetailFragments(props, table, eId, detailFragments, widthStyles, nFields)}
             </div>
             <ItemDetails table={table} eId={eId} />
-          </div> :
-          <div>
+          </div>
+        : <div>
             <div className="grid-status-cell" >
               {editControl(nextAlt, table, eId, update, false)}
               {form ? <EditStatus form={`${table}-${eId}`} showNeutral={true} /> : null}
@@ -114,8 +114,8 @@ const ItemRow = ({
             />
           </div>
       }
-    </div> :
-    <div>
+    </div>
+  : <div>
       <div className="grid-row" >
         {putFieldFragments(fieldFragments, widthStyles)}
         {putDetailFragments(props, table, eId, detailFragments, widthStyles, nFields)}

@@ -18,11 +18,11 @@ const Filter = ({
   fields,
   filterList, filteredAmount, filteredAmountOthers, amounts,
 }) => (
-  filterList == null ?
-    <div>
+  filterList == null
+  ? <div>
       {'No filters for this list'}
-    </div> :
-    <div>
+    </div>
+  : <div>
       {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
         const { type } = filter
         const { [type]: Fclass } = filterClass

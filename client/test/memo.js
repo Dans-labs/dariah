@@ -82,7 +82,8 @@ const testSeparation = () => {
  */
 
 const testPerformance = () => {
-  describe('Performance comparison with plain stringified keys', () => {
+  describe('Performance comparison with plain stringified keys', function() {
+    this.timeout(10000)
     const testF = (a1, a2, a3) => !!a1 && !!a2 && !!a3
 
     const scalar1 = 'foo'

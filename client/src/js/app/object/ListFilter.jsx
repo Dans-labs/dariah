@@ -25,6 +25,7 @@ class ListFilter extends Component {
         filterTag, gridTag,
       },
     } = this
+    console.warn(`RENDER ListFilter ${filteredIds == null ? 'prematurely' : ''}`)
     if (filteredIds == null) {return <div />}
     return (
       <div className={'list-filter'}>
@@ -41,8 +42,8 @@ class ListFilter extends Component {
         </div>
         <div className={'list'}>
           {
-            mode == 'list' ?
-              <ListPlain
+            mode == 'list'
+            ? <ListPlain
                 heading={heading}
                 table={table}
                 listIds={filteredIds}
@@ -51,19 +52,19 @@ class ListFilter extends Component {
                 title={title}
                 masterId={masterId}
                 linkField={linkField}
-              /> :
-            mode == 'grid' ?
-              <ListGrid
-                heading={heading}
-                table={table}
-                listIds={filteredIds}
-                perm={perm}
-                select={select}
-                gridTag={gridTag}
-                masterId={masterId}
-                linkField={linkField}
-              /> :
-              <span>{`unknown display mode "${mode}" for item list`}</span>
+              />
+            : mode == 'grid'
+              ? <ListGrid
+                  heading={heading}
+                  table={table}
+                  listIds={filteredIds}
+                  perm={perm}
+                  select={select}
+                  gridTag={gridTag}
+                  masterId={masterId}
+                  linkField={linkField}
+                />
+              : <span>{`unknown display mode "${mode}" for item list`}</span>
           }
         </div>
       </div>

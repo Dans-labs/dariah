@@ -15,11 +15,9 @@ const Doc = ({ location: { pathname: docPath } }) => {
   const [docDir, docFile] = /^(.*)\/([^/]+)$/g.exec(docPath).slice(1)
   const [docName, docExt] = /^(.*)\.([^.]+)$/g.exec(docFile).slice(1)
   const { [docExt]: DocClass } = docType
-  return DocClass == null ? (
-    <NotFound splat={`document ${docPath}`} />
-  ) : (
-    <DocClass docDir={docDir} docName={docName} docExt={docExt} />
-  )
+  return DocClass == null
+  ? <NotFound splat={`document ${docPath}`} />
+  : <DocClass docDir={docDir} docName={docName} docExt={docExt} />
 }
 
 export default Doc

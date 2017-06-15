@@ -42,31 +42,33 @@ class Notification extends Component {
             />
           </span>
         </p>
-        {show ? (
-          <div
-            ref={this.refDom('notbox')}
-            className="msg-box"
-            onClick={this.handleHide}
-          >{
-            (notifications).map((msg, i) => (
-              <p
-                key={i}
-                ref={this.refDom(`m${i}`)}
-                className={`msg-line ${[msg.kind]}-o ${msg.kind != 'info' ? 'msg-high' : ''}`}
-              >{msg.text}</p>
-            ))
-          }
-            <p className="msg-dismiss" >{'(click panel to hide)'}</p>
-            <p className="msg-trash" >
-              <a
-                href="#"
-                title="clear messages"
-                className="control fa fa-trash"
-                onClick={this.handleClear}
-              />
-            </p>
-          </div>
-        ) : null}
+        {
+          show
+          ? <div
+              ref={this.refDom('notbox')}
+              className="msg-box"
+              onClick={this.handleHide}
+            >{
+              (notifications).map((msg, i) => (
+                <p
+                  key={i}
+                  ref={this.refDom(`m${i}`)}
+                  className={`msg-line ${[msg.kind]}-o ${msg.kind != 'info' ? 'msg-high' : ''}`}
+                >{msg.text}</p>
+              ))
+            }
+              <p className="msg-dismiss" >{'(click panel to hide)'}</p>
+              <p className="msg-trash" >
+                <a
+                  href="#"
+                  title="clear messages"
+                  className="control fa fa-trash"
+                  onClick={this.handleClear}
+                />
+              </p>
+            </div>
+          : null
+        }
       </div>
     )
   }

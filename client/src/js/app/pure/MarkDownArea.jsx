@@ -25,13 +25,13 @@ const MarkdownArea = ({
         />
       </p>
       {
-        alt == 0 ?
-          <Markdown
+        alt == 0
+        ? <Markdown
             className={`${editClass(dirty, invalid)} field-content`}
             key="fmt"
             source={value}
-          /> :
-          <span key="src" className="field-content">
+          />
+        : <span key="src" className="field-content">
             <textarea
               className={`input ${editClass(dirty, invalid)}`}
               {...input}

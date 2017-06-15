@@ -1,7 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { handlE, emptyO } from 'utils'
+import { emptyO } from 'utils'
+import { handlE } from 'handle'
+
 import { changeFacet, getFilterSetting } from 'filters'
 
 const Facet = ({ table, filterTag, filterId, valueId, valueRep, filterSetting, dispatch }) => {

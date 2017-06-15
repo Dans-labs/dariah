@@ -11,9 +11,9 @@ const SubApp = ({ table, me, children }) => (
     <div className={'nav bar'} >
       <p><NavLink to={`/data/${table}/list`} >{'All items'}</NavLink></p>
       {
-        me.eppn ?
-          <p><NavLink to={`/data/${table}/mylist`} >{'My work'}</NavLink></p> :
-          null
+        me.eppn
+        ? <p><NavLink to={`/data/${table}/mylist`} >{'My work'}</NavLink></p>
+        : null
       }
     </div>
     <div className={'details'} >

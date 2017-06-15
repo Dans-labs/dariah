@@ -1,7 +1,6 @@
 import React from 'react'
 import { createSelector } from 'reselect'
-
-import { memoize } from 'memo'
+import update from 'immutability-helper'
 
 export const emptyA = []
 export const emptyO = {}
@@ -32,16 +31,40 @@ export const makeReducer = (flows, init = emptyO) => (state = init, action) => {
 const mergeObject = (...objects) => Object.assign({}, ...objects)
 export const combineSelectors = (...selectors) => createSelector(...selectors, mergeObject)
 
-export const handle = memoize((dispatch, action, ...actionArgs) => event => {
-  if (event) {event.preventDefault()}
-  dispatch(action.apply({}, actionArgs))
-})
+export const updateAuto = (state, path, data, asArray = false) => path.length == 0
+  ? update(state, data)
+  : path.length == 1
+    ? update(
+        state, {
+          [path[0]]: {
+            $apply: v => {
+              const newV = update(v || (asArray ? emptyA : emptyO), data)
+              return jString(v) == jString(newV)
+              ? v
+              : newV
+            },
+          },
+        },
+      )
+    : update(
+        state, {
+          [path[0]]: {
+            $apply: v => updateAuto(v || emptyO, path.slice(1), data, asArray),
+          },
+        },
+      )
 
-export const handlE = memoize((dispatch, action, ...actionArgs) => () => {
-  dispatch(action.apply({}, actionArgs))
-})
-
-export const handlEV = memoize((dispatch, action, ...actionArgs) => event => {
-  dispatch(action.apply({}, [...actionArgs, event.target.value]))
-})
+export const jString = (o, indent) => JSON.stringify(
+  o,
+  (k, v) => (v !== null && typeof v == 'object' && !Array.isArray(v))
+    ? Object.keys(v).sort().reduce(
+        (r, kv) => {
+          r[kv] = v[kv]
+          return r
+        },
+        {},
+      )
+    : v,
+  indent,
+)
 

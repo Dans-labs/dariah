@@ -4,7 +4,7 @@ import { createSelector } from 'reselect'
 
 import { accessData } from 'server'
 import { memoize } from 'memo'
-import { makeReducer, emptyA, emptyO } from 'utils'
+import { makeReducer, updateAuto, emptyA, emptyO } from 'utils'
 
 /* DEFS */
 
@@ -63,64 +63,15 @@ export const delItem = (table, eId) => accessData({
 
 /* REDUCER */
 
-const updateItemWithFields = (state, table, _id, fields, values) => update(state, {
-  [table]: {
-    $apply: t => update(t || {}, {
-      entities: {
-        $apply: e => update(e || {}, {
-          [_id]: {
-            $apply: i => update(i || {}, {
-              values: {
-                $apply: vals => {
-                  let newVals = vals || {}
-                  fields.forEach(field => {
-                    newVals = update(newVals, {
-                      [field]: {
-                        $apply: val => {
-                          const newVal = values[field]
-                          return JSON.stringify(val) == JSON.stringify(newVal) ? val : newVal
-                        },
-                      },
-                    })
-                  })
-                  return newVals
-                },
-              },
-            }),
-          },
-        }),
-      },
-    }),
-  },
-})
-
-const updateItemValues = (state, table, _id, values) => update(state, {
-  [table]: {
-    $apply: t => update(t || {}, {
-      entities: {
-        $apply: e => update(e || {}, {
-          [_id]: {
-            $apply: i => update(i || {}, {
-              values: { $set: values },
-            }),
-          },
-        }),
-      },
-    }),
-  },
-})
-
-const updateItemWhole = (state, table, _id, data) => update(state, {
-  [table]: {
-    $apply: t => update(t || {}, {
-      entities: {
-        $apply: e => update(e || {}, {
-          [_id]: { $set: data },
-        }),
-      },
-    }),
-  },
-})
+const updateItemWithFields = (state, table, _id, fields, values) => {
+  const newVals = {}
+  fields.forEach(field => {newVals[field] = values[field]})
+  return updateAuto(
+    state,
+    [table, 'entities', _id, 'values'],
+    { $merge: newVals },
+  )
+}
 
 const flowsCore = {
   fetchTable(state, { data }) {
@@ -138,16 +89,17 @@ const flowsCore = {
   },
   modItem(state, { data, table }) {
     if (data == null) {return state}
-    const { newValues } = data
+    const { values, values: { _id }, newValues } = data
     const { [table]: tableData } = state
     const { fields } = tableData
-    const { values, values: { _id } } = data
     const useFields = ['_id', ...Object.keys(fields)]
     let newState = updateItemWithFields(state, table, _id, useFields, values)
     const useRelFields = ['_id', 'rep']
-    for (const { _id, rep, relTable, field } of newValues) {
-      newState = updateItemWithFields(state, relTable, _id, useRelFields, { _id, rep })
-      newState = update(newState, { [table]: { valueLists: { [field]: { $unshift: [_id] } } } })
+    if (newValues != null) {
+      for (const { _id, rep, relTable, field } of newValues) {
+        newState = updateItemWithFields(newState, relTable, _id, useRelFields, { _id, rep })
+        newState = update(newState, { [table]: { valueLists: { [field]: { $unshift: [_id] } } } })
+      }
     }
     return newState
   },
@@ -157,11 +109,14 @@ const flowsCore = {
     const { fields } = tableData
     const { values, values: { _id } } = data
     const useFields = ['_id', ...Object.keys(fields)]
-    const newState = updateItemWithFields(state, table, _id, useFields, values)
+    let newState = updateItemWithFields(state, table, _id, useFields, values)
+    newState = updateAuto(newState, [table, ALLIDS], { $unshift: [_id] }, true)
+    if (select == MYIDS) {
+      newState = updateAuto(newState, [table, MYIDS], { $unshift: [_id] }, true)
+    }
     return update(newState, {
       [table]: {
         lastInserted: { $set: _id },
-        [select]: { $unshift: [_id] },
       },
     })
   },
@@ -189,17 +144,24 @@ const flowsMore = {
   fetchItem(state, { data, table }) {
     if (data == null) {return state}
     const { values: { _id } } = data
-    return updateItemWhole(state, table, _id, data)
+    return updateAuto(state, [table, 'entities', _id], { $set: data })
   },
   modItem(state, { data, table }) {
     if (data == null) {return state}
-    const { values, values: { _id } } = data
-    return updateItemValues(state, table, _id, values)
+    const { values, values: { _id }, newValues } = data
+    let newState = updateAuto(state, [table, 'entities', _id, 'values'], { $set: values })
+    const useRelFields = ['_id', 'rep']
+    if (newValues != null) {
+      for (const { _id, rep, relTable } of newValues) {
+        newState = updateItemWithFields(newState, relTable, _id, useRelFields, { _id, rep })
+      }
+    }
+    return newState
   },
   insertItem(state, { data, table }) {
     if (data == null) {return state}
     const { values: { _id } } = data
-    return updateItemWhole(state, table, _id, data)
+    return updateAuto(state, [table, 'entities', _id], { $set: data })
   },
   delItem(state, { data, table }) {
     if (data == null) {return state}
@@ -276,15 +238,18 @@ export const needTables = (tables, table, select = ALLIDS, complete) => {
 }
 
 export const needValues = ({ tableData, eId }) => (
-  tableData == null ||
-  tableData.entities[eId] == null
+  tableData == null
+  || tableData.entities[eId] == null
 )
 
 export const listValues = memoize(({ tables, table, eId, field }) => (
-  tables == null ? emptyA :
-  tables[table] == null ? emptyA :
-  tables[table].entities[eId] == null ? emptyA :
-  new Set(tables[table].entities[eId][field])
+  tables == null
+  ? emptyA
+  : tables[table] == null
+    ? emptyA
+    : tables[table].entities[eId] == null
+      ? emptyA
+      : new Set(tables[table].entities[eId][field])
 ), emptyO)
 
 const repUser = memoize((tables, valId) => {
@@ -295,11 +260,9 @@ const repUser = memoize((tables, valId) => {
     const email = emailPre || ''
     let linkText = [firstName || '', lastName || ''].filter(x => x).join(' ')
     if (linkText == '') {linkText = email}
-    const namePart = linkText && email ? (
-      `[${linkText}](mailto:${email})`
-    ) : (
-      linkText + email
-    )
+    const namePart = linkText && email
+    ? `[${linkText}](mailto:${email})`
+    : linkText + email
     const eppnPart = eppn ? ` eppn=${eppn} ` : ''
     const authorityPart = authority ? ` authenticated by=${authority} ` : ''
     const mayLoginPart = mayLogin ? ` active=${mayLogin} ` : ''

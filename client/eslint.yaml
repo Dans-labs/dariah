@@ -78,7 +78,7 @@ rules:
     - eventHandlerPrefix: handle
       eventHandlerPropPrefix: on
   react/jsx-indent:
-    - warn
+    - off
     - 2
   react/jsx-indent-props: off
   react/jsx-key: warn
@@ -229,5 +229,8 @@ rules:
     - allow:
       - error
   no-constant-condition: warn
+  operator-linebreak:
+    - warn
+    - before
 
 extends: "eslint:recommended"

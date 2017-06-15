@@ -1,8 +1,7 @@
-import merge from 'lodash/merge'
 import pickBy from 'lodash/pickby'
 
 import { memoize } from 'memo'
-import { makeReducer, emptyO } from 'utils'
+import { makeReducer, updateAuto, emptyO } from 'utils'
 import { getTables, getTable, repRelated, DETAILS } from 'tables'
 
 /* ACTIONS */
@@ -22,20 +21,20 @@ const flows = {
   initFiltering(state, { tableData, table, filterTag, fieldIds }) {
     const { [table]: filterData = {} } = state
     const defaults = initFilterSettings(tableData, filterData, filterTag, fieldIds)
-    return merge({}, state, { [table]: { [filterTag]: defaults } })
+    return updateAuto(state, [table, filterTag], { $set: defaults })
   },
   fulltext(state, { table, filterTag, filterId, data }) {
-    return merge({}, state, { [table]: { [filterTag]: { [filterId]: data } } })
+    return updateAuto(state, [table, filterTag, filterId], { $set: data })
   },
   facetAll(state, { table, filterTag, filterId, data }) {
     const { [table]: { [filterTag]: { [filterId]: facets } } } = state
     const sameSettings = {}
     Object.keys(facets).forEach(valueId => {sameSettings[valueId] = data})
-    return merge({}, state, { [table]: { [filterTag]: { [filterId]: sameSettings } } })
+    return updateAuto(state, [table, filterTag, filterId], { $set: sameSettings })
   },
   facet(state, { table, filterTag, filterId, data }) {
     const [valueId, filterSetting] = data
-    return merge({}, state, { [table]: { [filterTag]: { [filterId]: { [valueId]: filterSetting } } } })
+    return updateAuto(state, [table, filterTag, filterId, valueId], { $set: filterSetting })
   },
 }
 
@@ -81,9 +80,9 @@ const compileFieldIds = memoize((tableData, filterTag, listIds) => {
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterFields = presentFilterList.filter(x => x.type !== 'Fulltext').map(x => x.field)
   const these = filterTag.startsWith(DETAILS)
-  return these ?
-    gatherIds(tableData, listIds, filterFields, fieldSpecs) :
-    pickBy(valueLists, (value, key) => filterFields.includes(key))
+  return these
+  ? gatherIds(tableData, listIds, filterFields, fieldSpecs)
+  : pickBy(valueLists, (value, key) => filterFields.includes(key))
 }, emptyO, { debug: 'compileFieldIds' })
 
 const initFilterSettings = memoize((tableData, filterData, filterTag, fieldIds) => {
@@ -162,9 +161,9 @@ const computeFiltering = memoize((tables, table, listIds, fieldIds, filterSettin
   const amounts = {}
   presentFilterList.forEach(({ field, type }, filterId) => {
     const { [field]: fieldSpec } = fieldSpecs
-    amounts[filterId] = type === 'Fulltext' ? null : countFacets(
-      tables, field, fieldSpec, fieldIds[field], otherFilteredIds[filterId], entities
-    )
+    amounts[filterId] = type === 'Fulltext'
+    ? null
+    : countFacets(tables, field, fieldSpec, fieldIds[field], otherFilteredIds[filterId], entities)
   })
   const filteredAmountOthers = {}
   Object.entries(otherFilteredIds).forEach(([filterId, x]) => {
@@ -214,43 +213,47 @@ export const getFiltersApplied = (state, { table, filterTag, listIds }) => {
 
 /* HELPERS */
 
-export const makeTag = (select, masterId, linkField) => masterId == null ?
-  select :
-  `${select}-${masterId}-${linkField}`
+export const makeTag = (select, masterId, linkField) => masterId == null
+? select
+: `${select}-${masterId}-${linkField}`
 
 const getUnpack = (tables, fieldSpec, asString = false) => {
   const { valType, multiple } = fieldSpec
   let unpack
   if (typeof valType == 'string') {
-    unpack = multiple ? (
-      asString ? (
-        v => v == null ? '' : v.join(' ')
-      ) : (
-        v => v == null ? [] : v
-      )
-    ) : (
-      asString ? (
-        v => v == null ? '' : v
-      ) : (
-        v => v == null ? [] : [v]
-      )
-    )
+    unpack = multiple
+    ? asString
+      ? v => v == null
+        ? ''
+        : v.join(' ')
+      : v => v == null
+        ? []
+        : v
+    : asString
+      ? v => v == null
+        ? ''
+        : v
+      : v => v == null
+        ? []
+        : [v]
   }
   else {
     const { values: relTable } = valType
-    unpack = multiple ? (
-      asString ? (
-        v => v == null ? '' : v.map(v => repRelated(tables, relTable, v).join(' '))
-      ) : (
-        v => v == null ? [] : v
-      )
-    ) : (
-      asString ? (
-        v => v == null ? '' : repRelated(tables, relTable, v)
-      ) : (
-        v => v == null ? [] : [v]
-      )
-    )
+    unpack = multiple
+    ? asString
+      ? v => v == null
+        ? ''
+        : v.map(v => repRelated(tables, relTable, v).join(' '))
+    : v => v == null
+      ? []
+      : v
+  : asString
+    ? v => v == null
+      ? ''
+      : repRelated(tables, relTable, v)
+    : v => v == null
+      ? []
+      : [v]
   }
   return unpack
 }

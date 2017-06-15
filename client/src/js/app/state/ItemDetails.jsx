@@ -34,9 +34,9 @@ const ItemDetails = ({ tables, table, eId, ...props }) => {
           return (
             <div key={name}>
               {
-                alt == 0 ? (
-                  filtered ?
-                    <ListFilter
+                alt == 0
+                ? filtered
+                  ? <ListFilter
                       heading={label}
                       table={detailTable}
                       listIds={detailListIds}
@@ -48,19 +48,19 @@ const ItemDetails = ({ tables, table, eId, ...props }) => {
                       filterTag={filterTag}
                       masterId={eId}
                       linkField={linkField}
-                    /> : (
-                      mode == 'list' ?
-                        <ListPlain
-                          heading={label}
-                          table={detailTable}
-                          listIds={detailListIds}
-                          perm={detailPerm}
-                          title={detailTitle}
-                          masterId={eId}
-                          linkField={linkField}
-                        /> :
-                      mode == 'grid' ?
-                        <ListGrid
+                    />
+                  : mode == 'list'
+                    ? <ListPlain
+                        heading={label}
+                        table={detailTable}
+                        listIds={detailListIds}
+                        perm={detailPerm}
+                        title={detailTitle}
+                        masterId={eId}
+                        linkField={linkField}
+                      />
+                    : mode == 'grid'
+                      ? <ListGrid
                           heading={label}
                           table={detailTable}
                           listIds={detailListIds}
@@ -68,10 +68,9 @@ const ItemDetails = ({ tables, table, eId, ...props }) => {
                           gridTag={gridTag}
                           masterId={eId}
                           linkField={linkField}
-                        /> :
-                        <span>{`unknown display mode "${mode}" for item list`}</span>
-                    )
-                ) : ''
+                        />
+                      : <span>{`unknown display mode "${mode}" for item list`}</span>
+                : ''
               }
             </div>
           )

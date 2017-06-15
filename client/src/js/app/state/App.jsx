@@ -23,9 +23,9 @@ const App = ({ children, height, width, me }) => {
         />
         <NavLink to="/data/contrib" >{'Contributions'}</NavLink>
         {
-          me.eppn ?
-            <NavLink to="/backoffice" >{'Backoffice'}</NavLink> :
-            null
+          me.eppn
+          ? <NavLink to="/backoffice" >{'Backoffice'}</NavLink>
+          : null
         }
         <Static />
         <span className="resize" title={text}>{text}</span>

@@ -1,4 +1,4 @@
-import merge from 'lodash/merge'
+import update from 'immutability-helper'
 
 import { accessData } from 'server'
 import { propsChanged, makeReducer } from 'utils'
@@ -19,7 +19,7 @@ export const fetchDoc = props => {
 const flows = {
   fetchDoc(state, { path, data }) {
     if (data == null) {return state}
-    return merge({}, state, { [path]: data })
+    return update(state, { [path]: { $set: data } })
   },
 }
 

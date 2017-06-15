@@ -1,7 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { memoize } from 'memo'
-import { combineSelectors, handle, handlEV, emptyO } from 'utils'
+import { combineSelectors, emptyO } from 'utils'
+import { handle, handlEV } from 'handle'
 
 import { getSelect, setSearch, setPopUp, togglePopUp } from 'select'
 import { getOptions } from 'tables'
@@ -45,26 +46,29 @@ const Tags = ({ selectTag, optionLookup, optionStyle, value, onChange, dispatch 
   <div
     className="tags"
     onClick={handle(dispatch, togglePopUp, selectTag)}
-  >{
-    (value != null && value.length) ?
-      value.map(val => {
-        const { [val]: lab = val } = optionLookup
-        const { [val]: xClass = '' } = optionStyle
-        return (
-          <span
-            key={val}
-            className="tag"
-          >
-            <span
-              className={`button-tag ${xClass}`}
-              onClick={removeVal(value, onChange, val)}
-            >{'×'}</span>{' '}
-            <span>{lab}</span>
-          </span>
+  >
+    {
+      (value != null && value.length)
+      ? value.map(
+          val => {
+            const { [val]: lab = val } = optionLookup
+            const { [val]: xClass = '' } = optionStyle
+            return (
+              <span
+                key={val}
+                className="tag"
+              >
+                <span
+                  className={`button-tag ${xClass}`}
+                  onClick={removeVal(value, onChange, val)}
+                >{'×'}</span>{' '}
+                <span>{lab}</span>
+              </span>
+            )
+          }
         )
-      }) :
-      <span className="tag empty">{'click to enter values'}</span>
-  }
+      : <span className="tag empty">{'click to enter values'}</span>
+    }
   </div>
 )
 
@@ -96,11 +100,13 @@ const Typing = ({ selectTag, search, dispatch }) => (
       onFocus={handle(dispatch, setPopUp, selectTag, true)}
       onChange={handlEV(dispatch, setSearch, selectTag)}
     />
-    {search ?
-      <span
-        className="button-tag"
-        onClick={handle(dispatch, setSearch, selectTag, '')}
-      >{'×'}</span> : null
+    {
+      search
+      ? <span
+          className="button-tag"
+          onClick={handle(dispatch, setSearch, selectTag, '')}
+        >{'×'}</span>
+      : null
     }
   </span>
 )
@@ -109,22 +115,24 @@ const Options = ({ selectTag, optionLookup, optionStyle, multiple, allowNew, opt
   const pat = search.toLowerCase()
   return (
     <div className={'options'} >
-      {(
-        allowNew &&
-        search &&
-        !options.some(({ label }) => label == search) &&
-        !value.includes(search)
-      ) ? (
-        <span
-          className="new tag"
-          onClick={addVal(optionLookup, multiple, value, onChange, search)}
-        >{search}</span>
-      ) : null}
+      {
+        (
+          allowNew
+          && search
+          && !options.some(({ label }) => label == search)
+          && !value.includes(search)
+        )
+        ? <span
+            className="new tag"
+            onClick={addVal(optionLookup, multiple, value, onChange, search)}
+          >{search}</span>
+        : null
+      }
       {
         options.map(({ value: val, label: lab }) => {
           if (
-            (!multiple || !value.includes(val)) &&
-            (pat == null || pat == '' || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
+            (!multiple || !value.includes(val))
+            && (pat == null || pat == '' || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
           ) {
             const { [val]: xClass = '' } = optionStyle
             return (
@@ -154,44 +162,49 @@ const RelSelect = ({
   <div
     className={`select ${multiple ? 'multiselect' : ''}`}
   >
-    {multiple ?
-      <Tags
-        optionLookup={optionLookup}
-        optionStyle={optionStyle}
-        value={value}
-        selectTag={selectTag}
-        dispatch={dispatch}
-        onChange={onChange}
-      /> :
-      <Head
-        optionLookup={optionLookup}
-        optionStyle={optionStyle}
-        value={value}
-        popUp={popUp}
-        selectTag={selectTag}
-        dispatch={dispatch}
-      />
+    {
+      multiple
+      ? <Tags
+          optionLookup={optionLookup}
+          optionStyle={optionStyle}
+          value={value}
+          selectTag={selectTag}
+          dispatch={dispatch}
+          onChange={onChange}
+        />
+      : <Head
+          optionLookup={optionLookup}
+          optionStyle={optionStyle}
+          value={value}
+          popUp={popUp}
+          selectTag={selectTag}
+          dispatch={dispatch}
+        />
     }
-    {popUp ?
-      <Typing
-        selectTag={selectTag}
-        search={search}
-        dispatch={dispatch}
-      /> : null
+    {
+      popUp
+      ? <Typing
+          selectTag={selectTag}
+          search={search}
+          dispatch={dispatch}
+        />
+      : null
     }
-    {popUp ?
-      <Options
-        selectTag={selectTag}
-        optionLookup={optionLookup}
-        optionStyle={optionStyle}
-        options={options}
-        multiple={multiple}
-        allowNew={allowNew}
-        value={value}
-        search={search}
-        dispatch={dispatch}
-        onChange={onChange}
-      /> : null
+    {
+      popUp
+      ? <Options
+          selectTag={selectTag}
+          optionLookup={optionLookup}
+          optionStyle={optionStyle}
+          options={options}
+          multiple={multiple}
+          allowNew={allowNew}
+          value={value}
+          search={search}
+          dispatch={dispatch}
+          onChange={onChange}
+        />
+      : null
     }
   </div>
 )

@@ -43,17 +43,20 @@ class ListPlain extends Component {
     const { props, props: { tables, forms, table, listIds, perm, title } } = this
     const { [table]: { entities } } = tables
     const nItemsRep = `${listIds.length} item${listIds.length == 1 ? '' : 's'} `
+    console.warn(`RENDER ListPlain`)
     return (
       <div className={'listGeneric'} >
         <div>
           {nItemsRep}
-          {(perm != null && perm.insert) ? (
-            <span
-              className="fa fa-plus button-large"
-              title={`new ${table}`}
-              onClick={this.handleInsert}
-            />
-          ) : null}
+          {
+            (perm != null && perm.insert)
+            ? <span
+                className="fa fa-plus button-large"
+                title={`new ${table}`}
+                onClick={this.handleInsert}
+              />
+            : null
+          }
         </div>
         {
           listIds.map(eId => {
@@ -68,26 +71,23 @@ class ListPlain extends Component {
             return (
               <div key={eId} >
                 <span className={'itemHead'} {...scrollProps} >
-                  {form ?
-                    <EditStatus form={formTag} showNeutral={true} /> :
-                    <span>
-                      <span className={'fa fa-fw'} title={'not yet open'} />
-                      {' '}
-                    </span>
+                  {
+                    form
+                    ? <EditStatus form={formTag} showNeutral={true} />
+                    : <span>
+                        <span className={'fa fa-fw'} title={'not yet open'} />
+                        {' '}
+                      </span>
                   }
-                  <span
-                    className={'link head'}
-                    onClick={nextAlt}
-                  >
+                  <span className={'link head'} onClick={nextAlt} >
                     <span className={`fa fa-angle-${active ? 'up' : 'down'}`} />
                     {' '}{entityHead}
                   </span>
                 </span>
-                {active ?
-                  <ItemContainer
-                    table={table}
-                    eId={eId}
-                  /> : null
+                {
+                  active
+                  ? <ItemContainer table={table} eId={eId} />
+                  : null
                 }
               </div>
             )
@@ -116,18 +116,11 @@ class ListPlain extends Component {
   }
   shouldComponentUpdate(newProps) {
     for (const prop in newProps) {
-      if (prop != 'listIds') {
-        if (newProps[prop] !== this.props[prop]) {
-          return true
-        }
-      }
-      else {
-        if (!isEqual(newProps[prop], this.props[prop])) {
-          return true
-        }
+      if (!isEqual(newProps[prop], this.props[prop])) {
+        console.warn(`UPDATED ${prop}`, this.props[prop], newProps[prop])
       }
     }
-    return false
+    return true
   }
   componentDidMount() {
     this.gotoNewItem()

@@ -1,4 +1,5 @@
-import mergeWith from 'lodash/mergewith'
+import update from 'immutability-helper'
+
 import { makeReducer, emptyA } from 'utils'
 
 /* ACTIONS */
@@ -11,32 +12,23 @@ export const display = onOff => ({ type: 'display', onOff })
 
 const subFlows = {
   pending(state, { desc, busy, extraMsgs }) {
-    return mergeWith({}, state, {
-      notes: [
-        ...extraMsgs,
-        { kind: 'special', text: `waiting for ${desc}`},
-      ],
-      busy: busy + 1,
-    }, addItems)
+    return update(state, {
+      notes: { $push: [...extraMsgs, { kind: 'special', text: `waiting for ${desc}`}] },
+      busy: { $set: busy + 1 },
+    })
   },
   success(state, { desc, busy, extraMsgs }) {
-    return mergeWith({}, state, {
-      notes: [
-        ...extraMsgs,
-        { kind: 'info', text: `${desc} ok` },
-      ],
-      busy: busy - 1,
-    }, addItems)
+    return update(state, {
+      notes: { $push: [...extraMsgs, { kind: 'info', text: `${desc} ok` }] },
+      busy: { $set: busy - 1 },
+    })
   },
   error(state, { desc, busy, extraMsgs }) {
-    return mergeWith({}, state, {
-      notes: [
-        ...extraMsgs,
-        { kind: 'error', text: `${desc} failed` },
-      ],
-      busy: busy - 1,
-      show: true,
-    }, addItems)
+    return update(state, {
+      notes: { $push: [...extraMsgs, { kind: 'error', text: `${desc} failed` }] },
+      busy: { $set: busy - 1 },
+      show: { $set: true },
+    })
   },
 }
 
@@ -45,28 +37,26 @@ const flows = {
     const { busy } = state
     const extraMsgs = msgs || emptyA
     const { [status]: subFlow } = subFlows
-    return subFlow ? subFlow(state, { extraMsgs, desc, busy }) : state
+    return subFlow
+    ? subFlow(state, { extraMsgs, desc, busy })
+    : state
   },
   msgs(state, { msgs }) {
-    return mergeWith({}, state, {
-      notes: [
-        ...msgs,
-      ],
-      show: true,
-    }, addItems)
+    return update(state, {
+      notes: { $push: msgs },
+      show: { $set: true },
+    })
   },
   clear(state) {
-    return {
-      ...state,
-      notes: emptyA,
-      show: false,
-    }
+    return update(state, {
+      notes: { $set: emptyA },
+      show: { $set: false },
+    })
   },
   display(state, { onOff }) {
-    return {
-      ...state,
-      show: onOff,
-    }
+    return update(state, {
+      show: { $set: onOff },
+    })
   },
 }
 
@@ -95,10 +85,4 @@ export const getNotifications = ({ notify }) => {
 }
 
 /* HELPERS */
-
-const addItems = (objValue, srcValue, key) => {
-  if (key == 'notes') {
-    return objValue == null ? srcValue : objValue.concat(srcValue)
-  }
-}
 

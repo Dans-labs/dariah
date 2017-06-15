@@ -1,7 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { handlEV } from 'utils'
+import { handlEV } from 'handle'
+
 import { changeFulltext, getFilterSetting } from 'filters'
 
 import Stat from 'Stat'

@@ -9,6 +9,13 @@ if [[ "$1" == "module" ]]; then
     else
         npm install --save-dev $2
     fi
+elif [[ "$1" == "xmodule" ]]; then
+    cd client
+    if [[ "$2" == "" ]]; then
+        echo "pass module to remove as argument"
+    else
+        npm remove --save-dev $2
+    fi
 elif [[ "$1" == "test" ]]; then
     cd client
     export NODE_ENV="development"

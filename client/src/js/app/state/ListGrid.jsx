@@ -1,7 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { combineSelectors, handle } from 'utils'
+import { combineSelectors } from 'utils'
+import { handle } from 'handle'
 import { getSort, getSortedData, resetSort, addColumn, turnColumn, delColumn } from 'grid'
 import { getTable, insertItem } from 'tables'
 
@@ -58,31 +59,35 @@ const ListGrid = ({
     <div>
       <p>
         <span className={'listTitle'}>{theHeading}</span>{nItemsRep}
-        {(tablePerm != null && tablePerm.insert) ? (
-          <span
-            className="fa fa-plus button-large"
-            title={`new ${table}`}
-            onClick={handle(dispatch, insertItem, table, select, masterId, linkField)}
-          />
-        ) : null}
+        {
+          (tablePerm != null && tablePerm.insert)
+          ? <span
+              className="fa fa-plus button-large"
+              title={`new ${table}`}
+              onClick={handle(dispatch, insertItem, table, select, masterId, linkField)}
+            />
+          : null
+        }
       </p>
-      {sortSpec.length != 0 ?
-        <p className={'sortspecs'} >
-          {'Sorted: '}
-          {
-            sortSpec.map(([column, direction]) => (
-              <span className={'sortcol'} key={column} >
-                <span>{column}</span>
-                <span className={`fa fa-arrow${direction == -1 ? 'down' : 'up'}`} />
-              </span>
-            ))
-          }
-          <span
-            className={'fa fa-close button-small'}
-            title={'remove all sort options'}
-            onClick={handle(dispatch, resetSort, gridTag)}
-          />{' '}
-        </p> : null
+      {
+        sortSpec.length != 0
+        ? <p className={'sortspecs'} >
+            {'Sorted: '}
+            {
+              sortSpec.map(([column, direction]) => (
+                <span className={'sortcol'} key={column} >
+                  <span>{column}</span>
+                  <span className={`fa fa-arrow${direction == -1 ? 'down' : 'up'}`} />
+                </span>
+              ))
+            }
+            <span
+              className={'fa fa-close button-small'}
+              title={'remove all sort options'}
+              onClick={handle(dispatch, resetSort, gridTag)}
+            />{' '}
+          </p>
+        : null
       }
       <div className="grid" >
         <div className="grid-head" >
@@ -99,26 +104,26 @@ const ListGrid = ({
                   style={widthStyle}
                 >
                   {
-                    direction ?
-                      <span
+                    direction
+                    ? <span
                         className={'sorted button-small'}
                         title={'remove column from sort options'}
                         onClick={handle(dispatch, delColumn, gridTag, field)}
-                      >{field}</span> :
-                      <span
+                      >{field}</span>
+                    : <span
                         className={'unsorted button-small'}
                         title={'sort on this column'}
                         onClick={handle(dispatch, addColumn, gridTag, field, 1)}
                       >{field}</span>
                   }
                   {
-                    direction ?
-                      <span
+                    direction
+                    ? <span
                         className={`sorted button-small fa fa-arrow-${direction == 1 ? 'up' : 'down'}`}
                         title={'change sort direction'}
                         onClick={handle(dispatch, turnColumn, gridTag, field)}
-                      /> :
-                      null
+                      />
+                    : null
                   }
                 </div>
               )

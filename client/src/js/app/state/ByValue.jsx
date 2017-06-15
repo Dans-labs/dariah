@@ -39,47 +39,46 @@ const ByValue = ({
         />
       </p>
       {
-        alt == 0 ?
-          <table
-            key="table"
-            className="facets"
-          >
+        alt == 0
+        ? <table key="table" className="facets" >
             <tbody>
               {rows.map((entity, i) => (
                 <tr key={i} >
-                  {entity.map((f, j) => {
-                    if (f === null) {
-                      return <td key={j} />
-                    }
-                    const [valueId, valueRep] = f
-                    const facetClass = j == 0 ? 'facet' : 'facet mid'
-                    return [(
-                      <td
-                       key={valueId}
-                       className={facetClass}
-                      >
-                        <Facet
-                          table={table}
-                          filterTag={filterTag}
-                          filterId={filterId}
-                          valueId={valueId}
-                          valueRep={valueRep}
-                        />
-                      </td>
-                    ), (
-                      <td
-                        key="stat"
-                        className="statistic"
-                      >
-                        <Stat subTotal={amounts[valueId]} />
-                      </td>
-                    )]
-                  })}
+                  {
+                    entity.map((f, j) => {
+                      if (f === null) {
+                        return <td key={j} />
+                      }
+                      const [valueId, valueRep] = f
+                      const facetClass = j == 0 ? 'facet' : 'facet mid'
+                      return [(
+                        <td
+                         key={valueId}
+                         className={facetClass}
+                        >
+                          <Facet
+                            table={table}
+                            filterTag={filterTag}
+                            filterId={filterId}
+                            valueId={valueId}
+                            valueRep={valueRep}
+                          />
+                        </td>
+                      ), (
+                        <td
+                          key="stat"
+                          className="statistic"
+                        >
+                          <Stat subTotal={amounts[valueId]} />
+                        </td>
+                      )]
+                    })
+                  }
                 </tr>
                 ))}
             </tbody>
-          </table> :
-          <div />
+          </table>
+        : <div />
       }
     </div>
   )

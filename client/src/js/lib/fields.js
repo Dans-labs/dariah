@@ -8,58 +8,63 @@ import MarkdownArea from 'MarkdownArea'
 const editStatusGeneric = canSubmit => ({ showNeutral, dirty, invalid, submitting, reset, error }) => (
   <span>
     {
-      (dirty && !invalid && !submitting) ? (
-        canSubmit ?
-          <button
+      (dirty && !invalid && !submitting)
+      ? canSubmit
+        ? <button
             type="submit"
             className={'button-large edit-action fa fa-fw fa-check'}
             title={'save'}
-          /> :
-          <span
+          />
+        : <span
             className={'warning-o fa fa-fw fa-pencil'}
             title={'changed'}
           />
-        ) : null
+      : null
     }
     {
-      (dirty && invalid && !submitting) ?
-        <span
+      (dirty && invalid && !submitting)
+      ? <span
           className={'error-o fa fa-fw fa-exclamation-circle'}
           title={'invalid data'}
-        /> : null
+        />
+      : null
     }
     {
-      (!dirty && invalid && !submitting && showNeutral) ?
-        <span
+      (!dirty && invalid && !submitting && showNeutral)
+      ? <span
           className={'error-o fa fa-fw fa-exclamation-circle'}
           title={'invalid data'}
-        /> : null
+        />
+      : null
     }
     {
-      (!dirty && !invalid && !submitting && showNeutral) ?
-        <span
+      (!dirty && !invalid && !submitting && showNeutral)
+      ? <span
           className={'good-o fa fa-fw fa-circle'}
           title={'no changes'}
-        /> : null
+        />
+      : null
     }
     {
-      submitting ?
-        <span
+      submitting
+      ? <span
           className={'special-o fa fa-fw fa-spinner fa-spin'}
           title={'saving'}
-        /> : null
+        />
+      : null
     }
     {' '}
     {
-      (dirty && !submitting) ? (
-        canSubmit ?
-          <button
+      (dirty && !submitting)
+      ? canSubmit
+        ? <button
             type="button"
             className={'button-large error-o fa fa-fw fa-close'}
             title={'reset values to last saved'}
             onClick={reset}
-          /> : null
-        ) : null
+          />
+        : null
+      : null
     }
     {' '}
     {
@@ -78,13 +83,13 @@ export const EditStatus = reduxForm({
 export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : ''
 
 export const editDelete = (perm, buttonClass, callBack) => (
-  perm.delete ? (
-    <div
+  perm.delete
+  ? <div
       className={`grid-cell ${buttonClass} error-o fa fa-trash delete`}
       title={'delete this record'}
       onClick={callBack}
     />
-  ) : null
+  : null
 )
 
 /* Workaround (6.6.3) for issue https://github.com/erikras/redux-form/issues/2841

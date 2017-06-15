@@ -123,7 +123,7 @@ module.exports = {
   ],
   devtool: 'cheap-module-sourcemap',
   devServer: {
-    hot: true,
+    //hot: true, // currently, if this is present, browser will not refresh!
     publicPath: '/static/dist/',
     proxy: {
       '/static/': 'http://localhost:8001',

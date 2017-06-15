@@ -8,7 +8,9 @@ import { getTables, DETAILS } from 'tables'
 import { getAlts, makeAlt } from 'alter'
 
 const ItemDetailHeads = ({ tables, table, eId, detailFragments, ...props }) => {
-  const theFragments = detailFragments == null ? makeDetails(tables, table, eId) : detailFragments
+  const theFragments = detailFragments == null
+  ? makeDetails(tables, table, eId)
+  : detailFragments
   return (
     <div className={'grid fragments'}>{
       theFragments.map(({ name, label, nDetails }) => {

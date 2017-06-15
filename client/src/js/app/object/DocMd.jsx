@@ -9,9 +9,9 @@ import { getDoc, needDoc, changedDoc, fetchDoc } from 'docs'
 import { getAlts, makeAlt } from 'alter'
 
 const RouterLink = ({ children, href }) => (
-  href.match(/^(https?:)?\/\//) ?
-    <a href={href} >{children}</a> :
-    <Link to={href} >{children}</Link>
+  href.match(/^(https?:)?\/\//)
+  ? <a href={href} >{children}</a>
+  : <Link to={href} >{children}</Link>
 )
 const renderers = { Link: RouterLink }
 
@@ -36,14 +36,14 @@ class DocMd extends Component {
           />
         </p>
         {
-          alt == 0 ?
-            <div>
+          alt == 0
+          ? <div>
               <Markdown
                 source={text}
                 renderers={renderers}
               />
-            </div> :
-            <div>
+            </div>
+          : <div>
               <pre className="md-source" >{text}</pre>
             </div>
         }

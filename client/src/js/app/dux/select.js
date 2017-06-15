@@ -1,5 +1,9 @@
-import merge from 'lodash/merge'
+import update from 'immutability-helper'
 import { makeReducer, emptyO } from 'utils'
+
+/* DEFINITIONS */
+
+const initSelect = { search: '', popUp: false }
 
 /* ACTIONS */
 
@@ -11,18 +15,27 @@ export const togglePopUp = selectTag => ({ type: 'togglePopUp', selectTag })
 
 const flows = {
   setSearch(state, { selectTag, search }) {
-    const init = initSelect(state, selectTag)
-    return merge(init, state, { [selectTag]: { search } })
+    return update(state, {
+      [selectTag]: {
+        $apply: st => update(st || initSelect, { search: { $set: search } }),
+      },
+    })
   },
   setPopUp(state, { selectTag, onOff }) {
-    const init = initSelect(state, selectTag)
-    return merge(init, state, { [selectTag]: { popUp: onOff } })
+    return update(state, {
+      [selectTag]: {
+        $apply: st => update(st || initSelect, { popUp: { $set: onOff } }),
+      },
+    })
   },
   togglePopUp(state, { selectTag }) {
-    const init = initSelect(state, selectTag)
     const { [selectTag]: myState } = state
     const newOnOff = myState == null ? true : !myState.popUp
-    return merge(init, state, { [selectTag]: { popUp: newOnOff } })
+    return update(state, {
+      [selectTag]: {
+        $apply: st => update(st || initSelect, { popUp: { $set: newOnOff } }),
+      },
+    })
   },
 }
 
@@ -34,9 +47,3 @@ export const getSelect = ({ select }, { selectTag }) => ({ ...(select[selectTag]
 
 /* HELPERS */
 
-const initSelect = (state, selectTag) => {
-  const { [selectTag]: myState } = state
-  return myState == null ?
-    { [selectTag]: { search: '', popUp: false } } :
-    {}
-}
