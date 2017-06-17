@@ -13,13 +13,11 @@ import ItemDetails from 'ItemDetails'
 import ItemDetailHeads from 'ItemDetailHeads'
 
 const ItemForm = props => {
-  const {
-    table, eId, perm,
-  } = props
+  const { table, eId, initialValues, fields, perm } = props
   let { fieldFragments, detailFragments } = props
   if (fieldFragments == null) {fieldFragments = makeFields(props)}
   if (detailFragments == null) {detailFragments = makeDetails(props)}
-  const hasEditable = someEditable(props)
+  const hasEditable = someEditable(fields, perm)
   return (
     <div>
       {
@@ -28,6 +26,7 @@ const ItemForm = props => {
             table={table}
             eId={eId}
             form={`${table}-${eId}`}
+            initialValues={initialValues}
             perm={perm}
             fieldFragments={fieldFragments}
           />

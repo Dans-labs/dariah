@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { getTableMore, needValues, fetchItem } from 'tables'
+import { getTable, needValues, fetchItem } from 'tables'
 
 import ItemForm from 'ItemForm'
 
@@ -41,4 +41,4 @@ class ItemContainer extends Component {
   }
 }
 
-export default connect(getTableMore)(ItemContainer)
+export default connect(getTable)(ItemContainer)

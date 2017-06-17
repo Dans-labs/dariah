@@ -70,7 +70,7 @@ const ItemRow = ({
   widthStyles,
   ...props
 }) => {
-  const hasEditable = someEditable({ tables, table, eId, fields, perm })
+  const hasEditable = someEditable(fields, perm)
   const fieldFragments = makeFields({
     tables, table, eId, initialValues, perm,
     fields,
@@ -90,17 +90,16 @@ const ItemRow = ({
             <div className={'grid-row'}>
               <div className="grid-status-cell" >
                 {editControl(nextAlt, table, eId, update, true)}
-                {form ? <EditStatus form={`${table}-${eId}`} showNeutral={true} /> : null }
+                {form ? <EditStatus form={`${table}-${eId}`} active={false} /> : null}
               </div>
               {putFieldFragments(fieldFragments, widthStyles)}
               {putDetailFragments(props, table, eId, detailFragments, widthStyles, nFields)}
             </div>
-            <ItemDetails table={table} eId={eId} />
           </div>
         : <div>
             <div className="grid-status-cell" >
               {editControl(nextAlt, table, eId, update, false)}
-              {form ? <EditStatus form={`${table}-${eId}`} showNeutral={true} /> : null}
+              {form ? <EditStatus form={`${table}-${eId}`} active={true} /> : null}
             </div>
             <ItemForm
               table={table}

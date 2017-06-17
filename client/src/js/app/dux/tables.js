@@ -1,4 +1,3 @@
-import { combineReducers } from 'redux'
 import update from 'immutability-helper'
 import { createSelector } from 'reselect'
 
@@ -73,43 +72,33 @@ const updateItemWithFields = (state, table, _id, fields, values) => {
   )
 }
 
-const flowsCore = {
+const flows = {
   fetchTable(state, { data }) {
     if (data == null) {return state}
-    const { core } = data
-    return core == null ? state : update(state, { $merge: core })
+    return update(state, { $merge: data })
   },
   fetchItem(state, { data, table }) {
     if (data == null) {return state}
-    const { [table]: tableData } = state
-    const { fields } = tableData
-    const { values, values: { _id } } = data
-    const useFields = ['_id', ...Object.keys(fields)]
-    return updateItemWithFields(state, table, _id, useFields, values)
+    const { values: { _id } } = data
+    return updateAuto(state, [table, 'entities', _id], { $set: data })
   },
   modItem(state, { data, table }) {
     if (data == null) {return state}
     const { values, values: { _id }, newValues } = data
-    const { [table]: tableData } = state
-    const { fields } = tableData
-    const useFields = ['_id', ...Object.keys(fields)]
-    let newState = updateItemWithFields(state, table, _id, useFields, values)
     const useRelFields = ['_id', 'rep']
+    let newState = updateAuto(state, [table, 'entities', _id, 'values'], { $set: values })
     if (newValues != null) {
       for (const { _id, rep, relTable, field } of newValues) {
-        newState = updateItemWithFields(newState, relTable, _id, useRelFields, { _id, rep })
         newState = update(newState, { [table]: { valueLists: { [field]: { $unshift: [_id] } } } })
+        newState = updateItemWithFields(newState, relTable, _id, useRelFields, { _id, rep })
       }
     }
     return newState
   },
   insertItem(state, { data, table, select }) {
     if (data == null) {return state}
-    const { [table]: tableData } = state
-    const { fields } = tableData
-    const { values, values: { _id } } = data
-    const useFields = ['_id', ...Object.keys(fields)]
-    let newState = updateItemWithFields(state, table, _id, useFields, values)
+    const { values: { _id } } = data
+    let newState = updateAuto(state, [table, 'entities', _id], { $set: data })
     newState = updateAuto(newState, [table, ALLIDS], { $unshift: [_id] }, true)
     if (select == MYIDS) {
       newState = updateAuto(newState, [table, MYIDS], { $unshift: [_id] }, true)
@@ -135,59 +124,21 @@ const flowsCore = {
   },
 }
 
-const flowsMore = {
-  fetchTable(state, { data }) {
-    if (data == null) {return state}
-    const { more } = data
-    return more == null ? state : update(state, { $merge: more })
-  },
-  fetchItem(state, { data, table }) {
-    if (data == null) {return state}
-    const { values: { _id } } = data
-    return updateAuto(state, [table, 'entities', _id], { $set: data })
-  },
-  modItem(state, { data, table }) {
-    if (data == null) {return state}
-    const { values, values: { _id }, newValues } = data
-    let newState = updateAuto(state, [table, 'entities', _id, 'values'], { $set: values })
-    const useRelFields = ['_id', 'rep']
-    if (newValues != null) {
-      for (const { _id, rep, relTable } of newValues) {
-        newState = updateItemWithFields(newState, relTable, _id, useRelFields, { _id, rep })
-      }
-    }
-    return newState
-  },
-  insertItem(state, { data, table }) {
-    if (data == null) {return state}
-    const { values: { _id } } = data
-    return updateAuto(state, [table, 'entities', _id], { $set: data })
-  },
-  delItem(state, { data, table }) {
-    if (data == null) {return state}
-    const _id = data
-    return update(state, { [table]: { entities: { $unset: [_id] } } })
-  },
-}
-
-const core = makeReducer(flowsCore, emptyO)
-const more = makeReducer(flowsMore, emptyO)
-export default combineReducers({ core, more })
+export default makeReducer(flows)
 
 /* SELECTORS */
 
-export const getTables = ({ tables }) => ({ tables: tables.core })
+export const getTables = ({ tables }) => ({ tables })
 
-export const getTable = ({ tables }, { table }) => ({ tableData: tables.core[table] })
-export const getTableMore = ({ tables }, { table }) => ({ tableData: tables.more[table] })
+export const getTable = ({ tables }, { table }) => ({ tableData: tables[table] })
 
 export const getTableFilters = ({ tables }, { table }) => {
-  const { core: { [table]: { fields, filterList } } } = tables
+  const { [table]: { fields, filterList } } = tables
   return { fields, filterList }
 }
 
 export const getValueList = ({ tables }, { table, field }) => {
-  const { core: { [table]: { valueLists, fieldSpecs } } } = tables
+  const { [table]: { valueLists, fieldSpecs } } = tables
   const { [field]: { valType } } = fieldSpecs
   if (valueLists == null) {
     return { valType, table }
@@ -240,6 +191,7 @@ export const needTables = (tables, table, select = ALLIDS, complete) => {
 export const needValues = ({ tableData, eId }) => (
   tableData == null
   || tableData.entities[eId] == null
+  || tableData.entities[eId].fields == null
 )
 
 export const listValues = memoize(({ tables, table, eId, field }) => (

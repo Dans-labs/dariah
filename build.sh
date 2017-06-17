@@ -20,9 +20,9 @@ elif [[ "$1" == "test" ]]; then
     cd client
     export NODE_ENV="development"
     if [[ "$2" == "" ]]; then
-        npm test  'test/**/*.js'
+        npm test  'src/js/test/**/*.js'
     else
-        npm test test/$2.js
+        npm test src/js/test/$2.js
     fi
 elif [[ "$1" == "devenv" ]]; then
     # documentation server

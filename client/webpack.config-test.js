@@ -13,6 +13,7 @@ module.exports = {
       __dirname + '/src/js/app/state',
       __dirname + '/src/js/app/object',
       __dirname + '/src/js/lib',
+      __dirname + '/src/js/test',
       'node_modules',
     ],
   },

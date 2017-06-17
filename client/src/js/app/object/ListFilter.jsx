@@ -25,7 +25,6 @@ class ListFilter extends Component {
         filterTag, gridTag,
       },
     } = this
-    console.warn(`RENDER ListFilter ${filteredIds == null ? 'prematurely' : ''}`)
     if (filteredIds == null) {return <div />}
     return (
       <div className={'list-filter'}>

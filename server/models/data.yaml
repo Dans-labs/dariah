@@ -25,13 +25,6 @@ tables:
       - creator
       - dateCreated
       - modified
-    core:
-      - eppn
-      - email
-      - firstName
-      - lastName
-      - mayLogin
-      - authority
     fieldSpecs: 
       eppn:
         label: Eppn
@@ -97,10 +90,6 @@ tables:
       - creator
       - dateCreated
       - modified
-    core:
-      - iso
-      - name
-      - isMember
     fieldSpecs:
       iso:
         label: ISO(2)

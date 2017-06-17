@@ -1,13 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import isEqual from 'lodash/isequal'
 
 import { memoize } from 'memo'
 import { combineSelectors, emptyO } from 'utils'
-import { EditStatus } from 'fields'
+import { EditStatus, someEditable } from 'fields'
 
 import { getTables, insertItem } from 'tables'
-import { getForms } from 'forms'
 import { getAlts, makeAlt } from 'alter'
 
 import ItemContainer from 'ItemContainer'
@@ -40,10 +38,9 @@ class ListPlain extends Component {
   }
 
   render() {
-    const { props, props: { tables, forms, table, listIds, perm, title } } = this
+    const { props, props: { tables, table, listIds, perm, title } } = this
     const { [table]: { entities } } = tables
     const nItemsRep = `${listIds.length} item${listIds.length == 1 ? '' : 's'} `
-    console.warn(`RENDER ListPlain`)
     return (
       <div className={'listGeneric'} >
         <div>
@@ -60,22 +57,22 @@ class ListPlain extends Component {
         </div>
         {
           listIds.map(eId => {
-            const { [eId]: { values } } = entities
+            const { [eId]: { values, fields, perm } } = entities
             const { [title]: entityHead = '-empty-' } = values
             const formTag = `${table}-${eId}`
-            const { [formTag]: form } = forms
             const alterTag = `${table}-${eId}`
             const { alt, nextAlt } = makeAlt(props, { alterTag, nAlts, initial })
             const active = alt != initial
             const scrollProps = active ? { ref: this.scroll } : emptyO
+            const hasEditable = someEditable(fields, perm)
             return (
               <div key={eId} >
                 <span className={'itemHead'} {...scrollProps} >
                   {
-                    form
-                    ? <EditStatus form={formTag} showNeutral={true} />
+                    hasEditable
+                    ? <EditStatus form={formTag} active={active} />
                     : <span>
-                        <span className={'fa fa-fw'} title={'not yet open'} />
+                        <span className={'fa fa-fw'} />
                         {' '}
                       </span>
                   }
@@ -114,14 +111,6 @@ class ListPlain extends Component {
       }
     }
   }
-  shouldComponentUpdate(newProps) {
-    for (const prop in newProps) {
-      if (!isEqual(newProps[prop], this.props[prop])) {
-        console.warn(`UPDATED ${prop}`, this.props[prop], newProps[prop])
-      }
-    }
-    return true
-  }
   componentDidMount() {
     this.gotoNewItem()
   }
@@ -130,6 +119,6 @@ class ListPlain extends Component {
   }
 }
 
-const getInfo = combineSelectors(getTables, getForms, getAlts)
+const getInfo = combineSelectors(getTables, getAlts)
 
 export default connect(getInfo)(ListPlain)

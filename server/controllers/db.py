@@ -134,7 +134,7 @@ class DbAccess(object):
             withValueLists=True, withDetails=True, withFilters=True,
             my=False,
         ):
-        if table in data['core']: return
+        if table in data: return
         Perm = self.Perm
         tableInfo = self.DM.tables.get(table, {})
         title = tableInfo.get('title', self.DM.generic['title'])
@@ -152,17 +152,13 @@ class DbAccess(object):
         detailOrder = tableInfo.get('detailOrder', [])
         fieldOrder = [x for x in tableInfo.get('fieldOrder', []) if x in fieldFilter]
         fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', {}).items() if x[0] in fieldOrder)
-        core = set(tableInfo.get('core', []))
+        core = set()
         core.add(title)
         core |= {f['field'] for f in tableInfo.get('filters', [])}
         coreFields = dict(_id=True)
-        moreFields = {}
         getFields = set(fieldFilter)
         for f in getFields:
-            if f in core:
-                coreFields[f] = True
-            else:
-                moreFields[f] = True
+            coreFields[f] = True
 
         theFieldFilter = coreFields if titleOnly else fieldFilter 
         if rFilter != None:
@@ -172,19 +168,17 @@ class DbAccess(object):
         else:
             documents = list(_DBM[table].find(rowFilter, theFieldFilter).sort(sort))
         allIds=[d['_id'] for d in documents]
-        coreEntities=dict((str(d['_id']), dict(values=dict((f, d[f]) for f in d if f in coreFields))) for d in documents)
-        if not titleOnly:
-            moreEntities=dict((str(d['_id']), dict(values=d)) for d in documents)
+        entities=dict((str(d['_id']), dict(values=dict((f, d[f]) for f in d if (not titleOnly or f in coreFields)))) for d in documents)
         if not titleOnly:
             for d in documents:
                 (mayDelete, dFields) = Perm.may(table, 'delete', document=d)
                 (mayUpdate, uFields) = Perm.may(table, 'update', document=d)
                 thisPerm = dict(update=uFields, delete=mayDelete)
-                moreEntities[str(d['_id'])]['perm'] = thisPerm
+                entities[str(d['_id'])]['perm'] = thisPerm
 
-        resultCore = dict(
-            entities=coreEntities,
-            fields=coreFields,
+        result = dict(
+            entities=entities,
+            fields=theFieldFilter,
             title=title,
             perm=perm,
             fieldOrder=fieldOrder,
@@ -193,14 +187,12 @@ class DbAccess(object):
             detailOrder=detailOrder,
             complete=not titleOnly,
         )
-        if my: resultCore['myIds'] = allIds
-        else: resultCore['allIds'] = allIds
+        if my: result['myIds'] = allIds
+        else: result['allIds'] = allIds
 
-        data['core'][table] = resultCore
-        if not titleOnly:
-            data.setdefault('more', {})[table] = dict(entities=moreEntities, fields=theFieldFilter)
-        if withFilters: data['core'][table]['filterList'] = tableInfo.get('filters', [])
-        if withValueLists: data['core'][table]['valueLists'] = self.getValueLists(table, data, msgs)
+        data[table] = result
+        if withFilters: data[table]['filterList'] = tableInfo.get('filters', [])
+        if withValueLists: data[table]['valueLists'] = self.getValueLists(table, data, msgs)
         if withDetails: self.getDetails(table, data, msgs)
         return
 
@@ -210,7 +202,7 @@ class DbAccess(object):
             withValueLists=True, withDetails=True, withFilters=True,
             my=False,
         ):
-        data = dict(core={})
+        data = dict()
         msgs = []
         self._getList(
             controller, table,

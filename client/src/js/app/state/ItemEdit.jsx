@@ -26,7 +26,6 @@ const ItemEdit = props => {
           {
             editStatus({
               form: `${table}-${eId}`,
-              showNeutral: false,
               dirty, invalid, submitting, reset, error,
             })
           }
@@ -34,7 +33,7 @@ const ItemEdit = props => {
         <div className={'grid fragments'}>{
           fieldFragments.map(({
             field, label,
-            fragment: { editable, table: detailTable, myValues, ...props },
+            fragment: { editable, table, myValues, ...props },
           }) => (
             <div
               key={field}
@@ -46,13 +45,13 @@ const ItemEdit = props => {
                   editable
                   ? <FieldEdit
                       field={field}
-                      table={detailTable}
+                      table={table}
                       eId={eId}
                       {...props}
                     />
                   : <FieldRead
                       field={field}
-                      table={detailTable}
+                      table={table}
                       eId={eId}
                       myValues={myValues}
                     />

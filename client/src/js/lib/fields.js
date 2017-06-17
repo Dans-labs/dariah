@@ -5,7 +5,7 @@ import {countryBorders} from 'europe.geo'
 import Input from 'Input'
 import MarkdownArea from 'MarkdownArea'
 
-const editStatusGeneric = canSubmit => ({ showNeutral, dirty, invalid, submitting, reset, error }) => (
+const editStatusGeneric = canSubmit => ({ active, dirty, invalid, submitting, reset, error }) => (
   <span>
     {
       (dirty && !invalid && !submitting)
@@ -30,7 +30,7 @@ const editStatusGeneric = canSubmit => ({ showNeutral, dirty, invalid, submittin
       : null
     }
     {
-      (!dirty && invalid && !submitting && showNeutral)
+      (!dirty && invalid && !submitting && !canSubmit)
       ? <span
           className={'error-o fa fa-fw fa-exclamation-circle'}
           title={'invalid data'}
@@ -38,9 +38,9 @@ const editStatusGeneric = canSubmit => ({ showNeutral, dirty, invalid, submittin
       : null
     }
     {
-      (!dirty && !invalid && !submitting && showNeutral)
+      (!dirty && !invalid && !submitting && !canSubmit)
       ? <span
-          className={'good-o fa fa-fw fa-circle'}
+          className={`fa fa-fw fa-${active ? 'pencil' : 'check'}`}
           title={'no changes'}
         />
       : null
@@ -119,18 +119,7 @@ export const getValType = valType => {
 
 const iso2s = new Set(countryBorders.features.map(({ properties: { iso2 } }) => iso2))
 
-export const someEditable = ({ tables, table, fields, perm }) => {
-  const { [table]: { fieldOrder } } = tables
-
-  let hasEditable = false
-  for (const field of fieldOrder) {
-    const { [field]: f } = fields
-    if (f == null) {continue}
-    const { update: { [field]: editable } } = perm
-    if (editable) {hasEditable = true}
-  }
-  return hasEditable
-}
+export const someEditable = (fields, perm) => fields && Object.keys(fields).some(field => perm && perm.update && perm.update[field])
 
 export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
   const { initialValues } = props

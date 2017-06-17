@@ -76,7 +76,7 @@ if (process.env.NODE_ENV === `development`) {
     computed: true,
     cleared: true,
     whiteList: {
-      //nothing: true,
+      nothing: true,
       //compileFieldIds: true,
     },
   }
