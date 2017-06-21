@@ -149,6 +149,8 @@ class FMConvert(object):
     def __init__(self):
         with open('./config.yaml') as ch:
             config = yaml.load(ch)
+        with open('./criteria.yaml') as ch:
+            config.update(yaml.load(ch))
         homeDir = os.path.expanduser('~')
         baseDir = config['locations']['BASE_DIR']
         exportDir = config['locations']['EXPORT_DIR']
@@ -377,6 +379,28 @@ class FMConvert(object):
                 rep=('string', 1),
             )
 
+    def typeTable(self):
+        for row in self.allData['typeContribution']:
+            row['mainType'] = ''
+            row['subType'] = row['rep']
+            row['explanation'] = ['legacy type']
+            del row['rep']
+        nVals = len(self.valueDict['typeContribution'])
+        i = nVals
+        for u in self.typeExtra:
+            val = u['subType']
+            u['_id'] = self.mongo.newId()
+            _id = u['_id']
+            self.valueDict[i] = val
+            i += 1
+            self.relIndex['typeContribution'][self.norm(val)] = (_id, val)
+            self.allData['typeContribution'].append(u)
+
+        self.allFields['typeContribution']['_id'] = ('id', 1)
+        self.allFields['typeContribution']['mainType'] = ('string', 1)
+        self.allFields['typeContribution']['subType'] = ('string', 1)
+        self.allFields['typeContribution']['explanation'] = ('string', 2)
+
     def countryTable(self):
         extraInfo = self.countryExtra
         idMapping = dict()
@@ -470,7 +494,10 @@ class FMConvert(object):
         creator = self.CREATOR
         creatorId = self.uidMapping[creator]
         created = now()
-        for mt in ('user', 'country', 'package', 'criteria'):
+        for mt in ('user', 'country', 'typeContribution', 'package', 'criteria'):
+            self.allFields.setdefault(mt, {})['creator'] = ('string', 1)
+            self.allFields.setdefault(mt, {})['dateCreated'] = ('datetime', 1)
+            self.allFields.setdefault(mt, {})['modified'] = ('string', 2)
             for c in self.allData[mt]:
                 c['creator'] = creatorId
                 c['dateCreated'] = created
@@ -637,6 +664,7 @@ class FMConvert(object):
         self.countryTable()
         self.userTable()
         self.relTables()
+        self.typeTable()
         if isDevel: self.testTweaks()
         self.backoffice(isDevel)
         self.provenance()

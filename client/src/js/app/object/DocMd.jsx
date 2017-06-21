@@ -29,7 +29,7 @@ class DocMd extends Component {
       <div style={{paddingLeft: '0.5em'}} >
         <p style={{float: 'right'}} >
           <a
-            href="#"
+            href={'#'}
             className={`control fa fa-${alt == 0 ? 'hand-o-down' : 'file-code-o'}`}
             title={`${alt == 0 ? 'markdown source' : 'formatted'}`}
             onClick={nextAlt}
@@ -44,7 +44,7 @@ class DocMd extends Component {
               />
             </div>
           : <div>
-              <pre className="md-source" >{text}</pre>
+              <pre className={'md-source'} >{text}</pre>
             </div>
         }
       </div>

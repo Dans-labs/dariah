@@ -11,19 +11,8 @@ p.facet {
     margin-bottom: 0.05em;
     font-size: small;
     font-weight: bold;
-}
-table.facets {
-    width: 100%;
-}
-td.facet {
-    padding: 0;
-    margin: 0;
-    border: 0;
-    font-size: small;
-    -webkit-border-vertical-spacing: 0;
-}
-td.facet.mid {
-    padding-left: 0.5em;
+    padding-left: 0em;
+    padding-right: 0em;
 }
 input.facet {
     @include action();
@@ -37,10 +26,36 @@ input.search {
     color: $action-fore;
     background-color: $action-back;
 }
-td.statistic {
-  text-align: right;
-  padding-left: 0.5em;
-  font-size: small;
+
+.facet-container {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-content: flex-start;
 }
-
-
+.facet-row {
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: inline-flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: baseline;
+    align-content: flex-start;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+.facet-value {
+    flex-basis: 80%;
+    flex-grow: 1;
+    flex-shrink: 0;
+    font-size: small;
+}
+.facet-stat {
+    flex-basis: 20%;
+    flex-grow: 0.2;
+    flex-shrink: 0;
+    font-size: small;
+    text-align: right;
+    color: $dim-fore;
+    background-color: $dim-back;
+}

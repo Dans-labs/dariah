@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import L from 'leaflet'
 
-import {countryBorders} from 'europe.geo'
+import { countryBorders } from 'europe.geo'
 import { getFilterSetting } from 'filters'
 import { getTables } from 'tables'
 import { combineSelectors, emptyO } from 'utils'

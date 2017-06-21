@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { memoize } from 'memo'
-import { combineSelectors, emptyO } from 'utils'
+import { combineSelectors, emptyS, emptyO } from 'utils'
 import { EditStatus, someEditable } from 'fields'
 
 import { getTables, insertItem } from 'tables'
@@ -40,15 +40,15 @@ class ListPlain extends Component {
   render() {
     const { props, props: { tables, table, listIds, perm, title } } = this
     const { [table]: { entities } } = tables
-    const nItemsRep = `${listIds.length} item${listIds.length == 1 ? '' : 's'} `
+    const nItemsRep = `${listIds.length} item${listIds.length == 1 ? emptyS : 's'} `
     return (
-      <div className={'listGeneric'} >
+      <div className={'list-generic'} >
         <div>
           {nItemsRep}
           {
             (perm != null && perm.insert)
             ? <span
-                className="fa fa-plus button-large"
+                className={'fa fa-plus button-large'}
                 title={`new ${table}`}
                 onClick={this.handleInsert}
               />
@@ -67,7 +67,7 @@ class ListPlain extends Component {
             const hasEditable = someEditable(fields, perm)
             return (
               <div key={eId} >
-                <span className={'itemHead'} {...scrollProps} >
+                <span className={'item-head'} {...scrollProps} >
                   {
                     hasEditable
                     ? <EditStatus form={formTag} active={active} />

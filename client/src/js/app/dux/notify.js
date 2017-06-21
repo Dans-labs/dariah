@@ -1,6 +1,6 @@
 import update from 'immutability-helper'
 
-import { makeReducer, emptyA } from 'utils'
+import { makeReducer, emptyS, emptyA } from 'utils'
 
 /* ACTIONS */
 
@@ -67,7 +67,7 @@ export default makeReducer(flows, { notes: emptyA, busy: 0, show: false })
 export const getNotifications = ({ notify }) => {
   const { notes, busy, show } = notify
   let lastNote = -1
-  let lastKind = ''
+  let lastKind = emptyS
   notes.forEach((note, i) => {
     const { kind } = note
     if (kind == 'error') {

@@ -1,4 +1,4 @@
-import { jString } from 'utils'
+import { jString, emptyS } from 'utils'
 
 /* levels
  *
@@ -14,6 +14,8 @@ import { jString } from 'utils'
  * Level i+i means: JSON stringify the top i levels of the argument, and everything from level i+1
  * onwards is treated by obbject identity.
  * Level -1: JSON stringify that argument
+ *
+ * N.B: Function arguments can not be stringified, they always go by way of object identitiy.
  *
  * Object with keys: the argument numbers, and values: what to do with the argument
  * values:
@@ -68,16 +70,18 @@ import { jString } from 'utils'
 let debugStyle
 if (process.env.NODE_ENV === `development`) {
   debugStyle = {
-    key: false,
+    key: true,
     fName: true,
-    fArgs: false,
-    fResult: false,
-    retrieved: false,
+    fArgs: true,
+    fResult: true,
+    retrieved: true,
     computed: true,
     cleared: true,
     whiteList: {
       nothing: true,
+      //handle: true,
       //compileFieldIds: true,
+      //initFilterSettings: true,
     },
   }
 }
@@ -105,10 +109,10 @@ export const memoize = (f, levels, config) => {
       if (fName != null && (passes || nWhite == 0) && debugStyle[action]) {
         const Console = console
         Console.warn(
-          `${action} ${debugStyle.fName ? fName : ''}`,
-          debugStyle.key ? key : '',
-          debugStyle.fArgs ? fArgs : '',
-          debugStyle.fResult ? fResult : '',
+          `${action} ${debugStyle.fName ? fName : emptyS}`,
+          debugStyle.key ? key : emptyS,
+          debugStyle.fArgs ? fArgs : emptyS,
+          debugStyle.fResult ? fResult : emptyS,
         )
       }
     }
@@ -125,8 +129,9 @@ export const memoize = (f, levels, config) => {
   }
 
 
-  const resolveArg = fArg => {
+  const resolveArg = (fArg, byId) => {
     const fArgType = typeof fArg
+    if (!byId && fArgType != 'function') {return jString(fArg)}
     if (fArgType == 'object' || fArgType == 'function') {
       let mArg
       if (objMap.has(fArg)) {
@@ -142,8 +147,8 @@ export const memoize = (f, levels, config) => {
     else {return [false, fArg]}
   }
   const resolveToLevel = (fArg, level) => {
-    if (level == -1) {return jString(fArg)}
-    if (level == 0) {return resolveArg(fArg)}
+    if (level == -1) {return resolveArg(fArg, false)}
+    if (level == 0) {return resolveArg(fArg, true)}
     const fArgType = typeof fArg
     if (fArgType != 'object') {return resolveArg(fArg)}
     if (Array.isArray(fArg)) {return fArg.map(x => resolveToLevel(x, level - 1))}
@@ -170,7 +175,8 @@ export const memoize = (f, levels, config) => {
      * So there will not be clashes between real integer arguments and integers coming form keyMaps.
      */
     const memoKey = levels == null
-    ? jString(fArgs)
+    //? jString(fArgs)
+    ? jString(fArgs.map(fArg => resolveToLevel(fArg, -1)))
     : jString(fArgs.map((fArg, i) => resolveToLevel(fArg, useLevels[i] || 0)))
     let { [memoKey]: result } = memCache
     if (result == null) {

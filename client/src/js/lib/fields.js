@@ -1,6 +1,9 @@
 import React from 'react'
 import { reduxForm } from 'redux-form'
-import {countryBorders} from 'europe.geo'
+
+import { emptyS, emptyA } from 'utils'
+
+import { countryBorders } from 'europe.geo'
 
 import Input from 'Input'
 import MarkdownArea from 'MarkdownArea'
@@ -11,7 +14,7 @@ const editStatusGeneric = canSubmit => ({ active, dirty, invalid, submitting, re
       (dirty && !invalid && !submitting)
       ? canSubmit
         ? <button
-            type="submit"
+            type={'submit'}
             className={'button-large edit-action fa fa-fw fa-check'}
             title={'save'}
           />
@@ -58,7 +61,7 @@ const editStatusGeneric = canSubmit => ({ active, dirty, invalid, submitting, re
       (dirty && !submitting)
       ? canSubmit
         ? <button
-            type="button"
+            type={'button'}
             className={'button-large error-o fa fa-fw fa-close'}
             title={'reset values to last saved'}
             onClick={reset}
@@ -80,7 +83,7 @@ export const EditStatus = reduxForm({
   keepDirtyOnReinitialize: true,
 })(editStatusGeneric(false))
 
-export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : ''
+export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : emptyS
 
 export const editDelete = (perm, buttonClass, callBack) => (
   perm.delete
@@ -145,7 +148,7 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
 
 export const makeDetails = ({ tables, table, eId }) => {
   const { [table]: { details, detailOrder } } = tables
-  return (detailOrder || []).map(name => {
+  return (detailOrder || emptyA).map(name => {
     const { label, table: detailTable, linkField } = details[name]
     const {
       [detailTable]: {
@@ -160,6 +163,37 @@ export const makeDetails = ({ tables, table, eId }) => {
       nDetails: detailListIds.length,
     }
   })
+}
+
+export const getDateTime = (iso, absent = Number.NEGATIVE_INFINITY) => {
+  if (iso == null) {return absent}
+  let times
+  try {
+    times = (new Date(iso))
+  }
+  catch (error) {
+    return null
+  }
+  if (isNaN(times)) {
+    return null
+  }
+  return times.valueOf()
+}
+
+const INTL = new Intl.Collator('en', { sensitivity: 'base' })
+
+export const sortStringTemplate = template => (a, b) => INTL.compare(template(a), template(b))
+
+export const sortTimeInterval = (startField, endField) => (a, b) => {
+  const aStart = getDateTime(a[startField], Number.NEGATIVE_INFINITY)
+  const aEnd = getDateTime(a[endField], Number.POSITIVE_INFINITY)
+  const bStart = getDateTime(b[startField], Number.NEGATIVE_INFINITY)
+  const bEnd = getDateTime(b[endField], Number.POSITIVE_INFINITY)
+  return (aStart < bStart) || ((aStart == bStart) && (aEnd > bEnd))
+  ? -1
+  : (aStart == bStart && aEnd == bEnd)
+    ? 0
+    : 1
 }
 
 export const validation = {

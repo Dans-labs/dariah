@@ -153,6 +153,64 @@ tables:
           width: 10em
           grow: 1
 
+  typeContribution:
+    title: subType
+    sort:
+      - [mainType, 1]
+      - [subType, 1]
+    fieldOrder:
+      - mainType
+      - subType
+      - explanation
+      - creator
+      - dateCreated
+      - modified
+    fieldSpecs:
+      mainType:
+        label: Main type
+        valType: text
+        multiple: false
+        grid:
+          width: 10em
+          grow: 0
+      subType:
+        label: Subtype
+        valType: text
+        multiple: false
+        grid:
+          width: 10em
+          grow: 0
+      explanation:
+        label: Explanation
+        valType: textarea
+        multiple: true
+        grid:
+          width: 20em
+          grow: 1
+      creator:
+        label: creator
+        valType:
+          values: user
+          allowNew: false
+        multiple: false
+        grid:
+          width: 10em
+          grow: 1
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+        grid:
+          width: 10em
+          grow: 1
+      modified:
+        label: modified
+        valType: text
+        multiple: true
+        grid:
+          width: 10em
+          grow: 1
+
   contrib:
     title: title
     sort:
@@ -250,6 +308,10 @@ tables:
         valType:
           values: typeContribution
           allowNew: false
+          inactive:
+            className: inactive
+            title: this value does not belong to the current package
+            disable: true
         multiple: false
       typeContributionOther:
         label: Type

@@ -16,19 +16,19 @@ const App = ({ children, height, width, me }) => {
   return (
     <div>
       <Notification />
-      <p className="nav small top" >
+      <p className={'nav small top'} >
         <img
-          src="/static/images/inkind_logo_small.png"
-          title="information about this site"
+          src={'/static/images/inkind_logo_small.png'}
+          title={'information about this site'}
         />
-        <NavLink to="/data/contrib" >{'Contributions'}</NavLink>
+        <NavLink to={'/data/contrib'} >{'Contributions'}</NavLink>
         {
           me.eppn
-          ? <NavLink to="/backoffice" >{'Backoffice'}</NavLink>
+          ? <NavLink to={'/backoffice'} >{'Backoffice'}</NavLink>
           : null
         }
         <Static />
-        <span className="resize" title={text}>{text}</span>
+        <span className={'resize'} title={text}>{text}</span>
         <Login />
       </p>
       <div>{children}</div>

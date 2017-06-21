@@ -29,7 +29,7 @@ class ListFilter extends Component {
     return (
       <div className={'list-filter'}>
         <div className={'filters'}>
-          <p>{'Total '}<span className="good-o" >{listIds.length}</span></p>
+          <p>{'Total '}<span className={'good-o'} >{listIds.length}</span></p>
           <Filter
             table={table}
             filterTag={filterTag}

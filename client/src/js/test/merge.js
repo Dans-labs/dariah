@@ -1,7 +1,6 @@
 import assert from 'assert'
 import padStart from 'lodash/padstart'
 import padEnd from 'lodash/padend'
-import mergeWith from 'lodash/mergewith'
 import merge from 'lodash/merge'
 import update from 'immutability-helper'
 import { jString, updateAuto } from 'utils'

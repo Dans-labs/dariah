@@ -5,15 +5,15 @@ const DocPdf = ({ docDir, docName, docExt }) => {
   const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
   return iOS
   ? <p>
-      <a target="_blank" rel="noopener noreferrer" href={href} >{docName}</a>{' (open pdf in a new tab)'}
+      <a target={'_blank'} rel={'noopener noreferrer'} href={href} >{docName}</a>{' (open pdf in a new tab)'}
     </p>
   : <object
-      height="100%"
-      width="100%"
+      height={'100%'}
+      width={'100%'}
       data={href}
-      type="application/pdf"
+      type={'application/pdf'}
     >
-      <a target="_blank" rel="noopener noreferrer" href={href} >{docName}</a>{' (open pdf in a new tab)'}
+      <a target={'_blank'} rel={'noopener noreferrer'} href={href} >{docName}</a>{' (open pdf in a new tab)'}
     </object>
 }
 

@@ -30,7 +30,7 @@ class CheckboxI extends Component {
     return (
       <input
           ref={this.setIndeterminate}
-          type="checkbox"
+          type={'checkbox'}
           checked={states.allTrue}
           onChange={this.handleCheck}
       />

@@ -1,6 +1,9 @@
 import assert from 'assert'
 import padEnd from 'lodash/padend'
-import { memoize, memoizeX } from '../src/js/lib/memo.js'
+
+import { emptyA } from 'utils'
+
+import { memoize } from 'memo.js'
 
 /* memoizeOld and memoize
  * Store results in cache, retrieve results
@@ -64,8 +67,8 @@ const testSeparation = () => {
     it('Use memoized f1 on arg 5', () => {assert.equal(memF1(5), 6)})
     it('Use memoized f1 on arg 6', () => {assert.equal(memF1(6), 7)})
     it('Use memoized f2 on arg 7', () => {assert.equal(memF2(7), 17)})
-    it('Check cache keys f1', () => {assert.equal(memF1().cacheKeys[1], '[6]')})
-    it('Check cache keys f2', () => {assert.equal(memF2().cacheKeys[1], '[7]')})
+    it('Check cache keys f1', () => {assert.equal(memF1().cacheKeys[1], '["6"]')})
+    it('Check cache keys f2', () => {assert.equal(memF2().cacheKeys[1], '["7"]')})
     it('Wait to clear cache memoF1', done => {setTimeout(done, 1300)})
     it('Cache of memF1', () => {
       assert.equal(memF1().cacheKeys.length, 0, 'cache of memF1')
@@ -151,7 +154,7 @@ const testPerformance = () => {
  */
 
 const testFunctionArgs = () => {
-  describe('function arguments', () => {
+  describe('function arguments (if considering object identity)', () => {
     const testFunc = (f, x) => f(x)
     const fApply = memoize(testFunc, {})
 
@@ -161,6 +164,33 @@ const testFunctionArgs = () => {
     it('Apply with argument func1 and 0, should return 1', () => {assert.equal(fApply(func1, 0), 1)})
     it('Apply with argument func2 and 0, should return 2', () => {assert.equal(fApply(func2, 0), 2)})
     it('Apply with argument func3 and 0, should return 3', () => {assert.equal(fApply(func3, 0), 3)})
+    it('Apply with argument func1 and 0, should return 1', () => {assert.equal(fApply(func1, 0), 1)})
+    it('Apply with argument func2 and 0, should return 2', () => {assert.equal(fApply(func2, 0), 2)})
+    it('Apply with argument func3 and 0, should return 3', () => {assert.equal(fApply(func3, 0), 3)})
+    it('Cache inspection', () => {
+      const { computed, retrieved, cacheKeys } = fApply()
+      assert.equal(computed, 3, 'computed')
+      assert.equal(retrieved, 3, 'retrieved')
+    })
+  })
+  describe('function arguments (if considering object value)', () => {
+    const testFunc = (f, x) => f(x)
+    const fApply = memoize(testFunc)
+
+    const func1 = x => x + 1
+    const func2 = x => x + 2
+    const func3 = function(x) {return x + 3}
+    it('Apply with argument func1 and 0, should return 1', () => {assert.equal(fApply(func1, 0), 1)})
+    it('Apply with argument func2 and 0, should return 2', () => {assert.equal(fApply(func2, 0), 2)})
+    it('Apply with argument func3 and 0, should return 3', () => {assert.equal(fApply(func3, 0), 3)})
+    it('Apply with argument func1 and 0, should return 1', () => {assert.equal(fApply(func1, 0), 1)})
+    it('Apply with argument func2 and 0, should return 2', () => {assert.equal(fApply(func2, 0), 2)})
+    it('Apply with argument func3 and 0, should return 3', () => {assert.equal(fApply(func3, 0), 3)})
+    it('Cache inspection', () => {
+      const { computed, retrieved, cacheKeys } = fApply()
+      assert.equal(computed, 3, 'computed')
+      assert.equal(retrieved, 3, 'retrieved')
+    })
   })
 }
 
@@ -316,7 +346,7 @@ const testLogic = () => {
 
       const getLabels = thing => {
         const result = [thing.label];
-        (thing.children || []).forEach(child => {
+        (thing.children || emptyA).forEach(child => {
           result.push(...getLabels(child))
         })
         return result

@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { withParams } from 'utils'
-import { getTables, needTables, fetchTable, MYIDS } from 'tables'
+import { withParams, emptyA } from 'utils'
+import { loadExtra } from 'custom'
+
+import { getTables, needTables, fetchTables, MYIDS } from 'tables'
 import { makeTag } from 'filters'
 
 import ListGrid from 'ListGrid'
@@ -12,8 +14,8 @@ import ListFilter from 'ListFilter'
 class ListContainer extends Component {
   render() {
     const { props: { tables, table, select, mode, filtered } } = this
-    const grid = mode == 'grid'
-    if (needTables(tables, table, select, grid)) {return <div />}
+    const complete = mode == 'grid'
+    if (needTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA))) {return <div />}
     const { [table]: tableData } = tables
     const { title, perm, myIds, allIds } = tableData
     const listIds = select == MYIDS ? myIds : allIds
@@ -49,13 +51,13 @@ class ListContainer extends Component {
   }
   componentDidMount() {
     const { props: { tables, table, select, mode, dispatch } } = this
-    const grid = mode == 'grid'
-    if (needTables(tables, table, select, grid)) {dispatch(fetchTable(table, select, grid))}
+    const complete = mode == 'grid'
+    fetchTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA), dispatch)
   }
   componentDidUpdate() {
     const { props: { tables, table, select, mode, dispatch } } = this
-    const grid = mode == 'grid'
-    if (needTables(tables, table, select, grid)) {dispatch(fetchTable(table, select, grid))}
+    const complete = mode == 'grid'
+    fetchTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA), dispatch)
   }
 }
 

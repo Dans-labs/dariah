@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { memoize } from 'memo'
-import { combineSelectors } from 'utils'
+import { combineSelectors, emptyS } from 'utils'
 
 import { getTables, DETAILS } from 'tables'
 import { getForms } from 'forms'
@@ -20,7 +20,7 @@ const putFieldFragments = (fieldFragments, widthStyles) => fieldFragments.map(({
   const widthStyle = widthStyles[i]
   return (
     <div
-      className={`grid-cell valueColGrid ${editable ? 'editable' : ''}`}
+      className={`grid-cell valueColGrid ${editable ? 'editable' : emptyS}`}
       style={widthStyle}
       key={field}
     >
@@ -41,14 +41,14 @@ const putDetailFragments = (props, table, eId, detailFragments, widthStyles, nFi
   return (
     <div
       key={name}
-      className={'grid-cell valueColGrid'}
+      className={'grid-cell value-col-grid'}
       style={widthStyle}
     >
       <span
         className={'link'}
         onClick={nextAlt}
       >
-        {`${nDetails} item${nDetails == 1 ? '' : 's'}`}
+        {`${nDetails} item${nDetails == 1 ? emptyS : 's'}`}
       </span>
     </div>
   )
@@ -88,7 +88,7 @@ const ItemRow = ({
         alt == 0
         ? <div>
             <div className={'grid-row'}>
-              <div className="grid-status-cell" >
+              <div className={'grid-status-cell'} >
                 {editControl(nextAlt, table, eId, update, true)}
                 {form ? <EditStatus form={`${table}-${eId}`} active={false} /> : null}
               </div>
@@ -97,7 +97,7 @@ const ItemRow = ({
             </div>
           </div>
         : <div>
-            <div className="grid-status-cell" >
+            <div className={'grid-status-cell'} >
               {editControl(nextAlt, table, eId, update, false)}
               {form ? <EditStatus form={`${table}-${eId}`} active={true} /> : null}
             </div>
@@ -115,7 +115,7 @@ const ItemRow = ({
       }
     </div>
   : <div>
-      <div className="grid-row" >
+      <div className={'grid-row'} >
         {putFieldFragments(fieldFragments, widthStyles)}
         {putDetailFragments(props, table, eId, detailFragments, widthStyles, nFields)}
       </div>

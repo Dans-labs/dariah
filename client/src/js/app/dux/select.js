@@ -1,9 +1,9 @@
 import update from 'immutability-helper'
-import { makeReducer, emptyO } from 'utils'
+import { makeReducer, emptyS, emptyO } from 'utils'
 
 /* DEFINITIONS */
 
-const initSelect = { search: '', popUp: false }
+const initSelect = { search: emptyS, popUp: false }
 
 /* ACTIONS */
 

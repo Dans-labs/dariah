@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { combineSelectors } from 'utils'
-import { getFieldValues, placeFacets } from 'filters'
+import { getFieldValues } from 'filters'
 import { getAlts, makeAlt } from 'alter'
 
 import Facet from 'Facet'
@@ -18,21 +18,24 @@ const ByValue = ({
   expanded,
   ...props
 }) => {
-  const rows = placeFacets(fieldValues, maxCols)
-  if (rows == null) {
-    return <div className="facet" ><p>{' -no facets '}</p></div>
+  if (Object.keys(fieldValues).length == null) {
+    return <div className={'facet'} ><p>{' -no facets '}</p></div>
   }
   const alterTag = `${table}-${filterId}`
   const { alt, nextAlt } = makeAlt(props, { alterTag, nAlts: 2, initial: expanded ? 0 : 1 })
   return (
-    <div className="facet" >
-      <p className="facet" >
+    <div className={'facet'} >
+      <p className={'facet'} >
         <CheckboxI
           table={table}
           filterId={filterId}
           filterTag={filterTag}
         /> {filterLabel}{' '}
-        <Stat subTotal={filteredAmount} total={filteredAmountOthers} />{' '}
+        <Stat
+          subTotal={filteredAmount}
+          total={filteredAmountOthers}
+          className={'facet-stat-all'}
+        />{' '}
         <span
           className={`button-small fa fa-angle-${alt == 0 ? 'up' : 'down'}`}
           onClick={nextAlt}
@@ -40,44 +43,30 @@ const ByValue = ({
       </p>
       {
         alt == 0
-        ? <table key="table" className="facets" >
-            <tbody>
-              {rows.map((entity, i) => (
-                <tr key={i} >
-                  {
-                    entity.map((f, j) => {
-                      if (f === null) {
-                        return <td key={j} />
-                      }
-                      const [valueId, valueRep] = f
-                      const facetClass = j == 0 ? 'facet' : 'facet mid'
-                      return [(
-                        <td
-                         key={valueId}
-                         className={facetClass}
-                        >
-                          <Facet
-                            table={table}
-                            filterTag={filterTag}
-                            filterId={filterId}
-                            valueId={valueId}
-                            valueRep={valueRep}
-                          />
-                        </td>
-                      ), (
-                        <td
-                          key="stat"
-                          className="statistic"
-                        >
-                          <Stat subTotal={amounts[valueId]} />
-                        </td>
-                      )]
-                    })
-                  }
-                </tr>
-                ))}
-            </tbody>
-          </table>
+        ? <div className={'facet-container'} >
+            {
+              Object.entries(fieldValues).map(([valueId, valueRep]) => (
+                <div
+                  key={valueId}
+                  className={'facet-row'}
+                  style={{ flexBasis: `${94 / maxCols}%` }}
+                >
+                  <Facet
+                    className={'facet-value'}
+                    table={table}
+                    filterTag={filterTag}
+                    filterId={filterId}
+                    valueId={valueId}
+                    valueRep={valueRep}
+                  />
+                  <Stat
+                    className={'facet-stat'}
+                    subTotal={amounts[valueId]}
+                  />
+                </div>
+              ))
+            }
+          </div>
         : <div />
       }
     </div>

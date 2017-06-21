@@ -40,7 +40,7 @@
     flex-grow: 0;
     flex-shrink: 0;
 }
-.listGeneric {
+.list-generic {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
@@ -72,7 +72,7 @@ div.backoffice {
     align-content: flex-start;
     align-items: flex-start;
 }
-div.subApp {
+div.sub-app {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
@@ -108,6 +108,7 @@ div.filters {
     flex-grow: 1;
     padding-right: 0.5em;
     max-height: 100%;
+    max-width: 40%;
     overflow: auto;
 }
 div.list {
@@ -131,14 +132,16 @@ div.fulltext .search {
     flex-grow: 1;
     overflow: auto;
 }
-div.fulltext .stat {
+.fulltext-stat {
     flex-basis: 5em;
     flex-shrink: 0.2;
     flex-grow: 0.5;
     overflow: auto;
     text-align: right;
+    color: $dim-fore;
+    background-color: $dim-back;
 }
-.itemHead {
+.item-head {
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;

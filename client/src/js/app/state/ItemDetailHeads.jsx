@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { combineSelectors } from 'utils'
+import { combineSelectors, emptyS } from 'utils'
 import { makeDetails } from 'fields'
 
 import { getTables, DETAILS } from 'tables'
@@ -21,13 +21,13 @@ const ItemDetailHeads = ({ tables, table, eId, detailFragments, ...props }) => {
             key={name}
             className={'grid-row form'}
           >
-            <div className={'grid-head-cell labelCol'} >{`${label}:`}</div>
-            <div className={'grid-cell valueCol'} >
+            <div className={'grid-head-cell label-col'} >{`${label}:`}</div>
+            <div className={'grid-cell value-col'} >
               <span
                 className={'link'}
                 onClick={nextAlt}
               >
-                {`${nDetails} item${nDetails == 1 ? '' : 's'}`}
+                {`${nDetails} item${nDetails == 1 ? emptyS : 's'}`}
               </span>
             </div>
           </div>

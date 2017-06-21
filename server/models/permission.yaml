@@ -289,6 +289,32 @@ fields:
       read: system
       update: system
 
+  typeContribution:
+    mainType:
+      list:   public
+      read:   public
+      update: office
+    subType:
+      list:   public
+      read:   public
+      update: office
+    explanation:
+      list:   public
+      read:   public
+      update: office
+    creator:
+      list: public
+      read: public
+      update: office
+    dateCreated:
+      list: public
+      read: public
+      update: office
+    modified:
+      list: auth
+      read: auth
+      update: system
+
   vcc:
     rep:
       list:   public
@@ -308,12 +334,6 @@ fields:
       update: office
 
   keyword:
-    rep:
-      list:   public
-      read:   public
-      update: office
-
-  typeContribution:
     rep:
       list:   public
       read:   public

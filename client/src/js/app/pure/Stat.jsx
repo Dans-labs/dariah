@@ -1,10 +1,12 @@
 import React from 'react'
 
-const Stat = ({subTotal, total}) => (
-  <span className="good-o stat" >
+import { emptyS } from 'utils'
+
+const Stat = ({subTotal, total, className}) => (
+  <span className={className} >
     {subTotal == null ? '' : `${subTotal}`}
-    {(total == null || subTotal == null) ? '' : ' of '}
-    <strong>{total == null ? '' : `${total}`}</strong>
+    {(total == null || subTotal == null) ? emptyS : ' of '}
+    <strong>{total == null ? emptyS : `${total}`}</strong>
   </span>
 )
 

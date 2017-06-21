@@ -9,8 +9,8 @@ import { getTables, repr } from 'tables'
 
 export const resetSort = gridTag => ({ type: 'resetSort', gridTag })
 export const addColumn = (gridTag, column, direction) => ({ type: 'addColumn', gridTag, column, direction })
-export const turnColumn = (gridTag, column) => ({ type: 'turnColumn', gridTag, column })
 export const delColumn = (gridTag, column) => ({ type: 'delColumn', gridTag, column })
+export const turnColumn = (gridTag, column) => ({ type: 'turnColumn', gridTag, column })
 
 /* REDUCER */
 

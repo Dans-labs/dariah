@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import { emptyS } from 'utils'
+
 import { getNotifications, clear, display } from 'notify'
 
 class Notification extends Component {
@@ -30,12 +32,12 @@ class Notification extends Component {
     const busyBlocks = new Array(busy < 0 ? 0 : busy).fill(1)
     return (
       <div>
-        <p className="msg-spinner" >
+        <p className={'msg-spinner'} >
           <span
-            title="show/hide notifications and progress messages"
+            title={'show/hide notifications and progress messages'}
             className={highlight ? `spin-${lastKind}` : 'spin-ok'}
           >
-            { busyBlocks.map((b, i) => <span key={i} className="msg-dot fa fa-caret-left" />) }
+            { busyBlocks.map((b, i) => <span key={i} className={'msg-dot fa fa-caret-left'} />) }
             <span
               className={`fa fa-${busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}
               onClick={this.handleBox}
@@ -46,23 +48,23 @@ class Notification extends Component {
           show
           ? <div
               ref={this.refDom('notbox')}
-              className="msg-box"
+              className={'msg-box'}
               onClick={this.handleHide}
             >{
               (notifications).map((msg, i) => (
                 <p
                   key={i}
                   ref={this.refDom(`m${i}`)}
-                  className={`msg-line ${[msg.kind]}-o ${msg.kind != 'info' ? 'msg-high' : ''}`}
+                  className={`msg-line ${[msg.kind]}-o ${msg.kind != 'info' ? 'msg-high' : emptyS}`}
                 >{msg.text}</p>
               ))
             }
-              <p className="msg-dismiss" >{'(click panel to hide)'}</p>
-              <p className="msg-trash" >
+              <p className={'msg-dismiss'} >{'(click panel to hide)'}</p>
+              <p className={'msg-trash'} >
                 <a
-                  href="#"
-                  title="clear messages"
-                  className="control fa fa-trash"
+                  href={'#'}
+                  title={'clear messages'}
+                  className={'control fa fa-trash'}
                   onClick={this.handleClear}
                 />
               </p>

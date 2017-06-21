@@ -3,7 +3,7 @@ import { createSelector } from 'reselect'
 
 import { accessData } from 'server'
 import { memoize } from 'memo'
-import { makeReducer, updateAuto, emptyA, emptyO } from 'utils'
+import { makeReducer, updateAuto, emptyS, emptyA, emptyO } from 'utils'
 
 /* DEFS */
 
@@ -16,13 +16,19 @@ export const MYIDS = 'myIds'
  * Most actions call accessData, which will dispatch the ultimate fetch action.
  */
 
-export const fetchTable = (table, select = ALLIDS, grid) => accessData({
+export const fetchTable = (table, select = ALLIDS, complete) => accessData({
   type: 'fetchTable',
   contentType: 'db',
-  path: `/${select == 'myIds' ? 'my' : ''}list?table=${table}&grid=${grid}`,
+  path: `/${select == 'myIds' ? 'my' : emptyS}list?table=${table}&complete=${complete}`,
   desc: `${table} table`,
   table,
 })
+
+export const fetchTables = (tables, tableList, dispatch) => {
+  tableList.forEach(([table, select = ALLIDS, complete = true]) => {
+    if (needTable(tables, table, select, complete)) {dispatch(fetchTable(table, select, complete))}
+  })
+}
 
 export const fetchItem = (table, eId) => accessData({
   type: 'fetchItem',
@@ -174,7 +180,7 @@ const hasTableKey = (tables, table, key, value = null) => {
   return tableData[key] != null && (value == null || tableData[key] == value)
 }
 
-export const needTables = (tables, table, select = ALLIDS, complete) => {
+export const needTable = (tables, table, select = ALLIDS, complete) => {
   if (!hasTableKey(tables, table, select)) {return true}
   if (complete && !hasTableKey(tables, table, 'complete', true)) {return true}
   const { [table]: fieldSpecs } = tables
@@ -185,8 +191,13 @@ export const needTables = (tables, table, select = ALLIDS, complete) => {
       map(entry => entry[1].valType.values)
     )
   )
-  return relTables.some(relTable => !hasTableKey(tables, relTable, ALLIDS))
+  if (relTables.some(relTable => !hasTableKey(tables, relTable, ALLIDS))) {return true}
+  return false
 }
+
+export const needTables = (tables, tableList) => tableList.some(([table, select = ALLIDS, complete = true]) =>
+  needTable(tables, table, select, complete)
+)
 
 export const needValues = ({ tableData, eId }) => (
   tableData == null
@@ -209,15 +220,15 @@ const repUser = memoize((tables, valId) => {
   const { user: { entities: { [valId]: entity } } } = tables
   if (entity) {
     const { values: { eppn, firstName, lastName, emailPre, authority, mayLogin } } = entity
-    const email = emailPre || ''
-    let linkText = [firstName || '', lastName || ''].filter(x => x).join(' ')
-    if (linkText == '') {linkText = email}
+    const email = emailPre || emptyS
+    let linkText = [firstName || emptyS, lastName || emptyS].filter(x => x).join(' ')
+    if (linkText == emptyS) {linkText = email}
     const namePart = linkText && email
     ? `[${linkText}](mailto:${email})`
     : linkText + email
-    const eppnPart = eppn ? ` eppn=${eppn} ` : ''
-    const authorityPart = authority ? ` authenticated by=${authority} ` : ''
-    const mayLoginPart = mayLogin ? ` active=${mayLogin} ` : ''
+    const eppnPart = eppn ? ` eppn=${eppn} ` : emptyS
+    const authorityPart = authority ? ` authenticated by=${authority} ` : emptyS
+    const mayLoginPart = mayLogin ? ` active=${mayLogin} ` : emptyS
     valRep = [namePart, eppnPart, authorityPart, mayLoginPart].filter(x => x).join('; ')
   }
   else {valRep = 'UNKNOWN'}
@@ -229,6 +240,16 @@ const repCountry = (tables, valId) => {
   if (entity) {
     const { values: { name, iso } } = entity
     return `${iso}: ${name}`
+  }
+  else {return 'UNKNOWN'}
+}
+
+const repType = (tables, valId) => {
+  const { typeContribution: { entities: { [valId]: entity } } } = tables
+  if (entity) {
+    const { values: { mainType, subType } } = entity
+    const sep = (mainType && subType) ? ' / ' : emptyS
+    return `${mainType}${sep}${subType}`
   }
   else {return 'UNKNOWN'}
 }
@@ -246,15 +267,16 @@ const repValue = relTable => (tables, valId) => {
 const repMap = {
   user: repUser,
   country: repCountry,
+  typeContribution: repType,
   default: repValue,
 }
 
 export const repRelated = (tables, relTable, valId) => (repMap[relTable] || repMap.default(relTable))(tables, valId)
 
-const trimDate = text => (text == null ? '' : text.replace(/\.[0-9]+/, ''))
+const trimDate = text => (text == null ? emptyS : text.replace(/\.[0-9]+/, emptyS))
 
 export const repr = (tables, table, valType, value) => {
-  if (value == null) {return ''}
+  if (value == null) {return emptyS}
   if (typeof valType == 'string') {
     switch (valType) {
       case 'datetime': return trimDate(value)

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { combineSelectors } from 'utils'
+import { combineSelectors, emptyS, emptyA } from 'utils'
 import { handle } from 'handle'
 import { getSort, getSortedData, resetSort, addColumn, turnColumn, delColumn } from 'grid'
 import { getTable, insertItem } from 'tables'
@@ -16,7 +16,7 @@ const ListGrid = ({
   sortedData,
   dispatch,
 }) => {
-  const theHeading = heading ? `${heading}: ` : ''
+  const theHeading = heading ? `${heading}: ` : emptyS
   const { fields, fieldOrder, fieldSpecs, detailOrder, entities } = tableData
   const xfields = fields
   const { length: nFields } = fieldOrder
@@ -38,7 +38,7 @@ const ListGrid = ({
     flex: `${grow} ${shrink} ${width}`,
     overflow: 'auto',
   }))
-  const nItemsRep = `${listIds.length} item${listIds.length == 1 ? '' : 's'} `
+  const nItemsRep = `${listIds.length} item${listIds.length == 1 ? emptyS : 's'} `
 
   const rows = []
   for (const eId of sortedData) {
@@ -58,11 +58,11 @@ const ListGrid = ({
   return (
     <div>
       <p>
-        <span className={'listTitle'}>{theHeading}</span>{nItemsRep}
+        <span className={'list-title'}>{theHeading}</span>{nItemsRep}
         {
           (tablePerm != null && tablePerm.insert)
           ? <span
-              className="fa fa-plus button-large"
+              className={'fa fa-plus button-large'}
               title={`new ${table}`}
               onClick={handle(dispatch, insertItem, table, select, masterId, linkField)}
             />
@@ -89,9 +89,9 @@ const ListGrid = ({
           </p>
         : null
       }
-      <div className="grid" >
-        <div className="grid-head" >
-          <div className="grid-status-cell" />
+      <div className={'grid'} >
+        <div className={'grid-head'} >
+          <div className={'grid-status-cell'} />
           {
             fieldOrder.filter(field => field != linkField).map((field, i) => {
               const widthStyle = widthStyles[i]
@@ -99,7 +99,7 @@ const ListGrid = ({
               const direction = isSorted ? isSorted[1] : 0
               return (
                 <div
-                  className="grid-head-cell labelColGrid"
+                  className={'grid-head-cell label-col-grid'}
                   key={field}
                   style={widthStyle}
                 >
@@ -130,11 +130,11 @@ const ListGrid = ({
             })
           }
           {
-            (detailOrder || []).map((name, i) => {
+            (detailOrder || emptyA).map((name, i) => {
               const widthStyle = widthStyles[i]
               return (
                 <div
-                  className="grid-head-cell labelColGrid"
+                  className={'grid-head-cell label-col-grid'}
                   key={name}
                   style={widthStyle}
                 >{name}

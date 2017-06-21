@@ -13,8 +13,8 @@ const ItemRead = ({ eId, fieldFragments }) => (
           key={field}
           className={'grid-row form'}
         >
-          <div className={'grid-head-cell labelCol'}>{`${label}:`}</div>
-          <div className={'grid-cell valueCol'} >
+          <div className={'grid-head-cell label-col'}>{`${label}:`}</div>
+          <div className={'grid-cell value-col'} >
             {
               <FieldRead
                 field={field}

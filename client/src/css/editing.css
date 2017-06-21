@@ -143,7 +143,7 @@ textarea.invalid {
     width: 100%;
     max-width: 100%;
 }
-.labelCol {
+.label-col {
     text-align: right;
     padding: 0.2em 0.2em 0.2em 0.1em;
     background-color: $widget-fixed-back; 
@@ -152,20 +152,20 @@ textarea.invalid {
     flex-grow: 0;
     overflow: auto;
 }
-.listTitle {
+.list-title {
     text-align: left;
     padding: 0.2em;
     background-color: $widget-fixed-back; 
     font-weight: bold;
     overflow: auto;
 }
-.labelColGrid {
+.label-col-grid {
     padding: 0.2em 0.2em 0.2em 0.2em;
     background-color: $widget-fixed-back; 
     overflow: auto;
     font-size: small;
 }
-.valueCol {
+.value-col {
     text-align: left;
     padding: 0.2em 0.1em 0.2em 0.2em;
     background-color: #fafafa; 
@@ -174,14 +174,14 @@ textarea.invalid {
     flex-grow: 1;
     overflow: auto;
 }
-.valueColGrid {
+.value-col-grid {
     text-align: left;
     padding: 0.1em 0.1em 0.1em 0.1em;
     border-bottom: 2px solid #dddddd; 
     background-color: #fafafa; 
     overflow: auto;
 }
-.valueColGrid.editable {
+.value-col-grid.editable {
     background-color: #fafaff;
 }
 .delete {

@@ -1,7 +1,7 @@
 import pickBy from 'lodash/pickby'
 
 import { memoize } from 'memo'
-import { makeReducer, updateAuto, emptyO } from 'utils'
+import { makeReducer, updateAuto, emptyS, emptyA, emptyO } from 'utils'
 import { getTables, getTable, repRelated, DETAILS } from 'tables'
 
 /* ACTIONS */
@@ -65,7 +65,7 @@ const gatherIds = memoize((tableData, listIds, filterFields, fieldSpecs) => {
 const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField) => {
   const { [filterField]: { valType } } = fieldSpecs
   if (fieldIds == null) {return emptyO}
-  const fieldValues = {'': '-none-'}
+  const fieldValues = {[emptyS]: '-none-'}
   const { values: relTable } = valType
   fieldIds.forEach(_id => {
     fieldValues[_id] = repRelated(tables, relTable, _id)
@@ -95,15 +95,15 @@ const initFilterSettings = memoize((tableData, filterData, filterTag, fieldIds) 
   presentFilterList.forEach((filterSpec, filterId) => {
     const { [filterId]: filterSetting } = filterSettings
     if (filterSpec.type == 'Fulltext') {
-      if (filterSetting == null) {newFilterSettings[filterId] = ''}
+      if (filterSetting == null) {newFilterSettings[filterId] = emptyS}
     }
     else {
       const theFacets = filterSetting || emptyO
       const newFacets = {}
       fieldIds[filterSpec.field].forEach(valueId => {
-        if (theFacets[valueId] == null) {newFacets[valueId] = true}
+        newFacets[valueId] = theFacets[valueId] == null ? true : theFacets[valueId]
       })
-      if (theFacets[''] == null) {newFacets[''] = true}
+      newFacets[emptyS] = theFacets[emptyS] == null ? true : theFacets[emptyS]
       if (Object.keys(newFacets).length) {newFilterSettings[filterId] = newFacets}
     }
   })
@@ -224,17 +224,17 @@ const getUnpack = (tables, fieldSpec, asString = false) => {
     unpack = multiple
     ? asString
       ? v => v == null
-        ? ''
+        ? emptyS
         : v.join(' ')
       : v => v == null
-        ? []
+        ? emptyA
         : v
     : asString
       ? v => v == null
-        ? ''
+        ? emptyS
         : v
       : v => v == null
-        ? []
+        ? emptyA
         : [v]
   }
   else {
@@ -242,17 +242,17 @@ const getUnpack = (tables, fieldSpec, asString = false) => {
     unpack = multiple
     ? asString
       ? v => v == null
-        ? ''
+        ? emptyS
         : v.map(v => repRelated(tables, relTable, v).join(' '))
     : v => v == null
-      ? []
+      ? emptyA
       : v
   : asString
     ? v => v == null
-      ? ''
+      ? emptyS
       : repRelated(tables, relTable, v)
     : v => v == null
-      ? []
+      ? emptyA
       : [v]
   }
   return unpack
@@ -260,8 +260,8 @@ const getUnpack = (tables, fieldSpec, asString = false) => {
 
 const fulltextCheck = memoize((tables, field, fieldSpec, term) => {
   const unpack = getUnpack(tables, fieldSpec, true)
-  const search = term.toLowerCase()
-  if (search == null || search == '') {
+  const search = (term || emptyS).toLowerCase()
+  if (search == null || search == emptyS) {
     return () => true
   }
   return entity => {
@@ -273,14 +273,14 @@ const fulltextCheck = memoize((tables, field, fieldSpec, term) => {
 
 const facetCheck = memoize((tables, field, fieldSpec, facetSettings) => {
   const unpack = getUnpack(tables, fieldSpec)
-  if (facetSettings.size === 0) {
+  if ((facetSettings || emptyO).size === 0) {
     return () => false
   }
   return entity => {
     const { values: { [field]: val } } = entity
     const rep = unpack(val)
     if (rep.length == 0) {
-      return facetSettings['']
+      return facetSettings[emptyS]
     }
     for (const r of rep) {
       if (facetSettings[r]) {
@@ -294,12 +294,13 @@ const facetCheck = memoize((tables, field, fieldSpec, facetSettings) => {
 const countFacets = memoize((tables, field, fieldSpec, fieldIds, filteredIds, entities) => {
   const unpack = getUnpack(tables, fieldSpec)
   const facetAmounts = {}
+  facetAmounts[emptyS] = 0
   fieldIds.forEach(_id => {facetAmounts[_id] = 0})
   for (const eId of filteredIds) {
     const { [eId]: { values: { [field]: val } } } = entities
     const rep = unpack(val)
     if (rep.length == 0) {
-      facetAmounts[''] += 1
+      facetAmounts[emptyS] += 1
     }
     else {
       for (const r of rep) {
@@ -309,28 +310,6 @@ const countFacets = memoize((tables, field, fieldSpec, fieldIds, filteredIds, en
   }
   return facetAmounts
 }, emptyO, { debug: 'countFacets' })
-
-const INTL = new Intl.Collator('en', { sensitivity: 'base' })
-const sortEntries = (x, y) => INTL.compare(x[1], y[1])
-
-export const placeFacets = memoize((fieldValues, maxCols) => {
-  if (fieldValues == null) {return []}
-  const facets = Object.entries(fieldValues).sort(sortEntries)
-  if (facets.length == 0) {return []}
-  const rows = []
-  const { length: lf } = facets
-  const nrows = Math.floor(lf / maxCols) + (lf % maxCols ? 1 : 0)
-  const ncols = Math.floor(lf / nrows) + (lf % nrows ? 1 : 0)
-  for (let r = 0; r < nrows; r++) {
-    const row = []
-    for (let c = 0; c < ncols; c++) {
-      const f = nrows * c + r
-      row.push(f < lf ? facets[f] : null)
-    }
-    rows.push(row)
-  }
-  return rows
-}, emptyO, { debug: 'placeFacets' })
 
 export const testAllChecks = filterSetting => {
   let allTrue = true

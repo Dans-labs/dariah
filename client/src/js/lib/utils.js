@@ -2,6 +2,7 @@ import React from 'react'
 import { createSelector } from 'reselect'
 import update from 'immutability-helper'
 
+export const emptyS = ''
 export const emptyA = []
 export const emptyO = {}
 export const emptyF = () => null

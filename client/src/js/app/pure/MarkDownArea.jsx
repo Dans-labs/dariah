@@ -28,16 +28,16 @@ const MarkdownArea = ({
         alt == 0
         ? <Markdown
             className={`${editClass(dirty, invalid)} field-content`}
-            key="fmt"
+            key={'fmt'}
             source={value}
           />
-        : <span key="src" className="field-content">
+        : <span key={'src'} className={'field-content'}>
             <textarea
               className={`input ${editClass(dirty, invalid)}`}
               {...input}
-              wrap="soft"
+              wrap={'soft'}
             />
-            {error && <span className="invalid diag">{error}</span>}
+            {error && <span className={'invalid diag'}>{error}</span>}
           </span>
       }
     </div>

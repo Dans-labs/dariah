@@ -70,7 +70,7 @@ const ItemDetails = ({ tables, table, eId, ...props }) => {
                           linkField={linkField}
                         />
                       : <span>{`unknown display mode "${mode}" for item list`}</span>
-                : ''
+                : null
               }
             </div>
           )

@@ -7,7 +7,7 @@ import { getMe } from 'me'
 import NavLink from 'NavLink'
 
 const SubApp = ({ table, me, children }) => (
-  <div className={'subApp'} >
+  <div className={'sub-app'} >
     <div className={'nav bar'} >
       <p><NavLink to={`/data/${table}/list`} >{'All items'}</NavLink></p>
       {

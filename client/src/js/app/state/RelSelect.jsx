@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { memoize } from 'memo'
-import { combineSelectors, emptyO } from 'utils'
+import { combineSelectors, emptyS, emptyO } from 'utils'
 import { handle, handlEV } from 'handle'
 
 import { getSelect, setSearch, setPopUp, togglePopUp } from 'select'
@@ -9,7 +9,7 @@ import { getOptions } from 'tables'
 
 const RelOption = ({ label, xClass, selected, onHit }) => (
   <p
-    className={`tag option ${xClass} ${selected ? 'selected' : ''}`}
+    className={`tag option ${xClass} ${selected ? 'selected' : emptyS}`}
     onClick={selected ? null : onHit}
   >{label}</p>
 )
@@ -44,7 +44,7 @@ const changeSel = memoize((selectTag, multiple, value, val, onChange, dispatch) 
 
 const Tags = ({ selectTag, optionLookup, optionStyle, value, onChange, dispatch }) => (
   <div
-    className="tags"
+    className={'tags'}
     onClick={handle(dispatch, togglePopUp, selectTag)}
   >
     {
@@ -52,11 +52,11 @@ const Tags = ({ selectTag, optionLookup, optionStyle, value, onChange, dispatch 
       ? value.map(
           val => {
             const { [val]: lab = val } = optionLookup
-            const { [val]: xClass = '' } = optionStyle
+            const { [val]: xClass = emptyS } = optionStyle
             return (
               <span
                 key={val}
-                className="tag"
+                className={'tag'}
               >
                 <span
                   className={`button-tag ${xClass}`}
@@ -67,18 +67,18 @@ const Tags = ({ selectTag, optionLookup, optionStyle, value, onChange, dispatch 
             )
           }
         )
-      : <span className="tag empty">{'click to enter values'}</span>
+      : <span className={'tag empty'}>{'click to enter values'}</span>
     }
   </div>
 )
 
 const Head = ({ optionLookup, optionStyle, value, selectTag, dispatch }) => {
-  let label = ''
+  let label = emptyS
   const { [value]: lab = value } = optionLookup
-  const { [value]: xClass = '' } = optionStyle
+  const { [value]: xClass = emptyS } = optionStyle
   label = lab
   const classes = ['option-head', 'tag', xClass]
-  if (value == '') {
+  if (value == emptyS) {
     label = 'click to enter a value'
     classes.push('new')
   }
@@ -91,20 +91,20 @@ const Head = ({ optionLookup, optionStyle, value, selectTag, dispatch }) => {
 }
 
 const Typing = ({ selectTag, search, dispatch }) => (
-  <span className="option-type" >
+  <span className={'option-type'} >
     <input
-      className="invisible"
-      type="text"
+      className={'invisible'}
+      type={'text'}
       placeholder={'filter ...'}
-      value={search || ''}
+      value={search || emptyS}
       onFocus={handle(dispatch, setPopUp, selectTag, true)}
       onChange={handlEV(dispatch, setSearch, selectTag)}
     />
     {
       search
       ? <span
-          className="button-tag"
-          onClick={handle(dispatch, setSearch, selectTag, '')}
+          className={'button-tag'}
+          onClick={handle(dispatch, setSearch, selectTag, emptyS)}
         >{'×'}</span>
       : null
     }
@@ -123,7 +123,7 @@ const Options = ({ selectTag, optionLookup, optionStyle, multiple, allowNew, opt
           && !value.includes(search)
         )
         ? <span
-            className="new tag"
+            className={'new tag'}
             onClick={addVal(optionLookup, multiple, value, onChange, search)}
           >{search}</span>
         : null
@@ -132,9 +132,9 @@ const Options = ({ selectTag, optionLookup, optionStyle, multiple, allowNew, opt
         options.map(({ value: val, label: lab }) => {
           if (
             (!multiple || !value.includes(val))
-            && (pat == null || pat == '' || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
+            && (pat == null || pat == emptyS || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
           ) {
-            const { [val]: xClass = '' } = optionStyle
+            const { [val]: xClass = emptyS } = optionStyle
             return (
               <RelOption
                 key={val}
@@ -160,7 +160,7 @@ const RelSelect = ({
   multiple, allowNew, popUp, search, dispatch,
 }) => (
   <div
-    className={`select ${multiple ? 'multiselect' : ''}`}
+    className={`select ${multiple ? 'multiselect' : emptyS}`}
   >
     {
       multiple
