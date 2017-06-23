@@ -70,10 +70,10 @@ import { jString, emptyS } from 'utils'
 let debugStyle
 if (process.env.NODE_ENV === `development`) {
   debugStyle = {
-    key: true,
+    key: false,
     fName: true,
-    fArgs: true,
-    fResult: true,
+    fArgs: false,
+    fResult: false,
     retrieved: true,
     computed: true,
     cleared: true,
@@ -81,7 +81,13 @@ if (process.env.NODE_ENV === `development`) {
       nothing: true,
       //handle: true,
       //compileFieldIds: true,
+      //compileValues: true,
       //initFilterSettings: true,
+      //computeFiltering: true,
+      //compileActiveItems: true,
+      //compileNotifications: true,
+      //compileOptions: true,
+      //compileAlternatives: true,
     },
   }
 }
@@ -131,7 +137,7 @@ export const memoize = (f, levels, config) => {
 
   const resolveArg = (fArg, byId) => {
     const fArgType = typeof fArg
-    if (!byId && fArgType != 'function') {return jString(fArg)}
+    if (fArg == null || (!byId && fArgType != 'function')) {return jString(fArg)}
     if (fArgType == 'object' || fArgType == 'function') {
       let mArg
       if (objMap.has(fArg)) {
@@ -150,7 +156,7 @@ export const memoize = (f, levels, config) => {
     if (level == -1) {return resolveArg(fArg, false)}
     if (level == 0) {return resolveArg(fArg, true)}
     const fArgType = typeof fArg
-    if (fArgType != 'object') {return resolveArg(fArg)}
+    if (fArg == null || fArgType != 'object') {return resolveArg(fArg)}
     if (Array.isArray(fArg)) {return fArg.map(x => resolveToLevel(x, level - 1))}
     return Object.keys(fArg).sort().map(x => [x, resolveToLevel(fArg[x], level - 1)])
   }
@@ -199,3 +205,4 @@ export const memoize = (f, levels, config) => {
   return memoF
 }
 
+export const makeSet = memoize(keys => new Set(keys))

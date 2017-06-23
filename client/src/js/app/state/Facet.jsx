@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { emptyO } from 'utils'
 import { handlE } from 'handle'
 
-import { changeFacet, getFilterSetting } from 'filters'
+import { changeFacet } from 'filters'
 
 const Facet = ({ table, filterTag, filterId, valueId, valueRep, filterSetting, className, dispatch }) => {
   const { [valueId]: isOn = false } = filterSetting || emptyO
@@ -21,4 +21,4 @@ const Facet = ({ table, filterTag, filterId, valueId, valueRep, filterSetting, c
   )
 }
 
-export default connect(getFilterSetting)(Facet)
+export default connect()(Facet)

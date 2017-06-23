@@ -24,7 +24,9 @@ export const loadExtra = {
 
 /* SELECTORS */
 
-const getActiveItems = memoize((entitiesPkg, entitiesTyp, field = null) => {
+/* HELPERS */
+
+const compileActiveItems = memoize((entitiesPkg, entitiesTyp, field = null) => {
   const resultSetPkg = new Set()
   const resultSetTyp = new Set()
 
@@ -55,12 +57,10 @@ const getActiveItems = memoize((entitiesPkg, entitiesTyp, field = null) => {
       .sort(sortStringTemplate(e => `${e.mainType || emptyS} / ${e.subType || emptyS}`))
       .map(e => e._id),
   }
-}, emptyO)
+}, emptyO, { debug: 'compileActiveItems' })
 
-export const getActive = ({
+export const compileActive = ({
   [PACKAGE_TABLE]: { entities: entitiesPkg },
   [TYPE_TABLE]: { entities: entitiesTyp },
-}, field) => getActiveItems(entitiesPkg, entitiesTyp, field)
-
-/* HELPERS */
+}, field) => compileActiveItems(entitiesPkg, entitiesTyp, field)
 

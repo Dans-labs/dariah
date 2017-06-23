@@ -1,5 +1,9 @@
 import update from 'immutability-helper'
-import { makeReducer, emptyS, emptyO } from 'utils'
+
+import { makeReducer, emptyS, emptyA, emptyO } from 'utils'
+import { memoize } from 'memo'
+
+import { repr } from 'tables'
 
 /* DEFINITIONS */
 
@@ -43,7 +47,19 @@ export default makeReducer(flows, emptyO)
 
 /* SELECTORS */
 
-export const getSelect = ({ select }, { selectTag }) => ({ ...(select[selectTag] || emptyO) })
+export const getSelect = ({ select }) => ({ select })
 
 /* HELPERS */
+
+export const compileOptions = memoize((tables, table, field) => {
+  const { [table]: { valueLists, fieldSpecs } } = tables
+  const { [field]: valueList } = (valueLists || emptyO)
+  if (valueList == null) {return { options: emptyA, optionLookup: emptyO }}
+
+  const { [field]: { valType } } = fieldSpecs
+  const options = valueList.map(val => ({ value: val, label: repr(tables, table, valType, val) }))
+  const optionLookup = {}
+  options.forEach(({ value: val, label: lab }) => {optionLookup[val] = lab})
+  return { options, optionLookup }
+}, emptyO, { debug: 'compileOptions' })
 

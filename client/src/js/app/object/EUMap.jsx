@@ -1,11 +1,8 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import L from 'leaflet'
 
 import { countryBorders } from 'europe.geo'
-import { getFilterSetting } from 'filters'
-import { getTables } from 'tables'
-import { combineSelectors, emptyO } from 'utils'
+import { emptyO } from 'utils'
 
 import ByValue from 'ByValue'
 
@@ -66,13 +63,13 @@ class EUMap extends Component {
   setMap = dom => {if (dom) {this.dom = dom}}
 
   render() {
-    const { props: { tables, ...byValueProps }, setMap } = this
+    const { props, setMap } = this
     return (
       <div>
         <div
           ref={setMap}
         />
-        <ByValue {...byValueProps} />
+        <ByValue {...props} />
       </div>
     )
   }
@@ -131,4 +128,4 @@ class EUMap extends Component {
 
 EUMap.displayName = 'EUMap'
 
-export default connect(combineSelectors(getTables, getFilterSetting))(EUMap)
+export default EUMap

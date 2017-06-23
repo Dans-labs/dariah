@@ -93,6 +93,11 @@ else
     fi
     echo "./build.sh <task>"
     echo "    where <task> is one of:"
+    echo "module: install all modules in package.json from npm"
+    echo "module \$1: install single module"
+    echo "xmodule \$1: remove single module"
+    echo "test: run all tests"
+    echo "test \$1: run specific test"
     echo "devenv: start development services: webserver, docserver, client app server"
     echo "serve: start the bottle webserver"
     echo "docs: build and serve github pages documentation locally"

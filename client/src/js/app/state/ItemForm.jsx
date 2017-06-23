@@ -1,11 +1,8 @@
 import React from 'react'
-import { connect } from 'react-redux'
 
 import { makeFields, makeDetails, someEditable } from 'fields'
 
-import { getTables } from 'tables'
-
-//import { makeOptionStyles } from 'custom'
+import { DETAILS } from 'tables'
 
 import ItemEdit from 'ItemEdit'
 import ItemRead from 'ItemRead'
@@ -13,7 +10,7 @@ import ItemDetails from 'ItemDetails'
 import ItemDetailHeads from 'ItemDetailHeads'
 
 const ItemForm = props => {
-  const { table, eId, initialValues, fields, perm } = props
+  const { filters, tables, table, eId, initialValues, fields, perm } = props
   let { fieldFragments, detailFragments } = props
   if (fieldFragments == null) {fieldFragments = makeFields(props)}
   if (detailFragments == null) {detailFragments = makeDetails(props)}
@@ -23,6 +20,7 @@ const ItemForm = props => {
       {
         hasEditable
         ? <ItemEdit
+            tables={tables}
             table={table}
             eId={eId}
             form={`${table}-${eId}`}
@@ -31,16 +29,22 @@ const ItemForm = props => {
             fieldFragments={fieldFragments}
           />
         : <ItemRead
+            tables={tables}
             eId={eId}
             fieldFragments={fieldFragments}
           />
       }
       <ItemDetailHeads
+        alterSection={`${DETAILS}-${table}-${eId}`}
+        tables={tables}
         table={table}
         eId={eId}
         detailFragments={detailFragments}
       />
       <ItemDetails
+        alterSection={`${DETAILS}-${table}-${eId}`}
+        filters={filters}
+        tables={tables}
         table={table}
         eId={eId}
       />
@@ -48,4 +52,4 @@ const ItemForm = props => {
   )
 }
 
-export default connect(getTables)(ItemForm)
+export default ItemForm

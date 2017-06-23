@@ -1,6 +1,7 @@
 import update from 'immutability-helper'
 
-import { makeReducer, emptyS, emptyA } from 'utils'
+import { memoize } from 'memo'
+import { makeReducer, emptyS, emptyA, emptyO } from 'utils'
 
 /* ACTIONS */
 
@@ -11,21 +12,26 @@ export const display = onOff => ({ type: 'display', onOff })
 /* REDUCER */
 
 const subFlows = {
+  progress(state, { desc }) {
+    return update(state, {
+      messages: { $push: [{ kind: 'special', text: `still waiting for ${desc}`}] },
+    })
+  },
   pending(state, { desc, busy, extraMsgs }) {
     return update(state, {
-      notes: { $push: [...extraMsgs, { kind: 'special', text: `waiting for ${desc}`}] },
+      messages: { $push: [...extraMsgs, { kind: 'special', text: `waiting for ${desc}`}] },
       busy: { $set: busy + 1 },
     })
   },
   success(state, { desc, busy, extraMsgs }) {
     return update(state, {
-      notes: { $push: [...extraMsgs, { kind: 'info', text: `${desc} ok` }] },
+      messages: { $push: [...extraMsgs, { kind: 'info', text: `${desc} ok` }] },
       busy: { $set: busy - 1 },
     })
   },
   error(state, { desc, busy, extraMsgs }) {
     return update(state, {
-      notes: { $push: [...extraMsgs, { kind: 'error', text: `${desc} failed` }] },
+      messages: { $push: [...extraMsgs, { kind: 'error', text: `${desc} failed` }] },
       busy: { $set: busy - 1 },
       show: { $set: true },
     })
@@ -43,13 +49,13 @@ const flows = {
   },
   msgs(state, { msgs }) {
     return update(state, {
-      notes: { $push: msgs },
+      messages: { $push: msgs },
       show: { $set: true },
     })
   },
   clear(state) {
     return update(state, {
-      notes: { $set: emptyA },
+      messages: { $set: emptyA },
       show: { $set: false },
     })
   },
@@ -60,15 +66,19 @@ const flows = {
   },
 }
 
-export default makeReducer(flows, { notes: emptyA, busy: 0, show: false })
+export default makeReducer(flows, { messages: emptyA, busy: 0, show: false })
 
 /* SELECTORS */
 
-export const getNotifications = ({ notify }) => {
-  const { notes, busy, show } = notify
+export const getNotes = ({ notes }) => ({ notes })
+
+/* HELPERS */
+
+export const compileNotifications = memoize(notes => {
+  const { messages, busy, show } = notes
   let lastNote = -1
   let lastKind = emptyS
-  notes.forEach((note, i) => {
+  messages.forEach((note, i) => {
     const { kind } = note
     if (kind == 'error') {
       lastNote = i
@@ -81,8 +91,6 @@ export const getNotifications = ({ notify }) => {
       }
     }
   })
-  return { notifications: notes, busy, show, lastMsg: notes.length - 1, lastNote, lastKind }
-}
-
-/* HELPERS */
+  return { messages, busy, show, lastMsg: messages.length - 1, lastNote, lastKind }
+}, emptyO, { debug: 'compileNotifications' })
 

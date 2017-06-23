@@ -21,7 +21,7 @@ export default makeReducer(flows, initWinDim())
 
 /* SELECTORS */
 
-export const getWinDim = ({ win: { height, width } }) => ({ height, width })
+export const getWinDim = ({ win }) => ({ win })
 
 /* HELPERS */
 

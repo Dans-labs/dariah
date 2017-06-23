@@ -11,7 +11,8 @@ import NavLink from 'NavLink'
 import Static from 'Static'
 import Notification from 'Notification'
 
-const App = ({ children, height, width, me }) => {
+const App = ({ children, win, me }) => {
+  const { height, width } = win
   const text = `${width} x ${height}`
   return (
     <div>

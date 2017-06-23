@@ -2,18 +2,18 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { memoize } from 'memo'
-import { combineSelectors, emptyS } from 'utils'
+import { emptyS } from 'utils'
+import { makeFields, makeDetails, someEditable } from 'fields'
 
-import { getTables, DETAILS } from 'tables'
+import { DETAILS } from 'tables'
 import { getForms } from 'forms'
-import { EditStatus, makeFields, makeDetails, someEditable } from 'fields'
-import { getAlts, makeAlt } from 'alter'
 
+import { EditStatus } from 'EditControls'
 import FieldRead from 'FieldRead'
 import ItemForm from 'ItemForm'
 import ItemDetails from 'ItemDetails'
 
-const putFieldFragments = (fieldFragments, widthStyles) => fieldFragments.map(({
+const putFieldFragments = (tables, fieldFragments, widthStyles) => fieldFragments.map(({
   field, label,
   fragment: { editable, table, myValues },
 }, i) => {
@@ -26,6 +26,7 @@ const putFieldFragments = (fieldFragments, widthStyles) => fieldFragments.map(({
     >
       <FieldRead
         field={field}
+        tables={tables}
         table={table}
         myValues={myValues}
       />
@@ -33,11 +34,10 @@ const putFieldFragments = (fieldFragments, widthStyles) => fieldFragments.map(({
   )
 })
 
-const putDetailFragments = (props, table, eId, detailFragments, widthStyles, nFields) => detailFragments.map(({
+const putDetailFragments = (table, eId, detailFragments, widthStyles, nFields, nextAlt) => detailFragments.map(({
   name, label, nDetails,
 }, i) => {
   const widthStyle = widthStyles[nFields + i]
-  const { nextAlt } = makeAlt(props, { alterTag: `${DETAILS}-${table}-${eId}-${name}`, nAlts: 2, initial: 1 })
   return (
     <div
       key={name}
@@ -65,10 +65,9 @@ const editControl = memoize((nextAlt, table, eId, mayUpdate, withRow) => (
 ))
 
 const ItemRow = ({
-  tables, forms, table, eId, initialValues, perm,
+  alt, nextAlt, filters, tables, form, table, eId, initialValues, perm,
   fields,
   widthStyles,
-  ...props
 }) => {
   const hasEditable = someEditable(fields, perm)
   const fieldFragments = makeFields({
@@ -78,10 +77,8 @@ const ItemRow = ({
   const detailFragments = makeDetails({ tables, table, eId })
   const { update } = perm
   const nFields = fieldFragments.length
-  const alterTag = `row-${table}-${eId}`
-  const { alt, nextAlt } = makeAlt(props, { alterTag, nAlts: 2, initial: 0 })
   const formTag = `${table}-${eId}`
-  const { [formTag]: form } = forms
+  const hasForm = form.has(formTag)
   return hasEditable
   ? <div>
       {
@@ -90,21 +87,22 @@ const ItemRow = ({
             <div className={'grid-row'}>
               <div className={'grid-status-cell'} >
                 {editControl(nextAlt, table, eId, update, true)}
-                {form ? <EditStatus form={`${table}-${eId}`} active={false} /> : null}
+                {hasForm ? <EditStatus form={`${table}-${eId}`} active={false} /> : null}
               </div>
-              {putFieldFragments(fieldFragments, widthStyles)}
-              {putDetailFragments(props, table, eId, detailFragments, widthStyles, nFields)}
+              {putFieldFragments(tables, fieldFragments, widthStyles)}
+              {putDetailFragments(table, eId, detailFragments, widthStyles, nFields, nextAlt)}
             </div>
           </div>
         : <div>
             <div className={'grid-status-cell'} >
               {editControl(nextAlt, table, eId, update, false)}
-              {form ? <EditStatus form={`${table}-${eId}`} active={true} /> : null}
+              {hasForm ? <EditStatus form={`${table}-${eId}`} active={true} /> : null}
             </div>
             <ItemForm
+              filters={filters}
+              tables={tables}
               table={table}
               eId={eId}
-              form={`${table}-${eId}`}
               initialValues={initialValues}
               perm={perm}
               fields={fields}
@@ -116,13 +114,17 @@ const ItemRow = ({
     </div>
   : <div>
       <div className={'grid-row'} >
-        {putFieldFragments(fieldFragments, widthStyles)}
-        {putDetailFragments(props, table, eId, detailFragments, widthStyles, nFields)}
+        {putFieldFragments(tables, fieldFragments, widthStyles)}
+        {putDetailFragments(table, eId, detailFragments, widthStyles, nFields, nextAlt)}
       </div>
-      <ItemDetails table={table} eId={eId} />
+      <ItemDetails
+        alterSection={`${DETAILS}-${table}-${eId}`}
+        filters={filters}
+        tables={tables}
+        table={table}
+        eId={eId}
+      />
     </div>
 }
 
-const getInfo = combineSelectors(getTables, getForms, getAlts)
-
-export default connect(getInfo)(ItemRow)
+export default connect(getForms)(ItemRow)

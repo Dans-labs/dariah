@@ -3,20 +3,24 @@ import { connect } from 'react-redux'
 
 import { combineSelectors, emptyS, emptyA } from 'utils'
 import { handle } from 'handle'
-import { getSort, getSortedData, resetSort, addColumn, turnColumn, delColumn } from 'grid'
-import { getTable, insertItem } from 'tables'
+
+import { getAltSection, compileAlternatives } from 'alter'
+import { getGrid, compileSortedData, resetSort, addColumn, turnColumn, delColumn } from 'grid'
+import { insertItem } from 'tables'
 
 import ItemRow from 'ItemRow'
 
 const ListGrid = ({
+  alter, alterSection,
   heading,
-  tableData, table, listIds, select, perm: tablePerm,
+  filters, tables, table, listIds, select, perm: tablePerm,
   masterId, linkField,
-  gridTag, sortSpec,
-  sortedData,
+  grid, gridTag,
   dispatch,
 }) => {
+  const { [gridTag]: sortSpec = emptyA } = grid
   const theHeading = heading ? `${heading}: ` : emptyS
+  const { [table]: tableData } = tables
   const { fields, fieldOrder, fieldSpecs, detailOrder, entities } = tableData
   const xfields = fields
   const { length: nFields } = fieldOrder
@@ -40,12 +44,20 @@ const ListGrid = ({
   }))
   const nItemsRep = `${listIds.length} item${listIds.length == 1 ? emptyS : 's'} `
 
+  const sortedData = compileSortedData(tables, table, listIds, sortSpec)
+  const makeAlternatives = compileAlternatives(alterSection, 2, 0, dispatch)
   const rows = []
   for (const eId of sortedData) {
     const { [eId]: { values: initialValues, perm } } = entities
+    const { getAlt, nextAlt } = makeAlternatives(eId)
+    const alt = getAlt(alter)
     rows.push(
       <ItemRow
         key={`${table}-${eId}`}
+        alt={alt}
+        nextAlt={nextAlt}
+        filters={filters}
+        tables={tables}
         table={table}
         eId={eId}
         initialValues={initialValues}
@@ -149,6 +161,6 @@ const ListGrid = ({
   )
 }
 
-const getInfo = combineSelectors(getTable, getSort, getSortedData)
+const getInfo = combineSelectors(getGrid, getAltSection)
 
 export default connect(getInfo)(ListGrid)

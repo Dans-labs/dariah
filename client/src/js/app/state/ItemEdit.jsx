@@ -3,32 +3,33 @@ import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 
 import { handle } from 'handle'
-import { onSubmitSuccess, editStatus, editDelete } from 'fields'
+import { onSubmitSuccess } from 'fields'
 
-import { getTables, delItem, toDb } from 'tables'
+import { delItem, toDb } from 'tables'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
+import { EditControl, EditDelete } from 'EditControls'
 
 const ItemEdit = props => {
   const {
-    table, eId, perm,
+    tables, table, eId, perm,
     dirty, invalid, submitting, reset, error,
     fieldFragments,
     handleSubmit,
     dispatch,
   } = props
+  const editControlProps = { form: `${table}-${eId}`, dirty, invalid, submitting, reset, error }
   return (
     <div>
       <form onSubmit={handleSubmit(toDb(table, eId, dispatch))} >
         <div>
-          {editDelete(perm, 'button-large', handle(dispatch, delItem, table, eId))}
-          {
-            editStatus({
-              form: `${table}-${eId}`,
-              dirty, invalid, submitting, reset, error,
-            })
-          }
+          <EditDelete
+            perm={perm}
+            button={'button-large'}
+            onClick={handle(dispatch, delItem, table, eId)}
+          />
+          <EditControl {...editControlProps} />
         </div>
         <div className={'grid fragments'}>{
           fieldFragments.map(({
@@ -45,12 +46,14 @@ const ItemEdit = props => {
                   editable
                   ? <FieldEdit
                       field={field}
+                      tables={tables}
                       table={table}
                       eId={eId}
                       {...props}
                     />
                   : <FieldRead
                       field={field}
+                      tables={tables}
                       table={table}
                       eId={eId}
                       myValues={myValues}
@@ -66,7 +69,7 @@ const ItemEdit = props => {
   )
 }
 
-export default connect(getTables)(reduxForm({
+export default connect()(reduxForm({
   destroyOnUnmount: false,
   enableReinitialize: true,
   keepDirtyOnReinitialize: true,

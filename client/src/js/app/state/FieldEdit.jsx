@@ -2,18 +2,18 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Field, FieldArray } from 'redux-form'
 
+import { compileActive } from 'custom'
 import { validation, normalization, getValType } from 'fields'
-import { getTables } from 'tables'
 
 import InputMulti from 'InputMulti'
 import RelSelect from 'RelSelect'
 
-const FieldEdit = ({ field, tables, table, eId, ...props }) => {
+const FieldEdit = ({ alter, field, tables, table, eId, dispatch, ...props }) => {
   const { [table]: { fieldSpecs } } = tables
   const { [field]: { valType, valid, multiple } } = fieldSpecs
   if (typeof valType == 'string') {
     const typing = getValType(valType)
-    const { component, type } = typing
+    const { component, type, props: componentProps } = typing
     const { [valid || valType]: validate } = validation
     const { [valid || valType]: normalize } = normalization
     if (multiple) {
@@ -22,8 +22,10 @@ const FieldEdit = ({ field, tables, table, eId, ...props }) => {
           name={field}
           component={InputMulti}
           componentSingle={component}
+          {...componentProps}
           validateSingle={validate}
           normalizeSingle={normalize}
+          tables={tables}
           table={table}
           eId={eId}
           type={type}
@@ -36,8 +38,10 @@ const FieldEdit = ({ field, tables, table, eId, ...props }) => {
         <Field
           name={field}
           component={component}
+          {...componentProps}
           validate={validate}
           normalize={normalize}
+          tables={tables}
           table={table}
           eId={eId}
           type={type}
@@ -47,7 +51,8 @@ const FieldEdit = ({ field, tables, table, eId, ...props }) => {
     }
   }
   else {
-    const { allowNew } = valType
+    const { allowNew, inactive } = valType
+    const activeItems = inactive ? compileActive(tables, field) : null
     const selectTag = `${table}-${eId}-${field}`
     return (
       <Field
@@ -57,12 +62,15 @@ const FieldEdit = ({ field, tables, table, eId, ...props }) => {
         field={field}
         multiple={multiple}
         allowNew={allowNew}
+        tables={tables}
         table={table}
         eId={eId}
+        activeItems={activeItems}
+        inactive={inactive}
         {...props}
       />
     )
   }
 }
 
-export default connect(getTables)(FieldEdit)
+export default connect()(FieldEdit)

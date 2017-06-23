@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { changeFacetAll, getFilterSetting, testAllChecks } from 'filters'
+import { changeFacetAll, testAllChecks } from 'filters'
 
 const indeterminate = states => !states.allTrue && !states.allFalse
 
@@ -38,4 +38,4 @@ class CheckboxI extends Component {
   }
 }
 
-export default connect(getFilterSetting)(CheckboxI)
+export default connect()(CheckboxI)

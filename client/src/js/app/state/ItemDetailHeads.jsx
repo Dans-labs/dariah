@@ -1,21 +1,20 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { combineSelectors, emptyS } from 'utils'
+import { emptyS } from 'utils'
 import { makeDetails } from 'fields'
 
-import { getTables, DETAILS } from 'tables'
-import { getAlts, makeAlt } from 'alter'
+import { getAltSection, compileAlternatives } from 'alter'
 
-const ItemDetailHeads = ({ tables, table, eId, detailFragments, ...props }) => {
+const ItemDetailHeads = ({ alterSection, tables, table, eId, detailFragments, dispatch }) => {
   const theFragments = detailFragments == null
   ? makeDetails(tables, table, eId)
   : detailFragments
+  const makeAlternatives = compileAlternatives(alterSection, 2, 1, dispatch)
   return (
     <div className={'grid fragments'}>{
       theFragments.map(({ name, label, nDetails }) => {
-        const alterTag = `${DETAILS}-${table}-${eId}-${name}`
-        const { nextAlt } = makeAlt(props, { alterTag, nAlts: 2, initial: 1 })
+        const { nextAlt } = makeAlternatives(name)
         return (
           <div
             key={name}
@@ -38,6 +37,4 @@ const ItemDetailHeads = ({ tables, table, eId, detailFragments, ...props }) => {
   )
 }
 
-const getInfo = combineSelectors(getTables, getAlts)
-
-export default connect(getInfo)(ItemDetailHeads)
+export default connect(getAltSection)(ItemDetailHeads)

@@ -4,18 +4,16 @@ import Markdown from 'react-markdown'
 
 import { editClass } from 'fields'
 
-import { getAlts, makeAlt } from 'alter'
+import { getAltSection, compileAlternatives } from 'alter'
 
 const MarkdownArea = ({
-    table, eId, meta: { dirty, invalid, error },
-    input: { name, value }, input,
-    ...props
+  alter, alterSection, table, eId, meta: { dirty, invalid, error },
+  input: { name, value }, input,
+  dispatch,
 }) => {
-  const { alt, nextAlt } = makeAlt(props, {
-    alterTag: `md-${table}-${eId}-${name}`,
-    nAlts: 2,
-    initial: 0,
-  })
+  const alterTag = `${table}-${eId}-${name}`
+  const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 0, dispatch)(alterTag)
+  const alt = getAlt(alter)
   return (
     <div className={'md-field'}>
       <p className={'stick'} >
@@ -44,4 +42,4 @@ const MarkdownArea = ({
   )
 }
 
-export default connect(getAlts)(MarkdownArea)
+export default connect(getAltSection)(MarkdownArea)

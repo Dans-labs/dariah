@@ -5,7 +5,7 @@ import { emptyS } from 'utils'
 
 import { handlEV } from 'handle'
 
-import { changeFulltext, getFilterSetting } from 'filters'
+import { changeFulltext } from 'filters'
 
 import Stat from 'Stat'
 
@@ -28,4 +28,4 @@ const Fulltext = ({
   </div>
 )
 
-export default connect(getFilterSetting)(Fulltext)
+export default connect()(Fulltext)

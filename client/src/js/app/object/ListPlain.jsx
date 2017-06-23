@@ -2,12 +2,13 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { memoize } from 'memo'
-import { combineSelectors, emptyS, emptyO } from 'utils'
-import { EditStatus, someEditable } from 'fields'
+import { emptyS, emptyO } from 'utils'
+import { someEditable } from 'fields'
 
-import { getTables, insertItem } from 'tables'
-import { getAlts, makeAlt } from 'alter'
+import { insertItem, needValues } from 'tables'
+import { getAltSection, compileAlternatives } from 'alter'
 
+import { EditStatus } from 'EditControls'
 import ItemContainer from 'ItemContainer'
 
 const initial = 0
@@ -20,13 +21,13 @@ class ListPlain extends Component {
     this.gotoNew = true
   }
   gotoItem = eId => {
-    const { props, props: { table } } = this
-    const { nextAlt } = makeAlt(props, { alterTag: `${table}-${eId}`, nAlts, initial })
+    const { props: { alterSection, table, dispatch } } = this
+    const { nextAlt } = compileAlternatives(alterSection, nAlts, initial, dispatch)(`${table}-${eId}`)
     nextAlt()
   }
   closeItem = eId => {
-    const { props, props: { table } } = this
-    const { initAlt } = makeAlt(props, { alterTag: `${table}-${eId}`, nAlts, initial })
+    const { props: { alterSection, table, dispatch } } = this
+    const { initAlt } = compileAlternatives(alterSection, nAlts, initial, dispatch)(`${table}-${eId}`)
     initAlt()
   }
   handleCloseAll = memoize(items => () => {items.forEach(eId => {this.closeItem(eId)})})
@@ -38,9 +39,10 @@ class ListPlain extends Component {
   }
 
   render() {
-    const { props, props: { tables, table, listIds, perm, title } } = this
+    const { props: { alter, alterSection, filters, tables, table, listIds, perm, title, dispatch } } = this
     const { [table]: { entities } } = tables
     const nItemsRep = `${listIds.length} item${listIds.length == 1 ? emptyS : 's'} `
+    const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
     return (
       <div className={'list-generic'} >
         <div>
@@ -60,16 +62,18 @@ class ListPlain extends Component {
             const { [eId]: { values, fields, perm } } = entities
             const { [title]: entityHead = '-empty-' } = values
             const formTag = `${table}-${eId}`
-            const alterTag = `${table}-${eId}`
-            const { alt, nextAlt } = makeAlt(props, { alterTag, nAlts, initial })
+            const isComplete = !needValues(entities, eId)
+            const { getAlt, nextAlt } = makeAlternatives(eId)
+            const alt = getAlt(alter)
             const active = alt != initial
             const scrollProps = active ? { ref: this.scroll } : emptyO
-            const hasEditable = someEditable(fields, perm)
+            const showStatus = isComplete && someEditable(fields, perm)
+
             return (
               <div key={eId} >
                 <span className={'item-head'} {...scrollProps} >
                   {
-                    hasEditable
+                    showStatus
                     ? <EditStatus form={formTag} active={active} />
                     : <span>
                         <span className={'fa fa-fw'} />
@@ -83,7 +87,12 @@ class ListPlain extends Component {
                 </span>
                 {
                   active
-                  ? <ItemContainer table={table} eId={eId} />
+                  ? <ItemContainer
+                      filters={filters}
+                      tables={tables}
+                      table={table}
+                      eId={eId}
+                    />
                   : null
                 }
               </div>
@@ -119,6 +128,4 @@ class ListPlain extends Component {
   }
 }
 
-const getInfo = combineSelectors(getTables, getAlts)
-
-export default connect(getInfo)(ListPlain)
+export default connect(getAltSection)(ListPlain)

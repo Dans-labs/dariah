@@ -1,99 +1,16 @@
 import React from 'react'
-import { reduxForm } from 'redux-form'
 
-import { emptyS, emptyA } from 'utils'
+import { memoize } from 'memo'
+import { emptyS, emptyA, emptyO } from 'utils'
+
+import { repr } from 'tables'
 
 import { countryBorders } from 'europe.geo'
 
 import Input from 'Input'
 import MarkdownArea from 'MarkdownArea'
 
-const editStatusGeneric = canSubmit => ({ active, dirty, invalid, submitting, reset, error }) => (
-  <span>
-    {
-      (dirty && !invalid && !submitting)
-      ? canSubmit
-        ? <button
-            type={'submit'}
-            className={'button-large edit-action fa fa-fw fa-check'}
-            title={'save'}
-          />
-        : <span
-            className={'warning-o fa fa-fw fa-pencil'}
-            title={'changed'}
-          />
-      : null
-    }
-    {
-      (dirty && invalid && !submitting)
-      ? <span
-          className={'error-o fa fa-fw fa-exclamation-circle'}
-          title={'invalid data'}
-        />
-      : null
-    }
-    {
-      (!dirty && invalid && !submitting && !canSubmit)
-      ? <span
-          className={'error-o fa fa-fw fa-exclamation-circle'}
-          title={'invalid data'}
-        />
-      : null
-    }
-    {
-      (!dirty && !invalid && !submitting && !canSubmit)
-      ? <span
-          className={`fa fa-fw fa-${active ? 'pencil' : 'check'}`}
-          title={'no changes'}
-        />
-      : null
-    }
-    {
-      submitting
-      ? <span
-          className={'special-o fa fa-fw fa-spinner fa-spin'}
-          title={'saving'}
-        />
-      : null
-    }
-    {' '}
-    {
-      (dirty && !submitting)
-      ? canSubmit
-        ? <button
-            type={'button'}
-            className={'button-large error-o fa fa-fw fa-close'}
-            title={'reset values to last saved'}
-            onClick={reset}
-          />
-        : null
-      : null
-    }
-    {' '}
-    {
-      error && canSubmit && <span className={'invalid diag'}>{error}</span>
-    }
-  </span>
-)
-export const editStatus = editStatusGeneric(true)
-
-export const EditStatus = reduxForm({
-  destroyOnUnmount: false,
-  enableReinitialize: true,
-  keepDirtyOnReinitialize: true,
-})(editStatusGeneric(false))
-
 export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : emptyS
-
-export const editDelete = (perm, buttonClass, callBack) => (
-  perm.delete
-  ? <div
-      className={`grid-cell ${buttonClass} error-o fa fa-trash delete`}
-      title={'delete this record'}
-      onClick={callBack}
-    />
-  : null
-)
 
 /* Workaround (6.6.3) for issue https://github.com/erikras/redux-form/issues/2841
  * We do a mostly unnecessary reset() after a successful submit.
@@ -106,12 +23,12 @@ export const editDelete = (perm, buttonClass, callBack) => (
 export const onSubmitSuccess = (result, dispatch, { reset }) => reset()
 
 const valTypes = {
-  bool: { component: Input, type: 'checkbox' },
-  text: { component: Input, type: 'text' },
-  datetime: { component: Input, type: 'text' },
-  email: { component: Input, type: 'text' },
-  url: { component: Input, type: 'text' },
-  textarea: { component: MarkdownArea, type: 'text' },
+  bool: { component: Input, type: 'checkbox', props: emptyO },
+  text: { component: Input, type: 'text', props: emptyO },
+  datetime: { component: Input, type: 'text', props: emptyO },
+  email: { component: Input, type: 'text', props: emptyO },
+  url: { component: Input, type: 'text', props: emptyO },
+  textarea: { component: MarkdownArea, type: 'text', props: { alterSection: 'markdownfield' } },
 }
 const { text: DEFAULT_TYPE } = valTypes
 
@@ -122,7 +39,74 @@ export const getValType = valType => {
 
 const iso2s = new Set(countryBorders.features.map(({ properties: { iso2 } }) => iso2))
 
-export const someEditable = (fields, perm) => fields && Object.keys(fields).some(field => perm && perm.update && perm.update[field])
+const mergeClassnames = (classNames, attributes) => {
+  const className = classNames.join(' ')
+  return attributes == null
+  ? { className }
+  : { ...attributes, className: `${className} ${attributes.className || emptyS}` }
+}
+
+const valuePrepare = memoize((tables, table, valType, activeItems, inactive) => value => {
+  const rep = repr(tables, table, valType, value)
+  if (valType == 'textarea') {return [rep]}
+  if (valType == 'url') {return [rep, { href: rep, target: '_blank' }, 'a']}
+  if (valType == 'email') {
+    const mailLink = rep == null || rep.startsWith('mailto:') ? rep : `mailto:${rep}`
+    return [
+      rep,
+      { href: mailLink, target: '_blank' },
+      'a',
+    ]
+  }
+  const classNames = []
+  if (typeof valType == 'object') {classNames.push('tag')}
+  const className = classNames.join(' ')
+  if (activeItems == null || inactive == null || activeItems.has(value)) {
+    return [
+      rep,
+      classNames.length ? { className } : null,
+    ]
+  }
+  const { disabled, attributes } = inactive
+  if (disabled) {classNames.push('disabled')}
+  return [rep, classNames.length ? mergeClassnames(classNames, attributes) : attributes]
+}, emptyO)
+
+const putElem = ([rep, attributes, elem], i) => {
+  if (i == null && attributes == null && elem == null) {return rep}
+  const r = rep || ''
+  const atts = { ...(attributes || emptyO), key: i }
+  const Elem = elem || 'span'
+  return <Elem {...atts} >{r}</Elem>
+}
+
+export const readonlyValue = memoize((tables, table, valType, multiple, activeItems, inactive, values) => {
+  const prepare = valuePrepare(tables, table, valType, activeItems, inactive)
+  const reps = multiple
+  ? (values || emptyA).map(value => prepare(value)).filter(x => x != null)
+  : prepare(values)
+
+  return multiple
+  ? reps.map((repItem, i) => putElem(repItem, i))
+  : putElem(reps)
+}, emptyO)
+
+export const composeAttributes = memoize((activeItems, inactive) => (value, className) => {
+  const isInactive = activeItems != null && !activeItems.has(value)
+  const { disabled, attributes } = isInactive ? (inactive || emptyO) : emptyO
+  const finalAttributes = className == null
+  ? attributes
+  : attributes == null
+    ? { className }
+    : { ...attributes, className: `${className} ${attributes.className || emptyS}` }
+  return disabled ? mergeClassnames(['disabled'], finalAttributes) : finalAttributes
+}, emptyO)
+
+export const checkDisabled = (activeItems, inactive) => value =>
+  inactive && inactive.disabled && activeItems != null && !activeItems.has(value)
+
+export const someEditable = (fields, perm) =>
+  fields && Object.keys(fields).some(field => perm && perm.update && perm.update[field])
 
 export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
   const { initialValues } = props

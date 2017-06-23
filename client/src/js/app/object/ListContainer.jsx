@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { withParams, emptyA } from 'utils'
+import { combineSelectors, withParams, emptyA } from 'utils'
 import { loadExtra } from 'custom'
 
 import { getTables, needTables, fetchTables, MYIDS } from 'tables'
-import { makeTag } from 'filters'
+import { getFilters, makeTag } from 'filters'
 
 import ListGrid from 'ListGrid'
 import ListPlain from 'ListPlain'
@@ -13,7 +13,7 @@ import ListFilter from 'ListFilter'
 
 class ListContainer extends Component {
   render() {
-    const { props: { tables, table, select, mode, filtered } } = this
+    const { props: { filters, tables, table, select, mode, filtered } } = this
     const complete = mode == 'grid'
     if (needTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA))) {return <div />}
     const { [table]: tableData } = tables
@@ -22,6 +22,8 @@ class ListContainer extends Component {
     const filterTag = makeTag(select, null, null)
     return filtered
     ? <ListFilter
+        filters={filters}
+        tables={tables}
         table={table}
         listIds={listIds}
         perm={perm}
@@ -33,6 +35,9 @@ class ListContainer extends Component {
       />
     : mode == 'list'
       ? <ListPlain
+          alterSection={`list-${table}-${select}`}
+          filters={filters}
+          tables={tables}
           table={table}
           listIds={listIds}
           select={select}
@@ -41,6 +46,9 @@ class ListContainer extends Component {
         />
       : mode == 'grid'
         ? <ListGrid
+            alterSection={`list-${table}-${select}`}
+            filters={filters}
+            tables={tables}
             table={table}
             listIds={listIds}
             select={select}
@@ -61,5 +69,7 @@ class ListContainer extends Component {
   }
 }
 
-export default connect(getTables)(withParams(ListContainer))
+const getInfo = combineSelectors(getTables, getFilters)
+
+export default connect(getInfo)(withParams(ListContainer))
 

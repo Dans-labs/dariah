@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { getTables, needTables, fetchTable, ALLIDS } from 'tables'
 
-import { getActive, PACKAGE_TABLE, TYPE_TABLE } from 'custom'
+import { compileActive, PACKAGE_TABLE, TYPE_TABLE } from 'custom'
 
 import ListGrid from 'ListGrid'
 
@@ -11,7 +11,7 @@ class Overview extends Component {
   render() {
     const { props: { tables } } = this
     if (needTables(tables, [[PACKAGE_TABLE, ALLIDS, true]])) {return <div />}
-    const { activeIdsPkg, activeIdsTyp} = getActive(tables)
+    const { activeIdsPkg, activeIdsTyp} = compileActive(tables)
     return (
       <div className={'overview'} >
         {
@@ -19,7 +19,9 @@ class Overview extends Component {
             const { [table]: tableData } = tables
             return (
                 <ListGrid
+                  alterSection={`list-${table}-${ALLIDS}`}
                   key={table}
+                  tables={tables}
                   table={table}
                   listIds={listIds}
                   select={ALLIDS}

@@ -2,7 +2,7 @@ import React from 'react'
 
 import FieldRead from 'FieldRead'
 
-const ItemRead = ({ eId, fieldFragments }) => (
+const ItemRead = ({ tables, eId, fieldFragments }) => (
   <div>
     <div className={'grid fragments'}>{
       fieldFragments.map(({
@@ -18,6 +18,7 @@ const ItemRead = ({ eId, fieldFragments }) => (
             {
               <FieldRead
                 field={field}
+                tables={tables}
                 table={detailTable}
                 eId={eId}
                 myValues={myValues}

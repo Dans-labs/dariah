@@ -1,5 +1,4 @@
 import update from 'immutability-helper'
-import { createSelector } from 'reselect'
 
 import { accessData } from 'server'
 import { memoize } from 'memo'
@@ -136,39 +135,6 @@ export default makeReducer(flows)
 
 export const getTables = ({ tables }) => ({ tables })
 
-export const getTable = ({ tables }, { table }) => ({ tableData: tables[table] })
-
-export const getTableFilters = ({ tables }, { table }) => {
-  const { [table]: { fields, filterList } } = tables
-  return { fields, filterList }
-}
-
-export const getValueList = ({ tables }, { table, field }) => {
-  const { [table]: { valueLists, fieldSpecs } } = tables
-  const { [field]: { valType } } = fieldSpecs
-  if (valueLists == null) {
-    return { valType, table }
-  }
-  const { [field]: valueList } = valueLists
-  return { valType, valueList, table }
-}
-
-const computeOptions = ({ tables }, { valType, valueList, table }) => {
-  if (valueList == null) {
-    return { options: emptyA, optionLookup: emptyO }
-  }
-  const options = valueList.map(val => ({ value: val, label: repr(tables, table, valType, val) }))
-  const optionLookup = {}
-  options.forEach(({ value: val, label: lab }) => {optionLookup[val] = lab})
-  return { options, optionLookup }
-}
-
-export const getOptions = createSelector(
-  getTables,
-  getValueList,
-  computeOptions,
-)
-
 /* HELPERS */
 
 export const toDb = memoize((table, eId, dispatch) => values => dispatch(modItem(table, eId, values)))
@@ -199,10 +165,10 @@ export const needTables = (tables, tableList) => tableList.some(([table, select 
   needTable(tables, table, select, complete)
 )
 
-export const needValues = ({ tableData, eId }) => (
-  tableData == null
-  || tableData.entities[eId] == null
-  || tableData.entities[eId].fields == null
+export const needValues = (entities, eId) => (
+  entities == null
+  || entities[eId] == null
+  || entities[eId].fields == null
 )
 
 export const listValues = memoize(({ tables, table, eId, field }) => (
@@ -233,18 +199,18 @@ const repUser = memoize((tables, valId) => {
   }
   else {valRep = 'UNKNOWN'}
   return valRep
-})
+}, emptyO)
 
-const repCountry = (tables, valId) => {
+const repCountry = memoize((tables, valId) => {
   const { country: { entities: { [valId]: entity } } } = tables
   if (entity) {
     const { values: { name, iso } } = entity
     return `${iso}: ${name}`
   }
   else {return 'UNKNOWN'}
-}
+}, emptyO)
 
-const repType = (tables, valId) => {
+const repType = memoize((tables, valId) => {
   const { typeContribution: { entities: { [valId]: entity } } } = tables
   if (entity) {
     const { values: { mainType, subType } } = entity
@@ -252,17 +218,18 @@ const repType = (tables, valId) => {
     return `${mainType}${sep}${subType}`
   }
   else {return 'UNKNOWN'}
-}
+}, emptyO)
 
-const repValue = relTable => (tables, valId) => {
-  const { [relTable]: { title, entities: { [valId]: entity } } } = tables
-  const useTitle = title || 'rep'
-  if (entity) {
-    const { values: { [useTitle]: rep } } = entity
-    return rep
-  }
-  else {return 'UNKNOWN'}
-}
+const repValue = relTable =>
+  memoize((tables, valId) => {
+    const { [relTable]: { title, entities: { [valId]: entity } } } = tables
+    const useTitle = title || 'rep'
+    if (entity) {
+      const { values: { [useTitle]: rep } } = entity
+      return rep
+    }
+    else {return 'UNKNOWN'}
+  }, emptyO)
 
 const repMap = {
   user: repUser,

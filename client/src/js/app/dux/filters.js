@@ -2,7 +2,7 @@ import pickBy from 'lodash/pickby'
 
 import { memoize } from 'memo'
 import { makeReducer, updateAuto, emptyS, emptyA, emptyO } from 'utils'
-import { getTables, getTable, repRelated, DETAILS } from 'tables'
+import { repRelated, DETAILS } from 'tables'
 
 /* ACTIONS */
 
@@ -42,36 +42,9 @@ export default makeReducer(flows)
 
 /* SELECTORS */
 
-/* selector computers */
+export const getFilters = ({ filters }) => ({ filters })
 
-const gatherIds = memoize((tableData, listIds, filterFields, fieldSpecs) => {
-  const theseIds = {}
-  const { entities } = tableData
-  const records = listIds.map(eId => entities[eId].values)
-  for (const field of filterFields) {
-    const { [field]: { multiple } } = fieldSpecs
-    const valueSet = new Set()
-    for (const r of records) {
-      const { [field]: val } = r
-      if (val == null) {continue}
-      if (multiple) {for (const v of val) {valueSet.add(v)}}
-      else {valueSet.add(val)}
-    }
-    theseIds[field] = Array.from(new Set(valueSet))
-  }
-  return theseIds
-}, emptyO, { debug: 'gatherIds' })
-
-const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField) => {
-  const { [filterField]: { valType } } = fieldSpecs
-  if (fieldIds == null) {return emptyO}
-  const fieldValues = {[emptyS]: '-none-'}
-  const { values: relTable } = valType
-  fieldIds.forEach(_id => {
-    fieldValues[_id] = repRelated(tables, relTable, _id)
-  })
-  return fieldValues
-}, emptyO, { debug: 'gatherValues' })
+/* HELPERS */
 
 const compileFieldIds = memoize((tableData, filterTag, listIds) => {
   if (tableData == null) {return emptyO}
@@ -84,6 +57,14 @@ const compileFieldIds = memoize((tableData, filterTag, listIds) => {
   ? gatherIds(tableData, listIds, filterFields, fieldSpecs)
   : pickBy(valueLists, (value, key) => filterFields.includes(key))
 }, emptyO, { debug: 'compileFieldIds' })
+
+export const compileValues = memoize((tables, table, filterTag, listIds, filterField) => {
+  const { [table]: tableData } = tables
+  if (tableData == null) {return emptyA}
+  const { fieldSpecs } = tableData
+  const fieldIds = compileFieldIds(tableData, filterTag, listIds)[filterField]
+  return gatherValues(tables, fieldSpecs, fieldIds, filterField)
+}, emptyO, { debug: 'compileValues' })
 
 const initFilterSettings = memoize((tableData, filterData, filterTag, fieldIds) => {
   if (tableData == null) {return emptyO}
@@ -110,10 +91,17 @@ const initFilterSettings = memoize((tableData, filterData, filterTag, fieldIds) 
   return newFilterSettings
 }, emptyO, { debug: 'initFilterSettings' })
 
-const computeFiltering = memoize((tables, table, listIds, fieldIds, filterSettings) => {
-  if (filterSettings == null) {return emptyO}
-  const { [table]: { entities, fields, fieldSpecs, filterList } } = tables
+export const computeFiltering = memoize((tables, filters, table, filterTag, listIds) => {
+  const { [table]: tableData } = tables
+  if (tableData == null) {return emptyO}
+  const { entities, fields, fieldSpecs, filterList } = tableData
   if (filterList == null) {return { filteredIds: listIds }}
+
+  const { [table]: filterData = emptyO } = filters
+  const { [filterTag]: filterSettings } = filterData
+  if (filterSettings == null) {return emptyO}
+
+  const fieldIds = compileFieldIds(tableData, filterTag, listIds)
   const presentFilterList = filterList.filter(x => fields[x.field])
 
   const filterChecks = {}
@@ -176,42 +164,34 @@ const computeFiltering = memoize((tables, table, listIds, fieldIds, filterSettin
   }
 }, emptyO, { debug: 'computeFiltering' })
 
-/* selectors for export */
-
-export const getFieldValues = (state, { table, filterTag, listIds, filterField }) => {
-  const { tables } = getTables(state)
-  const { tableData } = getTable(state, { table })
-  if (tableData == null) {return emptyO}
-  const { fieldSpecs } = tableData
-  const fieldIds = compileFieldIds(tableData, filterTag, listIds)[filterField]
-
-  return { fieldValues: gatherValues(tables, fieldSpecs, fieldIds, filterField) }
-}
-
-export const getFilterSetting = ({ filters }, { table, filterTag, filterId }) => {
-  const { [table]: filterData } = filters
-  if (filterData == null) {return emptyO}
-  const { [filterTag]: filterSettings = emptyO } = filterData
-  const { [filterId]: filterSetting } = filterSettings
-  return { filterSetting }
-}
-
-export const getFiltersApplied = (state, { table, filterTag, listIds }) => {
-  const { tableData } = getTable(state, { table })
-  const { filters: { [table]: filterData = emptyO } } = state
-  if (tableData == null) {return emptyO}
-  const fieldIds = compileFieldIds(tableData, filterTag, listIds)
-  const { [filterTag]: filterSettings } = filterData
-  if (filterSettings == null) {return { tableData }}
-  const { tables } = getTables(state)
-  return {
-    tableData,
-    filterSettings,
-    ...computeFiltering(tables, table, listIds, fieldIds, filterSettings),
+const gatherIds = memoize((tableData, listIds, filterFields, fieldSpecs) => {
+  const theseIds = {}
+  const { entities } = tableData
+  const records = listIds.map(eId => entities[eId].values)
+  for (const field of filterFields) {
+    const { [field]: { multiple } } = fieldSpecs
+    const valueSet = new Set()
+    for (const r of records) {
+      const { [field]: val } = r
+      if (val == null) {continue}
+      if (multiple) {for (const v of val) {valueSet.add(v)}}
+      else {valueSet.add(val)}
+    }
+    theseIds[field] = Array.from(new Set(valueSet))
   }
-}
+  return theseIds
+}, emptyO, { debug: 'gatherIds' })
 
-/* HELPERS */
+const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField) => {
+  const { [filterField]: { valType } } = fieldSpecs
+  if (fieldIds == null) {return emptyO}
+  const fieldValues = {[emptyS]: '-none-'}
+  const { values: relTable } = valType
+  fieldIds.forEach(_id => {
+    fieldValues[_id] = repRelated(tables, relTable, _id)
+  })
+  return fieldValues
+}, emptyO, { debug: 'gatherValues' })
 
 export const makeTag = (select, masterId, linkField) => masterId == null
 ? select

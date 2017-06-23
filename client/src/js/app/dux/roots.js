@@ -2,8 +2,9 @@ import { combineReducers, createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import { reducer as form } from 'redux-form'
 
+import server from 'server'
 import win from 'win'
-import notify from 'notify'
+import notes from 'notes'
 import docs from 'docs'
 import tables from 'tables'
 import me from 'me'
@@ -55,8 +56,9 @@ const configureStore = reducer => {
 /* REDUCER */
 
 export default configureStore(combineReducers({
+  server,
   win,
-  notify,
+  notes,
   docs,
   tables,
   me,

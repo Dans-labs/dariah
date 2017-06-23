@@ -1,18 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { combineSelectors, emptyA } from 'utils'
+import { emptyA } from 'utils'
 
-import { getTables, DETAILS } from 'tables'
+import { DETAILS } from 'tables'
 import { makeTag } from 'filters'
-import { getAlts, makeAlt } from 'alter'
+import { getAltSection, compileAlternatives } from 'alter'
 
 import ListGrid from 'ListGrid'
 import ListPlain from 'ListPlain'
 import ListFilter from 'ListFilter'
 
-const ItemDetails = ({ tables, table, eId, ...props }) => {
+const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, dispatch }) => {
   const { [table]: { details, detailOrder } } = tables
+  const makeAlternatives = compileAlternatives(alterSection, 2, 1, dispatch)
   return (
     <div>
       {
@@ -29,8 +30,8 @@ const ItemDetails = ({ tables, table, eId, ...props }) => {
           const detailListIds = detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
           const filterTag = makeTag(DETAILS, eId, linkField)
           const gridTag = `${table}-${name}-${eId}`
-          const alterTag = `${DETAILS}-${table}-${eId}-${name}`
-          const { alt } = makeAlt(props, { alterTag, nAlts: 2, initial: 1 })
+          const { getAlt } = makeAlternatives(name)
+          const alt = getAlt(alter)
           return (
             <div key={name}>
               {
@@ -38,6 +39,8 @@ const ItemDetails = ({ tables, table, eId, ...props }) => {
                 ? filtered
                   ? <ListFilter
                       heading={label}
+                      filters={filters}
+                      tables={tables}
                       table={detailTable}
                       listIds={detailListIds}
                       perm={detailPerm}
@@ -51,7 +54,10 @@ const ItemDetails = ({ tables, table, eId, ...props }) => {
                     />
                   : mode == 'list'
                     ? <ListPlain
+                        alterSection={`list-${detailTable}-${eId}`}
                         heading={label}
+                        filters={filters}
+                        tables={tables}
                         table={detailTable}
                         listIds={detailListIds}
                         perm={detailPerm}
@@ -61,7 +67,10 @@ const ItemDetails = ({ tables, table, eId, ...props }) => {
                       />
                     : mode == 'grid'
                       ? <ListGrid
+                          alterSection={`list-${detailTable}-${eId}`}
                           heading={label}
+                          filters={filters}
+                          tables={tables}
                           table={detailTable}
                           listIds={detailListIds}
                           perm={detailPerm}
@@ -80,7 +89,5 @@ const ItemDetails = ({ tables, table, eId, ...props }) => {
   )
 }
 
-const getInfo = combineSelectors(getTables, getAlts)
-
-export default connect(getInfo)(ItemDetails)
+export default connect(getAltSection)(ItemDetails)
 

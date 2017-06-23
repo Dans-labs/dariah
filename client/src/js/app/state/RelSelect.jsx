@@ -1,15 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
+
 import { memoize } from 'memo'
-import { combineSelectors, emptyS, emptyO } from 'utils'
+import { emptyS, emptyO } from 'utils'
 import { handle, handlEV } from 'handle'
+import { composeAttributes, checkDisabled } from 'fields'
 
-import { getSelect, setSearch, setPopUp, togglePopUp } from 'select'
-import { getOptions } from 'tables'
+import { getSelect, compileOptions, setSearch, setPopUp, togglePopUp } from 'select'
 
-const RelOption = ({ label, xClass, selected, onHit }) => (
+const RelOption = ({ label, attributes, selected, onHit }) => (
   <p
-    className={`tag option ${xClass} ${selected ? 'selected' : emptyS}`}
+    {...attributes}
     onClick={selected ? null : onHit}
   >{label}</p>
 )
@@ -42,49 +43,53 @@ const changeSel = memoize((selectTag, multiple, value, val, onChange, dispatch) 
   }
 })
 
-const Tags = ({ selectTag, optionLookup, optionStyle, value, onChange, dispatch }) => (
-  <div
-    className={'tags'}
-    onClick={handle(dispatch, togglePopUp, selectTag)}
-  >
-    {
-      (value != null && value.length)
-      ? value.map(
-          val => {
-            const { [val]: lab = val } = optionLookup
-            const { [val]: xClass = emptyS } = optionStyle
-            return (
-              <span
-                key={val}
-                className={'tag'}
-              >
+const Tags = ({ selectTag, optionLookup, activeItems, inactive, value, onChange, dispatch }) => {
+  const makeAttributes = composeAttributes(activeItems, inactive)
+  return (
+    <div
+      className={'tags'}
+      onClick={handle(dispatch, togglePopUp, selectTag)}
+    >
+      {
+        (value != null && value.length)
+        ? value.map(
+            val => {
+              const { [val]: lab = val } = optionLookup
+              const attributes = makeAttributes(val, 'tag')
+              return (
                 <span
-                  className={`button-tag ${xClass}`}
-                  onClick={removeVal(value, onChange, val)}
-                >{'×'}</span>{' '}
-                <span>{lab}</span>
-              </span>
-            )
-          }
-        )
-      : <span className={'tag empty'}>{'click to enter values'}</span>
-    }
-  </div>
-)
+                  key={val}
+                  {...attributes}
+                >
+                  <span
+                    className={`button-tag`}
+                    onClick={removeVal(value, onChange, val)}
+                  >{'×'}</span>{' '}
+                  <span>{lab}</span>
+                </span>
+              )
+            }
+          )
+        : <span className={'tag empty'}>{'click to enter values'}</span>
+      }
+    </div>
+  )
+}
 
-const Head = ({ optionLookup, optionStyle, value, selectTag, dispatch }) => {
+const Head = ({ optionLookup, value, activeItems, inactive, selectTag, dispatch }) => {
+  const makeAttributes = composeAttributes(activeItems, inactive)
   let label = emptyS
   const { [value]: lab = value } = optionLookup
-  const { [value]: xClass = emptyS } = optionStyle
   label = lab
-  const classes = ['option-head', 'tag', xClass]
+  const classes = ['option-head', 'tag']
   if (value == emptyS) {
     label = 'click to enter a value'
     classes.push('new')
   }
+  const attributes = makeAttributes(value, classes.join(' '))
   return (
     <span
-      className={classes.join(' ')}
+      {...attributes}
       onClick={handle(dispatch, togglePopUp, selectTag)}
     >{label}</span>
   )
@@ -111,8 +116,15 @@ const Typing = ({ selectTag, search, dispatch }) => (
   </span>
 )
 
-const Options = ({ selectTag, optionLookup, optionStyle, multiple, allowNew, options, value, onChange, search, dispatch }) => {
+const Options = ({
+  selectTag, optionLookup, options,
+  activeItems, inactive,
+  multiple, allowNew,
+  value, onChange, search, dispatch,
+}) => {
   const pat = search.toLowerCase()
+  const makeAttributes = composeAttributes(activeItems, inactive)
+  const testDisabled = checkDisabled(activeItems, inactive)
   return (
     <div className={'options'} >
       {
@@ -133,14 +145,16 @@ const Options = ({ selectTag, optionLookup, optionStyle, multiple, allowNew, opt
           if (
             (!multiple || !value.includes(val))
             && (pat == null || pat == emptyS || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
+            && !testDisabled(val)
           ) {
-            const { [val]: xClass = emptyS } = optionStyle
+            const selected = (multiple && value.includes(val)) || (!multiple && value == val)
+            const attributes = makeAttributes(val, `tag option ${selected ? 'selected' : emptyS}`)
             return (
               <RelOption
                 key={val}
                 label={lab}
-                xClass={xClass}
-                selected={(multiple && value.includes(val)) || (!multiple && value == val)}
+                attributes={attributes}
+                selected={selected}
                 onHit={changeSel(selectTag, multiple, value, val, onChange, dispatch)}
               />
             )
@@ -155,60 +169,67 @@ const Options = ({ selectTag, optionLookup, optionStyle, multiple, allowNew, opt
 }
 
 const RelSelect = ({
-  selectTag, options, optionLookup, optionStyle = emptyO,
+  tables, table,
+  field, selectTag,
+  activeItems, inactive,
   input: { value, onChange },
-  multiple, allowNew, popUp, search, dispatch,
-}) => (
-  <div
-    className={`select ${multiple ? 'multiselect' : emptyS}`}
-  >
-    {
-      multiple
-      ? <Tags
-          optionLookup={optionLookup}
-          optionStyle={optionStyle}
-          value={value}
-          selectTag={selectTag}
-          dispatch={dispatch}
-          onChange={onChange}
-        />
-      : <Head
-          optionLookup={optionLookup}
-          optionStyle={optionStyle}
-          value={value}
-          popUp={popUp}
-          selectTag={selectTag}
-          dispatch={dispatch}
-        />
-    }
-    {
-      popUp
-      ? <Typing
-          selectTag={selectTag}
-          search={search}
-          dispatch={dispatch}
-        />
-      : null
-    }
-    {
-      popUp
-      ? <Options
-          selectTag={selectTag}
-          optionLookup={optionLookup}
-          optionStyle={optionStyle}
-          options={options}
-          multiple={multiple}
-          allowNew={allowNew}
-          value={value}
-          search={search}
-          dispatch={dispatch}
-          onChange={onChange}
-        />
-      : null
-    }
-  </div>
-)
+  multiple, allowNew, select, dispatch,
+}) => {
+  const { [selectTag]: { search, popUp } = emptyO } = select
+  const { options, optionLookup } = compileOptions(tables, table, field)
+  return (
+    <div
+      className={`select ${multiple ? 'multiselect' : emptyS}`}
+    >
+      {
+        multiple
+        ? <Tags
+            optionLookup={optionLookup}
+            activeItems={activeItems}
+            inactive={inactive}
+            value={value}
+            selectTag={selectTag}
+            dispatch={dispatch}
+            onChange={onChange}
+          />
+        : <Head
+            optionLookup={optionLookup}
+            activeItems={activeItems}
+            inactive={inactive}
+            value={value}
+            popUp={popUp}
+            selectTag={selectTag}
+            dispatch={dispatch}
+          />
+      }
+      {
+        popUp
+        ? <Typing
+            selectTag={selectTag}
+            search={search}
+            dispatch={dispatch}
+          />
+        : null
+      }
+      {
+        popUp
+        ? <Options
+            selectTag={selectTag}
+            optionLookup={optionLookup}
+            options={options}
+            activeItems={activeItems}
+            inactive={inactive}
+            multiple={multiple}
+            allowNew={allowNew}
+            value={value}
+            search={search}
+            dispatch={dispatch}
+            onChange={onChange}
+          />
+        : null
+      }
+    </div>
+  )
+}
 
-const getSelectOptions = combineSelectors(getOptions, getSelect)
-
-export default connect(getSelectOptions)(RelSelect)
+export default connect(getSelect)(RelSelect)

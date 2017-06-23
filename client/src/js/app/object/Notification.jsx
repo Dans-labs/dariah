@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { emptyS } from 'utils'
 
-import { getNotifications, clear, display } from 'notify'
+import { getNotes, compileNotifications, clear, display } from 'notes'
 
 class Notification extends Component {
   constructor(props) {
@@ -27,7 +27,9 @@ class Notification extends Component {
   }
 
   render() {
-    const { props: { notifications, lastNote, lastKind, busy, show } } = this
+    const { props: { notes } } = this
+    const { messages, lastNote, lastKind, busy, show } = compileNotifications(notes)
+
     const highlight = lastNote > -1
     const busyBlocks = new Array(busy < 0 ? 0 : busy).fill(1)
     return (
@@ -51,7 +53,7 @@ class Notification extends Component {
               className={'msg-box'}
               onClick={this.handleHide}
             >{
-              (notifications).map((msg, i) => (
+              messages.map((msg, i) => (
                 <p
                   key={i}
                   ref={this.refDom(`m${i}`)}
@@ -98,4 +100,4 @@ class Notification extends Component {
   }
 }
 
-export default connect(getNotifications)(Notification)
+export default connect(getNotes)(Notification)

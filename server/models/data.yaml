@@ -309,9 +309,10 @@ tables:
           values: typeContribution
           allowNew: false
           inactive:
-            className: inactive
-            title: this value does not belong to the current package
-            disable: true
+            attributes:
+              className: inactive
+              title: this value does not belong to the current package
+            disabled: true
         multiple: false
       typeContributionOther:
         label: Type
@@ -438,6 +439,11 @@ tables:
         valType:
           values: typeContribution
           allowNew: true
+          inactive:
+            attributes:
+              className: inactive
+              title: this value does not belong to the current package
+            disabled: false
         multiple: true
       notes:
         label: Notes
@@ -499,6 +505,11 @@ tables:
         valType:
           values: typeContribution
           allowNew: true
+          inactive:
+            attributes:
+              className: inactive
+              title: this value does not belong to the current package
+            disabled: true
         multiple: true
       criterion:
         label: Criterion

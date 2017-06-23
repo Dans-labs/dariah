@@ -3,7 +3,7 @@ import padEnd from 'lodash/padend'
 
 import { emptyA } from 'utils'
 
-import { memoize } from 'memo.js'
+import { memoize, makeSet } from 'memo.js'
 
 /* memoizeOld and memoize
  * Store results in cache, retrieve results
@@ -244,6 +244,22 @@ const testCacheInvalidation = () => {
 
 const testLogic = () => {
   describe('Logic', () => {
+    describe('null arguments', () => {
+      const f = x => x == null ? -1 : x.count + 1
+      const memF = memoize(f, {})
+      it('pass ordinary argument to memF', () => {
+        assert.equal(memF({count: 3}), 4, 'ordinary')
+      })
+      it('pass null argument to memF', () => {
+        assert.equal(memF(null), -1, 'null')
+      })
+      it('call again with null argument to memF', () => {
+        assert.equal(memF(null), -1, 'null again')
+        const { computed, retrieved } = memF()
+        assert.equal(computed, 2, 'computed check')
+        assert.equal(retrieved, 1, 'retrieved check')
+      })
+    })
     const getItem = (tables, table, eid) => tables[table][eid]
     const f = memoize(getItem, {})
     const tables = {
@@ -374,11 +390,41 @@ const testLogic = () => {
   })
 }
 
+const testMakeSet = () => {
+  describe('run makeSet twice and check object identity', () => {
+    const data1 = { x: 1, y: 2, z: 3 }
+    const data2 = { x: 1, y: 2, z: 3 }
+    const keys1 = Object.keys(data1)
+    const keys2 = Object.keys(data2)
+    const keys3 = Object.keys(data2)
+    const mkeys1 = makeSet(Object.keys(data1))
+    const mkeys2 = makeSet(Object.keys(data2))
+    const mkeys3 = makeSet(Object.keys(data2))
+    describe('without makeSet, key sets have different identity', () => {
+      it('keys of different objects', () => {
+        assert.equal(keys1 === keys2, false, 'data1 and data2')
+      })
+      it('twice the keys of the same object', () => {
+        assert.equal(keys2 === keys3, false, '2 x data2')
+      })
+    })
+    describe('with makeSet, key sets have same identity', () => {
+      it('keys of different objects', () => {
+        assert.equal(mkeys1 === mkeys2, true, 'data1 and data2')
+      })
+      it('twice the keys of the same object', () => {
+        assert.equal(mkeys2 === mkeys3, true, '2 x data2')
+      })
+    })
+  })
+}
+
 describe('Memoize', () => {
   testSeparation()
   testPerformance()
   testFunctionArgs()
   testCacheInvalidation()
   testLogic()
+  testMakeSet()
 })
 

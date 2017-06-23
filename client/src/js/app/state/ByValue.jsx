@@ -1,34 +1,37 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { combineSelectors } from 'utils'
-import { getFieldValues } from 'filters'
-import { getAlts, makeAlt } from 'alter'
+import { compileValues } from 'filters'
+import { getAltSection, compileAlternatives } from 'alter'
 
 import Facet from 'Facet'
 import CheckboxI from 'CheckboxI'
 import Stat from 'Stat'
 
 const ByValue = ({
-  table, filterTag,
-  filterId, filterLabel,
-  fieldValues,
+  alter, alterSection, tables, table,
+  filterTag, filterSetting,
+  filterId, filterField, filterLabel,
+  listIds,
   filteredAmount, filteredAmountOthers,
   amounts, maxCols,
   expanded,
-  ...props
+  dispatch,
 }) => {
+  const fieldValues = compileValues(tables, table, filterTag, listIds, filterField)
   if (Object.keys(fieldValues).length == null) {
     return <div className={'facet'} ><p>{' -no facets '}</p></div>
   }
-  const alterTag = `${table}-${filterId}`
-  const { alt, nextAlt } = makeAlt(props, { alterTag, nAlts: 2, initial: expanded ? 0 : 1 })
+  const initial = expanded ? 0 : 1
+  const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, initial, dispatch)('expand')
+  const alt = getAlt(alter)
   return (
     <div className={'facet'} >
       <p className={'facet'} >
         <CheckboxI
           table={table}
           filterId={filterId}
+          filterSetting={filterSetting}
           filterTag={filterTag}
         /> {filterLabel}{' '}
         <Stat
@@ -54,6 +57,7 @@ const ByValue = ({
                   <Facet
                     className={'facet-value'}
                     table={table}
+                    filterSetting={filterSetting}
                     filterTag={filterTag}
                     filterId={filterId}
                     valueId={valueId}
@@ -73,6 +77,4 @@ const ByValue = ({
   )
 }
 
-const getInfo = combineSelectors(getFieldValues, getAlts)
-
-export default connect(getInfo)(ByValue)
+export default connect(getAltSection)(ByValue)

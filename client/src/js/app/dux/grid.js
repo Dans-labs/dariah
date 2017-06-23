@@ -1,9 +1,10 @@
 import orderBy from 'lodash/orderby'
 import mapValues from 'lodash/mapvalues'
-import createCachedSelector from 're-reselect'
+
+import { memoize } from 'memo'
 import { makeReducer, emptyA, emptyO } from 'utils'
 
-import { getTables, repr } from 'tables'
+import { repr } from 'tables'
 
 /* ACTIONS */
 
@@ -36,7 +37,18 @@ export default makeReducer(flows, emptyO)
 
 /* SELECTORS */
 
-/* selector computers */
+export const getGrid = ({ grid }) => ({ grid })
+
+/* HELPERS */
+
+export const compileSortedData = memoize((tables, table, listIds, sortSpec) => {
+  const sortColumns = sortSpec.map(x => x[0])
+  const sortDirs = sortSpec.map(x => x[1] == 1 ? 'asc' : 'desc')
+  const { [table]: { entities } } = tables
+  const r = reprX(tables, table)
+  const fullData = listIds.map(_id => mapValues(entities[_id].values, r))
+  return orderBy(fullData, sortColumns, sortDirs).map(x => x._id)
+}, emptyO)
 
 const reprX = (tables, table) => {
   const { [table]: { fieldSpecs } } = tables
@@ -49,25 +61,5 @@ const reprX = (tables, table) => {
   }
 }
 
-const sortData = ({ tables }, { table, listIds, sortSpec }) => {
-  const sortColumns = sortSpec.map(x => x[0])
-  const sortDirs = sortSpec.map(x => x[1] == 1 ? 'asc' : 'desc')
-  const { [table]: { entities } } = tables
-  const r = reprX(tables, table)
-  const fullData = listIds.map(_id => mapValues(entities[_id].values, r))
-  return { sortedData: orderBy(fullData, sortColumns, sortDirs).map(x => x._id) }
-}
-
-/* selectors for export */
-
-export const getSort = ({ grid }, { table, gridTag, listIds }) => ({ table, gridTag, listIds, sortSpec: grid[gridTag] || emptyA })
-
-export const getSortedData = createCachedSelector(
-  getTables,
-  getSort,
-  sortData,
-)((state, { gridTag }) => gridTag)
-
-/* HELPERS */
 
 

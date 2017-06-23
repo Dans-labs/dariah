@@ -6,7 +6,7 @@ import { Link } from 'react-router'
 import { combineSelectors } from 'utils'
 
 import { getDoc, needDoc, changedDoc, fetchDoc } from 'docs'
-import { getAlts, makeAlt } from 'alter'
+import { getAltSection, compileAlternatives } from 'alter'
 
 const RouterLink = ({ children, href }) => (
   href.match(/^(https?:)?\/\//)
@@ -17,14 +17,13 @@ const renderers = { Link: RouterLink }
 
 class DocMd extends Component {
   render() {
-    const {props, props: { docName, text } } = this
+    const { props: { alter, alterSection, text, docName, dispatch } } = this
+
     if (needDoc({ text })) {return <div>{`No document ${docName}`}</div>}
 
-    const { alt, nextAlt } = makeAlt(props, {
-      alterTag: docName,
-      nAlts: 2,
-      initial: 0,
-    })
+    const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 0, dispatch)('format')
+    const alt = getAlt(alter)
+
     return (
       <div style={{paddingLeft: '0.5em'}} >
         <p style={{float: 'right'}} >
@@ -62,6 +61,6 @@ class DocMd extends Component {
   }
 }
 
-const getInfo = combineSelectors(getDoc, getAlts)
+const getInfo = combineSelectors(getDoc, getAltSection)
 
 export default connect(getInfo)(DocMd)
