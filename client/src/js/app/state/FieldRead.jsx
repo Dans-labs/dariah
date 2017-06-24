@@ -13,7 +13,9 @@ const FieldRead = ({ field, tables, table, myValues }) => {
   const rep = readonlyValue(tables, table, valType, multiple, activeItems, inactive, myValues)
 
   return valType == 'textarea'
-  ? <Markdown source={rep} />
+  ? multiple
+    ? <div>{rep.map((r, i) => <Markdown key={i} source={r} />)}</div>
+    : <Markdown source={rep} />
   : <span>{rep}</span>
 }
 

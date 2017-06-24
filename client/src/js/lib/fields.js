@@ -1,3 +1,5 @@
+import pickBy from 'lodash/pickby'
+
 import React from 'react'
 
 import { memoize } from 'memo'
@@ -85,6 +87,12 @@ export const readonlyValue = memoize((tables, table, valType, multiple, activeIt
   const reps = multiple
   ? (values || emptyA).map(value => prepare(value)).filter(x => x != null)
   : prepare(values)
+
+  if (valType == 'textarea') {
+    return multiple
+    ? reps.map(repItem => repItem[0])
+    : reps[0]
+  }
 
   return multiple
   ? reps.map((repItem, i) => putElem(repItem, i))
@@ -179,6 +187,13 @@ export const sortTimeInterval = (startField, endField) => (a, b) => {
     ? 0
     : 1
 }
+
+export const dealWithProvenance = memoize((settings, fields) => {
+  const { provenanceFields, hideProvenance } = settings
+  return hideProvenance
+  ? pickBy(fields, (value, key) => !provenanceFields.has(key))
+  : fields
+})
 
 export const validation = {
   datetime(val) {

@@ -2,7 +2,7 @@ import pickBy from 'lodash/pickby'
 
 import { memoize } from 'memo'
 import { makeReducer, updateAuto, emptyS, emptyA, emptyO } from 'utils'
-import { repRelated, DETAILS } from 'tables'
+import { entityHead, DETAILS } from 'tables'
 
 /* ACTIONS */
 
@@ -188,7 +188,7 @@ const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField) => {
   const fieldValues = {[emptyS]: '-none-'}
   const { values: relTable } = valType
   fieldIds.forEach(_id => {
-    fieldValues[_id] = repRelated(tables, relTable, _id)
+    fieldValues[_id] = entityHead(tables, relTable, _id)
   })
   return fieldValues
 }, emptyO, { debug: 'gatherValues' })
@@ -223,14 +223,14 @@ const getUnpack = (tables, fieldSpec, asString = false) => {
     ? asString
       ? v => v == null
         ? emptyS
-        : v.map(v => repRelated(tables, relTable, v).join(' '))
+        : v.map(v => entityHead(tables, relTable, v).join(' '))
     : v => v == null
       ? emptyA
       : v
   : asString
     ? v => v == null
       ? emptyS
-      : repRelated(tables, relTable, v)
+      : entityHead(tables, relTable, v)
     : v => v == null
       ? emptyA
       : [v]

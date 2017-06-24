@@ -81,6 +81,12 @@ tables:
     update: office
     insert: office
     delete: office
+  score:
+    list:   public
+    read:   public
+    update: office
+    insert: office
+    delete: office
   user:
     list:   public
     read:   own
@@ -166,7 +172,7 @@ fields:
       list: public
       read: public
       update: office
-    notes:
+    remarks:
       list: public
       read: public
       update: office
@@ -200,7 +206,45 @@ fields:
       list: public
       read: public
       update: office
-    notes:
+    remarks:
+      list: public
+      read: public
+      update: office
+    creator:
+      list: office
+      read: office
+      update: system
+    dateCreated:
+      list: office
+      read: office
+      update: system
+    modified:
+      list: office
+      read: office
+      update: system
+
+  score:
+    key:
+      list: public
+      read: public
+      update: office
+    level:
+      list: public
+      read: public
+      update: office
+    score:
+      list: public
+      read: public
+      update: office
+    description:
+      list: public
+      read: public
+      update: office
+    criteria:
+      list: public
+      read: public
+      update: office
+    remarks:
       list: public
       read: public
       update: office

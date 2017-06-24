@@ -5,7 +5,7 @@ import { memoize } from 'memo'
 import { emptyS, emptyO } from 'utils'
 import { someEditable } from 'fields'
 
-import { insertItem, needValues } from 'tables'
+import { insertItem, needValues, entityHead } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
 
 import { EditStatus } from 'EditControls'
@@ -39,7 +39,7 @@ class ListPlain extends Component {
   }
 
   render() {
-    const { props: { alter, alterSection, filters, tables, table, listIds, perm, title, dispatch } } = this
+    const { props: { alter, alterSection, filters, tables, table, listIds, perm, dispatch } } = this
     const { [table]: { entities } } = tables
     const nItemsRep = `${listIds.length} item${listIds.length == 1 ? emptyS : 's'} `
     const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
@@ -59,8 +59,8 @@ class ListPlain extends Component {
         </div>
         {
           listIds.map(eId => {
-            const { [eId]: { values, fields, perm } } = entities
-            const { [title]: entityHead = '-empty-' } = values
+            const { [eId]: { fields, perm } } = entities
+            const head = entityHead(tables, table, eId)
             const formTag = `${table}-${eId}`
             const isComplete = !needValues(entities, eId)
             const { getAlt, nextAlt } = makeAlternatives(eId)
@@ -82,7 +82,7 @@ class ListPlain extends Component {
                   }
                   <span className={'link head'} onClick={nextAlt} >
                     <span className={`fa fa-angle-${active ? 'up' : 'down'}`} />
-                    {' '}{entityHead}
+                    {' '}{head}
                   </span>
                 </span>
                 {

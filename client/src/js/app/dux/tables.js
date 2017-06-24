@@ -185,9 +185,17 @@ const repUser = memoize((tables, valId) => {
   let valRep
   const { user: { entities: { [valId]: entity } } } = tables
   if (entity) {
-    const { values: { eppn, firstName, lastName, emailPre, authority, mayLogin } } = entity
-    const email = emailPre || emptyS
-    let linkText = [firstName || emptyS, lastName || emptyS].filter(x => x).join(' ')
+    const {
+      values: {
+        eppn = emptyS,
+        firstName = emptyS,
+        lastName = emptyS,
+        email = emptyS,
+        authority,
+        mayLogin,
+      },
+    } = entity
+    let linkText = [firstName, lastName].filter(x => x).join(' ')
     if (linkText == emptyS) {linkText = email}
     const namePart = linkText && email
     ? `[${linkText}](mailto:${email})`
@@ -220,12 +228,24 @@ const repType = memoize((tables, valId) => {
   else {return 'UNKNOWN'}
 }, emptyO)
 
+const repScore = memoize((tables, valId) => {
+  let valRep
+  const { score: { entities: { [valId]: entity } } } = tables
+  if (entity) {
+    const { values: { score = 'N/A', level = 'N/A', description = emptyS } } = entity
+    valRep = (score || level)
+    ? `${score} - ${level}`
+    : description
+  }
+  else {valRep = 'UNKNOWN'}
+  return valRep
+}, emptyO)
+
 const repValue = relTable =>
   memoize((tables, valId) => {
-    const { [relTable]: { title, entities: { [valId]: entity } } } = tables
-    const useTitle = title || 'rep'
+    const { [relTable]: { title = 'rep', entities: { [valId]: entity } } } = tables
     if (entity) {
-      const { values: { [useTitle]: rep } } = entity
+      const { values: { [title]: rep } } = entity
       return rep
     }
     else {return 'UNKNOWN'}
@@ -235,10 +255,12 @@ const repMap = {
   user: repUser,
   country: repCountry,
   typeContribution: repType,
+  score: repScore,
   default: repValue,
 }
 
-export const repRelated = (tables, relTable, valId) => (repMap[relTable] || repMap.default(relTable))(tables, valId)
+export const entityHead = (tables, relTable, valId) =>
+  (repMap[relTable] || repMap.default(relTable))(tables, valId)
 
 const trimDate = text => (text == null ? emptyS : text.replace(/\.[0-9]+/, emptyS))
 
@@ -253,7 +275,7 @@ export const repr = (tables, table, valType, value) => {
   }
   else {
     const { values: relTable } = valType
-    return repRelated(tables, relTable, value)
+    return entityHead(tables, relTable, value)
   }
 }
 

@@ -2,14 +2,16 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { emptyO } from 'utils'
+import { dealWithProvenance } from 'fields'
 
+import { getSettings } from 'settings'
 import { needValues, fetchItem } from 'tables'
 
 import ItemForm from 'ItemForm'
 
 class ItemContainer extends Component {
   render() {
-    const { props: { filters, tables, table, eId } } = this
+    const { props: { settings, filters, tables, table, eId } } = this
     const {
       [table]: {
           entities = emptyO,
@@ -33,7 +35,7 @@ class ItemContainer extends Component {
         key={`${table}-${eId}`}
         initialValues={initialValues}
         perm={perm}
-        fields={fields}
+        fields={dealWithProvenance(settings, fields)}
       />
     )
   }
@@ -49,4 +51,4 @@ class ItemContainer extends Component {
   }
 }
 
-export default connect()(ItemContainer)
+export default connect(getSettings)(ItemContainer)

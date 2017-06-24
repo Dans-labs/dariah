@@ -4,16 +4,19 @@ import { connect } from 'react-redux'
 import { combineSelectors, emptyS, emptyA } from 'utils'
 import { handle } from 'handle'
 
+import { getSettings } from 'settings'
 import { getAltSection, compileAlternatives } from 'alter'
 import { getGrid, compileSortedData, resetSort, addColumn, turnColumn, delColumn } from 'grid'
 import { insertItem } from 'tables'
+
+import { dealWithProvenance } from 'fields'
 
 import ItemRow from 'ItemRow'
 
 const ListGrid = ({
   alter, alterSection,
   heading,
-  filters, tables, table, listIds, select, perm: tablePerm,
+  settings, filters, tables, table, listIds, select, perm: tablePerm,
   masterId, linkField,
   grid, gridTag,
   dispatch,
@@ -21,8 +24,9 @@ const ListGrid = ({
   const { [gridTag]: sortSpec = emptyA } = grid
   const theHeading = heading ? `${heading}: ` : emptyS
   const { [table]: tableData } = tables
-  const { fields, fieldOrder, fieldSpecs, detailOrder, entities } = tableData
-  const xfields = fields
+  const { fields: givenFields, fieldOrder: givenFieldOrder, fieldSpecs, detailOrder, entities } = tableData
+  const fields = dealWithProvenance(settings, givenFields)
+  const fieldOrder = givenFieldOrder.filter(field => fields[field])
   const { length: nFields } = fieldOrder
   const nDetails = detailOrder != null ? detailOrder.length : 0
   const avLength = `${90 / nFields}%`
@@ -62,7 +66,7 @@ const ListGrid = ({
         eId={eId}
         initialValues={initialValues}
         perm={perm}
-        fields={xfields}
+        fields={fields}
         widthStyles={widthStyles}
       />
     )
@@ -161,6 +165,6 @@ const ListGrid = ({
   )
 }
 
-const getInfo = combineSelectors(getGrid, getAltSection)
+const getInfo = combineSelectors(getSettings, getGrid, getAltSection)
 
 export default connect(getInfo)(ListGrid)

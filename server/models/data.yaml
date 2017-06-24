@@ -415,7 +415,7 @@ tables:
       - startDate
       - endDate
       - typeContribution
-      - notes
+      - remarks
       - criteria
       - creator
       - dateCreated
@@ -445,8 +445,8 @@ tables:
               title: this value does not belong to the current package
             disabled: false
         multiple: true
-      notes:
-        label: Notes
+      remarks:
+        label: Remarks
         valType: textarea
         multiple: true
       creator:
@@ -475,7 +475,7 @@ tables:
         filtered: true
 
   criteria:
-    title: key
+    title: criterion
     sort:
       - [package, 1]
       - [key, 1]
@@ -484,7 +484,7 @@ tables:
       - package
       - typeContribution
       - criterion
-      - notes
+      - remarks
       - creator
       - dateCreated
       - modified
@@ -513,10 +513,86 @@ tables:
         multiple: true
       criterion:
         label: Criterion
-        valType: textarea
+        valType: text
         multiple: false
-      notes:
-        label: Notes
+      remarks:
+        label: Remarks
+        valType: textarea
+        multiple: true
+      creator:
+        label: creator
+        valType:
+          values: user
+          allowNew: false
+        multiple: false
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+      modified:
+        label: modified
+        valType: text
+        multiple: true
+
+    detailOrder:
+      - score
+    details:
+      score:
+        label: scores
+        table: score
+        linkField: criteria
+        mode: list
+        filtered: true
+
+    filters:
+      - field: typeContribution
+        label: type
+        type: ByValue
+        maxCols: 1
+        expanded: true
+
+  score:
+    title: description
+    sort:
+      - [criteria, 1]
+      - [score, 1]
+      - [level, 1]
+    fieldOrder:
+      - key
+      - score
+      - level
+      - description
+      - criteria
+      - remarks
+      - creator
+      - dateCreated
+      - modified
+
+    fieldSpecs:
+      key:
+        label: Level
+        valType: text
+        multiple: false
+      level:
+        label: Level
+        valType: text
+        multiple: false
+      score:
+        label: Score
+        valType: number
+        multiple: false
+      description:
+        label: Description
+        valType: text
+        multiple: false
+      criteria:
+        label: Criterion
+        valType:
+          values: criteria
+          allowNew: false
+        multiple: false
+      remarks:
+        label: Remarks
         valType: textarea
         multiple: true
       creator:
@@ -535,8 +611,13 @@ tables:
         multiple: true
 
     filters:
-      - field: typeContribution
-        label: type
+      - field: description
+        label: description
+        type: Fulltext
+        maxCols: null
+        expanded: null
+      - field: criteria
+        label: criteria
         type: ByValue
         maxCols: 1
-        expanded: true
+        expanded: false

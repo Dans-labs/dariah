@@ -562,20 +562,30 @@ class FMConvert(object):
     def backoffice(self, isDevel):
         client = MongoClient()
         db = client.dariah
+        for row in self.allData['typeContribution']:
+            row['mainType'] = ''
+            row['subType'] = row['rep']
+            row['explanation'] = ['legacy type']
+            del row['rep']
+        self.allFields['typeContribution']['_id'] = ('id', 1)
+        self.allFields['typeContribution']['mainType'] = ('string', 1)
+        self.allFields['typeContribution']['subType'] = ('string', 1)
+        self.allFields['typeContribution']['explanation'] = ('string', 2)
+
         self.backofficeTables = set()
         if True or isDevel:
             for table in self.BACKOFFICE:
                 bt = table['name']
+                ifield = table['indexField']
                 self.backofficeTables.add(bt)
                 rows = table['rows']
-                self.allData[bt] = []
-                self.relIndex[bt] = dict()
+                if bt not in self.allData: self.allData[bt] = []
+                if bt not in self.relIndex: self.relIndex[bt] = dict()
                 for row in rows:
                     _id = self.mongo.newId()
                     newRow = dict()
                     newRow['_id'] = _id
-                    ifield = 'key' if bt == 'criteria' else 'title'
-                    self.relIndex[bt][row[ifield]] = _id
+                    self.relIndex[bt][self.norm(row[ifield])] = (_id, row[ifield])
                     for (field, value) in row.items():
                         if field in {'startDate', 'endDate'}:
                             newRow[field] = value
@@ -584,10 +594,16 @@ class FMConvert(object):
                             newRow[field] = valueRep
                         elif field == 'creator':
                             newRow[field] = self.uidMapping[value]
-                        elif field in {'typeContribution'}:
+                        elif \
+                            bt == 'package' and field == 'typeContribution' or \
+                            bt == 'criteria' and field == 'typeContribution' or \
+                            False:
                             newRow[field] = [self.relIndex[field][self.norm(val)][0] for val in value]
-                        elif field == 'package':
-                            newRow[field] = self.relIndex['package'][value]
+                        elif \
+                            bt == 'criteria' and field == 'package'  or \
+                            bt == 'score' and field == 'criteria' or \
+                            False :
+                            newRow[field] = self.relIndex[field][self.norm(value)][0]
                         else: newRow[field] = value
                     self.allData[bt].append(newRow)
         else:
@@ -664,7 +680,7 @@ class FMConvert(object):
         self.countryTable()
         self.userTable()
         self.relTables()
-        self.typeTable()
+        #self.typeTable()
         if isDevel: self.testTweaks()
         self.backoffice(isDevel)
         self.provenance()

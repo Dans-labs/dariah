@@ -73,35 +73,6 @@ inGroup:
     authority: DARIAH
     group: office
 
-typeExtra:
-  - mainType: service
-    subType: data hosting
-    explanation: [IT based, e.g. hosting software or data]
-  - mainType: service
-    subType: processing service
-    explanation: [IT based]
-  - mainType: service
-    subType: support service
-    explanation: [e.g. helpdesk, software maintenance]
-  - mainType: service
-    subType: access to resources
-    explanation: [e.g. educational resources, data resources, metadata creation, and enrichment]
-  - mainType: activity
-    subType: event
-    explanation: [e.g. summer school, webinar, training]
-  - mainType: activity
-    subType: consulting
-    explanation: []
-  - mainType: activity
-    subType: DARIAH coordination
-    explanation: []
-  - mainType: activity
-    subType: resource creation
-    explanation: [e.g. educational resources, data]
-  - mainType: activity
-    subType: software development
-    explanation: []
-
 countryExtra:
   AM:
     name: Armenia
