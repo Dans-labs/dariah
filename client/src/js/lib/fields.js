@@ -48,8 +48,8 @@ const mergeClassnames = (classNames, attributes) => {
   : { ...attributes, className: `${className} ${attributes.className || emptyS}` }
 }
 
-const valuePrepare = memoize((tables, table, valType, activeItems, inactive) => value => {
-  const rep = repr(tables, table, valType, value)
+const valuePrepare = memoize((tables, table, valType, activeItems, inactive, settings) => value => {
+  const rep = repr(tables, table, valType, value, settings)
   if (valType == 'textarea') {return [rep]}
   if (valType == 'url') {return [rep, { href: rep, target: '_blank' }, 'a']}
   if (valType == 'email') {
@@ -76,28 +76,31 @@ const valuePrepare = memoize((tables, table, valType, activeItems, inactive) => 
 
 const putElem = ([rep, attributes, elem], i) => {
   if (i == null && attributes == null && elem == null) {return rep}
-  const r = rep || ''
+  const r = rep || emptyS
   const atts = { ...(attributes || emptyO), key: i }
   const Elem = elem || 'span'
   return <Elem {...atts} >{r}</Elem>
 }
 
-export const readonlyValue = memoize((tables, table, valType, multiple, activeItems, inactive, values) => {
-  const prepare = valuePrepare(tables, table, valType, activeItems, inactive)
-  const reps = multiple
-  ? (values || emptyA).map(value => prepare(value)).filter(x => x != null)
-  : prepare(values)
+export const readonlyValue = memoize(
+  (tables, table, valType, multiple, activeItems, inactive, values, settings) => {
+    const prepare = valuePrepare(tables, table, valType, activeItems, inactive, settings)
+    const reps = multiple
+    ? (values || emptyA).map(value => prepare(value)).filter(x => x != null)
+    : prepare(values)
 
-  if (valType == 'textarea') {
+    if (valType == 'textarea') {
+      return multiple
+      ? reps.map(repItem => repItem[0])
+      : reps[0]
+    }
+
     return multiple
-    ? reps.map(repItem => repItem[0])
-    : reps[0]
-  }
-
-  return multiple
-  ? reps.map((repItem, i) => putElem(repItem, i))
-  : putElem(reps)
-}, emptyO)
+    ? reps.map((repItem, i) => putElem(repItem, i))
+    : putElem(reps)
+  },
+  emptyO,
+)
 
 export const composeAttributes = memoize((activeItems, inactive) => (value, className) => {
   const isInactive = activeItems != null && !activeItems.has(value)
@@ -141,17 +144,18 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
 export const makeDetails = ({ tables, table, eId }) => {
   const { [table]: { details, detailOrder } } = tables
   return (detailOrder || emptyA).map(name => {
-    const { label, table: detailTable, linkField } = details[name]
+    const { table: detailTable, linkField } = details[name]
     const {
       [detailTable]: {
         entities: detailEntities,
         allIds: detailAllIds,
+        item,
       },
     } = tables
     const detailListIds = detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
     return {
-      name, label,
-      table: detailTable,
+      name, item,
+      detailTable,
       nDetails: detailListIds.length,
     }
   })

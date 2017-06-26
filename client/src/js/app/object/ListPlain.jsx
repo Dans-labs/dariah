@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { memoize } from 'memo'
 import { emptyS, emptyO } from 'utils'
 import { someEditable } from 'fields'
 
-import { insertItem, needValues, entityHead } from 'tables'
+import { insertItem, needValues, entityHead, DETAILS } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
+import { compileActive } from 'custom'
 
-import { EditStatus } from 'EditControls'
+import { EditStatus, EditInsert } from 'EditControls'
 import ItemContainer from 'ItemContainer'
 
 const initial = 0
@@ -21,16 +21,10 @@ class ListPlain extends Component {
     this.gotoNew = true
   }
   gotoItem = eId => {
-    const { props: { alterSection, table, dispatch } } = this
-    const { nextAlt } = compileAlternatives(alterSection, nAlts, initial, dispatch)(`${table}-${eId}`)
+    const { props: { alterSection, dispatch } } = this
+    const { nextAlt } = compileAlternatives(alterSection, nAlts, initial, dispatch)(eId)
     nextAlt()
   }
-  closeItem = eId => {
-    const { props: { alterSection, table, dispatch } } = this
-    const { initAlt } = compileAlternatives(alterSection, nAlts, initial, dispatch)(`${table}-${eId}`)
-    initAlt()
-  }
-  handleCloseAll = memoize(items => () => {items.forEach(eId => {this.closeItem(eId)})})
 
   scroll = domElem => {
     if (domElem != null) {
@@ -39,24 +33,26 @@ class ListPlain extends Component {
   }
 
   render() {
-    const { props: { alter, alterSection, filters, tables, table, listIds, perm, dispatch } } = this
-    const { [table]: { entities } } = tables
-    const nItemsRep = `${listIds.length} item${listIds.length == 1 ? emptyS : 's'} `
+    const { props: { alter, alterSection, filters, tables, table, select, listIds, perm, dispatch } } = this
+    const { [table]: { item, entities } } = tables
     const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
+    const activeItems = compileActive(tables, table)
     return (
       <div className={'list-generic'} >
-        <div>
-          {nItemsRep}
-          {
-            (perm != null && perm.insert)
-            ? <span
-                className={'fa fa-plus button-large'}
-                title={`new ${table}`}
-                onClick={this.handleInsert}
-              />
-            : null
-          }
-        </div>
+        {
+          select == DETAILS
+          ? null
+          : <EditInsert
+              perm={perm}
+              listIds={listIds}
+              item={item}
+              button={'button-large'}
+              alterSection={alterSection}
+              nAlts={nAlts}
+              initial={initial}
+              onInsert={this.handleInsert}
+            />
+        }
         {
           listIds.map(eId => {
             const { [eId]: { fields, perm } } = entities
@@ -68,42 +64,45 @@ class ListPlain extends Component {
             const active = alt != initial
             const scrollProps = active ? { ref: this.scroll } : emptyO
             const showStatus = isComplete && someEditable(fields, perm)
+            const isactive = (activeItems != null && activeItems.has(eId))
+            ? 'isactive'
+            : emptyS
 
             return (
-              <div key={eId} >
-                <span className={'item-head'} {...scrollProps} >
-                  {
-                    showStatus
-                    ? <EditStatus form={formTag} active={active} />
-                    : <span>
-                        <span className={'fa fa-fw'} />
-                        {' '}
-                      </span>
-                  }
-                  <span className={'link head'} onClick={nextAlt} >
-                    <span className={`fa fa-angle-${active ? 'up' : 'down'}`} />
-                    {' '}{head}
-                  </span>
-                </span>
+              <div key={eId} className={isactive} >
                 {
                   active
-                  ? <ItemContainer
-                      filters={filters}
-                      tables={tables}
-                      table={table}
-                      eId={eId}
-                    />
-                  : null
+                  ? <div>
+                      <span className={'link head'} onClick={nextAlt} >
+                        <span className={`fa fa-angle-up`} />
+                      </span>
+                      <ItemContainer
+                        filters={filters}
+                        tables={tables}
+                        table={table}
+                        eId={eId}
+                        isactive={isactive}
+                      />
+                    </div>
+                  : <span className={'item-head'} {...scrollProps} >
+                      {
+                        showStatus
+                        ? <EditStatus form={formTag} active={active} />
+                        : <span>
+                            <span className={'fa fa-fw'} />
+                            {' '}
+                          </span>
+                      }
+                      <span className={'link head'} onClick={nextAlt} >
+                        <span className={`fa fa-angle-down`} />
+                        {' '}{head}
+                      </span>
+                    </span>
                 }
               </div>
             )
           })
         }
-        <div
-          className={'button-large fa fa-angle-double-left'}
-          title={'Close all opened items'}
-          onClick={this.handleCloseAll(listIds)}
-        />
       </div>
     )
   }

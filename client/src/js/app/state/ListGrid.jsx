@@ -1,30 +1,40 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { combineSelectors, emptyS, emptyA } from 'utils'
+import { combineSelectors, emptyA } from 'utils'
 import { handle } from 'handle'
 
 import { getSettings } from 'settings'
 import { getAltSection, compileAlternatives } from 'alter'
 import { getGrid, compileSortedData, resetSort, addColumn, turnColumn, delColumn } from 'grid'
-import { insertItem } from 'tables'
+import { insertItem, DETAILS } from 'tables'
+import { compileActive } from 'custom'
 
 import { dealWithProvenance } from 'fields'
 
+import { EditInsert } from 'EditControls'
 import ItemRow from 'ItemRow'
+
+const initial = 0
+const nAlts = 2
 
 const ListGrid = ({
   alter, alterSection,
-  heading,
   settings, filters, tables, table, listIds, select, perm: tablePerm,
   masterId, linkField,
   grid, gridTag,
   dispatch,
 }) => {
   const { [gridTag]: sortSpec = emptyA } = grid
-  const theHeading = heading ? `${heading}: ` : emptyS
   const { [table]: tableData } = tables
-  const { fields: givenFields, fieldOrder: givenFieldOrder, fieldSpecs, detailOrder, entities } = tableData
+  const {
+    fields: givenFields,
+    fieldOrder: givenFieldOrder,
+    fieldSpecs,
+    item,
+    detailOrder,
+    entities,
+  } = tableData
   const fields = dealWithProvenance(settings, givenFields)
   const fieldOrder = givenFieldOrder.filter(field => fields[field])
   const { length: nFields } = fieldOrder
@@ -46,15 +56,16 @@ const ListGrid = ({
     flex: `${grow} ${shrink} ${width}`,
     overflow: 'auto',
   }))
-  const nItemsRep = `${listIds.length} item${listIds.length == 1 ? emptyS : 's'} `
 
-  const sortedData = compileSortedData(tables, table, listIds, sortSpec)
+  const sortedData = compileSortedData(tables, table, listIds, sortSpec, settings)
   const makeAlternatives = compileAlternatives(alterSection, 2, 0, dispatch)
+  const activeItems = compileActive(tables, table)
   const rows = []
   for (const eId of sortedData) {
     const { [eId]: { values: initialValues, perm } } = entities
     const { getAlt, nextAlt } = makeAlternatives(eId)
     const alt = getAlt(alter)
+    const isactive = (activeItems != null && activeItems.has(eId))
     rows.push(
       <ItemRow
         key={`${table}-${eId}`}
@@ -64,6 +75,7 @@ const ListGrid = ({
         tables={tables}
         table={table}
         eId={eId}
+        isactive={isactive}
         initialValues={initialValues}
         perm={perm}
         fields={fields}
@@ -73,18 +85,20 @@ const ListGrid = ({
   }
   return (
     <div>
-      <p>
-        <span className={'list-title'}>{theHeading}</span>{nItemsRep}
-        {
-          (tablePerm != null && tablePerm.insert)
-          ? <span
-              className={'fa fa-plus button-large'}
-              title={`new ${table}`}
-              onClick={handle(dispatch, insertItem, table, select, masterId, linkField)}
-            />
-          : null
-        }
-      </p>
+      {
+        select == DETAILS
+        ? null
+        : <EditInsert
+            perm={tablePerm}
+            listIds={listIds}
+            item={item}
+            button={'button-large'}
+            alterSection={alterSection}
+            nAlts={nAlts}
+            initial={initial}
+            onInsert={handle(dispatch, insertItem, table, select, masterId, linkField)}
+          />
+      }
       {
         sortSpec.length != 0
         ? <p className={'sortspecs'} >

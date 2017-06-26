@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { emptyO } from 'utils'
+import { emptyS, emptyO } from 'utils'
 
 import Fulltext from 'Fulltext'
 import ByValue from 'ByValue'
@@ -16,6 +16,7 @@ const filterClass = {
 const Filter = ({
   filters, tables, table, filterTag, listIds,
   filteredAmount, filteredAmountOthers, amounts,
+  compact,
 }) => {
   const { [table]: filterData = emptyO } = filters
   const { [table]: { fields, filterList } } = tables
@@ -25,7 +26,7 @@ const Filter = ({
     ? <div>
         {'No filters for this list'}
       </div>
-    : <div>
+    : <div className={`filterSequence ${compact ? 'compact' : emptyS}`} >
         {filterList.filter(x => fields[x.field]).map((filter, filterId) => {
           const { type } = filter
           const { [type]: Fclass } = filterClass
@@ -47,6 +48,7 @@ const Filter = ({
               filteredAmountOthers={filteredAmountOthers[filterId]}
               amounts={amounts[filterId]}
               expanded={filter.expanded}
+              compact={compact}
             />
           )}
         )}

@@ -2,10 +2,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { memoize } from 'memo'
-import { emptyS, emptyO } from 'utils'
+import { combineSelectors, emptyS, emptyO } from 'utils'
 import { handle, handlEV } from 'handle'
 import { composeAttributes, checkDisabled } from 'fields'
 
+import { getSettings } from 'settings'
 import { getSelect, compileOptions, setSearch, setPopUp, togglePopUp } from 'select'
 
 const RelOption = ({ label, attributes, selected, onHit }) => (
@@ -169,6 +170,7 @@ const Options = ({
 }
 
 const RelSelect = ({
+  settings,
   tables, table,
   field, selectTag,
   activeItems, inactive,
@@ -176,7 +178,7 @@ const RelSelect = ({
   multiple, allowNew, select, dispatch,
 }) => {
   const { [selectTag]: { search, popUp } = emptyO } = select
-  const { options, optionLookup } = compileOptions(tables, table, field)
+  const { options, optionLookup } = compileOptions(tables, table, field, settings)
   return (
     <div
       className={`select ${multiple ? 'multiselect' : emptyS}`}
@@ -232,4 +234,6 @@ const RelSelect = ({
   )
 }
 
-export default connect(getSelect)(RelSelect)
+const getInfo = combineSelectors(getSettings, getSelect)
+
+export default connect(getInfo)(RelSelect)

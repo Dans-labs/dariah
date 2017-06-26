@@ -11,7 +11,7 @@ import ItemForm from 'ItemForm'
 
 class ItemContainer extends Component {
   render() {
-    const { props: { settings, filters, tables, table, eId } } = this
+    const { props: { settings, filters, tables, table, eId, isactive } } = this
     const {
       [table]: {
           entities = emptyO,
@@ -32,6 +32,7 @@ class ItemContainer extends Component {
         tables={tables}
         table={table}
         eId={eId}
+        isactive={isactive}
         key={`${table}-${eId}`}
         initialValues={initialValues}
         perm={perm}

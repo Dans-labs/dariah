@@ -51,13 +51,15 @@ export const getSelect = ({ select }) => ({ select })
 
 /* HELPERS */
 
-export const compileOptions = memoize((tables, table, field) => {
+export const compileOptions = memoize((tables, table, field, settings) => {
   const { [table]: { valueLists, fieldSpecs } } = tables
   const { [field]: valueList } = (valueLists || emptyO)
   if (valueList == null) {return { options: emptyA, optionLookup: emptyO }}
 
   const { [field]: { valType } } = fieldSpecs
-  const options = valueList.map(val => ({ value: val, label: repr(tables, table, valType, val) }))
+  const options = valueList.map(val => ({
+    value: val, label: repr(tables, table, valType, val, settings),
+  }))
   const optionLookup = {}
   options.forEach(({ value: val, label: lab }) => {optionLookup[val] = lab})
   return { options, optionLookup }

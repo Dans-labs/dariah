@@ -17,7 +17,8 @@ class ListContainer extends Component {
     const complete = mode == 'grid'
     if (needTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA))) {return <div />}
     const { [table]: tableData } = tables
-    const { title, perm, myIds, allIds } = tableData
+    const { title, item, perm, myIds, allIds } = tableData
+    const things = item[1]
     const listIds = select == MYIDS ? myIds : allIds
     const filterTag = makeTag(select, null, null)
     return filtered
@@ -55,7 +56,7 @@ class ListContainer extends Component {
             perm={perm}
             gridTag={table}
           />
-        : <span>{`unknown display mode "${mode}" for item list`}</span>
+        : <span>{`unknown display mode "${mode}" for ${things}`}</span>
   }
   componentDidMount() {
     const { props: { tables, table, select, mode, dispatch } } = this

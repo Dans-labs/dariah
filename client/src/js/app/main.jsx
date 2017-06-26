@@ -39,6 +39,7 @@ render(
           <Route path={':table'} >
             <Route path={'grid'} component={ListContainer} select={ALLIDS} mode={'grid'} />
             <Route path={'list'} component={ListContainer} select={ALLIDS} mode={'list'} />
+            <Route path={'filter'} component={ListContainer} select={ALLIDS} mode={'list'} filtered={true} />
           </Route>
         </Route>
       </Route>

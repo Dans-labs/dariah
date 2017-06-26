@@ -2,10 +2,10 @@ import React from 'react'
 import { createSelector } from 'reselect'
 import update from 'immutability-helper'
 
-export const emptyS = ''
-export const emptyA = []
-export const emptyO = {}
-export const emptyF = () => null
+export const emptyS = Object.freeze('')
+export const emptyA = Object.freeze([])
+export const emptyO = Object.freeze({})
+export const emptyF = Object.freeze(() => null)
 
 export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
   let result = false
@@ -23,7 +23,8 @@ export const withParams = Component => ({ params, route, ...props }) => {
   return <Component {...allProps} />
 }
 
-export const makeReducer = (flows, init = emptyO) => (state = init, action) => {
+export const makeReducer = (flows, init = emptyO) => (state, action) => {
+  if (state == undefined) {return init}
   const { type } = action
   const { [type]: flow } = flows
   return flow ? flow(state, action) : state

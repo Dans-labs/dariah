@@ -7,16 +7,15 @@ import { DETAILS } from 'tables'
 import ItemEdit from 'ItemEdit'
 import ItemRead from 'ItemRead'
 import ItemDetails from 'ItemDetails'
-import ItemDetailHeads from 'ItemDetailHeads'
 
 const ItemForm = props => {
-  const { filters, tables, table, eId, initialValues, fields, perm } = props
+  const { filters, tables, table, eId, isactive, initialValues, fields, perm } = props
   let { fieldFragments, detailFragments } = props
   if (fieldFragments == null) {fieldFragments = makeFields(props)}
   if (detailFragments == null) {detailFragments = makeDetails(props)}
   const hasEditable = someEditable(fields, perm)
   return (
-    <div>
+    <div className={`itemRecord ${isactive}`} >
       {
         hasEditable
         ? <ItemEdit
@@ -34,15 +33,9 @@ const ItemForm = props => {
             fieldFragments={fieldFragments}
           />
       }
-      <ItemDetailHeads
-        alterSection={`${DETAILS}-${table}-${eId}`}
-        tables={tables}
-        table={table}
-        eId={eId}
-        detailFragments={detailFragments}
-      />
       <ItemDetails
-        alterSection={`${DETAILS}-${table}-${eId}`}
+        alterSection={`list-${table}-${DETAILS}`}
+        detailFragments={detailFragments}
         filters={filters}
         tables={tables}
         table={table}

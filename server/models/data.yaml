@@ -3,12 +3,18 @@ generic:
   createdBy: creator
   modified: modified
   title: rep
+  item:
+    - item
+    - items
   sort:
     - [rep, 1]
 
 tables:
   user:
     title: eppn
+    item:
+      - user
+      - users
     sort:
       - [lastName, 1]
       - [firstName, 1]
@@ -77,8 +83,23 @@ tables:
         valType: text
         multiple: true
 
+    filters:
+      - field: authority
+        label: authority
+        type: ByValue
+        maxCols: 1
+        expanded: true
+      - field: mayLogin
+        label: login allowed
+        type: ByValue
+        maxCols: 1
+        expanded: true
+
   country:
     title: name
+    item:
+      - country
+      - countries
     sort:
       - [name, 1]
     fieldOrder:
@@ -153,8 +174,18 @@ tables:
           width: 10em
           grow: 1
 
+    filters:
+      - field: isMember
+        label: member of DARIAH
+        type: ByValue
+        maxCols: 1
+        expanded: true
+
   typeContribution:
     title: subType
+    item:
+      - contribution type
+      - contribution types
     sort:
       - [mainType, 1]
       - [subType, 1]
@@ -211,8 +242,23 @@ tables:
           width: 10em
           grow: 1
 
+    filters:
+      - field: mainType
+        label: main type
+        type: ByValue
+        maxCols: 1
+        expanded: true
+      - field: subType
+        label: subtype
+        type: ByValue
+        maxCols: 1
+        expanded: false
+
   contrib:
     title: title
+    item:
+      - contribution
+      - contributions
     sort:
       - [title, 1]
       - [dateCreated, -1]
@@ -407,6 +453,9 @@ tables:
 
   package:
     title: title
+    item:
+      - package
+      - packages
     sort:
       - [title, 1]
       - [dateCreated, -1]
@@ -416,7 +465,6 @@ tables:
       - endDate
       - typeContribution
       - remarks
-      - criteria
       - creator
       - dateCreated
       - modified
@@ -476,6 +524,9 @@ tables:
 
   criteria:
     title: criterion
+    item:
+      - criterion
+      - criteria
     sort:
       - [package, 1]
       - [key, 1]
@@ -553,6 +604,9 @@ tables:
 
   score:
     title: description
+    item:
+      - score
+      - scores
     sort:
       - [criteria, 1]
       - [score, 1]
@@ -621,3 +675,8 @@ tables:
         type: ByValue
         maxCols: 1
         expanded: false
+      - field: score
+        label: score
+        type: ByValue
+        maxCols: 1
+        expanded: true

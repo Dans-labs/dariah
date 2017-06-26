@@ -39,5 +39,6 @@ export const compileAlternatives = memoize((alterSection, nAlts, initial, dispat
   },
   nextAlt: handle(dispatch, nextAlt, alterSection, alterTag, nAlts, initial),
   initAlt: handle(dispatch, setAlt, alterSection, alterTag, initial),
-  setAlt: memoize(alt => handle(dispatch, setAlt, alterSection, alterTag, alt)),
+  setAlt: alt => handle(dispatch, setAlt, alterSection, alterTag, alt),
+  putAlt: alt => dispatch(setAlt(alterSection, alterTag, alt)),
 }), null, { debug: 'compileAlternatives' })

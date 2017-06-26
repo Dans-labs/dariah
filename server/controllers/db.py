@@ -131,13 +131,14 @@ class DbAccess(object):
             self, controller, table,
             data, msgs,
             rFilter=None, titleOnly=False,
-            withValueLists=True, withDetails=True, withFilters=True,
+            withValueLists=True, withDetails=True,
             my=False,
         ):
         if table in data: return
         Perm = self.Perm
         tableInfo = self.DM.tables.get(table, {})
         title = tableInfo.get('title', self.DM.generic['title'])
+        item = tableInfo.get('item', self.DM.generic['item'])
         sort =  tableInfo.get('sort', None)
         (mayInsert, iFields) = Perm.may(table, 'insert')
         perm = dict(insert=mayInsert)
@@ -180,6 +181,7 @@ class DbAccess(object):
             entities=entities,
             fields=theFieldFilter,
             title=title,
+            item=item,
             perm=perm,
             fieldOrder=fieldOrder,
             fieldSpecs=fieldSpecs,
@@ -191,7 +193,7 @@ class DbAccess(object):
         else: result['allIds'] = allIds
 
         data[table] = result
-        if withFilters: data[table]['filterList'] = tableInfo.get('filters', [])
+        data[table]['filterList'] = tableInfo.get('filters', [])
         if withValueLists: data[table]['valueLists'] = self.getValueLists(table, data, msgs)
         if withDetails: self.getDetails(table, data, msgs)
         return
@@ -199,7 +201,7 @@ class DbAccess(object):
     def getList(
             self, controller, table,
             rFilter=None, titleOnly=False,
-            withValueLists=True, withDetails=True, withFilters=True,
+            withValueLists=True, withDetails=True,
             my=False,
         ):
         data = dict()
@@ -209,7 +211,7 @@ class DbAccess(object):
             data,
             msgs,
             rFilter=rFilter, titleOnly=titleOnly,
-            withValueLists=withValueLists, withDetails=withDetails, withFilters=withFilters,
+            withValueLists=withValueLists, withDetails=withDetails,
             my=my,
         )
         return self.stop(data=data, msgs=msgs)
@@ -234,7 +236,7 @@ class DbAccess(object):
         good = True
         if not noTables:
             for t in relTables:
-                self._getList('list', t, data, msgs, withFilters=False, titleOnly=False)
+                self._getList('list', t, data, msgs, titleOnly=False)
 
         for f in relFields:
             fSpec = fieldSpecs[f]['valType']
@@ -253,7 +255,7 @@ class DbAccess(object):
         msgs = []
         for (name, detailProps) in details.items():
             t = detailProps['table']
-            self._getList('list', t, data, msgs, withFilters=True, titleOnly=False)
+            self._getList('list', t, data, msgs, titleOnly=False)
 
     def getItem(self, controller, table, ident):
         Perm = self.Perm

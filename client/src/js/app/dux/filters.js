@@ -53,9 +53,13 @@ const compileFieldIds = memoize((tableData, filterTag, listIds) => {
   const presentFilterList = filterList.filter(x => fields[x.field])
   const filterFields = presentFilterList.filter(x => x.type !== 'Fulltext').map(x => x.field)
   const these = filterTag.startsWith(DETAILS)
+  const gatherFields = filterFields.filter(x => valueLists[x] == null)
   return these
   ? gatherIds(tableData, listIds, filterFields, fieldSpecs)
-  : pickBy(valueLists, (value, key) => filterFields.includes(key))
+  : {
+    ...pickBy(valueLists, (value, key) => filterFields.includes(key)),
+    ...(gatherFields.length ? gatherIds(tableData, listIds, gatherFields, fieldSpecs) : emptyO),
+  }
 }, emptyO, { debug: 'compileFieldIds' })
 
 export const compileValues = memoize((tables, table, filterTag, listIds, filterField) => {
@@ -186,10 +190,17 @@ const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField) => {
   const { [filterField]: { valType } } = fieldSpecs
   if (fieldIds == null) {return emptyO}
   const fieldValues = {[emptyS]: '-none-'}
-  const { values: relTable } = valType
-  fieldIds.forEach(_id => {
-    fieldValues[_id] = entityHead(tables, relTable, _id)
-  })
+  if (typeof valType == 'string') {
+    fieldIds.forEach(_id => {
+      fieldValues[_id] = _id
+    })
+  }
+  else {
+    const { values: relTable } = valType
+    fieldIds.forEach(_id => {
+      fieldValues[_id] = entityHead(tables, relTable, _id)
+    })
+  }
   return fieldValues
 }, emptyO, { debug: 'gatherValues' })
 

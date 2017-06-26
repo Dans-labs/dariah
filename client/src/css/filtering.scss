@@ -1,4 +1,4 @@
-div.facet {
+.facetFilter {
     margin-top: 0.3em;
     margin-bottom: 0.1em;
     border: 1px solid $widget-border;
@@ -6,7 +6,7 @@ div.facet {
     color: $widget-fixed-fore;
     background-color: $widget-fixed-back;
 }
-p.facet {
+.facetHead {
     margin-top: 0.05em;
     margin-bottom: 0.05em;
     font-size: small;
@@ -25,6 +25,16 @@ input.search {
     font-family: monospace;
     color: $action-fore;
     background-color: $action-back;
+}
+input.search.compact {
+    font-size: medium;
+    font-family: monospace;
+    color: $action-fore;
+    background-color: $action-back;
+    height: 1.2em;
+    line-height: 1em;
+    width: 10em;
+    max-width: 10em;
 }
 
 .facet-container {
@@ -46,6 +56,53 @@ input.search {
 }
 .facet-value {
     flex-basis: 80%;
+    flex-grow: 1;
+    flex-shrink: 0;
+    font-size: small;
+}
+.facetFilter.compact {
+    margin-top: 0.3em;
+    margin-bottom: 0.1em;
+    border: 1px solid $widget-border;
+    border-radius: 6px;
+    color: $widget-fixed-fore;
+    background-color: $widget-fixed-back;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: baseline;
+    align-content: flex-start;
+}
+.facetHead.compact {
+    font-size: small;
+    font-weight: bold;
+    flex-basis: auto;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.facet-container.compact {
+    display: inline-flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    flex-basis: auto;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.facet-row.compact {
+    flex-basis: auto;
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: inline-flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: baseline;
+    align-content: flex-start;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+.facet-value.compact {
+    flex-basis: auto;
     flex-grow: 1;
     flex-shrink: 0;
     font-size: small;

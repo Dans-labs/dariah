@@ -41,23 +41,23 @@ export const getGrid = ({ grid }) => ({ grid })
 
 /* HELPERS */
 
-export const compileSortedData = memoize((tables, table, listIds, sortSpec) => {
+export const compileSortedData = memoize((tables, table, listIds, sortSpec, settings) => {
   const sortColumns = sortSpec.map(x => x[0])
   const sortDirs = sortSpec.map(x => x[1] == 1 ? 'asc' : 'desc')
   const { [table]: { entities } } = tables
-  const r = reprX(tables, table)
+  const r = reprX(tables, table, settings)
   const fullData = listIds.map(_id => mapValues(entities[_id].values, r))
   return orderBy(fullData, sortColumns, sortDirs).map(x => x._id)
 }, emptyO)
 
-const reprX = (tables, table) => {
+const reprX = (tables, table, settings) => {
   const { [table]: { fieldSpecs } } = tables
   return (myValues, field) => {
     if (field == '_id') {return myValues}
     const { [field]: { valType, multiple } } = fieldSpecs
     return multiple
-    ? (myValues || emptyA).map(value => repr(tables, table, valType, value)).join('|')
-    : repr(tables, table, valType, myValues)
+    ? (myValues || emptyA).map(value => repr(tables, table, valType, value, settings)).join('|')
+    : repr(tables, table, valType, myValues, settings)
   }
 }
 

@@ -1,5 +1,11 @@
 import React from 'react'
 import { reduxForm } from 'redux-form'
+import { connect } from 'react-redux'
+
+import { memoize } from 'memo'
+import { emptyS, emptyO } from 'utils'
+
+import { getAltSection, compileAlternatives } from 'alter'
 
 const editStatusGeneric = canSubmit => ({ active, dirty, invalid, submitting, reset, error }) => (
   <span>
@@ -88,3 +94,70 @@ export const EditDelete = ({ perm, button, onClick }) => (
   : null
 )
 
+const handleCloseAll = memoize((alter, alterSection, nAlts, initial, items, dispatch) => {
+  const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
+  return () => {
+    items.forEach(eId => {
+      const { getAlt, initAlt } = makeAlternatives(eId)
+      if (getAlt(alter) != initial) {
+        initAlt()
+      }
+    })
+  }
+}, emptyO)
+
+const handleOpenAll = memoize((alter, alterSection, nAlts, initial, items, dispatch) => {
+  const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
+  const theAlt = (initial + 1) % nAlts
+  return () => {
+    items.forEach(eId => {
+      const { getAlt, putAlt } = makeAlternatives(eId)
+      if (getAlt(alter) != theAlt) {
+        putAlt(theAlt)
+      }
+    })
+  }
+}, emptyO)
+
+const EditInsertPure = ({
+  alter, alterSection,
+  perm, listIds, item, button, onInsert,
+  nAlts, initial,
+  openAll,
+  dispatch,
+}) => {
+  const [thing, things] = item
+  const nItemsRep = `${listIds.length} ${listIds.length == 1 ? thing : things} `
+  return (
+    <div>
+      {nItemsRep}
+      {
+        (perm != null && perm.insert)
+        ? <span
+            className={`fa fa-plus ${button}`}
+            title={`new ${thing}`}
+            onClick={onInsert}
+          />
+        : null
+      }
+      {' '}
+      {
+        openAll
+        ? <div
+            className={`fa fa-angle-double-down ${button}`}
+            title={`Open all ${things}`}
+            onClick={handleOpenAll(alter, alterSection, nAlts, initial, listIds, dispatch)}
+          />
+        : emptyS
+      }
+      {' '}
+      <div
+        className={`fa fa-angle-double-up ${button}`}
+        title={`Close all opened ${things}`}
+        onClick={handleCloseAll(alter, alterSection, nAlts, initial, listIds, dispatch)}
+      />
+    </div>
+  )
+}
+
+export const EditInsert = connect(getAltSection)(EditInsertPure)

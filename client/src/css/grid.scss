@@ -119,6 +119,35 @@ div.list {
     max-height: 100%;
     overflow: auto;
 }
+div.list-filter.compact {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+div.filters.compact {
+    width: 100%;
+    max-width: 100%;
+    flex-basis: auto;
+    flex-shrink: 1;
+    flex-grow: 1;
+}
+div.filterSequence.compact {
+    width: 100%;
+    max-width: 100%;
+    display: inline-flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-content: flex-start;
+    align-items: baseline;
+}
+div.list.compact {
+    width: 100%;
+    flex-basis: auto;
+    flex-shrink: 1;
+    flex-grow: 1;
+}
 div.fulltext {
     display: flex;
     flex-flow: row wrap;

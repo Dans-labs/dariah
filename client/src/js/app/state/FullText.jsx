@@ -14,17 +14,22 @@ const Fulltext = ({
   filterId, filterLabel,
   filterSetting = emptyS,
   filteredAmount, filteredAmountOthers,
+  compact,
   dispatch,
 }) => (
   <div className={'fulltext'} title={`Search in ${filterLabel}`} >
     <input
       type={'text'}
-      className={'search'}
-      placeholder={`search in ${filterLabel}`}
+      className={`search ${compact ? 'compact' : emptyS}`}
+      placeholder={`search${compact ? emptyS : ` in ${filterLabel}`}`}
       value={filterSetting}
       onChange={handlEV(dispatch, changeFulltext, table, filterTag, filterId)}
     />{' '}
-    <Stat subTotal={filteredAmount} total={filteredAmountOthers} className={'fulltext-stat'} />
+    {
+      compact
+      ? null
+      : <Stat subTotal={filteredAmount} total={filteredAmountOthers} className={'fulltext-stat'} />
+    }
   </div>
 )
 

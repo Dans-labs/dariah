@@ -1,11 +1,19 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { initFiltering, computeFiltering } from 'filters'
+import { emptyS, emptyO } from 'utils'
+import { handle } from 'handle'
 
+import { initFiltering, computeFiltering } from 'filters'
+import { insertItem, DETAILS } from 'tables'
+
+import { EditInsert } from 'EditControls'
 import ListPlain from 'ListPlain'
 import ListGrid from 'ListGrid'
 import Filter from 'Filter'
+
+const initial = 0
+const nAlts = 2
 
 class ListFilter extends Component {
   componentWillMount() {
@@ -13,28 +21,67 @@ class ListFilter extends Component {
     const { [table]: tableData } = tables
     dispatch(initFiltering(tableData, table, filterTag, listIds))
   }
+  componentWillReceiveProps(newProps) {
+    const {
+      tables,
+       listIds,
+       table,
+       filterTag,
+       filters: { [table]: { [filterTag]: filterSettings } = emptyO },
+       dispatch,
+    } = newProps
+    const { props: { table: tableOld, filterTag: filterTagOld } } = this
+    if ((tableOld != table || filterTagOld != filterTag) && filterSettings == null) {
+      const { [table]: tableData } = tables
+      dispatch(initFiltering(tableData, table, filterTag, listIds))
+    }
+  }
   render() {
     const {
       props: {
         tables,
         filters,
-        heading,
         table,
         perm,
         select, masterId, linkField,
         listIds,
-        mode, title,
+        mode, compact,
+        title,
         filterTag, gridTag,
+        dispatch,
       },
     } = this
     const {
       filteredIds, filteredAmountOthers, amounts,
     } = computeFiltering(tables, filters, table, filterTag, listIds)
     if (filteredIds == null) {return <div />}
+    const compactClass = compact ? 'compact' : emptyS
+    const { [table]: { item } } = tables
+    const things = item[1]
+    const alterSection = `list-${table}-${select}`
     return (
-      <div className={'list-filter'}>
-        <div className={'filters'}>
-          <p>{'Total '}<span className={'good-o'} >{listIds.length}</span></p>
+      <div className={`list-filter ${compactClass}`}>
+        {
+          select == DETAILS
+          ? <EditInsert
+              perm={perm}
+              listIds={listIds}
+              item={item}
+              button={'button-large'}
+              alterSection={alterSection}
+              nAlts={nAlts}
+              initial={initial}
+              openAll={true}
+              onInsert={handle(dispatch, insertItem, table, select, masterId, linkField)}
+            />
+          : null
+        }
+        <div className={`filters ${compactClass}`}>
+          {
+            compact
+            ? null
+            : <p>{'Total '}<span className={'good-o'} >{listIds.length}</span></p>
+          }
           <Filter
             filters={filters}
             tables={tables}
@@ -44,14 +91,14 @@ class ListFilter extends Component {
             filteredAmount={filteredIds.length}
             filteredAmountOthers={filteredAmountOthers}
             amounts={amounts}
+            compact={compact}
           />
         </div>
-        <div className={'list'}>
+        <div className={`list ${compactClass}`}>
           {
             mode == 'list'
             ? <ListPlain
-                alterSection={`list-${table}-${select}`}
-                heading={heading}
+                alterSection={alterSection}
                 filters={filters}
                 tables={tables}
                 table={table}
@@ -64,8 +111,7 @@ class ListFilter extends Component {
               />
             : mode == 'grid'
               ? <ListGrid
-                  alterSection={`list-${table}-${select}`}
-                  heading={heading}
+                  alterSection={alterSection}
                   filters={filters}
                   tables={tables}
                   table={table}
@@ -76,7 +122,7 @@ class ListFilter extends Component {
                   masterId={masterId}
                   linkField={linkField}
                 />
-              : <span>{`unknown display mode "${mode}" for item list`}</span>
+              : <span>{`unknown display mode "${mode}" for ${things}`}</span>
           }
         </div>
       </div>

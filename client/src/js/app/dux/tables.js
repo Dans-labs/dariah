@@ -262,13 +262,18 @@ const repMap = {
 export const entityHead = (tables, relTable, valId) =>
   (repMap[relTable] || repMap.default(relTable))(tables, valId)
 
-const trimDate = text => (text == null ? emptyS : text.replace(/\.[0-9]+/, emptyS))
+const trimDate = (text, dateOnly) =>
+  text == null
+  ? emptyS
+  : dateOnly
+    ? text.replace(/T.*$/, emptyS)
+    : text.replace(/\.[0-9]+/, emptyS)
 
-export const repr = (tables, table, valType, value) => {
+export const repr = (tables, table, valType, value, settings) => {
   if (value == null) {return emptyS}
   if (typeof valType == 'string') {
     switch (valType) {
-      case 'datetime': return trimDate(value)
+      case 'datetime': return trimDate(value, settings && settings.shortDates)
       case 'bool': return value ? 'Yes' : 'No'
       default: return value
     }
