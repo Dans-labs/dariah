@@ -70,3 +70,7 @@ export const jString = (o, indent) => JSON.stringify(
   indent,
 )
 
+export const getUrlParts = browserHistory => {
+  const url = browserHistory.getCurrentLocation().pathname.replace(/\/$/, emptyS)
+  return (url.match(/^(.*)\/item\/?([^/]*)\/?$/) || [url, url, '']).slice(1)
+}

@@ -12,7 +12,7 @@ import FieldRead from 'FieldRead'
 import ItemForm from 'ItemForm'
 
 const putFieldFragments = (tables, fieldFragments, widthStyles) => fieldFragments.map(({
-  field, label,
+  field,
   fragment: { editable, table, myValues },
 }, i) => {
   const widthStyle = widthStyles[i]
@@ -33,9 +33,10 @@ const putFieldFragments = (tables, fieldFragments, widthStyles) => fieldFragment
 })
 
 const putDetailFragments = (table, eId, detailFragments, widthStyles, nFields) => detailFragments.map(({
-  name, label, nDetails,
+  name, detailListIds,
 }, i) => {
   const widthStyle = widthStyles[nFields + i]
+  const nDetails = detailListIds.length
   return (
     <div
       key={name}
@@ -47,11 +48,11 @@ const putDetailFragments = (table, eId, detailFragments, widthStyles, nFields) =
   )
 })
 
-const editControl = memoize((nextAlt, table, eId, mayUpdate, withRow) => (
+const fieldsButton = memoize((nextAlt, table, eId, mayUpdate, on) => (
   mayUpdate
   ? <span
-      className={`link fa fa-angle-${withRow ? 'down' : 'up'}`}
-      title={`${withRow ? 'open an' : 'close the'}edit form for this record`}
+      className={`link fa fa-angle-${on ? 'down' : 'up'}`}
+      title={`${on ? 'show' : 'close'} details of this record`}
       onClick={nextAlt}
     />
   : null
@@ -72,6 +73,7 @@ const ItemRow = ({
   const nFields = fieldFragments.length
   const formTag = `${table}-${eId}`
   const hasForm = form.has(formTag)
+  const alterSection = `edit-${table}-${eId}`
   return (
     <div className={isactive}>
       {
@@ -79,7 +81,7 @@ const ItemRow = ({
         ? <div>
             <div className={'grid-row'}>
               <div className={'grid-status-cell'} >
-                {editControl(nextAlt, table, eId, update, true)}
+                {fieldsButton(nextAlt, table, eId, update, true)}
                 {hasForm ? <EditStatus form={`${table}-${eId}`} active={false} /> : null}
               </div>
               {putFieldFragments(tables, fieldFragments, widthStyles)}
@@ -88,14 +90,14 @@ const ItemRow = ({
           </div>
         : <div>
             <div className={'grid-status-cell'} >
-              {editControl(nextAlt, table, eId, update, false)}
-              {hasForm ? <EditStatus form={`${table}-${eId}`} active={true} /> : null}
+              {fieldsButton(nextAlt, table, eId, update, false)}
             </div>
             <ItemForm
               filters={filters}
               tables={tables}
               table={table}
               eId={eId}
+              alterSection={alterSection}
               isactive={isactive}
               initialValues={initialValues}
               perm={perm}

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { emptyS } from 'utils'
 
-import { getNotes, compileNotifications, clear, display } from 'notes'
+import { getNotes, clear, display } from 'notes'
 
 class Notification extends Component {
   constructor(props) {
@@ -27,8 +27,7 @@ class Notification extends Component {
   }
 
   render() {
-    const { props: { notes } } = this
-    const { messages, lastNote, lastKind, busy, show } = compileNotifications(notes)
+    const { props: { messages, lastNote, lastKind, busy, show } } = this
 
     const highlight = lastNote > -1
     const busyBlocks = new Array(busy < 0 ? 0 : busy).fill(1)

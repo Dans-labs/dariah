@@ -1,7 +1,6 @@
 import update from 'immutability-helper'
 
-import { memoize } from 'memo'
-import { makeReducer, emptyS, emptyA, emptyO } from 'utils'
+import { makeReducer, emptyS, emptyA } from 'utils'
 
 /* ACTIONS */
 
@@ -70,11 +69,7 @@ export default makeReducer(flows, { messages: emptyA, busy: 0, show: false })
 
 /* SELECTORS */
 
-export const getNotes = ({ notes }) => ({ notes })
-
-/* HELPERS */
-
-export const compileNotifications = memoize(notes => {
+export const getNotes = ({ notes }) => {
   const { messages, busy, show } = notes
   let lastNote = -1
   let lastKind = emptyS
@@ -92,5 +87,7 @@ export const compileNotifications = memoize(notes => {
     }
   })
   return { messages, busy, show, lastMsg: messages.length - 1, lastNote, lastKind }
-}, emptyO, { debug: 'compileNotifications' })
+}
+
+/* HELPERS */
 

@@ -1013,7 +1013,7 @@ BACKOFFICE:
         level: Comprehensive
         description: Under an open or standard license
       - key: sv23-0
-        criteria: sv1
+        criteria: sv23
         score:  0
         level: None
         description: No event details
@@ -1028,7 +1028,7 @@ BACKOFFICE:
         level: Full
         description: Full information about the event
       - key: sv24-0
-        criteria: sv1
+        criteria: sv23
         score:  0
         level: Initial
         description: No statement about the target audience
@@ -1046,7 +1046,7 @@ BACKOFFICE:
           - >-
             (as part of the inkind contribution)
       - key: sv25-0
-        criteria: sv1
+        criteria: sv25
         score:  0
         level: Initial
         description: No document of the event available
@@ -1064,7 +1064,7 @@ BACKOFFICE:
           - >-
             it is fully available for reuse at a stable link
       - key: sv26-0
-        criteria: sv1
+        criteria: sv26
         score:  0
         level: Initial
         description: No or very generic information only
@@ -1086,7 +1086,7 @@ BACKOFFICE:
             including an account of which audience could benefit of
             the results
       - key: sv27-0
-        criteria: sv1
+        criteria: sv27
         score:  0
         level: None
         description: No description of the resource is provided
@@ -1104,7 +1104,7 @@ BACKOFFICE:
           - >-
             The description of the resource is fully provided and contextualised
       - key: sv28-0
-        criteria: sv1
+        criteria: sv28
         score:  0
         level: None
         description: No url provided
@@ -1122,7 +1122,7 @@ BACKOFFICE:
           - >-
             A persistent identifier, e.g. a DOI
       - key: sv29-0
-        criteria: sv1
+        criteria: sv29
         score:  0
         level: None
         description: No metadata provided

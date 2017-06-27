@@ -42,6 +42,7 @@ class ListFilter extends Component {
         tables,
         filters,
         table,
+        navItem,
         perm,
         select, masterId, linkField,
         listIds,
@@ -67,7 +68,7 @@ class ListFilter extends Component {
               perm={perm}
               listIds={listIds}
               item={item}
-              button={'button-large'}
+              button={'button-medium'}
               alterSection={alterSection}
               nAlts={nAlts}
               initial={initial}
@@ -102,6 +103,7 @@ class ListFilter extends Component {
                 filters={filters}
                 tables={tables}
                 table={table}
+                navItem={navItem}
                 listIds={filteredIds}
                 perm={perm}
                 select={select}
@@ -115,6 +117,7 @@ class ListFilter extends Component {
                   filters={filters}
                   tables={tables}
                   table={table}
+                  navItem={navItem}
                   listIds={filteredIds}
                   perm={perm}
                   select={select}

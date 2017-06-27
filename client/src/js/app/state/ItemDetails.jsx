@@ -21,21 +21,12 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
   return (
     <div className={'grid fragments'}>
       {
-        theFragments.map(({ name, detailTable, item: [thing, things], nDetails }) => {
+        theFragments.map(({ name, detailTitle, detailTable, detailItem, detailListIds, detailPerm }) => {
+          const nDetails = detailListIds.length
           const { getAlt, nextAlt } = makeAlternatives(name)
           const alt = getAlt(alter)
           const { linkField, mode, filtered } = details[name]
-          const {
-            [detailTable]: {
-              title: detailTitle,
-              item,
-              perm: detailPerm,
-              entities: detailEntities,
-              allIds: detailAllIds,
-            },
-          } = tables
-          const detailThings = item[1]
-          const detailListIds = detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
+          const [detailThing, detailThings] = detailItem
           const filterTag = makeTag(DETAILS, eId, linkField)
           const gridTag = `${table}-${name}-${eId}`
           return (
@@ -47,7 +38,7 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
                 <span className={`fa fa-angle-${alt == 0 ? 'down' : 'up'}`} />
                 {
                   alt == 0
-                  ? `${nDetails} ${nDetails == 1 ? thing : things}`
+                  ? `${nDetails} ${nDetails == 1 ? detailThing : detailThings}`
                   : emptyS
                 }
               </div>

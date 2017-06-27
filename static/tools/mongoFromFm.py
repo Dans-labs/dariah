@@ -606,6 +606,12 @@ class FMConvert(object):
                             newRow[field] = self.relIndex[field][self.norm(value)][0]
                         else: newRow[field] = value
                     self.allData[bt].append(newRow)
+            for table in self.BACKOFFICE:
+                bt = table['name']
+                ifield = table['indexField']
+                if ifield == 'key':
+                    for row in self.allData[bt]:
+                        del row['key']
         else:
             for table in self.BACKOFFICE:
                 bt = table['name']

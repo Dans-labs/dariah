@@ -29,6 +29,9 @@ export const loadExtra = {
 /* HELPERS */
 
 const compileActiveItems = memoize((entitiesPkg, entitiesTyp, entitiesCri, field = null) => {
+  if ([entitiesPkg, entitiesTyp, entitiesCri].some(x => x == null)) {
+    return field ? null : emptyO
+  }
   const resultSetPkg = new Set()
   const resultSetTyp = new Set()
   const resultSetCri = new Set()
@@ -75,9 +78,15 @@ const compileActiveItems = memoize((entitiesPkg, entitiesTyp, entitiesCri, field
   }
 }, emptyO, { debug: 'compileActiveItems' })
 
-export const compileActive = ({
-  [PACKAGE_TABLE]: { entities: entitiesPkg },
-  [CRITERIA_TABLE]: { entities: entitiesCri },
-  [TYPE_TABLE]: { entities: entitiesTyp },
-}, field) => compileActiveItems(entitiesPkg, entitiesTyp, entitiesCri, field)
+export const compileActive = (tables, field) => {
+  if ([PACKAGE_TABLE, CRITERIA_TABLE, TYPE_TABLE].some(x => tables[x] == null)) {
+    return field ? null : emptyO
+  }
+  const {
+    [PACKAGE_TABLE]: { entities: entitiesPkg },
+    [CRITERIA_TABLE]: { entities: entitiesCri },
+    [TYPE_TABLE]: { entities: entitiesTyp },
+  } = tables
+  return compileActiveItems(entitiesPkg, entitiesTyp, entitiesCri, field)
+}
 

@@ -151,8 +151,8 @@ class DbAccess(object):
         (rowFilter, fieldFilter) = result
         details = tableInfo.get('details', {})
         detailOrder = tableInfo.get('detailOrder', [])
-        fieldOrder = [x for x in tableInfo.get('fieldOrder', []) if x in fieldFilter]
-        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', {}).items() if x[0] in fieldOrder)
+        fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder']) if x in fieldFilter]
+        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
         core = set()
         core.add(title)
         core |= {f['field'] for f in tableInfo.get('filters', [])}
@@ -224,8 +224,8 @@ class DbAccess(object):
         valueLists = {}
         (rowFilter, fieldFilter) = result
         getFields = set(fieldFilter)
-        fieldOrder = [x for x in tableInfo.get('fieldOrder', []) if x in fieldFilter]
-        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', {}).items() if x[0] in fieldOrder)
+        fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder']) if x in fieldFilter]
+        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
 
         relFields = [
             f for (f, fSpec) in fieldSpecs.items()\
@@ -265,8 +265,8 @@ class DbAccess(object):
             return self.stop(text=result or 'Cannot read {}'.format(table))
         tableInfo = self.DM.tables.get(table, {})
         (rowFilter, fieldFilter) = result
-        fieldOrder = [x for x in tableInfo.get('fieldOrder', []) if x in fieldFilter]
-        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', {}).items() if x[0] in fieldOrder)
+        fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder']) if x in fieldFilter]
+        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
         rowFilter.update({'_id': oid(ident)})
         documents = list(_DBM[table].find(rowFilter, fieldFilter))
 
@@ -277,7 +277,12 @@ class DbAccess(object):
         (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
         (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
         perm = dict(update=uFields, delete=mayDelete)
-        return self.stop(data=dict(values=document, perm=perm, fields=fieldFilter))
+        return self.stop(data=dict(
+            values=document,
+            frozen=self.toMarkdown(table, [document], level=0, withDetails=table in {'package', 'criteria'}),
+            perm=perm,
+            fields=fieldFilter,
+        ))
 
     def modList(self, controller, table, action):
         Perm = self.Perm
@@ -390,3 +395,115 @@ class DbAccess(object):
         msgs = [] if good else [dict(kind='error', text=text)] if msgs == None else msgs
         return dict(data=data, msgs=msgs, good=good)
 
+    def toMarkdown(self, table, documents, level=0, withDetails=False):
+        tableInfo = self.DM.tables.get(table, {})
+        fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder'])]
+        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
+        detailOrder = tableInfo.get('detailOrder', None)
+        details = tableInfo.get('details', None)
+        title = tableInfo.get('title', self.DM.generic['title'])
+        item = tableInfo.get('item', self.DM.generic['item'])
+        (thing, things) = item
+        markdown = []
+        baseHeading = '#' * level
+        nDocs = len(documents)
+        markdown.append('{}# {} {}\n\nConsolidated on {}\n\n'.format(baseHeading, nDocs, thing if nDocs == 1 else things, now()))
+        for document in documents:
+            for field in fieldOrder:
+                if field not in document: continue
+                fieldSpec = fieldSpecs[field]
+                valType = fieldSpec['valType']
+                label = fieldSpec['label']
+                multiple = fieldSpec['multiple']
+                docVal = document[field]
+                if docVal == None or (multiple and len(docVal) == 0):
+                    if multiple:
+                        valRep = '*none given*'
+                    else:
+                        valRep = '*not given*'
+                elif type(valType) is str:
+                    valRep = \
+                        '* {}\n'.format('\n\n* '.join(simpleVal(valType, val) for val in docVal)) \
+                            if multiple else \
+                        simpleVal(valType, docVal)
+                else:
+                    valueTable = valType['values']
+                    rowFilter = {'_id': {'$in': [_id for _id in (docVal if multiple else [docVal])]}}
+                    relatedDocs = self.lookup(valueTable, rowFilter)
+                    if len(relatedDocs) == 0:
+                        valRep = 'Could not find value(s) in {}: '.format(valueTable, ','.join(str(val) for val in docVal) if multiple else str(docVal))
+                    else:
+                        valRep = \
+                            '* {}\n'.format('\n\n* '.join(self.head(valueTable, doc) for doc in relatedDocs)) \
+                                if multiple else \
+                            self.head(valueTable, relatedDocs[0])
+                markdown.append('{}## {}\n\n{}\n\n'.format(baseHeading, label, valRep))
+            if withDetails and detailOrder and details:
+                for detail in detailOrder:
+                    detailSpec = details[detail]
+                    detailTable = detailSpec['table']
+                    linkField = detailSpec['linkField']
+                    detailDocs = self.lookup(detailTable, {linkField: document['_id']})
+                    markdown.append(self.toMarkdown(detailTable, detailDocs, level=level+1, withDetails=False))
+        return ''.join(markdown)
+
+    def lookup(self, table, rowFilter):
+        return list(_DBM[table].find(rowFilter))
+
+    def head(self, table, doc):
+        methodName = 'head_{}'.format(table)
+        if hasattr(self, methodName):
+            return getattr(self, methodName)(doc)
+        tableInfo = self.DM.tables.get(table, {})
+        title = tableInfo.get('title', self.DM.generic['title'])
+        return str(doc.get(title, 'no {}'.format(title))).rstrip('\n')
+
+    def head_user(self, doc):
+        firstName = doc.get('firstName', '')
+        lastName = doc.get('lastName', '')
+        email = doc.get('email', '')
+        email = doc.get('email', '')
+        eppn = doc.get('eppn', '')
+        authority = doc.get('authority', '')
+        nameSection = '{}{}{}'.format(firstName, ' ' if firstName and lastName else '', lastName)
+        emailSection = '[{}](mailto:{})'.format(email, email) if email else ''
+        identitySection = '{}{}{}{}'.format('identified as ' if eppn else '', eppn, ' authorized by ' if authority else '', authority)
+        return '{} {} {}'.format(
+            nameSection,
+            emailSection,
+            identitySection,
+        )
+        return 'user'
+        
+    def head_country(self, doc):
+        return '{} = {}, {}a DARIAH member'.format(
+            doc.get('iso', ''),
+            doc.get('name', ''),
+            '' if doc.get('isMember', False) else 'not ',
+        )
+        
+    def head_typeContribution(self, doc):
+        mainType = doc.get('mainType', '')
+        subType = doc.get('subType', '')
+        sep = ' / ' if mainType and subType else ''
+        return '{}{}{}'.format(
+            mainType,
+            sep,
+            subType,
+        )
+        
+    def head_score(self, doc):
+        score = doc.get('score', 'N/A')
+        level = doc.get('level', 'N/A')
+        description = doc.get('description', '')
+        return '{} - {}'.format(score, level) if score or level else description
+
+def simpleVal(valType, val):
+    result = \
+        '[{}](mailto:{})'.format(val, val) if valType == 'email' \
+    else '[{}]({})'.format(val, val) if valType == 'url' \
+    else str(val).split('.', 1)[0] if valType == 'datetime' \
+    else ('Yes' if val else 'No') if valType == 'bool' \
+    else str(val) if valType == 'number' \
+    else val
+    return result.rstrip('\n')

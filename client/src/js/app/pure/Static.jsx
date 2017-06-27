@@ -4,6 +4,7 @@ import NavLink from 'NavLink'
 
 const Static = () => (
   <span className={'small'} >
+    <NavLink to={'/data'} >{'Registry'}</NavLink>
     <NavLink to={'/docs/about.md'} >{'About'}</NavLink>
     <NavLink to={'/tech/docs/design.pdf'} >{'diagrams'}</NavLink>
     <NavLink to={'/tech/docs/criteria.pdf'} >{'criteria specs'}</NavLink>

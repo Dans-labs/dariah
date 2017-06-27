@@ -13,7 +13,7 @@ import ListFilter from 'ListFilter'
 
 class ListContainer extends Component {
   render() {
-    const { props: { filters, tables, table, select, mode, filtered } } = this
+    const { props: { filters, tables, table, eId, select, mode, filtered } } = this
     const complete = mode == 'grid'
     if (needTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA))) {return <div />}
     const { [table]: tableData } = tables
@@ -26,6 +26,7 @@ class ListContainer extends Component {
         filters={filters}
         tables={tables}
         table={table}
+        navItem={eId}
         listIds={listIds}
         perm={perm}
         select={select}
@@ -40,6 +41,7 @@ class ListContainer extends Component {
           filters={filters}
           tables={tables}
           table={table}
+          navItem={eId}
           listIds={listIds}
           select={select}
           perm={perm}
@@ -51,6 +53,7 @@ class ListContainer extends Component {
             filters={filters}
             tables={tables}
             table={table}
+            navItem={eId}
             listIds={listIds}
             select={select}
             perm={perm}

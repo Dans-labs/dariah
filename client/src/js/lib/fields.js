@@ -61,12 +61,21 @@ const valuePrepare = memoize((tables, table, valType, activeItems, inactive, set
     ]
   }
   const classNames = []
-  if (typeof valType == 'object') {classNames.push('tag')}
-  const className = classNames.join(' ')
+  const link = {}
+  let elem = 'span'
+  if (typeof valType == 'object') {
+    classNames.push('tag')
+    const { values: detailTable } = valType
+    link.href = `/data/${detailTable}/list/item/${value}`
+    elem = 'a'
+  }
+  const className = classNames.length ? { className: classNames.join(' ') } : emptyO
+
   if (activeItems == null || inactive == null || activeItems.has(value)) {
     return [
       rep,
-      classNames.length ? { className } : null,
+      { ...className, ...link },
+      elem,
     ]
   }
   const { disabled, attributes } = inactive
@@ -121,13 +130,12 @@ export const someEditable = (fields, perm) =>
 
 export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
   const { initialValues } = props
-  const { [table]: { fieldSpecs, fieldOrder } } = tables
+  const { [table]: { fieldOrder } } = tables
 
   const fragments = []
   for (const field of fieldOrder) {
     const { [field]: f } = fields
     if (f == null) {continue}
-    const { [field]: { label } } = fieldSpecs
     const { update: { [field]: editable } } = perm
     const { [field]: myValues } = initialValues
     const theField = {
@@ -136,7 +144,7 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
       myValues,
       ...props,
     }
-    fragments.push({ field, label, fragment: theField })
+    fragments.push({ field, fragment: theField })
   }
   return fragments
 }
@@ -147,16 +155,24 @@ export const makeDetails = ({ tables, table, eId }) => {
     const { table: detailTable, linkField } = details[name]
     const {
       [detailTable]: {
+        title: detailTitle,
+        item: detailItem,
+        perm: detailPerm,
         entities: detailEntities,
         allIds: detailAllIds,
-        item,
+        fieldSpecs: { [linkField]: multiple },
       },
     } = tables
-    const detailListIds = detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
+    const detailListIds = multiple
+    ? detailAllIds.filter(_id => detailEntities[_id].values[linkField].includes(eId))
+    : detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
     return {
-      name, item,
+      name,
+      detailItem,
+      detailTitle,
       detailTable,
-      nDetails: detailListIds.length,
+      detailListIds,
+      detailPerm,
     }
   })
 }

@@ -17,16 +17,21 @@ const ItemEdit = props => {
     dirty, invalid, submitting, reset, error,
     fieldFragments,
     handleSubmit,
+    nextAlt,
     dispatch,
   } = props
-  const editControlProps = { form: `${table}-${eId}`, dirty, invalid, submitting, reset, error }
+  const editControlProps = {
+    form: `${table}-${eId}`,
+    dirty, invalid, submitting, reset, error,
+    nextAlt, handleSubmit: handleSubmit(toDb(table, eId, dispatch)),
+  }
   return (
     <div>
-      <form onSubmit={handleSubmit(toDb(table, eId, dispatch))} >
+      <form>
         <div>
           <EditDelete
             perm={perm}
-            button={'button-large'}
+            button={'button-medium'}
             onClick={handle(dispatch, delItem, table, eId)}
           />
           <EditControl {...editControlProps} />

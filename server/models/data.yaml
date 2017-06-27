@@ -8,6 +8,13 @@ generic:
     - items
   sort:
     - [rep, 1]
+  fieldOrder:
+    - rep
+  fieldSpecs:
+    rep:
+      label: representation
+      valType: text
+      multiple: false
 
 tables:
   user:
@@ -242,6 +249,21 @@ tables:
           width: 10em
           grow: 1
 
+    detailOrder:
+      - criteria
+      - package
+    details:
+      criteria:
+        table: criteria
+        linkField: typeContribution
+        mode: list
+        filtered: true
+      package:
+        table: package
+        linkField: typeContribution
+        mode: list
+        filtered: false
+
     filters:
       - field: mainType
         label: main type
@@ -451,6 +473,67 @@ tables:
         maxCols: 1
         expanded: false
 
+  assessment:
+    title: title
+    item:
+      - assessment
+      - assessments
+    sort:
+      - [contrib, 1]
+      - [title, 1]
+      - [dateCreated, -1]
+    fieldOrder: 
+      - title
+      - contrib
+      - frozenContribution
+      - remarks
+      - creator
+      - dateCreated
+      - modified
+
+    fieldSpecs: 
+      title:
+        label: Title
+        valType: text
+        multiple: false
+      contrib:
+        label: Contribution link
+        valType:
+          values: contrib
+          allowNew: false
+        multiple: false
+      frozenContribution:
+        label: Contribution details (frozen)
+        valType: textarea
+        multiple: false
+      remarks:
+        label: Remarks
+        valType: textarea
+        multiple: true
+      creator:
+        label: creator
+        valType:
+          values: user
+          allowNew: false
+        multiple: false
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+      modified:
+        label: modified
+        valType: text
+        multiple: true
+
+    detailOrder:
+      - criteria
+    details:
+      criteria:
+        table: criteria
+        linkField: package
+        mode: list
+        filtered: true
+
   package:
     title: title
     item:
@@ -516,7 +599,6 @@ tables:
       - criteria
     details:
       criteria:
-        label: Assessment criteria
         table: criteria
         linkField: package
         mode: list
@@ -525,26 +607,21 @@ tables:
   criteria:
     title: criterion
     item:
-      - criterion
-      - criteria
+      - assessment criterion
+      - assessment criteria
     sort:
       - [package, 1]
-      - [key, 1]
+      - [criterion, 1]
     fieldOrder:
-      - key
-      - package
-      - typeContribution
       - criterion
       - remarks
+      - typeContribution
+      - package
       - creator
       - dateCreated
       - modified
 
     fieldSpecs:
-      key:
-        label: Key
-        valType: text
-        multiple: false
       package:
         label: Package
         valType:
@@ -589,7 +666,6 @@ tables:
       - score
     details:
       score:
-        label: scores
         table: score
         linkField: criteria
         mode: list
@@ -612,21 +688,16 @@ tables:
       - [score, 1]
       - [level, 1]
     fieldOrder:
-      - key
       - score
       - level
       - description
-      - criteria
       - remarks
+      - criteria
       - creator
       - dateCreated
       - modified
 
     fieldSpecs:
-      key:
-        label: Level
-        valType: text
-        multiple: false
       level:
         label: Level
         valType: text

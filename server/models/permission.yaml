@@ -105,6 +105,12 @@ tables:
     update: own
     insert: auth
     delete: own
+  assessment:
+    list:   auth
+    read:   auth
+    update: own
+    insert: auth
+    delete: own
   vcc:
     list:   public
     read:   public
@@ -190,10 +196,6 @@ fields:
       update: system
 
   criteria:
-    key:
-      list: public
-      read: public
-      update: office
     package:
       list: public
       read: public
@@ -224,10 +226,6 @@ fields:
       update: system
 
   score:
-    key:
-      list: public
-      read: public
-      update: office
     level:
       list: public
       read: public
@@ -493,3 +491,32 @@ fields:
       read: auth
       update: system
 
+  assessment:
+    title:
+      list:   auth
+      read:   auth
+      update: own
+    contrib:
+      list:   auth
+      read:   auth
+      update: system
+    frozenContribution:
+      list:   auth
+      read:   auth
+      update: system
+    remarks:
+      list:   auth
+      read:   auth
+      update: own
+    creator:
+      list: office
+      read: office
+      update: system
+    dateCreated:
+      list: office
+      read: office
+      update: system
+    modified:
+      list: office
+      read: office
+      update: system

@@ -20,24 +20,53 @@ a.spin-warning {
 a.control {
     color: $action-fore;
 }
-p.nav {
+.nav {
     background-color: $widget-fixed-back;
     padding-top: 0.3em;
     padding-bottom: 0.3em;
     padding-right: 0.5em;
     padding-left: 0.5em;
 }
-p.nav.top {
+.nav.top {
     padding-right: 8em;
 }
-p.nav.top img {
+.nav.top img {
     margin-bottom: -1em;
     margin-top: -1em;
     height: 3em;
 }
-div.nav {
+.nav.bar {
     background-color: $widget-fixed-back;
     padding: 0;
+    display: flex;
+    flex-basis: content;
+    flex-grow: 0;
+    flex-shrink: 0;
+    height: 100%;
+    max-height: 100%;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+.nav.section {
+    flex-basis: content;
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: inline-flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+.nav.subsection {
+    flex-basis: content;
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: inline-flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-content: start-end;
+    margin-left: 2em;
+    font-size: small;
 }
 a.active {
     background-color: #eeeeee;

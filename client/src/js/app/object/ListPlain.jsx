@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { browserHistory } from 'react-router'
 
-import { emptyS, emptyO } from 'utils'
+import { memoize } from 'memo'
+import { withParams, getUrlParts, emptyS, emptyO } from 'utils'
 import { someEditable } from 'fields'
 
 import { insertItem, needValues, entityHead, DETAILS } from 'tables'
@@ -22,8 +24,9 @@ class ListPlain extends Component {
   }
   gotoItem = eId => {
     const { props: { alterSection, dispatch } } = this
-    const { nextAlt } = compileAlternatives(alterSection, nAlts, initial, dispatch)(eId)
-    nextAlt()
+    const { putAlt } = compileAlternatives(alterSection, nAlts, initial, dispatch)(eId)
+    const theAlt = (initial + 1) % nAlts
+    putAlt(theAlt)
   }
 
   scroll = domElem => {
@@ -46,7 +49,7 @@ class ListPlain extends Component {
               perm={perm}
               listIds={listIds}
               item={item}
-              button={'button-large'}
+              button={'button-medium'}
               alterSection={alterSection}
               nAlts={nAlts}
               initial={initial}
@@ -72,8 +75,8 @@ class ListPlain extends Component {
               <div key={eId} className={isactive} >
                 {
                   active
-                  ? <div>
-                      <span className={'link head'} onClick={nextAlt} >
+                  ? <div {...scrollProps} >
+                      <span className={'link head'} onClick={this.showHide(table, select, eId, false, nextAlt)} >
                         <span className={`fa fa-angle-up`} />
                       </span>
                       <ItemContainer
@@ -84,7 +87,7 @@ class ListPlain extends Component {
                         isactive={isactive}
                       />
                     </div>
-                  : <span className={'item-head'} {...scrollProps} >
+                  : <span className={'item-head'} >
                       {
                         showStatus
                         ? <EditStatus form={formTag} active={active} />
@@ -93,7 +96,7 @@ class ListPlain extends Component {
                             {' '}
                           </span>
                       }
-                      <span className={'link head'} onClick={nextAlt} >
+                      <span className={'link head'} onClick={this.showHide(table, select, eId, true, nextAlt)} >
                         <span className={`fa fa-angle-down`} />
                         {' '}{head}
                       </span>
@@ -107,9 +110,28 @@ class ListPlain extends Component {
     )
   }
 
+  showHide = memoize((table, select, eId, active, nextAlt) => () => {
+    if (select == DETAILS) {
+      nextAlt()
+      return
+    }
+    const [base, origEid] = getUrlParts(browserHistory)
+    if (active) {
+      if (origEid != eId) {
+        browserHistory.push(`${base}/item/${eId}/`)
+      }
+    }
+    else {
+      if (origEid != '') {
+        browserHistory.push(`${base}/`)
+      }
+      nextAlt()
+    }
+  })
+
   gotoNewItem() {
+    const { props: { tables, table, navItem } } = this
     if (this.gotoNew) {
-      const { props: { tables, table } } = this
       const { [table]: tableInfo } = tables
       if (tableInfo == null) {return}
       const { lastInserted } = tableInfo
@@ -117,6 +139,9 @@ class ListPlain extends Component {
         this.gotoNew = false
         this.gotoItem(lastInserted)
       }
+    }
+    else if (navItem != null) {
+      this.gotoItem(navItem)
     }
   }
   componentDidMount() {
@@ -127,4 +152,4 @@ class ListPlain extends Component {
   }
 }
 
-export default connect(getAltSection)(ListPlain)
+export default connect(getAltSection)(withParams(ListPlain))

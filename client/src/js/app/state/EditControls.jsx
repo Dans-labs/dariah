@@ -1,21 +1,31 @@
 import React from 'react'
 import { reduxForm } from 'redux-form'
 import { connect } from 'react-redux'
+import { browserHistory } from 'react-router'
 
 import { memoize } from 'memo'
-import { emptyS, emptyO } from 'utils'
+import { getUrlParts, emptyS, emptyO } from 'utils'
 
 import { getAltSection, compileAlternatives } from 'alter'
 
-const editStatusGeneric = canSubmit => ({ active, dirty, invalid, submitting, reset, error }) => (
+const editStatusGeneric = canSubmit => ({ active, dirty, invalid, submitting, reset, error, handleSubmit, nextAlt }) => (
   <span>
+    {
+      (canSubmit && !dirty && !submitting)
+      ? <span
+          className={'button-medium fa fa-fw fa-eye'}
+          title={'close the edit form'}
+          onClick={nextAlt}
+        />
+      : null
+    }
     {
       (dirty && !invalid && !submitting)
       ? canSubmit
-        ? <button
-            type={'submit'}
-            className={'button-large edit-action fa fa-fw fa-check'}
+        ? <span
+            className={'button-medium edit-action fa fa-fw fa-save'}
             title={'save'}
+            onClick={handleSubmit}
           />
         : <span
             className={'warning-o fa fa-fw fa-pencil'}
@@ -61,7 +71,7 @@ const editStatusGeneric = canSubmit => ({ active, dirty, invalid, submitting, re
       ? canSubmit
         ? <button
             type={'button'}
-            className={'button-large error-o fa fa-fw fa-close'}
+            className={'button-medium error-o fa fa-fw fa-close'}
             title={'reset values to last saved'}
             onClick={reset}
           />
@@ -83,7 +93,6 @@ export const EditStatus = reduxForm({
   keepDirtyOnReinitialize: true,
 })(editStatusGeneric(false))
 
-
 export const EditDelete = ({ perm, button, onClick }) => (
   perm.delete
   ? <div
@@ -96,7 +105,9 @@ export const EditDelete = ({ perm, button, onClick }) => (
 
 const handleCloseAll = memoize((alter, alterSection, nAlts, initial, items, dispatch) => {
   const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
+  const base = getUrlParts(browserHistory)[0]
   return () => {
+    browserHistory.push(`${base}/`)
     items.forEach(eId => {
       const { getAlt, initAlt } = makeAlternatives(eId)
       if (getAlt(alter) != initial) {

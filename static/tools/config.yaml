@@ -431,7 +431,7 @@ DEFAULT_VALUES:
 
 MOVE_FIELDS:
   contrib:
-    assessment:
+    assessmentLegacy:
       !!set
       ? approved
       ? dateApproved

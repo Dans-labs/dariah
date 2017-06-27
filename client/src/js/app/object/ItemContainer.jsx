@@ -26,12 +26,14 @@ class ItemContainer extends Component {
     } = tables
     if (needValues(entities, eId)) {return <div />}
 
+    const alterSection = `edit-${table}-${eId}`
     return (
       <ItemForm
         filters={filters}
         tables={tables}
         table={table}
         eId={eId}
+        alterSection={alterSection}
         isactive={isactive}
         key={`${table}-${eId}`}
         initialValues={initialValues}
