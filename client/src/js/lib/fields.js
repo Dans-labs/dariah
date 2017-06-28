@@ -167,16 +167,16 @@ export const makeDetails = ({ tables, table, eId }) => {
   const { [table]: { details, detailOrder } } = tables
   return (detailOrder || emptyA).map(name => {
     const { table: detailTable, linkField } = details[name]
+    const { [detailTable]: detailTableData } = tables
+    if (detailTableData == null) {return null}
     const {
-      [detailTable]: {
         title: detailTitle,
         item: detailItem,
         perm: detailPerm,
         entities: detailEntities,
         allIds: detailAllIds,
         fieldSpecs: { [linkField]: multiple },
-      },
-    } = tables
+    } = detailTableData
     const detailListIds = multiple
     ? detailAllIds.filter(_id => (detailEntities[_id].values[linkField] || emptyA).includes(eId))
     : detailAllIds.filter(_id => detailEntities[_id].values[linkField] === eId)
@@ -189,6 +189,7 @@ export const makeDetails = ({ tables, table, eId }) => {
       detailPerm,
     }
   })
+  .filter(x => x != null)
 }
 
 export const getDateTime = (iso, absent = Number.NEGATIVE_INFINITY) => {
