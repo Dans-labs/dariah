@@ -80,7 +80,11 @@ const valuePrepare = memoize((tables, table, valType, activeItems, inactive, set
   }
   const { disabled, attributes } = inactive
   if (disabled) {classNames.push('disabled')}
-  return [rep, classNames.length ? mergeClassnames(classNames, attributes) : attributes]
+  return [
+    rep,
+    { ...(classNames.length ? mergeClassnames(classNames, attributes) : attributes), ...link },
+    elem,
+  ]
 }, emptyO)
 
 const putElem = ([rep, attributes, elem], i) => {
