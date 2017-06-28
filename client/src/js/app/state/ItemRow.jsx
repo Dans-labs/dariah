@@ -18,7 +18,7 @@ const putFieldFragments = (tables, fieldFragments, widthStyles) => fieldFragment
   const widthStyle = widthStyles[i]
   return (
     <div
-      className={`grid-cell valueColGrid ${editable ? 'editable' : emptyS}`}
+      className={`grid-cell valueColGrid ${editable ? 'edit' : emptyS}`}
       style={widthStyle}
       key={field}
     >
@@ -77,7 +77,7 @@ const ItemRow = ({
   return (
     <div className={isactive}>
       {
-        alt == 0
+        alt === 0
         ? <div>
             <div className={'grid-row'}>
               <div className={'grid-status-cell'} >

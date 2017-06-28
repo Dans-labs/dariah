@@ -21,15 +21,15 @@ const flows = {
   },
   addColumn(state, { gridTag, column, direction }) {
     const { [gridTag]: sortSpec } = state
-    return { ...state, [gridTag]: (sortSpec || emptyA).filter(x => x[0] != column).concat([[column, direction]]) }
+    return { ...state, [gridTag]: (sortSpec || emptyA).filter(x => x[0] !== column).concat([[column, direction]]) }
   },
   delColumn(state, { gridTag, column }) {
     const { [gridTag]: sortSpec } = state
-    return { ...state, [gridTag]: (sortSpec || emptyA).filter(x => x[0] != column) }
+    return { ...state, [gridTag]: (sortSpec || emptyA).filter(x => x[0] !== column) }
   },
   turnColumn(state, { gridTag, column }) {
     const { [gridTag]: sortSpec } = state
-    return { ...state, [gridTag]: (sortSpec || emptyA).map(x => [x[0], x[0] == column ? -x[1] : x[1]]) }
+    return { ...state, [gridTag]: (sortSpec || emptyA).map(x => [x[0], x[0] === column ? -x[1] : x[1]]) }
   },
 }
 
@@ -43,7 +43,7 @@ export const getGrid = ({ grid }) => ({ grid })
 
 export const compileSortedData = memoize((tables, table, listIds, sortSpec, settings) => {
   const sortColumns = sortSpec.map(x => x[0])
-  const sortDirs = sortSpec.map(x => x[1] == 1 ? 'asc' : 'desc')
+  const sortDirs = sortSpec.map(x => x[1] === 1 ? 'asc' : 'desc')
   const { [table]: { entities } } = tables
   const r = reprX(tables, table, settings)
   const fullData = listIds.map(_id => mapValues(entities[_id].values, r))
@@ -53,7 +53,7 @@ export const compileSortedData = memoize((tables, table, listIds, sortSpec, sett
 const reprX = (tables, table, settings) => {
   const { [table]: { fieldSpecs } } = tables
   return (myValues, field) => {
-    if (field == '_id') {return myValues}
+    if (field === '_id') {return myValues}
     const { [field]: { valType, multiple } } = fieldSpecs
     return multiple
     ? (myValues || emptyA).map(value => repr(tables, table, valType, value, settings)).join('|')

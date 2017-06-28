@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { withParams } from 'utils'
+import { withParams, emptyA } from 'utils'
 import { getMe } from 'me'
 
 import NavLink from 'NavLink'
@@ -11,7 +11,7 @@ const tableLinks = (me, { path, name, own, details }) => !own || me.eppn
       <NavLink to={path} className={'head'} >{name}</NavLink>
       <div className={'nav subsection'} >
         {
-          details.filter(({ own: subOwn }) => !subOwn || me.eppn).map(
+          (details || emptyA).filter(({ own: subOwn }) => !subOwn || me.eppn).map(
             ({ path: subPath, name: subName }) =>
               <NavLink key={subPath} to={`${path}/${subPath}`} >{subName}</NavLink>
            )
@@ -99,6 +99,13 @@ const navBarItems = [
       { path: 'grid', name: 'table', own: true },
     ],
   },
+  /*
+  {
+    path: '/data',
+    name: 'All tables',
+    own: false,
+  },
+  */
 ]
 
 const SubApp = ({ me, table, routes, children }) => (
@@ -108,18 +115,20 @@ const SubApp = ({ me, table, routes, children }) => (
     </div>
     <div className={'details'} >
       {
-        routes[1].path == 'data' && routes.length == 2
-        ? <div>
-            <h3>{'Registry'}</h3>
-            <p>{'Use the side bar to navigate to a section'}</p>
-          </div>
-          : routes[1].path == 'data' && routes.length == 3
-            ? <div>
-                <h3>{'Registry'}</h3>
-                <h4>{`Table ${table}`}</h4>
-                <p>{'Use the side bar to navigate to a particular view on this table'}</p>
-              </div>
-            : null
+        routes[1].path === 'data' && routes.length === 1
+        ? <div>{'All tables'}</div>
+        : routes[1].path === 'data' && routes.length === 2
+          ? <div>
+              <h3>{'Registry'}</h3>
+              <p>{'Use the side bar to navigate to a section'}</p>
+            </div>
+            : routes[1].path === 'data' && routes.length === 3
+              ? <div>
+                  <h3>{'Registry'}</h3>
+                  <h4>{`Table ${table}`}</h4>
+                  <p>{'Use the side bar to navigate to a particular view on this table'}</p>
+                </div>
+              : null
       }
       { children }
     </div>

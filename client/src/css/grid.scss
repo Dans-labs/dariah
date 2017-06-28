@@ -36,9 +36,7 @@
     font-weight: bold;
 }
 .grid-status-cell {
-    flex-basis: 3em;
-    flex-grow: 0;
-    flex-shrink: 0;
+    flex: 0 0 3em;
 }
 .list-generic {
     display: flex;
@@ -73,17 +71,13 @@ div.sub-app {
     align-items: flex-start;
 }
 div.bar {
-    flex-basis: content;
-    flex-shrink: 1;
-    flex-grow: 0.5;
+    flex: 0.5 1 content;
     padding-right: 0.5em;
     max-height: 100%;
     overflow: auto;
 }
 div.details {
-    flex-basis: 70%;
-    flex-shrink: 1;
-    flex-grow: 1;
+    flex: 1 1 70%;
     padding-left: 0.5em;
     max-height: 100%;
     overflow: auto;
@@ -96,18 +90,14 @@ div.list-filter {
     align-items: flex-start;
 }
 div.filters {
-    flex-basis: content;
-    flex-shrink: 1;
-    flex-grow: 1;
+    flex: 1 1 content;
     padding-right: 0.5em;
     max-height: 100%;
     max-width: 40%;
     overflow: auto;
 }
 div.list {
-    flex-basis: 50%;
-    flex-shrink: 1;
-    flex-grow: 1;
+    flex: 1 1 50%;
     padding-left: 0.5em;
     max-height: 100%;
     overflow: auto;
@@ -122,9 +112,7 @@ div.list-filter.compact {
 div.filters.compact {
     width: 100%;
     max-width: 100%;
-    flex-basis: auto;
-    flex-shrink: 1;
-    flex-grow: 1;
+    flex: 1 1 auto;
 }
 div.filterSequence.compact {
     width: 100%;
@@ -137,9 +125,7 @@ div.filterSequence.compact {
 }
 div.list.compact {
     width: 100%;
-    flex-basis: auto;
-    flex-shrink: 1;
-    flex-grow: 1;
+    flex: 1 1 auto;
 }
 div.fulltext {
     display: flex;
@@ -149,15 +135,11 @@ div.fulltext {
     align-items: baseline;
 }
 div.fulltext .search {
-    flex-basis: 5em;
-    flex-shrink: 0.3;
-    flex-grow: 1;
+    flex: 1 0.3 5em;
     overflow: auto;
 }
 .fulltext-stat {
-    flex-basis: 5em;
-    flex-shrink: 0.2;
-    flex-grow: 0.5;
+    flex: 0.5 0.2 5em;
     overflow: auto;
     text-align: right;
     color: $dim-fore;

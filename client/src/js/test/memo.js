@@ -33,7 +33,7 @@ function memoizeOld(f) {
   let retrieved = 0
   let computed = 0
   const memoF = (...fArgs) => {
-    if (fArgs.length == 0) {
+    if (fArgs.length === 0) {
       return { cacheKeys: Object.keys(memCache), computed, retrieved }
     }
     const memoKey = JSON.stringify(fArgs)
@@ -139,9 +139,9 @@ const testPerformance = () => {
           const { cacheKeys, computed, retrieved, cleared } = f()
           assert.equal(cacheKeys.length, 1, 'number of cacheKeys')
           assert.equal(computed, 1, 'computed')
-          if (labelF != 'memoizeOld') {assert.equal(cleared, 0, 'cleared')}
+          if (labelF !== 'memoizeOld') {assert.equal(cleared, 0, 'cleared')}
           assert.equal(retrieved, 999)
-          if (labelF == 'memoize' && levels != null) {
+          if (labelF === 'memoize' && levels != null) {
             assert.equal(answer, cacheKeys[0], 'value of cacheKey')
           }
         })

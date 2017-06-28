@@ -51,12 +51,12 @@ const ByValue = ({
         }
         {' '}
         <span
-          className={`button-small fa fa-angle-${alt == 0 ? collapse : expand}`}
+          className={`button-small fa fa-angle-${alt === 0 ? collapse : expand}`}
           onClick={nextAlt}
         />
       </div>
       {
-        alt == 0
+        alt === 0
         ? <div className={`facet-container ${compact ? 'compact' : emptyS}`} >
             {
               Object.entries(fieldValues).map(([valueId, valueRep]) => (

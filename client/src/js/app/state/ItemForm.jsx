@@ -1,14 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { handle } from 'handle'
 import { makeFields, makeDetails, someEditable } from 'fields'
 
-import { DETAILS } from 'tables'
+import { delItem, DETAILS } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
 
 import ItemEdit from 'ItemEdit'
 import ItemRead from 'ItemRead'
 import ItemDetails from 'ItemDetails'
+import { EditDelete } from 'EditControls'
 
 const ItemForm = props => {
   const { alter, alterSection, filters, tables, table, eId, isactive, initialValues, fields, perm, dispatch } = props
@@ -21,8 +23,13 @@ const ItemForm = props => {
   return (
     <div className={`itemRecord ${isactive}`} >
       {
-        hasEditable && alt == 1
+        hasEditable && alt === 1
         ? <div>
+            <EditDelete
+              perm={perm}
+              button={'button-medium'}
+              onClick={handle(dispatch, delItem, table, eId)}
+            />
             <ItemEdit
               tables={tables}
               table={table}
@@ -44,6 +51,11 @@ const ItemForm = props => {
                 />
               : null
             }
+            <EditDelete
+              perm={perm}
+              button={'button-medium'}
+              onClick={handle(dispatch, delItem, table, eId)}
+            />
             <ItemRead
               tables={tables}
               eId={eId}

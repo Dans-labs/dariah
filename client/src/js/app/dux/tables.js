@@ -18,7 +18,7 @@ export const MYIDS = 'myIds'
 export const fetchTable = (table, select = ALLIDS, complete) => accessData({
   type: 'fetchTable',
   contentType: 'db',
-  path: `/${select == 'myIds' ? 'my' : emptyS}list?table=${table}&complete=${complete}`,
+  path: `/${select === 'myIds' ? 'my' : emptyS}list?table=${table}&complete=${complete}`,
   desc: `${table} table`,
   table,
 })
@@ -91,7 +91,9 @@ const flows = {
     if (data == null) {return state}
     const { values, values: { _id }, newValues } = data
     const useRelFields = ['_id', 'rep']
-    let newState = updateAuto(state, [table, 'entities', _id, 'values'], { $set: values })
+    const fieldUpdates = {}
+    Object.entries(values).forEach(([key, value]) => {fieldUpdates[key] = { $set: value }})
+    let newState = updateAuto(state, [table, 'entities', _id, 'values'], fieldUpdates)
     if (newValues != null) {
       for (const { _id, rep, relTable, field } of newValues) {
         newState = update(newState, { [table]: { valueLists: { [field]: { $unshift: [_id] } } } })
@@ -105,7 +107,7 @@ const flows = {
     const { values: { _id } } = data
     let newState = updateAuto(state, [table, 'entities', _id], { $set: data })
     newState = updateAuto(newState, [table, ALLIDS], { $unshift: [_id] }, true)
-    if (select == MYIDS) {
+    if (select === MYIDS) {
       newState = updateAuto(newState, [table, MYIDS], { $unshift: [_id] }, true)
     }
     return update(newState, {
@@ -121,7 +123,7 @@ const flows = {
     let newState = update(state, { [table]: { entities: { $unset: [_id] } } })
     Object.entries({ myIds, allIds }).forEach(([name, list]) => {
       if (list != null) {
-        const otherIds = list.filter(x => x != _id)
+        const otherIds = list.filter(x => x !== _id)
         newState = update(newState, { [table]: { [name]: { $set: otherIds } } })
       }
     })
@@ -143,7 +145,7 @@ const hasTableKey = (tables, table, key, value = null) => {
   if (tables == null) {return false}
   const { [table]: tableData } = tables
   if (tableData == null) {return false}
-  return tableData[key] != null && (value == null || tableData[key] == value)
+  return tableData[key] != null && (value == null || tableData[key] === value)
 }
 
 export const needTable = (tables, table, select = ALLIDS, complete) => {
@@ -153,7 +155,7 @@ export const needTable = (tables, table, select = ALLIDS, complete) => {
   const relTables = Array.from(
     new Set(
       Object.entries(fieldSpecs).
-      filter(entry => ((typeof entry[1].valType) == 'object') && entry[1].valType.values != null).
+      filter(entry => ((typeof entry[1].valType) === 'object') && entry[1].valType.values != null).
       map(entry => entry[1].valType.values)
     )
   )
@@ -196,7 +198,7 @@ const repUser = memoize((tables, valId) => {
       },
     } = entity
     let linkText = [firstName, lastName].filter(x => x).join(' ')
-    if (linkText == emptyS) {linkText = email}
+    if (linkText === emptyS) {linkText = email}
     const namePart = linkText && email
     ? `[${linkText}](mailto:${email})`
     : linkText + email
@@ -271,7 +273,7 @@ const trimDate = (text, dateOnly) =>
 
 export const repr = (tables, table, valType, value, settings) => {
   if (value == null) {return emptyS}
-  if (typeof valType == 'string') {
+  if (typeof valType === 'string') {
     switch (valType) {
       case 'datetime': return trimDate(value, settings && settings.shortDates)
       case 'bool': return value ? 'Yes' : 'No'

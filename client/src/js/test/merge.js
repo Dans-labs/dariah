@@ -102,7 +102,7 @@ const testMergeBasic = () => {
     for (const [dataLabel, dataSets] of updates) {
       describe(`Updating with ${dataLabel}`, () => {
         for (const [methodLabel, method] of methods) {
-          const data = methodLabel == 'update' ? dataSets[1] : dataSets[0]
+          const data = methodLabel === 'update' ? dataSets[1] : dataSets[0]
           const newState = method(state, data)
           const vAnswer = answers[dataLabel][methodLabel].v
           const stateValue = jString(state, 2)
@@ -112,7 +112,7 @@ const testMergeBasic = () => {
               assert.equal(newStateValue, stateValue, 'equal values')
             }
             else {
-              assert.equal(newStateValue == stateValue, false, 'unequal values')
+              assert.equal(newStateValue === stateValue, false, 'unequal values')
             }
           })
           inspect.forEach((f, level) => {

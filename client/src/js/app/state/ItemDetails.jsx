@@ -32,61 +32,65 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
           return (
             <div key={name} className={'grid-row'} >
               <div
-                className={'link'}
+                className={'link detail-control'}
                 onClick={nextAlt}
               >
-                <span className={`fa fa-angle-${alt == 0 ? 'down' : 'up'}`} />
+                <span className={`fa fa-angle-${alt === 0 ? 'down' : 'up'}`} />
                 {
-                  alt == 0
-                  ? `${nDetails} ${nDetails == 1 ? detailThing : detailThings}`
+                  alt === 0
+                  ? `${nDetails} ${nDetails === 1 ? detailThing : detailThings}`
                   : emptyS
                 }
               </div>
-              {
-                alt == 1
-                ? filtered
-                  ? <ListFilter
-                      filters={filters}
-                      tables={tables}
-                      table={detailTable}
-                      listIds={detailListIds}
-                      perm={detailPerm}
-                      select={DETAILS}
-                      mode={mode}
-                      compact={true}
-                      title={detailTitle}
-                      gridTag={gridTag}
-                      filterTag={filterTag}
-                      masterId={eId}
-                      linkField={linkField}
-                    />
-                  : mode == 'list'
-                    ? <ListPlain
-                        alterSection={`list-${detailTable}-${DETAILS}`}
+              <div className={'detail-body'} >
+                {
+                  alt === 1
+                  ? filtered
+                    ? <ListFilter
                         filters={filters}
                         tables={tables}
                         table={detailTable}
                         listIds={detailListIds}
                         perm={detailPerm}
+                        select={DETAILS}
+                        mode={mode}
+                        compact={true}
                         title={detailTitle}
+                        gridTag={gridTag}
+                        filterTag={filterTag}
                         masterId={eId}
                         linkField={linkField}
                       />
-                    : mode == 'grid'
-                      ? <ListGrid
+                    : mode === 'list'
+                      ? <ListPlain
                           alterSection={`list-${detailTable}-${DETAILS}`}
                           filters={filters}
                           tables={tables}
                           table={detailTable}
                           listIds={detailListIds}
                           perm={detailPerm}
-                          gridTag={gridTag}
+                          select={DETAILS}
+                          title={detailTitle}
                           masterId={eId}
                           linkField={linkField}
                         />
-                      : <span>{`unknown display mode "${mode}" for ${detailThings}`}</span>
-                : null
-              }
+                      : mode === 'grid'
+                        ? <ListGrid
+                            alterSection={`list-${detailTable}-${DETAILS}`}
+                            filters={filters}
+                            tables={tables}
+                            table={detailTable}
+                            listIds={detailListIds}
+                            perm={detailPerm}
+                            select={DETAILS}
+                            gridTag={gridTag}
+                            masterId={eId}
+                            linkField={linkField}
+                          />
+                        : <span>{`unknown display mode "${mode}" for ${detailThings}`}</span>
+                  : null
+                }
+              </div>
             </div>
           )
         })

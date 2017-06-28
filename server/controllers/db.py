@@ -1,4 +1,5 @@
 import json, datetime
+from functools import reduce
 from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -50,6 +51,8 @@ class DbAccess(object):
             self.DM.generic['createdBy'],
             self.DM.generic['modified'],
         }
+        self.CREATOR = self.DM.generic['createdBy']
+        self.getActiveItems()
 
     def userFind(self, eppn, authority): return _DBM.user.find_one({'eppn': eppn, 'authority': authority})
     def userLocal(self): return _DBM.user.find({'authority': 'local'})
@@ -60,7 +63,12 @@ class DbAccess(object):
     def validate(self, table, itemValues, uFields):
         tableInfo = self.DM.tables.get(table, {})
         modified = self.DM.generic['modified']
-        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', {}).items() if x[0] in itemValues)
+        (fieldOrder, fieldSpecs, allFields, frozenFields) = self.extendFields(table, True)
+        for f in frozenFields:
+            (of, details) = frozenFields[f]
+            if of in uFields:
+                uFields[f] = True
+        #fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', {}).items() if x[0] in itemValues)
         valItemValues = dict()
         newValues = []
         for (f, values) in itemValues.items():
@@ -79,9 +87,7 @@ class DbAccess(object):
             if f not in uFields:
 # if the current user has no update access to a system field, the received value is discarded.
 # later on, the system will append the correct value
-                if f not in self.SYSTEM_FIELDS:
-                    valid = False
-                    diags.append('{} not accessible'.format(f))
+                continue
             elif type(valType) is str:
                 if valType == 'datetime':
                     good = True
@@ -151,8 +157,7 @@ class DbAccess(object):
         (rowFilter, fieldFilter) = result
         details = tableInfo.get('details', {})
         detailOrder = tableInfo.get('detailOrder', [])
-        fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder']) if x in fieldFilter]
-        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
+        (fieldOrder, fieldSpecs, fieldFilter, frozenFields) = self.extendFields(table, fieldFilter)
         core = set()
         core.add(title)
         core |= {f['field'] for f in tableInfo.get('filters', [])}
@@ -162,6 +167,8 @@ class DbAccess(object):
             coreFields[f] = True
 
         theFieldFilter = coreFields if titleOnly else fieldFilter 
+        creatorField = self.CREATOR
+        theFieldFilter[creatorField] = True
         if rFilter != None:
             rowFilter.update(rFilter)
         if sort == None:
@@ -169,7 +176,10 @@ class DbAccess(object):
         else:
             documents = list(_DBM[table].find(rowFilter, theFieldFilter).sort(sort))
         allIds=[d['_id'] for d in documents]
-        entities=dict((str(d['_id']), dict(values=dict((f, d[f]) for f in d if (not titleOnly or f in coreFields)))) for d in documents)
+        entities=dict((str(d['_id']), dict(values=dict((f, d[f]) for f in d if (
+                (not titleOnly or f in coreFields) and
+                (f != creatorField or f in fieldFilter)
+            )))) for d in documents)
         if not titleOnly:
             for d in documents:
                 (mayDelete, dFields) = Perm.may(table, 'delete', document=d)
@@ -265,24 +275,10 @@ class DbAccess(object):
             return self.stop(text=result or 'Cannot read {}'.format(table))
         tableInfo = self.DM.tables.get(table, {})
         (rowFilter, fieldFilter) = result
-        fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder']) if x in fieldFilter]
-        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
+        (fieldOrder, fieldSpecs, fieldFilter, frozenFields) = self.extendFields(table, fieldFilter)
         rowFilter.update({'_id': oid(ident)})
-        documents = list(_DBM[table].find(rowFilter, fieldFilter))
 
-        ldoc = len(documents)
-        if ldoc == 0:
-            return self.stop(data=none, text='{} item does not exist'.format(table))
-        document = documents[0]
-        (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
-        (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
-        perm = dict(update=uFields, delete=mayDelete)
-        return self.stop(data=dict(
-            values=document,
-            frozen=self.toMarkdown(table, [document], level=0, withDetails=table in {'package', 'criteria'}),
-            perm=perm,
-            fields=fieldFilter,
-        ))
+        return self.findDoc(table, rowFilter, fieldFilter, frozenFields, {}, '{} item does not exist'.format(table))
 
     def modList(self, controller, table, action):
         Perm = self.Perm
@@ -301,11 +297,16 @@ class DbAccess(object):
             tableInfo = self.DM.tables.get(table, {})
             title = tableInfo.get('title', self.DM.generic['title'])
             sort = tableInfo.get('title', self.DM.generic['sort'])
-            modified = self.DM.generic['modified']
+            (readGood, readResult) = Perm.getPerm(controller, table, 'read')
+            if not readGood:
+                return self.stop(data=none, text=readResult or 'Cannot read table {}'.format(table))
+            (readRowFilter, readFieldFilter) = readResult
+            (fieldOrder, fieldSpecs, readFieldFilter, frozenFields) = self.extendFields(table, True)
             modDate = now()
             modBy = self.eppn
             createdDate = self.DM.generic['createdDate']
             createdBy = self.DM.generic['createdBy']
+            modified = self.DM.generic['modified']
             insertValues = {
                 title: 'no title',
                 createdDate: now(),
@@ -314,21 +315,46 @@ class DbAccess(object):
             }
             if masterId != None and linkField != None:
                 insertValues[linkField] = oid(masterId)
+                linkSpecs = fieldSpecs[linkField]['valType']
+                masterTable = linkSpecs['values']
+                freeze = linkSpecs.get('freeze', {})
+                if freeze:
+                    masterDocument = list(_DBM[masterTable].find({ '_id': insertValues[linkField]}))[0]
+                    frozenField = 'frozen-{}'.format(linkField)
+                    frozenValue = self.freezeDocs(masterTable, [masterDocument], level=0, withDetails=freeze.get('details', False))
+                    insertValues[frozenField] = frozenValue
+                    if table == 'assessment':
+                        insertValues[title] = 'Self assessment of {}'.format(masterDocument['title'])
             result = _DBM[table].insert_one(insertValues)
             ident = result.inserted_id
-            (readGood, readResult) = Perm.getPerm(controller, table, 'read')
-            if not readGood:
-                return self.stop(data=none, text=readResult or 'Cannot read table {}'.format(table))
-            (readRowFilter, readFieldFilter) = readResult
-            documents = list(_DBM[table].find(dict(_id=ident), readFieldFilter))
-            ldoc = len(documents)
-            if ldoc == 0:
-                return self.stop(data=none, text='failed to insert new item into {}'.format(table))
-            document = documents[0]
-            (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
-            (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
-            perm = dict(update=uFields, delete=mayDelete)
-            return self.stop(data=dict(values=document, perm=perm, fields=readFieldFilter))
+
+            if masterId != None and linkField != None:
+                if freeze:
+                    if table == 'assessment':
+                        activeItems = self.getActiveItems()
+                        criteriaEntities = activeItems['criteriaEntities']
+                        typeCriteria = activeItems['typeCriteria']
+                        masterType = masterDocument['typeContribution']
+                        criteria = typeCriteria[masterType]
+                        detailData = []
+                        for critId in criteria:
+                            critDoc = criteriaEntities[str(critId)]
+                            detailData.append({
+                                'criterion': critDoc['criterion'],
+                                'criteria': critId,
+                                'frozen-criteria': self.freezeDocs('criteria', [critDoc], level=0, withDetails=True),
+                                'evidence': [],
+                                'assessment': ident,
+                                createdDate: now(),
+                                createdBy: self.uid,
+                                modified: ['{} on {}'.format(modBy, modDate)],
+                            })
+
+                        _DBM['criteriaEntry'].insert_many(detailData)
+
+
+
+            return self.findDoc(table, dict(_id=ident), readFieldFilter, frozenFields, '', 'failed to insert new item into {}'.format(table))
 
         elif action == 'delete':
             newData = request.json
@@ -336,7 +362,7 @@ class DbAccess(object):
             if ident == None:
                 return self.stop(data=none, text='Not specified which item to delete')
             rowFilter.update({'_id': oid(ident)})
-            documents = list(_DBM[table].find(rowFilter, {'_id': True}))
+            documents = list(_DBM[table].find(rowFilter))
             if len(documents) != 1:
                 return self.stop(data=none, text='Unidentified item to delete')
             document = documents[0]
@@ -378,6 +404,24 @@ class DbAccess(object):
                 validationDiags['_error'] = 'invalid values in fields {}'.format(invalidFields)
                 validationMsgs.append(dict(kind='warning', text='table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)))
                 return self.stop(data=validationDiags, msgs=validationMsgs)
+
+            (fieldOrder, fieldSpecs, fieldFilter, frozenFields) = self.extendFields(table, fieldFilter)
+            for field in frozenFields:
+                (origField, details) = frozenFields[field]
+                fieldSpec = fieldSpecs[origField]
+                valType = fieldSpec['valType']
+                multiple = fieldSpec['multiple']
+                valueTable = valType['values']
+                if multiple:
+                    if sorted(updateValues[origField]) == sorted(document[origField]): continue
+                    docs = list(_DBM[valueTable].find({ '_id': {'$in': updateValues[origField]}}))
+                    frozenValue = [self.freezeDocs(valueTable, doc, level=0, withDetails=details) for doc in docs] 
+                else:
+                    if updateValues[origField] == document[origField]: continue
+                    doc = list(_DBM[valueTable].find({ '_id': updateValues[origField]}))[0]
+                    frozenValue = self.freezeDocs(valueTable, [doc], level=0, withDetails=details)
+                updateValues[field] = frozenValue
+
             modDate = now()
             modBy = self.eppn
             updateSaveValues = {}
@@ -395,7 +439,30 @@ class DbAccess(object):
         msgs = [] if good else [dict(kind='error', text=text)] if msgs == None else msgs
         return dict(data=data, msgs=msgs, good=good)
 
-    def toMarkdown(self, table, documents, level=0, withDetails=False):
+    def findDoc(self, table, rowFilter, fieldFilter, frozenFields, failData, failText):
+        Perm = self.Perm
+        creatorField = self.CREATOR
+        theFieldFilter = dict(x for x in fieldFilter.items())
+        theFieldFilter[creatorField] = True
+        documents = list(_DBM[table].find(rowFilter, theFieldFilter))
+        ldoc = len(documents)
+        if ldoc == 0:
+            return self.stop(data=failData, text=failText)
+        document = documents[0]
+        (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
+        (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
+        for f in frozenFields:
+            (of, details) = frozenFields[f]
+            if of in uFields:
+                uFields[f] = True
+        perm = dict(update=uFields, delete=mayDelete)
+        return self.stop(data=dict(
+            values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
+            perm=perm,
+            fields=fieldFilter),
+        )
+
+    def freezeDocs(self, table, documents, level=0, withDetails=False):
         tableInfo = self.DM.tables.get(table, {})
         fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder'])]
         fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
@@ -407,7 +474,7 @@ class DbAccess(object):
         markdown = []
         baseHeading = '#' * level
         nDocs = len(documents)
-        markdown.append('{}# {} {}\n\nConsolidated on {}\n\n'.format(baseHeading, nDocs, thing if nDocs == 1 else things, now()))
+        markdown.append('Reference {}# {}\n\n'.format(baseHeading, thing if nDocs == 1 else things))
         for document in documents:
             for field in fieldOrder:
                 if field not in document: continue
@@ -428,8 +495,9 @@ class DbAccess(object):
                         simpleVal(valType, docVal)
                 else:
                     valueTable = valType['values']
-                    rowFilter = {'_id': {'$in': [_id for _id in (docVal if multiple else [docVal])]}}
-                    relatedDocs = self.lookup(valueTable, rowFilter)
+                    relatedDocs = list(_DBM[valueTable].find(
+                        {'_id': {'$in': [_id for _id in (docVal if multiple else [docVal])]}}
+                    ))
                     if len(relatedDocs) == 0:
                         valRep = 'Could not find value(s) in {}: '.format(valueTable, ','.join(str(val) for val in docVal) if multiple else str(docVal))
                     else:
@@ -443,12 +511,10 @@ class DbAccess(object):
                     detailSpec = details[detail]
                     detailTable = detailSpec['table']
                     linkField = detailSpec['linkField']
-                    detailDocs = self.lookup(detailTable, {linkField: document['_id']})
-                    markdown.append(self.toMarkdown(detailTable, detailDocs, level=level+1, withDetails=False))
+                    detailDocs = list(_DBM[detailTable].find({linkField: document['_id']}))
+                    markdown.append(self.freezeDocs(detailTable, detailDocs, level=level+1, withDetails=False))
+        markdown.append('\n\n*Consolidated {} {} on {}*\n\n'.format(nDocs, thing if nDocs == 1 else things, now()))
         return ''.join(markdown)
-
-    def lookup(self, table, rowFilter):
-        return list(_DBM[table].find(rowFilter))
 
     def head(self, table, doc):
         methodName = 'head_{}'.format(table)
@@ -498,6 +564,63 @@ class DbAccess(object):
         description = doc.get('description', '')
         return '{} - {}'.format(score, level) if score or level else description
 
+    def extendFields(self, table, fieldFilter):
+        tableInfo = self.DM.tables.get(table, {})
+        fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder']) if fieldFilter == True or x in fieldFilter]
+        fieldSpecsPost = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
+        fieldFilterPost = dict()
+        frozenFields = dict()
+        fieldOrderPost = []
+        for field in fieldOrder:
+            if fieldFilter or x in fieldFilter:
+                fieldFilterPost[field] = True
+            fieldOrderPost.append(field)
+            fieldSpec = fieldSpecsPost.get(field, {})
+            valType = fieldSpec.get('valType', None)
+            if valType == None or type(valType) is not dict: continue
+            freeze = valType.get('freeze', None)
+            if freeze == None: continue
+            details = freeze['details']
+            frozenField = 'frozen-{}'.format(field)
+            fieldOrderPost.append(frozenField)
+            fieldSpecsPost[frozenField] = dict(
+                label='{} (consolidated)'.format(field),
+                valType='textarea',
+                multiple=fieldSpec.get('multiple', False),
+            )
+            frozenFields[frozenField] = [field, details]
+            fieldFilterPost[frozenField] = True
+        return (fieldOrderPost, fieldSpecsPost, fieldFilterPost, frozenFields)
+
+    def getActiveItems(self):
+        present = now()
+        packages = list(_DBM.package.find(
+            dict(startDate={'$lte': present}, endDate={'$gte': present}),
+            dict(_id=True, typeContribution=True),
+        ))
+        packageIds = [doc['_id'] for doc in packages]  
+        activeFilter = dict(package={'$in': packageIds})
+        criteria = list(_DBM.criteria.find(
+            activeFilter,
+            #dict(_id=True, package=True, typeContribution=True),
+        ))
+        typeCriteria = dict()
+        criteriaEntities = dict()
+        for doc in criteria:
+            criteriaEntities[str(doc['_id'])] = doc
+            for tp in doc['typeContribution']:
+                typeCriteria.setdefault(tp, set()).add(doc['_id'])
+        criteriaIds = [doc['_id'] for doc in criteria]  
+        typeIds = {tp for doc in packages for tp in doc['typeContribution']}
+        result = dict(
+            package=set(packageIds),
+            type=typeIds,
+            criteria=criteriaIds,
+            criteriaEntities=criteriaEntities,
+            typeCriteria=typeCriteria,
+        )
+        return result
+
 def simpleVal(valType, val):
     result = \
         '[{}](mailto:{})'.format(val, val) if valType == 'email' \
@@ -507,3 +630,4 @@ def simpleVal(valType, val):
     else str(val) if valType == 'number' \
     else val
     return result.rstrip('\n')
+

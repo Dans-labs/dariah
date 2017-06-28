@@ -42,7 +42,7 @@ def serveApiDbWho():
 @get('/api/db/<verb:re:[a-z0-9_]+>')
 def serveApiDb(verb):
     Auth.authenticate()
-    Perm = PermApi(Auth, PM)
+    Perm = PermApi(Auth, DM, PM)
     return Controller.data(verb, Perm)
 
 @route('/slogout')

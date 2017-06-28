@@ -79,7 +79,7 @@ const initFilterSettings = memoize((tableData, filterData, filterTag, fieldIds) 
   const newFilterSettings = {}
   presentFilterList.forEach((filterSpec, filterId) => {
     const { [filterId]: filterSetting } = filterSettings
-    if (filterSpec.type == 'Fulltext') {
+    if (filterSpec.type === 'Fulltext') {
       if (filterSetting == null) {newFilterSettings[filterId] = emptyS}
     }
     else {
@@ -190,7 +190,7 @@ const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField) => {
   const { [filterField]: { valType } } = fieldSpecs
   if (fieldIds == null) {return emptyO}
   const fieldValues = {[emptyS]: '-none-'}
-  if (typeof valType == 'string') {
+  if (typeof valType === 'string') {
     fieldIds.forEach(_id => {
       fieldValues[_id] = _id
     })
@@ -211,7 +211,7 @@ export const makeTag = (select, masterId, linkField) => masterId == null
 const getUnpack = (tables, fieldSpec, asString = false) => {
   const { valType, multiple } = fieldSpec
   let unpack
-  if (typeof valType == 'string') {
+  if (typeof valType === 'string') {
     unpack = multiple
     ? asString
       ? v => v == null
@@ -252,7 +252,7 @@ const getUnpack = (tables, fieldSpec, asString = false) => {
 const fulltextCheck = memoize((tables, field, fieldSpec, term) => {
   const unpack = getUnpack(tables, fieldSpec, true)
   const search = (term || emptyS).toLowerCase()
-  if (search == null || search == emptyS) {
+  if (search == null || search === emptyS) {
     return () => true
   }
   return entity => {
@@ -270,7 +270,7 @@ const facetCheck = memoize((tables, field, fieldSpec, facetSettings) => {
   return entity => {
     const { values: { [field]: val } } = entity
     const rep = unpack(val)
-    if (rep.length == 0) {
+    if (rep.length === 0) {
       return facetSettings[emptyS]
     }
     for (const r of rep) {
@@ -290,7 +290,7 @@ const countFacets = memoize((tables, field, fieldSpec, fieldIds, filteredIds, en
   for (const eId of filteredIds) {
     const { [eId]: { values: { [field]: val } } } = entities
     const rep = unpack(val)
-    if (rep.length == 0) {
+    if (rep.length === 0) {
       facetAmounts[emptyS] += 1
     }
     else {

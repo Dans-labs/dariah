@@ -36,14 +36,14 @@ class ListPlain extends Component {
   }
 
   render() {
-    const { props: { alter, alterSection, filters, tables, table, select, listIds, perm, dispatch } } = this
+    const { props: { alter, alterSection, filtered, filters, tables, table, select, listIds, perm, dispatch } } = this
     const { [table]: { item, entities } } = tables
     const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
     const activeItems = compileActive(tables, table)
     return (
       <div className={'list-generic'} >
         {
-          select == DETAILS
+          filtered && select === DETAILS
           ? null
           : <EditInsert
               perm={perm}
@@ -64,7 +64,7 @@ class ListPlain extends Component {
             const isComplete = !needValues(entities, eId)
             const { getAlt, nextAlt } = makeAlternatives(eId)
             const alt = getAlt(alter)
-            const active = alt != initial
+            const active = alt !== initial
             const scrollProps = active ? { ref: this.scroll } : emptyO
             const showStatus = isComplete && someEditable(fields, perm)
             const isactive = (activeItems != null && activeItems.has(eId))
@@ -111,18 +111,18 @@ class ListPlain extends Component {
   }
 
   showHide = memoize((table, select, eId, active, nextAlt) => () => {
-    if (select == DETAILS) {
+    if (select === DETAILS) {
       nextAlt()
       return
     }
     const [base, origEid] = getUrlParts(browserHistory)
     if (active) {
-      if (origEid != eId) {
+      if (origEid !== eId) {
         browserHistory.push(`${base}/item/${eId}/`)
       }
     }
     else {
-      if (origEid != '') {
+      if (origEid !== '') {
         browserHistory.push(`${base}/`)
       }
       nextAlt()

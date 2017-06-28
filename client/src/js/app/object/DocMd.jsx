@@ -29,13 +29,13 @@ class DocMd extends Component {
         <p style={{float: 'right'}} >
           <a
             href={'#'}
-            className={`control fa fa-${alt == 0 ? 'hand-o-down' : 'file-code-o'}`}
-            title={`${alt == 0 ? 'markdown source' : 'formatted'}`}
+            className={`control fa fa-${alt === 0 ? 'hand-o-down' : 'file-code-o'}`}
+            title={`${alt === 0 ? 'markdown source' : 'formatted'}`}
             onClick={nextAlt}
           />
         </p>
         {
-          alt == 0
+          alt === 0
           ? <div>
               <Markdown
                 source={text}

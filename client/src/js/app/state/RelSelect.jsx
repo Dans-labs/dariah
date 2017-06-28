@@ -19,7 +19,7 @@ const RelOption = ({ label, attributes, selected, onHit }) => (
 const removeVal = (value, onChange, val) => event => {
   event.stopPropagation()
   if (value.includes(val)) {
-    const newValue = value.filter(v => v != val)
+    const newValue = value.filter(v => v !== val)
     onChange(newValue)
   }
 }
@@ -83,7 +83,7 @@ const Head = ({ optionLookup, value, activeItems, inactive, selectTag, dispatch 
   const { [value]: lab = value } = optionLookup
   label = lab
   const classes = ['option-head', 'tag']
-  if (value == emptyS) {
+  if (value === emptyS) {
     label = 'click to enter a value'
     classes.push('new')
   }
@@ -132,7 +132,7 @@ const Options = ({
         (
           allowNew
           && search
-          && !options.some(({ label }) => label == search)
+          && !options.some(({ label }) => label === search)
           && !value.includes(search)
         )
         ? <span
@@ -145,10 +145,10 @@ const Options = ({
         options.map(({ value: val, label: lab }) => {
           if (
             (!multiple || !value.includes(val))
-            && (pat == null || pat == emptyS || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
+            && (pat == null || pat === emptyS || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
             && !testDisabled(val)
           ) {
-            const selected = (multiple && value.includes(val)) || (!multiple && value == val)
+            const selected = (multiple && value.includes(val)) || (!multiple && value === val)
             const attributes = makeAttributes(val, `tag option ${selected ? 'selected' : emptyS}`)
             return (
               <RelOption
@@ -174,11 +174,12 @@ const RelSelect = ({
   tables, table,
   field, selectTag,
   activeItems, inactive,
+  allowed,
   input: { value, onChange },
   multiple, allowNew, select, dispatch,
 }) => {
   const { [selectTag]: { search, popUp } = emptyO } = select
-  const { options, optionLookup } = compileOptions(tables, table, field, settings)
+  const { options, optionLookup } = compileOptions(tables, table, allowed, field, settings)
   return (
     <div
       className={`select ${multiple ? 'multiselect' : emptyS}`}

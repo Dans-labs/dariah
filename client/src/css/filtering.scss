@@ -55,9 +55,7 @@ input.search.compact {
     padding-right: 0.2em;
 }
 .facet-value {
-    flex-basis: 80%;
-    flex-grow: 1;
-    flex-shrink: 0;
+    flex: 1 0 80%;
     font-size: small;
 }
 .facetFilter.compact {
@@ -76,24 +74,18 @@ input.search.compact {
 .facetHead.compact {
     font-size: small;
     font-weight: bold;
-    flex-basis: auto;
-    flex-grow: 0;
-    flex-shrink: 0;
+    flex: 0 0 auto;
 }
 .facet-container.compact {
     display: inline-flex;
     flex-flow: row wrap;
     justify-content: flex-start;
     align-content: flex-start;
-    flex-basis: auto;
-    flex-grow: 0;
-    flex-shrink: 0;
+    flex: 0 0 auto;
     max-width: 100%;
 }
 .facet-row.compact {
-    flex-basis: auto;
-    flex-grow: 0;
-    flex-shrink: 0;
+    flex: 0 0 auto;
     display: inline-flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
@@ -105,15 +97,11 @@ input.search.compact {
     border-right: 1px solid white;
 }
 .facet-value.compact {
-    flex-basis: auto;
-    flex-grow: 1;
-    flex-shrink: 0;
+    flex: 1 0 auto;
     font-size: small;
 }
 .facet-stat {
-    flex-basis: 20%;
-    flex-grow: 0.2;
-    flex-shrink: 0;
+    flex: 0.2 0 20%;
     font-size: small;
     text-align: right;
     color: $dim-fore;

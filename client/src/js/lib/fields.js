@@ -50,9 +50,9 @@ const mergeClassnames = (classNames, attributes) => {
 
 const valuePrepare = memoize((tables, table, valType, activeItems, inactive, settings) => value => {
   const rep = repr(tables, table, valType, value, settings)
-  if (valType == 'textarea') {return [rep]}
-  if (valType == 'url') {return [rep, { href: rep, target: '_blank' }, 'a']}
-  if (valType == 'email') {
+  if (valType === 'textarea') {return [rep]}
+  if (valType === 'url') {return [rep, { href: rep, target: '_blank' }, 'a']}
+  if (valType === 'email') {
     const mailLink = rep == null || rep.startsWith('mailto:') ? rep : `mailto:${rep}`
     return [
       rep,
@@ -63,7 +63,7 @@ const valuePrepare = memoize((tables, table, valType, activeItems, inactive, set
   const classNames = []
   const link = {}
   let elem = 'span'
-  if (typeof valType == 'object') {
+  if (typeof valType === 'object') {
     classNames.push('tag')
     const { values: detailTable } = valType
     link.href = `/data/${detailTable}/list/item/${value}`
@@ -98,7 +98,7 @@ export const readonlyValue = memoize(
     ? (values || emptyA).map(value => prepare(value)).filter(x => x != null)
     : prepare(values)
 
-    if (valType == 'textarea') {
+    if (valType === 'textarea') {
       return multiple
       ? reps.map(repItem => repItem[0])
       : reps[0]
@@ -130,12 +130,13 @@ export const someEditable = (fields, perm) =>
 
 export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
   const { initialValues } = props
-  const { [table]: { fieldOrder } } = tables
+  const { [table]: { fieldSpecs, fieldOrder } } = tables
 
   const fragments = []
   for (const field of fieldOrder) {
     const { [field]: f } = fields
     if (f == null) {continue}
+    const { [field]: { label, valType } } = fieldSpecs
     const { update: { [field]: editable } } = perm
     const { [field]: myValues } = initialValues
     const theField = {
@@ -144,7 +145,20 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
       myValues,
       ...props,
     }
-    fragments.push({ field, fragment: theField })
+    if (editable) {
+      const { values, link } = valType
+      if (link != null) {
+        const { [table]: { entities: { [eId]: { values: { [link]: masterValue } = emptyO } = emptyO } = emptyO } = emptyO } = tables
+        if (masterValue != null) {
+          const { [values]: { entities } } = tables
+          if (entities != null) {
+            const allowed = Object.keys(entities).filter(_id => entities[_id].values[link] === masterValue)
+            theField.allowed = allowed
+          }
+        }
+      }
+    }
+    fragments.push({ field, label, fragment: theField })
   }
   return fragments
 }
@@ -164,8 +178,8 @@ export const makeDetails = ({ tables, table, eId }) => {
       },
     } = tables
     const detailListIds = multiple
-    ? detailAllIds.filter(_id => detailEntities[_id].values[linkField].includes(eId))
-    : detailAllIds.filter(_id => detailEntities[_id].values[linkField] == eId)
+    ? detailAllIds.filter(_id => (detailEntities[_id].values[linkField] || emptyA).includes(eId))
+    : detailAllIds.filter(_id => detailEntities[_id].values[linkField] === eId)
     return {
       name,
       detailItem,
@@ -201,9 +215,9 @@ export const sortTimeInterval = (startField, endField) => (a, b) => {
   const aEnd = getDateTime(a[endField], Number.POSITIVE_INFINITY)
   const bStart = getDateTime(b[startField], Number.NEGATIVE_INFINITY)
   const bEnd = getDateTime(b[endField], Number.POSITIVE_INFINITY)
-  return (aStart < bStart) || ((aStart == bStart) && (aEnd > bEnd))
+  return (aStart < bStart) || ((aStart === bStart) && (aEnd > bEnd))
   ? -1
-  : (aStart == bStart && aEnd == bEnd)
+  : (aStart === bStart && aEnd === bEnd)
     ? 0
     : 1
 }

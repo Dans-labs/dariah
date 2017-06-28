@@ -14,12 +14,12 @@ import ListFilter from 'ListFilter'
 class ListContainer extends Component {
   render() {
     const { props: { filters, tables, table, eId, select, mode, filtered } } = this
-    const complete = mode == 'grid'
+    const complete = mode === 'grid'
     if (needTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA))) {return <div />}
     const { [table]: tableData } = tables
     const { title, item, perm, myIds, allIds } = tableData
     const things = item[1]
-    const listIds = select == MYIDS ? myIds : allIds
+    const listIds = select === MYIDS ? myIds : allIds
     const filterTag = makeTag(select, null, null)
     return filtered
     ? <ListFilter
@@ -35,7 +35,7 @@ class ListContainer extends Component {
         filterTag={filterTag}
         gridTag={table}
       />
-    : mode == 'list'
+    : mode === 'list'
       ? <ListPlain
           alterSection={`list-${table}-${select}`}
           filters={filters}
@@ -47,7 +47,7 @@ class ListContainer extends Component {
           perm={perm}
           title={title}
         />
-      : mode == 'grid'
+      : mode === 'grid'
         ? <ListGrid
             alterSection={`list-${table}-${select}`}
             filters={filters}
@@ -63,12 +63,12 @@ class ListContainer extends Component {
   }
   componentDidMount() {
     const { props: { tables, table, select, mode, dispatch } } = this
-    const complete = mode == 'grid'
+    const complete = mode === 'grid'
     fetchTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA), dispatch)
   }
   componentDidUpdate() {
     const { props: { tables, table, select, mode, dispatch } } = this
-    const complete = mode == 'grid'
+    const complete = mode === 'grid'
     fetchTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA), dispatch)
   }
 }

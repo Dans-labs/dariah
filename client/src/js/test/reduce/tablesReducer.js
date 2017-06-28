@@ -258,6 +258,55 @@ const actionTests = [
 
     // ACTION
     action: 'modItem',
+    comment: 'without related data and selective field updates',
+
+    // OLD STATE
+    state: {
+      person: {
+        fields: { name: true, surName: true, keyword: true },
+        entities: {
+          1: { values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] } },
+          2: {
+            values: { _id: 2, name: 'Mary', surName: 'Black', keyword: ['a', 'c'], email: 'mary@black.com', gender: 'b' },
+            fields: { name: true, surName: true, keyword: true, email: true, gender: true },
+          },
+        },
+      },
+    },
+
+    // ACTION DATA and PROPS
+    props: { table: 'person' },
+
+    data: {
+      values: { _id: 2, surName: 'Blacque', email: 'marie@blacque.com' },
+    },
+
+    // NEW STATE
+    predictedState: {
+      person: {
+        fields: { name: true, surName: true, keyword: true },
+        entities: {
+          1: { values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] } },
+          2: {
+            values: { _id: 2, name: 'Mary', surName: 'Blacque', keyword: ['a', 'c'], email: 'marie@blacque.com', gender: 'b' },
+            fields: { name: true, surName: true, keyword: true, email: true, gender: true },
+          },
+        },
+      },
+    },
+    inspect: [
+      ['top',               x => x,                    false],
+      ['person',            x => x.person,             false],
+      ['entities',          x => x.person.entities,    false],
+      ['affected-entity',   x => x.person.entities[2], false],
+      ['unaffected-entity', x => x.person.entities[1], true ],
+    ],
+  },
+  {
+    // MODITEM
+
+    // ACTION
+    action: 'modItem',
     comment: 'with related data',
 
     // OLD STATE

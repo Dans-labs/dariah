@@ -8,7 +8,11 @@ import { getUrlParts, emptyS, emptyO } from 'utils'
 
 import { getAltSection, compileAlternatives } from 'alter'
 
-const editStatusGeneric = canSubmit => ({ active, dirty, invalid, submitting, reset, error, handleSubmit, nextAlt }) => (
+const editStatusGeneric = canSubmit => ({
+    active,
+    dirty, invalid, submitting, reset, error, handleSubmit,
+    nextAlt,
+}) => (
   <span>
     {
       (canSubmit && !dirty && !submitting)
@@ -110,7 +114,7 @@ const handleCloseAll = memoize((alter, alterSection, nAlts, initial, items, disp
     browserHistory.push(`${base}/`)
     items.forEach(eId => {
       const { getAlt, initAlt } = makeAlternatives(eId)
-      if (getAlt(alter) != initial) {
+      if (getAlt(alter) !== initial) {
         initAlt()
       }
     })
@@ -123,7 +127,7 @@ const handleOpenAll = memoize((alter, alterSection, nAlts, initial, items, dispa
   return () => {
     items.forEach(eId => {
       const { getAlt, putAlt } = makeAlternatives(eId)
-      if (getAlt(alter) != theAlt) {
+      if (getAlt(alter) !== theAlt) {
         putAlt(theAlt)
       }
     })
@@ -138,7 +142,7 @@ const EditInsertPure = ({
   dispatch,
 }) => {
   const [thing, things] = item
-  const nItemsRep = `${listIds.length} ${listIds.length == 1 ? thing : things} `
+  const nItemsRep = `${listIds.length} ${listIds.length === 1 ? thing : things} `
   return (
     <div>
       {nItemsRep}

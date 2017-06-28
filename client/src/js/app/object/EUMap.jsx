@@ -48,7 +48,7 @@ const mapOptions = {
 
 const computeRadius = (_id, filteredAmountOthers, amounts) => {
   const amount = amounts ? (amounts[_id] || 0) : 0
-  if (amount == 0) {return 0}
+  if (amount === 0) {return 0}
   const { MAX_RADIUS, LEVEL_OFF } = mapOptions
   const proportional = MAX_RADIUS * amount / filteredAmountOthers
   if (filteredAmountOthers < LEVEL_OFF) {return proportional}

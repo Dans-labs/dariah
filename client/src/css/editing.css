@@ -115,42 +115,41 @@ textarea.invalid {
 }
 .multi-content {
     padding: 0 0 0 1em;
-    flex-basis: 40%;
-    flex-shrink: 2;
-    flex-grow: 1;
+    flex: 1 2 40%;
     overflow: auto;
 }
 .multi-control {
     padding: 0 0 0 0;
-    flex-basis: 2em;
-    flex-shrink: 0;
-    flex-grow: 0;
+    flex: 0 0 2em;
     overflow: auto;
 }
 .field-content {
-    flex-basis: 100%;
-    flex-shrink: 1;
-    flex-grow: 0;
+    flex: 0 1 100%;
     overflow: auto;
 }
 .field-control {
-    flex-basis: 2em;
-    flex-shrink: 0;
-    flex-grow: 0;
+    flex: 0 0 2em;
     overflow: auto;
 }
 .fragments {
     width: 100%;
     max-width: 100%;
 }
+div.detail-control {
+    flex: 0 0 1em;
+}
+div.detail-body {
+    flex: 1 0 90%;
+}
 .label-col {
     text-align: right;
     padding: 0.2em 0.2em 0.2em 0.1em;
     background-color: $widget-fixed-back; 
-    flex-basis: 10em;
-    flex-shrink: 0;
-    flex-grow: 0;
+    flex: 0 0 10em;
     overflow: auto;
+}
+.label-col.edit {
+    background-color: $widget-fixed-edit-back; 
 }
 .list-title {
     text-align: left;
@@ -169,20 +168,18 @@ textarea.invalid {
     text-align: left;
     padding: 0.2em 0.1em 0.2em 0.2em;
     background-color: #fafafa; 
-    flex-basis: 20em;
-    flex-shrink: 1;
-    flex-grow: 1;
+    flex: 1 1 20em;
     overflow: auto;
 }
 .value-col-grid {
     text-align: left;
     padding: 0.1em 0.1em 0.1em 0.1em;
     border-bottom: 2px solid #dddddd; 
-    background-color: #fafafa; 
+    background-color: $value-back;
     overflow: auto;
 }
-.value-col-grid.editable {
-    background-color: #fafaff;
+.value-col-grid.edit {
+    background-color: $value-edit-back;
 }
 .delete {
     float: right;

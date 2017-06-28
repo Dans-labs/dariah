@@ -19,7 +19,7 @@ const initial = 0
 const nAlts = 2
 
 const ListGrid = ({
-  alter, alterSection,
+  alter, alterSection, filtered,
   settings, filters, tables, table, listIds, select, perm: tablePerm,
   masterId, linkField,
   grid, gridTag,
@@ -86,7 +86,7 @@ const ListGrid = ({
   return (
     <div>
       {
-        select == DETAILS
+        filtered && select === DETAILS
         ? null
         : <EditInsert
             perm={tablePerm}
@@ -100,14 +100,14 @@ const ListGrid = ({
           />
       }
       {
-        sortSpec.length != 0
+        sortSpec.length !== 0
         ? <p className={'sortspecs'} >
             {'Sorted: '}
             {
               sortSpec.map(([column, direction]) => (
                 <span className={'sortcol'} key={column} >
                   <span>{column}</span>
-                  <span className={`fa fa-arrow${direction == -1 ? 'down' : 'up'}`} />
+                  <span className={`fa fa-arrow${direction === -1 ? 'down' : 'up'}`} />
                 </span>
               ))
             }
@@ -123,9 +123,9 @@ const ListGrid = ({
         <div className={'grid-head'} >
           <div className={'grid-status-cell'} />
           {
-            fieldOrder.filter(field => field != linkField).map((field, i) => {
+            fieldOrder.filter(field => field !== linkField).map((field, i) => {
               const widthStyle = widthStyles[i]
-              const isSorted = sortSpec.find(x => x[0] == field)
+              const isSorted = sortSpec.find(x => x[0] === field)
               const direction = isSorted ? isSorted[1] : 0
               return (
                 <div
@@ -149,7 +149,7 @@ const ListGrid = ({
                   {
                     direction
                     ? <span
-                        className={`sorted button-small fa fa-arrow-${direction == 1 ? 'up' : 'down'}`}
+                        className={`sorted button-small fa fa-arrow-${direction === 1 ? 'up' : 'down'}`}
                         title={'change sort direction'}
                         onClick={handle(dispatch, turnColumn, gridTag, field)}
                       />

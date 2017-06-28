@@ -8,10 +8,10 @@ import { validation, normalization, getValType } from 'fields'
 import InputMulti from 'InputMulti'
 import RelSelect from 'RelSelect'
 
-const FieldEdit = ({ alter, field, tables, table, eId, dispatch, ...props }) => {
+const FieldEdit = ({ alter, field, tables, table, eId, dispatch, allowed, ...props }) => {
   const { [table]: { fieldSpecs } } = tables
   const { [field]: { valType, valid, multiple } } = fieldSpecs
-  if (typeof valType == 'string') {
+  if (typeof valType === 'string') {
     const typing = getValType(valType)
     const { component, type, props: componentProps } = typing
     const { [valid || valType]: validate } = validation
@@ -65,6 +65,7 @@ const FieldEdit = ({ alter, field, tables, table, eId, dispatch, ...props }) => 
         tables={tables}
         table={table}
         eId={eId}
+        allowed={allowed}
         activeItems={activeItems}
         inactive={inactive}
         {...props}

@@ -31,7 +31,7 @@ class ListFilter extends Component {
        dispatch,
     } = newProps
     const { props: { table: tableOld, filterTag: filterTagOld } } = this
-    if ((tableOld != table || filterTagOld != filterTag) && filterSettings == null) {
+    if ((tableOld !== table || filterTagOld !== filterTag) && filterSettings == null) {
       const { [table]: tableData } = tables
       dispatch(initFiltering(tableData, table, filterTag, listIds))
     }
@@ -63,7 +63,7 @@ class ListFilter extends Component {
     return (
       <div className={`list-filter ${compactClass}`}>
         {
-          select == DETAILS
+          select === DETAILS
           ? <EditInsert
               perm={perm}
               listIds={listIds}
@@ -97,9 +97,10 @@ class ListFilter extends Component {
         </div>
         <div className={`list ${compactClass}`}>
           {
-            mode == 'list'
+            mode === 'list'
             ? <ListPlain
                 alterSection={alterSection}
+                filtered={true}
                 filters={filters}
                 tables={tables}
                 table={table}
@@ -111,9 +112,10 @@ class ListFilter extends Component {
                 masterId={masterId}
                 linkField={linkField}
               />
-            : mode == 'grid'
+            : mode === 'grid'
               ? <ListGrid
                   alterSection={alterSection}
+                  filtered={true}
                   filters={filters}
                   tables={tables}
                   table={table}

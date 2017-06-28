@@ -39,9 +39,7 @@ a.control {
     background-color: $widget-fixed-back;
     padding: 0;
     display: flex;
-    flex-basis: content;
-    flex-grow: 0;
-    flex-shrink: 0;
+    flex: 0 0 content;
     height: 100%;
     max-height: 100%;
     flex-flow: column nowrap;
@@ -49,9 +47,7 @@ a.control {
     align-content: flex-start;
 }
 .nav.section {
-    flex-basis: content;
-    flex-grow: 0;
-    flex-shrink: 0;
+    flex: 0 0 content;
     display: inline-flex;
     flex-flow: column nowrap;
     justify-content: flex-start;

@@ -13,7 +13,7 @@ export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
     if (need(newProps)) {result = true}
   }
   else {
-    if (keyPropNames.some(a => newProps[a] != oldProps[a]) && need(newProps)) {result = true}
+    if (keyPropNames.some(a => newProps[a] !== oldProps[a]) && need(newProps)) {result = true}
   }
   return result
 }
@@ -24,7 +24,7 @@ export const withParams = Component => ({ params, route, ...props }) => {
 }
 
 export const makeReducer = (flows, init = emptyO) => (state, action) => {
-  if (state == undefined) {return init}
+  if (state === undefined) {return init}
   const { type } = action
   const { [type]: flow } = flows
   return flow ? flow(state, action) : state
@@ -33,15 +33,15 @@ export const makeReducer = (flows, init = emptyO) => (state, action) => {
 const mergeObject = (...objects) => Object.assign({}, ...objects)
 export const combineSelectors = (...selectors) => createSelector(...selectors, mergeObject)
 
-export const updateAuto = (state, path, data, asArray = false) => path.length == 0
+export const updateAuto = (state, path, data, asArray = false) => path.length === 0
   ? update(state, data)
-  : path.length == 1
+  : path.length === 1
     ? update(
         state, {
           [path[0]]: {
             $apply: v => {
               const newV = update(v || (asArray ? emptyA : emptyO), data)
-              return jString(v) == jString(newV)
+              return jString(v) === jString(newV)
               ? v
               : newV
             },
@@ -58,7 +58,7 @@ export const updateAuto = (state, path, data, asArray = false) => path.length ==
 
 export const jString = (o, indent) => JSON.stringify(
   o,
-  (k, v) => (v !== null && typeof v == 'object' && !Array.isArray(v))
+  (k, v) => (v !== null && typeof v === 'object' && !Array.isArray(v))
     ? Object.keys(v).sort().reduce(
         (r, kv) => {
           r[kv] = v[kv]

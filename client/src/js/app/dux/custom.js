@@ -55,11 +55,11 @@ const compileActiveItems = memoize((entitiesPkg, entitiesTyp, entitiesCri, field
     }
   })
   return field
-  ? field == TYPE_FIELD
+  ? field === TYPE_FIELD
     ? resultSetTyp
-    : field == PACKAGE_TABLE
+    : field === PACKAGE_TABLE
       ? resultSetPkg
-      : field == CRITERIA_TABLE
+      : field === CRITERIA_TABLE
       ? resultSetCri
         : null
   : {

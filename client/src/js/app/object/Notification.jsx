@@ -40,7 +40,7 @@ class Notification extends Component {
           >
             { busyBlocks.map((b, i) => <span key={i} className={'msg-dot fa fa-caret-left'} />) }
             <span
-              className={`fa fa-${busy == 0 ? 'circle-o' : 'spinner fa-spin'}`}
+              className={`fa fa-${busy === 0 ? 'circle-o' : 'spinner fa-spin'}`}
               onClick={this.handleBox}
             />
           </span>
@@ -56,7 +56,7 @@ class Notification extends Component {
                 <p
                   key={i}
                   ref={this.refDom(`m${i}`)}
-                  className={`msg-line ${[msg.kind]}-o ${msg.kind != 'info' ? 'msg-high' : emptyS}`}
+                  className={`msg-line ${[msg.kind]}-o ${msg.kind !== 'info' ? 'msg-high' : emptyS}`}
                 >{msg.text}</p>
               ))
             }

@@ -2,18 +2,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 
-import { handle } from 'handle'
 import { onSubmitSuccess } from 'fields'
-
-import { delItem, toDb } from 'tables'
+import { toDb } from 'tables'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
-import { EditControl, EditDelete } from 'EditControls'
+import { EditControl } from 'EditControls'
 
 const ItemEdit = props => {
   const {
-    tables, table, eId, perm,
+    tables, table, eId,
     dirty, invalid, submitting, reset, error,
     fieldFragments,
     handleSubmit,
@@ -28,14 +26,7 @@ const ItemEdit = props => {
   return (
     <div>
       <form>
-        <div>
-          <EditDelete
-            perm={perm}
-            button={'button-medium'}
-            onClick={handle(dispatch, delItem, table, eId)}
-          />
-          <EditControl {...editControlProps} />
-        </div>
+        <EditControl {...editControlProps} />
         <div className={'grid fragments'}>{
           fieldFragments.map(({
             field, label,
@@ -45,8 +36,8 @@ const ItemEdit = props => {
               key={field}
               className={'grid-row form'}
             >
-              <div className={'grid-head-cell label-col'}>{`${label}:`}</div>
-              <div className={'grid-cell value-col'} >
+              <div className={`grid-head-cell label-col ${editable ? 'edit' : ''}`}>{`${label}:`}</div>
+              <div className={'grid-cell value-col edit'} >
                 {
                   editable
                   ? <FieldEdit

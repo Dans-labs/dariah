@@ -421,6 +421,15 @@ tables:
         valType: text
         multiple: true
 
+    detailOrder:
+      - assessment
+    details:
+      assessment:
+        table: assessment
+        linkField: contrib
+        mode: list
+        filtered: false
+
     filters:
       - field: title
         label: title
@@ -485,7 +494,6 @@ tables:
     fieldOrder: 
       - title
       - contrib
-      - frozenContribution
       - remarks
       - creator
       - dateCreated
@@ -501,10 +509,8 @@ tables:
         valType:
           values: contrib
           allowNew: false
-        multiple: false
-      frozenContribution:
-        label: Contribution details (frozen)
-        valType: textarea
+          freeze:
+            details: false
         multiple: false
       remarks:
         label: Remarks
@@ -526,13 +532,88 @@ tables:
         multiple: true
 
     detailOrder:
-      - criteria
+      - criteriaEntry
     details:
-      criteria:
-        table: criteria
-        linkField: package
+      criteriaEntry:
+        table: criteriaEntry
+        linkField: assessment
         mode: list
         filtered: true
+
+  criteriaEntry:
+    title: criterion
+    item:
+      - criterion entry
+      - criterion entries
+    sort:
+      - [criteria, 1]
+      - [criterion, 1]
+    fieldOrder:
+      - criterion
+      - score
+      - evidence
+      - criteria
+      - assessment
+      - creator
+      - dateCreated
+      - modified
+
+    fieldSpecs:
+      criterion:
+        label: Criterion
+        valType: text
+        multiple: false
+      criteria:
+        label: criterion
+        valType:
+          values: criteria
+          allowNew: false
+          freeze:
+            details: true
+        multiple: false
+      score:
+        label: score
+        valType:
+          values: score
+          link: criteria
+          allowNew: false
+        multiple: false
+      assessment:
+        label: assessment
+        valType:
+          values: assessment
+          allowNew: false
+        multiple: false
+      evidence:
+        label: evidence
+        valType: textarea
+        multiple: true
+      creator:
+        label: creator
+        valType:
+          values: user
+          allowNew: false
+        multiple: false
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+      modified:
+        label: modified
+        valType: text
+        multiple: true
+
+    filters:
+      - field: score
+        label: score
+        type: ByValue
+        maxCols: 1
+        expanded: true
+      - field: criteria
+        label: criterion
+        type: ByValue
+        maxCols: 1
+        expanded: false
 
   package:
     title: title

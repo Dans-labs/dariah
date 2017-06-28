@@ -5,7 +5,7 @@ import { jString, emptyS } from 'utils'
  * For small values, JSON.stringify is the most efficient.
  *
  * If the level params is null or undefined, all arguments will be stringified in one go.
- * If levels == {}, all object arguments will be treated by object identity.
+ * If levels === {}, all object arguments will be treated by object identity.
  *
  * Otherwise, levels should be an object, keyed by number (argument position) and valued by
  * level.
@@ -112,7 +112,7 @@ export const memoize = (f, levels, config) => {
       const { debug: fName } = useConfig
       const { whiteList, whiteList: { [fName]: passes } } = debugStyle
       const nWhite = Object.keys(whiteList).length
-      if (fName != null && (passes || nWhite == 0) && debugStyle[action]) {
+      if (fName != null && (passes || nWhite === 0) && debugStyle[action]) {
         const Console = console
         Console.warn(
           `${action} ${debugStyle.fName ? fName : emptyS}`,
@@ -137,8 +137,8 @@ export const memoize = (f, levels, config) => {
 
   const resolveArg = (fArg, byId) => {
     const fArgType = typeof fArg
-    if (fArg == null || (!byId && fArgType != 'function')) {return jString(fArg)}
-    if (fArgType == 'object' || fArgType == 'function') {
+    if (fArg == null || (!byId && fArgType !== 'function')) {return jString(fArg)}
+    if (fArgType === 'object' || fArgType === 'function') {
       let mArg
       if (objMap.has(fArg)) {
         mArg = objMap.get(fArg)
@@ -153,16 +153,16 @@ export const memoize = (f, levels, config) => {
     else {return [false, fArg]}
   }
   const resolveToLevel = (fArg, level) => {
-    if (level == -1) {return resolveArg(fArg, false)}
-    if (level == 0) {return resolveArg(fArg, true)}
+    if (level === -1) {return resolveArg(fArg, false)}
+    if (level === 0) {return resolveArg(fArg, true)}
     const fArgType = typeof fArg
-    if (fArg == null || fArgType != 'object') {return resolveArg(fArg)}
+    if (fArg == null || fArgType !== 'object') {return resolveArg(fArg)}
     if (Array.isArray(fArg)) {return fArg.map(x => resolveToLevel(x, level - 1))}
     return Object.keys(fArg).sort().map(x => [x, resolveToLevel(fArg[x], level - 1)])
   }
 
   const memoF = (...fArgs) => {
-    if (fArgs.length == 0) {
+    if (fArgs.length === 0) {
       return { cacheKeys: Object.keys(memCache), computed, retrieved, cleared }
     }
     /* We have to compute a key from the arguments.

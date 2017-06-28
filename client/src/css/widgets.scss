@@ -1,10 +1,13 @@
 $widget-fixed-fore: #226622; 
 $widget-fixed-back: #eeeeee; 
+$widget-fixed-edit-back: #ffeedd; 
 $widget-border: #aaaaaa; 
 $widget-varia-fore: #000000; 
 $widget-varia-back: #ffffff; 
 $widget-high-fore: #ffffff; 
 $widget-high-back: #444444; 
+$value-back: #fafafa;
+$value-edit-back: #faffff;
 
 .hidden {
     color: $widget-fixed-back;

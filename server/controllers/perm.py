@@ -1,6 +1,7 @@
 class PermApi(object):
-    def __init__(self, auth, PM):
+    def __init__(self, auth, DM, PM):
         self.PM = PM
+        self.DM = DM
         self.userInfo = auth.userInfo
         self.uid = self.userInfo.get('_id', None)
         self.eppn = self.userInfo.get('eppn', None)
@@ -45,15 +46,9 @@ class PermApi(object):
     def _isOwn(self, table, document):
         uid = self.uid
         owners = self.PM.owners
-        ownField = owners.get(table, None)
-        if ownField == None: return False
-        ownComps = ownField.split('.')
-        src = document
-        for comp in ownComps:
-            src = src.get(comp, {})
-            if type(src) is list:
-                src = {} if len(src) == 0 else src[0]
-        return src == self.uid
+        ownField = owners.get(table, self.DM.generic['createdBy'])
+        if ownField == None or ownField not in document: return False
+        return document[ownField] == self.uid
 
     def _authorize(self, level, asInt=False, isOwn=None):
         group = self.group
@@ -71,7 +66,7 @@ class PermApi(object):
 
     def _rowSet(self, table, level):
         owners = self.PM.owners
-        ownField = owners.get(table, None)
+        ownField = owners.get(table, self.DM.generic['createdBy'])
         authorized = self._authorize(level, asInt=True)
         if authorized == 1: return {}
         if authorized == 0: return False

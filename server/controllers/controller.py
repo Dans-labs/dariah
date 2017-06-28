@@ -34,4 +34,3 @@ class Controller(object):
         table = getq('table')
         action = getq('action')
         return self.DB.modList(name, table, action)
-

@@ -75,12 +75,12 @@ export const getNotes = ({ notes }) => {
   let lastKind = emptyS
   messages.forEach((note, i) => {
     const { kind } = note
-    if (kind == 'error') {
+    if (kind === 'error') {
       lastNote = i
       lastKind = 'error'
     }
-    else if (kind == 'warning') {
-      if (lastKind != 'error') {
+    else if (kind === 'warning') {
+      if (lastKind !== 'error') {
         lastNote = i
         lastKind = 'warning'
       }
