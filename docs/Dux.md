@@ -16,12 +16,17 @@ We have organized dux as follows:
 This app contains the following dux:
 
 * [alter](#alter)
+* [custom](#custom)
 * [docs](#docs)
 * [filters](#filters)
+* [forms](#forms)
+* [grid](#grid)
 * [me](#me)
-* [notify](#notify)
+* [notes](#notes)
 * [roots](#roots)
 * [select](#select)
+* [server](#server)
+* [settings](#settings)
 * [tables](#tables)
 * [win](#win)
 
@@ -48,19 +53,36 @@ In the payload of this action is also the total number of alternatives (in order
 alternative again after all the others), and an optional initial value.
 If there is not yet a state for this instantiation, the initial value will be used to start from.
 
+### setAlt()
+
 Reducer
 ---------------------------------------------------------------------------
 Increases the index of the alternative by one, cyclically, and puts it under the right key in the state..
 
 Selectors
 ---------------------------------------------------------------------------
-### getAlt()
+### getAltSection()
 Delivers the number of the current alternative, or the initial value (from the
 props of the connected component) or 0.
 
 Helpers
 ---------------------------------------------------------------------------
-No Helpers.
+### compileAlternatives
+
+[custom]({{site.appBase}}/dux/win.js)
+=============================================================================================
+Actions
+---------------------------------------------------------------------------
+
+Reducer
+---------------------------------------------------------------------------
+
+Selectors
+---------------------------------------------------------------------------
+
+Helpers
+---------------------------------------------------------------------------
+### compileActive
 
 [docs]({{site.appBase}}/dux/docs.js)
 =============================================================================================
@@ -119,7 +141,7 @@ facet
 ### changeFacetAll()
 Responds to a click to (de)select all facets of a field.
 
-### setupFiltering()
+### initFiltering()
 Initializes filtering for a table. This action also looks at the tables slice of the state,
 which is managed by [tables](#tables).
 
@@ -142,7 +164,7 @@ Selectors
 Filter information is being translated from the state to props that can be consumed by components.
 All the actual filter work is done here, but because it is rather complex, we have outsourced it to the *helpers*.
 
-### getFilterSetting()
+### getFilters()
 Reads the current settings of a filter and injects it as `filterSettings` into
 the props of the receiving components, which are typically the filter widgets that receive user interaction:
 [Fulltext](Components#fulltext)
@@ -150,7 +172,10 @@ the props of the receiving components, which are typically the filter widgets th
 [CheckboxI](Components#checkboxi),
 [EUMap](Components#eumap).
 
-### getFieldValues()
+Helpers
+---------------------------------------------------------------------------
+### compileValues()
+Computes facet values from the records of a table.
 Reads a table of items (provided it has been downloaded from the server) and produces facet information.
 The items are supposed to contain title fields and at least those fields that are subject to filtering.
 
@@ -172,7 +197,11 @@ I have created my own [memoizer](Lib#memo).
 Here you see that the helper function `compileFiltering` is used under memoization.
 So, all those instances of `ByValue` quickly find their facet values upon each rendering.
  
-### getFiltersApplied()
+
+### initFiltering()
+Computes initial filter settings, after `compileFiltering`.
+
+### computeFiltering()
 Applies the filters, according to the current filter settings.
 Applying means: determine the subset of filtered items (`filteredData`), and provide statistics for the facets.
 
@@ -183,24 +212,50 @@ So this function delivers exactly that: `filteredData`, `filteredAmountOthers`, 
 
 It is also a costly function, but it does neet to be invoked upon each rendering caused by a click or a key press.
 
-Helpers
----------------------------------------------------------------------------
-### compileFiltering()
-Computes facet values from the records of a table.
-
-### initFiltering()
-Computes initial filter settings, after `compileFiltering`.
-
-### computeFiltering()
-Applies the filters.
-
-### placeFacets()
-Distributes the facets of a field into a table, with a give maximum of rows.
-This table can be presented to the user.
+### makeTag
 
 ### testAllChecks()
 Looks if all facets are checked, or all unchecked, of none of both.
 Used to steer the *collective* checkbox that governs all facets.
+
+[forms]({{site.appBase}}/dux/win.js)
+=============================================================================================
+Actions
+---------------------------------------------------------------------------
+
+Reducer
+---------------------------------------------------------------------------
+
+Selectors
+---------------------------------------------------------------------------
+
+### getForms
+
+Helpers
+---------------------------------------------------------------------------
+
+[grid]({{site.appBase}}/dux/win.js)
+=============================================================================================
+Actions
+---------------------------------------------------------------------------
+### resetSort
+
+### addColumn
+
+### delColumn
+
+### turnColumn
+
+Reducer
+---------------------------------------------------------------------------
+
+Selectors
+---------------------------------------------------------------------------
+
+### getGrid
+
+Helpers
+---------------------------------------------------------------------------
 
 [me]({{site.appBase}}/dux/me.js)
 =============================================================================================
@@ -252,7 +307,7 @@ Helpers
 ---------------------------------------------------------------------------
 No helpers.
 
-[notify]({{site.appBase}}/dux/notify.js)
+[notes]({{site.appBase}}/dux/notes.js)
 =============================================================================================
 Powers the notification widget, top right on the screen, realized by the component
 [Notification](Components#notification).
@@ -288,13 +343,13 @@ These notifications are given a the type `async` and convey a status `pending`,
 
 Reducer
 ---------------------------------------------------------------------------
-Transforms the state in response to dispatched ticket, notably the `notify` slice.
+Transforms the state in response to dispatched ticket, notably the `notes` slice.
 The state maintains a counter `busy`, which is the number of currently asynchronously pending operations.
 A notification widget can show a progress spinner if `busy > 0`.
 
 Selectors
 ---------------------------------------------------------------------------
-### getNotifications()
+### getNotes()
 The notification widget gets the notifications from the state, including `busy` and `show`, the latter
 indicating whether the notification panel should be hidden or not.
 For the convenience of the [Notification](Components#notification) component,
@@ -302,8 +357,6 @@ the index of the last important notification message is also computed, and its k
 
 Helpers
 ---------------------------------------------------------------------------
-### addItem()
-A helper for the reducer, to add items to an array.
 
 [roots]({{site.appBase}}/dux/roots.js)
 =============================================================================================
@@ -322,10 +375,6 @@ into the *root reducer*, that operates on the whole state.
 
 Selectors
 ---------------------------------------------------------------------------
-### combineSelectors()
-Utility function to combine several selectors.
-Handy for components that use several slices of the state.
-
 Helpers
 ---------------------------------------------------------------------------
 No helpers.
@@ -361,8 +410,58 @@ Retrieves all state information of a *specific* select control, i.e. an instance
 
 Helpers
 ---------------------------------------------------------------------------
-### initSelect()
+### compileOptions()
 Initializes the state for a specific select control. This is an initialization *per tag*.
+
+[server]({{site.appBase}}/dux/server.js)
+=============================================================================================
+## accessData(task)
+Asynchronous action to fetch data from the server, and also to send data to it.
+
+A `task` object specifies what to fetch, and can contain data
+to send to the server.
+
+It can be used for database queries or file content.
+During request, [notify](Dux#notes) actions will be dispatched.
+
+Actions
+---------------------------------------------------------------------------
+### accessData
+
+#### progress
+
+#### ask
+
+#### err
+
+#### succeed
+
+Reducer
+---------------------------------------------------------------------------
+
+Selectors
+---------------------------------------------------------------------------
+
+Helpers
+---------------------------------------------------------------------------
+
+[settings]({{site.appBase}}/dux/settings.js)
+=============================================================================================
+Actions
+---------------------------------------------------------------------------
+
+### set
+
+Reducer
+---------------------------------------------------------------------------
+
+Selectors
+---------------------------------------------------------------------------
+
+### getSettings
+
+Helpers
+---------------------------------------------------------------------------
 
 [tables]({{site.appBase}}/dux/tables.js)
 =============================================================================================
@@ -385,9 +484,8 @@ Actions
 ### fetchTable()
 Fetches a complete table, but only the title fields and the fields needed for filtering.
 
-### fetchTableMy()
-Fetches *my* rows from a table, but only the title fields.
-The server decides who I am and what my rows are.
+### fetchTables()
+Fetches a complete table, but only the title fields and the fields needed for filtering.
 
 ### fetchItem()
 Fetches a single rows from a table, all fields.
@@ -395,6 +493,12 @@ The server decides which fields I am allowed to retrieve.
 
 If fields refer to other tables for their values, the above actions will
 fetch these tables as well.
+
+### modItem
+
+### insertItem
+
+### delItem
 
 Reducer
 ---------------------------------------------------------------------------
@@ -443,11 +547,17 @@ Just get all the table information in a prop called `tables`.
 
 Helpers
 ---------------------------------------------------------------------------
+### entityHead
+
+### needTable()
+
 ### needTables()
 Checks a list of table names to see if sufficient data is available in the state.
 
 ### needValues()
 Checks a single entity in a single table to see if it contains values for all fields.
+
+### listValues()
 
 ### changedItem()
 Checks if properties have changed in such a few that new data should be fetched.
@@ -460,6 +570,8 @@ an id of a record in an other table, the value for that id will be looked up and
 Makes a streamlined string representation out of a field value. It looks up ids 
 in related value list tables, and applies special formatting to fields that
 refer to users and to countries.
+
+### toDb
 
 [win]({{site.appBase}}/dux/win.js)
 =============================================================================================
@@ -491,6 +603,4 @@ the same name.
 
 Helpers
 ---------------------------------------------------------------------------
-### initWinDim()
-Based on the actual window size, it computes the sizes of designated areas on the screen.
 

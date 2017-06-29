@@ -31,6 +31,7 @@ export const makeReducer = (flows, init = emptyO) => (state, action) => {
 }
 
 const mergeObject = (...objects) => Object.assign({}, ...objects)
+
 export const combineSelectors = (...selectors) => createSelector(...selectors, mergeObject)
 
 export const updateAuto = (state, path, data, asArray = false) => path.length === 0

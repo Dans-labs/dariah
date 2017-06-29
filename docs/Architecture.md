@@ -79,7 +79,7 @@ Currently, these are the dux of this app:
 * [docs](Dux#docs): fetch documents, especially markdown ones, and show them in two representations: source and formatted;
 * [filters](Dux#filters): the machinery of faceted and full text filtering of entities from tables;
 * [me](Dux#me): data about the currently logged-in user;
-* [notify](Dux#notify): the notification system;
+* [notes](Dux#notes): the notification system;
 * [roots](Dux#roots): combining all the other dux;
 * [select](Dux#select): the state of all multiselect widgets in the app;
 * [tables](Dux#tables): manage all database data that has been fetched from the server;

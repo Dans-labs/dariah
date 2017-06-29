@@ -8,7 +8,8 @@ title: Home
 
 This is the technical documentation for the DARIAH contribution tool.
 
-The contribution is an [SPA](https://en.wikipedia.org/wiki/Single-page_application) (Single Page Application)
+The contribution is an [SPA](https://en.wikipedia.org/wiki/Single-page_application)
+(Single Page Application)
 and hence the focus is on the client side, aka front-end of the app.
 
 We have implemented the front-end with the help of
@@ -38,8 +39,9 @@ To see that picture, start with looking at the side bar, where the components ha
 
 ## Dux
 These are the pillars of connected pieces of labour, that support the individual components.
-I follow a [proposal by Erik Rasmussen](https://github.com/erikras/ducks-modular-redux) to call
-a modular Redux package a duck, and in the plural I call them **dux**, honouring the good work of Redux.
+I follow a [proposal by Erik Rasmussen](https://github.com/erikras/ducks-modular-redux)
+to call a modular Redux package a duck, and in the plural I call them **dux**,
+honouring the good work of Redux.
 
 ## Backend
 At the server side we store the data in a [MongoDB](https://docs.mongodb.com).
@@ -48,6 +50,16 @@ The authentication of users is outsourced to the DARIAH infrastructure, see
 [here](Dux#me). The authorization is defined by the [data model](Server#data-model) and
 [permission model](Server#permissions),
 which govern all data access.
+
+## Tests
+
+[Testing](Tests)
+becomes a life saviour when your app is growing in complexity.
+When you add new behaviours you run the risk that existing behaviours break.
+The remedy is to write tests for all aspects of the behaviours, and run them rigorously
+after each change and refactoring.
+That way, you proactively discover your bugs before your users get a chance to
+encounter them.
 
 ## Deployment
 Here are the bits and pieces you have to do in order to get a working system out of this.
@@ -59,9 +71,11 @@ To get an impression of the kind of work behind this app, see
 
 # Author
 
-Dirk Roorda [DANS](https://www.dans.knaw.nl) [dirk.roorda@dans.knaw.nl](mailto:dirk.roorda@dans.knaw.nl)
+Dirk Roorda
+[DANS](https://www.dans.knaw.nl)
+[dirk.roorda@dans.knaw.nl](mailto:dirk.roorda@dans.knaw.nl)
 
-2017-04-13
+2017-06-29
 
 
 

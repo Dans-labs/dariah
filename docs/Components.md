@@ -472,6 +472,40 @@ They have been injected by the wrapper
 a child of [FieldEdit](#fieldedit)) of this component, and they are just passed
 on to *Field* and *FieldArray*, so that they can do their magic.
 
+[ItemContainer]({{site.appBase}}/object/ItemRecord.jsx)
+=============================================================================================
+(life cycle) connected via [tables](Dux#tables)
+
+Container for a single record in a table.
+This component is responsible for the database actions of fetching, inserting and deleting,
+but not form input.
+
+#### Props
+###### `tables` object from [getTables](Dux#gettables)
+Where all information that has been fetched into tables can be found.
+
+###### `table` string
+The name of the table in question.
+
+##### `eId` string
+Entity id of this record.
+
+###### `fetch` function is [fetchItem](Dux#fetchitem)
+Callback to fetch entity data from the server.
+
+###### `insert` function is [insertItem](Dux#insertitem)
+Callback to insert a create a new record in the database.
+This will become the current record in view.
+
+###### `del` function is [delItem](Dux#delitem)
+Callback to delete the current record from the database.
+
+[ItemDetails]({{site.appBase}}/object/ItemDetails.jsx)
+=============================================================================================
+
+[ItemEdit]({{site.appBase}}/object/ItemEdit.jsx)
+=============================================================================================
+
 [ItemForm]({{site.appBase}}/state/ItemForm.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
@@ -587,57 +621,8 @@ An editable field will be handled by a
 and a read-only field by a
 [`<FieldRead />](#fieldRead) component.
 
-[Items]({{site.appBase}}/object/Items.jsx)
+[ItemRow]({{site.appBase}}/object/ItemRow.jsx)
 =============================================================================================
-(life cycle) connected via [tables](Dux#tables)
-
-Displays the list of items of the current user in the left [Pane](#pane),
-with a details/edit view in the right one.
-
-#### Props
-###### `tables` object from [getTables](Dux#gettables)
-Where all information that has been fetched into tables can be found.
-
-###### `table` string
-The name of the table in question.
-
-**NB:** The `table` prop is not directly present in `props` but in the `params` member of `props`.
-
-###### `fetch` function is [fetchTable](Dux#fetchtable)
-Callback to fetch table data and metadata from the server.
-
-This component is very much like [ListContainer](#listcontainer) as far a data fetching is concerned. It has the virtually the same props.
- 
-The main differences are that there is no filtering, and the list of records is
-separated from the detail view.
-
-[ItemRecord]({{site.appBase}}/object/ItemRecord.jsx)
-=============================================================================================
-(life cycle) connected via [tables](Dux#tables)
-
-Container for a single record in a table.
-This component is responsible for the database actions of fetching, inserting and deleting,
-but not form input.
-
-#### Props
-###### `tables` object from [getTables](Dux#gettables)
-Where all information that has been fetched into tables can be found.
-
-###### `table` string
-The name of the table in question.
-
-##### `eId` string
-Entity id of this record.
-
-###### `fetch` function is [fetchItem](Dux#fetchitem)
-Callback to fetch entity data from the server.
-
-###### `insert` function is [insertItem](Dux#insertitem)
-Callback to insert a create a new record in the database.
-This will become the current record in view.
-
-###### `del` function is [delItem](Dux#delitem)
-Callback to delete the current record from the database.
 
 [ListContainer]({{site.appBase}}/object/ListContainer.jsx)
 =============================================================================================
@@ -678,6 +663,9 @@ Whether the filters have been initialized.
 
 ###### `init` function is [setupFiltering](Dux#setupfiltering)
 Callback to initialize filtering.
+
+[ListGrid]({{site.appBase}}/state/ListGrid.jsx)
+=============================================================================================
 
 [ListPlain]({{site.appBase}}/state/ListPlain.jsx)
 =============================================================================================
@@ -769,7 +757,7 @@ The text to display on the 404 page.
 
 [Notification]({{site.appBase}}/object/Notification.jsx)
 =============================================================================================
-(life cycle) connected via [notify](Dux#notify)
+(life cycle) connected via [notes](Dux#notes)
 
 Component that receives notifications and displays them in a
 little panel with fixed position on the screen.
@@ -780,16 +768,16 @@ There is also a progress indicator, a little circle fixed at the top right corne
 It hints at the current status of asynchronous operations. A click on it will show the notifications panel.
 
 #### Props
-###### `notifications` array of objects from [getNotifications](Dux#getnotifications)
+###### `notifications` array of objects from [getNotes](Dux#getnotes)
 The list of notifications that have been issued since the beginning of the session or since the last time that the user has cleared the messages.
 
-###### `busy` from [getNotifications](Dux#getnotifications)
+###### `busy` from [getNotes](Dux#getnotes)
 The amount of asynchronous actions that are still pending.
 
-###### `show` from [getNotifications](Dux#getnotifications)
+###### `show` from [getNotes](Dux#getnotes)
 Whether the panel should be hidden. 
 
-###### `lastMsg`, `lastNote`, `lastKind` from [getNotifications](Dux#getnotifications)
+###### `lastMsg`, `lastNote`, `lastKind` from [getNotes](Dux#getnotes)
 The indexes of the last message and the last notable message, and the kind of the last notable message, which is one of `error`, `warning`, `special`.
 Only the kind `info` is non-special.
 
@@ -802,22 +790,8 @@ Callback by which the list of notifications can be cleared.
 ###### `display` function is [display](Dux#display)
 Callback to be invoked when the user clicks the panel or the progress indicator to hide and show the notifications panel.
 
-[Pane]({{site.appBase}}/object/Win.jsx)
+[Overview]({{site.appBase}}/object/Overview.jsx)
 =============================================================================================
-connected via [win](Dux#win)
-
-A dedicated piece of real screen estate, with a certain formatting and a size proportional to the dimensions of the browser window. The dimensions of the pane will be adapted when the browser window is being resized.
-
-#### Props
-###### `format` string
-A CSS class for formatting the pane.
-
-###### `position`
-A code indicating which portion of the screen this pane occupies.
-See [columnStyle](Dux#columnstyle) for the range of possibilities here.
-
-###### `height`, `width` number from [getWinDim](Dux#getwindim)
-The current height and width of the screen.
 
 [RelSelect]({{site.appBase}}/state/RelSelect.jsx)
 =============================================================================================

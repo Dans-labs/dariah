@@ -4,6 +4,7 @@ title: Codebase
 
 # Statistics
 
+[cloc tool](https://github.com/AlDanial/cloc)
 {% include_relative Stats.md %}
 
 # Legend

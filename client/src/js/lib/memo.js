@@ -1,70 +1,5 @@
 import { jString, emptyS } from 'utils'
 
-/* levels
- *
- * For small values, JSON.stringify is the most efficient.
- *
- * If the level params is null or undefined, all arguments will be stringified in one go.
- * If levels === {}, all object arguments will be treated by object identity.
- *
- * Otherwise, levels should be an object, keyed by number (argument position) and valued by
- * level.
- *
- * Level 0 means: use object identity as the key.
- * Level i+i means: JSON stringify the top i levels of the argument, and everything from level i+1
- * onwards is treated by obbject identity.
- * Level -1: JSON stringify that argument
- *
- * N.B: Function arguments can not be stringified, they always go by way of object identitiy.
- *
- * Object with keys: the argument numbers, and values: what to do with the argument
- * values:
- *  true: treat argument by value (use JSON.stringify to compute a key)
- *  null, false, absent: treat argument by ref: use object-identity and WeakMap to compute a key
- *  number: descend into the object that levels deep. At that level, treat objects by identity.
- *
- *  Example:
- *
- *  const tables = {
- *    person: { entities: { ... } },
- *    address: { entities: { ... } },
- *    job: { entities: { ... } },
- *    car: { entities: { ... } },
- *    profile: { entities: { ... } },
- *  }
- *
- *  const personal1 = {
- *    a: tables[person],
- *    b: tables[profile],
- *  }
- *
- *  const personal2 = {
- *    a: tables[person],
- *    b: tables[profile],
- *  }
- *
- *  const f = (tables) => tables.a
- *
- *  const memF = memoize(f)
- *
- *  memF(personal1) // computes
- *  memF(personal2) // computes again, because personal1 !== personal2
- *
- *  const memF1({0: 1}, f)
- *
- *  memF1(personal1) // computes
- *  memF1(personal2) // retrieves from cache, because personal1.a === personal2.a and personal1.b === personal2.b
- *
- *  Likewise if your component is an array
- *
- */
-
-/* Config
- * clearCache: time in seconds that a key is being retained in the memCache
- * debug: if a string: shows this string when keys are retrieved, computed, and cleared, via Console.warn
- *  Only in development mode!
- */
-
 /* global process */
 
 let debugStyle
@@ -133,7 +68,6 @@ export const memoize = (f, levels, config) => {
       report(key, 'cleared')
     }
   }
-
 
   const resolveArg = (fArg, byId) => {
     const fArgType = typeof fArg

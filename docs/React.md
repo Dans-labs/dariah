@@ -320,7 +320,7 @@ The hint to use lodash functions for this is given
 
 These functions take an object, and transform it on the bases of an other object, precisely as needed for our purposes.
 And if a little tweak is needed for certain keys of the state, `mergeWith()` provides a hook for that.
-See [notify.js]({{site.appBase}}/dux/notify.js), the function `addItem()`.
+See [notes.js]({{site.appBase}}/dux/notes.js), the function `addItem()`.
 There, if the old state has an array of items, and we need to append some items, we create a new array, consisting of the 
 items of the orginal array, with the new items concatenated after them.
 
