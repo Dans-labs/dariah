@@ -1,0 +1,66 @@
+---
+# github.com/AlDanial/cloc
+header : 
+  cloc_url           : github.com/AlDanial/cloc
+  cloc_version       : 1.72
+  elapsed_seconds    : 2.28432703018188
+  n_files            : 127
+  n_lines            : 16953
+  files_per_second   : 55.5962427104353
+  lines_per_second   : 7421.44175330717
+  report_file        : docs/Stats.yaml
+YAML :
+  nFiles: 8
+  blank: 152
+  comment: 1
+  code: 3687
+JavaScript :
+  nFiles: 27
+  blank: 368
+  comment: 300
+  code: 2762
+JSX :
+  nFiles: 39
+  blank: 207
+  comment: 12
+  code: 2413
+Markdown :
+  nFiles: 14
+  blank: 705
+  comment: 0
+  code: 2315
+Python :
+  nFiles: 15
+  blank: 288
+  comment: 106
+  code: 2253
+Sass :
+  nFiles: 13
+  blank: 36
+  comment: 0
+  code: 733
+CSS :
+  nFiles: 1
+  blank: 5
+  comment: 11
+  code: 170
+Bourne Shell :
+  nFiles: 5
+  blank: 22
+  comment: 25
+  code: 145
+HTML :
+  nFiles: 2
+  blank: 11
+  comment: 3
+  code: 122
+JSON :
+  nFiles: 3
+  blank: 0
+  comment: 0
+  code: 101
+SUM: 
+  blank: 1794
+  comment: 458
+  code: 14701
+  nFiles: 127

@@ -2,6 +2,15 @@
 
 root=`pwd`
 
+function codestats {
+    cd $root
+    xd="__pycache__,node_modules,.tmp"
+    xf="cloc_exclude.lst"
+    rf="docs/Stats.md"
+    client/node_modules/cloc/lib/cloc --exclude_dir=$xd --exclude-list-file=$xf --report-file=$rf --md .
+    cat $rf
+}
+
 if [[ "$1" == "module" ]]; then
     cd client
     if [[ "$2" == "" ]]; then
@@ -16,6 +25,8 @@ elif [[ "$1" == "xmodule" ]]; then
     else
         npm remove --save-dev $2
     fi
+elif [[ "$1" == "stats" ]]; then
+    codestats
 elif [[ "$1" == "test" ]]; then
     cd client
     export NODE_ENV="development"
@@ -38,6 +49,7 @@ elif [[ "$1" == "devenv" ]]; then
     python3 confyg.py models
     export REGIME=devel; python3 -m bottle --debug --reload --bind localhost:8001 index:app
 elif [[ "$1" == "docs" ]]; then
+    codestats
     cd docs
     bundle exec jekyll serve
 elif [[ "$1" == "dev" ]]; then
@@ -56,6 +68,7 @@ elif [[ "$1" == "data" ]]; then
     cd static/tools
     python3 mongoFromFm.py development
 elif [[ "$1" == "prod" ]]; then
+    codestats
     pushd client
     pushd ../docs
     bundle exec jekyll build
@@ -64,6 +77,7 @@ elif [[ "$1" == "prod" ]]; then
     webpack -p
     popd
 elif [[ "$1" == "shipdocs" ]]; then
+    codestats
     pushd client
     pushd ../docs
     bundle exec jekyll build
@@ -73,6 +87,7 @@ elif [[ "$1" == "shipdocs" ]]; then
     git commit -m "docs: $2"
     git push origin master
 elif [[ "$1" == "shipcode" ]]; then
+    codestats
     pushd client
     pushd ../docs
     bundle exec jekyll build
@@ -96,6 +111,7 @@ else
     echo "module: install all modules in package.json from npm"
     echo "module \$1: install single module"
     echo "xmodule \$1: remove single module"
+    echo "stats: collect codebase statistics"
     echo "test: run all tests"
     echo "test \$1: run specific test"
     echo "devenv: start development services: webserver, docserver, client app server"

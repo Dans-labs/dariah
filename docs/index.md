@@ -52,6 +52,11 @@ which govern all data access.
 ## Deployment
 Here are the bits and pieces you have to do in order to get a working system out of this.
 
+## Code base
+
+To get an impression of the kind of work behind this app, see 
+[Codebase](Codebase) where it is revealed how many lines of code have been written in which languages.
+
 # Author
 
 Dirk Roorda [DANS](https://www.dans.knaw.nl) [dirk.roorda@dans.knaw.nl](mailto:dirk.roorda@dans.knaw.nl)

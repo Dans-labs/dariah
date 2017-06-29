@@ -16,7 +16,7 @@ It is taken care of by the build tool of our choice:
 Our source code conforms to a number of style guides, which are enforced by
 [eslint](http://eslint.org).
 There are many options and choices, ours are
-[here]({{site.repBase}}/client/eslint.yaml).
+[here]({{site.clientBase}}/eslint.yaml).
 
 The evolution of Javascript to ES6 and beyond has transformed Javascript from a "horrible language" into a performant
 language with a beautiful syntax on one of the most widely supported platforms: the browser.
