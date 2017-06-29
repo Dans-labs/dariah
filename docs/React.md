@@ -41,7 +41,7 @@ then we need to program the component as a class with so-called
 
 We put all these components in a directory called **object**.
 
-[Example: ItemFiltered]({{site.appBase}}/object/ItemFiltered.jsx).
+[Example: ListContainer]({{site.appBase}}/object/ListContainer.jsx).
 
 ## React Processing Concepts
 React renders updates to
@@ -385,7 +385,7 @@ the url and the part of your app that should be active in response to it.
 <Router history={browserHistory} >
   <Route path="/" component={App} >
     <Route path="about" component={About} />
-    <Route path="table" component={ItemList} />
+    <Route path="table" component={ListPlain} />
   </Route>
 </Router>
 ```

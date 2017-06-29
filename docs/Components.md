@@ -16,59 +16,9 @@ Entry point of the client side app.
 Contains the [routing](Routing), wrapped in a [Root](#roots) component, that
 sets up the store in which the central state lives.
 
-[Alternative]({{site.appBase}}/state/Alternative.jsx)
-=============================================================================================
-connected via [alter](Dux#alter)
-
-Displays one of a list of alternatives and
-let the user cycle through the alternatives.
-
-Handy for:
-* show/hide a component: pass as alternatives: `[component, <div>]`
-* view alternative representations of a resource, e.g.
-```jsx
-[
-   <div>{MarkdownSource}</div>,
-   <div>{FormattedDoc}</div>
-]
-```
-
-The state maintains the number of the currently chosen alternative.
-
-#### Props
-###### `tag` string
-An extra identification, to distinguish this instance of the component from others.
-The current alternative is saved to the state under this key.
-
-###### `alt` integer from [`getAlt`](Dux#getalt)
-The currently chosen alternative.
-
-###### `alternatives` array of fragments
-A list of fragments to choose from.
-These fragments are referred to later by their index in this array.
-
-###### `controls` array of fragments
-A list of fragments that contain controls by which the user can go to
-the next alternative. The *i*-th control will be displayed together
-with the *i*-th alternative.
-
-Every individual control must be given as a function `handler => fragment`.
-When the controls are placed, the control functions will be passed the
-`nextAlt` callback,
-which will handle the clicks on the controls.
-
-###### `controlPlacement` function
-Puts each control and alternative combination in place.
-In this way the caller can fine tune how exactly the control appears in relation to
-the alternative component.
-
-###### `initial` number 
-The index of the initial alternative.
-
 [App]({{site.appBase}}/state/App.jsx)
 =============================================================================================
 connected via [win](Dux#win)
-
 
 As far as the logic of the web page is concerned, this is the top level component.
 
@@ -81,14 +31,6 @@ As far as the logic of the web page is concerned, this is the top level componen
 ###### `height`, `width`, number from [getWinDim](Dux#getwindim)
 The height and width of the main window.
 It is only used to display the height and the width somewhere on the screen.
-
-[Backoffice]({{site.appBase}}/state/Backoffice.jsx)
-=============================================================================================
-presents [tables](Dux#tables)
-
-Gives access to backoffice functions, i.e. management of tables that support the business logic of the app.
-
-A lot has to be implemented here.
 
 [ByValue]({{site.appBase}}/state/ByValue.jsx)
 =============================================================================================
@@ -433,28 +375,6 @@ This information comes from the [tables](Dux#tables) part of the state.
 ###### `filteredAmount` object, `filteredAmountOthers` object, `amounts` object
 The results of [applying](Dux#getfiltersapplied) the filters.
 
-[FilterCompute]({{site.appBase}}/object/FilterCompute.jsx)
-=============================================================================================
-(life cycle) connected via [filters](Dux#filters)
-
-Parent component of a table and all its filters.
-The table must be present.
-Fetching tables is done by other components, such as
-[ItemFiltered](#ItemFiltered).
-This component is for processing user interaction on the filters.
-The filters and the list of filtered items are shown in separate
-[Pane](#pane)s.
-
-#### Props
-###### `filteredAmount` object, `filteredAmountOthers` object, `amounts` object from [getFiltersApplied](Dux#getfiltersapplied)
-The results of [applying](Dux#getfiltersapplied) the filters.
-
-###### `initialized` bool
-Whether the filters have been initialized.
-
-###### `init` function is [setupFiltering](Dux#setupfiltering)
-Callback to initialize filtering.
-
 [Fulltext]({{site.appBase}}/state/Fulltext.jsx)
 =============================================================================================
 connected via [filters](Dux#filters)
@@ -551,24 +471,6 @@ They have been injected by the wrapper
 [ItemForm](#itemform), the uncle (`InputMulti` is passed as attribute to `Field` which is
 a child of [FieldEdit](#fieldedit)) of this component, and they are just passed
 on to *Field* and *FieldArray*, so that they can do their magic.
-
-[ItemFiltered]({{site.appBase}}/object/ItemFiltered.jsx)
-=============================================================================================
-(life cycle) connected via [tables](Dux#tables)
-
-Manages a table. Responsible for fetching data from the server.
-The display of the (filtered) table is left to other components,
-such as [FilterCompute](#filtercompute).
-
-#### Props
-###### `tables` object from [getTables](Dux#gettables)
-Where all information that has been fetched into tables can be found.
-
-###### `table` string
-The name of the table in question.
-
-###### `fetch` function is [fetchTable](Dux#fetchtable)
-Callback to fetch table data and metadata from the server.
 
 [ItemForm]({{site.appBase}}/state/ItemForm.jsx)
 =============================================================================================
@@ -685,56 +587,6 @@ An editable field will be handled by a
 and a read-only field by a
 [`<FieldRead />](#fieldRead) component.
 
-[ItemHead]({{site.appBase}}/pure/ItemHead.jsx)
-=============================================================================================
-presents [tables](Dux#tables)
-
-Displays an item heading in a table row.
-With a control to view the whole records.
-Only the fields that the user is allowed to view.
-
-#### Props
-###### `table` string
-The name of the table in question.
-
-###### `values` object
-All available field content.
-
-###### `title` string
-The name of the field that will be used as the *title* of the record.
-
-###### `inplace` bool
-Whether the title can be expanded to the full record by the user.
-
-**N.B** No item fetching will be done if `inplace == false` or if the
-records are not expanded. But if you set the initial alternative to expanded, all
-records will be fetched one by one, which is hugely inefficient!
-
-[ItemList]({{site.appBase}}/state/ItemList.jsx)
-=============================================================================================
-connected via [tables](Dux#tables)
-
-Displays a list of items from a table.
-If filters are active on that table, this component is meant to just display the
-filtered items.
-
-#### Props
-###### `tables` object from [getTables](Dux#gettables)
-Where all information that has been fetched into tables can be found.
-
-###### `table` string
-The name of the table in question.
-
-###### `title` string
-The name of the field that will be used as the *title* of the record.
-
-###### `filteredData` array
-The list of ids of the records to be shown.
-The full information of the records will be looked up from `tables` in the state.
-
-###### `inplace` bool
-Whether the title can be expanded to the full record by the user.
-
 [Items]({{site.appBase}}/object/Items.jsx)
 =============================================================================================
 (life cycle) connected via [tables](Dux#tables)
@@ -754,7 +606,7 @@ The name of the table in question.
 ###### `fetch` function is [fetchTable](Dux#fetchtable)
 Callback to fetch table data and metadata from the server.
 
-This component is very much like [ItemFiltered](#itemfiltered) as far a data fetching is concerned. It has the virtually the same props.
+This component is very much like [ListContainer](#listcontainer) as far a data fetching is concerned. It has the virtually the same props.
  
 The main differences are that there is no filtering, and the list of records is
 separated from the detail view.
@@ -786,6 +638,71 @@ This will become the current record in view.
 
 ###### `del` function is [delItem](Dux#delitem)
 Callback to delete the current record from the database.
+
+[ListContainer]({{site.appBase}}/object/ListContainer.jsx)
+=============================================================================================
+(life cycle) connected via [tables](Dux#tables)
+
+Manages a table. Responsible for fetching data from the server.
+The display of the (filtered) table is left to other components,
+such as [ListFilter](#listfilter).
+
+#### Props
+###### `tables` object from [getTables](Dux#gettables)
+Where all information that has been fetched into tables can be found.
+
+###### `table` string
+The name of the table in question.
+
+###### `fetch` function is [fetchTable](Dux#fetchtable)
+Callback to fetch table data and metadata from the server.
+
+[ListFilter]({{site.appBase}}/object/ListFilter.jsx)
+=============================================================================================
+(life cycle) connected via [filters](Dux#filters)
+
+Parent component of a table and all its filters.
+The table must be present.
+Fetching tables is done by other components, such as
+[ListContainer](#listcontainer).
+This component is for processing user interaction on the filters.
+The filters and the list of filtered items are shown in separate
+[Pane](#pane)s.
+
+#### Props
+###### `filteredAmount` object, `filteredAmountOthers` object, `amounts` object from [getFiltersApplied](Dux#getfiltersapplied)
+The results of [applying](Dux#getfiltersapplied) the filters.
+
+###### `initialized` bool
+Whether the filters have been initialized.
+
+###### `init` function is [setupFiltering](Dux#setupfiltering)
+Callback to initialize filtering.
+
+[ListPlain]({{site.appBase}}/state/ListPlain.jsx)
+=============================================================================================
+connected via [tables](Dux#tables)
+
+Displays a list of items from a table.
+If filters are active on that table, this component is meant to just display the
+filtered items.
+
+#### Props
+###### `tables` object from [getTables](Dux#gettables)
+Where all information that has been fetched into tables can be found.
+
+###### `table` string
+The name of the table in question.
+
+###### `title` string
+The name of the field that will be used as the *title* of the record.
+
+###### `filteredData` array
+The list of ids of the records to be shown.
+The full information of the records will be looked up from `tables` in the state.
+
+###### `inplace` bool
+Whether the title can be expanded to the full record by the user.
 
 [Login]({{site.appBase}}/object/Login.jsx)
 =============================================================================================

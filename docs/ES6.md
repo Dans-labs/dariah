@@ -106,7 +106,7 @@ very pleasant indeed. In our app we have activated linters that insist on using 
 amount possible. 
 It will dramatically change the general outlook of a piece of javascript code.
 Just to have a taste, look at this bit of
-[source code]({{site.appBase}}/object/FilterCompute.jsx).
+[source code]({{site.appBase}}/object/ListFilter.jsx).
 
 An *object* contains key-value pairs like this:
 

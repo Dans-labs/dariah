@@ -372,7 +372,7 @@ When different components fetch the bits and pieces they need, it all lands here
 This reduces the amount of fetching that is needed, and it improves consistency, because
 all data consuming components look at the same data.
 
-Principal data consuming components are [ItemFiltered](Components#itemfiltered) and
+Principal data consuming components are [ListContainer](Components#listcontainer) and
 [Items](Components#itemmy).
 
 In order to do the job properly, a fair amount of metadata about tables and fields is also fetched and stored.

@@ -4,7 +4,15 @@
     components:
   - method: connected
     components:
-    - Alternative
+  - method: pure
+    components:
+- dux: custom
+  methods:
+  - method: lifecycle
+    components:
+    - Overview
+  - method: connected
+    components:
   - method: pure
     components:
 - dux: docs
@@ -25,8 +33,8 @@
     components:
     - CheckboxI
     - EUMap
-    - FilterCompute
-    - ItemFiltered
+    - ListContainer
+    - ListFilter
   - method: connected
     components:
     - ByValue
@@ -36,6 +44,24 @@
   - method: pure
     components:
     - Stat
+- dux: forms
+  methods:
+  - method: lifecycle
+    components:
+  - method: connected
+    components:
+    - ItemRow
+  - method: pure
+    components:
+- dux: grid
+  methods:
+  - method: lifecycle
+    components:
+  - method: connected
+    components:
+    - ListGrid
+  - method: pure
+    components:
 - dux: me
   methods:
   - method: lifecycle
@@ -43,9 +69,10 @@
     - Login
   - method: connected
     components:
+    - SubApp
   - method: pure
     components:
-- dux: notify
+- dux: notes
   methods:
   - method: lifecycle
     components:
@@ -73,27 +100,57 @@
     - RelSelect
   - method: pure
     components:
+- dux: server
+  methods:
+  - method: ducting
+    components:
+     - docs
+     - me
+     - tables
+  - method: lifecycle
+    components:
+  - method: connected
+    components:
+  - method: pure
+    components:
+- dux: settings
+  methods:
+  - method: lifecycle
+    components:
+     - ItemContainer
+  - method: connected
+    components:
+     - FieldRead
+     - ListGrid
+     - RelSelect
+  - method: pure
+    components:
 - dux: tables
   methods:
   - method: lifecycle
     components:
-    - ItemFiltered
-    - Items
-    - ItemRecord
+    - ItemContainer
+    - ListContainer
+    - ListFilter
+    - ListPlain
+    - Overview
   - method: connected
     components:
-    - Backoffice
+    - EditControls
     - FieldEdit
     - FieldRead
+    - ItemDetails
+    - ItemEdit
     - ItemForm
-    - ItemList
+    - ItemRow
+    - ListGrid
+    - MarkdownArea
+    - RelSelect
   - method: pure
     components:
-    - ItemHead
     - Input
-    - InputMultiple
-    - MarkdownArea
-    - SelectR
+    - InputMulti
+    - ItemRead
 - dux: win
   methods:
   - method: lifecycle
@@ -102,7 +159,6 @@
   - method: connected
     components:
     - App
-    - Pane
     - SubApp
   - method: pure
     components:

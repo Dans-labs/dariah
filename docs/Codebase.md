@@ -8,6 +8,9 @@ title: Codebase
 
 # Legend
 
+The numbers stands for lines of code.
+1000 lines is ~ 1 typed A4 page of text.
+
 ## [YAML](http://www.yaml.org)
 
 A simple plain-text way to convey structured data.
