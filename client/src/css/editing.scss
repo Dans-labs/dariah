@@ -116,20 +116,20 @@ textarea.invalid {
 .multi-content {
     padding: 0 0 0 1em;
     flex: 1 2 40%;
-    overflow: auto;
+    @include sized();
 }
 .multi-control {
     padding: 0 0 0 0;
     flex: 0 0 2em;
-    overflow: auto;
+    @include sized();
 }
 .field-content {
     flex: 0 1 100%;
-    overflow: auto;
+    @include sized();
 }
 .field-control {
     flex: 0 0 2em;
-    overflow: auto;
+    @include sized();
 }
 .fragments {
     width: 100%;
@@ -146,7 +146,7 @@ div.detail-body {
     padding: 0.2em 0.2em 0.2em 0.1em;
     background-color: $widget-fixed-back; 
     flex: 0 0 10em;
-    overflow: auto;
+    @include sized();
 }
 .label-col.edit {
     background-color: $widget-fixed-edit-back; 
@@ -156,12 +156,12 @@ div.detail-body {
     padding: 0.2em;
     background-color: $widget-fixed-back; 
     font-weight: bold;
-    overflow: auto;
+    @include sized();
 }
 .label-col-grid {
     padding: 0.2em 0.2em 0.2em 0.2em;
     background-color: $widget-fixed-back; 
-    overflow: auto;
+    @include sized();
     font-size: small;
 }
 .value-col {
@@ -169,14 +169,14 @@ div.detail-body {
     padding: 0.2em 0.1em 0.2em 0.2em;
     background-color: #fafafa; 
     flex: 1 1 20em;
-    overflow: auto;
+    @include sized();
 }
 .value-col-grid {
     text-align: left;
     padding: 0.1em 0.1em 0.1em 0.1em;
     border-bottom: 2px solid #dddddd; 
     background-color: $value-back;
-    overflow: auto;
+    @include sized();
 }
 .value-col-grid.edit {
     background-color: $value-edit-back;

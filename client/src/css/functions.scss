@@ -20,4 +20,8 @@
     padding-right: $ver;
 }
 
+@mixin sized() {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
 

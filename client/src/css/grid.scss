@@ -43,7 +43,7 @@
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-content: flex-start;
-    overflow: auto;
+    @include sized();
 }
 .sortspecs {
     font-size: small;
@@ -74,13 +74,13 @@ div.bar {
     flex: 0.5 1 content;
     padding-right: 0.5em;
     max-height: 100%;
-    overflow: auto;
+    @include sized();
 }
 div.details {
     flex: 1 1 70%;
     padding-left: 0.5em;
     max-height: 100%;
-    overflow: auto;
+    @include sized();
 }
 div.list-filter {
     display: flex;
@@ -94,13 +94,13 @@ div.filters {
     padding-right: 0.5em;
     max-height: 100%;
     max-width: 40%;
-    overflow: auto;
+    @include sized();
 }
 div.list {
     flex: 1 1 45%;
     padding-left: 0.5em;
     max-height: 100%;
-    overflow: auto;
+    @include sized();
 }
 div.list-filter.compact {
     display: flex;
@@ -136,11 +136,11 @@ div.fulltext {
 }
 div.fulltext .search {
     flex: 1 0.3 5em;
-    overflow: auto;
+    @include sized();
 }
 .fulltext-stat {
     flex: 0.5 0.2 5em;
-    overflow: auto;
+    @include sized();
     text-align: right;
     color: $dim-fore;
     background-color: $dim-back;

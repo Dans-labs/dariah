@@ -17,8 +17,6 @@ span.login {
 }
 
 div.sized {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 0;
+    @include sized();
 }
 
