@@ -4,7 +4,8 @@ title: Library
 
 [europe.geo]({{site.libBase}}/europe.geo.js)
 =============================================================================================
-## countryBorders
+### countryBorders
+
 Object that contains the borders of the European countries plus a bit of additional information in
 [geojson](http://geojson.org)
 format.
@@ -15,44 +16,53 @@ to see where this data comes from and how it has been tweaked for this website.
 [fields]({{site.libBase}}/fields.js)
 =============================================================================================
 
-## checkDisabled
+### checkDisabled
 
-## composeAttributes
+### composeAttributes
 
-## dealWithProvenance
+### dealWithProvenance
 
-## editClass(dirty, invalid)
+### editClass(dirty, invalid)
 Returns the proper css class for styling content that is being edited,
 depending on the state it may be in:
 
 * `dirty`: a changed value that has not been saved to the database yet, and/or
 * `invalid`: a value that does not pass validation.
 
-## getDateTime
+### getDateTime
 
-## makeFields
+### makeFields
 
-## makeDetails
+### makeDetails
 
-## normalization
+### normalization
 An object with normalization functions, named after the types of the values they normalize.
 All functions take a value, and return a normalized value.
 
-## onSubmitSuccess
+### onSubmitSuccess
 
-## getValType(valType)
+### getValType(valType)
 For a given value type, such as `text`, `url`, `number`, return a component and subtype
 for handling the input of such values, e.g. `<input type="url" />`.
 
-## readonlyValue
+### readonlyValue
 
-## someEditable
+### someEditable
 
-## sortStringTemplate
+### sortStringTemplate
 
-## sortTimeInterval
+### sortTimeInterval
 
-## validation
+Sort by time interval.
+Sorting by time intervals should works as follows:
+
+* if both intervals are fully specified, the interval with the earlier startdate comes first;
+* if the startdates are equal, the one with the LATER enddate comes first,
+  in this way, containing intervals come before contained intervals;
+* if the startdate is missing, the startdate is assumed to be in the infinite past;
+* if the enddate is missing, the enddate is assumed to be in the infinite future.
+
+### validation
 An object with validation functions, named after the types of the values they validate.
 All functions take a value, and return undefined if the value passes validation or is itself undefined.
 If a value does not pass validation, a simple string expressing the reason is returned.
@@ -101,7 +111,7 @@ The solution is to use a [memoized](#memo) version of `handleItem`.
 
 The following functions are conveniences for doing exactly that.
 
-## handle(dispatch, actionCreator, actionArgs)
+### handle(dispatch, actionCreator, actionArgs)
 
 This is a memoized action *creator* wrapper. It return a function, that can be called
 with an event. After receiving the event, the passed `actionCreator` will be called
@@ -113,19 +123,19 @@ This particular function `handle` will not use the information in the event.
 It takes trouble to neutralize the event instead.
 If there is relevant information in the event, use one of the following functions.
 
-## handlE
+### handlE
 
 Like `handle`, and the information in the event is not used, but the default
 behaviour of the event and its propagation are not suppressed.
 
-## handlEV
+### handlEV
 
 Like `handle`, but now the `event.target.value` is passed the actionCreator as final
 argument.
 
 [memo]({{site.libBase}}/memo.js)
 =============================================================================================
-## makeSet
+### makeSet
 We use plain objects, including `Array`s for all things on the state.
 But what if your component prefers the data as a 
 [Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set)?
@@ -135,7 +145,7 @@ copies of the same set, which is a waste.
 Here memoization is a solution.
 `makeSet` is e memoized function that takes an array and returns its values as a `Set`.
 
-## memoize(f)
+### memoize
 Turns the function `f` into a memoized function `memF` that yields the same results
 for the same parameters.
 It stores computed results under a key dependent on the parameters for which the result
@@ -269,34 +279,34 @@ as the root cause of this particular slowness.
 
 [utils]({{site.libBase}}/utils.js)
 =============================================================================================
-## combineSelectors(...selectors)
+### combineSelectors(...selectors)
 Given a list of *selector* functions, creates a combined selector that returns
 an object containing the results of the individual selectors.
 This function uses the *reselect's*
 [createSelector](https://github.com/reactjs/reselect#createselectorinputselectors--inputselectors-resultfunc).
 We use it quite often when components need multiple sections of the state.
 
-## emptyX (S A O F)
+### emptyX (S A O F)
 
-## getUrlParts
+### getUrlParts
 
-## jString
+### jString
 
-## makeReducer(flows, init)
+### makeReducer(flows, init)
 Given an object of *flows* and an initial state, returns a *reducer* function.
 The *flows* is an object with functions, named after *actions*.
 These functions define how a new state must be produced when an action has been
 *dispatched*.
 
-## propsChanged(newProps, need, oldProps, keyPropNames)
+### propsChanged(newProps, need, oldProps, keyPropNames)
 Determines whether `newProps` differ significantly from `oldProps`, based on 
 the props with `keyPropNames` only.
 If the props are sufficiently changed, it uses the `need` function to
 finally determine whether the change should result in an action.
 
-## updateAuto
+### updateAuto
 
-## withParams(Component)
+### withParams(Component)
 Higher order function that turns a Component (which is a function) into
 another component.
 

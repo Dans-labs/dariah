@@ -27,7 +27,7 @@ and the diagram visualizes the same logic.
 
 ## Fall-back behaviour
 The server responds to any url with sending the
-[index]({{site.repBase}}/server/controllers/views/index.tpl)
+[index]({{site.serverBase}}/controllers/views/index.tpl)
 page, which also causes the bundled app in [dist]({{site.repBase}}/static/dist) to load.
 
 The server's rules are very simple:
@@ -51,5 +51,5 @@ If the url points to `/api/`,
 the server will respond in a variety of ways, depending on the rest of the url.
 By means of these `/api/` urls the client can ask for additional data services, from file system or database.
 The server side routing in
-[index.py]({{site.repBase}}/server/controllers/index.py)
+[index.py]({{site.serverBase}}/index.py)
 maps these urls to specific controllers that fetch and assemble the requested data.

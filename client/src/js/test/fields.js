@@ -3,17 +3,6 @@ import padStart from 'lodash/padstart'
 import padEnd from 'lodash/padend'
 import { sortByInterval, getDateTime } from 'fields'
 
-/* Sort by interval */
-
-/* 
- * Sorting by time intervals should work as follows:
- * If both intervals are fully specified, the interval with the earlier startdate comes first
- * If the startdates are equal, the one with the LATER enddate comes first.
- * In this way, containing intervals come before contained intervals.
- * If the startdate is missing, the startdate is assumed to be in the infinite past.
- * If the enddate is missing, the enddate is assumed to be in the infinite future.
- */
-
 const testSortInterval = () => {
   describe('Sort by time interval', ()  => {
     it('with fully specified intervals', ()  => {

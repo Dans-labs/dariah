@@ -21,8 +21,10 @@ and followed the most recent and idiomatic practices to achieve our ends.
 ## The technology
 Crash course in modern Javascript, [ES6](ES6) and [React+Redux](React).
 
-## Routing
+## API and Routing
 How server and client react to the urls that are being passed around: [Routing](Routing).
+
+You can also use the tool through an [API](API).
 
 ## Division of labour
 How the dozens of React components are structured around a handful of slices of the *state*,

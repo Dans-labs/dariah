@@ -12,7 +12,8 @@ title: Codebase
 The numbers stands for lines of code.
 1000 lines is ~ 1 typed A4 page of text.
 
-## [YAML](http://www.yaml.org)
+[YAML](http://www.yaml.org)
+-----------------------------------------------------------------------------------------
 
 A simple plain-text way to convey structured data.
 What [Markdown](#markdown) is to text, YAML is to XML-JSON.
@@ -20,15 +21,16 @@ In this app we use YAML for configuration details.
 
 * the conversion of legacy contribution data into MongoDB is steered by a 
   [config.yaml]({{site.repBase}}/static/tools/config.yaml).
-* the [data model]({{site.repBase}}/server/models/data.yaml) lists all the tables
+* the [data model]({{site.serverBase}}/models/data.yaml) lists all the tables
   and fields, including how they hang together and how we want to represent them on screen.
   If you, as developer, need to add new tables and fields, you can do so by modifying this
   file. No extra coding is needed.
-* the [permissions]({{site.repBase}}/server/models/permissions.yaml) define a system of
+* the [permissions]({{site.serverBase}}/models/permissions.yaml) define a system of
   access control. There are groups, levels, actions, tables and fields. This config file
   utterly defines who may do what operations on which data.
 
-## [Markdown](https://guides.github.com/features/mastering-markdown/)
+[Markdown](https://guides.github.com/features/mastering-markdown/)
+-----------------------------------------------------------------------------------------
 
 A simple plain-text way to write formatted text.
 See it as a shortcut to writing HTML.
@@ -51,7 +53,8 @@ In this app we use markdown in the following ways:
 * the app can present markdown [documents](Components#docmd)
 * all big [text fields](Components#markdownarea) in this app support markdown.
 
-## [Javascript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[Javascript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+-----------------------------------------------------------------------------------------
 
 The principal scripting language for web applications.
 It has evolved into a performant language with a beautiful syntax, capable
@@ -62,7 +65,8 @@ We use it as a work horse which takes care of a copy of data from the database.
 It reacts to changes by integrating new bits of data into the existing state,
 a process that is called [reducing](Dux).
 
-## [JSX](https://facebook.github.io/react/docs/introducing-jsx.html)
+[JSX](https://facebook.github.io/react/docs/introducing-jsx.html)
+-----------------------------------------------------------------------------------------
 
 This is also Javascript, but with a thin layer of syntactic sugar, by which you
 can present your code as a collection of [React](https://facebook.github.io/react/)
@@ -83,7 +87,8 @@ The plumbing needs some specialized, technical functions, which are collected in
 [lib](Lib) section of the app.
 One of the most crucial is [memoization](Lib#memo).
 
-## [Python](https://docs.python.org/3/)
+[Python](https://docs.python.org/3/)
+-----------------------------------------------------------------------------------------
 
 A general purpose scripting language with excellent data processing facilities.
 
@@ -98,7 +103,8 @@ but when it comes to database access, the module
 [db]({{site.serverBase}}/controllers/db.py) does the heavy lifting and tends
 to become uglier and uglier.
 
-## [SASS](http://sass-lang.com)
+[SASS](http://sass-lang.com)
+-----------------------------------------------------------------------------------------
 
 This is syntactic sugar on top of [CSS](#css).
 Styling the app has nigthmarish overtones, because the concerns of style often cut
@@ -112,7 +118,8 @@ And finally, you can extract common color and size properties in handy functions
 them from parameters.
 For this we use SASS, but we do it half-heartedly.
 
-## [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
+-----------------------------------------------------------------------------------------
 
 Cascading stylesheets are the ultimate way to paint the final look and feel of the website.
 By using [flex boxes](http://sass-lang.com) instead of tables we can make
@@ -120,7 +127,8 @@ the app respond gracefully to changes in the size of the display without
 resorting to the bureaucracy of overdefining style properties.
 Note that our app does not use the HTML `<table>` element anymore for aligning pieces of content.
 
-## [Shell](https://www.gnu.org/software/bash/)
+[Shell](https://www.gnu.org/software/bash/)
+-----------------------------------------------------------------------------------------
 
 The shell is the interpreter of system level commands. 
 Our app does not use it, but we use it to develop the app.
@@ -133,7 +141,8 @@ That's why we have a [build]({{site.repBase}}/build.sh) script.
 You have to pass it just the name of a task, and the script executes that task with all the
 sophistication needed.
 
-## [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
+-----------------------------------------------------------------------------------------
 
 The core language of the web.
 Surprisingly, our code does not contain HTML anymore.
@@ -148,7 +157,8 @@ But our server does not send HTML anymore to the browser, except for a very firs
 that serves to load a bulk of stylesheets and [javascript](#javascript) into the browser.
 This javascript code builds and manipulates the DOM directly, without generating any formal HTML.
 
-## [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON)
+[JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON)
+-----------------------------------------------------------------------------------------
 
 A format to serialize javascript objects.
 In web applications, the program logic happens at two separate places (at least):

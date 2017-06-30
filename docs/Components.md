@@ -8,6 +8,23 @@ They lean on the [dux](Dux) that work for them in the background.
 
 Click on the names in the titles to view their source code on Github.
 
+Components get *properties* as input (we call them *props*).
+For each component we mention the props they expect and what type 
+of data they represent.
+
+However, some props occur over and over again, and we name them consistently.
+
+Here is a list of those props and their types.
+When mention these props later on, we omit the types.
+
+* `tables` **object** A slice of the state. All data that comes from database tables.
+  Organized by `table` name. For each table there is spec information
+  and actual entity data. 
+* `table` **string** Name of the table that the component must deal with.
+* `filters` **object** A slice of the state. Contains the actual filter settings.
+  Organized by table and then `filterId`. 
+* `filterId` **number**
+
 [main]({{site.appBase}}/main.jsx)
 =============================================================================================
 connected via [roots](Dux#roots)
@@ -22,15 +39,20 @@ connected via [win](Dux#win)
 
 As far as the logic of the web page is concerned, this is the top level component.
 
-`App` is always in view and consists of the
-* top navigation bar (with logo, [Login](#login), and [Notification](#notification))
-* right navigation bar (with navigation links to the components of the app
-  and documentation).
+`App` is always in view and consists of the top navigation bar with
+
+* logo, [Login](#login);
+* [Notification](#notification));
+* static links to documentation.
 
 #### Props
-###### `height`, `width`, number from [getWinDim](Dux#getwindim)
+###### win = { `height`, `width` }, numbers from [getWinDim](Dux#getwindim)
 The height and width of the main window.
 It is only used to display the height and the width somewhere on the screen.
+
+###### `children` components
+
+The sub-top level components that are placed under the App component.
 
 [ByValue]({{site.appBase}}/components/ByValue.jsx)
 =============================================================================================
@@ -41,6 +63,8 @@ There is also a [collective checkbox](#checkboxi), by which the user can check o
 All values that occur are displayed, with statistics in the form *subtotal of total*.
 
 #### Props
+###### `tables` object
+
 ###### `table` string
 The name of the table that is filtered.
 
@@ -61,24 +85,6 @@ The maximum number of rows in which the facets have to be stacked.
 
 ###### `expanded` bool
 Whether the facets should be expanded or collapsed (hidden).
-
-## Note on performance
-There is a subtlety here.
-When we have the facets, we want to lay them out in a grid.
-That work needs only be done upon construction,
-and not for state updates in response to user
-events on the filters.
-So we want to do the grid computation
-[placeFacets](Filter#placefacets)
-once, in an initialization stage, e.g. in the
-[constructor()](React#constructor) the component.
-But it turns out that for the visual performance it does not matter.
-
-This is the virtue of React: the code for rendering just constructs a
-[Fragment](React#fragment), not the real [DOM](React#dom).
-The computation inside [placeFacets](Filter#placefacets)
-is just a little bit of juggling with tiny datastructures, so the fragment is constructed in no time.
-See [Reconciliation](React#reconciliation).
 
 [CheckboxI]({{site.appBase}}/components/CheckboxI.jsx)
 =============================================================================================
@@ -192,7 +198,7 @@ with a [geojson]({{site.libBase}}/europe.geo.js) file of country boundaries laid
 The map is not react aware, it will be rendered in its own div.
 The [lifecycle](React#life-cycle) methods of this component set up the map and update when new filter settings have been applied.
 
-## Compute Marker Radius
+### Compute Marker Radius
 
 When we know the filter results per country, we can put markers on them
 with a radius in proportion to their scores.
@@ -615,7 +621,7 @@ This is a function that takes a `values` object, and calls `mod(table, eId, valu
 where `mod` is the function that dispatches a server action: the `values` are sent
 to the server, where they are used to update the record `eId` in `table`.  
 
-## Implementation
+### Implementation
 The construction of the actual fields is done by a function `makeFields()`, that
 generates an array of fragments, one for each field.
 An editable field will be handled by a

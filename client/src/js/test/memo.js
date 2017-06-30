@@ -5,29 +5,6 @@ import { emptyA } from 'utils'
 
 import { memoize, makeSet } from 'memo.js'
 
-/* memoizeOld and memoize
- * Store results in cache, retrieve results
- * when called with same arguments.
- *
- * memoizeOld used JSON stringify.
- * If some of the arguments are (large) objects,
- * this was getting (very) slow, because the arguments are
- * JSON-stringified.
- *
- * The new memoize is hundreds of times faster in those cases.
- * However, if all arguments are scalars or small objects, memoizeOld is still 2-3 times faster.
- * For scalars and small objects, the overhead of key computation is so small,
- * (100,000 times per second) that we can incur performance hits.
- *
- * Caveat: the new memoize is based on object identity, not the semantic value of objects.
- * In Redux we work with objects that do not mutate. 
- * So a different value will be packaged in a different object.
- *
- * Note that because of this we have to use WeakMap, otherwise this memo function
- * would effectively prevent those big data structures to be garbage collected.
- * However, the keys of WeakMaps can only be objects. All other arguments we still stringify.
- *
- */
 function memoizeOld(f) {
   const memCache = {}
   let retrieved = 0

@@ -375,6 +375,7 @@ into the *root reducer*, that operates on the whole state.
 
 Selectors
 ---------------------------------------------------------------------------
+
 Helpers
 ---------------------------------------------------------------------------
 No helpers.
@@ -415,7 +416,9 @@ Initializes the state for a specific select control. This is an initialization *
 
 [server]({{site.appBase}}/dux/server.js)
 =============================================================================================
-## accessData(task)
+Actions
+---------------------------------------------------------------------------
+### accessData(task)
 Asynchronous action to fetch data from the server, and also to send data to it.
 
 A `task` object specifies what to fetch, and can contain data
@@ -424,9 +427,6 @@ to send to the server.
 It can be used for database queries or file content.
 During request, [notify](Dux#notes) actions will be dispatched.
 
-Actions
----------------------------------------------------------------------------
-### accessData
 
 #### progress
 
@@ -534,11 +534,30 @@ with existing entities' values.
 
 Of all dux, this is the best example of what proper *reducing* is and what it achieves.
 It might look hard to take care of this merging, under the constraint that only those branches of the state should be touched that are actually updated.
+
 But the
 [lodash mergeWith](https://lodash.com/docs/#mergewith)
 makes this a breeze.
+
+Unfortunately, this library does not always leave unchanged values untouched, which results in unnecessary
+re-renderings of components.
+
+The best solution turned out to be
+[Immutability-Helper](https://github.com/kolodny/immutability-helper).
+
+If you want to dive deeper into this issue, see the
+[tests about merging](Tests#merge),
+which includes tests that makes this issue crystal clear.
+
+The methods of the Immutability-Helper have a syntax inspired by the MongoDB commands,
+which is a nice reduction of cognitive load, since we use MongoDB at the server side.
+
 Have a look again at the [reducer source code]({{site.appBase}}/dux/tables.js) and
 see how straightforward it is to code one of the most tricky reducers in this app.
+
+This reducer actively covered by [tests](Tests#tablesReducer).
+Have a look at them to get more feeling of how table actions
+cause state transitions.
 
 Selectors
 ---------------------------------------------------------------------------
