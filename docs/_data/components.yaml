@@ -1,175 +1,68 @@
-- dux: alter
-  methods:
-  - method: lifecycle
-    components:
-  - method: connected
-    components:
-  - method: pure
-    components:
-- dux: custom
-  methods:
-  - method: lifecycle
-    components:
-    - Overview
-  - method: connected
-    components:
-  - method: pure
-    components:
-- dux: docs
-  methods:
-  - method: lifecycle
-    components:
-    - DocMd
-  - method: connected
-    components:
-  - method: pure
-    components:
-    - Doc
-    - DocHtml
-    - DocPdf
-- dux: filters
-  methods:
-  - method: lifecycle
-    components:
-    - CheckboxI
-    - EUMap
-    - ListContainer
-    - ListFilter
-  - method: connected
-    components:
-    - ByValue
-    - Facet
-    - Filter
-    - Fulltext
-  - method: pure
-    components:
-    - Stat
-- dux: forms
-  methods:
-  - method: lifecycle
-    components:
-  - method: connected
-    components:
-    - ItemRow
-  - method: pure
-    components:
-- dux: grid
-  methods:
-  - method: lifecycle
-    components:
-  - method: connected
-    components:
-    - ListGrid
-  - method: pure
-    components:
-- dux: me
-  methods:
-  - method: lifecycle
-    components:
-    - Login
-  - method: connected
-    components:
-    - SubApp
-  - method: pure
-    components:
-- dux: notes
-  methods:
-  - method: lifecycle
-    components:
-    - Notification
-  - method: connected
-    components:
-  - method: pure
-    components:
-- dux: roots
-  methods:
-  - method: lifecycle
-    components:
-  - method: connected
-    components:
-    - main
-  - method: pure
-    components:
-    - Root
-- dux: select
-  methods:
-  - method: lifecycle
-    components:
-  - method: connected
-    components:
-    - RelSelect
-  - method: pure
-    components:
-- dux: server
-  methods:
-  - method: ducting
-    components:
-     - docs
-     - me
-     - tables
-  - method: lifecycle
-    components:
-  - method: connected
-    components:
-  - method: pure
-    components:
-- dux: settings
-  methods:
-  - method: lifecycle
-    components:
-     - ItemContainer
-  - method: connected
-    components:
-     - FieldRead
-     - ListGrid
-     - RelSelect
-  - method: pure
-    components:
-- dux: tables
-  methods:
-  - method: lifecycle
-    components:
-    - ItemContainer
-    - ListContainer
-    - ListFilter
-    - ListPlain
-    - Overview
-  - method: connected
-    components:
-    - EditControls
-    - FieldEdit
-    - FieldRead
-    - ItemDetails
-    - ItemEdit
-    - ItemForm
-    - ItemRow
-    - ListGrid
-    - MarkdownArea
-    - RelSelect
-  - method: pure
-    components:
-    - Input
-    - InputMulti
-    - ItemRead
-- dux: win
-  methods:
-  - method: lifecycle
-    components:
-    - Window
-  - method: connected
-    components:
-    - App
-    - SubApp
-  - method: pure
-    components:
-- dux: __none__
-  methods:
-  - method: lifecycle
-    components:
-  - method: connected
-    components:
-  - method: pure
-    components:
-    - Static
-    - NavLink
-    - NotFound
+- alter
+- custom:
+  - Overview
+- docs:
+  - DocMd
+  - Doc
+  - DocHtml
+  - DocPdf
+- filters:
+  - CheckboxI
+  - EUMap
+  - ListContainer
+  - ListFilter
+  - ByValue
+  - Facet
+  - Filter
+  - Fulltext
+  - Stat
+- forms:
+  - ItemRow
+- grid:
+  - ListGrid
+- me:
+  - Login
+  - SubApp
+- notes:
+  - Notification
+- roots:
+  - main
+  - Root
+- select:
+  - RelSelect
+- server:
+  - docs
+  - me
+  - tables
+- settings:
+  - ItemContainer
+  - FieldRead
+  - ListGrid
+  - RelSelect
+- tables:
+  - ItemContainer
+  - ListContainer
+  - ListFilter
+  - ListPlain
+  - Overview
+  - EditControls
+  - FieldEdit
+  - FieldRead
+  - ItemDetails
+  - ItemEdit
+  - ItemForm
+  - ItemRow
+  - ListGrid
+  - MarkdownArea
+  - RelSelect
+  - Input
+  - InputMulti
+  - ItemRead
+- win:
+  - Window
+  - App
+  - SubApp
+- __none__:
+  - Static
+  - NavLink
+  - NotFound

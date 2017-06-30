@@ -9,9 +9,7 @@ module.exports = {
     extensions: ['.js', '.jsx'],
     modules: [
       __dirname + '/src/js/app/dux',
-      __dirname + '/src/js/app/pure',
-      __dirname + '/src/js/app/state',
-      __dirname + '/src/js/app/object',
+      __dirname + '/src/js/app/components',
       __dirname + '/src/js/lib',
       __dirname + '/src/js/test',
       'node_modules',

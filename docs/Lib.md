@@ -150,7 +150,7 @@ In many cases, the
 [reselect](https://github.com/reactjs/reselect)
 library is all we need for the memoization of *selector functions*.
 However, if you want to bind a callback function to concrete arguments, e.g. in
-[InputMulti]({{site.appBase}}/pure/InputMulti.jsx),
+[InputMulti]({{site.appBase}}/components/InputMulti.jsx),
 you need more powerful memoization, such as `memoize` here.
 
 However, a naive implementation of memoize has a big drawback. 

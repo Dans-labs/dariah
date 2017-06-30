@@ -28,23 +28,20 @@
         {% endfor %}
         <h3>Components by Dux</h3>
         {% for dux in site.data.components %}
-            {% assign dux_down = dux.dux | downcase %}
-            <h4><a href="{{ '/Dux.html#' | append:dux_down | relative_url }}">{{ dux.dux }}</a></h4>
+            {% for item in dux %}
+                {% assign dux_down = item[0] | downcase %}
+            <h4><a href="{{ '/Dux.html#' | append:dux_down | relative_url }}">{{ item[0] }}</a></h4>
             <table>
                 <tbody>
-            {% for method in dux.methods %}
-                {% if method.components.size %}
                     <tr>
-                        <th>{{ method.method }}</th>
                         <td>
-                    {% for comp in method.components %}
-                        {% assign comp_down = comp | downcase %}
-                            <a href="{{ '/Components.html#' | append:comp_down | relative_url }}">{{ comp }}</a>
-                    {% endfor %}
+                {% for comp in item[1] %}
+                    {% assign comp_down = comp | downcase %}
+                    <a href="{{ '/Components.html#' | append:comp_down | relative_url }}">{{ comp }}</a>
+                {% endfor %}
+            {% endfor %}
                         </td>
                     </tr>
-                {% endif %}
-            {% endfor %}
                 </tbody>
             </table>
         {% endfor %}

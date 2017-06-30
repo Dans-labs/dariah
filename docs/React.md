@@ -19,7 +19,7 @@ a static template, it can be (and will be) coded as a pure function.
 
 We put all these components in a directory called **pure**.
 
-[Example: Stat]({{site.appBase}}/pure/Stat.jsx).
+[Example: Stat]({{site.appBase}}/components/Stat.jsx).
 
 ## Simple Stateful components
 If a component needs to store the effects of the outside worlds
@@ -30,7 +30,7 @@ by means of a simple binding: [connect](#connect).
 
 We put all these components in a directory called **state**.
 
-[Example: Facet]({{site.appBase}}/state/Facet.jsx).
+[Example: Facet]({{site.appBase}}/components/Facet.jsx).
 
 ## Complex components
 If a component has to handle the DOM after it has been constructed,
@@ -41,7 +41,7 @@ then we need to program the component as a class with so-called
 
 We put all these components in a directory called **object**.
 
-[Example: ListContainer]({{site.appBase}}/object/ListContainer.jsx).
+[Example: ListContainer]({{site.appBase}}/components/ListContainer.jsx).
 
 ## React Processing Concepts
 React renders updates to

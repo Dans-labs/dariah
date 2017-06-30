@@ -16,7 +16,7 @@ Entry point of the client side app.
 Contains the [routing](Routing), wrapped in a [Root](#roots) component, that
 sets up the store in which the central state lives.
 
-[App]({{site.appBase}}/state/App.jsx)
+[App]({{site.appBase}}/components/App.jsx)
 =============================================================================================
 connected via [win](Dux#win)
 
@@ -32,7 +32,7 @@ As far as the logic of the web page is concerned, this is the top level componen
 The height and width of the main window.
 It is only used to display the height and the width somewhere on the screen.
 
-[ByValue]({{site.appBase}}/state/ByValue.jsx)
+[ByValue]({{site.appBase}}/components/ByValue.jsx)
 =============================================================================================
 connected via [filters](Dux#filters)
 
@@ -80,7 +80,7 @@ The computation inside [placeFacets](Filter#placefacets)
 is just a little bit of juggling with tiny datastructures, so the fragment is constructed in no time.
 See [Reconciliation](React#reconciliation).
 
-[CheckboxI]({{site.appBase}}/object/CheckboxI.jsx)
+[CheckboxI]({{site.appBase}}/components/CheckboxI.jsx)
 =============================================================================================
 (life cycle) connected via [filters](Dux#filters)
 
@@ -102,7 +102,7 @@ of the associate checkboxes are checked.
 We have to resort to a [DOM](React#dom) manipulation after rendering to get the
 indeterminate state across.
 
-[Doc]({{site.appBase}}/pure/Doc.jsx)
+[Doc]({{site.appBase}}/components/Doc.jsx)
 =============================================================================================
 presents [docs](Dux#docs)
 
@@ -117,7 +117,7 @@ From this object the property `pathname` will be read, which will be split
 into directory, file and extension parts.
 The extension is used to switch to the component for that type of documents.
 
-[DocHtml]({{site.appBase}}/pure/DocHtml.jsx)
+[DocHtml]({{site.appBase}}/components/DocHtml.jsx)
 =============================================================================================
 presents [docs](Dux#docs)
 
@@ -127,7 +127,7 @@ Displays an HTML document by linking to it in an IFRAME.
 ###### `docDir`, `docName`, `docExt` string
 The directory, filename and extension of the document container.
 
-[DocMd]({{site.appBase}}/object/DocMd.jsx)
+[DocMd]({{site.appBase}}/components/DocMd.jsx)
 =============================================================================================
 (life cycle) connected via [docs](Dux#docs)
 
@@ -156,7 +156,7 @@ internal links to this application.
 A full link (with protocol `http`(`s`) is translated to a
 plain HTML `a` element, so clicking it will leave this application.
 
-[DocPdf]({{site.appBase}}/pure/DocPdf.jsx)
+[DocPdf]({{site.appBase}}/components/DocPdf.jsx)
 =============================================================================================
 presents [docs](Dux#docs)
 
@@ -169,7 +169,7 @@ We only do that when we detect an iOS browser.
 ###### `docDir`, `docName`, `docExt` string
 The directory, filename and extension of the document container.
 
-[EUMap]({{site.appBase}}/object/EUMap.jsx)
+[EUMap]({{site.appBase}}/components/EUMap.jsx)
 =============================================================================================
 (life cycle) connected via [filters](Dux#filters)
 
@@ -201,7 +201,7 @@ or the big markers get too big.
 We mitigate this effect, by using proportional radii only for values below a certain
 threshold (`LEVEL_OFF`). For higher values we essentiall take the square root.
 
-[Facet]({{site.appBase}}/state/Facet.jsx)
+[Facet]({{site.appBase}}/components/Facet.jsx)
 =============================================================================================
 connected via [filters](Dux#filters)
 
@@ -229,7 +229,7 @@ Callback to be invoked when the facet is clicked.
 
 Note that we use the strategy of [controlled components](React#controlled-component) here.
 
-[FieldEdit]({{site.appBase}}/state/FieldEdit.jsx)
+[FieldEdit]({{site.appBase}}/components/FieldEdit.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
 
@@ -322,7 +322,7 @@ Both turned out to be related to Redux-Form.
   Another cause for the same problem I encountered in [InputMulti](Components#inputmulti),
   where I had memoized the callbacks for adding and removing values to/from a sequence.
 
-[FieldRead]({{site.appBase}}/state/FieldRead.jsx)
+[FieldRead]({{site.appBase}}/components/FieldRead.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
 
@@ -343,7 +343,7 @@ The name of the table in question.
 The actual value for this field.
 It could be a string, a number, or an object, or even an array of such things.
 
-[Filter]({{site.appBase}}/state/Filter.jsx)
+[Filter]({{site.appBase}}/components/Filter.jsx)
 =============================================================================================
 connected via [filters](Dux#filters)
 
@@ -375,7 +375,7 @@ This information comes from the [tables](Dux#tables) part of the state.
 ###### `filteredAmount` object, `filteredAmountOthers` object, `amounts` object
 The results of [applying](Dux#getfiltersapplied) the filters.
 
-[Fulltext]({{site.appBase}}/state/Fulltext.jsx)
+[Fulltext]({{site.appBase}}/components/Fulltext.jsx)
 =============================================================================================
 connected via [filters](Dux#filters)
 
@@ -405,7 +405,7 @@ Callback to be invoked when the user is typing the search string.
 
 Note that we use the strategy of [controlled components](React#controlled-component) here.
 
-[Input]({{site.appBase}}/pure/Input.jsx)
+[Input]({{site.appBase}}/components/Input.jsx)
 =============================================================================================
 presents [tables](Dux#tables)
 
@@ -426,7 +426,7 @@ These attributes are passed verbatim to the underlying `<input />`.
 ###### `type` string
 The *type* of `<input type="..." />`. It will go to the place of the dots.
 
-[InputMulti]({{site.appBase}}/pure/InputMulti.jsx)
+[InputMulti]({{site.appBase}}/components/InputMulti.jsx)
 =============================================================================================
 presents [tables](Dux#tables)
 
@@ -472,7 +472,7 @@ They have been injected by the wrapper
 a child of [FieldEdit](#fieldedit)) of this component, and they are just passed
 on to *Field* and *FieldArray*, so that they can do their magic.
 
-[ItemContainer]({{site.appBase}}/object/ItemContainer.jsx)
+[ItemContainer]({{site.appBase}}/components/ItemContainer.jsx)
 =============================================================================================
 (life cycle) connected via [tables](Dux#tables)
 
@@ -500,15 +500,15 @@ This will become the current record in view.
 ###### `del` function is [delItem](Dux#delitem)
 Callback to delete the current record from the database.
 
-[ItemDetails]({{site.appBase}}/state/ItemDetails.jsx)
+[ItemDetails]({{site.appBase}}/components/ItemDetails.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
 
-[ItemEdit]({{site.appBase}}/state/ItemEdit.jsx)
+[ItemEdit]({{site.appBase}}/components/ItemEdit.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
 
-[ItemForm]({{site.appBase}}/state/ItemForm.jsx)
+[ItemForm]({{site.appBase}}/components/ItemForm.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
 
@@ -623,11 +623,11 @@ An editable field will be handled by a
 and a read-only field by a
 [`<FieldRead />](#fieldRead) component.
 
-[ItemRow]({{site.appBase}}/state/ItemRow.jsx)
+[ItemRow]({{site.appBase}}/components/ItemRow.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
 
-[ListContainer]({{site.appBase}}/object/ListContainer.jsx)
+[ListContainer]({{site.appBase}}/components/ListContainer.jsx)
 =============================================================================================
 (life cycle) connected via [tables](Dux#tables)
 
@@ -645,7 +645,7 @@ The name of the table in question.
 ###### `fetch` function is [fetchTable](Dux#fetchtable)
 Callback to fetch table data and metadata from the server.
 
-[ListFilter]({{site.appBase}}/object/ListFilter.jsx)
+[ListFilter]({{site.appBase}}/components/ListFilter.jsx)
 =============================================================================================
 (life cycle) connected via [filters](Dux#filters)
 
@@ -667,11 +667,11 @@ Whether the filters have been initialized.
 ###### `init` function is [setupFiltering](Dux#setupfiltering)
 Callback to initialize filtering.
 
-[ListGrid]({{site.appBase}}/state/ListGrid.jsx)
+[ListGrid]({{site.appBase}}/components/ListGrid.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
 
-[ListPlain]({{site.appBase}}/object/ListPlain.jsx)
+[ListPlain]({{site.appBase}}/components/ListPlain.jsx)
 =============================================================================================
 (life cycle) connected via [filters](Dux#filters)
 
@@ -696,7 +696,7 @@ The full information of the records will be looked up from `tables` in the state
 ###### `inplace` bool
 Whether the title can be expanded to the full record by the user.
 
-[Login]({{site.appBase}}/object/Login.jsx)
+[Login]({{site.appBase}}/components/Login.jsx)
 =============================================================================================
 (life cycle) connected via [me](Dux#me)
 
@@ -710,7 +710,7 @@ The information about the currently logged-in user, fetched from the server.
 ###### `fetch` function is [fetchMe](Dux#fetchme)
 Callback to fetch user information from the server.
 
-[MarkdownArea]({{site.appBase}}/state/MarkdownArea.jsx)
+[MarkdownArea]({{site.appBase}}/components/MarkdownArea.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
 
@@ -736,7 +736,7 @@ invalid, and of so, for what reason?
 Contains attributes related to the actual value that is being held.
 These attributes are passed verbatim to the underlying `<input />`.
 
-[NavLink]({{site.appBase}}/pure/NavLink.jsx)
+[NavLink]({{site.appBase}}/components/NavLink.jsx)
 =============================================================================================
 presents __none__
 
@@ -748,7 +748,7 @@ it will become highlighted.
 ###### activeClassName
 The CSS class to be used when the navigation link has been clicked.
 
-[NotFound]({{site.appBase}}/pure/NotFound.jsx)
+[NotFound]({{site.appBase}}/components/NotFound.jsx)
 =============================================================================================
 presents __none__
 
@@ -759,7 +759,7 @@ Displays a 404 if no
 ###### `splat` string
 The text to display on the 404 page.
 
-[Notification]({{site.appBase}}/object/Notification.jsx)
+[Notification]({{site.appBase}}/components/Notification.jsx)
 =============================================================================================
 (life cycle) connected via [notes](Dux#notes)
 
@@ -794,10 +794,10 @@ Callback by which the list of notifications can be cleared.
 ###### `display` function is [display](Dux#display)
 Callback to be invoked when the user clicks the panel or the progress indicator to hide and show the notifications panel.
 
-[Overview]({{site.appBase}}/object/Overview.jsx)
+[Overview]({{site.appBase}}/components/Overview.jsx)
 =============================================================================================
 
-[RelSelect]({{site.appBase}}/state/RelSelect.jsx)
+[RelSelect]({{site.appBase}}/components/RelSelect.jsx)
 =============================================================================================
 presents [select](Dux#select)
 
@@ -818,7 +818,7 @@ The capabilities of this widget are:
 * plays well with [Redux-Form](https://redux-form.com);
 
 
-[Root]({{site.appBase}}/pure/Root.jsx)
+[Root]({{site.appBase}}/components/Root.jsx)
 =============================================================================================
 presents [roots](Dux#roots)
 
@@ -832,7 +832,7 @@ detecting some global UI events.
 #### Props
 Except for the standard prop `children`, there are no props.
 
-[Stat]({{site.appBase}}/pure/Stat.jsx)
+[Stat]({{site.appBase}}/components/Stat.jsx)
 =============================================================================================
 presents [filters](Dux#filters)
 
@@ -842,7 +842,7 @@ If one of the two is missing, the `of` will not display.
 #### Props
 ###### `subtotal`, `total` number
 
-[Static]({{site.appBase}}/pure/Static.jsx)
+[Static]({{site.appBase}}/components/Static.jsx)
 =============================================================================================
 presents __none__
 
@@ -851,7 +851,7 @@ Fixed navigation links to some static resources.
 #### Props
 None.
 
-[SubApp]({{site.appBase}}/state/SubApp.jsx)
+[SubApp]({{site.appBase}}/components/SubApp.jsx)
 =============================================================================================
 presents [win](Dux#win)
 
@@ -864,7 +864,7 @@ display in those panes.
 The name of the table of entities that is central to the subcomponent that
 is displayed in the panes.
 
-[Window]({{site.appBase}}/object/Window.jsx)
+[Window]({{site.appBase}}/components/Window.jsx)
 =============================================================================================
 (life cycle) connected via [win](Dux#win)
 
