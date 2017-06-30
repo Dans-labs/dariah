@@ -35,12 +35,13 @@ In the [Components](Components) document they are all documented, alphabetically
 
 But components hang together, work together, share data.
 To see that picture, start with looking at the side bar, where the components have been grouped by 
-... **duck** ... !
+... **duct** ... !
 
 ## Dux
 These are the pillars of connected pieces of labour, that support the individual components.
 I follow a [proposal by Erik Rasmussen](https://github.com/erikras/ducks-modular-redux)
-to call a modular Redux package a duck, and in the plural I call them **dux**,
+to call a modular Redux package a duck, but with a twist: I call it a *duct*.
+But in the plural I call them **dux**,
 honouring the good work of Redux.
 
 ## Backend

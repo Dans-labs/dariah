@@ -19,10 +19,10 @@ all your React components, especially if you use Redux in an idiomatic way.
 ![diag](design/design.007.jpeg)
 
 # Components and Dux
-In Redux, every component has read access to the state, and indirect write access by *dispatching* *actions*.
+In Redux, every component may obtain read access to the state, and has indirect write access by *dispatching* *actions*.
 The state is held in a store and the store manages all access to the state.
 When actions are dispatched to the store, the store calls a *reducer*,
-which is a function written by the application developer and subscribed to the store.
+which is a function written by the application developer.
 
 The reducer is given the action, which has a *type* and a payload, and on that basis, and that basis alone,
 it produces a new state from the old state.
@@ -34,7 +34,8 @@ The components involved do not need the whole state, but a specific *selection* 
 Some of the actions may become really specialized, involved, and complex, and for those
 one writes dedicated *helpers*.
 
-We have organized these concerns into *dux* (plural of *duck*), where a duck is one file of [ES6](ES6) code that
+We have organized these concerns into *dux* (plural of *duct* or
+more affectionately: *duck*), where a duct is one file of [ES6](ES6) code that
 exports
 
 * *action* creator functions (one or more as named exports); their names typically start with `handle`, `change`, `fetch`;
@@ -43,8 +44,10 @@ exports
 * *selector* functions (one or more as named exports); their names always start with `get`;
   `get` as in: "get a fragment of the whole state".
 * *helper* functions (some of which do not have to be exported).
+  Quite often their names start with `compile` as in "compile the state data into something
+  that may component can readily consume".
 
-Such a *duck* ties in very well with the way that React components can be connected to the state.
+Such a *duct* ties in very well with the way that React components can be connected to the state.
 The idiomatic approach is to write your component as a pure, stateless function, even if it needs state.
 When it does need to read the state, assume that your component will receive that information as *properties*.
 And when it needs to modify the state, assume that it will receive callbacks, also as *properties*, to dispatch actions.
@@ -65,7 +68,7 @@ This will reduce the potential bugs considerably.
 
 ![diag](design/design.008.jpeg)
 
-Note that all code to make the connection between components and a (slice of the) state are located in a duck.
+Note that all code to make the connection between components and a (slice of the) state are located in a duct.
 We are talking about the *selectors*, the *actions*, and possibly the *helpers*.
 The reducer is something that is hidden from the component code.
 It is only used by the store, via a kind of subscription.
@@ -76,12 +79,23 @@ so it really makes sense to have all four things in one file.
 Currently, these are the dux of this app:
 
 * [alter](Dux#alter): show/hide, cycle through *n* alternative representations of a piece of user interface;
+* [custom](Dux#custom): specialized logic to treat some tables and items different from others, based on the
+  meaning they have for the users of the application
 * [docs](Dux#docs): fetch documents, especially markdown ones, and show them in two representations: source and formatted;
 * [filters](Dux#filters): the machinery of faceted and full text filtering of entities from tables;
+* [forms](Dux#forms): the state of all data entry forms in the app.
+  Managed by [redux-form](http://redux-form.com), but we need to 
+  inspect it as well;
+* [grid](Dux#grid): the display state of all lists in grid layout: the sort columns and the directions
+  of sorting;
 * [me](Dux#me): data about the currently logged-in user;
 * [notes](Dux#notes): the notification system;
 * [roots](Dux#roots): combining all the other dux;
 * [select](Dux#select): the state of all multiselect widgets in the app;
+* [server](Dux#server): handling asynchronous actions and reporting about success, failure
+  and pending requests;
+* [settings](Dux#settings): cross-cutting operational parameters, such as whether to show or hide
+  the provenance fields (creator, created data, sequence of modified-by records);
 * [tables](Dux#tables): manage all database data that has been fetched from the server;
 * [win](Dux#win): react to the resizing of the browser window.
 

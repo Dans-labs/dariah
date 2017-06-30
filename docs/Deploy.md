@@ -108,7 +108,7 @@ The absolute location is not important. Here we assume everything resides in `/o
           - `js`
             - `app`
               - `dux` connectors between React components and the Redux state. Plain ES6.
-                Every duck handles a specific concern of the app.
+                Every duct handles a specific concern of the app.
                 All contain the following sections: *actions*, *reducer*, *selectors*, *helpers*.
               - `object`, `state`, `pure`: React components in `*.jsx` files. The ones in `pure` are functions
                  without side effects; the ones in `state` are programmed as pure functions, but an enhanced version that

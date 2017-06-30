@@ -237,10 +237,10 @@ Edit control for an editable field.
 Depending on the type of the field and the multiplicity, it presents
 the right control.
 Basically, this component produces one or more 
-[Field](http://redux-form.com/6.6.3/docs/api/Field.md/) 
+[Field](http://redux-form.com/docs/api/Field.md/) 
 or
-[FieldArray](http://redux-form.com/6.6.3/docs/api/FieldArray.md/)
-components (which are provided by [redux-form](https://redux-form.com/6.6.3/). 
+[FieldArray](http://redux-form.com/6.8.0/docs/api/FieldArray.md/)
+components (which are provided by [redux-form](https://redux-form.com). 
 
 Note that we do not pass the actual values to these components.
 They know how to get the current values from the state, and what actions
@@ -274,7 +274,7 @@ The name of the table in question.
 ###### ...props any
 There are many more props that get passed to `FieldEdit`. 
 They have been injected by the wrapper
-[reduxForm()](http://redux-form.com/6.6.3/docs/api/ReduxForm.md/) into
+[reduxForm()](http://redux-form.com/6.8.0/docs/api/ReduxForm.md/) into
 [ItemForm](#itemform), the parent of this component, and they are just passed
 on to *Field* and *FieldArray*, so that they can do their magic.
 
@@ -295,7 +295,7 @@ Both turned out to be related to Redux-Form.
   on to the component function by redux-form.
 
   This is actually documented in the redux-form docs. You need 
-  [this](http://redux-form.com/6.7.0/docs/api/Field.md/), section **2. A stateless function**
+  [this](http://redux-form.com/6.8.0/docs/api/Field.md/), section **2. A stateless function**
 
   > You must define the stateless function outside of your render() method,
   or else it will be recreated on every render and will force the Field to rerender
@@ -306,7 +306,7 @@ Both turned out to be related to Redux-Form.
 
   and
   
-  [this](http://redux-form.com/6.7.0/docs/api/Field.md/#props):
+  [this](http://redux-form.com/6.8.0/docs/api/Field.md/#props):
 
   > Any custom props passed to Field will be merged into the props object
   on the same level as the input and meta objects.
@@ -431,9 +431,9 @@ The *type* of `<input type="..." />`. It will go to the place of the dots.
 presents [tables](Dux#tables)
 
 Renders a sequence of
-[Field](http://redux-form.com/6.6.3/docs/api/Field.md/) 
+[Field](http://redux-form.com/6.8.0/docs/api/Field.md/) 
 components on behalf of a
-[FieldArray](http://redux-form.com/6.6.3/docs/api/FieldArray.md/)
+[FieldArray](http://redux-form.com/6.8.0/docs/api/FieldArray.md/)
 component.
 There are controls to remove values, and to add fresh, empty values.
 
@@ -467,12 +467,12 @@ invalid, and of so, for what reason?
 ###### ...props any
 There are many more props that must be passed to `Field`. 
 They have been injected by the wrapper
-[reduxForm()](http://redux-form.com/6.6.3/docs/api/ReduxForm.md/) into
+[reduxForm()](http://redux-form.com/6.8.0/docs/api/ReduxForm.md/) into
 [ItemForm](#itemform), the uncle (`InputMulti` is passed as attribute to `Field` which is
 a child of [FieldEdit](#fieldedit)) of this component, and they are just passed
 on to *Field* and *FieldArray*, so that they can do their magic.
 
-[ItemContainer]({{site.appBase}}/object/ItemRecord.jsx)
+[ItemContainer]({{site.appBase}}/object/ItemContainer.jsx)
 =============================================================================================
 (life cycle) connected via [tables](Dux#tables)
 
@@ -500,11 +500,13 @@ This will become the current record in view.
 ###### `del` function is [delItem](Dux#delitem)
 Callback to delete the current record from the database.
 
-[ItemDetails]({{site.appBase}}/object/ItemDetails.jsx)
+[ItemDetails]({{site.appBase}}/state/ItemDetails.jsx)
 =============================================================================================
+connected via [tables](Dux#tables)
 
-[ItemEdit]({{site.appBase}}/object/ItemEdit.jsx)
+[ItemEdit]({{site.appBase}}/state/ItemEdit.jsx)
 =============================================================================================
+connected via [tables](Dux#tables)
 
 [ItemForm]({{site.appBase}}/state/ItemForm.jsx)
 =============================================================================================
@@ -513,21 +515,21 @@ connected via [tables](Dux#tables)
 Manages the display and editing of a single record.
 The component also shows *save* and *reset* buttons (if appropriate).
 
-We use [redux-form](http://redux-form.com/6.6.3/) as machinery for displaying forms,
+We use [redux-form](http://redux-form.com) as machinery for displaying forms,
 filling them out, submitting them, sending the values to the database, validating and normalizing
 values.
 
 Although *redux-form* has an awesome functionality, it is far from trivial to get it integrated.
 
 The work horses are the
-[Field](http://redux-form.com/6.6.3/docs/api/Field.md/) 
+[Field](http://redux-form.com/6.8.0/docs/api/Field.md/) 
 and
-[FieldArray](http://redux-form.com/6.6.3/docs/api/FieldArray.md/)
+[FieldArray](http://redux-form.com/6.8.0/docs/api/FieldArray.md/)
 components.
 
 These elements can be put in an arbitrary component, under a `<form/>` element.
 The resulting component is enhanced by the
-[reduxForm()](http://redux-form.com/6.6.3/docs/api/ReduxForm.md/) function.
+[reduxForm()](http://redux-form.com/6.8.0/docs/api/ReduxForm.md/) function.
 
 The basic flow is this:
 
@@ -606,7 +608,7 @@ Resetting means: changing all edited values back to the initialValues.
 
 ###### `handleSubmit` function
 A function that is invoked when the form is submitted.
-This function handles all the [redux-form](https://redux-form.com/6.6.3/) machinery that is needed.
+This function handles all the [redux-form](https://redux-form.com) machinery that is needed.
 It also calls a function that you can pass to it as first argument.
 We pass it our `toDb(table, eId, mod)` function.
 This is a function that takes a `values` object, and calls `mod(table, eId, values)`,
@@ -621,8 +623,9 @@ An editable field will be handled by a
 and a read-only field by a
 [`<FieldRead />](#fieldRead) component.
 
-[ItemRow]({{site.appBase}}/object/ItemRow.jsx)
+[ItemRow]({{site.appBase}}/state/ItemRow.jsx)
 =============================================================================================
+connected via [tables](Dux#tables)
 
 [ListContainer]({{site.appBase}}/object/ListContainer.jsx)
 =============================================================================================
@@ -666,10 +669,11 @@ Callback to initialize filtering.
 
 [ListGrid]({{site.appBase}}/state/ListGrid.jsx)
 =============================================================================================
-
-[ListPlain]({{site.appBase}}/state/ListPlain.jsx)
-=============================================================================================
 connected via [tables](Dux#tables)
+
+[ListPlain]({{site.appBase}}/object/ListPlain.jsx)
+=============================================================================================
+(life cycle) connected via [filters](Dux#filters)
 
 Displays a list of items from a table.
 If filters are active on that table, this component is meant to just display the
@@ -706,9 +710,9 @@ The information about the currently logged-in user, fetched from the server.
 ###### `fetch` function is [fetchMe](Dux#fetchme)
 Callback to fetch user information from the server.
 
-[MarkdownArea]({{site.appBase}}/pure/MarkdownArea.jsx)
+[MarkdownArea]({{site.appBase}}/state/MarkdownArea.jsx)
 =============================================================================================
-presents [tables](Dux#tables)
+connected via [tables](Dux#tables)
 
 An edit control for bigger chunks of text.
 It is basically a `<textarea>...</textarea>` but it is enhanced to convert to the text
@@ -811,12 +815,12 @@ The capabilities of this widget are:
 * options can be filtered by a full text filter;
 * only one copy of an option can be chosen;
 * selected options are removed from the list of selectable options;
-* plays well with [Redux-Form](https://redux-form.com/6.6.3/);
+* plays well with [Redux-Form](https://redux-form.com);
 
 
 [Root]({{site.appBase}}/pure/Root.jsx)
 =============================================================================================
- presents [roots](Dux#roots)
+presents [roots](Dux#roots)
 
 Top-level wrapping component to set up the central store. It does so
 by configuring the store, calling [configureStore](Dux#roots), and passing
@@ -830,7 +834,7 @@ Except for the standard prop `children`, there are no props.
 
 [Stat]({{site.appBase}}/pure/Stat.jsx)
 =============================================================================================
- presents [filters](Dux#filters)
+presents [filters](Dux#filters)
 
 Displays a string of the form *subTotal* `of` *total*.
 If one of the two is missing, the `of` will not display.

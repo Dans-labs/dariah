@@ -296,8 +296,8 @@ We divide the state into segments that are responsible for well-described tasks,
 * alternative presentations to the user
 * window resizing
 
-For every such task, we make a *duck* and put it into the *dux* directory.
-Every duck manages a slice of the state has four sections:
+For every such task, we make a *duct* and put it into the *dux* directory.
+Every duct manages a slice of the state has four sections:
 
 * Actions: functions that create the actions whose dispatch will trigger a state update
 * Reducer: a single function that translates all relevant actions into updates of its slice of the state
@@ -354,7 +354,7 @@ However, we will also encounter cases where we need more complete memoization, s
 have a cache for their results given multiple sets of parameters. See [memo](Lib#memo).
 
 ## Connect
-Redux and the ducks streamline very much how components deal with the centralized store.
+Redux and the dux streamline very much how components deal with the centralized store.
 The central function is Redux
 [connect](https://github.com/reactjs/react-redux/blob/master/docs/api#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options).
 
