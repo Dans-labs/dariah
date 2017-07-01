@@ -17,12 +17,21 @@ to see where this data comes from and how it has been tweaked for this website.
 =============================================================================================
 
 ### checkDisabled
+Checks whether a certain value is inactive and should be disabled.
+See [custom logic](Dux#custom).
+Used in component [RelSelect](Components#relselect).
 
 ### composeAttributes
+When composing a Field component for an item, compute attributes telling whether
+the item is active or not, and merge them into the other attributes.
+Used in component [RelSelect](Components#relselect).
 
 ### dealWithProvenance
+Remove provenance fields if current settings require that.
+See [settings](Dux#settings).
+Used in component [ItemContainer](Components#itemcontainer) and others.
 
-### editClass(dirty, invalid)
+### editClass
 Returns the proper css class for styling content that is being edited,
 depending on the state it may be in:
 
@@ -30,26 +39,60 @@ depending on the state it may be in:
 * `invalid`: a value that does not pass validation.
 
 ### getDateTime
+Convert a datetime object or string into a numerical value, so you can make comparisons.
+If absent, yield negative infinity for start dates and positive infinity for end dates.
+Used in [custom](Dux#custom).
 
 ### makeFields
+Prepare field components for an item of a table.
+Collect the specs and put all information in an array objects,
+each corresponding to a field, from which components can easily
+construct a widget for showing or editing that field.
+
+Example: [ItemForm](Components#ItemForm)
 
 ### makeDetails
+Prepare lists of details for an item of a table.
+Collect the specs and put all information in an array of objects,
+each corresponding to a details list,
+from which components can easily
+construct a widget for handling lists of details
+
+Example: [ItemForm](Components#ItemForm)
 
 ### normalization
 An object with normalization functions, named after the types of the values they normalize.
 All functions take a value, and return a normalized value.
 
 ### onSubmitSuccess
+Needed in a workaround for an
+[issue in redux-form](https://github.com/erikras/redux-form/issues/2841).
+See [ItemEdit](Components#ItemEdit)
 
 ### getValType(valType)
 For a given value type, such as `text`, `url`, `number`, return a component and subtype
 for handling the input of such values, e.g. `<input type="url" />`.
 
+Example: [FieldEdit](Components#FieldEdit)
+
 ### readonlyValue
+For a given value type, such as `text`, `url`, `number`, return
+a formatted value for readonly display.
+If the value comes from a value list or a related table, it will have a link
+that shows you the value as an item in its list.
+
+Example: [FieldRead](Components#FieldRead)
 
 ### someEditable
+Checks whether a list of fields contains at least one that the current user may edit.
+
+Example: [ItemForm](Components#ItemForm)
 
 ### sortStringTemplate
+Compare function for sorting. Wraps the values to be compared in a template before actually
+comparing them.
+
+Used in [custom](Dux#custom).
 
 ### sortTimeInterval
 
@@ -66,6 +109,8 @@ Sorting by time intervals should works as follows:
 An object with validation functions, named after the types of the values they validate.
 All functions take a value, and return undefined if the value passes validation or is itself undefined.
 If a value does not pass validation, a simple string expressing the reason is returned.
+
+Used in [custom](Dux#custom).
 
 [handle]({{site.libBase}}/handle.js)
 =============================================================================================
