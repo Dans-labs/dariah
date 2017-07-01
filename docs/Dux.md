@@ -2,8 +2,10 @@
 title: Dux (Appliances)
 ---
 
-Dux are appliances within the app, i.e. sets of components that all work
-with the same slice of the state.
+Dux (ducts) are appliances within the app, i.e. sets of components that all work
+with the same slice of the state
+A duct is a connector between a slice of the state and the components that
+work with that slice.
 
 We have organized dux as follows:
 
@@ -32,45 +34,103 @@ This app contains the following dux:
 
 [alter]({{site.appBase}}/dux/alter.js)
 =============================================================================================
-Hides and shows material on the user interface.
+A mechanism for switching between alternative representations of a component, such
+as: expanded / collapsed, editable / readonly.
 It is a bit more general than that: you can supply *n* alternatives and *n* controls,
 and let the user cycle through the alternatives by clicking the controls.
-The corresponding component is
-[Alternative](Components#alternative).
 
-The state remembers the index of the currently presented alternative, keyed by a tag.
-All instantiations should offer a unique tag. 
+Components that work with alternatives must collect them in a group.
+The name of that group is passed as a prop called `alterSection`.
+Component that are passed this prop, have access to the state of the alternatives in this
+group. To get the state information for a single alternative, another key
+must be supplied, usually called `alterTag`.
 
-There is no meaningful state initialization.
-By default, the first choice is alternative 0.
-But a component may specify an other initial value.
+The component that displays the alternatives need not be the same component that presents
+the controls to switch alternatives.
 
 Actions
 ---------------------------------------------------------------------------
+Both actions below work relative an `alterSection` and `alterTag`.
+
 ### nextAlt()
-Only one action, with the instruction to go to the next alternative.
-In the payload of this action is also the total number of alternatives (in order go to the first
-alternative again after all the others), and an optional initial value.
-If there is not yet a state for this instantiation, the initial value will be used to start from.
+Switch to the next alternative.
+This action must specify the total number of alternatives
+and an optional initial value.
+If there is not yet a state for this instantiation,
+the initial value will be used to start from.
 
 ### setAlt()
+Switch to specified alternative.
 
 Reducer
 ---------------------------------------------------------------------------
-Increases the index of the alternative by one, cyclically, and puts it under the right key in the state..
+Increases the index of the alternative by one, cyclically, and puts it under the right
+keys in the state..
 
 Selectors
 ---------------------------------------------------------------------------
 ### getAltSection()
-Delivers the number of the current alternative, or the initial value (from the
-props of the connected component) or 0.
+Delivers the numbers of the current alternatives as far as they are
+registered under the `alterSection` key in the `alter` slice of the
+state.
 
 Helpers
 ---------------------------------------------------------------------------
 ### compileAlternatives
+A component that wants to work with the alternatives,
+of a group of components, 
+must call `compileAlternatives()` with
+the right parameters.
+
+Think of a List component that wants to provide child items with a control
+to expand themselves.
+It is more efficient that the List connects to the `alter` state, than that
+each item connects to that state individually.
+
+This function is a factory function that, given an `alterTag`,
+delivers an object with functions for getting
+and setting the alternatives of that particular instance.
+
+### Caution
+It is tempting to make one alterSection for all components in the app that need
+alternatives.
+The flip side of doing so is that all those components will be triggered for rerender
+whenever any single one of them switches alternatives.
+That is why offer the possibility of grouping related componenents under the
+same `alterSection` and be shielded from updates in the components that belong to other
+`alterSections`.
 
 [custom]({{site.appBase}}/dux/win.js)
 =============================================================================================
+
+A lot of the logic of showing lists, items, related items and fields is purely
+generic and driven by the [data model]({{site.serverBase}}/models/data.yaml).
+
+But there is considerably more to an app than this kind of generic logic.
+The `custom` duct is the entry point for additional, non-trivial business logic.
+
+It is still in development.
+
+### Active items
+The `package` table determines a lot about the assessment process.
+It has records with a specified startDate end endData.
+The packages that have started and are not yet passed there endDate are the
+*active* packages. Normally there will be exactly one package.
+
+From the active package derive a number of other active concepts:
+
+* the contribution types listed in the `typeContribution` field of the active package
+  are the *active types*
+* the criteria that are details of the active package are *active criteria*.
+
+The generic List and Item components can be made sensitive to this notion of activity.
+Active items can be formatted specially, and likewise the non-active items,
+which can also be disabled in some contexts.
+
+The way (in)active items are displayed is controlled by the 
+[data model]({{site.serverBase}}/models/data.yaml).
+See for example the field `typeContribution` in the tables `package` and `criteria`.
+
 Actions
 ---------------------------------------------------------------------------
 
@@ -83,6 +143,9 @@ Selectors
 Helpers
 ---------------------------------------------------------------------------
 ### compileActive
+
+Computes the active packages, types and criteria and deliver them in an object,
+keyed by kind of item and containing an array of active item MongoDB ids for that kind.
 
 [docs]({{site.appBase}}/dux/docs.js)
 =============================================================================================
@@ -114,17 +177,23 @@ Check whether a component has new props in such a way that a new document should
 
 [filters]({{site.appBase}}/dux/filters.js)
 =============================================================================================
-Displays the list of items in the right column, but
-only those that have passed all the filters, which are displayed in the
-left column.
+Supports the display of filtered lists, where there is a bunch of filters and
+a list with items filtered by those.
 
 ![diag](design/design.002.jpeg)
 
-This is a complex system of components, where data is fetched from the server,
-and user events are registered at the ilter widgets.
-On top of that, there is a visualization in the form of a map of European countries
-with markers having a radius indicative of the number of filtered items
-by that country.
+Lists and filters form a complex system of components, involving
+
+* fetching list data from the the server,
+* fetching filter specifications
+* fetching the metadata that is used by the filtering
+* handling the user interactions with the filters
+* supporting special effects such as a map of European countries
+  with markers having a radius indicative of the number of filtered items
+  by that country.
+
+This duct not only needs data from the `filters` slice, but also from the 
+`tables` slice!
 
 Actions
 ---------------------------------------------------------------------------
@@ -144,28 +213,24 @@ Responds to a click to (de)select all facets of a field.
 ### initFiltering()
 Initializes filtering for a table. This action also looks at the tables slice of the state,
 which is managed by [tables](#tables).
-
-The initialization accomplishes the following things:
-
-* for all the faceted fields a list of all possible values is made. The result
-  is delivered to the caller, but also stored in a cache, because this part is
-  done by a memoized function (see [memoBind](Lib#memo)
-* for all fulltext filters and faceted filters new, initial filtersetting
-  will be written to the state. This is the information that will be influenced
-  by subsequent user clicks.
+The actual work is done by a memoized helper function: [compileFieldIds](#compileFieldIds).
+On the basis of this, initial settings of facet filters can be made.
+This is done by the helper function [initFilterSettings](#initFilterSettings)
+and these settings are to be added to the `filters` slice of the state
+under the key `table` and then under a key `filterTag`.
+In this way you can set up various kinds of filtering for the same table.
 
 Reducer
 ---------------------------------------------------------------------------
-Transforms the state in response to dispatched tickets, notably the `filterSettings` slice.
-Well, it is a bit more complicated, because every table has its own filterSettings.
+Transforms the state in response to dispatched actions, notably the `filters` slice
+and within that a sliced keyed by `table`.
 
 Selectors
 ---------------------------------------------------------------------------
 Filter information is being translated from the state to props that can be consumed by components.
-All the actual filter work is done here, but because it is rather complex, we have outsourced it to the *helpers*.
 
 ### getFilters()
-Reads the current settings of a filter and injects it as `filterSettings` into
+Reads the current settings of a filter and injects it as `filters` into
 the props of the receiving components, which are typically the filter widgets that receive user interaction:
 [Fulltext](Components#fulltext)
 [Facet](Components#facet), and also
@@ -174,11 +239,11 @@ the props of the receiving components, which are typically the filter widgets th
 
 Helpers
 ---------------------------------------------------------------------------
-### compileValues()
-Computes facet values from the records of a table.
-Reads a table of items (provided it has been downloaded from the server) and produces facet information.
-The items are supposed to contain title fields and at least those fields that are subject to filtering.
+### compileFieldIds()
+For all the faceted fields a list of all possible values is made and returned as
+their MongoDB ids.
 
+### compileValues()
 For every field that is chosen for faceted browsing, the list of values will be compiled.
 
 The result is used by 
@@ -186,20 +251,22 @@ The result is used by
 This component is responsible for all the facets of a field.
 
 It is useful to store the results of this compilation, but where?
-We do not store it in the state, because it is derived data, and we adhere to the principle that the
+We do not store it in the state, because it is derived data,
+and we adhere to the principle that the
 state is a
 [normalized single source of truth](http://redux.js.org/docs/recipes/reducers/NormalizingStateShape.html).
-Selectors are invoked upon each rendering, but in this case we do not want to redo the compilation all the time.
+Selectors are invoked upon each rendering,
+but in this case we do not want to redo the compilation all the time.
 The solution is to use a
 [memoized function](http://redux.js.org/docs/recipes/ComputingDerivedData.html).
 I have created my own [memoizer](Lib#memo). 
 
-Here you see that the helper function `compileFiltering` is used under memoization.
-So, all those instances of `ByValue` quickly find their facet values upon each rendering.
- 
 
-### initFiltering()
-Computes initial filter settings, after `compileFiltering`.
+### initFilterSettings()
+Computes initial filter settings, after `compileFieldIds`.
+For all fulltext filters and faceted filters new, initial filtersettings
+are computed.
+This is the information that will be influenced by subsequent user clicks.
 
 ### computeFiltering()
 Applies the filters, according to the current filter settings.
@@ -213,6 +280,9 @@ So this function delivers exactly that: `filteredData`, `filteredAmountOthers`, 
 It is also a costly function, but it does neet to be invoked upon each rendering caused by a click or a key press.
 
 ### makeTag
+Makes a `filterTag`, depending on the situation of the List of items that needs the filtering.
+The most fundamental issue is: is the list showing all items in the table, or my items
+only, or is it a list of detail records of some master record in an other table?
 
 ### testAllChecks()
 Looks if all facets are checked, or all unchecked, of none of both.
@@ -220,6 +290,16 @@ Used to steer the *collective* checkbox that governs all facets.
 
 [forms]({{site.appBase}}/dux/win.js)
 =============================================================================================
+
+The `forms` slice of the state is under control of the
+[Redux-Form](https://redux-form.com) module.
+It contains all current form data of components where the user is interacting with forms.
+
+Some other components might want to know whether a component is engaged in data entry or not,
+without fully connecting to all form state properties of redux-form.
+
+This duct gives that information and that information only.
+
 Actions
 ---------------------------------------------------------------------------
 
@@ -229,33 +309,50 @@ Reducer
 Selectors
 ---------------------------------------------------------------------------
 
-### getForms
-
 Helpers
 ---------------------------------------------------------------------------
+### getForms
+Returns the set of keys of the `forms` slice of the state.
+It calls a memoized function to turn the keys into a set.
+So, if the set of keys is asked repeatedly without having been changed,
+exactly the same set object is being returned.
 
 [grid]({{site.appBase}}/dux/win.js)
 =============================================================================================
+This duct support grid views of tables,
+by managing sorting information of the grid columns.
+Every grid table must identify itself with a `gridTag` and its
+data resides on the `grid` slice of the state under that tag.
+
 Actions
 ---------------------------------------------------------------------------
 ### resetSort
+Removes all sorting information under a `gridTag`.
 
 ### addColumn
+Adds a sorting column. Grids can be sorted by multiple columns.
 
 ### delColumn
+Deletes a sorting column.
 
 ### turnColumn
+Toggles the sort method between ascending and descending for a specified column.
 
 Reducer
 ---------------------------------------------------------------------------
+Applies the state changes, defined by the actions, to the `grid` slice,
+under the key `gridTag`.
 
 Selectors
 ---------------------------------------------------------------------------
 
 ### getGrid
+Returns the `grid` slice of the state.
 
 Helpers
 ---------------------------------------------------------------------------
+### compileSortedData
+This function actually applies a given sort order to a list of ids of items from a table.
 
 [me]({{site.appBase}}/dux/me.js)
 =============================================================================================
@@ -416,6 +513,22 @@ Initializes the state for a specific select control. This is an initialization *
 
 [server]({{site.appBase}}/dux/server.js)
 =============================================================================================
+Here all interaction with the server is managed.
+All activity that involves waiting for a server, will eventually reach out to actions
+here.
+The actions below only are concerned with requesting a server response, waiting for it,
+and reporting success or failure.
+
+Before a request is made, it is checked whether that request has been submitted before
+and is still pending.
+In that case, the *request counter* will be increased, and no new request will be made.
+
+* request counters that are non-zero correspond to requests that are either pending,
+  or have ended in failure;
+* pending requests have positive request counters, the number represents the number of
+  requests the app has tried to make so far (only 1 request will be issued effectively);
+* successful request have their request counter set to 0 again.
+
 Actions
 ---------------------------------------------------------------------------
 ### accessData(task)
@@ -425,40 +538,59 @@ A `task` object specifies what to fetch, and can contain data
 to send to the server.
 
 It can be used for database queries or file content.
-During request, [notify](Dux#notes) actions will be dispatched.
-
+During the stages of a request, [notify](Dux#notes) actions will be dispatched.
 
 #### progress
+This action represents the situation that a request is offered multiple times before
+the first one has been completed. The request will not be made, but the
+request counter will be increased.
 
 #### ask
+Just before a request is made, this action sets the the request counter to 1.
 
 #### err
+When a request returns failure, the request counter is set to -1.
 
 #### succeed
+When a request returns succes, the request counter is set to 0.
 
 Reducer
 ---------------------------------------------------------------------------
+Manages the request counter and puts it under a key under the `server` slice of the state.
+The key is identical to the `path` of the request (the url that is fired to the server). 
+
+### Note
+But all actions except `accessData` are also picked up by the [notes](#notes) reducer,
+where they
+result in notification.
 
 Selectors
 ---------------------------------------------------------------------------
+There are no selectors.
+So far, no component needs this slice of the state.
 
 Helpers
 ---------------------------------------------------------------------------
 
 [settings]({{site.appBase}}/dux/settings.js)
 =============================================================================================
+Cross cutting settings for the app are defined here.
+The `settings` slice of the state is just a store of keys and values.
+
 Actions
 ---------------------------------------------------------------------------
-
 ### set
+Adds a key value pair.
 
 Reducer
 ---------------------------------------------------------------------------
+Straightforward reducer.
 
 Selectors
 ---------------------------------------------------------------------------
 
 ### getSettings
+Returns the `settings` slice of the state.
 
 Helpers
 ---------------------------------------------------------------------------
@@ -485,7 +617,7 @@ Actions
 Fetches a complete table, but only the title fields and the fields needed for filtering.
 
 ### fetchTables()
-Fetches a complete table, but only the title fields and the fields needed for filtering.
+Fetches a list of tables by successively calling `fetchTable`.
 
 ### fetchItem()
 Fetches a single rows from a table, all fields.
@@ -495,10 +627,16 @@ If fields refer to other tables for their values, the above actions will
 fetch these tables as well.
 
 ### modItem
+Sends a request to update an item to the server, and merges the answer (the updated values)
+into the state.
 
 ### insertItem
+Sends a request to insert an item to the server, and merges the answer (the inserted item)
+into the state.
 
 ### delItem
+Sends a request to delete an item to the server, and updates the state to reflect the deletion
+of that item.
 
 Reducer
 ---------------------------------------------------------------------------
@@ -562,13 +700,18 @@ cause state transitions.
 Selectors
 ---------------------------------------------------------------------------
 ### getTables()
-Just get all the table information in a prop called `tables`.
+Return the whole `tables` slice of the state.
 
 Helpers
 ---------------------------------------------------------------------------
 ### entityHead
+Computes the a title for an item, based on the
+[data model]({{site.serverBase}}/models/data.yaml)
+or on specialized functions, defined here.
+See also [repr](#repr).
 
 ### needTable()
+Checks if sufficient `table` data is available in the state.
 
 ### needTables()
 Checks a list of table names to see if sufficient data is available in the state.
@@ -577,6 +720,7 @@ Checks a list of table names to see if sufficient data is available in the state
 Checks a single entity in a single table to see if it contains values for all fields.
 
 ### listValues()
+Gives the list of all values of a specified field in a table. 
 
 ### changedItem()
 Checks if properties have changed in such a few that new data should be fetched.
@@ -587,10 +731,12 @@ an id of a record in an other table, the value for that id will be looked up and
 
 ### repr()
 Makes a streamlined string representation out of a field value. It looks up ids 
-in related value list tables, and applies special formatting to fields that
-refer to users and to countries.
+in related value list tables.
+For some tables, special representation functions will be invoked.
+(users, countries, etc).
 
 ### toDb
+Dispactches an item modification action to the store.
 
 [win]({{site.appBase}}/dux/win.js)
 =============================================================================================

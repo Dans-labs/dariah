@@ -684,6 +684,7 @@ An object with the initial values of all fields that are being managed by the fo
 
 ###### `isactive` string
 A CSS className to add extra formatting if the record in question is deemed *inactive*.
+The notion of active items is defined in the duct [custom](Dux#custom).
 
 ### Task
 Manages the display (readonly) of a single record.
@@ -695,11 +696,6 @@ For editing records, [ItemEdit](#itemedit) is being used.
 
 You might wonder why `table` is missing in the props.
 The `fieldFragment`s prop contains that information.
-
-### Note on `isActive`
-Example: only contribution types that are mentioned in a *current* package record
-are considered to be active.
-A package is current if its startDate has passed and its endDate not.
 
 [ItemRow]({{site.appBase}}/components/ItemRow.jsx)
 =============================================================================================
@@ -725,6 +721,7 @@ view of the record.
 
 ###### `isactive` string
 A CSS className to add extra formatting if the record in question is deemed *inactive*.
+The notion of active items is defined in the duct [custom](Dux#custom).
 
 ### Task
 This component displays a record in row form, so that it fits in a grid view of the
@@ -927,9 +924,7 @@ global state. This is about whether the options have popped up and what
 search text the user has entered in the filter box.
 
 ### `activeItems` array
-It is possible to indicate a subset of `active` items.
-Those items can be formatted specially, and likewise the non-active items,
-which can also be disabled.
+The notion of active items is defined in the duct [custom](Dux#custom).
 
 ###### `isactive` string
 A CSS className to add extra formatting if the record in question is deemed *inactive*.
@@ -959,11 +954,6 @@ The capabilities of this widget are:
 * selected options are removed from the list of selectable options;
 * plays well with [Redux-Form](https://redux-form.com);
 * facilitates disabling some options and presenting options in custom ways
-
-### Note on `isactive` and `activeItems`
-The way (in)active items are displayed is controlled by the 
-[data model]({{site.serverBase}}/models/data.yaml).
-See for example the field `typeContribution` in the tables `package` and `criteria`.
 
 [Root]({{site.appBase}}/components/Root.jsx)
 =============================================================================================
