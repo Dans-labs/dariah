@@ -332,16 +332,68 @@ This function uses the *reselect's*
 We use it quite often when components need multiple sections of the state.
 
 ### emptyX (S A O F)
+Many objects get created during rendering and re-rendering.
+If we render a list of thousand entries, and we pass each item component
+a property with a value like
+
+```
+    details={details || {}}
+```
+
+then thousand instances of an empty object will be created and need to be garbage
+collected soon after that.
+But if we are interested in the value of the empty object, without an intention to
+modify it, this is an utter waste.
+
+Therefore we declare a few *empty* concepts:
+
+* emptyS (string)
+* emptyA (array), 
+* emptyO (object),
+* emptyF (function).
+
+We also
+[freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze)
+them, so that we cannot inadvertently mutate them.
+
+The contract with ourselves is: do not ever use one of
+
+```
+'' [] {} x => x
+```
+
+if you need an empty value, but use an `empty`*X* (*X* in `S`, `A`, `O`, `F`) instead.
 
 ### getUrlParts
+Analyse urls in order to extract a part `/item/`*itemID* from it (if present).
+
+This is needed if we open and close items in a list and want the url to reflect that.
+
+See [ListPlain](Components#listplain) for an example.
 
 ### jString
+When we need the value of an object as a key, for example when we
+[memoize](Lib#memo) functions, the most straightforward way is to 
+[JSON.stringify](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
+that object (if it is not forbiddingly large). 
+But this has one defect: the order in which the keys of objects are serialized is not
+fixed. So two results of a stringify of objects with the same value can be different,
+due to different orders of keys.
+
+Our function `jString` fixes that.
+It is a bit more expensive to run than the plain `JSON.stringify`, but the penalty of not using
+it has the consequence that we fail to say the equalness of objects, which results
+in spurious re-rendering of components.
+If that happens too often, the cost adds up or even multiplies quickly.
 
 ### makeReducer(flows, init)
 Given an object of *flows* and an initial state, returns a *reducer* function.
 The *flows* is an object with functions, named after *actions*.
 These functions define how a new state must be produced when an action has been
 *dispatched*.
+
+This function helps to write down complex reducer function as small components
+with a clean syntax.
 
 ### propsChanged(newProps, need, oldProps, keyPropNames)
 Determines whether `newProps` differ significantly from `oldProps`, based on 
@@ -350,6 +402,17 @@ If the props are sufficiently changed, it uses the `need` function to
 finally determine whether the change should result in an action.
 
 ### updateAuto
+The `update()` function of the
+[Immutability-Helper module](https://github.com/kolodny/immutability-helper)
+is great.
+But one thing is a bit clumsy: it does not have 
+[auto-vivification](https://en.wikipedia.org/wiki/Autovivification).
+The documentation points to a
+[way out](https://github.com/kolodny/immutability-helper#autovivification),
+but the code for that becomes tedious quickly.
+
+The idea, however, is right, and this function is a variant of the `update()` function
+with autovification.
 
 ### withParams(Component)
 Higher order function that turns a Component (which is a function) into
