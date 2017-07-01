@@ -13,6 +13,8 @@ A version of a few dozen real world criteria and their scoring has been added to
 database.
 
 ### Technically
+We count the lines of code in all formats used. See the [codebase](Codebase) page.
+
 Many changes in the table area: lists and items and filters.
 It has become more generic. Master-detail relations can be defined
 and utilized.
