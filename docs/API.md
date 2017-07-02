@@ -32,7 +32,7 @@ source code:
 
 ### list
 
-`list?table=`**table name**`&complete=`**false**|**true**
+`list?table=`**table name**`&complete=`**false** or **true**
 
 Get the records of the table with name **table name**.
 

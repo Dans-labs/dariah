@@ -52,14 +52,14 @@ Actions
 ---------------------------------------------------------------------------
 Both actions below work relative an `alterSection` and `alterTag`.
 
-### nextAlt()
+### nextAlt
 Switch to the next alternative.
 This action must specify the total number of alternatives
 and an optional initial value.
 If there is not yet a state for this instantiation,
 the initial value will be used to start from.
 
-### setAlt()
+### setAlt
 Switch to specified alternative.
 
 Reducer
@@ -69,7 +69,7 @@ keys in the state..
 
 Selectors
 ---------------------------------------------------------------------------
-### getAltSection()
+### getAltSection
 Delivers the numbers of the current alternatives as far as they are
 registered under the `alterSection` key in the `alter` slice of the
 state.
@@ -155,7 +155,7 @@ The [DocMd](Components#docmd) provides a widget for such documents.
 
 Actions
 ---------------------------------------------------------------------------
-### fetchDoc()
+### fetchDoc
 Fetches a document from the server asynchronously.
 
 Reducer
@@ -164,15 +164,15 @@ Stores the fetched raw document source into the state.
 
 Selectors
 ---------------------------------------------------------------------------
-### getDoc()
+### getDoc
 Retrieves the stored data for the specified document.
 
 Helpers
 ---------------------------------------------------------------------------
-### needDoc()
+### needDoc
 Check whether a component contains the data for its document.
 
-### changedDoc()
+### changedDoc
 Check whether a component has new props in such a way that a new document should be fetched.
 
 [filters]({{site.appBase}}/dux/filters.js)
@@ -197,20 +197,20 @@ This duct not only needs data from the `filters` slice, but also from the
 
 Actions
 ---------------------------------------------------------------------------
-### changeFulltext()
+### changeFulltext
 Responds to a change in the search text in a
 [Fulltext](Components#fulltext)
 search widget.
 
-### changeFacet()
+### changeFacet
 Responds to a click in the checkbox of a
 facet
 [Facet](Components#facet).
 
-### changeFacetAll()
+### changeFacetAll
 Responds to a click to (de)select all facets of a field.
 
-### initFiltering()
+### initFiltering
 Initializes filtering for a table. This action also looks at the tables slice of the state,
 which is managed by [tables](#tables).
 The actual work is done by a memoized helper function: [compileFieldIds](#compileFieldIds).
@@ -229,7 +229,7 @@ Selectors
 ---------------------------------------------------------------------------
 Filter information is being translated from the state to props that can be consumed by components.
 
-### getFilters()
+### getFilters
 Reads the current settings of a filter and injects it as `filters` into
 the props of the receiving components, which are typically the filter widgets that receive user interaction:
 [Fulltext](Components#fulltext)
@@ -239,11 +239,11 @@ the props of the receiving components, which are typically the filter widgets th
 
 Helpers
 ---------------------------------------------------------------------------
-### compileFieldIds()
+### compileFieldIds
 For all the faceted fields a list of all possible values is made and returned as
 their MongoDB ids.
 
-### compileValues()
+### compileValues
 For every field that is chosen for faceted browsing, the list of values will be compiled.
 
 The result is used by 
@@ -262,13 +262,13 @@ The solution is to use a
 I have created my own [memoizer](Lib#memo). 
 
 
-### initFilterSettings()
+### initFilterSettings
 Computes initial filter settings, after `compileFieldIds`.
 For all fulltext filters and faceted filters new, initial filtersettings
 are computed.
 This is the information that will be influenced by subsequent user clicks.
 
-### computeFiltering()
+### computeFiltering
 Applies the filters, according to the current filter settings.
 Applying means: determine the subset of filtered items (`filteredData`), and provide statistics for the facets.
 
@@ -284,7 +284,7 @@ Makes a `filterTag`, depending on the situation of the List of items that needs 
 The most fundamental issue is: is the list showing all items in the table, or my items
 only, or is it a list of detail records of some master record in an other table?
 
-### testAllChecks()
+### testAllChecks
 Looks if all facets are checked, or all unchecked, of none of both.
 Used to steer the *collective* checkbox that governs all facets.
 
@@ -308,14 +308,14 @@ Reducer
 
 Selectors
 ---------------------------------------------------------------------------
-
-Helpers
----------------------------------------------------------------------------
 ### getForms
 Returns the set of keys of the `forms` slice of the state.
 It calls a memoized function to turn the keys into a set.
 So, if the set of keys is asked repeatedly without having been changed,
 exactly the same set object is being returned.
+
+Helpers
+---------------------------------------------------------------------------
 
 [grid]({{site.appBase}}/dux/win.js)
 =============================================================================================
@@ -382,7 +382,7 @@ The current user can be retrieved by `/api/db/who/ami`.
 
 Actions
 ---------------------------------------------------------------------------
-### fetchMe()
+### fetchMe
 Fetches data about *me*, the logged in user.
 It is actually handled by the helper 
 [server](Lib#server).
@@ -394,7 +394,7 @@ It just contains the known attributes of a single user, the one that is logged i
 
 Selectors
 ---------------------------------------------------------------------------
-### getMe()
+### getMe
 Plainly hand over the attributes of the currently logged in user.
 At the moment only the
 [Login](Components#login)
@@ -423,13 +423,13 @@ The user can click away the panel and hide the messages.
 
 Actions
 ---------------------------------------------------------------------------
-### notify()
+### notify
 Issues its payload, which consists of an array of messages, as notifications.
 
-### clear()
+### clear
 Clears the existing list of notifications.
 
-### display()
+### display
 Turns the visibility of notification panel on or off.
 
 Other components can issue notifactions easily, either by importing these
@@ -446,7 +446,7 @@ A notification widget can show a progress spinner if `busy > 0`.
 
 Selectors
 ---------------------------------------------------------------------------
-### getNotes()
+### getNotes
 The notification widget gets the notifications from the state, including `busy` and `show`, the latter
 indicating whether the notification panel should be hidden or not.
 For the convenience of the [Notification](Components#notification) component,
@@ -461,7 +461,7 @@ Top level management of the state: initialization and combination of all the oth
 
 Actions
 ---------------------------------------------------------------------------
-### configureStore()
+### configureStore
 `Root` does not have proper actions of its own.
 But it does set up the store, and passes it on to the [main](Components#main) component.
 
@@ -486,15 +486,15 @@ the entity id, and the field name.
 
 Actions
 ---------------------------------------------------------------------------
-### setSearch()
+### setSearch
 When a user types something in the search input field associated with the select control,
 the search string is sent to the state.
 
-### setPopUp()
+### setPopUp
 Parts of the interface of the select widget will pop up after a user action, or disappear after an other user action.
 This action sets the *popped up state* categorically to *true* or *false*, depending on a parameter.
 
-### togglePopUp()
+### togglePopUp
 Toggles the popped up state of the relevant part of the widget.
 
 Reducer
@@ -503,12 +503,12 @@ Straightforward merge of the payload of pop up actions and search string updates
 
 Selectors
 ---------------------------------------------------------------------------
-### getSelect()
+### getSelect
 Retrieves all state information of a *specific* select control, i.e. an instance identified by a tag.
 
 Helpers
 ---------------------------------------------------------------------------
-### compileOptions()
+### compileOptions
 Initializes the state for a specific select control. This is an initialization *per tag*.
 
 [server]({{site.appBase}}/dux/server.js)
@@ -531,7 +531,7 @@ In that case, the *request counter* will be increased, and no new request will b
 
 Actions
 ---------------------------------------------------------------------------
-### accessData(task)
+### accessData
 Asynchronous action to fetch data from the server, and also to send data to it.
 
 A `task` object specifies what to fetch, and can contain data
@@ -613,13 +613,13 @@ the data model, a set of *yaml* files.
 
 Actions
 ---------------------------------------------------------------------------
-### fetchTable()
+### fetchTable
 Fetches a complete table, but only the title fields and the fields needed for filtering.
 
-### fetchTables()
+### fetchTables
 Fetches a list of tables by successively calling `fetchTable`.
 
-### fetchItem()
+### fetchItem
 Fetches a single rows from a table, all fields.
 The server decides which fields I am allowed to retrieve.
 
@@ -699,7 +699,7 @@ cause state transitions.
 
 Selectors
 ---------------------------------------------------------------------------
-### getTables()
+### getTables
 Return the whole `tables` slice of the state.
 
 Helpers
@@ -710,26 +710,26 @@ Computes the a title for an item, based on the
 or on specialized functions, defined here.
 See also [repr](#repr).
 
-### needTable()
+### needTable
 Checks if sufficient `table` data is available in the state.
 
-### needTables()
+### needTables
 Checks a list of table names to see if sufficient data is available in the state.
 
-### needValues()
+### needValues
 Checks a single entity in a single table to see if it contains values for all fields.
 
-### listValues()
+### listValues
 Gives the list of all values of a specified field in a table. 
 
-### changedItem()
+### changedItem
 Checks if properties have changed in such a few that new data should be fetched.
 
-### repRelated()
+### repRelated
 Makes a representation of a related value. If a field in a table contains
 an id of a record in an other table, the value for that id will be looked up and returned.
 
-### repr()
+### repr
 Makes a streamlined string representation out of a field value. It looks up ids 
 in related value list tables.
 For some tables, special representation functions will be invoked.
@@ -748,7 +748,7 @@ so that everything stays in relatively good proportions on a single screen.
 
 Actions
 ---------------------------------------------------------------------------
-### changeWinDim()
+### changeWinDim
 Responds to window resizing, as set up in
 [Window](Components#window).
 It is just a matter of storing the `height` and the `width` of the window into the state.
@@ -762,7 +762,7 @@ Transforms the state in response to dispatched ticket, notably the `win` slice.
 
 Selectors
 ---------------------------------------------------------------------------
-### getWinDim()
+### getWinDim
 Reads the `height` and `width` from the state and transports them as props with
 the same name.
 

@@ -19,7 +19,7 @@ However, some props occur over and over again, and we name them consistently.
 Here is a list of those props and their types.
 When mention these props later on, we omit the types.
 
-* `alter` **string**;
+* `alter` **object**;
   a slice of the state from [getAltSection](Dux#getAltsection);
   Group of settings for components with alternative renderings:
   these settings tell which alternative has been chosen for each of those components;
@@ -50,9 +50,9 @@ When mention these props later on, we omit the types.
 * `dispatch` **function**; this function belongs to the store that holds the state;
   it is generally injected into the props of a component by
   [connect](https://github.com/reactjs/react-redux/blob/master/docs/api.md#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options)ing
-  a component to the store. This only happens if `connect()` is called with
+  a component to the store; this only happens if `connect()` is called with
   zero or one argument (the `MapDispatchToProps` argument should be undefined);
-  with the `dispatch` function the component can trigger an action that changes the state;
+  the `dispatch` function enables the component to trigger an action that changes the state;
   where you would call `setState()` in vanilla-React you put `dispatch(action)` if your
   app uses Redux;
 * `eId` **string**;
@@ -75,7 +75,7 @@ When mention these props later on, we omit the types.
   for each filter, the amount of items that passes all filters except that one filter;
   see [computeFiltering](Dux#computefiltering);
 * `filterField` **string**;
-  the name of the filter by which it is known to the application
+  the name of the field that the current filter is acting upon;
   (as in the [data model]({{site.serverBase}}/models/data.yaml);
 * `filterId` **number**;
   the sequence number of a specific filter which identifies it among all filters
@@ -102,8 +102,8 @@ When mention these props later on, we omit the types.
   means of a `filterTag` prop;
 * `linkField` **string**;
   when rendering a list of records that are details of some master record,
-  this is the field of the detail record that links to the `materId`.
-  When the component creates a new record, it will prefill this field with the current
+  this is the field of the detail record that links to the `materId`;
+  when the component creates a new record, it will prefill this field with the current
   `masterId`;
 * `listIds` **array of string**;
   a sequence of strings which are essentially MongoDB identifiers of entities in a table;
@@ -113,7 +113,7 @@ When mention these props later on, we omit the types.
   when rendering a list of records that are details of some master record, this holds the MongoDB id of that record;
 * `me` **object**;
   a slice of the state from [getMe](Dux#getMe);
-  the information about the currently logged-in user, fetched from the server.
+  the information about the currently logged-in user, fetched from the server;
 * `mode` **string**;
   either `list` or `grid`;
   whether the list of items should render as a list of expandable headings,
@@ -125,9 +125,9 @@ When mention these props later on, we omit the types.
   ultimately extracted from the `tables` slice of the state; it contains the values
   of the fields of the entity that is being dealt with;
 * `select` **string**;
-  Sometimes a list is fetched as a whole, sometimes only *my own* records are displayed
-  and yet other times only records that are the details of some master record must be shown.
-  This property indicates which is which.
+  sometimes a list is fetched as a whole, sometimes only *my own* records are displayed
+  and yet other times only records that are the details of some master record must be shown;
+  this property indicates which is which;
 * `settings` **object**;
   a slice of the state from [getSettings](Dux#getSettings);
   settings are pieces of custom information that are relevant to many components of the app;
@@ -140,7 +140,7 @@ When mention these props later on, we omit the types.
   and actual entity data;
 * `win` **{**`width` **number**`, height` **number**`}`;
   a slice of the state from [getWinDim](Dux#getwindim);
-  Contain the physical dimensions of the window at any time;
+  contains the physical dimensions of the window at any time.
 
 [main]({{site.appBase}}/main.jsx)
 =============================================================================================
@@ -180,7 +180,7 @@ The maximum number of rows in which the facets have to be stacked.
 ###### `expanded` bool
 Whether the facets should be expanded or collapsed (hidden).
 
-###Task
+### Task
 A widget by which the user can click the [facet](#facet)s associated with one field.
 There is also a [collective checkbox](#checkboxi), by which the user can check or uncheck all facets in one go.
 All values that occur are displayed, with statistics in the form *subtotal of total*.
@@ -666,16 +666,6 @@ and a read-only field by a
 [ItemForm]({{site.appBase}}/components/ItemForm.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
-
-This is the component that can open an item and show its fields, either for reading or
-for editing. 
-Every list rendering component that want to display an individual item full view,
-will use this component.
-Full view means: as a vertical table of field labels and field values.
-
-[ItemRead]({{site.appBase}}/components/ItemRead.jsx)
-=============================================================================================
-connected via [tables](Dux#tables)
 #### [Props](#standard-props)
 ###### alter alterSection tables table eId filters fields perm fieldFragments detailFragments dispatch
 
@@ -687,12 +677,22 @@ A CSS className to add extra formatting if the record in question is deemed *ina
 The notion of active items is defined in the duct [custom](Dux#custom).
 
 ### Task
+This is the component that can open an item and show its fields, either for reading or
+for editing. 
+Every list rendering component that want to display an individual item full view,
+will use this component.
+Full view means: as a vertical table of field labels and field values.
+
+[ItemRead]({{site.appBase}}/components/ItemRead.jsx)
+=============================================================================================
+connected via [tables](Dux#tables)
+#### [Props](#standard-props)
+###### tables eId fieldFragments
+
+### Task
 Manages the display (readonly) of a single record.
 It is used if no fields need to be edited.
 For editing records, [ItemEdit](#itemedit) is being used.
-
-#### [Props](#standard-props)
-###### tables eId fieldFragments
 
 You might wonder why `table` is missing in the props.
 The `fieldFragment`s prop contains that information.

@@ -69,11 +69,11 @@ The absolute location is not important. Here we assume everything resides in `/o
           - `auth.py` handle the login process
           - `user.py` handle the user data
           - `perm.py` permission control
-          - `models` yaml files and python files generated on the basis of the yaml files
-            - `data.yaml` the data model
-            - `perm.yaml` the permissions model
-          - `views` html templates
-            - `index.tpl` the html template of the single page
+        - `models` yaml files and python files generated on the basis of the yaml files
+          - `data.yaml` the data model
+          - `perm.yaml` the permissions model
+        - `views` html templates
+          - `index.tpl` the html template of the single page
         - `serve.py` wsgi entry-point for apache
         - `confyg.py` converts yaml model files into python modules
         - `config`
@@ -110,10 +110,7 @@ The absolute location is not important. Here we assume everything resides in `/o
               - `dux` connectors between React components and the Redux state. Plain ES6.
                 Every duct handles a specific concern of the app.
                 All contain the following sections: *actions*, *reducer*, *selectors*, *helpers*.
-              - `object`, `state`, `pure`: React components in `*.jsx` files. The ones in `pure` are functions
-                 without side effects; the ones in `state` are programmed as pure functions, but an enhanced version that
-                 is connected to the redux state is being exported; the ones in `object` are programmed as classes with
-                 life cycle methods of React.
+              - `components`: React components in `*.jsx` files.
               - `main.jsx` client-side entry-point for the javascript
             - `lib`
               - `*.js` client-side code and data in ES6
@@ -220,4 +217,15 @@ The second one starts op a development server, and produces an incremental devel
 in the source code, with hot-reloading of react modules.
 
 The third one provides a minified production build.
+
+#### build.sh
+We have collected all routine tasks for building and updating the app and its data into
+a [build script]({{server.repBase}}/build.sh).
+See the code for an overview of what it can do, or run
+
+```
+./build.sh
+```
+
+(without arguments).
 
