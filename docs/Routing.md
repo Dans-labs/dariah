@@ -27,7 +27,7 @@ and the diagram visualizes the same logic.
 
 ## Fall-back behaviour
 The server responds to any url with sending the
-[index]({{site.serverBase}}/controllers/views/index.tpl)
+[index]({{site.serverBase}}/views/index.tpl)
 page, which also causes the bundled app in [dist]({{site.repBase}}/static/dist) to load.
 
 The server's rules are very simple:

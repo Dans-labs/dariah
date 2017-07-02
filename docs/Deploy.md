@@ -101,7 +101,7 @@ The absolute location is not important. Here we assume everything resides in `/o
         - `node_modules` javascript dependencies
         - `package.json` npm config file
         - `webpack.config.js` config file for webpack, the build tool
-        - `index.html` soft link to ../server/controllers/views/index.tpl, the entry html that holds the whole app
+        - `index.html` soft link to ../server/views/index.tpl, the entry html that holds the whole app
         - `src`
           - `css`
             - `*.scss`, `*.css` (plain CSS and SASS stylesheets)				

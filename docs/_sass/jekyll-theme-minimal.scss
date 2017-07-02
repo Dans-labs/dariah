@@ -25,6 +25,15 @@ h1 {
   border-radius: 1ex;
   padding: 1em;
 }
+h1.title {
+  line-height:1.2;
+  font-size: medium;
+  margin: 1ex 0 1ex 0;
+  background-color: #d0eaff;
+  background-color: #d0ffea;
+  border-radius: 1ex;
+  padding: 0.2em;
+}
 h2 {
   line-height:1.15;
   font-size: x-large;
@@ -42,7 +51,8 @@ h3 {
   padding: 0.25em;
 }
 header h3 {
-    font-size: medium;
+  font-size: medium;
+  margin: 1ex 0 1ex 0;
 }
 h4 {
   line-height:1.05;
@@ -51,6 +61,11 @@ h4 {
 }
 header h4 {
     font-size: small;
+}
+header h4.dux {
+  font-size: small;
+  margin: 0ex 0 0.2ex 0;
+  font-weight: bold;
 }
 h5 {
   line-height:1.05;
@@ -63,8 +78,11 @@ h6 {
   margin: 1ex 0 1ex 2em;
 }
 
-p, ul, ol, table, pre, dl {
+p, ul, ol, pre, dl {
   margin:0 0 20px;
+}
+table {
+  margin:0.25em 0 0.25em 0;
 }
 
 a {
@@ -121,6 +139,7 @@ table {
 th, td {
   text-align:left;
   padding:5px 10px;
+  padding:0em 0em 0em 1em;
   border-bottom:1px solid #e5e5e5;
 }
 
@@ -170,7 +189,7 @@ header li {
   float:left;
   border-right:1px solid #e0e0e0;
   font-size: small;
-  height:40px;
+  //height:40px;
 }
 
 header li:first-child a {
@@ -188,7 +207,7 @@ header ul a {
   display:block;
   text-align:center;
   padding-top:6px;
-  height:34px;
+  //height:34px;
 }
 
 header ul a:hover {

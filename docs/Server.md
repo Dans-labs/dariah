@@ -15,7 +15,7 @@ which encapsulate the information in the yaml files.
 These modules are then imported by all controllers, so that all data access happens in conformance
 with the data model and its permissions.
 
-[Data model]({{site.serverBase}}/controllers/models/data.yaml)
+[Data model]({{site.serverBase}}/models/data.yaml)
 ==========
 
 MongoDB
@@ -107,7 +107,7 @@ Each filter is a dictionary with the following information.
 * **maxCols**: facets are displayed in a table with at most this amount of columns.
 * **expanded**: whether the table of facets is initially expanded or collapsed.
 
-[Permission model]({{site.serverBase}}/controllers/models/permission.yaml)
+[Permission model]({{site.serverBase}}/models/permission.yaml)
 =================
 
 The authorization system is built up from permissions.
@@ -215,7 +215,7 @@ The permissions model has a configuration section for tables as a whole, which w
 
 Then there is also a configuration section for all fields in all tables, which will give rise to the field filter.
 
-[Db]({{site.serverBase}}/controllers/models/permission.yaml)
+[Db]({{site.serverBase}}/models/permission.yaml)
 ==============
 
 This is the data access module.

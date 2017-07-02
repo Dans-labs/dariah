@@ -2,9 +2,6 @@
 title: API
 ---
 
-API Specification
-===============================================
-
 ### Root
 
 All API calls are structured like this:

@@ -30,7 +30,7 @@
         {% for dux in site.data.components %}
             {% for item in dux %}
                 {% assign dux_down = item[0] | downcase %}
-            <h4><a href="{{ '/Dux.html#' | append:dux_down | relative_url }}">{{ item[0] }}</a></h4>
+            <h4 class="dux"><a href="{{ '/Dux.html#' | append:dux_down | relative_url }}">{{ item[0] }}</a></h4>
             <table>
                 <tbody>
                     <tr>
@@ -45,10 +45,10 @@
                 </tbody>
             </table>
         {% endfor %}
-        </ul>
       </header>
       <section>
 
+      <h1 class="title">{{ page.title }}</h1>
       {{ content }}
 
       </section>
