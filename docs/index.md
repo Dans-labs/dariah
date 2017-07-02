@@ -51,13 +51,13 @@ At the server side we store the data in a [MongoDB](https://docs.mongodb.com).
 This data is server through a [Python-Bottle](http://bottlepy.org/docs/dev/) web framework.
 The authentication of users is outsourced to the DARIAH infrastructure, see
 [here](Dux#me). The authorization is defined by the [data model](Server#data-model) and
-[permission model](Server#permissions),
+[permission model](Server#permission-model),
 which govern all data access.
 
 ## Tests
 
 [Testing](Tests)
-becomes a life saviour when your app is growing in complexity.
+becomes a life saver when your app is growing in complexity.
 When you add new behaviours you run the risk that existing behaviours break.
 The remedy is to write tests for all aspects of the behaviours, and run them rigorously
 after each change and refactoring.

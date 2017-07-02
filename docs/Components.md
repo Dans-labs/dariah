@@ -20,7 +20,7 @@ Here is a list of those props and their types.
 When mention these props later on, we omit the types.
 
 * `alter` **object**;
-  a slice of the state from [getAltSection](Dux#getAltsection);
+  a slice of the state from [getAltSection](Dux#getaltsection);
   Group of settings for components with alternative renderings:
   these settings tell which alternative has been chosen for each of those components;
 * `alterSection` **string**;
@@ -61,7 +61,7 @@ When mention these props later on, we omit the types.
   the name of a field that is being dealt with;
 * `fieldFragments` **array**
   an array with instructions per field how to render it;
-  ultimately computed by [makeFragments](Lib#makefragments) and then passed to child components;
+  ultimately computed by [makeFields](Lib#makefields) and then passed to child components;
 * `filtered` **bool**;
   whether the list should be accompanied by filters;
   the specification of which filters is in the
@@ -83,7 +83,7 @@ When mention these props later on, we omit the types.
 * `filterLabel` **string**;
   the user-facing name of the filter;
 * `filters` **object**;
-  a slice of the state from [getFilters](Dux#getFilters);
+  a slice of the state from [getFilters](Dux#getfilters);
   contains the actual filter settings;
   organized by table and then by `filterTag` and then by `filterId`; 
 * `filterSettings` **object**;
@@ -112,7 +112,7 @@ When mention these props later on, we omit the types.
 * `masterId` **string**;
   when rendering a list of records that are details of some master record, this holds the MongoDB id of that record;
 * `me` **object**;
-  a slice of the state from [getMe](Dux#getMe);
+  a slice of the state from [getMe](Dux#getme);
   the information about the currently logged-in user, fetched from the server;
 * `mode` **string**;
   either `list` or `grid`;
@@ -129,12 +129,12 @@ When mention these props later on, we omit the types.
   and yet other times only records that are the details of some master record must be shown;
   this property indicates which is which;
 * `settings` **object**;
-  a slice of the state from [getSettings](Dux#getSettings);
+  a slice of the state from [getSettings](Dux#getsettings);
   settings are pieces of custom information that are relevant to many components of the app;
 * `table` **string**;
   name of the table that the component must deal with;
 * `tables` **object**;
-  a slice of the state from [getTables](Dux#getTables);
+  a slice of the state from [getTables](Dux#gettables);
   all data that comes from database tables;
   organized by `table` name; For each table there is spec information
   and actual entity data;

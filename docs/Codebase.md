@@ -10,7 +10,7 @@ title: Codebase
 # Legend
 
 The numbers stands for lines of code.
-1000 lines is ~ 1 typed A4 page of text.
+1000 lines is ~ 20 typed A4 page of text.
 
 [YAML](http://www.yaml.org)
 -----------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ In this app we use YAML for configuration details.
   and fields, including how they hang together and how we want to represent them on screen.
   If you, as developer, need to add new tables and fields, you can do so by modifying this
   file. No extra coding is needed.
-* the [permissions]({{site.serverBase}}/models/permissions.yaml) define a system of
+* the [permissions]({{site.serverBase}}/models/permission.yaml) define a system of
   access control. There are groups, levels, actions, tables and fields. This config file
   utterly defines who may do what operations on which data.
 
@@ -63,7 +63,7 @@ of running on the server and in websites.
 This app uses javascript in the client only.
 We use it as a work horse which takes care of a copy of data from the database.
 It reacts to changes by integrating new bits of data into the existing state,
-a process that is called [reducing](Dux).
+a process that is called [reducing](React#redux).
 
 [JSX](https://facebook.github.io/react/docs/introducing-jsx.html)
 -----------------------------------------------------------------------------------------

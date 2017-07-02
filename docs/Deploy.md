@@ -71,7 +71,7 @@ The absolute location is not important. Here we assume everything resides in `/o
           - `perm.py` permission control
         - `models` yaml files and python files generated on the basis of the yaml files
           - `data.yaml` the data model
-          - `perm.yaml` the permissions model
+          - `permission.yaml` the permissions model
         - `views` html templates
           - `index.tpl` the html template of the single page
         - `serve.py` wsgi entry-point for apache

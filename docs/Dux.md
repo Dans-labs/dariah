@@ -694,7 +694,7 @@ which is a nice reduction of cognitive load, since we use MongoDB at the server 
 Have a look again at the [reducer source code]({{site.appBase}}/dux/tables.js) and
 see how straightforward it is to code one of the most tricky reducers in this app.
 
-This reducer actively covered by [tests](Tests#tablesReducer).
+This reducer actively covered by [tests](Tests#tablesreducer).
 Have a look at them to get more feeling of how table actions
 cause state transitions.
 

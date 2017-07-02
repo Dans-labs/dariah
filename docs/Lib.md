@@ -49,7 +49,7 @@ Collect the specs and put all information in an array objects,
 each corresponding to a field, from which components can easily
 construct a widget for showing or editing that field.
 
-Example: [ItemForm](Components#ItemForm)
+Example: [ItemForm](Components#itemform)
 
 ### makeDetails
 Prepare lists of details for an item of a table.
@@ -58,7 +58,7 @@ each corresponding to a details list,
 from which components can easily
 construct a widget for handling lists of details
 
-Example: [ItemForm](Components#ItemForm)
+Example: [ItemForm](Components#itemform)
 
 ### normalization
 An object with normalization functions, named after the types of the values they normalize.
@@ -67,13 +67,13 @@ All functions take a value, and return a normalized value.
 ### onSubmitSuccess
 Needed in a workaround for an
 [issue in redux-form](https://github.com/erikras/redux-form/issues/2841).
-See [ItemEdit](Components#ItemEdit)
+See [ItemEdit](Components#itemedit)
 
 ### getValType(valType)
 For a given value type, such as `text`, `url`, `number`, return a component and subtype
 for handling the input of such values, e.g. `<input type="url" />`.
 
-Example: [FieldEdit](Components#FieldEdit)
+Example: [FieldEdit](Components#fieldedit)
 
 ### readonlyValue
 For a given value type, such as `text`, `url`, `number`, return
@@ -81,12 +81,12 @@ a formatted value for readonly display.
 If the value comes from a value list or a related table, it will have a link
 that shows you the value as an item in its list.
 
-Example: [FieldRead](Components#FieldRead)
+Example: [FieldRead](Components#fieldread)
 
 ### someEditable
 Checks whether a list of fields contains at least one that the current user may edit.
 
-Example: [ItemForm](Components#ItemForm)
+Example: [ItemForm](Components#itemform)
 
 ### sortStringTemplate
 Compare function for sorting. Wraps the values to be compared in a template before actually

@@ -6,7 +6,10 @@ Although this app is a single page application with most of the business logic
 coded at the client side, there are a bunch of things that are handled at the server side.
 
 All data access is handled by server side controllers that implement a data api.
-These controllers are informed by a *data model* and a *permissions model*.
+These controllers are informed by a
+[data model]({{site.serverBase}}/models/data.yaml)
+and a
+[permissions model]({{site.serverBase}}/models/permission.yaml)
 
 Both models are specified in a `yaml` file.
 When the webserver starts, these model files are read, and converted to python modules with the same,
