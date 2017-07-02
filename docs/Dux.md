@@ -6,6 +6,7 @@ Dux (ducts) are appliances within the app, i.e. sets of components that all work
 with the same slice of the state
 A duct is a connector between a slice of the state and the components that
 work with that slice.
+As such, it is a piece of plumbing, hidden behind the walls and under the floors.
 
 We have organized dux as follows:
 
