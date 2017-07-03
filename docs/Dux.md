@@ -214,9 +214,9 @@ Responds to a click to (de)select all facets of a field.
 ### initFiltering
 Initializes filtering for a table. This action also looks at the tables slice of the state,
 which is managed by [tables](#tables).
-The actual work is done by a memoized helper function: [compileFieldIds](#compileFieldIds).
+The actual work is done by a memoized helper function: [compileFieldIds](#compilefieldids).
 On the basis of this, initial settings of facet filters can be made.
-This is done by the helper function [initFilterSettings](#initFilterSettings)
+This is done by the helper function [initFilterSettings](#initfiltersettings)
 and these settings are to be added to the `filters` slice of the state
 under the key `table` and then under a key `filterTag`.
 In this way you can set up various kinds of filtering for the same table.

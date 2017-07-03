@@ -192,7 +192,7 @@ All values that occur are displayed, with statistics in the form *subtotal of to
 ###### table filterTag filterId filterSetting dispatch
 
 ### Task
-Displays a *collective* checkbox for a [facet filter](#ByValue) with many facets.
+Displays a *collective* checkbox for a [facet filter](#byvalue) with many facets.
 
 Clicking on this box will collectively check and uncheck all associate
 checkboxes.
@@ -661,7 +661,7 @@ generates an array of fragments, one for each field.
 An editable field will be handled by a
 [`<FieldEdit />](#fieldedit) component,
 and a read-only field by a
-[`<FieldRead />](#fieldRead) component.
+[`<FieldRead />](#fieldread) component.
 
 [ItemForm]({{site.appBase}}/components/ItemForm.jsx)
 =============================================================================================
