@@ -35,7 +35,7 @@ by new copies of values.
 [genericReducer]({{site.testBase}}/genericReducer.js)
 =============================================================================================
 
-### [runActionTest]
+### runActionTest
 
 Given an action and the description of a few state transitions,
 and a list of inspection instructions,

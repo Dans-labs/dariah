@@ -53,3 +53,5 @@ By means of these `/api/` urls the client can ask for additional data services, 
 The server side routing in
 [index.py]({{site.serverBase}}/index.py)
 maps these urls to specific controllers that fetch and assemble the requested data.
+
+Not only the client app can access this [api](API), you can too.

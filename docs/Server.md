@@ -12,8 +12,9 @@ and a
 [permissions model]({{site.serverBase}}/models/permission.yaml)
 
 Both models are specified in a `yaml` file.
-When the webserver starts, these model files are read, and converted to python modules with the same,
-which encapsulate the information in the yaml files.
+When the webserver starts, these model files are read,
+and converted to python modules with the same base name
+that encapsulate the information in the yaml files.
 
 These modules are then imported by all controllers, so that all data access happens in conformance
 with the data model and its permissions.
@@ -26,13 +27,14 @@ MongoDB
 We store the data in a [MongoDB](https://docs.mongodb.com).
 A MongoDB does not work with a fixed scheme. A MongoDB *collection* consists of
 *documents*, which are essentially json-like structures, arbitrarily large and arbitrarily nested.
-That makes it easy to add new kinds of data to documents and collections when there arise new needs to do so.
+That makes it easy to add new kinds of data to documents and collections
+when the need arises to do so.
 This will not break the existing code. 
 
-The MongoDB way favors the storing of related data inside the main document.
-This may lead to a big redundancy and to consistency problems, if the application does not try to
-enforce consistency somehow.
-But MongoDB is optimized to read quickly, at the cost of more expensive data manipulation operations.
+The MongoDB way favors storing of related data inside the main document.
+This increases the redundancy of the data and may lead to consistency problems,
+unless the application not tries to enforce consistency somehow.
+MongoDB is optimized to read quickly, at the cost of more expensive data manipulation operations.
 
 In this app, with a limited amount of data, we use MongoDB primarily for its flexibility.
 We still adhere largely to SQL-like practices when we deal with related tables.
