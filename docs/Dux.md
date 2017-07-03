@@ -742,10 +742,9 @@ Dispactches an item modification action to the store.
 [win]({{site.appBase}}/dux/win.js)
 =============================================================================================
 Reacts to window resizing by the user.
-It will recompute the sizes of several [Pane](Components#pane)s on the screen,
-so that everything stays in relatively good proportions on a single screen.
-
-![diag](design/design.004.jpeg)
+It will deliver the new window size after resizing.
+Useful for components that care about the window size,
+such as [App](Components#app).
 
 Actions
 ---------------------------------------------------------------------------
@@ -759,13 +758,12 @@ is being throttled, so that it does not run too frequently during the actual res
 
 Reducer
 ---------------------------------------------------------------------------
-Transforms the state in response to dispatched ticket, notably the `win` slice.
+Transforms the `win` slice of the state in response to resize events.
 
 Selectors
 ---------------------------------------------------------------------------
 ### getWinDim
-Reads the `height` and `width` from the state and transports them as props with
-the same name.
+Returns the `win` slice of the state, which is just the current width and height of the browser window.
 
 Helpers
 ---------------------------------------------------------------------------

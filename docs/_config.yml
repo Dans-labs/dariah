@@ -36,6 +36,7 @@ exclude:
   - Gemfile
   - Gemfile.lock
 
+liveBase: https://dariah-beta.dans.knaw.nl
 serverBase: https://github.com/Dans-labs/dariah/blob/master/server
 clientBase: https://github.com/Dans-labs/dariah/blob/master/client
 appBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/app

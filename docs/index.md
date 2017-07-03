@@ -4,9 +4,11 @@ title: Home
 
 ![logo](images/inkind_logo.png)
 
-# DARIAH contribution tool
+# [DARIAH contribution tool](https://dariah-beta.dans.knaw.nl)
 
-This is the technical documentation for the DARIAH contribution tool.
+This is the technical documentation for the
+DARIAH contribution tool, an instrument to register and assess
+community contributions to the [DARIAH](http://www.dariah.eu).
 
 The contribution is an [SPA](https://en.wikipedia.org/wiki/Single-page_application)
 (Single Page Application)
@@ -21,32 +23,31 @@ and followed the most recent and idiomatic practices to achieve our ends.
 ## The technology
 Crash course in modern Javascript, [ES6](ES6) and [React+Redux](React).
 
-## API and Routing
-How server and client react to the urls that are being passed around: [Routing](Routing).
+## [API](API) and [Routing](Routing)
+The data of the tool is accessible through an API.
+The routing page tells more about how the tool reacts to urls.
 
-You can also use the tool through an [API](API).
-
-## Division of labour
-How the dozens of React components are structured around a handful of slices of the *state*,
+## [Architecture](Architecture)
+Read about division of labour, 
+and how the dozens of React components are structured around a handful of slices of the *state*,
 the single source of truth for the whole app when it lives in the browser.
-It is all a matter of [Architecture](Architecture).
 
-## Components
+## [Components](Components)
 The user interface is realized by many React components.
-In the [Components](Components) document they are all documented, alphabetically.
+In this section they are all documented, alphabetically.
 
 But components hang together, work together, share data.
 To see that picture, start with looking at the side bar, where the components have been grouped by 
 ... **duct** ... !
 
-## Dux
+## [Dux](Dux)
 These are the pillars of connected pieces of labour, that support the individual components.
 I follow a [proposal by Erik Rasmussen](https://github.com/erikras/ducks-modular-redux)
 to call a modular Redux package a duck, but with a twist: I call it a *duct*.
 But in the plural I call them **dux**,
 honouring the good work of Redux.
 
-## Backend
+## [Server](server)
 At the server side we store the data in a [MongoDB](https://docs.mongodb.com).
 This data is server through a [Python-Bottle](http://bottlepy.org/docs/dev/) web framework.
 The authentication of users is outsourced to the DARIAH infrastructure, see
@@ -54,23 +55,19 @@ The authentication of users is outsourced to the DARIAH infrastructure, see
 [permission model](Server#permission-model),
 which govern all data access.
 
-## Tests
-
-[Testing](Tests)
+## [Tests](Tests)
 becomes a life saver when your app is growing in complexity.
 When you add new behaviours you run the risk that existing behaviours break.
 The remedy is to write tests for all aspects of the behaviours, and run them rigorously
 after each change and refactoring.
-That way, you proactively discover your bugs before your users get a chance to
-encounter them.
+That way, you proactively discover your bugs before your users do.
 
-## Deployment
+## [Deploy](Deploy)
 Here are the bits and pieces you have to do in order to get a working system out of this.
 
-## Code base
-
-To get an impression of the kind of work behind this app, see 
-[Codebase](Codebase) where it is revealed how many lines of code have been written in which languages.
+## [Code base](Codebase)
+To get an impression of the kind of work behind this app, we 
+reveal how many lines of code have been written in which languages.
 
 # Author
 
@@ -78,9 +75,4 @@ Dirk Roorda
 [DANS](https://www.dans.knaw.nl)
 [dirk.roorda@dans.knaw.nl](mailto:dirk.roorda@dans.knaw.nl)
 
-2017-06-29
-
-
-
-
-
+2017-07-03

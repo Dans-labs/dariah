@@ -18,7 +18,7 @@ all your React components, especially if you use Redux in an idiomatic way.
 # Overview
 ![diag](design/design.007.jpeg)
 
-# Components and Dux
+# [Components](Components) and [Dux](Dux)
 In Redux, every component may obtain read access to the state, and has indirect write access by *dispatching* *actions*.
 The state is held in a store and the store manages all access to the state.
 When actions are dispatched to the store, the store calls a *reducer*,
@@ -53,7 +53,7 @@ When it does need to read the state, assume that your component will receive tha
 And when it needs to modify the state, assume that it will receive callbacks, also as *properties*, to dispatch actions.
 See also [connect](React#connect).
 
-# Dux as glue between components and the state
+# [Dux](Dux) as glue between [components](Components) and the [state](React#redux)
 If you have written your component, say `MyComp`, and you need a piece of the state `mySlice` that is provided by a *selector*
 `getMySlice`, and you need to dispatch an action `handle` in response of a user click, and the action creator
 `changeSlice` provides that, then you can wrap your component by means of the Redux higher order function `connect` like this:
@@ -75,7 +75,7 @@ It is only used by the store, via a kind of subscription.
 The structure of the reducer follows the types of the actions very closely
 so it really makes sense to have all four things in one file.
 
-# The dux of this app
+# The [dux](Dux) of this app
 Currently, these are the dux of this app:
 
 * [alter](Dux#alter): show/hide, cycle through *n* alternative representations of a piece of user interface;

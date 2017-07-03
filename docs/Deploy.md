@@ -47,7 +47,7 @@ All hand written code is monitored syntactically and stylistically by [eslint](h
 We make use of the DARIAH infrastructure for *user authentication* 
 [AAI](https://wiki.de.dariah.eu/display/publicde/DARIAH+AAI+Documentation)
 (see in particular
-[/Integrating Shibboleth Authentication into your Application](https://wiki.de.dariah.eu/display/publicde/Integrating+Shibboleth+Authentication+into+your+Application)
+[Integrating Shibboleth Authentication into your Application](https://wiki.de.dariah.eu/display/publicde/Integrating+Shibboleth+Authentication+into+your+Application)
 
 The app itself gives access to *documentation*, not only for end users, but also for developers and designers.
 
@@ -220,7 +220,7 @@ The third one provides a minified production build.
 
 #### build.sh
 We have collected all routine tasks for building and updating the app and its data into
-a [build script]({{server.repBase}}/build.sh).
+a [build script]({{site.repBase}}/build.sh).
 See the code for an overview of what it can do, or run
 
 ```

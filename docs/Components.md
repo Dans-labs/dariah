@@ -148,7 +148,7 @@ connected via [roots](Dux#roots)
 
 ### Task
 Entry point of the client side app.
-Contains the [routing](Routing), wrapped in a [Root](#roots) component, that
+Contains the [routing](Routing), wrapped in a [Root](#root) component, that
 sets up the store in which the central state lives.
 
 [App]({{site.appBase}}/components/App.jsx)
@@ -963,7 +963,7 @@ presents [roots](Dux#roots)
 
 ### Task
 Top-level wrapping component to set up the central store. It does so
-by configuring the store, calling [configureStore](Dux#roots), and passing
+by configuring the store, calling [configureStore](Dux#configurestore), and passing
 it to the special [Provider](React#redux) component of Redux.
 
 Then it wraps the whole remaining app in a [Window](#window) component for 
