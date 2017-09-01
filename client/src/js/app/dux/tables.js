@@ -103,18 +103,23 @@ const flows = {
     return newState
   },
   insertItem(state, { data, table, select }) {
-    if (data == null) {return state}
-    const { values: { _id } } = data
-    let newState = updateAuto(state, [table, 'entities', _id], { $set: data })
-    newState = updateAuto(newState, [table, ALLIDS], { $unshift: [_id] }, true)
-    if (select === MYIDS) {
-      newState = updateAuto(newState, [table, MYIDS], { $unshift: [_id] }, true)
+    if (data == null || data.length == 0) {return state}
+    let newState = state
+    for (const dataSlice of data) {
+      const { table: thisTable, ...dataRest } = dataSlice
+      const { values: { _id } } = dataRest
+      newState = updateAuto(newState, [thisTable, 'entities', _id], { $set: dataRest })
+      newState = updateAuto(newState, [thisTable, ALLIDS], { $unshift: [_id] }, true)
+      if (select === MYIDS && table === thisTable) {
+        newState = updateAuto(newState, [table, MYIDS], { $unshift: [_id] }, true)
+      }
+      newState = update(newState, {
+        [thisTable]: {
+          lastInserted: { $set: _id },
+        },
+      })
     }
-    return update(newState, {
-      [table]: {
-        lastInserted: { $set: _id },
-      },
-    })
+    return newState
   },
   delItem(state, { data, table }) {
     if (data == null) {return state}

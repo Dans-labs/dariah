@@ -235,16 +235,16 @@ const getUnpack = (tables, fieldSpec, asString = false) => {
       ? v => v == null
         ? emptyS
         : v.map(v => entityHead(tables, relTable, v).join(' '))
-    : v => v == null
-      ? emptyA
-      : v
-  : asString
-    ? v => v == null
-      ? emptyS
-      : entityHead(tables, relTable, v)
-    : v => v == null
-      ? emptyA
-      : [v]
+      : v => v == null
+        ? emptyA
+        : v
+    : asString
+      ? v => v == null
+        ? emptyS
+        : entityHead(tables, relTable, v)
+      : v => v == null
+        ? emptyA
+        : [v]
   }
   return unpack
 }

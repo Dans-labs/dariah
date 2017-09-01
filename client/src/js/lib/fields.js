@@ -149,7 +149,7 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
       myValues,
       ...props,
     }
-    if (editable) {
+    if (editable && typeof valType === 'object') {
       const { values, link } = valType
       if (link != null) {
         const { [table]: { entities: { [eId]: { values: { [link]: masterValue } = emptyO } = emptyO } = emptyO } = emptyO } = tables
@@ -179,7 +179,7 @@ export const makeDetails = ({ tables, table, eId }) => {
         perm: detailPerm,
         entities: detailEntities,
         allIds: detailAllIds,
-        fieldSpecs: { [linkField]: multiple },
+        fieldSpecs: { [linkField]: { multiple } },
     } = detailTableData
     const detailListIds = multiple
     ? detailAllIds.filter(_id => (detailEntities[_id].values[linkField] || emptyA).includes(eId))

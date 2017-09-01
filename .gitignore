@@ -5,6 +5,7 @@
 .tmp/
 *.pyc
 *.pyo
+.tmp
 client/*.zip
 databases/*.table
 databases/*.log

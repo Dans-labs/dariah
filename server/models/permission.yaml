@@ -524,7 +524,7 @@ fields:
       update: system
 
   criteriaEntry:
-    criterion:
+    title:
       list:   auth
       read:   own
       update: system

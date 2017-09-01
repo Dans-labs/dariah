@@ -3,7 +3,7 @@ import padEnd from 'lodash/padend'
 
 import { emptyA } from 'utils'
 
-import { memoize, makeSet } from 'memo.js'
+import { memoize, makeSet } from 'memo'
 
 function memoizeOld(f) {
   const memCache = {}

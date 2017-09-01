@@ -155,7 +155,7 @@ const actionTests = [
 
     // ACTION
     action: 'insertItem',
-    comment: 'note lastInserted, allIds, myIds',
+    comment: 'just one record, note lastInserted, allIds, myIds',
 
     // OLD STATE
     state: {
@@ -173,10 +173,13 @@ const actionTests = [
     // ACTION DATA and PROPS
     props: { table: 'person', select: 'myIds' },
 
-    data: { 
-      values: { _id: 2, name: 'no Name' },
-      fields: { name: true, surName: true, keyword: true, email: true, gender: true },
-    },
+    data: [
+      { 
+        table: 'person',
+        values: { _id: 2, name: 'no Name' },
+        fields: { name: true, surName: true, keyword: true, email: true, gender: true },
+      },
+    ],
 
     // NEW STATE
     predictedState: {
@@ -201,6 +204,101 @@ const actionTests = [
       ['person',            x => x.person,             false],
       ['entities',          x => x.person.entities,    false],
       ['unaffected-entity', x => x.person.entities[1], true ],
+    ],
+  },
+  {
+    // INSERTITEM
+
+    // ACTION
+    action: 'insertItem',
+    comment: 'multiple records, note lastInserted, allIds, myIds',
+
+    // OLD STATE
+    state: {
+      person: {
+        allIds: [1],
+        fields: { name: true, surName: true, keyword: true },
+        entities: {
+          1: {
+            values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] },
+          },
+        },
+      },
+      address: {
+        allIds: [1, 2],
+        fields: { street: true, number: true, city: true },
+        entities: {
+          1: { values: { _id: 1, street: 'School street', number: '41', city: 'Zutphen' } },
+          2: { values: { _id: 1, street: 'Church street', number: '42', city: 'Deventer' } },
+        },
+      },
+    },
+
+    // ACTION DATA and PROPS
+    props: { table: 'person', select: 'myIds' },
+
+    data: [
+      { 
+        table: 'person',
+        values: { _id: 2, name: 'no Name' },
+        fields: { name: true, surName: true, keyword: true, email: true, gender: true },
+      },
+      { 
+        table: 'address',
+        values: { _id: 3, street: 'Main street', number: '43', city: 'Zwolle' },
+        fields: { street: true, number: true, city: true },
+      },
+      { 
+        table: 'address',
+        values: { _id: 4, street: 'High street', number: '44', city: 'Kampen' },
+        fields: { street: true, number: true, city: true },
+      },
+    ],
+
+    // NEW STATE
+    predictedState: {
+      person: {
+        allIds: [2, 1],
+        myIds: [2],
+        lastInserted: 2,
+        fields: { name: true, surName: true, keyword: true },
+        entities: {
+          1: {
+            values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] },
+          },
+          2: {
+            values: { _id: 2, name: 'no Name' },
+            fields: { name: true, surName: true, keyword: true, email: true, gender: true },
+          },
+        },
+      },
+      address: {
+        allIds: [4, 3, 1, 2],
+        lastInserted: 4,
+        fields: { street: true, number: true, city: true },
+        entities: {
+          1: { values: { _id: 1, street: 'School street', number: '41', city: 'Zutphen' } },
+          2: { values: { _id: 1, street: 'Church street', number: '42', city: 'Deventer' } },
+          3: {
+            values: { _id: 3, street: 'Main street', number: '43', city: 'Zwolle' },
+            fields: { street: true, number: true, city: true },
+          },
+          4: {
+            values: { _id: 4, street: 'High street', number: '44', city: 'Kampen' },
+            fields: { street: true, number: true, city: true },
+          },
+        },
+      },
+    },
+    inspect: [
+      ['top',                x => x,                     false],
+      ['person',             x => x.person,              false],
+      ['address',            x => x.address,             false],
+      ['entities (person)',  x => x.person.entities,     false],
+      ['entities (address)', x => x.address.entities,    false],
+      ['unaffected-entity',  x => x.person.entities[1],  true ],
+      ['unaffected-entity',  x => x.address.entities[1], true ],
+      ['unaffected-entity',  x => x.address.entities[2], true ],
     ],
   },
   {

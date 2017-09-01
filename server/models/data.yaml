@@ -3,6 +3,7 @@ generic:
   createdBy: creator
   modified: modified
   title: rep
+  noTitle: no title
   item:
     - item
     - items
@@ -511,6 +512,12 @@ tables:
           allowNew: false
           freeze:
             details: false
+            template: |
+              {title} ({year})
+              {typeContribution}
+              {dateCreated} by {creator}
+
+              {description}
         multiple: false
       remarks:
         label: Remarks
@@ -541,26 +548,25 @@ tables:
         filtered: true
 
   criteriaEntry:
-    title: criterion
+    title: title
     item:
       - criterion entry
       - criterion entries
     sort:
-      - [criteria, 1]
-      - [criterion, 1]
+      - [title, 1]
     fieldOrder:
-      - criterion
+      - title
+      - criteria
       - score
       - evidence
-      - criteria
       - assessment
       - creator
       - dateCreated
       - modified
 
     fieldSpecs:
-      criterion:
-        label: Criterion
+      title:
+        label: title
         valType: text
         multiple: false
       criteria:
@@ -569,7 +575,11 @@ tables:
           values: criteria
           allowNew: false
           freeze:
-            details: true
+            template: |
+              {typeContribution}
+              {criterion}
+              {remarks}
+            details: false
         multiple: false
       score:
         label: score
@@ -605,6 +615,7 @@ tables:
 
     filters:
       - field: score
+        relField: score
         label: score
         type: ByValue
         maxCols: 1
