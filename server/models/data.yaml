@@ -511,13 +511,13 @@ tables:
           values: contrib
           allowNew: false
           freeze:
-            details: false
             template: |
               {title} ({year})
               {typeContribution}
               {dateCreated} by {creator}
 
               {description}
+            details: false
         multiple: false
       remarks:
         label: Remarks
@@ -546,6 +546,9 @@ tables:
         linkField: assessment
         mode: list
         filtered: true
+        cascade: true
+        fixed: true
+    needMaster: true
 
   criteriaEntry:
     title: title
@@ -593,6 +596,7 @@ tables:
         valType:
           values: assessment
           allowNew: false
+          freeze: true
         multiple: false
       evidence:
         label: evidence
@@ -613,6 +617,8 @@ tables:
         valType: text
         multiple: true
 
+    needMaster: true
+
     filters:
       - field: score
         relField: score
@@ -620,11 +626,6 @@ tables:
         type: ByValue
         maxCols: 1
         expanded: true
-      - field: criteria
-        label: criterion
-        type: ByValue
-        maxCols: 1
-        expanded: false
 
   package:
     title: title
@@ -762,6 +763,7 @@ tables:
         linkField: criteria
         mode: list
         filtered: true
+        cascade: true
 
     filters:
       - field: typeContribution

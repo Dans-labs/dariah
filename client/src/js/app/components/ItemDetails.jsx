@@ -25,7 +25,7 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
           const nDetails = detailListIds.length
           const { getAlt, nextAlt } = makeAlternatives(name)
           const alt = getAlt(alter)
-          const { linkField, mode, filtered } = details[name]
+          const { linkField, mode, filtered, fixed } = details[name]
           const [detailThing, detailThings] = detailItem
           const filterTag = makeTag(DETAILS, eId, linkField)
           const gridTag = `${table}-${name}-${eId}`
@@ -54,12 +54,13 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
                         perm={detailPerm}
                         select={DETAILS}
                         mode={mode}
-                        compact={true}
+                        compact={false}
                         title={detailTitle}
                         gridTag={gridTag}
                         filterTag={filterTag}
                         masterId={eId}
                         linkField={linkField}
+                        fixed={fixed}
                       />
                     : mode === 'list'
                       ? <ListPlain
@@ -73,6 +74,7 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
                           title={detailTitle}
                           masterId={eId}
                           linkField={linkField}
+                          fixed={fixed}
                         />
                       : mode === 'grid'
                         ? <ListGrid
@@ -86,6 +88,7 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
                             gridTag={gridTag}
                             masterId={eId}
                             linkField={linkField}
+                            fixed={fixed}
                           />
                         : <span>{`unknown display mode "${mode}" for ${detailThings}`}</span>
                   : null

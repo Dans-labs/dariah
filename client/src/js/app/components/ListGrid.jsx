@@ -21,7 +21,7 @@ const nAlts = 2
 const ListGrid = ({
   alter, alterSection, filtered,
   settings, filters, tables, table, listIds, select, perm: tablePerm,
-  masterId, linkField,
+  masterId, linkField, fixed,
   grid, gridTag,
   dispatch,
 }) => {
@@ -80,24 +80,28 @@ const ListGrid = ({
         perm={perm}
         fields={fields}
         widthStyles={widthStyles}
+        fixed={fixed}
       />
     )
   }
   return (
     <div>
       {
-        filtered && select === DETAILS
-        ? null
-        : <EditInsert
+        !(filtered && select === DETAILS)
+        ? <EditInsert
             perm={tablePerm}
+            select={select}
+            fixed={fixed}
             listIds={listIds}
             item={item}
             button={'button-medium'}
             alterSection={alterSection}
             nAlts={nAlts}
             initial={initial}
+            openAll={select == DETAILS}
             onInsert={handle(dispatch, insertItem, table, select, masterId, linkField)}
           />
+        : null
       }
       {
         sortSpec.length !== 0

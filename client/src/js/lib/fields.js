@@ -140,7 +140,7 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
   for (const field of fieldOrder) {
     const { [field]: f } = fields
     if (f == null) {continue}
-    const { [field]: { label, valType } } = fieldSpecs
+    const { [field]: { label, valType, valType: { freeze } } } = fieldSpecs
     const { update: { [field]: editable } } = perm
     const { [field]: myValues } = initialValues
     const theField = {
@@ -162,7 +162,7 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
         }
       }
     }
-    fragments.push({ field, label, fragment: theField })
+    fragments.push({ field, label, freeze, fragment: theField })
   }
   return fragments
 }

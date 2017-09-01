@@ -121,17 +121,20 @@ const flows = {
     }
     return newState
   },
-  delItem(state, { data, table }) {
-    if (data == null) {return state}
-    const { [table]: { myIds, allIds } } = state
-    const _id = data
-    let newState = update(state, { [table]: { entities: { $unset: [_id] } } })
-    Object.entries({ myIds, allIds }).forEach(([name, list]) => {
-      if (list != null) {
-        const otherIds = list.filter(x => x !== _id)
-        newState = update(newState, { [table]: { [name]: { $set: otherIds } } })
+  delItem(state, { data }) {
+    if (data == null || data.length == 0) {return state}
+    let newState = state
+    for (const dataSlice of data) {
+      const [thisTable, _id] = dataSlice
+      newState = update(newState, { [thisTable]: { entities: { $unset: [_id] } } })
+      const { [thisTable]: { myIds, allIds } } = newState
+      for (const [name, list] of Object.entries({ myIds, allIds})) {
+        if (list != null) {
+          const otherIds = list.filter(x => x !== _id)
+          newState = update(newState, { [thisTable]: { [name]: { $set: otherIds } } })
+        }
       }
-    })
+    }
     return newState
   },
 }
@@ -268,6 +271,10 @@ const repMap = {
 
 export const entityHead = (tables, relTable, valId) =>
   (repMap[relTable] || repMap.default(relTable))(tables, valId)
+
+export const entityFieldVal = memoize(relField => (tables, relTable, valId) =>
+  tables[relTable].entities[valId].values[relField]
+)
 
 const trimDate = (text, dateOnly) =>
   text == null

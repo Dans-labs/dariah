@@ -36,25 +36,28 @@ class ListPlain extends Component {
   }
 
   render() {
-    const { props: { alter, alterSection, filtered, filters, tables, table, select, listIds, perm, dispatch } } = this
+    const { props: { alter, alterSection, filtered, filters, tables, table, select, fixed, listIds, perm, dispatch } } = this
     const { [table]: { item, entities } } = tables
     const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
     const activeItems = compileActive(tables, table)
     return (
       <div className={'list-generic'} >
         {
-          filtered && select === DETAILS
-          ? null
-          : <EditInsert
+          !(filtered && select === DETAILS)
+          ? <EditInsert
               perm={perm}
+              select={select}
+              fixed={fixed}
               listIds={listIds}
               item={item}
               button={'button-medium'}
               alterSection={alterSection}
               nAlts={nAlts}
               initial={initial}
+              openAll={select == DETAILS}
               onInsert={this.handleInsert}
             />
+          : null
         }
         {
           listIds.map(eId => {
@@ -85,6 +88,7 @@ class ListPlain extends Component {
                         table={table}
                         eId={eId}
                         isactive={isactive}
+                        fixed={fixed}
                       />
                     </div>
                   : <span className={'item-head'} >

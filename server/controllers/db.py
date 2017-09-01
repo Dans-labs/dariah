@@ -147,7 +147,7 @@ class DbAccess(object):
         item = tableInfo.get('item', self.DM.generic['item'])
         sort =  tableInfo.get('sort', None)
         (mayInsert, iFields) = Perm.may(table, 'insert')
-        perm = dict(insert=mayInsert)
+        perm = dict(insert=mayInsert, needMaster=tableInfo.get('needMaster', False))
         orderKey = 'myIds' if my else 'allIds' 
         none = {table: {orderKey: [], 'entities': {}, 'fields': {}, 'perm': {}}}
         (good, result) = Perm.getPerm(controller, table, 'list')
@@ -312,12 +312,12 @@ class DbAccess(object):
                 insertValues[field] = value
         fInsertValues = dict()
         for (field, value) in insertValues.items():
-            freeze = {}
+            freeze = False
             specs = fieldSpecs[field]['valType']
             if type(specs) is not str:
-                freeze = specs.get('freeze', {})
+                freeze = specs.get('freeze', False)
             fInsertValues[field] = value
-            if freeze:
+            if type(freeze) is dict:
                 relTable = specs['values']
                 relTableInfo = self.DM.tables.get(relTable, {})
                 relTitle = relTableInfo.get('title', self.DM.generic['title'])
@@ -343,24 +343,62 @@ class DbAccess(object):
         records.append((table, ident, readFieldFilter, frozenFields))
 
         if table == 'assessment':
-            activeItems = self.getActiveItems()
-            criteriaEntities = activeItems['criteriaEntities']
-            typeCriteria = activeItems['typeCriteria']
-            masterType = masterDocument['typeContribution']
-            criteria = typeCriteria[masterType]
-            detailData = []
-            criteriaEntryTitle = self.DM.tables.get('criteriaEntry', {}).get('title', self.DM.generic.get('title'))
-            criteriaTitle = self.DM.tables.get('criteria', {}).get('title', self.DM.generic.get('title'))
-            for critId in criteria:
-                critDoc = criteriaEntities[str(critId)]
-                self._insertItem(controller, 'criteriaEntry', {
-                    'linkField': 'assessment',
-                    'masterId': ident,
-                    criteriaEntryTitle: critDoc.get(criteriaTitle, '??'),
-                    'criteria': critId,
-                    'evidence': [],
-                }, records)
-        #return (ident, readFieldFilter, frozenFields)
+            if masterDocument != None:
+                activeItems = self.getActiveItems()
+                criteriaEntities = activeItems['criteriaEntities']
+                typeCriteria = activeItems['typeCriteria']
+                masterType = masterDocument['typeContribution']
+                criteria = typeCriteria[masterType]
+                detailData = []
+                criteriaEntryTitle = self.DM.tables.get('criteriaEntry', {}).get('title', self.DM.generic.get('title'))
+                criteriaTitle = self.DM.tables.get('criteria', {}).get('title', self.DM.generic.get('title'))
+                for critId in criteria:
+                    critDoc = criteriaEntities[str(critId)]
+                    self._insertItem(controller, 'criteriaEntry', {
+                        'linkField': 'assessment',
+                        'masterId': ident,
+                        criteriaEntryTitle: critDoc.get(criteriaTitle, '??'),
+                        'criteria': critId,
+                        'evidence': [],
+                    }, records)
+
+    def _deleteItem(self, controller, table, newData, records, errors):
+        Perm = self.Perm
+        ident = newData.get('_id', None)
+        if ident == None:
+            errors.append('Not specified which item to delete from table {}'.format(table))
+            return
+        (good, result) = Perm.getPerm(controller, table, 'delete')
+        (rowFilter, fieldFilter) = result
+        rowFilter.update({'_id': oid(ident)})
+        documents = list(_DBM[table].find(rowFilter))
+        if len(documents) != 1:
+            errors.append('Unidentified item to delete')
+            return
+        document = documents[0]
+        (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
+        if not mayDelete:
+            errors.append('Not allowed to delete item {} from {}'.format(ident, table))
+            return
+        else:
+            # first delete detail records
+            tableInfo = self.DM.tables.get(table, {})
+            details = tableInfo.get('details', {})
+            for detail in details.values():
+                cascade = detail.get('cascade', False)
+                if not cascade: continue
+                detailTable = detail['table']
+                linkField = detail['linkField']
+                (good, result) = self.Perm.getPerm(controller, detailTable, 'delete')
+                if not good: continue
+                (detailRowFilter, fieldFilter) = result
+                detailRowFilter.update({linkField: oid(ident)})
+                detailDocuments = list(_DBM[detailTable].find(detailRowFilter, {'_id': True}))
+                for detailDoc in detailDocuments:
+                    self._deleteItem(controller, detailTable, {'_id': detailDoc['_id']}, records, errors)
+            # finally delete the main record
+            _DBM[table].delete_one(rowFilter)
+            records.append((table, str(ident)))
 
     def modList(self, controller, table, action):
         Perm = self.Perm
@@ -376,28 +414,19 @@ class DbAccess(object):
             newData = request.json
             records = []
             self._insertItem(controller, table, newData, records)
-            for r in records: print(r)
             return self.findDocs(records)
-            #(ident, readFieldFilter, frozenFields) = self._insertItem(controller, table, newData)
-            #return self.findDoc(table, dict(_id=ident), readFieldFilter, frozenFields, '', 'failed to insert new item into {}'.format(table))
 
         elif action == 'delete':
             newData = request.json
-            ident = newData.get('_id', None)
-            if ident == None:
-                return self.stop(data=none, text='Not specified which item to delete')
-            rowFilter.update({'_id': oid(ident)})
-            documents = list(_DBM[table].find(rowFilter))
-            if len(documents) != 1:
-                return self.stop(data=none, text='Unidentified item to delete')
-            document = documents[0]
-            (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
-            if not mayDelete:
-                return self.stop(data=none, text='Not allowed to delete this item')
-            else:
-                _DBM[table].delete_one(rowFilter)
-                return self.stop(data=str(ident))
-
+            records = []
+            errors = []
+            self._deleteItem(controller, table, newData, records, errors)
+            if errors:
+                return self.stop(
+                    data=records,
+                    text='\n'.join(errors),
+                )
+            return self.stop(data=records)
         elif action == 'update':
             newData = request.json
             ident = newData.get('_id', None)
@@ -438,7 +467,7 @@ class DbAccess(object):
                 multiple = fieldSpec['multiple']
                 valueTable = valType['values']
                 if multiple:
-                    if sorted(updateValues[origField]) == sorted(document[origField]): continue
+                    if sorted(updateValues[origField]) == sorted(document.get('origField', None)): continue
                     docs = list(_DBM[valueTable].find({ '_id': {'$in': updateValues[origField]}}))
                     frozenValue = [self.freezeDocs(
                         valueTable, doc,
@@ -447,7 +476,7 @@ class DbAccess(object):
                         withDetails=details,
                     ) for doc in docs] 
                 else:
-                    if updateValues[origField] == document[origField]: continue
+                    if updateValues[origField] == document.get('origField', None): continue
                     doc = list(_DBM[valueTable].find({ '_id': updateValues[origField]}))[0]
                     frozenValue = self.freezeDocs(
                         valueTable, [doc],
@@ -684,8 +713,8 @@ class DbAccess(object):
             fieldSpec = fieldSpecsPost.get(field, {})
             valType = fieldSpec.get('valType', None)
             if valType == None or type(valType) is not dict: continue
-            freeze = valType.get('freeze', None)
-            if freeze == None: continue
+            freeze = valType.get('freeze', False)
+            if type(freeze) is not dict: continue
             details = freeze['details']
             template = freeze.get('template', None)
             frozenField = 'frozen-{}'.format(field)

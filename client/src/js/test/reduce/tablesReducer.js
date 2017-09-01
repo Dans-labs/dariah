@@ -503,7 +503,7 @@ const actionTests = [
     // ACTION DATA and PROPS
     props: { table: 'person' },
 
-    data: 2,
+    data: [['person', 2]],
 
     // NEW STATE
     predictedState: {
@@ -528,6 +528,68 @@ const actionTests = [
 
     // ACTION
     action: 'delItem',
+    comment: 'with detail records',
+
+    // OLD STATE
+    state: {
+      person: {
+        allIds: [1, 2],
+        myIds: [2],
+        fields: { name: true, surName: true, keyword: true },
+        entities: {
+          1: { values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] } },
+          2: { values: { _id: 2, name: 'Mary', surName: 'Black', keyword: ['a', 'c'] } },
+        },
+      },
+      address: {
+        allIds: [1, 2, 3],
+        fields: { person: true, street: true, number: true, city: true },
+        entities: {
+          1: { values: { person: 1, _id: 1, street: 'School street', number: '41', city: 'Zutphen' } },
+          2: { values: { person: 2, _id: 1, street: 'Church street', number: '42', city: 'Deventer' } },
+          3: { values: { person: 2, _id: 1, street: 'Church street', number: '44', city: 'Deventer' } },
+        },
+      },
+    },
+
+    // ACTION DATA and PROPS
+    props: { table: 'person' },
+
+    data: [['address', 2], ['address', 3], ['person', 2]],
+
+    // NEW STATE
+    predictedState: {
+      person: {
+        allIds: [1],
+        myIds: [],
+        fields: { name: true, surName: true, keyword: true },
+        entities: {
+          1: { values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] } },
+        },
+      },
+      address: {
+        allIds: [1],
+        fields: { person: true, street: true, number: true, city: true },
+        entities: {
+          1: { values: { person: 1, _id: 1, street: 'School street', number: '41', city: 'Zutphen' } },
+        },
+      },
+    },
+    inspect: [
+      ['top',                x => x,                     false],
+      ['person',             x => x.person,              false],
+      ['address',            x => x.address,             false],
+      ['entities (person)',  x => x.person.entities,     false],
+      ['entities (address)', x => x.address.entities,    false],
+      ['unaffected-entity',  x => x.person.entities[1],  true ],
+      ['unaffected-entity',  x => x.address.entities[1], true ],
+    ],
+  },
+  {
+    // DELITEM
+
+    // ACTION
+    action: 'delItem',
     comment: 'with data absent',
 
     // OLD STATE
@@ -543,7 +605,7 @@ const actionTests = [
     // ACTION DATA and PROPS
     props: { table: 'person' },
 
-    data: 2,
+    data: [['person', 2]],
 
     // NEW STATE
     predictedState: {

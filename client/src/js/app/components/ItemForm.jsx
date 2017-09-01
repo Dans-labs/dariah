@@ -13,7 +13,7 @@ import ItemDetails from 'ItemDetails'
 import { EditDelete } from 'EditControls'
 
 const ItemForm = props => {
-  const { alter, alterSection, filters, tables, table, eId, isactive, initialValues, fields, perm, dispatch } = props
+  const { alter, alterSection, filters, tables, table, eId, isactive, fixed, initialValues, fields, perm, dispatch } = props
   let { fieldFragments, detailFragments } = props
   if (fieldFragments == null) {fieldFragments = makeFields(props)}
   if (detailFragments == null) {detailFragments = makeDetails(props)}
@@ -27,6 +27,7 @@ const ItemForm = props => {
         ? <div>
             <EditDelete
               perm={perm}
+              fixed={fixed}
               button={'button-medium'}
               onClick={handle(dispatch, delItem, table, eId)}
             />
@@ -53,6 +54,7 @@ const ItemForm = props => {
             }
             <EditDelete
               perm={perm}
+              fixed={fixed}
               button={'button-medium'}
               onClick={handle(dispatch, delItem, table, eId)}
             />

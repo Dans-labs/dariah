@@ -18,8 +18,7 @@ const nAlts = 2
 class ListFilter extends Component {
   componentWillMount() {
     const { props: { tables, table, filterTag, listIds, dispatch } } = this
-    const { [table]: tableData } = tables
-    dispatch(initFiltering(tableData, table, filterTag, listIds))
+    dispatch(initFiltering(tables, table, filterTag, listIds))
   }
   componentWillReceiveProps(newProps) {
     const {
@@ -32,8 +31,7 @@ class ListFilter extends Component {
     } = newProps
     const { props: { table: tableOld, filterTag: filterTagOld } } = this
     if ((tableOld !== table || filterTagOld !== filterTag) && filterSettings == null) {
-      const { [table]: tableData } = tables
-      dispatch(initFiltering(tableData, table, filterTag, listIds))
+      dispatch(initFiltering(tables, table, filterTag, listIds))
     }
   }
   render() {
@@ -44,7 +42,7 @@ class ListFilter extends Component {
         table,
         navItem,
         perm,
-        select, masterId, linkField,
+        select, masterId, linkField, fixed,
         listIds,
         mode, compact,
         title,
@@ -66,6 +64,8 @@ class ListFilter extends Component {
           select === DETAILS
           ? <EditInsert
               perm={perm}
+              select={select}
+              fixed={fixed}
               listIds={listIds}
               item={item}
               button={'button-medium'}
@@ -111,6 +111,7 @@ class ListFilter extends Component {
                 title={title}
                 masterId={masterId}
                 linkField={linkField}
+                fixed={fixed}
               />
             : mode === 'grid'
               ? <ListGrid
@@ -126,6 +127,7 @@ class ListFilter extends Component {
                   gridTag={gridTag}
                   masterId={masterId}
                   linkField={linkField}
+                  fixed={fixed}
                 />
               : <span>{`unknown display mode "${mode}" for ${things}`}</span>
           }

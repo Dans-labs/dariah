@@ -60,7 +60,7 @@ const fieldsButton = memoize((nextAlt, table, eId, mayUpdate, on) => (
 
 const ItemRow = ({
   alt, nextAlt, filters, tables, form, table, eId, initialValues, perm,
-  isactive,
+  isactive, fixed,
   fields,
   widthStyles,
 }) => {
@@ -104,6 +104,7 @@ const ItemRow = ({
               fields={fields}
               fieldFragments={fieldFragments}
               detailFragments={detailFragments}
+              fixed={fixed}
             />
           </div>
       }

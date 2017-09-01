@@ -42,6 +42,7 @@ const Filter = ({
               listIds={listIds}
               filterId={filterId}
               filterField={filter.field}
+              filterRelField={filter.relField}
               filterLabel={filter.label}
               maxCols={filter.maxCols}
               filteredAmount={filteredAmount}

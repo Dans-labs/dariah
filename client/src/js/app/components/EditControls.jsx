@@ -7,6 +7,7 @@ import { memoize } from 'memo'
 import { getUrlParts, emptyS, emptyO } from 'utils'
 
 import { getAltSection, compileAlternatives } from 'alter'
+import { DETAILS } from 'tables'
 
 const editStatusGeneric = canSubmit => ({
     active,
@@ -97,8 +98,8 @@ export const EditStatus = reduxForm({
   keepDirtyOnReinitialize: true,
 })(editStatusGeneric(false))
 
-export const EditDelete = ({ perm, button, onClick }) => (
-  perm.delete
+export const EditDelete = ({ perm, fixed, button, onClick }) => (
+  !fixed && perm.delete
   ? <div
       className={`grid-cell ${button} error-o fa fa-trash delete`}
       title={'delete this record'}
@@ -136,7 +137,7 @@ const handleOpenAll = memoize((alter, alterSection, nAlts, initial, items, dispa
 
 const EditInsertPure = ({
   alter, alterSection,
-  perm, listIds, item, button, onInsert,
+  perm, select, fixed, listIds, item, button, onInsert,
   nAlts, initial,
   openAll,
   dispatch,
@@ -147,7 +148,7 @@ const EditInsertPure = ({
     <div>
       {nItemsRep}
       {
-        (perm != null && perm.insert)
+        (!fixed && perm != null && perm.insert && (!perm.needMaster || select == DETAILS))
         ? <span
             className={`fa fa-plus ${button}`}
             title={`new ${thing}`}

@@ -13,7 +13,7 @@ import Stat from 'Stat'
 const ByValue = ({
   alter, alterSection, tables, table,
   filterTag, filterSetting,
-  filterId, filterField, filterLabel,
+  filterId, filterField, filterRelField, filterLabel,
   listIds,
   filteredAmount, filteredAmountOthers,
   amounts, maxCols,
@@ -21,7 +21,7 @@ const ByValue = ({
   compact,
   dispatch,
 }) => {
-  const fieldValues = compileValues(tables, table, filterTag, listIds, filterField)
+  const fieldValues = compileValues(tables, table, filterTag, listIds, filterField, filterRelField)
   if (Object.keys(fieldValues).length == null) {
     return <div className={'facet'} ><p>{' -no facets '}</p></div>
   }
