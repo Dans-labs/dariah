@@ -17,13 +17,12 @@ const nAlts = 2
 
 class ListFilter extends Component {
   componentWillMount() {
-    const { props: { tables, table, filterTag, listIds, dispatch } } = this
-    dispatch(initFiltering(tables, table, filterTag, listIds))
+    const { props: { tables, table, filterTag, dispatch } } = this
+    dispatch(initFiltering(tables, table, filterTag))
   }
   componentWillReceiveProps(newProps) {
     const {
       tables,
-       listIds,
        table,
        filterTag,
        filters: { [table]: { [filterTag]: filterSettings } = emptyO },
@@ -31,7 +30,7 @@ class ListFilter extends Component {
     } = newProps
     const { props: { table: tableOld, filterTag: filterTagOld } } = this
     if ((tableOld !== table || filterTagOld !== filterTag) && filterSettings == null) {
-      dispatch(initFiltering(tables, table, filterTag, listIds))
+      dispatch(initFiltering(tables, table, filterTag))
     }
   }
   render() {
@@ -66,6 +65,7 @@ class ListFilter extends Component {
               perm={perm}
               select={select}
               fixed={fixed}
+              table={table}
               listIds={listIds}
               item={item}
               button={'button-medium'}

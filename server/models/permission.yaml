@@ -6,6 +6,7 @@ groups:
   own:    authenticated user and creator of records in question
   office: management user
   system: system administrator
+  nobody: nobody
 
 levels:
   - public
@@ -191,15 +192,15 @@ fields:
     creator:
       list: office
       read: office
-      update: system
+      update: nobody
     dateCreated:
       list: office
       read: office
-      update: system
+      update: nobody
     modified:
       list: office
       read: office
-      update: system
+      update: nobody
 
   criteria:
     package:
@@ -221,15 +222,15 @@ fields:
     creator:
       list: office
       read: office
-      update: system
+      update: nobody
     dateCreated:
       list: office
       read: office
-      update: system
+      update: nobody
     modified:
       list: office
       read: office
-      update: system
+      update: nobody
 
   score:
     level:
@@ -255,15 +256,15 @@ fields:
     creator:
       list: office
       read: office
-      update: system
+      update: nobody
     dateCreated:
       list: office
       read: office
-      update: system
+      update: nobody
     modified:
       list: office
       read: office
-      update: system
+      update: nobody
 
   user:
     firstName:
@@ -293,15 +294,15 @@ fields:
     creator:
       list: office
       read: office
-      update: system
+      update: nobody
     dateCreated:
       list: office
       read: office
-      update: system
+      update: nobody
     modified:
       list: office
       read: office
-      update: system
+      update: nobody
 
   country:
     name:
@@ -327,15 +328,15 @@ fields:
     creator:
       list: system
       read: system
-      update: system
+      update: nobody
     dateCreated:
       list: system
       read: system
-      update: system
+      update: nobody
     modified:
       list: system
       read: system
-      update: system
+      update: nobody
 
   typeContribution:
     mainType:
@@ -353,15 +354,15 @@ fields:
     creator:
       list: public
       read: public
-      update: office
+      update: nobody
     dateCreated:
       list: public
       read: public
-      update: office
+      update: nobody
     modified:
       list: auth
       read: auth
-      update: system
+      update: nobody
 
   vcc:
     rep:
@@ -423,7 +424,7 @@ fields:
     typeContributionLegacy:
       list:   office
       read:   office
-      update: system
+      update: nobody
     vcc:
       list:   public
       read:   public
@@ -487,15 +488,15 @@ fields:
     creator:
       list: public
       read: public
-      update: office
+      update: nobody
     dateCreated:
       list: public
       read: public
-      update: office
+      update: nobody
     modified:
       list: auth
       read: auth
-      update: system
+      update: nobody
 
   assessment:
     title:
@@ -505,7 +506,7 @@ fields:
     contrib:
       list:   auth
       read:   auth
-      update: system
+      update: nobody
     remarks:
       list:   auth
       read:   auth
@@ -513,25 +514,25 @@ fields:
     creator:
       list: office
       read: office
-      update: system
+      update: nobody
     dateCreated:
       list: office
       read: office
-      update: system
+      update: nobody
     modified:
       list: office
       read: office
-      update: system
+      update: nobody
 
   criteriaEntry:
-    title:
+    seq:
       list:   auth
       read:   own
-      update: system
+      update: nobody
     criteria:
       list:   auth
       read:   own
-      update: system
+      update: nobody
     score:
       list:   auth
       read:   own
@@ -543,16 +544,16 @@ fields:
     assessment:
       list:   auth
       read:   own
-      update: system
+      update: nobody
     creator:
       list: office
       read: office
-      update: system
+      update: nobody
     dateCreated:
       list: office
       read: office
-      update: system
+      update: nobody
     modified:
       list: office
       read: office
-      update: system
+      update: nobody

@@ -511,12 +511,26 @@ tables:
           values: contrib
           allowNew: false
           freeze:
-            template: |
-              {title} ({year})
-              {typeContribution}
-              {dateCreated} by {creator}
+            label: Contribution details
+            formatting:
+              listSpecs:
+                typeContribution:
+                  start: ""
+                  sep: ", "
+              template: |
+                [{title}]({urlContribution})
 
-              {description}
+                {country} {year}
+
+                {typeContribution}
+
+                [{contactPersonName}]({contactPersonEmail[0]})
+
+                Created {dateCreated}
+
+                Last modified {modifiedLast} 
+
+                {description}
             details: false
         multiple: false
       remarks:
@@ -551,14 +565,14 @@ tables:
     needMaster: true
 
   criteriaEntry:
-    title: title
+    title: criteria
     item:
       - criterion entry
       - criterion entries
     sort:
-      - [title, 1]
+      - [seq, 1]
     fieldOrder:
-      - title
+      - seq
       - criteria
       - score
       - evidence
@@ -568,9 +582,9 @@ tables:
       - modified
 
     fieldSpecs:
-      title:
-        label: title
-        valType: text
+      seq:
+        label: Number
+        valType: number
         multiple: false
       criteria:
         label: criterion
@@ -578,10 +592,10 @@ tables:
           values: criteria
           allowNew: false
           freeze:
-            template: |
-              {typeContribution}
-              {criterion}
-              {remarks}
+            label: Details
+            formatting:
+              template: |
+                {remarksStr}
             details: false
         multiple: false
       score:
@@ -590,6 +604,7 @@ tables:
           values: score
           link: criteria
           allowNew: false
+          popUpIfEmpty: true
         multiple: false
       assessment:
         label: assessment
@@ -720,6 +735,7 @@ tables:
         valType:
           values: package
           allowNew: true
+          freeze: true
         multiple: false
       typeContribution:
         label: Type
@@ -764,6 +780,8 @@ tables:
         mode: list
         filtered: true
         cascade: true
+
+    needMaster: true
 
     filters:
       - field: typeContribution

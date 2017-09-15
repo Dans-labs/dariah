@@ -55,9 +55,7 @@ const reprX = (tables, table, settings) => {
   return (myValues, field) => {
     if (field === '_id') {return myValues}
     const { [field]: { valType, multiple } } = fieldSpecs
-    return multiple
-    ? (myValues || emptyA).map(value => repr(tables, table, valType, value, settings)).join('|')
-    : repr(tables, table, valType, myValues, settings)
+    return repr(tables, table, valType, multiple, null, myValues, settings, '|')
   }
 }
 

@@ -17,7 +17,7 @@ of data they represent.
 However, some props occur over and over again, and we name them consistently.
 
 Here is a list of those props and their types.
-When mention these props later on, we omit the types.
+When we mention these props later on, we omit the types.
 
 * `alter` **object**;
   a slice of the state from [getAltSection](Dux#getaltsection);
@@ -30,8 +30,7 @@ When mention these props later on, we omit the types.
   section; in this way components will not be dependent on too big a part of the state;
   those dependencies may cause spurious re-renderings;
 * `amounts` **object**;
-  for each other filter of the same table and group:
-  the number of items that passes that filter;
+  for a faceted filter: contains the amount of items that match each facet;
   see [computeFiltering](Dux#computefiltering);
 * `children` **components**;
   a special prop defined by React itself;
@@ -43,7 +42,7 @@ When mention these props later on, we omit the types.
 * `compact` **bool**;
   whether the component should minimize the real estate on the screen that it uses;
 * `detailFragments` **array of object**;
-  the information on the basis of which the details can be rendered;
+  the information on the basis of which the detail records of an item can be rendered;
   every entry in the array corresponds to a detail table that may contain detail records
   of the master record that is being dealt with;
   ultimately computed by [makeDetails](Lib#makedetails) and then passed to child components;
@@ -64,7 +63,7 @@ When mention these props later on, we omit the types.
   ultimately computed by [makeFields](Lib#makefields) and then passed to child components;
 * `filtered` **bool**;
   whether the list should be accompanied by filters;
-  the specification of which filters is in the
+  the specification of the filters themselves is in the
   [data model]({{site.serverBase}}/models/data.yaml);
 * `fields` **objects**;
   defines a subset of all fields: these are the fields that the component has to deal with;
@@ -84,7 +83,8 @@ When mention these props later on, we omit the types.
   the user-facing name of the filter;
 * `filters` **object**;
   a slice of the state from [getFilters](Dux#getfilters);
-  contains the actual filter settings;
+  contains the actual filter settings, i.e.
+  what the user has entered in search boxes and which facets the user has clicked;
   organized by table and then by `filterTag` and then by `filterId`; 
 * `filterSettings` **object**;
   a slice of the state, sub-slice of `filters`, corresponding to the filters
@@ -92,8 +92,8 @@ When mention these props later on, we omit the types.
 * `filterSetting` **object** or **string**;
   a slice of the state, sub-slice of `filterSetting`, corresponding to a single filter,
   identified by `filterId`; whether this is an object or a string, depends on the nature
-  of the filter: for a [Fulltext](#fulltext) filter it is a string, for a [ByValue](#byvalue) 
-  filter it is an object, containing the status of all its facet checkboxes;
+  of the filter: for a [Fulltext](#fulltext) filter it is a string (the search text), for a [ByValue](#byvalue) 
+  filter it is an object, containing the status (boolean) of all its facet checkboxes;
 * `filterTag` **string**;
   identifies a group of filters for a single table; tables may have multiple incarnations;
   a table can be a main table, but also a detail table for a specific record;
@@ -102,15 +102,17 @@ When mention these props later on, we omit the types.
   means of a `filterTag` prop;
 * `linkField` **string**;
   when rendering a list of records that are details of some master record,
-  this is the field of the detail record that links to the `materId`;
-  when the component creates a new record, it will prefill this field with the current
+  this is the field of the detail records that holds the `masterId`; in this way the detail record
+  links to its master record;
+  when the component creates a new detail record, it will prefill this field with the current
   `masterId`;
 * `listIds` **array of string**;
   a sequence of strings which are essentially MongoDB identifiers of entities in a table;
   components that display lists use this prop to determine which entities must be actually
   appear on the screen and in what order; see also the prop `filteredIds`;
 * `masterId` **string**;
-  when rendering a list of records that are details of some master record, this holds the MongoDB id of that record;
+  when rendering a list of records that are details of some master record, this holds the MongoDB id of
+  the master record;
 * `me` **object**;
   a slice of the state from [getMe](Dux#getme);
   the information about the currently logged-in user, fetched from the server;
@@ -136,7 +138,7 @@ When mention these props later on, we omit the types.
 * `tables` **object**;
   a slice of the state from [getTables](Dux#gettables);
   all data that comes from database tables;
-  organized by `table` name; For each table there is spec information
+  organized by `table` name; for each table there is spec information
   and actual entity data;
 * `win` **{**`width` **number**`, height` **number**`}`;
   a slice of the state from [getWinDim](Dux#getwindim);
@@ -175,10 +177,10 @@ connected via [filters](Dux#filters)
 ###### alter alterSection tables table filterTag filterSetting filterId filterField filterLabel  listIds compact dispatch
 
 ###### `maxCols` number
-The maximum number of rows in which the facets have to be stacked.
+The maximum number of columns in which the facets have to be stacked.
 
 ###### `expanded` bool
-Whether the facets should be expanded or collapsed (hidden).
+Whether the facets should be initially expanded or collapsed (hidden).
 
 ### Task
 A widget by which the user can click the [facet](#facet)s associated with one field.

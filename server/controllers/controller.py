@@ -27,7 +27,7 @@ class Controller(object):
 
     def view(self, name):
         table = getq('table')
-        ident = getq('id')
+        ident = getq('id') if 'id' in request.query else None
         return self.DB.getItem(name, table, ident)
 
     def mod(self, name):

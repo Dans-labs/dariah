@@ -92,6 +92,7 @@ const ListGrid = ({
             perm={tablePerm}
             select={select}
             fixed={fixed}
+            table={table}
             listIds={listIds}
             item={item}
             button={'button-medium'}

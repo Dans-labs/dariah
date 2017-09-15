@@ -3,12 +3,13 @@ import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
 import { memoize } from 'memo'
-import { withParams, getUrlParts, emptyS, emptyO } from 'utils'
+import { combineSelectors, withParams, getUrlParts, emptyS, emptyO } from 'utils'
 import { someEditable } from 'fields'
 
-import { insertItem, needValues, entityHead, DETAILS } from 'tables'
+import { insertItem, needValues, headEntity, DETAILS } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
 import { compileActive } from 'custom'
+import { getSettings } from 'settings'
 
 import { EditStatus, EditInsert } from 'EditControls'
 import ItemContainer from 'ItemContainer'
@@ -36,7 +37,7 @@ class ListPlain extends Component {
   }
 
   render() {
-    const { props: { alter, alterSection, filtered, filters, tables, table, select, fixed, listIds, perm, dispatch } } = this
+    const { props: { settings, alter, alterSection, filtered, filters, tables, table, select, fixed, listIds, perm, dispatch } } = this
     const { [table]: { item, entities } } = tables
     const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
     const activeItems = compileActive(tables, table)
@@ -48,6 +49,7 @@ class ListPlain extends Component {
               perm={perm}
               select={select}
               fixed={fixed}
+              table={table}
               listIds={listIds}
               item={item}
               button={'button-medium'}
@@ -62,7 +64,7 @@ class ListPlain extends Component {
         {
           listIds.map(eId => {
             const { [eId]: { fields, perm } } = entities
-            const head = entityHead(tables, table, eId)
+            const head = headEntity(tables, table, eId, settings)
             const formTag = `${table}-${eId}`
             const isComplete = !needValues(entities, eId)
             const { getAlt, nextAlt } = makeAlternatives(eId)
@@ -156,4 +158,6 @@ class ListPlain extends Component {
   }
 }
 
-export default connect(getAltSection)(withParams(ListPlain))
+const getInfo = combineSelectors(getSettings, getAltSection)
+
+export default connect(getInfo)(withParams(ListPlain))

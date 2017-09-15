@@ -5,22 +5,23 @@ title: Architecture
 # Introduction
 This app consists of many [React](React) components.
 By default React components have a private state where they can store everything that changes
-in their life course. That is: user interaction and server data.
+in their life courses. That is: user interaction and server data.
 
 If many components handle overlapping data, problems arise, and they manifest themselves first as subtle bugs.
-Hard to reproduce, hard to fix. Because they have to do with unpredictable timing of changing entities.
+Hard to reproduce, hard to fix, because they have to do with unpredictable timing of changing entities.
 
 That is where [Redux](React#redux) comes to the rescue.
 Redux provides a central state as a *single source of truth*.
 Redux itself is a very small library, under 600 lines of code, but using it will have a dramatic effect on
-all your React components, especially if you use Redux in an idiomatic way.
+all your React components, especially if you use Redux in an *idiomatic* way.
 
 # Overview
 ![diag](design/design.007.jpeg)
 
 # [Components](Components) and [Dux](Dux)
-In Redux, every component may obtain read access to the state, and has indirect write access by *dispatching* *actions*.
-The state is held in a store and the store manages all access to the state.
+In Redux, every component may obtain read access to the state,
+and has indirect write access to it by *dispatching* *actions*.
+The state is held in a *store* and the store manages all access to the state.
 When actions are dispatched to the store, the store calls a *reducer*,
 which is a function written by the application developer.
 
@@ -29,8 +30,8 @@ it produces a new state from the old state.
 
 An app has many concerns, some of which are pretty well separable from others.
 Such a concern tends to be centered around a specific slice of the state,
-involving a specific set of actions, and a dedicated partial reducer of that slice of the state.
-The components involved do not need the whole state, but a specific *selection* of the state.
+involving a specific set of actions, and a dedicated partial reducer of that slice.
+The components involved do not need the whole state, but only this specific slice of the state.
 Some of the actions may become really specialized, involved, and complex, and for those
 one writes dedicated *helpers*.
 
@@ -43,8 +44,8 @@ exports
 * a single *reducer* function (as the default export);
 * *selector* functions (one or more as named exports); their names always start with `get`;
   `get` as in: "get a fragment of the whole state".
-* *helper* functions (some of which do not have to be exported).
-  Quite often their names start with `compile` as in "compile the state data into something
+* *helper* functions (some of which do not have to be exported);
+  quite often their names start with `compile` as in "compile the state data into something
   that may component can readily consume".
 
 Such a *duct* ties in very well with the way that React components can be connected to the state.
@@ -79,23 +80,32 @@ so it really makes sense to have all four things in one file.
 Currently, these are the dux of this app:
 
 * [alter](Dux#alter): show/hide, cycle through *n* alternative representations of a piece of user interface;
+  example: widgets that can be expanded and collapsed by the user;
 * [custom](Dux#custom): specialized logic to treat some tables and items different from others, based on the
-  meaning they have for the users of the application
+  meaning they have for the users of the application;
+  example: the logic that determines what are the active contribution types and assessment criteria at a given point in time, which
+  is determined by records in the `package` table;
 * [docs](Dux#docs): fetch documents, especially markdown ones, and show them in two representations: source and formatted;
 * [filters](Dux#filters): the machinery of faceted and full text filtering of entities from tables;
-* [forms](Dux#forms): the state of all data entry forms in the app.
-  Managed by [redux-form](http://redux-form.com), but we need to 
-  inspect it as well;
+* [forms](Dux#forms): the state of all data entry forms in the app;
+  managed by [redux-form](http://redux-form.com); but other parts of the app need to inspect the `form` slice of the state as well;
 * [grid](Dux#grid): the display state of all lists in grid layout: the sort columns and the directions
   of sorting;
 * [me](Dux#me): data about the currently logged-in user;
-* [notes](Dux#notes): the notification system;
+* [notes](Dux#notes): the notification system; this is what displays progress and error messages; it can be accessed by the user
+  by clicking the unobtrusive open circle in the upper right corner of the browser window;
 * [roots](Dux#roots): combining all the other dux;
 * [select](Dux#select): the state of all multiselect widgets in the app;
 * [server](Dux#server): handling asynchronous actions and reporting about success, failure
-  and pending requests;
+  and pending requests; it also prevents subsequent requests of data between the first request and the arrival of the data;
 * [settings](Dux#settings): cross-cutting operational parameters, such as whether to show or hide
   the provenance fields (creator, created data, sequence of modified-by records);
-* [tables](Dux#tables): manage all database data that has been fetched from the server;
-* [win](Dux#win): react to the resizing of the browser window.
+* [tables](Dux#tables): manage all database data that has been fetched from the server; in fact, we construct a normalized copy
+  of all tables that contain information that is application needs; when more data is needed, the application fetches it from the
+  server and merges it in `tables` slice of the state; this slice not only holds the data of the tables, but also the specs of them,
+  such as the fields, their types, the relations between tables, the master-detail structure, etc.;
+* [win](Dux#win): react to the resizing of the browser window; earlier stages of the application used this to resize certain areas in the
+  application window; however, by using new CSS features such as [flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
+  we do not have any real need to make the window size known to the app; this might change when the app acquires new functionality,
+  so for the moment we retain this mechanism.
 

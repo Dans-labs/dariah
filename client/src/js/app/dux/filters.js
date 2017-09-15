@@ -2,7 +2,7 @@ import pickBy from 'lodash/pickby'
 
 import { memoize } from 'memo'
 import { makeReducer, updateAuto, emptyS, emptyA, emptyO } from 'utils'
-import { entityHead, entityFieldVal, DETAILS } from 'tables'
+import { headEntity, DETAILS } from 'tables'
 
 /* ACTIONS */
 
@@ -10,9 +10,9 @@ export const changeFulltext = (table, filterTag, filterId, searchString) => ({ t
 export const changeFacet = (table, filterTag, filterId, valueId, onOff) => ({ type: 'facet', table, filterTag, filterId, data: [valueId, onOff] })
 export const changeFacetAll = (table, filterTag, filterId, onOff) => ({ type: 'facetAll', table, filterTag, filterId, data: onOff })
 
-export const initFiltering = (tables, table, filterTag, listIds) => {
+export const initFiltering = (tables, table, filterTag) => {
   const { [table]: tableData } = tables
-  const fieldIds = compileFieldIds(tableData, filterTag, listIds)
+  const fieldIds = compileAllFieldIds(tableData)
   return { type: 'initFiltering', tables, table, filterTag, fieldIds }
 }
 
@@ -46,6 +46,19 @@ export default makeReducer(flows)
 export const getFilters = ({ filters }) => ({ filters })
 
 /* HELPERS */
+
+const compileAllFieldIds = memoize(tableData => {
+  if (tableData == null) {return emptyO}
+  const { valueLists, fields, filterList, fieldSpecs } = tableData
+  if (filterList == null) {return emptyO}
+  const presentFilterList = filterList.filter(x => fields[x.field])
+  const filterFields = presentFilterList.filter(x => x.type !== 'Fulltext').map(x => x.field)
+  const gatherFields = filterFields.filter(x => valueLists[x] == null)
+  return {
+    ...pickBy(valueLists, (value, key) => filterFields.includes(key)),
+    ...(gatherFields.length ? gatherAllIds(tableData, gatherFields, fieldSpecs) : emptyO),
+  }
+}, emptyO, { debug: 'compileAllFieldIds' })
 
 const compileFieldIds = memoize((tableData, filterTag, listIds) => {
   if (tableData == null) {return emptyO}
@@ -198,6 +211,23 @@ const gatherIds = memoize((tableData, listIds, filterFields, fieldSpecs) => {
   return theseIds
 }, emptyO, { debug: 'gatherIds' })
 
+const gatherAllIds = memoize((tableData, filterFields, fieldSpecs) => {
+  const theseIds = {}
+  const { entities } = tableData
+  for (const field of filterFields) {
+    const { [field]: { multiple } } = fieldSpecs
+    const valueSet = new Set()
+    for (const e of Object.values(entities)) {
+      const { values: { [field]: val } } = e
+      if (val == null) {continue}
+      if (multiple) {for (const v of val) {valueSet.add(v)}}
+      else {valueSet.add(val)}
+    }
+    theseIds[field] = Array.from(new Set(valueSet))
+  }
+  return theseIds
+}, emptyO, { debug: 'gatherAllIds' })
+
 const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField, filterRelField) => {
   const { [filterField]: { valType } } = fieldSpecs
   if (fieldIds == null) {return emptyO}
@@ -211,7 +241,7 @@ const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField, filterR
     const { values: relTable } = valType
     if (filterRelField == null) {
       fieldIds.forEach(_id => {
-        fieldValues[_id] = entityHead(tables, relTable, _id)
+        fieldValues[_id] = headEntity(tables, relTable, _id)
       })
     }
     else {
@@ -228,6 +258,11 @@ const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField, filterR
 export const makeTag = (select, masterId, linkField) => masterId == null
 ? select
 : `${select}-${masterId}-${linkField}`
+
+const entityFieldVal = memoize(relField =>
+  (tables, relTable, valId) => tables[relTable].entities[valId].values[relField],
+  emptyO,
+)
 
 const getUnpack = (tables, fieldSpec, asString = false, relField = null) => {
   const { valType, multiple } = fieldSpec
@@ -253,7 +288,7 @@ const getUnpack = (tables, fieldSpec, asString = false, relField = null) => {
     const { values: relTable } = valType
     const entityRep = relField
     ? entityFieldVal(relField)
-    : entityHead
+    : headEntity
     unpack = multiple
     ? asString
       ? v => v == null

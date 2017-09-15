@@ -184,7 +184,7 @@ const actionTests = [
     // NEW STATE
     predictedState: {
       person: {
-        allIds: [2, 1],
+        allIds: [1, 2],
         myIds: [2],
         lastInserted: 2,
         fields: { name: true, surName: true, keyword: true },
@@ -258,7 +258,7 @@ const actionTests = [
     // NEW STATE
     predictedState: {
       person: {
-        allIds: [2, 1],
+        allIds: [1, 2],
         myIds: [2],
         lastInserted: 2,
         fields: { name: true, surName: true, keyword: true },
@@ -273,7 +273,7 @@ const actionTests = [
         },
       },
       address: {
-        allIds: [4, 3, 1, 2],
+        allIds: [1, 2, 3, 4],
         lastInserted: 4,
         fields: { street: true, number: true, city: true },
         entities: {
@@ -315,8 +315,8 @@ const actionTests = [
         entities: {
           1: { values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] } },
           2: {
-            values: { _id: 2, name: 'Mary', surName: 'Black', keyword: ['a', 'c'], email: 'mary@black.com', gender: 'b' },
-            fields: { name: true, surName: true, keyword: true, email: true, gender: true },
+            values: { _id: 2, name: 'Mary', surName: 'Black', keyword: ['a', 'c'], email: 'mary@black.com', gender: 'b', age: 65, member: true },
+            fields: { name: true, surName: true, keyword: true, email: true, gender: true, age: true, member: true },
           },
         },
       },
@@ -326,8 +326,8 @@ const actionTests = [
     props: { table: 'person' },
 
     data: {
-      values: { _id: 2, name: 'Marie', surName: 'Blacque', keyword: ['a', 'd'], email: 'marie@blacque.com', gender: 'x' },
-      fields: { name: true, surName: true, keyword: true, email: true, gender: true },
+      values: { _id: 2, name: 'Marie', surName: 'Blacque', keyword: ['a', 'd'], email: 'marie@blacque.com', gender: 'x', age: 66, member: false },
+      fields: { name: true, surName: true, keyword: true, email: true, gender: true, age: true, member: true },
     },
 
     // NEW STATE
@@ -337,8 +337,8 @@ const actionTests = [
         entities: {
           1: { values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] } },
           2: {
-            values: { _id: 2, name: 'Marie', surName: 'Blacque', keyword: ['a', 'd'], email: 'marie@blacque.com', gender: 'x' },
-            fields: { name: true, surName: true, keyword: true, email: true, gender: true },
+            values: { _id: 2, name: 'Marie', surName: 'Blacque', keyword: ['a', 'd'], email: 'marie@blacque.com', gender: 'x', age: 66, member: false },
+            fields: { name: true, surName: true, keyword: true, email: true, gender: true, age: true, member: true },
           },
         },
       },
@@ -457,7 +457,7 @@ const actionTests = [
           },
         },
         valueLists: {
-          keyword: ['y', 'x', 'a', 'b', 'c', 'd'],
+          keyword: ['a', 'b', 'c', 'd', 'x', 'y'],
         },
       },
       keyword: {

@@ -9,8 +9,8 @@ title: Codebase
 
 # Legend
 
-The numbers stands for lines of code.
-1000 lines is ~ 20 typed A4 page of text.
+The numbers stand for lines of code.
+1000 lines is ~ 20 typed A4 pages of text.
 
 [YAML](http://www.yaml.org)
 -----------------------------------------------------------------------------------------

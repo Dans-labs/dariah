@@ -37,6 +37,16 @@ export const fetchItem = (table, eId) => accessData({
   table,
 })
 
+export const fetchItems = (table, eIds, alterSection, alt) => accessData({
+  type: 'fetchItems',
+  contentType: 'db',
+  path: `/view?table=${table}`,
+  desc: `${table} records ${eIds.length}`,
+  sendData: eIds,
+  table,
+  eIds, alterSection, alt,
+})
+
 export const modItem = (table, eId, values) => accessData({
   type: 'modItem',
   contentType: 'db',
@@ -87,6 +97,15 @@ const flows = {
     const { values: { _id } } = data
     return updateAuto(state, [table, 'entities', _id], { $set: data })
   },
+  fetchItems(state, { data, table }) {
+    if (data == null || data.length == 0) {return state}
+    let newState = state
+    for (const dataSlice of data) {
+      const { values: { _id } } = dataSlice
+      newState = updateAuto(newState, [table, 'entities', _id], { $set: dataSlice })
+    }
+    return newState
+  },
   modItem(state, { data, table }) {
     if (data == null) {return state}
     const { values, values: { _id }, newValues } = data
@@ -96,7 +115,7 @@ const flows = {
     let newState = updateAuto(state, [table, 'entities', _id, 'values'], fieldUpdates)
     if (newValues != null) {
       for (const { _id, rep, relTable, field } of newValues) {
-        newState = update(newState, { [table]: { valueLists: { [field]: { $unshift: [_id] } } } })
+        newState = update(newState, { [table]: { valueLists: { [field]: { $push: [_id] } } } })
         newState = updateItemWithFields(newState, relTable, _id, useRelFields, { _id, rep })
       }
     }
@@ -109,9 +128,11 @@ const flows = {
       const { table: thisTable, ...dataRest } = dataSlice
       const { values: { _id } } = dataRest
       newState = updateAuto(newState, [thisTable, 'entities', _id], { $set: dataRest })
-      newState = updateAuto(newState, [thisTable, ALLIDS], { $unshift: [_id] }, true)
+      if (newState[thisTable][ALLIDS] != null) {
+        newState = updateAuto(newState, [thisTable, ALLIDS], { $push: [_id] }, true)
+      }
       if (select === MYIDS && table === thisTable) {
-        newState = updateAuto(newState, [table, MYIDS], { $unshift: [_id] }, true)
+        newState = updateAuto(newState, [table, MYIDS], { $push: [_id] }, true)
       }
       newState = update(newState, {
         [thisTable]: {
@@ -191,7 +212,67 @@ export const listValues = memoize(({ tables, table, eId, field }) => (
       : new Set(tables[table].entities[eId][field])
 ), emptyO)
 
-const repUser = memoize((tables, valId) => {
+/* Record and Field value representation
+ *
+ * In this dux (tables), we provide export functions to
+ *
+ * A. convert a raw entity into a string value that can act as a heading for that record
+ *    headEntity()
+ *
+ * B. convert a raw value of any field into an appropriate string.
+ *    repr()
+ *
+ * In the library file 'fields' we provide a function (wrappedRepr)
+ * to get field values into appropriate elements * with appropriate attributes.
+ *
+ * There are complications.
+ *
+ * 1. tables are really special
+ * 2. fields may have multiple values
+ * 3. field values may refer to other tables by id
+ *
+ * Ad 1: Special tables
+ * For special tables, such as user, country, and a bunch of others, we write special head functions.
+ * headEntity() will make the switch, based on the name of the table.
+ *
+ * Ad 2: Multiplicity
+ * Whenever we encounter fields with multiple values, we do the relevant operations value-wise.
+ * repr() works such that if an array of values goes in, an array of representations goes out.
+ * Unless the 'sep' parameter is passed.
+ * In that case, if there are multiple values, their reps will be joined by means of the 'sep'.
+ *
+ * Ad 3: Releated tables
+ * When a field is an id referring to an entity in another table,
+ * there are various options.
+ * The default case is to use the headEntity of the related record as representation.
+ * It is also possible to pass a detail field name.
+ * In that case, the repr of that field of the detail record will be taken.
+ *
+ * Combination of 2 and 3.
+ * It is possible that a field that points to a related table, has multiple values.
+ * It is possible that the detail field, used to represent the detail records, itself has multiple values.
+ * repr() deals with all cases.
+ * Without the sep parameter, it might return:
+ *
+ * (a) a single string (if field and detail field are both not multiple)
+ * (b1) an array of strings (if field is not multiple, but detail field is multiple)
+ * (b2) an array of strings (if field is multiple, but detail field is not multiple)
+ * (c) an array of an array of strings (if field and detail field are both multiple)
+ *
+ * You can pass a 'sep' and a 'detail sep' to repr().
+ * If you pass 'sep', and field is multiple, the resulting reps will be joined with sep.
+ * If you pass 'detail sep' and detail field is multiple, the resulting detail reps will be joined with detail sep.
+ *
+ * One caveat: if both field and detail field are multiple, and sep is given, detail sep must also be given,
+ * otherwise the detail reps would be arrays, which cannot be string-joined.
+ * If a detail sep is not passed in this case, we assume a default value: a single space.
+ *
+ */
+
+/* The table specific head functions
+ */
+
+const headUser = memoize((tables, valId) => {
   let valRep
   const { user: { entities: { [valId]: entity } } } = tables
   if (entity) {
@@ -219,7 +300,7 @@ const repUser = memoize((tables, valId) => {
   return valRep
 }, emptyO)
 
-const repCountry = memoize((tables, valId) => {
+const headCountry = memoize((tables, valId) => {
   const { country: { entities: { [valId]: entity } } } = tables
   if (entity) {
     const { values: { name, iso } } = entity
@@ -228,7 +309,7 @@ const repCountry = memoize((tables, valId) => {
   else {return 'UNKNOWN'}
 }, emptyO)
 
-const repType = memoize((tables, valId) => {
+const headType = memoize((tables, valId) => {
   const { typeContribution: { entities: { [valId]: entity } } } = tables
   if (entity) {
     const { values: { mainType, subType } } = entity
@@ -238,7 +319,7 @@ const repType = memoize((tables, valId) => {
   else {return 'UNKNOWN'}
 }, emptyO)
 
-const repScore = memoize((tables, valId) => {
+const headScore = memoize((tables, valId) => {
   let valRep
   const { score: { entities: { [valId]: entity } } } = tables
   if (entity) {
@@ -251,30 +332,33 @@ const repScore = memoize((tables, valId) => {
   return valRep
 }, emptyO)
 
-const repValue = relTable =>
-  memoize((tables, valId) => {
-    const { [relTable]: { title = 'rep', entities: { [valId]: entity } } } = tables
+const headRelated = relTable =>
+  memoize((tables, valId, settings) => {
+    const { [relTable]: { title = 'rep', entities: { [valId]: entity }, fieldSpecs } } = tables
     if (entity) {
       const { values: { [title]: rep } } = entity
-      return rep
+      const { [title]: { valType } } = fieldSpecs
+      return repr1Head(tables, relTable, valType, rep, settings)
     }
     else {return 'UNKNOWN'}
   }, emptyO)
 
-const repMap = {
-  user: repUser,
-  country: repCountry,
-  typeContribution: repType,
-  score: repScore,
-  default: repValue,
+/* The head switch function
+ */
+
+const headSwitch = {
+  user: headUser,
+  country: headCountry,
+  typeContribution: headType,
+  score: headScore,
+  default: headRelated,
 }
 
-export const entityHead = (tables, relTable, valId) =>
-  (repMap[relTable] || repMap.default(relTable))(tables, valId)
+/* The generic head function is exported
+ */
 
-export const entityFieldVal = memoize(relField => (tables, relTable, valId) =>
-  tables[relTable].entities[valId].values[relField]
-)
+export const headEntity = (tables, relTable, valId, settings) =>
+  (headSwitch[relTable] || headSwitch.default(relTable))(tables, valId, settings)
 
 const trimDate = (text, dateOnly) =>
   text == null
@@ -283,9 +367,30 @@ const trimDate = (text, dateOnly) =>
     ? text.replace(/T.*$/, emptyS)
     : text.replace(/\.[0-9]+/, emptyS)
 
-export const repr = (tables, table, valType, value, settings) => {
+/*
+ * The repr functions
+ *
+ * repr() has to deal with very many cases, so we break it down
+ * into simpler functions.
+ *
+ * repr1Head()
+ *
+ * Deals with a single value
+ * When a field points to a related record, headEntity() is used as representation.
+ * So no complications with detail fields.
+ * The result is always a string.
+ *
+ * reprHead()
+ * Deals with single and multiple values.
+ * When a field points to a related record, headEntity() is used as representation.
+ * So no complications with detail fields.
+ * If the field is multiple, it will be joined by sep, if sep is not null.
+ * The result is a string, except when the field is multiple and sep is null.
+ *
+ */
+const repr1Head = (tables, table, valType, value, settings) => {
   if (value == null) {return emptyS}
-  if (typeof valType === 'string') {
+  if (valType == null || typeof valType === 'string') {
     switch (valType) {
       case 'datetime': return trimDate(value, settings && settings.shortDates)
       case 'bool': return value ? 'Yes' : 'No'
@@ -294,7 +399,53 @@ export const repr = (tables, table, valType, value, settings) => {
   }
   else {
     const { values: relTable } = valType
-    return entityHead(tables, relTable, value)
+    return headEntity(tables, relTable, value)
   }
 }
 
+const reprHead = (tables, table, valType, multiple, value, settings, sep) => {
+  const rep = multiple
+  ? (value || emptyA).map(val => repr1Head(tables, table, valType, val, settings))
+  : repr1Head(tables, table, valType, value, settings)
+  return multiple && sep != null
+  ? rep.join(sep)
+  : rep
+}
+
+/*
+ * The exported repr() function.
+ *
+ * It can deal with a detail field, with multiplicity in field and detail field, in any combination,
+ * and it can do joining.
+ * If sep is present, detail sep should also be present.
+ * If not, we take a single space as default.
+ */
+export const repr = memoize(
+  (tables, table, valType, multiple, detailField, value, settings, sep, detailSep) => {
+    if (detailField == null) {
+      return reprHead(tables, table, valType, multiple, value, settings, sep)
+    }
+
+    const { values: detailTable } = valType
+    const {
+      [detailTable]: {
+        fieldSpecs: { [detailField]: { multiple: detailMultiple, valType: detailValType } },
+      },
+    } = tables
+    const detailValues = multiple
+    ? value.map(val => tables[detailTable].entities[val].values[detailField])
+    : tables[detailTable].entities[value].values[detailField]
+
+    const theDetailSep = multiple && detailMultiple && sep != null && detailSep == null
+    ? ' '
+    : detailSep
+    const rep = multiple
+    ? detailValues.map(detailValue => reprHead(tables, detailTable, detailValType, detailMultiple, detailValue, settings, theDetailSep))
+    : reprHead(tables, detailTable, detailValType, detailMultiple, detailValues, settings, detailSep)
+
+    return multiple && sep != null
+    ? rep.join(sep)
+    : rep
+  },
+  emptyO,
+)

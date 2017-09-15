@@ -33,6 +33,32 @@ This app contains the following dux:
 * [tables](#tables)
 * [win](#win)
 
+However, life is complicated, and the interplay between dux and components is no exception.
+Sometimes actions will be fired that affect more than one slice of the state.
+
+For example, in order to set up filters for a table, both the `tables` slice and the `filters` slice are needed.
+And when the user expands a table row into a record form, the `alter` state is changed to cater for the 
+expand action, and the `tables` slice is changed by receiving additional data for that record.
+
+In Redux, the slices of the state are not sealed off from each other.
+In the end, there is one and only one reducer, that examines every dispatched action for its `type` property,
+and hands it over to a subfunction that has "subscribed" to handle actions for that type.
+It is prefectly possible that multiple subfunctions will deal with a single action.
+
+A good example is when a record is displayed with multiple detail records, displayed as a list of titles.
+There is a button "Open All" on the interface.
+When it is pressed, data for all detail records is fetched, and the titles expand into full record views for those details.
+
+The way it is implemented, is that pressing "Open All" leads to the dispatch of an action
+with type `fetchItems`, and with payload the list of ids of the entities that must be fetched.
+
+To this action, the `tables` reducer subfunction reacts by fetching the corresponding entity data from the server,
+and the `alter` reducer subfunction reacts by expanding the corresponding entity titles into full records.
+
+Whenever you are tempted to write complicated,
+time-sensitive logic to orchestrate what happens at multiple slices of the state,
+all that is needed is in fact just an extra response of an other sub reducer.
+
 [alter]({{site.appBase}}/dux/alter.js)
 =============================================================================================
 A mechanism for switching between alternative representations of a component, such

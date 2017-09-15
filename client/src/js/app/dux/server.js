@@ -25,7 +25,6 @@ export const accessData = task => (dispatch, getState) => {
     return
   }
   dispatch(ask(path, desc))
-  dispatch(task)
 
   let settings = { credentials: 'same-origin' }
   if (sendData != null) {

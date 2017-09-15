@@ -10,6 +10,8 @@ export const nextAlt = (alterSection, alterTag, nAlts, initial) =>
   ({ type: 'nextAlt', alterSection, alterTag, nAlts, initial })
 export const setAlt = (alterSection, alterTag, alt) =>
   ({ type: 'setAlt', alterSection, alterTag, alt })
+export const closeItems = (alts, alterSection, alt) =>
+  ({ type: 'closeItems', eIds: alts, alterSection, alt })
 
 /* REDUCER */
 
@@ -21,6 +23,24 @@ const flows = {
   },
   setAlt(state, { alterSection, alterTag, alt }) {
     return updateAuto(state, [alterSection, alterTag], { $set: alt })
+  },
+  fetchItems(state, { data, eIds, alterSection, alt }) {
+    let newState = state
+    if (data && eIds != null) {
+      for (const eId of eIds) {
+        newState = updateAuto(newState, [alterSection, eId], { $set: alt })
+      }
+    }
+    return newState
+  },
+  closeItems(state, { eIds, alterSection, alt }) {
+    let newState = state
+    if (eIds != null) {
+      for (const eId of eIds) {
+        newState = updateAuto(newState, [alterSection, eId], { $set: alt })
+      }
+    }
+    return newState
   },
 }
 
@@ -42,3 +62,4 @@ export const compileAlternatives = memoize((alterSection, nAlts, initial, dispat
   setAlt: alt => handle(dispatch, setAlt, alterSection, alterTag, alt),
   putAlt: alt => dispatch(setAlt(alterSection, alterTag, alt)),
 }), null, { debug: 'compileAlternatives' })
+

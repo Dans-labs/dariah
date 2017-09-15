@@ -1,11 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { combineSelectors } from 'utils'
+
 import { handle } from 'handle'
 import { makeFields, makeDetails, someEditable } from 'fields'
 
 import { delItem, DETAILS } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
+import { getSettings } from 'settings'
 
 import ItemEdit from 'ItemEdit'
 import ItemRead from 'ItemRead'
@@ -13,7 +16,7 @@ import ItemDetails from 'ItemDetails'
 import { EditDelete } from 'EditControls'
 
 const ItemForm = props => {
-  const { alter, alterSection, filters, tables, table, eId, isactive, fixed, initialValues, fields, perm, dispatch } = props
+  const { settings, alter, alterSection, filters, tables, table, eId, isactive, fixed, initialValues, fields, perm, dispatch } = props
   let { fieldFragments, detailFragments } = props
   if (fieldFragments == null) {fieldFragments = makeFields(props)}
   if (detailFragments == null) {detailFragments = makeDetails(props)}
@@ -59,7 +62,9 @@ const ItemForm = props => {
               onClick={handle(dispatch, delItem, table, eId)}
             />
             <ItemRead
+              settings={settings}
               tables={tables}
+              table={table}
               eId={eId}
               fieldFragments={fieldFragments}
             />
@@ -77,4 +82,6 @@ const ItemForm = props => {
   )
 }
 
-export default connect(getAltSection)(ItemForm)
+const getInfo = combineSelectors(getSettings, getAltSection)
+
+export default connect(getInfo)(ItemForm)

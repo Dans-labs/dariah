@@ -65,7 +65,7 @@ class DbAccess(object):
         modified = self.DM.generic['modified']
         (fieldOrder, fieldSpecs, allFields, frozenFields) = self.extendFields(table, True)
         for f in frozenFields:
-            (of, template, details) = frozenFields[f]
+            (of, formatting, details) = frozenFields[f]
             if of in uFields:
                 uFields[f] = True
         #fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', {}).items() if x[0] in itemValues)
@@ -276,9 +276,13 @@ class DbAccess(object):
         tableInfo = self.DM.tables.get(table, {})
         (rowFilter, fieldFilter) = result
         (fieldOrder, fieldSpecs, fieldFilter, frozenFields) = self.extendFields(table, fieldFilter)
-        rowFilter.update({'_id': oid(ident)})
 
-        return self.findDoc(table, rowFilter, fieldFilter, frozenFields, {}, '{} item does not exist'.format(table))
+        if ident != None:
+            rowFilter.update({'_id': oid(ident)})
+            return self.findDoc(table, rowFilter, fieldFilter, frozenFields, {}, '{} item does not exist'.format(table))
+        else:
+            rowFilter.update({'_id': {'$in': [oid(i) for i in request.json]}})
+            return self.findDoc(table, rowFilter, fieldFilter, frozenFields, {}, '{} cannot find items'.format(table), multiple=True)
 
     def _insertItem(self, controller, table, newData, records):
         masterId = newData.get('masterId', None)
@@ -326,7 +330,7 @@ class DbAccess(object):
                 frozenValue = self.freezeDocs(
                     relTable, [relDocument],
                     level=0,
-                    template=freeze.get('template', None),
+                    formatting=freeze.get('formatting', None),
                     withDetails=freeze.get('details', False),
                 )
                 fInsertValues[frozenField] = frozenValue
@@ -345,19 +349,19 @@ class DbAccess(object):
         if table == 'assessment':
             if masterDocument != None:
                 activeItems = self.getActiveItems()
+                criteriaIds = activeItems['criteriaIds']
                 criteriaEntities = activeItems['criteriaEntities']
                 typeCriteria = activeItems['typeCriteria']
                 masterType = masterDocument['typeContribution']
                 criteria = typeCriteria[masterType]
+                theseCriteriaIds = [c for c in criteriaIds if c in criteria]
                 detailData = []
-                criteriaEntryTitle = self.DM.tables.get('criteriaEntry', {}).get('title', self.DM.generic.get('title'))
-                criteriaTitle = self.DM.tables.get('criteria', {}).get('title', self.DM.generic.get('title'))
-                for critId in criteria:
+                for (n, critId) in enumerate(theseCriteriaIds):
                     critDoc = criteriaEntities[str(critId)]
                     self._insertItem(controller, 'criteriaEntry', {
                         'linkField': 'assessment',
                         'masterId': ident,
-                        criteriaEntryTitle: critDoc.get(criteriaTitle, '??'),
+                        'seq': n + 1,
                         'criteria': critId,
                         'evidence': [],
                     }, records)
@@ -461,7 +465,7 @@ class DbAccess(object):
 
             (fieldOrder, fieldSpecs, fieldFilter, frozenFields) = self.extendFields(table, fieldFilter)
             for field in frozenFields:
-                (origField, template, details) = frozenFields[field]
+                (origField, formatting, details) = frozenFields[field]
                 fieldSpec = fieldSpecs[origField]
                 valType = fieldSpec['valType']
                 multiple = fieldSpec['multiple']
@@ -472,7 +476,7 @@ class DbAccess(object):
                     frozenValue = [self.freezeDocs(
                         valueTable, doc,
                         level=0,
-                        template=template,
+                        formatting=formatting,
                         withDetails=details,
                     ) for doc in docs] 
                 else:
@@ -481,7 +485,7 @@ class DbAccess(object):
                     frozenValue = self.freezeDocs(
                         valueTable, [doc],
                         level=0,
-                        template=template,
+                        formatting=formatting,
                         withDetails=details,
                     )
                 updateValues[field] = frozenValue
@@ -503,7 +507,7 @@ class DbAccess(object):
         msgs = [] if good else [dict(kind='error', text=text)] if msgs == None else msgs
         return dict(data=data, msgs=msgs, good=good)
 
-    def findDoc(self, table, rowFilter, fieldFilter, frozenFields, failData, failText):
+    def findDoc(self, table, rowFilter, fieldFilter, frozenFields, failData, failText, multiple=False):
         Perm = self.Perm
         creatorField = self.CREATOR
         theFieldFilter = dict(x for x in fieldFilter.items())
@@ -512,19 +516,36 @@ class DbAccess(object):
         ldoc = len(documents)
         if ldoc == 0:
             return self.stop(data=failData, text=failText)
-        document = documents[0]
-        (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
-        (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
-        for f in frozenFields:
-            (of, template, details) = frozenFields[f]
-            if of in uFields:
-                uFields[f] = True
-        perm = dict(update=uFields, delete=mayDelete)
-        return self.stop(data=dict(
-            values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
-            perm=perm,
-            fields=fieldFilter),
-        )
+        if multiple:
+            data = []
+            for document in documents:
+                (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
+                (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
+                for f in frozenFields:
+                    (of, formatting, details) = frozenFields[f]
+                    if of in uFields:
+                        uFields[f] = True
+                perm = dict(update=uFields, delete=mayDelete)
+                data.append(dict(
+                    values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
+                    perm=perm,
+                    fields=fieldFilter,
+                ))
+            return self.stop(data=data)
+        else:
+            document = documents[0]
+            (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
+            (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
+            for f in frozenFields:
+                (of, formatting, details) = frozenFields[f]
+                if of in uFields:
+                    uFields[f] = True
+            perm = dict(update=uFields, delete=mayDelete)
+            return self.stop(data=dict(
+                values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
+                perm=perm,
+                fields=fieldFilter),
+            )
 
     def findDocs(self, records):
         Perm = self.Perm
@@ -544,7 +565,7 @@ class DbAccess(object):
             (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
             (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
             for f in frozenFields:
-                (of, template, details) = frozenFields[f]
+                (of, formatting, details) = frozenFields[f]
                 if of in uFields:
                     uFields[f] = True
             perm = dict(update=uFields, delete=mayDelete)
@@ -561,7 +582,7 @@ class DbAccess(object):
             )
         return self.stop(data=data)
 
-    def freezeDocs(self, table, documents, level=0, template=None, withDetails=False):
+    def freezeDocs(self, table, documents, level=0, formatting=None, withDetails=False):
         tableInfo = self.DM.tables.get(table, {})
         fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder'])]
         fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
@@ -571,11 +592,11 @@ class DbAccess(object):
         item = tableInfo.get('item', self.DM.generic['item'])
         (thing, things) = item
         fixedText = []
-        baseHeading = '#' * level
         nDocs = len(documents)
-        fixedText.append('{}# {} {}\n\n'.format(baseHeading, nDocs, thing if nDocs == 1 else things))
-        for document in documents:
-            if template == None:
+        if formatting == None:
+            baseHeading = '#' * level
+            fixedText.append('{}# {} {}\n\n'.format(baseHeading, nDocs, thing if nDocs == 1 else things))
+            for document in documents:
                 for field in fieldOrder:
                     if field not in document: continue
                     fieldSpec = fieldSpecs[field]
@@ -606,47 +627,72 @@ class DbAccess(object):
                                     if multiple else \
                                 self.head(valueTable, relatedDocs[0])
                     fixedText.append('{}## {}\n\n{}\n\n'.format(baseHeading, label, valRep))
-            else:
+        else:
+            template = formatting['template']
+            listSpecs = formatting.get('listSpecs', {})
+            for document in documents:
                 docVals = dict()
                 for field in fieldOrder:
-                    if field not in document:
-                        docVals[field] = ''
-                        continue
                     fieldSpec = fieldSpecs[field]
                     valType = fieldSpec['valType']
                     multiple = fieldSpec['multiple']
-                    docVal = document[field]
-                    if docVal == None or (multiple and len(docVal) == 0):
-                        docVals[field] = ''
-                    elif type(valType) is str:
-                        docVals[field] = \
-                            '* {}\n'.format('\n\n* '.join(simpleVal(valType, val) for val in docVal)) \
-                                if multiple else \
-                            simpleVal(valType, docVal)
-                    else:
-                        valueTable = valType['values']
-                        relatedDocs = list(_DBM[valueTable].find(
-                            {'_id': {'$in': [_id for _id in (docVal if multiple else [docVal])]}}
-                        ))
-                        if len(relatedDocs) == 0:
-                            docVals[field] = ''
+                    docVal = document.get(field, [] if multiple else '')
+                    if multiple:
+                        listSpec = listSpecs.get(field, {})
+                        valSep = listSpec.get('sep', '\n* ')
+                        valStart = listSpec.get('start', '* ')
+                        fullField = '{}Str'.format(field)
+                        lastField = '{}Last'.format(field)
+                        if docVal == None or len(docVal) == 0:
+                            docVals[field] = ['']
+                            docVals[lastField] = ''
+                            docVals[fullField] = ''
                         else:
-                            docVals[field] = \
-                                ', '.join(self.head(valueTable, doc) for doc in relatedDocs) \
-                                    if multiple else \
-                                self.head(valueTable, relatedDocs[0])
+                            if type(valType) is str:
+                                values = [simpleVal(valType, val) for val in docVal]
+                                docVals[field] = values
+                                docVals[lastField] = values[-1]
+                                docVals[fullField] = valStart + valSep.join(values)
+                            else:
+                                valueTable = valType['values']
+                                relatedDocs = list(_DBM[valueTable].find(
+                                    {'_id': {'$in': [_id for _id in (docVal if multiple else [docVal])]}}
+                                ))
+                                if len(relatedDocs) == 0:
+                                    docVals[field] = ['']
+                                    docVals[lastField] = ''
+                                    docVals[fullField] = ''
+                                else:
+                                    values = [self.head(valueTable, doc) for doc in relatedDocs]
+                                    docVals[field] = values
+                                    docVals[lastField] = values[-1]
+                                    docVals[fullField] = valStart + valSep.join(values)
+                    else:
+                        if docVal == None:
+                            docVals[field] = ''
+                        elif type(valType) is str:
+                            docVals[field] = simpleVal(valType, docVal)
+                        else:
+                            valueTable = valType['values']
+                            relatedDocs = list(_DBM[valueTable].find(
+                                {'_id': docVal}
+                            ))
+                            if len(relatedDocs) == 0:
+                                docVals[field] = ''
+                            else:
+                                docVals[field] = self.head(valueTable, relatedDocs[0])
                 fixedText.append(template.format(**docVals))
             if withDetails and detailOrder and details:
                 for detail in detailOrder:
                     detailSpec = details[detail]
                     detailTable = detailSpec['table']
                     linkField = detailSpec['linkField']
-                    detailTemplate = detailSpec.get('template', None)
+                    detailFormatting = detailSpec.get('formatting', None)
                     detailDocs = list(_DBM[detailTable].find({linkField: document['_id']}))
                     fixedText.append(self.freezeDocs(
                         detailTable, detailDocs,
                         level=level+1,
-                        template=detailTemplate,
+                        formatting=detailFormatting,
                         withDetails=False,
                     ))
         return ''.join(fixedText)
@@ -711,20 +757,22 @@ class DbAccess(object):
                 fieldFilterPost[field] = True
             fieldOrderPost.append(field)
             fieldSpec = fieldSpecsPost.get(field, {})
+            fieldLabel = fieldSpec.get('label', field)
             valType = fieldSpec.get('valType', None)
             if valType == None or type(valType) is not dict: continue
             freeze = valType.get('freeze', False)
             if type(freeze) is not dict: continue
             details = freeze['details']
-            template = freeze.get('template', None)
+            formatting = freeze.get('formatting', None)
+            frozenLabel = freeze.get('label', '{} (consolidated)'.format(fieldLabel))
             frozenField = 'frozen-{}'.format(field)
             fieldOrderPost.append(frozenField)
             fieldSpecsPost[frozenField] = dict(
-                label='{} (consolidated)'.format(field),
+                label=frozenLabel,
                 valType='textarea',
                 multiple=fieldSpec.get('multiple', False),
             )
-            frozenFields[frozenField] = [field, template, details]
+            frozenFields[frozenField] = [field, formatting, details]
             fieldFilterPost[frozenField] = True
         return (fieldOrderPost, fieldSpecsPost, fieldFilterPost, frozenFields)
 
@@ -739,19 +787,19 @@ class DbAccess(object):
         criteria = list(_DBM.criteria.find(
             activeFilter,
             #dict(_id=True, package=True, typeContribution=True),
-        ))
+        ).sort('criterion', 1))
         typeCriteria = dict()
         criteriaEntities = dict()
+        criteriaIds = [doc['_id'] for doc in criteria]  
         for doc in criteria:
             criteriaEntities[str(doc['_id'])] = doc
             for tp in doc['typeContribution']:
                 typeCriteria.setdefault(tp, set()).add(doc['_id'])
-        criteriaIds = [doc['_id'] for doc in criteria]  
         typeIds = {tp for doc in packages for tp in doc['typeContribution']}
         result = dict(
             package=set(packageIds),
             type=typeIds,
-            criteria=criteriaIds,
+            criteriaIds=criteriaIds,
             criteriaEntities=criteriaEntities,
             typeCriteria=typeCriteria,
         )

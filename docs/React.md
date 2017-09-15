@@ -17,18 +17,14 @@ In this app we distinguish between three *capability levels* of components.
 If a component knows how to build the DOM, purely on the basis of its properties and
 a static template, it can be (and will be) coded as a pure function.
 
-We put all these components in a directory called **pure**.
-
 [Example: Stat]({{site.appBase}}/components/Stat.jsx).
 
 ## Simple Stateful components
-If a component needs to store the effects of the outside worlds
+If a component needs to store the effects of the outside world
 (incoming server data or user interaction), it is stateful.
 If the component does not need [lifecycle](life-cycle) methods, it can be programmed
 as a pure function that will be connected to the Redux state
 by means of a simple binding: [connect](#connect).
-
-We put all these components in a directory called **state**.
 
 [Example: Facet]({{site.appBase}}/components/Facet.jsx).
 
@@ -38,8 +34,6 @@ e.g. apply some hiding and showing, fill a div with a third party component,
 or get data from the state in a sophisticated way,
 then we need to program the component as a class with so-called
 [life cycle methods](#life-cycle).
-
-We put all these components in a directory called **object**.
 
 [Example: ListContainer]({{site.appBase}}/components/ListContainer.jsx).
 

@@ -77,13 +77,13 @@ const Tags = ({ selectTag, optionLookup, activeItems, inactive, value, onChange,
   )
 }
 
-const Head = ({ optionLookup, value, activeItems, inactive, selectTag, dispatch }) => {
+const Head = ({ optionLookup, value, popUpIfEmpty, activeItems, inactive, selectTag, dispatch }) => {
   const makeAttributes = composeAttributes(activeItems, inactive)
   let label = emptyS
   const { [value]: lab = value } = optionLookup
   label = lab
   const classes = ['option-head', 'tag']
-  if (value === emptyS) {
+  if (value === emptyS && !popUpIfEmpty) {
     label = 'click to enter a value'
     classes.push('new')
   }
@@ -123,11 +123,19 @@ const Options = ({
   multiple, allowNew,
   value, onChange, search, dispatch,
 }) => {
-  const pat = search.toLowerCase()
+  const pat = (search || emptyS).toLowerCase()
   const makeAttributes = composeAttributes(activeItems, inactive)
   const testDisabled = checkDisabled(activeItems, inactive)
   return (
     <div className={'options'} >
+      {
+        multiple || value == null || value == emptyS
+        ? null
+        : <span
+            className={'button-tag'}
+            onClick={changeSel(selectTag, multiple, null, null, onChange, dispatch)}
+          >{'×'}</span>
+      }
       {
         (
           allowNew
@@ -176,10 +184,11 @@ const RelSelect = ({
   activeItems, inactive,
   allowed,
   input: { value, onChange },
-  multiple, allowNew, select, dispatch,
+  multiple, allowNew, popUpIfEmpty, select, dispatch,
 }) => {
   const { [selectTag]: { search, popUp } = emptyO } = select
   const { options, optionLookup } = compileOptions(tables, table, allowed, field, settings)
+  const realPopUp = popUp || value == null || value == emptyS || value.length == 0
   return (
     <div
       className={`select ${multiple ? 'multiselect' : emptyS}`}
@@ -201,12 +210,13 @@ const RelSelect = ({
             inactive={inactive}
             value={value}
             popUp={popUp}
+            popUpIfEmpty={popUpIfEmpty}
             selectTag={selectTag}
             dispatch={dispatch}
           />
       }
       {
-        popUp
+        realPopUp
         ? <Typing
             selectTag={selectTag}
             search={search}
@@ -215,7 +225,7 @@ const RelSelect = ({
         : null
       }
       {
-        popUp
+        realPopUp
         ? <Options
             selectTag={selectTag}
             optionLookup={optionLookup}

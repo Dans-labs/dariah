@@ -6,8 +6,8 @@ import { browserHistory } from 'react-router'
 import { memoize } from 'memo'
 import { getUrlParts, emptyS, emptyO } from 'utils'
 
-import { getAltSection, compileAlternatives } from 'alter'
-import { DETAILS } from 'tables'
+import { getAltSection, compileAlternatives, closeItems } from 'alter'
+import { fetchItems, DETAILS } from 'tables'
 
 const editStatusGeneric = canSubmit => ({
     active,
@@ -113,31 +113,37 @@ const handleCloseAll = memoize((alter, alterSection, nAlts, initial, items, disp
   const base = getUrlParts(browserHistory)[0]
   return () => {
     browserHistory.push(`${base}/`)
+    const alts = []
     items.forEach(eId => {
-      const { getAlt, initAlt } = makeAlternatives(eId)
-      if (getAlt(alter) !== initial) {
-        initAlt()
+      const { getAlt } = makeAlternatives(eId)
+      const alt = getAlt(alter)
+      if (alt !== initial) {
+        alts.push(eId)
       }
     })
+    dispatch(closeItems(alts, alterSection, initial))
   }
 }, emptyO)
 
-const handleOpenAll = memoize((alter, alterSection, nAlts, initial, items, dispatch) => {
+const handleOpenAll = memoize((alter, alterSection, nAlts, initial, table, items, dispatch) => {
   const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
   const theAlt = (initial + 1) % nAlts
   return () => {
+    const alts = []
     items.forEach(eId => {
-      const { getAlt, putAlt } = makeAlternatives(eId)
-      if (getAlt(alter) !== theAlt) {
-        putAlt(theAlt)
+      const { getAlt } = makeAlternatives(eId)
+      const alt = getAlt(alter)
+      if (alt !== theAlt) {
+        alts.push(eId)
       }
     })
+    dispatch(fetchItems(table, alts, alterSection, theAlt))
   }
 }, emptyO)
 
 const EditInsertPure = ({
   alter, alterSection,
-  perm, select, fixed, listIds, item, button, onInsert,
+  table, perm, select, fixed, listIds, item, button, onInsert,
   nAlts, initial,
   openAll,
   dispatch,
@@ -162,7 +168,7 @@ const EditInsertPure = ({
         ? <div
             className={`fa fa-angle-double-down ${button}`}
             title={`Open all ${things}`}
-            onClick={handleOpenAll(alter, alterSection, nAlts, initial, listIds, dispatch)}
+            onClick={handleOpenAll(alter, alterSection, nAlts, initial, table, listIds, dispatch)}
           />
         : emptyS
       }

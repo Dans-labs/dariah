@@ -1,6 +1,7 @@
 import pickBy from 'lodash/pickby'
 
 import React from 'react'
+import Markdown from 'react-markdown'
 
 import { memoize } from 'memo'
 import { emptyS, emptyA, emptyO } from 'utils'
@@ -26,6 +27,7 @@ export const onSubmitSuccess = (result, dispatch, { reset }) => reset()
 
 const valTypes = {
   bool: { component: Input, type: 'checkbox', props: emptyO },
+  number: { component: Input, type: 'text', props: emptyO },
   text: { component: Input, type: 'text', props: emptyO },
   datetime: { component: Input, type: 'text', props: emptyO },
   email: { component: Input, type: 'text', props: emptyO },
@@ -48,9 +50,8 @@ const mergeClassnames = (classNames, attributes) => {
   : { ...attributes, className: `${className} ${attributes.className || emptyS}` }
 }
 
-const valuePrepare = memoize((tables, table, valType, activeItems, inactive, settings) => value => {
-  const rep = repr(tables, table, valType, value, settings)
-  if (valType === 'textarea') {return [rep]}
+const valuePrepare = memoize((tables, table, valType, detailField, activeItems, inactive) => (value, rep) => {
+  if (valType === 'textarea') {return [rep, { source: rep }, 'Markdown']}
   if (valType === 'url') {return [rep, { href: rep, target: '_blank' }, 'a']}
   if (valType === 'email') {
     const mailLink = rep == null || rep.startsWith('mailto:') ? rep : `mailto:${rep}`
@@ -64,10 +65,26 @@ const valuePrepare = memoize((tables, table, valType, activeItems, inactive, set
   const link = {}
   let elem = 'span'
   if (typeof valType === 'object') {
-    classNames.push('tag')
     const { values: detailTable } = valType
-    link.href = `/data/${detailTable}/list/item/${value}`
-    elem = 'a'
+    if (detailField == null) {
+      classNames.push('tag')
+      link.href = `/data/${detailTable}/list/item/${value}`
+      elem = 'a'
+    }
+    else {
+      const { [detailTable]: { fieldSpecs: { [detailField]: {
+        valType: detailValType,
+        multiple: detailMultiple,
+      } } } } = tables
+      const detailPrepare = valuePrepare(tables, detailTable, detailValType, null, activeItems, inactive)
+      const detailValues = tables[detailTable].entities[value].values[detailField]
+      const xReps = detailMultiple
+      ? (detailValues || emptyA).map((detailValue, i) => detailPrepare(detailValue, rep[i])).filter(x => x != null)
+      : detailPrepare(detailValues, rep)
+      return detailMultiple
+      ? [(xReps || emptyA).map((r, i) => putElem(r, i)), emptyO, 'div']
+      : xReps
+    }
   }
   const className = classNames.length ? { className: classNames.join(' ') } : emptyO
 
@@ -88,29 +105,31 @@ const valuePrepare = memoize((tables, table, valType, activeItems, inactive, set
 }, emptyO)
 
 const putElem = ([rep, attributes, elem], i) => {
-  if (i == null && attributes == null && elem == null) {return rep}
   const r = rep || emptyS
-  const atts = { ...(attributes || emptyO), key: i }
+  if (i == null && attributes == null && elem == null) {return r}
+  const keyAtt = i == null ? emptyO : { key: i }
+  const atts = { ...(attributes || emptyO), ...keyAtt }
+  if (elem == 'Markdown') {
+    return <Markdown {...atts} />
+  }
   const Elem = elem || 'span'
   return <Elem {...atts} >{r}</Elem>
 }
 
-export const readonlyValue = memoize(
-  (tables, table, valType, multiple, activeItems, inactive, values, settings) => {
-    const prepare = valuePrepare(tables, table, valType, activeItems, inactive, settings)
-    const reps = multiple
-    ? (values || emptyA).map(value => prepare(value)).filter(x => x != null)
-    : prepare(values)
-
-    if (valType === 'textarea') {
-      return multiple
-      ? reps.map(repItem => repItem[0])
-      : reps[0]
-    }
-
+/*
+ * Retrieve a value of a field and package it for readonly usage.
+ * Depending on settings and active items it might be wrapped into elements with attributes.
+ */
+export const wrappedRepr = memoize(
+  (tables, table, valType, multiple, detailField, activeItems, inactive, values, settings) => {
+    const prepare = valuePrepare(tables, table, valType, detailField, activeItems, inactive)
+    const reps = repr(tables, table, valType, multiple, detailField, values, settings)
+    const xReps = multiple
+    ? (values || emptyA).map((value, i) => prepare(value, reps[i])).filter(x => x != null)
+    : prepare(values, reps)
     return multiple
-    ? reps.map((repItem, i) => putElem(repItem, i))
-    : putElem(reps)
+    ? <div>{xReps.map((rep, i) => putElem(rep, i))}</div>
+    : putElem(xReps)
   },
   emptyO,
 )
@@ -140,7 +159,7 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
   for (const field of fieldOrder) {
     const { [field]: f } = fields
     if (f == null) {continue}
-    const { [field]: { label, valType, valType: { freeze } } } = fieldSpecs
+    const { [field]: { label, valType, multiple } } = fieldSpecs
     const { update: { [field]: editable } } = perm
     const { [field]: myValues } = initialValues
     const theField = {
@@ -162,9 +181,17 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
         }
       }
     }
-    fragments.push({ field, label, freeze, fragment: theField })
+    fragments.push({ field, label, valType, multiple, fragment: theField })
   }
   return fragments
+}
+
+export const toFieldInfo = (eId, fragments) => {
+  const fieldInfo = { _id: eId }
+  for (const { field, fragment: { myValues: value } } of fragments) {
+    fieldInfo[field] = value
+  }
+  return fieldInfo
 }
 
 export const makeDetails = ({ tables, table, eId }) => {
@@ -286,8 +313,26 @@ export const validation = {
 export const normalization = {
   datetime(val) {
     try {
-      const times = new Date(val)
-      return times.toISOString()
+      const properVal = new Date(val)
+      return properVal.toISOString()
+    }
+    catch (error) {
+      return val
+    }
+  },
+  number(val) {
+    try {
+      const properVal = Number(val)
+      return properVal
+    }
+    catch (error) {
+      return val
+    }
+  },
+  bool(val) {
+    try {
+      const properVal = Boolean(val)
+      return properVal
     }
     catch (error) {
       return val
