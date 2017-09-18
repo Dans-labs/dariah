@@ -611,7 +611,7 @@ class DbAccess(object):
                             valRep = '*not given*'
                     elif type(valType) is str:
                         valRep = \
-                            '* {}\n'.format('\n\n* '.join(simpleVal(valType, val) for val in docVal)) \
+                            '\n\n---\n\n'.format('\n\n* '.join(simpleVal(valType, val) for val in docVal)) \
                                 if multiple else \
                             simpleVal(valType, docVal)
                     else:
@@ -623,7 +623,7 @@ class DbAccess(object):
                             valRep = 'Could not find value(s) in {}: '.format(valueTable, ','.join(str(val) for val in docVal) if multiple else str(docVal))
                         else:
                             valRep = \
-                                '* {}\n'.format('\n\n* '.join(self.head(valueTable, doc) for doc in relatedDocs)) \
+                                '\n\n---\n'.format('\n\n* '.join(self.head(valueTable, doc) for doc in relatedDocs)) \
                                     if multiple else \
                                 self.head(valueTable, relatedDocs[0])
                     fixedText.append('{}## {}\n\n{}\n\n'.format(baseHeading, label, valRep))

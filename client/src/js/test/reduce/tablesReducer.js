@@ -682,6 +682,115 @@ const actionTests = [
       ['unaffected-table',  x => x.person,             true ],
     ],
   },
+  {
+    // FETCHTABLE
+
+    // ACTION
+    action: 'fetchTable',
+    comment: 'my items after all items',
+
+    // OLD STATE
+    state: {
+      person: {
+        fields: { name: true, surName: true },
+        entities: {
+          1: { values: { _id: 1, name: 'John', surName: 'White' }, },
+          2: { values: { _id: 2, name: 'Mary', surName: 'Black' }, },
+          3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
+        },
+        allIDs: [1, 2, 3],
+      },
+    },
+
+    // ACTION DATA and PROPS
+    props: {},
+
+    data: {
+      person: {
+        fields: { name: true, surName: true },
+        entities: {
+          3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
+        },
+        myIDs: [3],
+      },
+    },
+
+    // NEW STATE
+    predictedState: {
+      person: {
+        fields: { name: true, surName: true },
+        entities: {
+          1: { values: { _id: 1, name: 'John', surName: 'White' }, },
+          2: { values: { _id: 2, name: 'Mary', surName: 'Black' }, },
+          3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
+        },
+        allIDs: [1, 2, 3],
+        myIDs: [3],
+      }
+    },
+    inspect: [
+      ['top',               x => x,                    false],
+      ['affected table',    x => x.person,             false],
+      ['entities',          x => x.person.entities,    false],
+      ['allIds',            x => x.person.allIds,      true],
+    ],
+  },
+  /* note that we do not expect that the merged entities end up unchanged.
+   * It would be too costly to enforce this
+   */
+  {
+    // FETCHTABLE
+
+    // ACTION
+    action: 'fetchTable',
+    comment: 'all items after my items',
+
+    // OLD STATE
+    state: {
+      person: {
+        fields: { name: true, surName: true },
+        entities: {
+          3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
+        },
+        myIDs: [3],
+      },
+    },
+
+    // ACTION DATA and PROPS
+    props: {},
+
+    data: {
+      person: {
+        fields: { name: true, surName: true },
+        entities: {
+          1: { values: { _id: 1, name: 'John', surName: 'White' }, },
+          2: { values: { _id: 2, name: 'Mary', surName: 'Black' }, },
+          3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
+        },
+        allIDs: [1, 2, 3],
+      },
+    },
+
+    // NEW STATE
+    predictedState: {
+      person: {
+        fields: { name: true, surName: true },
+        entities: {
+          1: { values: { _id: 1, name: 'John', surName: 'White' }, },
+          2: { values: { _id: 2, name: 'Mary', surName: 'Black' }, },
+          3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
+        },
+        allIDs: [1, 2, 3],
+        myIDs: [3],
+      }
+    },
+    inspect: [
+      ['top',               x => x,                    false],
+      ['affected table',    x => x.person,             false],
+      ['entities',          x => x.person.entities,    false],
+      ['myIds',            x => x.person.myIds,        true],
+    ],
+  },
 ]
 
 describe('Tables reducer', ()  => {

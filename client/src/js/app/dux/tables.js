@@ -90,7 +90,16 @@ const updateItemWithFields = (state, table, _id, fields, values) => {
 const flows = {
   fetchTable(state, { data }) {
     if (data == null) {return state}
-    return update(state, { $merge: data })
+    let newState = state
+    Object.entries(data).forEach(([table, tableData]) => {
+      const { [table]: oldTableData = emptyO } = state
+      const { entities: oldEntities = emptyO } = oldTableData
+      const { entities } = tableData
+      const newEntities = update(oldEntities, { $merge: entities })
+      const newTableData = update(tableData, { entities: { $set: newEntities } })
+      newState = updateAuto(newState, [table], { $merge: newTableData })
+    })
+    return newState
   },
   fetchItem(state, { data, table }) {
     if (data == null) {return state}
@@ -180,14 +189,14 @@ const hasTableKey = (tables, table, key, value = null) => {
 export const needTable = (tables, table, select = ALLIDS, complete) => {
   if (!hasTableKey(tables, table, select)) {return true}
   if (complete && !hasTableKey(tables, table, 'complete', true)) {return true}
-  const { [table]: fieldSpecs } = tables
+  const { [table]: { fieldSpecs, detailOrder = emptyA } } = tables
   const relTables = Array.from(
     new Set(
       Object.entries(fieldSpecs).
       filter(entry => ((typeof entry[1].valType) === 'object') && entry[1].valType.values != null).
       map(entry => entry[1].valType.values)
     )
-  )
+  ).concat(detailOrder)
   if (relTables.some(relTable => !hasTableKey(tables, relTable, ALLIDS))) {return true}
   return false
 }

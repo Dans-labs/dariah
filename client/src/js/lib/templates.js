@@ -1,31 +1,49 @@
 import React from 'react'
 
-//import { memoize } from 'memo'
-//import { emptyS, emptyA, emptyO } from 'utils'
+import { emptyS } from 'utils'
 
-import Expand from 'Expand'
+import Expand, { ExpandHead, ExpandBody } from 'Expand'
 import FieldRead from 'FieldRead'
 
 const templates = {
-  criteriaEntry(v, f) {
+  criteriaEntry(e, v, f) {
+    e('evidence')
+    e('score')
     return (
       <div>
         <div className={'criteriaEntry'}>
           <Expand
             alterSection={`criteriaEntry${v('_id')}`}
             alterTag={'remarks'}
-            headLine={[v('seq'), f('criteria')]}
+            headLine={[
+              <span key="seq">{v('seq')}</span>,
+              <span key="crit">{f('criteria')}</span>,
+            ]}
             full={<div className={'criteriaRemarks'}>{f('criteria', 'remarks')}</div>}
             className={'fat'}
           />
           <div className={'slim'}>{f('score')}</div>
+          {
+            e('evidence')
+            ? <div className={'slim tError'}>{'no evidence'}</div>
+            : <ExpandHead
+                alterSection={`criteriaEntry${v('_id')}`}
+                alterTag={'evidence'}
+                headLine={'evidence'}
+                className={'slim tGood'}
+              />
+          }
         </div>
-        <Expand
-          alterSection={`criteriaEntry${v('_id')}`}
-          alterTag={'evidence'}
-          headLine={'Evidence'}
-          full={f('evidence')}
-        />
+        {
+          e('evidence')
+          ? null
+          : <ExpandBody
+              alterSection={`criteriaEntry${v('_id')}`}
+              alterTag={'evidence'}
+              full={f('evidence')}
+              className={'evidence'}
+            />
+        }
       </div>
     )
   },
@@ -34,6 +52,10 @@ const templates = {
 export const applyTemplate = (settings, tables, table, values) => {
   const { [table]: template } = templates
   if (template == null) {return null}
+  const e = field => {
+    const { [field]: value } = values
+    return value == null || value == emptyS
+  }
   const v = field => values[field]
   const f = (field, detailField) => {
     const { [field]: value } = values
@@ -48,5 +70,5 @@ export const applyTemplate = (settings, tables, table, values) => {
       />
     )
   }
-  return template(v, f)
+  return template(e, v, f)
 }

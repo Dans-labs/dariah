@@ -1,0 +1,26 @@
+div.criteriaEntry {
+    display: flex;
+    justify-content: space-between;
+}
+div.fat {
+    flex: 0 1 80%;
+}
+div.slim {
+    flex: 0 1 10em;
+}
+div.criteriaRemarks {
+    background-color: #eeeeee;
+}
+
+div.evidence {
+    background-color: #ffffff;
+}
+.vtop {
+    vertical-align: top;
+}
+.tError {
+    background-color: #ff8888;
+}
+.tGood {
+    background-color: #88ff88;
+}

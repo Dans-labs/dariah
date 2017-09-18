@@ -11,21 +11,3 @@
     background-color: #ccffcc;
 }
 
-div.criteriaEntry {
-    display: flex;
-    justify-content: space-between;
-}
-div.fat {
-    flex: 0 1 80%;
-}
-div.slim {
-    flex: 0 1 10em;
-}
-.vtop {
-    vertical-align: top;
-}
-div.criteriaRemarks {
-    font-size: small;
-    color: #440000;
-    background-color: #ffeeee;
-}

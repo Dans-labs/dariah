@@ -594,6 +594,10 @@ tables:
           freeze:
             label: Details
             formatting:
+              listSpecs:
+                remarks:
+                  start: ""
+                  sep: "\n\n---\n\n"
               template: |
                 {remarksStr}
             details: false
