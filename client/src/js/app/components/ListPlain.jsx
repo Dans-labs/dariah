@@ -6,7 +6,7 @@ import { memoize } from 'memo'
 import { combineSelectors, withParams, getUrlParts, emptyS, emptyO } from 'utils'
 import { someEditable } from 'fields'
 
-import { insertItem, needValues, headEntity, DETAILS } from 'tables'
+import { insertItem, needValues, headEntity, DETAILS, handleOpenAll } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
 import { compileActive } from 'custom'
 import { getSettings } from 'settings'
@@ -37,7 +37,16 @@ class ListPlain extends Component {
   }
 
   render() {
-    const { props: { settings, alter, alterSection, filtered, filters, tables, table, select, fixed, listIds, perm, dispatch } } = this
+    const {
+      props: {
+        settings, alter, alterSection,
+        filtered, filters,
+        tables, table, select,
+        fixed, listIds, expand, border,
+        perm,
+        dispatch,
+      },
+    } = this
     const { [table]: { item, entities } } = tables
     const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
     const activeItems = compileActive(tables, table)
@@ -57,6 +66,7 @@ class ListPlain extends Component {
               nAlts={nAlts}
               initial={initial}
               openAll={select == DETAILS}
+              expand={expand}
               onInsert={this.handleInsert}
             />
           : null
@@ -81,9 +91,13 @@ class ListPlain extends Component {
                 {
                   active
                   ? <div {...scrollProps} >
-                      <span className={'link head'} onClick={this.showHide(table, select, eId, false, nextAlt)} >
-                        <span className={`fa fa-angle-up`} />
-                      </span>
+                      {
+                        !expand
+                        ? <span className={'link head'} onClick={this.showHide(table, select, eId, false, nextAlt)} >
+                            <span className={`fa fa-angle-up`} />
+                          </span>
+                        : null
+                      }
                       <ItemContainer
                         filters={filters}
                         tables={tables}
@@ -91,6 +105,8 @@ class ListPlain extends Component {
                         eId={eId}
                         isactive={isactive}
                         fixed={fixed}
+                        inhibitFetch={expand}
+                        border={border}
                       />
                     </div>
                   : <span className={'item-head'} >
@@ -150,10 +166,25 @@ class ListPlain extends Component {
       this.gotoItem(navItem)
     }
   }
+  openAll() {
+    const {
+      props: {
+        alter, alterSection,
+        table, listIds,
+        expand,
+        dispatch,
+      },
+    } = this
+    if (expand) {
+      handleOpenAll(alter, alterSection, nAlts, initial, table, listIds, dispatch)()
+    }
+  }
   componentDidMount() {
+    this.openAll()
     this.gotoNewItem()
   }
   componentDidUpdate() {
+    this.openAll()
     this.gotoNewItem()
   }
 }

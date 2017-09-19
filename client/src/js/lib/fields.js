@@ -197,7 +197,7 @@ export const toFieldInfo = (eId, fragments) => {
 export const makeDetails = ({ tables, table, eId }) => {
   const { [table]: { details, detailOrder } } = tables
   return (detailOrder || emptyA).map(name => {
-    const { table: detailTable, linkField } = details[name]
+    const { table: detailTable, linkField, ...detailSpecs } = details[name]
     const { [detailTable]: detailTableData } = tables
     if (detailTableData == null) {return null}
     const {
@@ -216,8 +216,10 @@ export const makeDetails = ({ tables, table, eId }) => {
       detailItem,
       detailTitle,
       detailTable,
+      linkField,
       detailListIds,
       detailPerm,
+      detailSpecs,
     }
   })
   .filter(x => x != null)

@@ -4,6 +4,8 @@ import { accessData } from 'server'
 import { memoize } from 'memo'
 import { makeReducer, updateAuto, emptyS, emptyA, emptyO } from 'utils'
 
+import { compileAlternatives } from 'alter'
+
 /* DEFS */
 
 export const DETAILS = 'details'
@@ -18,7 +20,7 @@ export const MYIDS = 'myIds'
 export const fetchTable = (table, select = ALLIDS, complete) => accessData({
   type: 'fetchTable',
   contentType: 'db',
-  path: `/${select === 'myIds' ? 'my' : emptyS}list?table=${table}&complete=${complete}`,
+  path: `/${select === MYIDS ? 'my' : emptyS}list?table=${table}&complete=${complete}`,
   desc: `${table} table`,
   table,
 })
@@ -87,15 +89,35 @@ const updateItemWithFields = (state, table, _id, fields, values) => {
   )
 }
 
+const updateEntities = (stateEntities, entities) => {
+  let newEntities = entities
+  Object.entries(stateEntities).forEach(([_id, stateEntity]) => {
+    const newEntity = newEntities[_id]
+    if (newEntity != null && stateEntity.fields != null && newEntity.fields == null) {
+      const theseValues = update(stateEntity.values, { $merge: newEntity.values })
+      newEntities = update(
+        newEntities, {
+          [_id]: {
+            fields: { $set: stateEntity.fields },
+            values: { $merge: theseValues },
+          },
+        },
+      )
+    }
+  })
+  return update(stateEntities, { $merge: newEntities })
+}
+
 const flows = {
   fetchTable(state, { data }) {
     if (data == null) {return state}
     let newState = state
     Object.entries(data).forEach(([table, tableData]) => {
-      const { [table]: oldTableData = emptyO } = state
-      const { entities: oldEntities = emptyO } = oldTableData
+      const { [table]: stateTableData = emptyO } = state
+      const { entities: stateEntities = emptyO } = stateTableData
       const { entities } = tableData
-      const newEntities = update(oldEntities, { $merge: entities })
+
+      const newEntities = updateEntities(stateEntities, entities)
       const newTableData = update(tableData, { entities: { $set: newEntities } })
       newState = updateAuto(newState, [table], { $merge: newTableData })
     })
@@ -458,3 +480,22 @@ export const repr = memoize(
   },
   emptyO,
 )
+
+export const handleOpenAll = memoize((alter, alterSection, nAlts, initial, table, items, dispatch) => {
+  const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
+  const theAlt = (initial + 1) % nAlts
+  return () => {
+    const alts = []
+    items.forEach(eId => {
+      const { getAlt } = makeAlternatives(eId)
+      const alt = getAlt(alter)
+      if (alt !== theAlt) {
+        alts.push(eId)
+      }
+    })
+    if (alts.length) {
+      dispatch(fetchItems(table, alts, alterSection, theAlt))
+    }
+  }
+}, emptyO)
+

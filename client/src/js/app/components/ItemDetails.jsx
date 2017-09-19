@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { emptyS } from 'utils'
-import { makeDetails } from 'fields'
 
 import { DETAILS } from 'tables'
 import { makeTag } from 'filters'
@@ -13,35 +12,38 @@ import ListPlain from 'ListPlain'
 import ListFilter from 'ListFilter'
 
 const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailFragments, dispatch }) => {
-  const theFragments = detailFragments == null
-  ? makeDetails(tables, table, eId)
-  : detailFragments
+  if (detailFragments.length == 0) {return null}
   const makeAlternatives = compileAlternatives(alterSection, 2, 1, dispatch)
-  const { [table]: { details } } = tables
   return (
     <div className={'grid fragments'}>
       {
-        theFragments.map(({ name, detailTitle, detailTable, detailItem, detailListIds, detailPerm }) => {
+        detailFragments.map(({
+          name, detailTitle, detailTable, linkField, detailItem, detailListIds, detailPerm, detailSpecs,
+        }) => {
           const nDetails = detailListIds.length
           const { getAlt, nextAlt } = makeAlternatives(name)
           const alt = getAlt(alter)
-          const { linkField, mode, filtered, fixed } = details[name]
+          const { mode, expand, border, filtered, fixed } = detailSpecs
           const [detailThing, detailThings] = detailItem
           const filterTag = makeTag(DETAILS, eId, linkField)
           const gridTag = `${table}-${name}-${eId}`
           return (
             <div key={name} className={'grid-row'} >
-              <div
-                className={'link detail-control'}
-                onClick={nextAlt}
-              >
-                <span className={`fa fa-angle-${alt === 0 ? 'down' : 'up'}`} />
-                {
-                  alt === 0
-                  ? `${nDetails} ${nDetails === 1 ? detailThing : detailThings}`
-                  : emptyS
-                }
-              </div>
+              {
+                !expand
+                ? <div
+                    className={'link detail-control'}
+                    onClick={nextAlt}
+                  >
+                    <span className={`fa fa-angle-${alt === 0 ? 'down' : 'up'}`} />
+                    {
+                      alt === 0
+                      ? `${nDetails} ${nDetails === 1 ? detailThing : detailThings}`
+                      : emptyS
+                    }
+                  </div>
+                : null
+              }
               <div className={'detail-body'} >
                 {
                   alt === 1
@@ -60,6 +62,8 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
                         filterTag={filterTag}
                         masterId={eId}
                         linkField={linkField}
+                        expand={expand}
+                        border={border}
                         fixed={fixed}
                       />
                     : mode === 'list'
@@ -74,6 +78,8 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
                           title={detailTitle}
                           masterId={eId}
                           linkField={linkField}
+                          expand={expand}
+                          border={border}
                           fixed={fixed}
                         />
                       : mode === 'grid'

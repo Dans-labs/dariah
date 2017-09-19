@@ -1,25 +1,45 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { emptyS } from 'utils'
+
 import { getAltSection, compileAlternatives } from 'alter'
+
+const nbsp = ' '
+
+const cleanPut = text => text || null
+
+const cleanWrap = (text, next, className) =>
+  text
+  ? <span className={className}>{`${nbsp}${text}${next ? nbsp : emptyS}`}</span>
+  : null
 
 const Expand = ({
   alter, alterSection, alterTag,
-  headLine, full,
+  headActive, headLine, full,
   className,
+  iconOpen, iconClose,
+  titleOpen, titleClose,
   dispatch,
 }) => {
   const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 0, dispatch)(alterTag)
   const alt = getAlt(alter)
+  const iOpen = iconOpen || 'angle-down'
+  const iClose = iconClose || 'angle-up'
+  const tOpen = titleOpen || 'expand'
+  const tClose = titleClose || 'collapse'
   return (
     <div className={className}>
       <span className={'vtop'}>
+        {nbsp}
         <span
-          className={`link vtop fa fa-angle-${alt === 0 ? 'down' : 'up'}`}
+          className={`link vtop fa fa-${alt === 0 ? iOpen : iClose}`}
+          title={alt === 0 ? tOpen : tClose}
           onClick={nextAlt}
-        />
-        {' '}
-        {headLine}
+        >
+          {cleanWrap(headActive, headLine, 'body')}
+        </span>
+        {cleanPut(headLine)}
       </span>
       {
         alt == 0
@@ -32,20 +52,28 @@ const Expand = ({
 
 const ExpandHeadPure = ({
   alter, alterSection, alterTag,
-  headLine,
+  headActive, headLine,
   className,
+  iconOpen, iconClose,
+  titleOpen, titleClose,
   dispatch,
 }) => {
   const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 0, dispatch)(alterTag)
   const alt = getAlt(alter)
+  const iOpen = iconOpen || 'angle-down'
+  const iClose = iconClose || 'angle-up'
+  const tOpen = titleOpen || 'expand'
+  const tClose = titleClose || 'collapse'
   return (
     <div className={`vtop ${className}`}>
       <span
-        className={`link vtop fa fa-angle-${alt === 0 ? 'down' : 'up'}`}
+        className={`link vtop fa fa-${alt === 0 ? iOpen : iClose}`}
+        title={alt === 0 ? tOpen : tClose}
         onClick={nextAlt}
-      />
-      {' '}
-      {headLine}
+      >
+        {cleanWrap(headActive, headLine, 'body')}
+      </span>
+      {cleanPut(headLine)}
     </div>
   )
 }
@@ -59,13 +87,13 @@ const ExpandBodyPure = ({
   const { getAlt } = compileAlternatives(alterSection, 2, 0, dispatch)(alterTag)
   const alt = getAlt(alter)
   return (
-    <div className={className}>
-      {
-        alt == 0
-        ? null
-        : <div>{full}</div>
-      }
-    </div>
+    alt == 0
+    ? null
+    : <div className={className}>
+        {
+          <div>{full}</div>
+        }
+      </div>
   )
 }
 

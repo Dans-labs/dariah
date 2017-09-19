@@ -1,4 +1,4 @@
-import reducer from 'tables.js'
+import reducer, { ALLIDS, MYIDS } from 'tables.js'
 
 import { runActionTest } from 'genericReducer.js'
 
@@ -160,7 +160,7 @@ const actionTests = [
     // OLD STATE
     state: {
       person: {
-        allIds: [1],
+        [ALLIDS]: [1],
         fields: { name: true, surName: true, keyword: true },
         entities: {
           1: {
@@ -171,7 +171,7 @@ const actionTests = [
     },
 
     // ACTION DATA and PROPS
-    props: { table: 'person', select: 'myIds' },
+    props: { table: 'person', select: MYIDS },
 
     data: [
       { 
@@ -184,8 +184,8 @@ const actionTests = [
     // NEW STATE
     predictedState: {
       person: {
-        allIds: [1, 2],
-        myIds: [2],
+        [ALLIDS]: [1, 2],
+        [MYIDS]: [2],
         lastInserted: 2,
         fields: { name: true, surName: true, keyword: true },
         entities: {
@@ -216,7 +216,7 @@ const actionTests = [
     // OLD STATE
     state: {
       person: {
-        allIds: [1],
+        [ALLIDS]: [1],
         fields: { name: true, surName: true, keyword: true },
         entities: {
           1: {
@@ -225,7 +225,7 @@ const actionTests = [
         },
       },
       address: {
-        allIds: [1, 2],
+        [ALLIDS]: [1, 2],
         fields: { street: true, number: true, city: true },
         entities: {
           1: { values: { _id: 1, street: 'School street', number: '41', city: 'Zutphen' } },
@@ -235,7 +235,7 @@ const actionTests = [
     },
 
     // ACTION DATA and PROPS
-    props: { table: 'person', select: 'myIds' },
+    props: { table: 'person', select: MYIDS },
 
     data: [
       { 
@@ -258,8 +258,8 @@ const actionTests = [
     // NEW STATE
     predictedState: {
       person: {
-        allIds: [1, 2],
-        myIds: [2],
+        [ALLIDS]: [1, 2],
+        [MYIDS]: [2],
         lastInserted: 2,
         fields: { name: true, surName: true, keyword: true },
         entities: {
@@ -273,7 +273,7 @@ const actionTests = [
         },
       },
       address: {
-        allIds: [1, 2, 3, 4],
+        [ALLIDS]: [1, 2, 3, 4],
         lastInserted: 4,
         fields: { street: true, number: true, city: true },
         entities: {
@@ -490,8 +490,8 @@ const actionTests = [
     // OLD STATE
     state: {
       person: {
-        allIds: [1, 2],
-        myIds: [2],
+        [ALLIDS]: [1, 2],
+        [MYIDS]: [2],
         fields: { name: true, surName: true, keyword: true },
         entities: {
           1: { values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] } },
@@ -508,8 +508,8 @@ const actionTests = [
     // NEW STATE
     predictedState: {
       person: {
-        allIds: [1],
-        myIds: [],
+        [ALLIDS]: [1],
+        [MYIDS]: [],
         fields: { name: true, surName: true, keyword: true },
         entities: {
           1: { values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] } },
@@ -533,8 +533,8 @@ const actionTests = [
     // OLD STATE
     state: {
       person: {
-        allIds: [1, 2],
-        myIds: [2],
+        [ALLIDS]: [1, 2],
+        [MYIDS]: [2],
         fields: { name: true, surName: true, keyword: true },
         entities: {
           1: { values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] } },
@@ -542,7 +542,7 @@ const actionTests = [
         },
       },
       address: {
-        allIds: [1, 2, 3],
+        [ALLIDS]: [1, 2, 3],
         fields: { person: true, street: true, number: true, city: true },
         entities: {
           1: { values: { person: 1, _id: 1, street: 'School street', number: '41', city: 'Zutphen' } },
@@ -560,15 +560,15 @@ const actionTests = [
     // NEW STATE
     predictedState: {
       person: {
-        allIds: [1],
-        myIds: [],
+        [ALLIDS]: [1],
+        [MYIDS]: [],
         fields: { name: true, surName: true, keyword: true },
         entities: {
           1: { values: { _id: 1, name: 'John', surName: 'White', keyword: ['a', 'b'] } },
         },
       },
       address: {
-        allIds: [1],
+        [ALLIDS]: [1],
         fields: { person: true, street: true, number: true, city: true },
         entities: {
           1: { values: { person: 1, _id: 1, street: 'School street', number: '41', city: 'Zutphen' } },
@@ -698,7 +698,7 @@ const actionTests = [
           2: { values: { _id: 2, name: 'Mary', surName: 'Black' }, },
           3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
         },
-        allIDs: [1, 2, 3],
+        [ALLIDS]: [1, 2, 3],
       },
     },
 
@@ -711,7 +711,7 @@ const actionTests = [
         entities: {
           3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
         },
-        myIDs: [3],
+        [MYIDS]: [3],
       },
     },
 
@@ -724,15 +724,15 @@ const actionTests = [
           2: { values: { _id: 2, name: 'Mary', surName: 'Black' }, },
           3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
         },
-        allIDs: [1, 2, 3],
-        myIDs: [3],
+        [ALLIDS]: [1, 2, 3],
+        [MYIDS]: [3],
       }
     },
     inspect: [
       ['top',               x => x,                    false],
       ['affected table',    x => x.person,             false],
       ['entities',          x => x.person.entities,    false],
-      ['allIds',            x => x.person.allIds,      true],
+      [ALLIDS,              x => x.person[ALLIDS],      true],
     ],
   },
   /* note that we do not expect that the merged entities end up unchanged.
@@ -752,7 +752,7 @@ const actionTests = [
         entities: {
           3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
         },
-        myIDs: [3],
+        [MYIDS]: [3],
       },
     },
 
@@ -767,7 +767,7 @@ const actionTests = [
           2: { values: { _id: 2, name: 'Mary', surName: 'Black' }, },
           3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
         },
-        allIDs: [1, 2, 3],
+        [ALLIDS]: [1, 2, 3],
       },
     },
 
@@ -780,15 +780,80 @@ const actionTests = [
           2: { values: { _id: 2, name: 'Mary', surName: 'Black' }, },
           3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
         },
-        allIDs: [1, 2, 3],
-        myIDs: [3],
+        [ALLIDS]: [1, 2, 3],
+        [MYIDS]: [3],
       }
     },
     inspect: [
       ['top',               x => x,                    false],
       ['affected table',    x => x.person,             false],
       ['entities',          x => x.person.entities,    false],
-      ['myIds',            x => x.person.myIds,        true],
+      [MYIDS,               x => x.person[MYIDS],       true],
+    ],
+  },
+  {
+    // FETCHTABLE
+
+    // ACTION
+    action: 'fetchTable',
+    comment: 'all items on top of some individual items',
+
+    // OLD STATE
+    state: {
+      person: {
+        fields: { name: true, surName: true, gender: true },
+        entities: {
+          1: {
+            values: { _id: 1, name: 'John', surName: 'White', gender: 'm' },
+            fields: { name: true, surName: true, gender: true },
+          },
+          2: {
+            values: { _id: 2, name: 'Mary', surName: 'Black', gender: 'f' },
+            fields: { name: true, surName: true, gender: true },
+          },
+        },
+        [ALLIDS]: [1, 2],
+      },
+    },
+
+    // ACTION DATA and PROPS
+    props: {},
+
+    data: {
+      person: {
+        fields: { name: true, surName: true, gender: true },
+        entities: {
+          1: { values: { _id: 1, name: 'John', surName: 'White' } },
+          2: { values: { _id: 2, name: 'Mary', surName: 'Black' } },
+          3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' } },
+        },
+        [ALLIDS]: [1, 2, 3],
+      },
+    },
+
+    // NEW STATE
+    predictedState: {
+      person: {
+        fields: { name: true, surName: true, gender: true },
+        entities: {
+          1: {
+            values: { _id: 1, name: 'John', surName: 'White', gender: 'm' },
+            fields: { name: true, surName: true, gender: true },
+          },
+          2: {
+            values: { _id: 2, name: 'Mary', surName: 'Black', gender: 'f' },
+            fields: { name: true, surName: true, gender: true },
+          },
+          3: { values: { _id: 3, name: 'Dirk', surName: 'Roorda' }, },
+        },
+        [ALLIDS]: [1, 2, 3],
+      }
+    },
+    inspect: [
+      ['top',               x => x,                    false],
+      ['affected table',    x => x.person,             false],
+      ['entities',          x => x.person.entities,    false],
+      [MYIDS,               x => x.person[MYIDS],        true],
     ],
   },
 ]

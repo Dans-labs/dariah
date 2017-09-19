@@ -1,5 +1,6 @@
 div.criteriaEntry {
     display: flex;
+    flex-flow: row  nowrap;
     justify-content: space-between;
 }
 div.fat {
@@ -7,6 +8,9 @@ div.fat {
 }
 div.slim {
     flex: 0 1 10em;
+}
+div.xSlim {
+    flex: 0 1 2em;
 }
 div.criteriaRemarks {
     background-color: #eeeeee;
@@ -19,8 +23,8 @@ div.evidence {
     vertical-align: top;
 }
 .tError {
-    background-color: #ff8888;
+    color: #bb0000;
 }
 .tGood {
-    background-color: #88ff88;
+    color: #00bb00;
 }

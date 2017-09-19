@@ -4,10 +4,10 @@ import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
 import { memoize } from 'memo'
-import { getUrlParts, emptyS, emptyO } from 'utils'
+import { getUrlParts, emptyO } from 'utils'
 
 import { getAltSection, compileAlternatives, closeItems } from 'alter'
-import { fetchItems, DETAILS } from 'tables'
+import { DETAILS, handleOpenAll } from 'tables'
 
 const editStatusGeneric = canSubmit => ({
     active,
@@ -101,11 +101,11 @@ export const EditStatus = reduxForm({
 export const EditDelete = ({ perm, fixed, button, onClick }) => (
   !fixed && perm.delete
   ? <div
-      className={`grid-cell ${button} error-o fa fa-trash delete`}
+      className={`grid-cell ${button} inlineR error-o fa fa-trash delete`}
       title={'delete this record'}
       onClick={onClick}
     />
-  : null
+    : null
 )
 
 const handleCloseAll = memoize((alter, alterSection, nAlts, initial, items, dispatch) => {
@@ -121,23 +121,9 @@ const handleCloseAll = memoize((alter, alterSection, nAlts, initial, items, disp
         alts.push(eId)
       }
     })
-    dispatch(closeItems(alts, alterSection, initial))
-  }
-}, emptyO)
-
-const handleOpenAll = memoize((alter, alterSection, nAlts, initial, table, items, dispatch) => {
-  const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
-  const theAlt = (initial + 1) % nAlts
-  return () => {
-    const alts = []
-    items.forEach(eId => {
-      const { getAlt } = makeAlternatives(eId)
-      const alt = getAlt(alter)
-      if (alt !== theAlt) {
-        alts.push(eId)
-      }
-    })
-    dispatch(fetchItems(table, alts, alterSection, theAlt))
+    if (alts.length) {
+      dispatch(closeItems(alts, alterSection, initial))
+    }
   }
 }, emptyO)
 
@@ -145,7 +131,7 @@ const EditInsertPure = ({
   alter, alterSection,
   table, perm, select, fixed, listIds, item, button, onInsert,
   nAlts, initial,
-  openAll,
+  openAll, expand,
   dispatch,
 }) => {
   const [thing, things] = item
@@ -164,20 +150,24 @@ const EditInsertPure = ({
       }
       {' '}
       {
-        openAll
+        openAll && !expand
         ? <div
             className={`fa fa-angle-double-down ${button}`}
             title={`Open all ${things}`}
             onClick={handleOpenAll(alter, alterSection, nAlts, initial, table, listIds, dispatch)}
           />
-        : emptyS
+        : null
       }
       {' '}
-      <div
-        className={`fa fa-angle-double-up ${button}`}
-        title={`Close all opened ${things}`}
-        onClick={handleCloseAll(alter, alterSection, nAlts, initial, listIds, dispatch)}
-      />
+      {
+        !expand
+        ? <div
+            className={`fa fa-angle-double-up ${button}`}
+            title={`Close all opened ${things}`}
+            onClick={handleCloseAll(alter, alterSection, nAlts, initial, listIds, dispatch)}
+          />
+        : null
+      }
     </div>
   )
 }

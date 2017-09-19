@@ -4,7 +4,7 @@ td {
     vertical-align: top;
 }
 
-body,p,div,td,li {
+.body,body,p,div,td,li {
     font-family: sans-serif;
 }
 span.login {
@@ -20,3 +20,9 @@ div.sized {
     @include sized();
 }
 
+.inlineL {
+    float: left;
+}
+.inlineR {
+    float: right;
+}

@@ -11,7 +11,7 @@ import ItemForm from 'ItemForm'
 
 class ItemContainer extends Component {
   render() {
-    const { props: { settings, filters, tables, table, eId, isactive, fixed } } = this
+    const { props: { settings, filters, tables, table, eId, isactive, fixed, border } } = this
     const {
       [table]: {
           entities = emptyO,
@@ -40,19 +40,17 @@ class ItemContainer extends Component {
         perm={perm}
         fields={dealWithProvenance(settings, fields)}
         fixed={fixed}
+        border={border}
       />
     )
   }
-  componentDidMount() {
-    const { props: { tables, table, eId, dispatch } } = this
+  openItem() {
+    const { props: { tables, table, eId, inhibitFetch, dispatch } } = this
     const { [table]: { entities = emptyO } } = tables
-    if (needValues(entities, eId)) {dispatch(fetchItem(table, eId))}
+    if (!inhibitFetch && needValues(entities, eId)) {dispatch(fetchItem(table, eId))}
   }
-  componentDidUpdate() {
-    const { props: { tables, table, eId, dispatch } } = this
-    const { [table]: { entities = emptyO } } = tables
-    if (needValues(entities, eId)) {dispatch(fetchItem(table, eId))}
-  }
+  componentDidMount() {this.openItem()}
+  componentDidUpdate() {this.openItem()}
 }
 
 export default connect(getSettings)(ItemContainer)

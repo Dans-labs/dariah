@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { combineSelectors } from 'utils'
+import { combineSelectors, emptyS } from 'utils'
 
 import { handle } from 'handle'
 import { makeFields, makeDetails, someEditable } from 'fields'
@@ -16,15 +16,35 @@ import ItemDetails from 'ItemDetails'
 import { EditDelete } from 'EditControls'
 
 const ItemForm = props => {
-  const { settings, alter, alterSection, filters, tables, table, eId, isactive, fixed, initialValues, fields, perm, dispatch } = props
+  const {
+    settings,
+    alter, alterSection,
+    filters,
+    tables, table, eId,
+    isactive,
+    fixed,
+    border,
+    initialValues,
+    fields, perm,
+    dispatch,
+  } = props
   let { fieldFragments, detailFragments } = props
   if (fieldFragments == null) {fieldFragments = makeFields(props)}
   if (detailFragments == null) {detailFragments = makeDetails(props)}
   const hasEditable = someEditable(fields, perm)
   const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 0, dispatch)('edit')
   const alt = getAlt(alter)
+  const borderSwitch = border == null
+  ? emptyS
+  : hasEditable && alt === 1
+    ? border.edit != null && !border.edit
+      ? 'noBorder'
+      : emptyS
+    : border.read != null && !border.read
+      ? 'noBorder'
+      : emptyS
   return (
-    <div className={`itemRecord ${isactive}`} >
+    <div className={`itemRecord ${borderSwitch} ${isactive}`} >
       {
         hasEditable && alt === 1
         ? <div>
@@ -49,7 +69,7 @@ const ItemForm = props => {
             {
               hasEditable
               ? <span
-                  className={`button-medium fa fa-pencil`}
+                  className={`button-medium inlineL fa fa-pencil`}
                   title={`open an edit form for this record`}
                   onClick={nextAlt}
                 />

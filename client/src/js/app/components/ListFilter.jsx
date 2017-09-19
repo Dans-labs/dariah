@@ -41,7 +41,7 @@ class ListFilter extends Component {
         table,
         navItem,
         perm,
-        select, masterId, linkField, fixed,
+        select, masterId, linkField, expand, border, fixed,
         listIds,
         mode, compact,
         title,
@@ -73,6 +73,7 @@ class ListFilter extends Component {
               nAlts={nAlts}
               initial={initial}
               openAll={true}
+              expand={expand}
               onInsert={handle(dispatch, insertItem, table, select, masterId, linkField)}
             />
           : null
@@ -111,6 +112,8 @@ class ListFilter extends Component {
                 title={title}
                 masterId={masterId}
                 linkField={linkField}
+                expand={expand}
+                border={border}
                 fixed={fixed}
               />
             : mode === 'grid'

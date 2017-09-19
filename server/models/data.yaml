@@ -558,7 +558,12 @@ tables:
       criteriaEntry:
         table: criteriaEntry
         linkField: assessment
+        expand: true
         mode: list
+        border: {
+          read: false,
+          edit: true,
+        }
         filtered: true
         cascade: true
         fixed: true

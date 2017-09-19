@@ -7,30 +7,40 @@ import FieldRead from 'FieldRead'
 
 const templates = {
   criteriaEntry(e, v, f) {
-    e('evidence')
-    e('score')
     return (
       <div>
         <div className={'criteriaEntry'}>
           <Expand
             alterSection={`criteriaEntry${v('_id')}`}
             alterTag={'remarks'}
-            headLine={[
-              <span key="seq">{v('seq')}</span>,
-              <span key="crit">{f('criteria')}</span>,
-            ]}
+            iconOpen={'info-circle'}
+            iconClose={'minus-circle'}
+            titleOpen={'Show criteria details'}
+            titleClose={'Hide criteria details'}
+            headActive={v('seq')}
+            headLine={f('criteria')}
             full={<div className={'criteriaRemarks'}>{f('criteria', 'remarks')}</div>}
             className={'fat'}
           />
           <div className={'slim'}>{f('score')}</div>
           {
             e('evidence')
-            ? <div className={'slim tError'}>{'no evidence'}</div>
+            ? <div className={'xSlim'}>
+                <span
+                  title={'No evidence yet'}
+                  className={'slim fa fa-file-o tError'}
+                />
+              </div>
             : <ExpandHead
                 alterSection={`criteriaEntry${v('_id')}`}
                 alterTag={'evidence'}
-                headLine={'evidence'}
-                className={'slim tGood'}
+                iconOpen={'file-text'}
+                iconClose={'minus-square'}
+                titleOpen={'Show evidence'}
+                titleClose={'Hide evidence'}
+                headActive={''}
+                headLine={''}
+                className={'xSlim tGood'}
               />
           }
         </div>
@@ -40,6 +50,10 @@ const templates = {
           : <ExpandBody
               alterSection={`criteriaEntry${v('_id')}`}
               alterTag={'evidence'}
+              iconOpen={'file-text'}
+              iconClose={'minus-square'}
+              titleOpen={'Show evidence'}
+              titleClose={'Hide evidence'}
               full={f('evidence')}
               className={'evidence'}
             />
