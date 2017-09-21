@@ -14,4 +14,4 @@ destdir="/home/dirkr/dariah_data"
 cd $sourcedir
 ssh $destserver "rm -rf $destdir" 
 ssh $destserver "mkdir -p $destdir/$filename" 
-scp -r $filename $destserver:$destdir/$filename
+scp -r $filename $destserver:$destdir
