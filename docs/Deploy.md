@@ -93,8 +93,8 @@ The absolute location is not important. Here we assume everything resides in `/o
           - `update.sh` script to deploy updates of the web app. Pulls code from the github repo, restarts httpd.
           - `from_filemaker.ipynb` Jupyter notebook for legacy data conversion
           - `mongoFromFm.py` Stand-alone definitive data conversion from FileMaker original to MongoDb
-          - `dump.sh` dump the mongodb as set of bson files
-          - `load.sh` load a set of *.bson* files into mongodb
+          - `dump.sh` copy Filemaker legacy data to production server, as XML export
+          - `load.sh` run Filemaker conversion and import into MongoDB on production server
           - `compose_countries` tool to tweak a map of European countries, 
             result in `/client/src/js/lib/europe.geo.js`
       - `client`

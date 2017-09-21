@@ -2,6 +2,14 @@
 title: News
 ---
 
+### 2017-09021
+The presentation of assessment is developing to much more useful layouts.
+Lots of issues of an information-logistic nature had to be solved.
+
+Talking of which: the conversion of legacy content has now improved.
+The import is repeatable, and will not disturb data that has been 
+added later, using the contribution tool itself. Read [more](Content).
+
 ### 2017-07-01
 
 #### Functionally

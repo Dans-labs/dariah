@@ -62,6 +62,15 @@ The remedy is to write tests for all aspects of the behaviours, and run them rig
 after each change and refactoring.
 That way, you proactively discover your bugs before your users do.
 
+## [Initial Content](Content)
+There are already 800 contributions in the system. 
+They have been collected in a FileMaker database in the past.
+We convert this content and use it for an initial filling of the contribution tool.
+The legacy import is automated and repeatable, even into a database
+that has been used in production for a while.
+Click on the title of this section to read more about how difficult that is, and how we
+partly solved it.
+
 ## [Deploy](Deploy)
 Here are the bits and pieces you have to do in order to get a working system out of this.
 
