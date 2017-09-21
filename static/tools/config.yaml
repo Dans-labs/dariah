@@ -20,47 +20,41 @@ testUsers:
     lastName: Karelse
     mayLogin: true
     authority: local
+    group: auth
   - eppn: marie
     email: marie@test.eu
     firstName: Marie
     lastName: Pieterse
     mayLogin: true
     authority: local
+    group: auth
   - eppn: gertjan
     email: gertjan@test.eu
     firstName: Gert-Jan
     lastName: Klein-Holgerink
     mayLogin: false
     authority: local
+    group: auth
   - eppn: lisa
     email: lisa@test.eu
     firstName: Lisa
     lastName: de Leeuw
     mayLogin: true
     authority: local
+    group: office
   - eppn: dirk
     email: dirk@test.eu
     firstName: Dirk
     lastName: Roorda
     mayLogin: true
     authority: local
-
-inGroupTest:
-  - eppn: dirk
-    authority: local
     group: system
-  - eppn: lisa
-    authority: local
-    group: office
-  - eppn: suzan
-    authority: local
-    group: auth
-  - eppn: marie
-    authority: local
-    group: auth
-  - eppn: gertjan
-    authority: local
-    group: auth
+
+CREATOR:
+  eppn: HaSProject
+  authority: DARIAH
+  mayLogin: false
+  group: office
 
 inGroup:
   - eppn: DirkRoorda@dariah.eu
@@ -291,8 +285,6 @@ testOwner:
       !!set
       ? 3DHOP
       ? AAI
-
-CREATOR: lisa
 
 MAIN_TABLES:
 - contrib
