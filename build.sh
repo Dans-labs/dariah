@@ -99,8 +99,10 @@ elif [[ "$1" == "shipcode" ]]; then
     git commit -m "ship: $2"
     git push origin master
 elif [[ "$1" == "shipdata" ]]; then
+    git add --all .
+    git commit -m "ship legacy data"
+    git push origin master
     cd static/tools
-    python3 mongoFromFm.py production
     ./dump.sh
 else
     if [[ "$1" != "help" && "$1" != "--help" && "$1" != "" ]]; then

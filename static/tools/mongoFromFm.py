@@ -1,3 +1,25 @@
+# USAGE
+#
+# python3 mongoFromFm.py production
+# python3 mongoFromFm.py developmentwhat
+#
+# In development mode, the following things happen
+# 1. excel spreadsheets with the original Filemaker data and the resulting MongoDB data are generated
+# 2. a bunch of test users is added
+# 3. The ownership of some contributions is changed to the developer, so that he can test easily
+#
+# The original tables are not deleted.
+# Instead, all records having the field isPristine = True will be deleted first.
+# All records created by this script get a field isPristine = true.
+# The application should delete this field whenever the record holding it gets updated,
+# and new records created by the app should not contain this field.
+# So, in effect, this is just a replacement of the legacy records.
+# The records that have been added later are untouched.
+# This can only work if identifiers are deterministic, i.e. that different runs of this script yield the same
+# identifiers for the same records.
+# In order to make that work, we construct mongo identifiers deterministically
+# from the table name and the record number.
+#
 # To import the bson dump in another mongodb installation, use the commandline to dump the dariah database here
 # 
 #     mongodump -d dariah -o dariah
@@ -29,6 +51,9 @@ from lxml import etree
 from datetime import datetime, date
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from hashlib import md5
+
+isDevel = len(sys.argv) > 1 and sys.argv[1] == 'development'
 
 def info(x): sys.stdout.write('{}\n'.format(x))
 def warning(x): sys.stderr.write('{}\n'.format(x))
@@ -124,6 +149,13 @@ funcs = dict(
     stripNum=stripNum,
 )
 
+# do not tweak this, otherwise the identifiers will break:
+# links between non-legacy records and valuetables will break
+
+def toHexName(name): return md5(bytes(name, 'utf-8')).hexdigest()[:10]
+def toHexNumber(number): return '{:0>6x}'.format(number)
+def toHexMongo(name, number): return '{:0>8x}{}{}'.format(0, toHexName(name), toHexNumber(number))
+
 class IdIndex(object):
     def __init__(self):
         self._idFromName = {}
@@ -131,7 +163,7 @@ class IdIndex(object):
     def getId(self, name):
         _id = self._idFromName.get(name, None)
         if _id == None:
-            _id = ObjectId()
+            _id = ObjectId(name)
             self._idFromName[name] = _id
             self._nameFromId[_id] = name
         return _id
@@ -140,19 +172,19 @@ class IdIndex(object):
 class MongoId(IdIndex):
     def __init__(self):
         super().__init__()
-        self.cur = 0
-    def newId(self):
-        self.cur += 1
-        return self.getId(self.cur)
+        self.cur = collections.Counter()
+    def newId(self, table):
+        self.cur[table] += 1
+        return self.getId(toHexMongo(table, self.cur[table]))
         
 class FMConvert(object):
     def __init__(self):
         with open('./config.yaml') as ch:
             config = yaml.load(ch)
-        with open('./criteria.yaml') as ch:
+        with open('./backoffice.yaml') as ch:
             config.update(yaml.load(ch))
         homeDir = os.path.expanduser('~')
-        baseDir = config['locations']['BASE_DIR']
+        baseDir = config['locations']['BASE_DIR_{}'.format('DEVEL' if isDevel else 'PROD')]
         exportDir = config['locations']['EXPORT_DIR']
         for (loc, path) in config['locations'].items():
             config['locations'][loc] = os.path.expanduser(path.format(b=baseDir, e=exportDir))
@@ -289,12 +321,12 @@ class FMConvert(object):
                 self.allFields[mt][fo] = self.allFields[mt][f]
                 self.allFields[mt][f] = [self.allFields[mt][f][0], 1]
             for (f, t) in self.FIELD_TYPE.get(mt, {}).items():
-                self.allFields[mt][f][0] = t
+                self.allFields[mt].setdefault(f, ['', 1])[0] = t
             for (f, m) in self.FIELD_MULTIPLE.get(mt, {}).items():
                 self.allFields[mt][f][1] = m
 
     def readFmData(self):
-        for mt in self.MAIN_TABLES:
+        for mt in self.MAIN_TABLES: # this is a deterministic order
             infile = '{}/{}.xml'.format(self.FM_DIR, mt)
             root = etree.parse(infile, self.parser).getroot()
             dataroots = [x for x in root.iter(self.FMNS+'RESULTSET')]
@@ -323,7 +355,7 @@ class FMConvert(object):
                 for (f, fo) in self.DECOMPOSE_FIELDS[mt].items():
                     row[fo] = row[f][1:]
                     row[f] = [row[f][0]] if len(row[f]) else []
-                row['_id'] = self.mongo.newId()
+                row['_id'] = self.mongo.newId(mt)
                 for (f, v) in row.items(): row[f] = self.sanitize(mt, i, f, v)
                 rows.append(row)
             self.allData[mt] = rows
@@ -338,20 +370,27 @@ class FMConvert(object):
                 ))
 
     def moveFields(self):
-        for mt in self.MAIN_TABLES:
+        for mt in self.MAIN_TABLES: # deterministic order
             for (omt, mfs) in self.MOVE_FIELDS[mt].items():
                 for mf in mfs:
                     self.allFields.setdefault(omt, dict())[mf] = self.allFields[mt][mf]
                     del self.allFields[mt][mf]
                 self.allFields.setdefault(omt, dict)['{}_id'.format(mt)] = ('id', 1)
 
-            for row in self.allData[mt]:
-                for (omt, mfs) in self.MOVE_FIELDS[mt].items():
+
+            for row in self.allData[mt]: # deterministic order
+                for (omt, mfs) in sorted(self.MOVE_FIELDS[mt].items()):
                     orow = dict((mf, row[mf]) for mf in mfs)
-                    orow['_id'] = self.mongo.newId()
+                    orow['_id'] = self.mongo.newId(omt)
                     orow['{}_id'.format(mt)] = row['_id']
                     self.allData.setdefault(omt, []).append(orow)
                     for mf in mfs: del row[mf]
+
+    def pristinize(self):
+        pristine = self.PRISTINE
+        for mt in self.allData:
+            for row in self.allData[mt]:
+                row[pristine] = True
 
     def readLists(self):
         valueLists = collections.defaultdict(set)
@@ -379,48 +418,38 @@ class FMConvert(object):
                 rep=('string', 1),
             )
 
-    def typeTable(self):
-        for row in self.allData['typeContribution']:
-            row['mainType'] = ''
-            row['subType'] = row['rep']
-            row['explanation'] = ['legacy type']
-            del row['rep']
-        nVals = len(self.valueDict['typeContribution'])
-        i = nVals
-        for u in self.typeExtra:
-            val = u['subType']
-            u['_id'] = self.mongo.newId()
-            _id = u['_id']
-            self.valueDict[i] = val
-            i += 1
-            self.relIndex['typeContribution'][self.norm(val)] = (_id, val)
-            self.allData['typeContribution'].append(u)
-
-        self.allFields['typeContribution']['_id'] = ('id', 1)
-        self.allFields['typeContribution']['mainType'] = ('string', 1)
-        self.allFields['typeContribution']['subType'] = ('string', 1)
-        self.allFields['typeContribution']['explanation'] = ('string', 2)
+    def yearTable(self):
+        mt = 'year'
+        existingYears = dict((int(row['rep']), row) for row in self.allData[mt])
+        targetInterval = set(range(2010, 2030))
+        allYears = set(existingYears) | targetInterval
+        interval = range(min(allYears), max(allYears) + 1)
+        self.allData[mt] = [
+            existingYears[year] if year in existingYears else dict(_id=self.mongo.newId(mt), rep=str(year)) \
+            for year in interval
+        ]
 
     def countryTable(self):
         extraInfo = self.countryExtra
         idMapping = dict()
 
         seen = set()
-        for row in self.allData['country']:
+        mt = 'country'
+        for row in self.allData[mt]: # deterministic order
             for f in row:
                 if type(row[f]) is list: row[f] = row[f][0]
             iso = row['iso']
             seen.add(iso)
-            row['_id'] = self.mongo.newId()
+            row['_id'] = self.mongo.newId(mt)
             idMapping[iso] = row['_id']
             thisInfo = extraInfo[iso]
             row['latitude'] = thisInfo['latitude']
             row['longitude'] = thisInfo['longitude']
-        for (iso, info) in extraInfo.items():
+        for (iso, info) in sorted(extraInfo.items()):
             if iso in seen: continue
-            _id = self.mongo.newId()
+            _id = self.mongo.newId(mt)
             idMapping[iso] = _id
-            self.allData['country'].append(dict(
+            self.allData[mt].append(dict(
                 _id=_id,
                 iso=iso,
                 name=info['name'],
@@ -430,14 +459,14 @@ class FMConvert(object):
             ))
 
         for row in self.allData['contrib']:
-            if row['country'] != None:
-                iso = row['country']
-                row['country'] = idMapping[iso]
+            if row[mt] != None:
+                iso = row[mt]
+                row[mt] = idMapping[iso]
         
-        self.allFields['country']['_id'] = ('id', 1)
-        self.allFields['country']['iso'] = ('string', 1)
-        self.allFields['country']['latitude'] = ('float', 1)
-        self.allFields['country']['longitude'] = ('float', 1)
+        self.allFields[mt]['_id'] = ('id', 1)
+        self.allFields[mt]['iso'] = ('string', 1)
+        self.allFields[mt]['latitude'] = ('float', 1)
+        self.allFields[mt]['longitude'] = ('float', 1)
 
     def userTable(self):
         idMapping = dict()
@@ -450,7 +479,8 @@ class FMConvert(object):
             crs = [x for x in crsPre if x != None]
             for cr in crs:
                 eppnSet.add(cr)
-        idMapping = dict((eppn, self.mongo.newId()) for eppn in sorted(eppnSet))
+        idMapping = dict((eppn, self.mongo.newId('user')) for eppn in sorted(eppnSet))
+        # deterministic order
         for c in self.allData['contrib']:
             c['creator'] = idMapping[c['creator']]
 
@@ -458,11 +488,15 @@ class FMConvert(object):
         for (i, eppn) in sorted(users.items()):
             existingUsers.append(dict(_id=i, eppn=eppn, mayLogin=False, authority='legacy'))
 
-        for u in self.testUsers:
-            u['_id'] = self.mongo.newId()
-            idMapping[u['eppn']] = u['_id']
-            existingUsers.append(u)
-        self.inGroup = [dict(tuple(ig.items())+(('_id', self.mongo.newId()),)) for ig in self.inGroup]
+        self.inGroup = [dict(tuple(ig.items())+(('_id', self.mongo.newId('inGroup')),)) for ig in self.inGroup]
+        # deterministic order
+        if isDevel:
+            for u in self.testUsers: # deterministic order
+                u['_id'] = self.mongo.newId('user')
+                idMapping[u['eppn']] = u['_id']
+                existingUsers.append(u)
+                self.inGroup = [dict(tuple(ig.items())+(('_id', self.mongo.newId('inGroup')),)) for ig in self.inGroupTest]
+                # deterministic order
         self.allData['user'] = existingUsers
         self.allData['inGroup'] = self.inGroup
         
@@ -510,7 +544,7 @@ class FMConvert(object):
         relIndex = dict()
         for mt in sorted(self.VALUE_LISTS):
             rows = self.allData[mt]
-            for f in sorted(self.VALUE_LISTS[mt]):
+            for f in self.VALUE_LISTS[mt]: # deterministic order
                 comps = f.split(':')
                 if len(comps) == 2:
                     (f, fAs) = comps
@@ -518,7 +552,8 @@ class FMConvert(object):
                     fAs = f
                 relInfo = self.valueDict[fAs]
                 if not fAs in relIndex:
-                    idMapping = dict((i, self.mongo.newId()) for i in relInfo)
+                    idMapping = dict((i, self.mongo.newId(fAs)) for i in sorted(relInfo))
+                    # deterministic order
                     self.allData[fAs] = [dict(_id=idMapping[i], rep=v) for (i, v) in relInfo.items()]
                     relIndex[fAs] = dict((self.norm(v), (idMapping[i], v)) for (i, v) in relInfo.items())
                 (ftype, fmult) = self.allFields[mt][f]
@@ -543,6 +578,7 @@ class FMConvert(object):
         self.relIndex = relIndex
 
     def testTweaks(self):
+        # sets the ownership a few contribution to the developer himself, so that he can test
         for (table, test) in self.testOwner.items():
             my = self.uidMapping[test['owner']]
             search = test['search']
@@ -559,7 +595,7 @@ class FMConvert(object):
                     if value in mine:
                         row[field] = my
 
-    def backoffice(self, isDevel):
+    def backoffice(self):
         client = MongoClient()
         db = client.dariah
         for row in self.allData['typeContribution']:
@@ -573,57 +609,79 @@ class FMConvert(object):
         self.allFields['typeContribution']['explanation'] = ('string', 2)
 
         self.backofficeTables = set()
-        if True or isDevel:
-            for table in self.BACKOFFICE:
-                bt = table['name']
-                ifield = table['indexField']
-                self.backofficeTables.add(bt)
-                rows = table['rows']
-                if bt not in self.allData: self.allData[bt] = []
-                if bt not in self.relIndex: self.relIndex[bt] = dict()
-                for row in rows:
-                    _id = self.mongo.newId()
-                    newRow = dict()
-                    newRow['_id'] = _id
-                    self.relIndex[bt][self.norm(row[ifield])] = (_id, row[ifield])
-                    for (field, value) in row.items():
-                        if field in {'startDate', 'endDate'}:
-                            newRow[field] = value
-                        elif field in {'dateCreated'}:
-                            valueRep = now() if value == 'now' else value
-                            newRow[field] = valueRep
-                        elif field == 'creator':
-                            newRow[field] = self.uidMapping[value]
-                        elif \
-                            bt == 'package' and field == 'typeContribution' or \
-                            bt == 'criteria' and field == 'typeContribution' or \
-                            False:
-                            newRow[field] = [self.relIndex[field][self.norm(val)][0] for val in value]
-                        elif \
-                            bt == 'criteria' and field == 'package'  or \
-                            bt == 'score' and field == 'criteria' or \
-                            False :
-                            newRow[field] = self.relIndex[field][self.norm(value)][0]
-                        else: newRow[field] = value
-                    self.allData[bt].append(newRow)
-            for table in self.BACKOFFICE:
-                bt = table['name']
-                ifield = table['indexField']
-                if ifield == 'key':
-                    for row in self.allData[bt]:
-                        del row['key']
-        else:
-            for table in self.BACKOFFICE:
-                bt = table['name']
-                self.allData[bt] = [{}]
+        for table in self.BACKOFFICE:
+            bt = table['name']
+            ifield = table['indexField']
+            self.backofficeTables.add(bt)
+            rows = table['rows']
+            if bt not in self.allData: self.allData[bt] = []
+            if bt not in self.relIndex: self.relIndex[bt] = dict()
+            for row in rows: #deterministic order
+                _id = self.mongo.newId(bt)
+                newRow = dict()
+                newRow['_id'] = _id
+                self.relIndex[bt][self.norm(row[ifield])] = (_id, row[ifield])
+                for (field, value) in row.items():
+                    if field in {'startDate', 'endDate'}:
+                        newRow[field] = value
+                    elif field in {'dateCreated'}:
+                        valueRep = now() if value == 'now' else value
+                        newRow[field] = valueRep
+                    elif field == 'creator':
+                        newRow[field] = self.uidMapping[value]
+                    elif \
+                        bt == 'package' and field == 'typeContribution' or \
+                        bt == 'criteria' and field == 'typeContribution' or \
+                        False:
+                        newRow[field] = [self.relIndex[field][self.norm(val)][0] for val in value]
+                    elif \
+                        bt == 'criteria' and field == 'package'  or \
+                        bt == 'score' and field == 'criteria' or \
+                        False :
+                        newRow[field] = self.relIndex[field][self.norm(value)][0]
+                    else: newRow[field] = value
+                self.allData[bt].append(newRow)
+        for table in self.BACKOFFICE:
+            bt = table['name']
+            ifield = table['indexField']
+            if ifield == 'key':
+                for row in self.allData[bt]:
+                    del row['key']
 
     def importMongo(self):
         client = MongoClient()
-        client.drop_database('dariah')
         db = client.dariah
-        for (mt, rows) in self.allData.items():
-            info(mt)
-            db[mt].insert_many(rows)
+        pristine = self.PRISTINE
+        lineFmt = '| {:<20} |' + (' {:>4} |' * 6)
+        headings = 'COLL EXST PRST MODF GENR TRBL INSR'.split()
+        info('''LEGEND:
+COLL = Collection
+EXST = documents existing before import
+PRST = pristine existing documents
+MODF = modified existing documents
+GENR = generated documents
+TRBL = modified existing documents threatened by overwriting
+INSR = documents to be inserted, avoiding overwriting
+''')
+        info(lineFmt.format(*headings))
+        for (mt, generatedRows) in self.allData.items():
+            generatedIds = {row['_id'] for row in generatedRows}
+            existingRows = list(db[mt].find({}, {'_id': True, pristine: True}))
+            existingPristineIds = {row['_id'] for row in existingRows if row.get(pristine, False)}
+            existingNonPristineIds = {row['_id'] for row in existingRows if not row.get(pristine, False)}
+            troubleIds = existingNonPristineIds & generatedIds
+            insertRows = [row for row in generatedRows if row['_id'] not in troubleIds]
+            info(lineFmt.format(
+                mt,
+                len(existingRows),
+                len(existingPristineIds),
+                len(existingNonPristineIds),
+                len(generatedIds),
+                len(troubleIds),
+                len(insertRows),
+            ))
+            db[mt].delete_many({pristine: True})
+            db[mt].insert_many(insertRows)
 
     def exportXlsx(self):
         workbook = xlsxwriter.Workbook(self.EXPORT_ORIG, {'strings_to_urls': False})
@@ -666,7 +724,6 @@ class FMConvert(object):
         workbook.close()
 
     def run(self):
-        isDevel = len(sys.argv) > 1 and sys.argv[1] == 'development'
         self.moneyWarnings = {}
         self.moneyNotes = {}
         self.valueDict = dict()
@@ -686,10 +743,11 @@ class FMConvert(object):
         self.countryTable()
         self.userTable()
         self.relTables()
-        #self.typeTable()
+        self.yearTable()
         if isDevel: self.testTweaks()
-        self.backoffice(isDevel)
+        self.backoffice()
         self.provenance()
+        self.pristinize()
         self.importMongo()
         #self.showData()
         #self.showMoney()

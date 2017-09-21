@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { emptyS } from 'utils'
+import { emptyS, emptyO } from 'utils'
 
 import Expand, { ExpandHead, ExpandBody } from 'Expand'
 import FieldRead from 'FieldRead'
@@ -63,6 +63,28 @@ const templates = {
   },
 }
 
+const frozenTemplates = {
+  assessment: {
+    contrib(v) {
+      console.warn('applying frozen template assessment-contrib', v)
+      return (
+        <div>
+          <p>{v.title}</p>
+          <p>
+            {
+              v.vcc
+              ? v.vcc.join(', ')
+              : null
+            }
+            {' '}
+            {v.year}
+          </p>
+        </div>
+      )
+    },
+  },
+}
+
 export const applyTemplate = (settings, tables, table, values) => {
   const { [table]: template } = templates
   if (template == null) {return null}
@@ -85,4 +107,10 @@ export const applyTemplate = (settings, tables, table, values) => {
     )
   }
   return template(e, v, f)
+}
+
+export const applyFrozenTemplate = (table, frozen, value) => {
+  const { [table]: { [frozen]: template } = emptyO } = frozenTemplates
+  if (template == null) {return null}
+  return template(value)
 }

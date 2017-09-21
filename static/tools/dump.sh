@@ -4,17 +4,14 @@
 # 
 # ./dump.sh
 
-# dumps mongo database data for the DARIAH application
+# dumps source data for generating legacy data
 
-filename=dariah_data
+filename=fm
+sourcedir=~/Documents/DANS/projects/has/dacs
 destserver="dirkr@tclarin11.dans.knaw.nl"
-destdir="/home/dirkr"
+destdir="/home/dirkr/dariah_data"
 
-pushd ~/Downloads
-rm -rf $filename
-mongodump -o $filename -d dariah
-# rm -rf $filename/dariah/user.bson
-# rm -rf $filename/dariah/user.metadata.json
-ssh $destserver "rm -rf $filename" 
-scp -r $filename $destserver:$destdir
-popd
+cd $sourcedir
+ssh $destserver "rm -rf $destdir" 
+ssh $destserver "mkdir -p $destdir/$filename" 
+scp -r $filename $destserver:$destdir/$filename

@@ -1,5 +1,6 @@
 locations:
-  BASE_DIR: ~/Documents/DANS/projects/has/dacs
+  BASE_DIR_DEVEL: ~/Documents/DANS/projects/has/dacs
+  BASE_DIR_PROD: /home/dirkr/dariah_data
   FM_DIR: >-
     {b}/fm
   EXPORT_DIR: ~/Downloads
@@ -44,7 +45,7 @@ testUsers:
     mayLogin: true
     authority: local
 
-inGroup:
+inGroupTest:
   - eppn: dirk
     authority: local
     group: system
@@ -60,6 +61,8 @@ inGroup:
   - eppn: gertjan
     authority: local
     group: auth
+
+inGroup:
   - eppn: DirkRoorda@dariah.eu
     authority: DARIAH
     group: system
@@ -314,6 +317,8 @@ SKIP_FIELDS:
   - whois
   country: {}
 
+PRISTINE: isPristine
+
 MERGE_FIELDS:
   contrib:
     academic_entity_url:
@@ -415,6 +420,7 @@ FIELD_TYPE:
     vccApproval: bool
     vccDecision: bool
     vccDisApproval: bool
+    isLegacy: bool
   country:
     isMember: bool
 
@@ -432,30 +438,28 @@ DEFAULT_VALUES:
 MOVE_FIELDS:
   contrib:
     assessmentLegacy:
-      !!set
-      ? approved
-      ? dateApproved
-      ? dateApprovedCIO
-      ? submitted
-      ? reviewerName
-      ? reviewerDecision
-      ? vccDecision
-      ? vccApproval
-      ? vccDisApproval
+      - approved
+      - dateApproved
+      - dateApprovedCIO
+      - submitted
+      - reviewerName
+      - reviewerDecision
+      - vccDecision
+      - vccApproval
+      - vccDisApproval
   country: {}
 
 VALUE_LISTS:
   contrib:
-    !!set
-    ? keyword
-    ? discipline
-    ? tadirahActivity
-    ? tadirahObject
-    ? tadirahTechnique
-    ? typeContribution
-    ? typeContributionOther:typeContribution
-    ? vcc
-    ? year
+    - keyword
+    - discipline
+    - tadirahActivity
+    - tadirahObject
+    - tadirahTechnique
+    - typeContribution
+    - typeContributionOther:typeContribution
+    - vcc
+    - year
 
 MOVE_MISSING:
   contrib: description

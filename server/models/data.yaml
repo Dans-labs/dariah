@@ -512,25 +512,6 @@ tables:
           allowNew: false
           freeze:
             label: Contribution details
-            formatting:
-              listSpecs:
-                typeContribution:
-                  start: ""
-                  sep: ", "
-              template: |
-                [{title}]({urlContribution})
-
-                {country} {year}
-
-                {typeContribution}
-
-                [{contactPersonName}]({contactPersonEmail[0]})
-
-                Created {dateCreated}
-
-                Last modified {modifiedLast} 
-
-                {description}
             details: false
         multiple: false
       remarks:
@@ -597,14 +578,7 @@ tables:
           values: criteria
           allowNew: false
           freeze:
-            label: Details
-            formatting:
-              listSpecs:
-                remarks:
-                  start: ""
-                  sep: "\n\n---\n\n"
-              template: |
-                {remarksStr}
+            label: Criteria details
             details: false
         multiple: false
       score:

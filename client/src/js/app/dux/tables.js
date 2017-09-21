@@ -430,7 +430,9 @@ const repr1Head = (tables, table, valType, value, settings) => {
   }
   else {
     const { values: relTable } = valType
-    return headEntity(tables, relTable, value)
+    return relTable == null
+    ? emptyS
+    : headEntity(tables, relTable, value)
   }
 }
 
@@ -458,6 +460,7 @@ export const repr = memoize(
     }
 
     const { values: detailTable } = valType
+    if (detailTable == null) {return emptyS}
     const {
       [detailTable]: {
         fieldSpecs: { [detailField]: { multiple: detailMultiple, valType: detailValType } },

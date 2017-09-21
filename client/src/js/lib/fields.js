@@ -5,6 +5,7 @@ import Markdown from 'react-markdown'
 
 import { memoize } from 'memo'
 import { emptyS, emptyA, emptyO } from 'utils'
+import { applyFrozenTemplate } from 'templates'
 
 import { repr } from 'tables'
 
@@ -65,7 +66,10 @@ const valuePrepare = memoize((tables, table, valType, detailField, activeItems, 
   const link = {}
   let elem = 'span'
   if (typeof valType === 'object') {
-    const { values: detailTable } = valType
+    const { frozen, values: detailTable } = valType
+    if (frozen) {
+      return [applyFrozenTemplate(table, frozen, value)]
+    }
     if (detailField == null) {
       classNames.push('tag')
       link.href = `/data/${detailTable}/list/item/${value}`
@@ -122,8 +126,11 @@ const putElem = ([rep, attributes, elem], i) => {
  */
 export const wrappedRepr = memoize(
   (tables, table, valType, multiple, detailField, activeItems, inactive, values, settings) => {
+    const { frozen } = valType
     const prepare = valuePrepare(tables, table, valType, detailField, activeItems, inactive)
-    const reps = repr(tables, table, valType, multiple, detailField, values, settings)
+    const reps = frozen
+    ? values
+    : repr(tables, table, valType, multiple, detailField, values, settings)
     const xReps = multiple
     ? (values || emptyA).map((value, i) => prepare(value, reps[i])).filter(x => x != null)
     : prepare(values, reps)
@@ -170,7 +177,7 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
     }
     if (editable && typeof valType === 'object') {
       const { values, link } = valType
-      if (link != null) {
+      if (values != null && link != null) {
         const { [table]: { entities: { [eId]: { values: { [link]: masterValue } = emptyO } = emptyO } = emptyO } = emptyO } = tables
         if (masterValue != null) {
           const { [values]: { entities } } = tables
