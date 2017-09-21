@@ -1,5 +1,5 @@
 #!/bin/bash
-# This a the script that you can run on the production server of DARIAH to update the code and the data
+# This a the script that you can run on the production server of DARIAH to update the code
 
 # run it as follows:
 #
