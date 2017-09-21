@@ -33,6 +33,7 @@ fi
 
 cd $ADIR/$APP
 git pull origin master
+
 cd static/tools
 python3 mongoFromFm.py production
 

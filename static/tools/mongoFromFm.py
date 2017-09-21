@@ -99,7 +99,7 @@
 # * write SQL create statements and insert statements
 # * import a moderately denormalized version of the data into MongoDB
 
-import os,sys,re,collections,json,yaml,xlsxwriter
+import os,sys,re,collections,json,yaml
 from os.path import splitext, basename
 from functools import reduce
 from glob import glob
@@ -851,7 +851,7 @@ INSR = documents to be inserted, avoiding overwriting
         self.importMongo()
         #self.showData()
         #self.showMoney()
-        if isDevel: self.exportXlsx()
+        #if isDevel: self.exportXlsx()
 
 FMConvert().run()
 
