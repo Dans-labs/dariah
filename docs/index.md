@@ -20,6 +20,11 @@ and followed the most recent and idiomatic practices to achieve our ends.
 
 # Overview of this documentation
 
+## [Workflow](Workflow)
+This app is designed to handle a self-assessment and review workflow of
+`contribution` descriptions.
+This is a fairly sophisticated workflow. Read more by clicking on the heading of this section.
+
 ## The technology
 Crash course in modern Javascript, [ES6](ES6) and [React+Redux](React).
 
