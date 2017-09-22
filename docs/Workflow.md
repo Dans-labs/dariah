@@ -2,7 +2,7 @@
 title: Workflow
 ---
 
-A contribution is a piece of work in Digital Humanities, delivered by a person or institute,
+A  contribution is a piece of work in Digital Humanities, delivered by a person or institute,
 and potentially relevant to the European DARIAH research infrastructure.
 The national members of DARIAH may add such a contribution to their agreed budget of inkind
 contributions to DARIAH as a whole. This makes it necessary to assess contributions against
