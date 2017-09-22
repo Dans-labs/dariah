@@ -6,17 +6,12 @@ title: Home
 
 # [DARIAH contribution tool](https://dariah-beta.dans.knaw.nl)
 
-This is the technical documentation for the
+This is the documentation for the
 DARIAH contribution tool, an instrument to register and assess
 community contributions to the [DARIAH](http://www.dariah.eu).
 
-The contribution is an [SPA](https://en.wikipedia.org/wiki/Single-page_application)
-(Single Page Application)
-and hence the focus is on the client side, aka front-end of the app.
-
-We have implemented the front-end with the help of
-[React](https://facebook.github.io/react/) and [Redux](http://redux.js.org)
-and followed the most recent and idiomatic practices to achieve our ends.
+The documentation contains a functional part, the *workflow* of assessment and reviewing,
+and a technical part: architecture, technologiy, software design.
 
 # Overview of this documentation
 
@@ -26,7 +21,14 @@ This app is designed to handle a self-assessment and review workflow of
 This is a fairly sophisticated workflow. Read more by clicking on the heading of this section.
 
 ## The technology
-Crash course in modern Javascript, [ES6](ES6) and [React+Redux](React).
+The contribution is an [SPA](https://en.wikipedia.org/wiki/Single-page_application)
+(Single Page Application) and hence the focus is on the client side, aka front-end of the app.
+
+We have implemented the front-end with the help of
+[React](https://facebook.github.io/react/) and [Redux](http://redux.js.org)
+and followed the most recent and idiomatic practices to achieve our ends.
+
+Here is a crash course in modern i[Javascript, ES6](ES6) and [React+Redux](React).
 
 ## [API](API) and [Routing](Routing)
 The data of the tool is accessible through an API.
