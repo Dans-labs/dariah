@@ -97,7 +97,7 @@ In all cases, a *consolidated* version of the assessment will be made.
 ## Approve
 This is a record, where all links to related records have been replaced by concrete values present at that time.
 A consolidated record only contains text fields. 
-Consolidated assessments will be stored in a collection called **\_assessment**.
+Consolidated assessments will be stored in a collection called `_assessment`.
 They contain the id of the *live* assessment, and a time stamp of the moment of consolidating.
 
 The *live* assessment will remain immutable, but the *live* contribution becomes mutable again.
