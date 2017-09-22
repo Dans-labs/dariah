@@ -8,7 +8,7 @@ The national members of DARIAH may add such a contribution to their agreed budge
 contributions to DARIAH as a whole. This makes it necessary to assess contributions against
 a set of well-defined criteria.
 
-### Assessment model
+# Assessment model
 Contributions may represent as diverse efforts as consultancy, workshops, software development, and hosting
 services.
 This asks for a diversification of contribution types and associated criteria.
@@ -37,7 +37,7 @@ In that case, the sets of active types and criteria are the union of the sets of
 and criteria for each active package. 
 But the intention is that there is always exactly one active package.
 
-#### Assessing
+## Assessing
 Applicants with write access to a contribution can add a self-assessment to a contribution.
 A self assessment is a record in the **assessment** table, and consists of a few metadata fields.
 
@@ -50,7 +50,7 @@ one criteriaEntry record will be created per active criterion.
 A criteriaEntry record has a field for choosing a score and a text field for entering the evidence.
 Scores are defined in yet another type of record.
 
-#### Scoring
+## Scoring
 The scores for a criterion are in detail records of criteria: **score** records.
 Scores have a number, typically `0`, `2`, `4`, and a short description, typically
 `None`, `Partial`, `Full`, but the number and nature of scores may vary freely between criteria.
@@ -76,7 +76,7 @@ score(B) = (4 + 4  + 4 + 0) / 4 = 3
 
 Not all criteria will allow `NA` values!
 
-### Review model
+# Review model
 After a contributor has filled out an assessment, (s)he can ask for a review.
 Two reviewers will be selected, and they will get access to the self assessment.
 
@@ -94,7 +94,7 @@ At a certain point, Reviewer 2 can take a three fold decision:
 
 In all cases, a *consolidated* version of the assessment will be made.
 
-#### Approve
+## Approve
 This is a record, where all links to related records have been replaced by concrete values present at that time.
 A consolidated record only contains text fields. 
 Consolidated assessments will be stored in a collection called **\_assessment**.
@@ -112,7 +112,7 @@ Their metadata (among which urls and email addresses) may change, and the contri
 to keep the data for his/her contribution up to data, especially in view of data exchange between the contribtuon tool
 and the Market Place.
 
-#### Reject
+## Reject
 In this case, a *consolidated* version of the assessment will be made.
 The *live* assessment will remain immutable, but the *live* contribution becomes mutable again.
 The applicant may enter an objection.
@@ -125,12 +125,12 @@ In that case the backoffice will ask a second opinion and take appropriate actio
 * If the second opinion is *reassess*, the applicant is invited to create a new self assessment and offer it for
   review. Two different reviewers will be chosen.
 
-#### Modifications needed
+## Modifications needed
 The *live* assessment and *live* contribution will become mutable again, and the applicant can modify both
 in response to comments by the reviewers.
 When (s)he is finished, the applicant can again ask for review.
 
-### Trails
+# Trails
 After an assessment and review process, the system contains a trail of all that has gone on in the following form:
 
 * **live contribution**
