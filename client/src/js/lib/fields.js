@@ -5,7 +5,7 @@ import Markdown from 'react-markdown'
 
 import { memoize } from 'memo'
 import { emptyS, emptyA, emptyO } from 'utils'
-import { applyFrozenTemplate } from 'templates'
+import { applyTemplate } from 'templates'
 
 import { repr } from 'tables'
 
@@ -51,7 +51,7 @@ const mergeClassnames = (classNames, attributes) => {
   : { ...attributes, className: `${className} ${attributes.className || emptyS}` }
 }
 
-const valuePrepare = memoize((tables, table, valType, detailField, activeItems, inactive) => (value, rep) => {
+const valuePrepare = memoize((settings, tables, table, valType, relField, activeItems, inactive) => (value, rep) => {
   if (valType === 'textarea') {return [rep, { source: rep }, 'Markdown']}
   if (valType === 'url') {return [rep, { href: rep, target: '_blank' }, 'a']}
   if (valType === 'email') {
@@ -66,26 +66,28 @@ const valuePrepare = memoize((tables, table, valType, detailField, activeItems, 
   const link = {}
   let elem = 'span'
   if (typeof valType === 'object') {
-    const { frozen, values: detailTable } = valType
-    if (frozen) {
-      return [applyFrozenTemplate(table, frozen, value)]
+    const { relTable } = valType
+    const relRecord = tables[relTable].entities[value]
+    if (value != null) {
+      const templateApplied = applyTemplate(settings, tables, relTable, 'related', table, relRecord.values)
+      if (templateApplied) {return [templateApplied]}
     }
-    if (detailField == null) {
+    if (relField == null) {
       classNames.push('tag')
-      link.href = `/data/${detailTable}/list/item/${value}`
+      link.href = `/data/${relTable}/list/item/${value}`
       elem = 'a'
     }
     else {
-      const { [detailTable]: { fieldSpecs: { [detailField]: {
-        valType: detailValType,
-        multiple: detailMultiple,
+      const { [relTable]: { fieldSpecs: { [relField]: {
+        valType: relValType,
+        multiple: relMultiple,
       } } } } = tables
-      const detailPrepare = valuePrepare(tables, detailTable, detailValType, null, activeItems, inactive)
-      const detailValues = tables[detailTable].entities[value].values[detailField]
-      const xReps = detailMultiple
-      ? (detailValues || emptyA).map((detailValue, i) => detailPrepare(detailValue, rep[i])).filter(x => x != null)
-      : detailPrepare(detailValues, rep)
-      return detailMultiple
+      const relPrepare = valuePrepare(settings, tables, relTable, relValType, null, activeItems, inactive)
+      const relValues = relRecord.values[relField]
+      const xReps = relMultiple
+      ? (relValues || emptyA).map((relValue, i) => relPrepare(relValue, rep[i])).filter(x => x != null)
+      : relPrepare(relValues, rep)
+      return relMultiple
       ? [(xReps || emptyA).map((r, i) => putElem(r, i)), emptyO, 'div']
       : xReps
     }
@@ -125,12 +127,9 @@ const putElem = ([rep, attributes, elem], i) => {
  * Depending on settings and active items it might be wrapped into elements with attributes.
  */
 export const wrappedRepr = memoize(
-  (tables, table, valType, multiple, detailField, activeItems, inactive, values, settings) => {
-    const { frozen } = valType
-    const prepare = valuePrepare(tables, table, valType, detailField, activeItems, inactive)
-    const reps = frozen
-    ? values
-    : repr(tables, table, valType, multiple, detailField, values, settings)
+  (tables, table, valType, multiple, relField, activeItems, inactive, values, settings) => {
+    const prepare = valuePrepare(settings, tables, table, valType, relField, activeItems, inactive)
+    const reps = repr(tables, table, valType, multiple, relField, values, settings)
     const xReps = multiple
     ? (values || emptyA).map((value, i) => prepare(value, reps[i])).filter(x => x != null)
     : prepare(values, reps)
@@ -176,11 +175,11 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
       ...props,
     }
     if (editable && typeof valType === 'object') {
-      const { values, link } = valType
-      if (values != null && link != null) {
+      const { relTable, link } = valType
+      if (relTable != null && link != null) {
         const { [table]: { entities: { [eId]: { values: { [link]: masterValue } = emptyO } = emptyO } = emptyO } = emptyO } = tables
         if (masterValue != null) {
-          const { [values]: { entities } } = tables
+          const { [relTable]: { entities } } = tables
           if (entities != null) {
             const allowed = Object.keys(entities).filter(_id => entities[_id].values[link] === masterValue)
             theField.allowed = allowed

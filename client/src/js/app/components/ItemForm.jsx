@@ -21,6 +21,7 @@ const ItemForm = props => {
     alter, alterSection,
     filters,
     tables, table, eId,
+    masterId, linkField,
     isactive,
     fixed,
     border,
@@ -86,6 +87,8 @@ const ItemForm = props => {
               tables={tables}
               table={table}
               eId={eId}
+              masterId={masterId}
+              linkField={linkField}
               fieldFragments={fieldFragments}
             />
           </div>

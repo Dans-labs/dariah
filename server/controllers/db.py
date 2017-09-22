@@ -69,11 +69,7 @@ class DbAccess(object):
     def validate(self, table, itemValues, uFields):
         tableInfo = self.DM.tables.get(table, {})
         modified = self.DM.generic['modified']
-        (fieldOrder, fieldSpecs, allFields, frozenFields) = self.extendFields(table, True)
-        for f in frozenFields:
-            (of, details) = frozenFields[f]
-            if of in uFields:
-                uFields[f] = True
+        (fieldOrder, fieldSpecs, allFields) = self.theseFields(table, True)
         valItemValues = dict()
         newValues = []
         for (f, values) in itemValues.items():
@@ -110,14 +106,14 @@ class DbAccess(object):
                 else:
                     valValues = [v for v in values]
             else: 
-                if 'values' not in valType: continue
+                if 'relTable' not in valType: continue
                 valueLists = self.getValueLists(table, {}, msgs, noTables=True)
                 if len(msgs):
                     valid = False
                     diags.append('Could not get the valuelists')
                 else:
                     allowNew = valType['allowNew']
-                    relTable = valType['values']
+                    relTable = valType['relTable']
                     for v in values:
                         if v not in valueLists.get(f, {}):
                             if not allowNew:
@@ -163,7 +159,7 @@ class DbAccess(object):
         (rowFilter, fieldFilter) = result
         details = tableInfo.get('details', {})
         detailOrder = tableInfo.get('detailOrder', [])
-        (fieldOrder, fieldSpecs, fieldFilter, frozenFields) = self.extendFields(table, fieldFilter)
+        (fieldOrder, fieldSpecs, fieldFilter) = self.theseFields(table, fieldFilter)
         core = set()
         core.add(title)
         core |= {f['field'] for f in tableInfo.get('filters', [])}
@@ -247,9 +243,9 @@ class DbAccess(object):
             f for (f, fSpec) in fieldSpecs.items()\
                 if f in getFields and\
                 type(fSpec['valType']) is dict and\
-                'values' in fSpec['valType']
+                'relTable' in fSpec['valType']
         ]  
-        relTables = {fieldSpecs[f]['valType']['values'] for f in relFields}
+        relTables = {fieldSpecs[f]['valType']['relTable'] for f in relFields}
         good = True
         if not noTables:
             for t in relTables:
@@ -257,7 +253,7 @@ class DbAccess(object):
 
         for f in relFields:
             fSpec = fieldSpecs[f]['valType']
-            t = fSpec['values']
+            t = fSpec['relTable']
             thisTableInfo = self.DM.tables.get(t, {})
             select = fSpec.get('select', {})
             valueOrder = thisTableInfo.get('sort', self.DM.generic['sort'])
@@ -282,14 +278,14 @@ class DbAccess(object):
             return self.stop(text=result or 'Cannot read {}'.format(table))
         tableInfo = self.DM.tables.get(table, {})
         (rowFilter, fieldFilter) = result
-        (fieldOrder, fieldSpecs, fieldFilter, frozenFields) = self.extendFields(table, fieldFilter)
+        (fieldOrder, fieldSpecs, fieldFilter) = self.theseFields(table, fieldFilter)
 
         if ident != None:
             rowFilter.update({'_id': oid(ident)})
-            return self.findDoc(table, rowFilter, fieldFilter, frozenFields, {}, '{} item does not exist'.format(table))
+            return self.findDoc(table, rowFilter, fieldFilter, {}, '{} item does not exist'.format(table))
         else:
             rowFilter.update({'_id': {'$in': [oid(i) for i in request.json]}})
-            return self.findDoc(table, rowFilter, fieldFilter, frozenFields, {}, '{} cannot find items'.format(table), multiple=True)
+            return self.findDoc(table, rowFilter, fieldFilter, {}, '{} cannot find items'.format(table), multiple=True)
 
     def _insertItem(self, controller, table, newData, records):
         masterId = newData.get('masterId', None)
@@ -303,7 +299,6 @@ class DbAccess(object):
         if not readGood:
             return self.stop(data=none, text=readResult or 'Cannot read table {}'.format(table))
         (readRowFilter, readFieldFilter) = readResult
-        (fieldOrder, fieldSpecs, readFieldFilter, frozenFields) = self.extendFields(table, True)
         modDate = now()
         modBy = self.eppn
         createdDate = self.DM.generic['createdDate']
@@ -317,40 +312,23 @@ class DbAccess(object):
         masterDocument = None
         masterTitle = None
         if masterId != None and linkField != None:
-            insertValues[linkField] = oid(masterId)
+            (fieldOrder, fieldSpecs, fieldFilter) = self.theseFields(table, readFieldFilter)
+            oMasterId = oid(masterId)
+            insertValues[linkField] = oMasterId
+            linkFieldSpecs = fieldSpecs[linkField]
+            masterTable = linkFieldSpecs['valType']['relTable']
+            masterDocument = list(_DBM[masterTable].find({'_id': oMasterId}))[0]
+            masterTableInfo = self.DM.tables.get(masterTable, {})
+            masterTitle = masterTableInfo.get('title', self.DM.generic['title'])
         for (field, value) in newData.items():
             if field != 'linkField' and field != 'masterId':
                 insertValues[field] = value
-        fInsertValues = dict()
-        for (field, value) in insertValues.items():
-            freeze = False
-            specs = fieldSpecs[field]['valType']
-            if type(specs) is not str:
-                freeze = specs.get('freeze', False)
-            fInsertValues[field] = value
-            if type(freeze) is dict:
-                relTable = specs['values']
-                relTableInfo = self.DM.tables.get(relTable, {})
-                relTitle = relTableInfo.get('title', self.DM.generic['title'])
-                relDocument = list(_DBM[relTable].find({ '_id': value}))[0]
-                frozenField = 'frozen-{}'.format(field)
-                frozenValue = self.consolidateDocs(
-                    relTable, relDocument,
-                    level=0,
-                    withDetails=freeze.get('details', False),
-                )
-                fInsertValues[frozenField] = frozenValue
-                if field == linkField:
-                    masterDocument = relDocument
-                    masterTitle = relTitle
-                    fInsertValues[title] = '{} of {}'.format(item, masterDocument[relTitle])
-
         if title not in insertValues:
-            fInsertValues[title] = '{} of {}'.format(item, masterDocument[masterTitle]) if masterDocument else noTitle
+            insertValues[title] = '{} of {}'.format(item, masterDocument[masterTitle]) if masterDocument else noTitle
 
-        result = _DBM[table].insert_one(fInsertValues)
+        result = _DBM[table].insert_one(insertValues)
         ident = result.inserted_id
-        records.append((table, ident, readFieldFilter, frozenFields))
+        records.append((table, ident, readFieldFilter))
 
         if table == 'assessment':
             if masterDocument != None:
@@ -447,7 +425,13 @@ class DbAccess(object):
             if len(documents) != 1:
                 return self.stop(data=none, text='Unidentified item to update')
             document = documents[0]
-            (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
+            (mayUpdate, updFields) = Perm.may(table, 'update', document=document)
+            (fieldOrder, fieldSpecs, fieldFilter) = self.theseFields(table, fieldFilter)
+            uFields = set()
+            for uField in updFields:
+                valType = fieldSpecs[uField]['valType']
+                if type(valType) is not dict or not valType.get('fixed', False):
+                    uFields.add(uField)
             if not mayUpdate:
                 return self.stop(data=none, text='Not allowed to update this item')
             newValues = dict(x for x in newData.get('values', {}).items())
@@ -469,30 +453,6 @@ class DbAccess(object):
                 validationMsgs.append(dict(kind='warning', text='table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)))
                 return self.stop(data=validationDiags, msgs=validationMsgs)
 
-            (fieldOrder, fieldSpecs, fieldFilter, frozenFields) = self.extendFields(table, fieldFilter)
-            for field in frozenFields:
-                (origField, details) = frozenFields[field]
-                fieldSpec = fieldSpecs[origField]
-                valType = fieldSpec['valType']
-                multiple = fieldSpec['multiple']
-                valueTable = valType['values']
-                if multiple:
-                    if sorted(updateValues[origField]) == sorted(document.get('origField', None)): continue
-                    docs = list(_DBM[valueTable].find({ '_id': {'$in': updateValues[origField]}}))
-                    frozenValue = self.consolidateDocs(
-                        valueTable, docs,
-                        level=0,
-                        withDetails=details,
-                    )
-                else:
-                    if updateValues[origField] == document.get('origField', None): continue
-                    doc = list(_DBM[valueTable].find({ '_id': updateValues[origField]}))[0]
-                    frozenValue = self.consolidateDocs(
-                        valueTable, doc,
-                        level=0,
-                        withDetails=details,
-                    )
-                updateValues[field] = frozenValue
 
             modDate = now()
             modBy = self.eppn
@@ -515,7 +475,7 @@ class DbAccess(object):
         msgs = [] if good else [dict(kind='error', text=text)] if msgs == None else msgs
         return dict(data=data, msgs=msgs, good=good)
 
-    def findDoc(self, table, rowFilter, fieldFilter, frozenFields, failData, failText, multiple=False):
+    def findDoc(self, table, rowFilter, fieldFilter, failData, failText, multiple=False):
         Perm = self.Perm
         creatorField = self.CREATOR
         theFieldFilter = dict(x for x in fieldFilter.items())
@@ -529,10 +489,6 @@ class DbAccess(object):
             for document in documents:
                 (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
                 (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
-                for f in frozenFields:
-                    (of, details) = frozenFields[f]
-                    if of in uFields:
-                        uFields[f] = True
                 perm = dict(update=uFields, delete=mayDelete)
                 data.append(dict(
                     values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
@@ -544,10 +500,6 @@ class DbAccess(object):
             document = documents[0]
             (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
             (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
-            for f in frozenFields:
-                (of, details) = frozenFields[f]
-                if of in uFields:
-                    uFields[f] = True
             perm = dict(update=uFields, delete=mayDelete)
             return self.stop(data=dict(
                 values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
@@ -560,7 +512,7 @@ class DbAccess(object):
         creatorField = self.CREATOR
         errors = []
         data = []
-        for (table, ident, fieldFilter, frozenFields) in records:
+        for (table, ident, fieldFilter) in records:
             rowFilter = dict(_id=ident)
             theFieldFilter = dict(x for x in fieldFilter.items())
             theFieldFilter[creatorField] = True
@@ -572,10 +524,6 @@ class DbAccess(object):
             document = documents[0]
             (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
             (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
-            for f in frozenFields:
-                (of, details) = frozenFields[f]
-                if of in uFields:
-                    uFields[f] = True
             perm = dict(update=uFields, delete=mayDelete)
             data.append(dict(
                 table=table,
@@ -614,10 +562,8 @@ class DbAccess(object):
                 if type(valType) is str:
                     consDoc[field] = [simpleVal(valType, val) for val in docVal] if multiple else simpleVal(valType, docVal)
                     continue
-                elif 'frozen' in valType:
-                    consDoc[field] = docVal
                 else:
-                    valueTable = valType['values']
+                    valueTable = valType['relTable']
                     relatedDocs = list(_DBM[valueTable].find(
                         {'_id': {'$in': [_id for _id in (docVal if multiple else [docVal])]}}
                     ))
@@ -689,36 +635,16 @@ class DbAccess(object):
         description = doc.get('description', '')
         return '{} - {}'.format(score, level) if score or level else description
 
-    def extendFields(self, table, fieldFilter):
+    def theseFields(self, table, fieldFilter):
         tableInfo = self.DM.tables.get(table, {})
         fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder']) if fieldFilter == True or x in fieldFilter]
-        fieldSpecsPost = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
-        fieldFilterPost = dict()
-        frozenFields = dict()
-        fieldOrderPost = []
-        for field in fieldOrder:
-            if field.startswith('frozen-'): continue
-            if fieldFilter or x in fieldFilter:
-                fieldFilterPost[field] = True
-            fieldOrderPost.append(field)
-            fieldSpec = fieldSpecsPost.get(field, {})
-            fieldLabel = fieldSpec.get('label', field)
-            valType = fieldSpec.get('valType', None)
-            if valType == None or type(valType) is not dict: continue
-            freeze = valType.get('freeze', False)
-            if type(freeze) is not dict: continue
-            details = freeze['details']
-            frozenLabel = freeze.get('label', '{} (consolidated)'.format(fieldLabel))
-            frozenField = 'frozen-{}'.format(field)
-            fieldOrderPost.append(frozenField)
-            fieldSpecsPost[frozenField] = dict(
-                label=frozenLabel,
-                valType=dict(frozen=valType['values']),
-                multiple=fieldSpec.get('multiple', False),
-            )
-            frozenFields[frozenField] = [field, details]
-            fieldFilterPost[frozenField] = True
-        return (fieldOrderPost, fieldSpecsPost, fieldFilterPost, frozenFields)
+        fieldSpecs = dict(
+            x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder
+        )
+        fieldFilterPost = dict(
+            (f, True) for f in fieldOrder
+        )
+        return (fieldOrder, fieldSpecs, fieldFilterPost)
 
     def getActiveItems(self):
         present = now()

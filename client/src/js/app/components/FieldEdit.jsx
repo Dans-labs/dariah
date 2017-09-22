@@ -51,8 +51,7 @@ const FieldEdit = ({ alter, field, tables, table, eId, dispatch, allowed, ...pro
     }
   }
   else {
-    const { frozen, allowNew, popUpIfEmpty, inactive } = valType
-    if (frozen) {return null}
+    const { allowNew, popUpIfEmpty, inactive } = valType
     const activeItems = inactive ? compileActive(tables, field) : null
     const selectTag = `${table}-${eId}-${field}`
     return (

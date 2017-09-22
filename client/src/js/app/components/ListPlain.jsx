@@ -42,6 +42,7 @@ class ListPlain extends Component {
         settings, alter, alterSection,
         filtered, filters,
         tables, table, select,
+        masterId, linkField,
         fixed, listIds, expand, border,
         perm,
         dispatch,
@@ -103,6 +104,8 @@ class ListPlain extends Component {
                         tables={tables}
                         table={table}
                         eId={eId}
+                        masterId={masterId}
+                        linkField={linkField}
                         isactive={isactive}
                         fixed={fixed}
                         inhibitFetch={expand}

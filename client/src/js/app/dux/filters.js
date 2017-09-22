@@ -238,7 +238,7 @@ const gatherValues = memoize((tables, fieldSpecs, fieldIds, filterField, filterR
     })
   }
   else {
-    const { values: relTable } = valType
+    const { relTable } = valType
     if (filterRelField == null) {
       fieldIds.forEach(_id => {
         fieldValues[_id] = headEntity(tables, relTable, _id)
@@ -285,7 +285,7 @@ const getUnpack = (tables, fieldSpec, asString = false, relField = null) => {
         : [v]
   }
   else {
-    const { values: relTable } = valType
+    const { relTable } = valType
     const entityRep = relField
     ? entityFieldVal(relField)
     : headEntity

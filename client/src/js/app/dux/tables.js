@@ -215,8 +215,8 @@ export const needTable = (tables, table, select = ALLIDS, complete) => {
   const relTables = Array.from(
     new Set(
       Object.entries(fieldSpecs).
-      filter(entry => ((typeof entry[1].valType) === 'object') && entry[1].valType.values != null).
-      map(entry => entry[1].valType.values)
+      filter(entry => ((typeof entry[1].valType) === 'object') && entry[1].valType.relTable != null).
+      map(entry => entry[1].valType.relTable)
     )
   ).concat(detailOrder)
   if (relTables.some(relTable => !hasTableKey(tables, relTable, ALLIDS))) {return true}
@@ -304,7 +304,6 @@ export const listValues = memoize(({ tables, table, eId, field }) => (
  */
 
 const headUser = memoize((tables, valId) => {
-  let valRep
   const { user: { entities: { [valId]: entity } } } = tables
   if (entity) {
     const {
@@ -313,22 +312,13 @@ const headUser = memoize((tables, valId) => {
         firstName = emptyS,
         lastName = emptyS,
         email = emptyS,
-        authority,
-        mayLogin,
       },
     } = entity
-    let linkText = [firstName, lastName].filter(x => x).join(' ')
-    if (linkText === emptyS) {linkText = email}
-    const namePart = linkText && email
-    ? `[${linkText}](mailto:${email})`
-    : linkText + email
-    const eppnPart = eppn ? ` eppn=${eppn} ` : emptyS
-    const authorityPart = authority ? ` authenticated by=${authority} ` : emptyS
-    const mayLoginPart = mayLogin ? ` active=${mayLogin} ` : emptyS
-    valRep = [namePart, eppnPart, authorityPart, mayLoginPart].filter(x => x).join('; ')
+    const nameParts = [firstName, lastName].filter(x => x)
+    if (nameParts.length) {return nameParts.join(' ')}
+    return [email, eppn, 'no name'].filter(x => x)[0]
   }
-  else {valRep = 'UNKNOWN'}
-  return valRep
+  else {return 'UNKNOWN'}
 }, emptyO)
 
 const headCountry = memoize((tables, valId) => {
@@ -429,7 +419,7 @@ const repr1Head = (tables, table, valType, value, settings) => {
     }
   }
   else {
-    const { values: relTable } = valType
+    const { relTable } = valType
     return relTable == null
     ? emptyS
     : headEntity(tables, relTable, value)
@@ -454,28 +444,28 @@ const reprHead = (tables, table, valType, multiple, value, settings, sep) => {
  * If not, we take a single space as default.
  */
 export const repr = memoize(
-  (tables, table, valType, multiple, detailField, value, settings, sep, detailSep) => {
-    if (detailField == null) {
+  (tables, table, valType, multiple, relField, value, settings, sep, relSep) => {
+    if (relField == null) {
       return reprHead(tables, table, valType, multiple, value, settings, sep)
     }
 
-    const { values: detailTable } = valType
-    if (detailTable == null) {return emptyS}
+    const { relTable } = valType
+    if (relTable == null) {return emptyS}
     const {
-      [detailTable]: {
-        fieldSpecs: { [detailField]: { multiple: detailMultiple, valType: detailValType } },
+      [relTable]: {
+        fieldSpecs: { [relField]: { multiple: relMultiple, valType: relValType } },
       },
     } = tables
-    const detailValues = multiple
-    ? value.map(val => tables[detailTable].entities[val].values[detailField])
-    : tables[detailTable].entities[value].values[detailField]
+    const relValues = multiple
+    ? value.map(val => tables[relTable].entities[val].values[relField])
+    : tables[relTable].entities[value].values[relField]
 
-    const theDetailSep = multiple && detailMultiple && sep != null && detailSep == null
+    const theRelSep = multiple && relMultiple && sep != null && relSep == null
     ? ' '
-    : detailSep
+    : relSep
     const rep = multiple
-    ? detailValues.map(detailValue => reprHead(tables, detailTable, detailValType, detailMultiple, detailValue, settings, theDetailSep))
-    : reprHead(tables, detailTable, detailValType, detailMultiple, detailValues, settings, detailSep)
+    ? relValues.map(relValue => reprHead(tables, relTable, relValType, relMultiple, relValue, settings, theRelSep))
+    : reprHead(tables, relTable, relValType, relMultiple, relValues, settings, relSep)
 
     return multiple && sep != null
     ? rep.join(sep)

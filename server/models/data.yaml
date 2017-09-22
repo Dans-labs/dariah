@@ -79,7 +79,7 @@ tables:
       creator:
         label: creator
         valType:
-          values: user
+          relTable: user
           allowNew: false
         multiple: false
       dateCreated:
@@ -161,7 +161,7 @@ tables:
       creator:
         label: creator
         valType:
-          values: user
+          relTable: user
           allowNew: false
         multiple: false
         grid:
@@ -229,7 +229,7 @@ tables:
       creator:
         label: creator
         valType:
-          values: user
+          relTable: user
           allowNew: false
         multiple: false
         grid:
@@ -343,7 +343,7 @@ tables:
       country:
         label: Country(ies)
         valType:
-          values: country
+          relTable: country
           select:
             isMember: true
           allowNew: false
@@ -351,31 +351,31 @@ tables:
       year:
         label: Year
         valType:
-          values: year
+          relTable: year
           allowNew: true
         multiple: false
       vcc:
         label: VCC
         valType:
-          values: vcc
+          relTable: vcc
           allowNew: false
         multiple: true
       discipline:
         label: Disciplines
         valType:
-          values: discipline
+          relTable: discipline
           allowNew: true
         multiple: true
       keyword:
         label: Keywords
         valType:
-          values: keyword
+          relTable: keyword
           allowNew: true
         multiple: true
       typeContribution:
         label: Type
         valType:
-          values: typeContribution
+          relTable: typeContribution
           allowNew: false
           inactive:
             attributes:
@@ -386,31 +386,31 @@ tables:
       typeContributionOther:
         label: Type
         valType:
-          values: typeContribution
+          relTable: typeContribution
           allowNew: true
         multiple: true
       tadirahObject:
         label: Object(s)
         valType:
-          values: tadirahObject
+          relTable: tadirahObject
           allowNew: false
         multiple: true
       tadirahActivity:
         label: Activity(ies)
         valType:
-          values: tadirahActivity
+          relTable: tadirahActivity
           allowNew: false
         multiple: true
       tadirahTechnique:
         label: Technique(s)
         valType:
-          values: tadirahTechnique
+          relTable: tadirahTechnique
           allowNew: false
         multiple: true
       creator:
         label: creator
         valType:
-          values: user
+          relTable: user
           allowNew: false
         multiple: false
       dateCreated:
@@ -506,13 +506,10 @@ tables:
         valType: text
         multiple: false
       contrib:
-        label: Contribution link
+        label: Contribution
         valType:
-          values: contrib
+          relTable: contrib
           allowNew: false
-          freeze:
-            label: Contribution details
-            details: false
         multiple: false
       remarks:
         label: Remarks
@@ -521,7 +518,7 @@ tables:
       creator:
         label: creator
         valType:
-          values: user
+          relTable: user
           allowNew: false
         multiple: false
       dateCreated:
@@ -575,16 +572,14 @@ tables:
       criteria:
         label: criterion
         valType:
-          values: criteria
+          relTable: criteria
           allowNew: false
-          freeze:
-            label: Criteria details
-            details: false
+          fixed: true
         multiple: false
       score:
         label: score
         valType:
-          values: score
+          relTable: score
           link: criteria
           allowNew: false
           popUpIfEmpty: true
@@ -592,9 +587,9 @@ tables:
       assessment:
         label: assessment
         valType:
-          values: assessment
+          relTable: assessment
           allowNew: false
-          freeze: true
+          fixed: true
         multiple: false
       evidence:
         label: evidence
@@ -603,7 +598,7 @@ tables:
       creator:
         label: creator
         valType:
-          values: user
+          relTable: user
           allowNew: false
         multiple: false
       dateCreated:
@@ -659,7 +654,7 @@ tables:
       typeContribution:
         label: Type
         valType:
-          values: typeContribution
+          relTable: typeContribution
           allowNew: true
           inactive:
             attributes:
@@ -674,7 +669,7 @@ tables:
       creator:
         label: creator
         valType:
-          values: user
+          relTable: user
           allowNew: false
         multiple: false
       dateCreated:
@@ -716,14 +711,14 @@ tables:
       package:
         label: Package
         valType:
-          values: package
+          relTable: package
           allowNew: true
-          freeze: true
+          fixed: true
         multiple: false
       typeContribution:
         label: Type
         valType:
-          values: typeContribution
+          relTable: typeContribution
           allowNew: true
           inactive:
             attributes:
@@ -742,7 +737,7 @@ tables:
       creator:
         label: creator
         valType:
-          values: user
+          relTable: user
           allowNew: false
         multiple: false
       dateCreated:
@@ -808,7 +803,7 @@ tables:
       criteria:
         label: Criterion
         valType:
-          values: criteria
+          relTable: criteria
           allowNew: false
         multiple: false
       remarks:
@@ -818,7 +813,7 @@ tables:
       creator:
         label: creator
         valType:
-          values: user
+          relTable: user
           allowNew: false
         multiple: false
       dateCreated:

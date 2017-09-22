@@ -11,7 +11,13 @@ import ItemForm from 'ItemForm'
 
 class ItemContainer extends Component {
   render() {
-    const { props: { settings, filters, tables, table, eId, isactive, fixed, border } } = this
+    const {
+      props: {
+        settings, filters, tables, table, eId,
+        masterId, linkField,
+        isactive, fixed, border,
+      },
+    } = this
     const {
       [table]: {
           entities = emptyO,
@@ -33,6 +39,8 @@ class ItemContainer extends Component {
         tables={tables}
         table={table}
         eId={eId}
+        masterId={masterId}
+        linkField={linkField}
         alterSection={alterSection}
         isactive={isactive}
         key={`${table}-${eId}`}

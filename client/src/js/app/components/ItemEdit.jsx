@@ -29,7 +29,7 @@ const ItemEdit = props => {
         <EditControl {...editControlProps} />
         <div className={'grid fragments'}>{
           fieldFragments.map(({
-            field, label, valType: { freeze },
+            field, label, valType,
             fragment: { editable, table, myValues, ...props },
           }) => (
             <div
@@ -39,7 +39,7 @@ const ItemEdit = props => {
               <div className={`grid-head-cell label-col ${editable ? 'edit' : ''}`}>{`${label}:`}</div>
               <div className={'grid-cell value-col edit'} >
                 {
-                  editable && !freeze
+                  editable && (typeof valType != 'object' || !valType.fixed)
                   ? <FieldEdit
                       field={field}
                       tables={tables}

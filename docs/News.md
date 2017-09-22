@@ -2,6 +2,12 @@
 title: News
 ---
 
+### 2017-09022
+There is now a templating mechanism in place by which I can design the display
+of detail records and related records within the display of another record.
+I use this to customise the criteriaEntry records within an assessment, as well as the contribution
+record within an assessment.
+
 ### 2017-09021
 The presentation of assessment is developing to much more useful layouts.
 Lots of issues of an information-logistic nature had to be solved.
