@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { getTables, needTables, fetchTable, ALLIDS } from 'tables'
 
-import { compileActive, PACKAGE_TABLE, TYPE_TABLE } from 'custom'
+import { compileActive, PACKAGE_TABLE, TYPE_TABLE } from 'workflow'
 
 import ListGrid from 'ListGrid'
 

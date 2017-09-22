@@ -68,13 +68,14 @@ const valuePrepare = memoize((settings, tables, table, valType, relField, active
   if (typeof valType === 'object') {
     const { relTable } = valType
     const relRecord = tables[relTable].entities[value]
+    const linkMe = `/data/${relTable}/list/item/${value}`
     if (value != null) {
-      const templateApplied = applyTemplate(settings, tables, relTable, 'related', table, relRecord.values)
+      const templateApplied = applyTemplate(settings, tables, relTable, 'related', table, relRecord.values, linkMe)
       if (templateApplied) {return [templateApplied]}
     }
     if (relField == null) {
       classNames.push('tag')
-      link.href = `/data/${relTable}/list/item/${value}`
+      link.href = linkMe
       elem = 'a'
     }
     else {

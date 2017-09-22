@@ -8,7 +8,7 @@ import { someEditable } from 'fields'
 
 import { insertItem, needValues, headEntity, DETAILS, handleOpenAll } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
-import { compileActive } from 'custom'
+import { compileActive } from 'workflow'
 import { getSettings } from 'settings'
 
 import { EditStatus, EditInsert } from 'EditControls'

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Field, FieldArray } from 'redux-form'
 
-import { compileActive } from 'custom'
+import { compileActive } from 'workflow'
 import { validation, normalization, getValType } from 'fields'
 
 import InputMulti from 'InputMulti'

@@ -81,10 +81,8 @@ Currently, these are the dux of this app:
 
 * [alter](Dux#alter): show/hide, cycle through *n* alternative representations of a piece of user interface;
   example: widgets that can be expanded and collapsed by the user;
-* [custom](Dux#custom): specialized logic to treat some tables and items different from others, based on the
-  meaning they have for the users of the application;
-  example: the logic that determines what are the active contribution types and assessment criteria at a given point in time, which
-  is determined by records in the `package` table;
+* [workflow](Dux#workflow): specialized logic for the assessment and review workflow
+  e.g. to determine what are the active contribution types and assessment criteria at a given point in time;
 * [docs](Dux#docs): fetch documents, especially markdown ones, and show them in two representations: source and formatted;
 * [filters](Dux#filters): the machinery of faceted and full text filtering of entities from tables;
 * [forms](Dux#forms): the state of all data entry forms in the app;

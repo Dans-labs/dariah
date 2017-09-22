@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { combineSelectors, withParams, emptyA } from 'utils'
-import { loadExtra } from 'custom'
+import { loadExtra } from 'workflow'
 
 import { getTables, needTables, fetchTables, MYIDS } from 'tables'
 import { getFilters, makeTag } from 'filters'

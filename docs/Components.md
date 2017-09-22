@@ -676,7 +676,7 @@ An object with the initial values of all fields that are being managed by the fo
 
 ###### `isactive` string
 A CSS className to add extra formatting if the record in question is deemed *inactive*.
-The notion of active items is defined in the duct [custom](Dux#custom).
+The notion of active items is defined in the duct [workflow](Dux#workflow).
 
 ### Task
 This is the component that can open an item and show its fields, either for reading or
@@ -723,7 +723,7 @@ view of the record.
 
 ###### `isactive` string
 A CSS className to add extra formatting if the record in question is deemed *inactive*.
-The notion of active items is defined in the duct [custom](Dux#custom).
+The notion of active items is defined in the duct [workflow](Dux#workflow).
 
 ### Task
 This component displays a record in row form, so that it fits in a grid view of the
@@ -926,7 +926,7 @@ global state. This is about whether the options have popped up and what
 search text the user has entered in the filter box.
 
 ### `activeItems` array
-The notion of active items is defined in the duct [custom](Dux#custom).
+The notion of active items is defined in the duct [workflow](Dux#workflow).
 
 ###### `isactive` string
 A CSS className to add extra formatting if the record in question is deemed *inactive*.

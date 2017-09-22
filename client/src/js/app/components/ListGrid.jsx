@@ -8,7 +8,7 @@ import { getSettings } from 'settings'
 import { getAltSection, compileAlternatives } from 'alter'
 import { getGrid, compileSortedData, resetSort, addColumn, turnColumn, delColumn } from 'grid'
 import { insertItem, DETAILS } from 'tables'
-import { compileActive } from 'custom'
+import { compileActive } from 'workflow'
 
 import { dealWithProvenance } from 'fields'
 

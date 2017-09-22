@@ -211,21 +211,24 @@ const hasTableKey = (tables, table, key, value = null) => {
 export const needTable = (tables, table, select = ALLIDS, complete) => {
   if (!hasTableKey(tables, table, select)) {return true}
   if (complete && !hasTableKey(tables, table, 'complete', true)) {return true}
-  const { [table]: { fieldSpecs, detailOrder = emptyA } } = tables
+  //const { [table]: { fieldSpecs, detailOrder = emptyA } } = tables
+  const { [table]: { fieldSpecs } } = tables
   const relTables = Array.from(
     new Set(
       Object.entries(fieldSpecs).
       filter(entry => ((typeof entry[1].valType) === 'object') && entry[1].valType.relTable != null).
       map(entry => entry[1].valType.relTable)
     )
-  ).concat(detailOrder)
+  )
+  //).concat(detailOrder)
   if (relTables.some(relTable => !hasTableKey(tables, relTable, ALLIDS))) {return true}
   return false
 }
 
-export const needTables = (tables, tableList) => tableList.some(([table, select = ALLIDS, complete = true]) =>
-  needTable(tables, table, select, complete)
-)
+export const needTables = (tables, tableList) =>
+  tableList.some(([table, select = ALLIDS, complete = true]) =>
+    needTable(tables, table, select, complete)
+  )
 
 export const needValues = (entities, eId) => (
   entities == null

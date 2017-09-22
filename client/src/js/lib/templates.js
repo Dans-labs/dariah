@@ -9,17 +9,17 @@ import FieldRead from 'FieldRead'
 
 const relatedTemplates = {
   contrib: {
-    assessment(v, e, f) {
+    assessment(v, e, f, linkMe) {
       const cTitle = v('title')
       return (
         <div>
-          {
-            e('urlContribution')
-            ? cTitle
-            : <a href={v('urlContribution')}>{cTitle}</a>
-          }
-          {' '}
-          {f('typeContribution')}
+          <div>
+            {
+              e('urlContribution')
+              ? cTitle
+              : <a href={v('urlContribution')}>{cTitle}</a>
+            }
+          </div>
           <div>
             {v('vcc', null, ', ')}
             {' '}
@@ -50,7 +50,11 @@ const relatedTemplates = {
             titleOpen={'Show contribution descriptions'}
             titleClose={'Hide contribution descriptions'}
             headActive={'Description fields'}
-            headLine={emptyS}
+            headLine={
+              e('urlAcademic')
+              ? <a href={v('urlAcademic')}>{v('urlAcademic')}</a>
+              : emptyS
+            }
             full={
               <div>
                 <div>{f('description')}</div>
@@ -93,6 +97,8 @@ const relatedTemplates = {
               </div>
             }
           />
+          <div>{<a href={linkMe}>{'To the contribution record'}</a>}</div>
+          <div>{f('typeContribution')}</div>
         </div>
       )
     },
@@ -182,7 +188,7 @@ const switchKind = {
   consolidated: consolidatedTemplates,
 }
 
-export const applyTemplate = (settings, tables, table, kind, otherTable, values) => {
+export const applyTemplate = (settings, tables, table, kind, otherTable, values, linkMe) => {
   const { [kind]: templates } = switchKind
   const { [table]: { [otherTable]: template } = emptyO } = templates
   if (template == null) {return null}
@@ -221,5 +227,5 @@ export const applyTemplate = (settings, tables, table, kind, otherTable, values)
         relField={relField}
         myValues={values[field]}
       />
-  return template(v, e, f)
+  return template(v, e, f, linkMe)
 }

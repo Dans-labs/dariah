@@ -507,6 +507,10 @@ fields:
       list:   auth
       read:   auth
       update: nobody
+    assessmentType:
+      list:   auth
+      read:   auth
+      update: nobody
     remarks:
       list:   auth
       read:   auth

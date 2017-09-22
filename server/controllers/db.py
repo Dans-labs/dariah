@@ -1,34 +1,12 @@
-import json, datetime
+import json
 from functools import reduce
 from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
-from bson.objectid import ObjectId
-from datetime import datetime
+
+from controllers.utils import oid, now, dtm, json_string
+from controllers.workflow import detailInsert
 
 PRISTINE = 'isPristine'
-
-def oid(oidstr):
-    return ObjectId() if oidstr == None else ObjectId(oidstr) 
-
-def now(): return datetime.utcnow()
-
-def dtm(isostr):
-    isostr = isostr.rstrip('Z')
-    try:
-        date = datetime.strptime(isostr, "%Y-%m-%dT%H:%M:%S.%f")
-    except:
-        try:
-            date = datetime.strptime(isostr, "%Y-%m-%dT%H:%M:%S")
-        except Exception as err:
-            return ('{}'.format(err), isostr)
-    return ('', date)
-
-def json_string(obj):
-    if isinstance(obj, datetime):
-        return obj.isoformat()
-    elif isinstance(obj, ObjectId):
-        return str(obj)
-    raise TypeError('Not sure how to serialize %s' % (obj,))
 
 # We store the mongo db connection here as a module global variable
 # No other module is supposed to import the connection
@@ -54,13 +32,31 @@ class DbAccess(object):
             self.DM.generic['modified'],
         }
         self.CREATOR = self.DM.generic['createdBy']
-        self.getActiveItems()
+
+        # this function is a simple table getter from mongoDB, but it does respect the permissions.
+        # The workflow module needs to read tables, but we do not want code for the reading
+        # in that module.
+        # All db access is here, through _DBM, and all _DBM access is guarded by permission calculation.
+        # Other modules can safely call basicList, it will never return results that are not permitted.
+
+        def basicList(table, rowFilter, fieldFilter, sort=None):
+            Perm = self.Perm
+            (mayRead, readFields) = Perm.may(table, 'read')
+            theFieldFilter = readFields if fieldFilter == True else dict(x for x in fieldFilter.items() if x[0] in readFields)
+            if sort == None:
+                result = list(_DBM[table].find(rowFilter, theFieldFilter))
+            else:
+                result = list(_DBM[table].find(rowFilter, theFieldFilter).sort(sort))
+            return result
+
+        self.basicList = basicList
 
     def userFind(self, eppn, authority): return _DBM.user.find_one({'eppn': eppn, 'authority': authority})
     def userLocal(self): return _DBM.user.find({'authority': 'local'})
     def userInGroup(self): return _DBM.inGroup.find({})
     def userAdd(self, record): _DBM.user.insert_one(record)
     def userMod(self, record):
+        if PRISTINE in record: del record[PRISTINE]
         _DBM.user.update_one(
             {'eppn': record['eppn']},
             {'$set': record, '$unset': {PRISTINE: ''}},
@@ -160,9 +156,6 @@ class DbAccess(object):
         details = tableInfo.get('details', {})
         detailOrder = tableInfo.get('detailOrder', [])
         (fieldOrder, fieldSpecs, fieldFilter) = self.theseFields(table, fieldFilter)
-        core = set()
-        core.add(title)
-        core |= {f['field'] for f in tableInfo.get('filters', [])}
         coreFields = dict(_id=True)
         getFields = set(fieldFilter)
         for f in getFields:
@@ -323,32 +316,30 @@ class DbAccess(object):
         for (field, value) in newData.items():
             if field != 'linkField' and field != 'masterId':
                 insertValues[field] = value
+
         if title not in insertValues:
             insertValues[title] = '{} of {}'.format(item, masterDocument[masterTitle]) if masterDocument else noTitle
+
+        # hook for workflow-specific actions: extra fields, extra details
+        extraData = detailInsert(self.basicList,
+            table=table,
+            masterDocument=masterDocument,
+        )
+
+        # use the extra fields, if any
+        if extraData and 'insertValues' in extraData:
+            insertValues.update(extraData['insertValues'])
 
         result = _DBM[table].insert_one(insertValues)
         ident = result.inserted_id
         records.append((table, ident, readFieldFilter))
 
-        if table == 'assessment':
-            if masterDocument != None:
-                activeItems = self.getActiveItems()
-                criteriaIds = activeItems['criteriaIds']
-                criteriaEntities = activeItems['criteriaEntities']
-                typeCriteria = activeItems['typeCriteria']
-                masterType = masterDocument['typeContribution']
-                criteria = typeCriteria[masterType]
-                theseCriteriaIds = [c for c in criteriaIds if c in criteria]
-                detailData = []
-                for (n, critId) in enumerate(theseCriteriaIds):
-                    critDoc = criteriaEntities[str(critId)]
-                    self._insertItem(controller, 'criteriaEntry', {
-                        'linkField': 'assessment',
-                        'masterId': ident,
-                        'seq': n + 1,
-                        'criteria': critId,
-                        'evidence': [],
-                    }, records)
+        # use the extra details, if any
+        if extraData and 'detailData' in extraData:
+            for (detailTable, detailRecords) in extraData['detailData'].items():
+                for detailRecord in detailRecords:
+                    detailRecord['masterId'] = ident
+                    self._insertItem(controller, detailTable, detailRecord, records)
 
     def _deleteItem(self, controller, table, newData, records, errors):
         Perm = self.Perm
@@ -463,6 +454,7 @@ class DbAccess(object):
                         updateSaveValues[sysField] = document[sysField] # add the system field
 
             updateSaveValues[modified].append('{} on {}'.format(modBy, modDate))
+            if PRISTINE in updateSaveValues: del updateSaveValues[PRISTINE]
             _DBM[table].update_one(
                 rowFilter,
                 {'$set': updateSaveValues, '$unset': {PRISTINE: ''}},
@@ -645,35 +637,6 @@ class DbAccess(object):
             (f, True) for f in fieldOrder
         )
         return (fieldOrder, fieldSpecs, fieldFilterPost)
-
-    def getActiveItems(self):
-        present = now()
-        packages = list(_DBM.package.find(
-            dict(startDate={'$lte': present}, endDate={'$gte': present}),
-            dict(_id=True, typeContribution=True),
-        ))
-        packageIds = [doc['_id'] for doc in packages]  
-        activeFilter = dict(package={'$in': packageIds})
-        criteria = list(_DBM.criteria.find(
-            activeFilter,
-            #dict(_id=True, package=True, typeContribution=True),
-        ).sort('criterion', 1))
-        typeCriteria = dict()
-        criteriaEntities = dict()
-        criteriaIds = [doc['_id'] for doc in criteria]  
-        for doc in criteria:
-            criteriaEntities[str(doc['_id'])] = doc
-            for tp in doc['typeContribution']:
-                typeCriteria.setdefault(tp, set()).add(doc['_id'])
-        typeIds = {tp for doc in packages for tp in doc['typeContribution']}
-        result = dict(
-            package=set(packageIds),
-            type=typeIds,
-            criteriaIds=criteriaIds,
-            criteriaEntities=criteriaEntities,
-            typeCriteria=typeCriteria,
-        )
-        return result
 
 def simpleVal(valType, val):
     result = \

@@ -494,6 +494,7 @@ tables:
       - [dateCreated, -1]
     fieldOrder: 
       - title
+      - assessmentType
       - contrib
       - remarks
       - creator
@@ -510,6 +511,18 @@ tables:
         valType:
           relTable: contrib
           allowNew: false
+        multiple: false
+      assessmentType:
+        label: Assessment type
+        valType:
+          relTable: typeContribution
+          allowNew: false
+          fixed: true
+          inactive:
+            attributes:
+              className: inactive
+              title: this value does not belong to the current package
+            disabled: true
         multiple: false
       remarks:
         label: Remarks

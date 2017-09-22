@@ -19,7 +19,7 @@ We have organized dux as follows:
 This app contains the following dux:
 
 * [alter](#alter)
-* [custom](#custom)
+* [workflow](#workflow)
 * [docs](#docs)
 * [filters](#filters)
 * [forms](#forms)
@@ -127,14 +127,14 @@ That is why offer the possibility of grouping related componenents under the
 same `alterSection` and be shielded from updates in the components that belong to other
 `alterSections`.
 
-[custom]({{site.appBase}}/dux/win.js)
+[workflow]({{site.appBase}}/dux/workflow.js)
 =============================================================================================
 
 A lot of the logic of showing lists, items, related items and fields is purely
 generic and driven by the [data model]({{site.serverBase}}/models/data.yaml).
 
 But there is considerably more to an app than this kind of generic logic.
-The `custom` duct is the entry point for additional, non-trivial business logic.
+The `workflow` duct is the entry point for additional, non-trivial business logic.
 
 It is still in development.
 

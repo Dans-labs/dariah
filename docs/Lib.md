@@ -18,7 +18,7 @@ to see where this data comes from and how it has been tweaked for this website.
 
 ### checkDisabled
 Checks whether a certain value is inactive and should be disabled.
-See [custom logic](Dux#custom).
+See [workflow logic](Dux#workflow).
 Used in component [RelSelect](Components#relselect).
 
 ### composeAttributes
@@ -41,7 +41,7 @@ depending on the state it may be in:
 ### getDateTime
 Convert a datetime object or string into a numerical value, so you can make comparisons.
 If absent, yield negative infinity for start dates and positive infinity for end dates.
-Used in [custom](Dux#custom).
+Used in [workflow](Dux#workflow).
 
 ### makeFields
 Prepare field components for an item of a table.
@@ -92,7 +92,7 @@ Example: [ItemForm](Components#itemform)
 Compare function for sorting. Wraps the values to be compared in a template before actually
 comparing them.
 
-Used in [custom](Dux#custom).
+Used in [workflow](Dux#workflow).
 
 ### sortTimeInterval
 
@@ -110,7 +110,7 @@ An object with validation functions, named after the types of the values they va
 All functions take a value, and return undefined if the value passes validation or is itself undefined.
 If a value does not pass validation, a simple string expressing the reason is returned.
 
-Used in [custom](Dux#custom).
+Used in [workflow](Dux#workflow).
 
 [handle]({{site.libBase}}/handle.js)
 =============================================================================================
