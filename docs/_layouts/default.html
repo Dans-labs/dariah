@@ -14,10 +14,8 @@
   <body>
     <div class="wrapper">
       <header>
-          
-        <h3><img src="{{ site.logo | relative_url }}" class="logo"/>
-            {{ site.title | default: site.github.repository_name }}
-        </h3>
+        <img src="{{ site.logo | relative_url }}" class="logo"/>  
+        <h3>{{ site.title | default: site.github.repository_name }}</h3>
 
         <h3>Pages</h3>
         <h4><a href="{{ '/index.html' | relative_url }}">Home</a></h4>

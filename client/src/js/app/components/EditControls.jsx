@@ -127,49 +127,48 @@ const handleCloseAll = memoize((alter, alterSection, nAlts, initial, items, disp
   }
 }, emptyO)
 
-const EditInsertPure = ({
+export const EditInsert = ({
+  perm, select, fixed, item, button, onInsert,
+}) => {
+  const thing = item[0]
+  return (!fixed && perm != null && perm.insert && (!perm.needMaster || select == DETAILS))
+    ? <span
+        className={`fa fa-plus ${button}`}
+        title={`new ${thing}`}
+        onClick={onInsert}
+      />
+    : null
+}
+
+const OpenCloseAllPure = ({
   alter, alterSection,
-  table, perm, select, fixed, listIds, item, button, onInsert,
+  table, listIds, item, button,
   nAlts, initial,
   openAll, expand,
   dispatch,
 }) => {
   const [thing, things] = item
-  const nItemsRep = `${listIds.length} ${listIds.length === 1 ? thing : things} `
-  return (
-    <div>
-      {nItemsRep}
-      {
-        (!fixed && perm != null && perm.insert && (!perm.needMaster || select == DETAILS))
-        ? <span
-            className={`fa fa-plus ${button}`}
-            title={`new ${thing}`}
-            onClick={onInsert}
-          />
-        : null
-      }
-      {' '}
-      {
-        openAll && !expand
-        ? <div
-            className={`fa fa-angle-double-down ${button}`}
-            title={`Open all ${things}`}
-            onClick={handleOpenAll(alter, alterSection, nAlts, initial, table, listIds, dispatch)}
-          />
-        : null
-      }
-      {' '}
-      {
-        !expand
-        ? <div
-            className={`fa fa-angle-double-up ${button}`}
-            title={`Close all opened ${things}`}
-            onClick={handleCloseAll(alter, alterSection, nAlts, initial, listIds, dispatch)}
-          />
-        : null
-      }
-    </div>
-  )
+  const itemsRep = listIds.length === 1 ? thing : things
+  const nItemsRep = `${listIds.length} ${itemsRep} `
+  return [
+    <span key="I">{nItemsRep}</span>,
+    openAll && !expand
+    ? <div
+        key="O"
+        className={`fa fa-angle-double-down ${button}`}
+        title={`Open all ${itemsRep}`}
+        onClick={handleOpenAll(alter, alterSection, nAlts, initial, table, listIds, dispatch)}
+      />
+    : null,
+    !expand
+    ? <div
+        key="C"
+        className={`fa fa-angle-double-up ${button}`}
+        title={`Close all opened ${itemsRep}`}
+        onClick={handleCloseAll(alter, alterSection, nAlts, initial, listIds, dispatch)}
+      />
+    : null,
+  ]
 }
 
-export const EditInsert = connect(getAltSection)(EditInsertPure)
+export const OpenCloseAll = connect(getAltSection)(OpenCloseAllPure)

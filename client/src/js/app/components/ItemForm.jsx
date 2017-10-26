@@ -23,6 +23,7 @@ const ItemForm = props => {
     tables, table, eId,
     masterId, linkField,
     isactive,
+    startMode,
     fixed,
     border,
     initialValues,
@@ -33,7 +34,7 @@ const ItemForm = props => {
   if (fieldFragments == null) {fieldFragments = makeFields(props)}
   if (detailFragments == null) {detailFragments = makeDetails(props)}
   const hasEditable = someEditable(fields, perm)
-  const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 0, dispatch)('edit')
+  const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, startMode, dispatch)('edit')
   const alt = getAlt(alter)
   const borderSwitch = border == null
   ? emptyS

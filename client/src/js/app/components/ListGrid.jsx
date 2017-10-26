@@ -12,7 +12,7 @@ import { compileActive } from 'workflow'
 
 import { dealWithProvenance } from 'fields'
 
-import { EditInsert } from 'EditControls'
+import { EditInsert, OpenCloseAll } from 'EditControls'
 import ItemRow from 'ItemRow'
 
 const initial = 0
@@ -90,20 +90,26 @@ const ListGrid = ({
     <div>
       {
         !(filtered && select === DETAILS)
-        ? <EditInsert
-            perm={tablePerm}
-            select={select}
-            fixed={fixed}
-            table={table}
-            listIds={listIds}
-            item={item}
-            button={'button-medium'}
-            alterSection={alterSection}
-            nAlts={nAlts}
-            initial={initial}
-            openAll={select == DETAILS}
-            onInsert={handle(dispatch, insertItem, table, select, masterId, linkField)}
-          />
+        ? <div>
+            <EditInsert
+              perm={tablePerm}
+              select={select}
+              fixed={fixed}
+              item={item}
+              button={'button-medium'}
+              onInsert={handle(dispatch, insertItem, table, select, masterId, linkField)}
+            />
+            <OpenCloseAll
+              table={table}
+              listIds={listIds}
+              item={item}
+              button={'button-medium'}
+              alterSection={alterSection}
+              nAlts={nAlts}
+              initial={initial}
+              openAll={select == DETAILS}
+            />
+          </div>
         : null
       }
       {

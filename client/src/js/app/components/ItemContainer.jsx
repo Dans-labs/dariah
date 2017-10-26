@@ -15,7 +15,7 @@ class ItemContainer extends Component {
       props: {
         settings, filters, tables, table, eId,
         masterId, linkField,
-        isactive, fixed, border,
+        isactive, startMode, fixed, border,
       },
     } = this
     const {
@@ -43,6 +43,7 @@ class ItemContainer extends Component {
         linkField={linkField}
         alterSection={alterSection}
         isactive={isactive}
+        startMode={startMode}
         key={`${table}-${eId}`}
         initialValues={initialValues}
         perm={perm}

@@ -5,13 +5,14 @@ import { browserHistory } from 'react-router'
 import { memoize } from 'memo'
 import { combineSelectors, withParams, getUrlParts, emptyS, emptyO } from 'utils'
 import { someEditable } from 'fields'
+import { editMode } from 'templates'
 
 import { insertItem, needValues, headEntity, DETAILS, handleOpenAll } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
 import { compileActive } from 'workflow'
 import { getSettings } from 'settings'
 
-import { EditStatus, EditInsert } from 'EditControls'
+import { EditStatus, EditInsert, OpenCloseAll } from 'EditControls'
 import ItemContainer from 'ItemContainer'
 
 const initial = 0
@@ -51,30 +52,51 @@ class ListPlain extends Component {
     const { [table]: { item, entities } } = tables
     const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
     const activeItems = compileActive(tables, table)
+    let masterTable = null
+    if (linkField != null) {
+      const {
+        [table]: {
+          fieldSpecs: {
+            [linkField]: {
+              valType: { relTable } = emptyO,
+            } = emptyO },
+        },
+      } = tables
+      masterTable = relTable
+    }
+    const startMode = masterTable == null
+    ? 0
+    : editMode(tables, table, 'detail', masterTable)
     return (
       <div className={'list-generic'} >
         {
           !(filtered && select === DETAILS)
-          ? <EditInsert
-              perm={perm}
-              select={select}
-              fixed={fixed}
-              table={table}
-              listIds={listIds}
-              item={item}
-              button={'button-medium'}
-              alterSection={alterSection}
-              nAlts={nAlts}
-              initial={initial}
-              openAll={select == DETAILS}
-              expand={expand}
-              onInsert={this.handleInsert}
-            />
+          ? <div>
+              <EditInsert
+                perm={perm}
+                select={select}
+                fixed={fixed}
+                item={item}
+                button={'button-medium'}
+                onInsert={this.handleInsert}
+              />
+              <OpenCloseAll
+                table={table}
+                listIds={listIds}
+                item={item}
+                button={'button-medium'}
+                alterSection={alterSection}
+                nAlts={nAlts}
+                initial={initial}
+                openAll={select == DETAILS}
+                expand={expand}
+              />
+            </div>
           : null
         }
         {
           listIds.map(eId => {
-            const { [eId]: { fields, perm } } = entities
+            const { [eId]: { fields, perm, values } } = entities
             const head = headEntity(tables, table, eId, settings)
             const formTag = `${table}-${eId}`
             const isComplete = !needValues(entities, eId)
@@ -86,6 +108,7 @@ class ListPlain extends Component {
             const isactive = (activeItems != null && activeItems.has(eId))
             ? 'isactive'
             : emptyS
+            const thisStartMode = startMode === 0 ? startMode : startMode(values)
 
             return (
               <div key={eId} className={isactive} >
@@ -107,6 +130,7 @@ class ListPlain extends Component {
                         masterId={masterId}
                         linkField={linkField}
                         isactive={isactive}
+                        startMode={thisStartMode}
                         fixed={fixed}
                         inhibitFetch={expand}
                         border={border}

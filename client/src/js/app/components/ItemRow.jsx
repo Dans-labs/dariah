@@ -102,6 +102,7 @@ const ItemRow = ({
               linkField={linkField}
               alterSection={alterSection}
               isactive={isactive}
+              startMode={0}
               initialValues={initialValues}
               perm={perm}
               fields={fields}

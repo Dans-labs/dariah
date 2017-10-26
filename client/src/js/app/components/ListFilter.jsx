@@ -7,7 +7,7 @@ import { handle } from 'handle'
 import { initFiltering, computeFiltering } from 'filters'
 import { insertItem, DETAILS } from 'tables'
 
-import { EditInsert } from 'EditControls'
+import { EditInsert, OpenCloseAll } from 'EditControls'
 import ListPlain from 'ListPlain'
 import ListGrid from 'ListGrid'
 import Filter from 'Filter'
@@ -61,21 +61,27 @@ class ListFilter extends Component {
       <div className={`list-filter ${compactClass}`}>
         {
           select === DETAILS
-          ? <EditInsert
-              perm={perm}
-              select={select}
-              fixed={fixed}
-              table={table}
-              listIds={listIds}
-              item={item}
-              button={'button-medium'}
-              alterSection={alterSection}
-              nAlts={nAlts}
-              initial={initial}
-              openAll={true}
-              expand={expand}
-              onInsert={handle(dispatch, insertItem, table, select, masterId, linkField)}
-            />
+          ? <div>
+              <EditInsert
+                perm={perm}
+                select={select}
+                fixed={fixed}
+                item={item}
+                button={'button-medium'}
+                onInsert={handle(dispatch, insertItem, table, select, masterId, linkField)}
+              />
+              <OpenCloseAll
+                 table={table}
+                 listIds={listIds}
+                 item={item}
+                 button={'button-medium'}
+                 alterSection={alterSection}
+                 nAlts={nAlts}
+                 initial={initial}
+                 openAll={true}
+                 expand={expand}
+              />
+            </div>
           : null
         }
         <div className={`filters ${compactClass}`}>

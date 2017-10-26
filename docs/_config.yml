@@ -8,7 +8,7 @@ baseurl: /dariah
 logo: /images/inkind_logo.png
 
 url: "https://dariah-beta.dans.knaw.nl/" 
-github_username:  dirkroorda
+github_username:  Dans-labs
 
 staff:
     - name: Dirk Roorda

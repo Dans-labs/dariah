@@ -165,6 +165,7 @@ const detailTemplates = {
   },
 }
 
+
 const consolidatedTemplates = {
   assessment: {
     trail(v) { // consolidated assessment within a trail record
@@ -182,14 +183,29 @@ const consolidatedTemplates = {
   },
 }
 
-const switchKind = {
+const detailEdit = {
+  criteriaEntry: {
+    assessment(e) {
+      return (e('score') || e('evidence')) ? 1 : 0
+    },
+  },
+}
+
+const relatedEdit = {}
+
+const switchTemplateKind = {
   detail: detailTemplates,
   related: relatedTemplates,
   consolidated: consolidatedTemplates,
 }
 
+const switchEditKind = {
+  detail: detailEdit,
+  related: relatedEdit,
+}
+
 export const applyTemplate = (settings, tables, table, kind, otherTable, values, linkMe) => {
-  const { [kind]: templates } = switchKind
+  const { [kind]: templates } = switchTemplateKind
   const { [table]: { [otherTable]: template } = emptyO } = templates
   if (template == null) {return null}
 
@@ -228,4 +244,19 @@ export const applyTemplate = (settings, tables, table, kind, otherTable, values,
         myValues={values[field]}
       />
   return template(v, e, f, linkMe)
+}
+
+export const editMode = (tables, table, kind, otherTable) => values => {
+  const { [kind]: tests } = switchEditKind
+  const { [table]: { [otherTable]: test } = emptyO } = tests
+  if (test == null) {return 0}
+
+  const { [table]: { fieldSpecs } } = tables
+
+  const e = field => {
+    const { [field]: value } = values
+    const { [field]: { multiple } } = fieldSpecs
+    return value == null || value == emptyS || (multiple && value.length == 0)
+  }
+  return test(e)
 }
