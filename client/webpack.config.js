@@ -3,6 +3,7 @@ const autoprefixer = require('autoprefixer')
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const extractCSS = new ExtractTextPlugin('main.css')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
   context: __dirname + '/src',
@@ -118,6 +119,7 @@ module.exports = {
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
+    new UglifyJSPlugin(),
   ],
   devtool: 'cheap-module-sourcemap',
   devServer: {
