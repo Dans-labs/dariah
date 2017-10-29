@@ -57,6 +57,7 @@ const ItemForm = props => {
               onClick={handle(dispatch, delItem, table, eId)}
             />
             <ItemEdit
+              settings={settings}
               tables={tables}
               table={table}
               eId={eId}
@@ -64,6 +65,8 @@ const ItemForm = props => {
               form={`${table}-${eId}`}
               initialValues={initialValues}
               perm={perm}
+              masterId={masterId}
+              linkField={linkField}
               fieldFragments={fieldFragments}
             />
           </div>

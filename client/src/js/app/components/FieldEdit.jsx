@@ -29,6 +29,7 @@ const FieldEdit = ({ alter, field, tables, table, eId, dispatch, allowed, ...pro
           table={table}
           eId={eId}
           type={type}
+          valType={valType}
           {...props}
         />
       )

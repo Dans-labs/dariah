@@ -106,6 +106,16 @@ textarea.invalid {
     align-items: baseline;
     align-content: flex-start;
 }
+.multi-field.textarea {
+    margin-left: 0em;
+    padding-left: 0em;
+    width: 100%;
+    display: inline-flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: top;
+    align-content: flex-start;
+}
 .md-field {
     margin-left: 0em;
     padding-left: 0em;
@@ -116,6 +126,12 @@ textarea.invalid {
 .multi-content {
     padding: 0 0 0 1em;
     flex: 1 2 40%;
+    @include sized();
+}
+.textarea .multi-content {
+    padding: 0 0 0 1em;
+    flex: 1 2 auto;
+    width: 90%;
     @include sized();
 }
 .multi-control {

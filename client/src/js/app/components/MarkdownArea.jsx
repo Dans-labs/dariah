@@ -12,13 +12,14 @@ const MarkdownArea = ({
   dispatch,
 }) => {
   const alterTag = `${table}-${eId}-${name}`
-  const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 0, dispatch)(alterTag)
+  const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 1, dispatch)(alterTag)
   const alt = getAlt(alter)
   return (
     <div className={'md-field'}>
       <p className={'stick'} >
         <span
           className={`button-medium field-control fa fa-${alt === 0 ? 'pencil' : 'hand-o-down'}`}
+          title={`${alt === 0 ? 'edit text' : 'preview formatted text'}`}
           onClick={nextAlt}
         />
       </p>

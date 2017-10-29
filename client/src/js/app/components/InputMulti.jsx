@@ -14,22 +14,17 @@ const fieldPush = fields => () => {fields.push()}
 const InputMulti = ({
   componentSingle, validateSingle, normalizeSingle,
   meta: { dirty, invalid, error },
-  fields, table, eId, name,
+  fields, table, eId, name, valType,
   ...props
 }) => (
   <div
-    className={`${editClass(dirty, invalid)} multi-field`}
+    className={`${editClass(dirty, invalid)} multi-field ${valType}`}
   >
     {fields.map((field, i) =>
       <div
         key={field}
         className={'multi-content'}
       >
-        <span
-          className={'button-small fa fa-close'}
-          title={'remove'}
-          onClick={fieldRemove(fields, i)}
-        />
         <Field
           name={field}
           component={componentSingle}
@@ -39,6 +34,11 @@ const InputMulti = ({
           table={table}
           eId={eId}
           {...props}
+        />
+        <span
+          className={'button-small fa fa-trash'}
+          title={'remove'}
+          onClick={fieldRemove(fields, i)}
         />
       </div>
     )}

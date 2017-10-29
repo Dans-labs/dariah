@@ -185,6 +185,7 @@ const RelSelect = ({
   allowed,
   input: { value, onChange },
   multiple, allowNew, popUpIfEmpty, select, dispatch,
+  suppressTyping,
 }) => {
   const { [selectTag]: { search, popUp } = emptyO } = select
   const { options, optionLookup } = compileOptions(tables, table, allowed, field, settings)
@@ -216,7 +217,7 @@ const RelSelect = ({
           />
       }
       {
-        realPopUp
+        realPopUp && !suppressTyping
         ? <Typing
             selectTag={selectTag}
             search={search}

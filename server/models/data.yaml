@@ -553,7 +553,7 @@ tables:
         mode: list
         border: {
           read: false,
-          edit: true,
+          edit: false,
         }
         filtered: true
         cascade: true

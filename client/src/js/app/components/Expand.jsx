@@ -16,13 +16,15 @@ const cleanWrap = (text, next, className) =>
 
 const Expand = ({
   alter, alterSection, alterTag,
+  initAlt,
   headActive, headLine, full,
   className,
   iconOpen, iconClose,
   titleOpen, titleClose,
   dispatch,
 }) => {
-  const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 0, dispatch)(alterTag)
+  const init = initAlt || 0
+  const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, init, dispatch)(alterTag)
   const alt = getAlt(alter)
   const iOpen = iconOpen || 'angle-down'
   const iClose = iconClose || 'angle-up'
@@ -52,13 +54,15 @@ const Expand = ({
 
 const ExpandHeadPure = ({
   alter, alterSection, alterTag,
+  initAlt,
   headActive, headLine,
   className,
   iconOpen, iconClose,
   titleOpen, titleClose,
   dispatch,
 }) => {
-  const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 0, dispatch)(alterTag)
+  const init = initAlt || 0
+  const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, init, dispatch)(alterTag)
   const alt = getAlt(alter)
   const iOpen = iconOpen || 'angle-down'
   const iClose = iconClose || 'angle-up'
@@ -80,11 +84,13 @@ const ExpandHeadPure = ({
 
 const ExpandBodyPure = ({
   alter, alterSection, alterTag,
+  initAlt,
   full,
   className,
   dispatch,
 }) => {
-  const { getAlt } = compileAlternatives(alterSection, 2, 0, dispatch)(alterTag)
+  const init = initAlt || 0
+  const { getAlt } = compileAlternatives(alterSection, 2, init, dispatch)(alterTag)
   const alt = getAlt(alter)
   return (
     alt == 0

@@ -1,7 +1,29 @@
+div.criteriaEntryRead, div.criteraEntryEdit {
+    border-radius: 6pt;
+    margin: 2pt;
+}
+div.criteriaEntryRead.complete {
+    border: 2pt solid #00ff00;
+    background-color: #ffffff;
+}
+div.criteriaEntryRead.incomplete {
+    border: 2pt solid #ff0000;
+    background-color: #ffeeee;
+}
+div.criteriaEntryEdit.complete {
+    border: 2pt solid #00ff00;
+    background-color: #ffffee;
+}
+div.criteriaEntryEdit.incomplete {
+    border: 2pt solid #ff0000;
+    background-color: #ffffee;
+}
+
 div.criteriaEntry {
     display: flex;
     flex-flow: row  nowrap;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 div.fat {
     flex: 0 1 80%;
@@ -13,10 +35,16 @@ div.xSlim {
     flex: 0 1 2em;
 }
 div.criteriaRemarks {
-    background-color: #eeeeee;
+    color: #002200;
+    background-color: #fffffa;
+    font-size: small;
+    margin-left: 0em;
+    margin-right: 3.5em;
 }
 
 div.evidence {
+    margin-left: 2em;
+    margin-right: 3.5em;
     background-color: #ffffff;
 }
 .vtop {

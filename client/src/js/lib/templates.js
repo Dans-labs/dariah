@@ -6,6 +6,7 @@ import { repr } from 'tables'
 
 import Expand, { ExpandHead, ExpandBody } from 'Expand'
 import FieldRead from 'FieldRead'
+import FieldEdit from 'FieldEdit'
 
 const relatedTemplates = {
   contrib: {
@@ -108,9 +109,11 @@ const relatedTemplates = {
 const detailTemplates = {
   criteriaEntry: {
     assessment(v, e, f) {
+      const statusClass = (e('evidence') || e('score')) ? 'incomplete' : 'complete'
       return (
-        <div>
+        <div className={`criteriaEntryRead ${statusClass}`}>
           <div className={'criteriaEntry'}>
+            <div>{v('seq')}</div>
             <Expand
               alterSection={`criteriaEntry${v('_id')}`}
               alterTag={'remarks'}
@@ -118,7 +121,7 @@ const detailTemplates = {
               iconClose={'minus-circle'}
               titleOpen={'Show criteria details'}
               titleClose={'Hide criteria details'}
-              headActive={v('seq')}
+              headActive={''}
               headLine={f('criteria')}
               full={<div className={'criteriaRemarks'}>{f('criteria', 'remarks')}</div>}
               className={'fat'}
@@ -135,6 +138,7 @@ const detailTemplates = {
               : <ExpandHead
                   alterSection={`criteriaEntry${v('_id')}`}
                   alterTag={'evidence'}
+                  initAlt={1}
                   iconOpen={'file-text'}
                   iconClose={'minus-square'}
                   titleOpen={'Show evidence'}
@@ -151,14 +155,33 @@ const detailTemplates = {
             : <ExpandBody
                 alterSection={`criteriaEntry${v('_id')}`}
                 alterTag={'evidence'}
-                iconOpen={'file-text'}
-                iconClose={'minus-square'}
-                titleOpen={'Show evidence'}
-                titleClose={'Hide evidence'}
+                  initAlt={1}
                 full={f('evidence')}
                 className={'evidence'}
               />
           }
+        </div>
+      )
+    },
+  },
+}
+
+const detailEditTemplates = {
+  criteriaEntry: {
+    assessment(v, e, f, fe, editButton) {
+      const statusClass = (e('evidence') || e('score')) ? 'incomplete' : 'complete'
+      return (
+        <div className={`criteriaEntryEdit ${statusClass}`}>
+          <div key={'H'} className={'criteriaEntry'}>
+            {editButton}
+            {v('seq')}
+            <div className={'fat'}>
+              <div className={'fat'}>{f('criteria')}</div>
+              <div className={'criteriaRemarks'}>{f('criteria', 'remarks')}</div>
+            </div>
+            <div className={'slim'}>{fe('score', { suppressTyping: true })}</div>
+          </div>
+          <div key={'E'}>{fe('evidence')}</div>
         </div>
       )
     },
@@ -195,6 +218,7 @@ const relatedEdit = {}
 
 const switchTemplateKind = {
   detail: detailTemplates,
+  detailEdit: detailEditTemplates,
   related: relatedTemplates,
   consolidated: consolidatedTemplates,
 }
@@ -243,7 +267,74 @@ export const applyTemplate = (settings, tables, table, kind, otherTable, values,
         relField={relField}
         myValues={values[field]}
       />
+
   return template(v, e, f, linkMe)
+}
+
+export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId, fieldFragments, editButton) => {
+  const { [kind]: templates } = switchTemplateKind
+  const { [table]: { [otherTable]: template } = emptyO } = templates
+  if (template == null) {return null}
+
+  const fieldInfo = {}
+  for (const { field, ...fieldProps } of fieldFragments) {
+    fieldInfo[field] = fieldProps
+  }
+  fieldInfo['_id'] = { multiple: false, fragment: { editable: false, myValues: eId } }
+
+  const { [table]: { fieldSpecs } } = tables
+
+  const e = field => {
+    const { [field]: { fragment: { myValues } } } = fieldInfo
+    const { [field]: { multiple } } = fieldSpecs
+    return myValues == null || myValues == emptyS || (multiple && myValues.length == 0)
+  }
+  const v = (field, relField, sep, relSep) => {
+    const { [field]: { fragment: { myValues } } } = fieldInfo
+    const { [field]: { valType, multiple } = emptyO } = fieldSpecs
+    return repr(tables, table, valType, multiple, relField, myValues, settings, sep, relSep)
+  }
+
+  const f = (field, relField) => {
+    const { [field]: { fragment: { myValues } } } = fieldInfo
+    return (
+      <FieldRead
+        settings={settings}
+        tables={tables}
+        table={table}
+        field={field}
+        relField={relField}
+        myValues={myValues}
+      />
+    )
+  }
+
+  const fe = (field, editOptions) => {
+    const {
+      [field]: {
+        valType,
+        fragment: { editable, table, myValues, ...fieldProps },
+      },
+    } = fieldInfo
+    return editable && (typeof valType != 'object' || !valType.fixed)
+    ? <FieldEdit
+        field={field}
+        tables={tables}
+        table={table}
+        eId={eId}
+        {...fieldProps}
+        {...editOptions}
+      />
+    : <FieldRead
+        field={field}
+        tables={tables}
+        table={table}
+        eId={eId}
+        myValues={myValues}
+      />
+  }
+
+  return template(v, e, f, fe, editButton)
 }
 
 export const editMode = (tables, table, kind, otherTable) => values => {
