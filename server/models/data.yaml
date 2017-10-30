@@ -341,7 +341,7 @@ tables:
         valType: textarea
         multiple: false
       country:
-        label: Country(ies)
+        label: Country
         valType:
           relTable: country
           select:
