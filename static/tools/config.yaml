@@ -56,6 +56,22 @@ CREATOR:
   mayLogin: false
   group: office
 
+# the group table is redundant, the same info
+# is in the permissions yaml file.
+# But we want to use the tool to assign groups to people,
+# so we make a fixed group table
+
+groups:
+  public: unauthenticated user
+  auth:   authenticated user
+  own:    authenticated user and creator of records in question
+  office: management user
+  system: system administrator
+  root:   all powerful
+  nobody: nobody
+
+
+# not used anymore!
 inGroup:
   - eppn: DirkRoorda@dariah.eu
     authority: DARIAH

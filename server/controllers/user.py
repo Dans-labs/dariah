@@ -24,20 +24,13 @@ class UserApi(object):
             record = self._update(record, newUserInfo)
         return record
 
-    def getInGroup(self):
-        groups = self.PM.groups
-        records = self.DB.userInGroup()
-        inGroup = {}
-        for r in records:
-            eppn = r['eppn']
-            authority = r['authority']
-            group = r['group']
-            inGroup[(eppn, authority)] = group
-        return inGroup
-
     def deliver(self):
+        unauth = self.idFromGroup[self.PM.unauth]
         groups = self.PM.groups
-        self.userInfo['groupDesc'] = groups.get(self.userInfo['group'], '??')
+        groupId = self.userInfo.get('group', unauth)
+        group = self.groupFromId[groupId]
+        self.userInfo['groupRep'] = group
+        self.userInfo['groupDesc'] = groups.get('group', '??')
         return dict(data=dict(x for x in self.userInfo.items() if x[0] != '_id'), msgs=[], good=True)
 
     def _store(self, newUserInfo):

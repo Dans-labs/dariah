@@ -1,4 +1,5 @@
-unauth:   public
+unauth: public
+auth:   auth
 
 groups:
   public: unauthenticated user
@@ -6,6 +7,7 @@ groups:
   own:    authenticated user and creator of records in question
   office: management user
   system: system administrator
+  root: all powerful
   nobody: nobody
 
 levels:
@@ -15,6 +17,7 @@ levels:
   - OWN
   - office
   - system
+  - root
   - nobody
 
 authorize:
@@ -25,17 +28,28 @@ authorize:
     auth:   1
     own:   -1
     OWN:   -1
+    ownLT: -2
   office:
     public: 1
     auth:   1
     own:    1
     OWN:   -1
+    ownLT: -2
     office: 1
   system:
     public: 1
     auth:   1
     own:    1
     OWN:   -1
+    ownLT: -2
+    office: 1
+    system: 1
+  root:
+    public: 1
+    auth:   1
+    own:    1
+    OWN:   -1
+    ownLT:  1
     office: 1
     system: 1
 
@@ -88,12 +102,18 @@ tables:
     update: office
     insert: office
     delete: office
+  permissionGroup:
+    list:   public
+    read:   public
+    update: nobody
+    insert: nobody
+    delete: nobody
   user:
     list:   public
     read:   own
     update: office
-    insert: office
-    delete: office
+    insert: nobody
+    delete: nobody
   country:
     list:   public
     read:   public
@@ -266,6 +286,16 @@ fields:
       read: office
       update: nobody
 
+  permissionGroup:
+    rep:
+      list:   public
+      read:   public
+      update: nobody
+    description:
+      list:   public
+      read:   public
+      update: nobody
+
   user:
     firstName:
       list:   public
@@ -290,7 +320,11 @@ fields:
     authority:
       list:   public
       read:   public
-      update: office
+      update: nobody
+    group:
+      list:   public
+      read:   public
+      update: ownLT
     creator:
       list: office
       read: office

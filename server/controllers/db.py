@@ -51,9 +51,17 @@ class DbAccess(object):
 
         self.basicList = basicList
 
+    def getGroups(self, dest):
+        dest.idFromGroup = dict()
+        dest.groupFromId = dict()
+        for doc in _DBM.permissionGroup.find():
+            gid = doc['_id']
+            group = doc['rep']
+            dest.idFromGroup[group] = gid
+            dest.groupFromId[gid] = group
+
     def userFind(self, eppn, authority): return _DBM.user.find_one({'eppn': eppn, 'authority': authority})
     def userLocal(self): return _DBM.user.find({'authority': 'local'})
-    def userInGroup(self): return _DBM.inGroup.find({})
     def userAdd(self, record): _DBM.user.insert_one(record)
     def userMod(self, record):
         if PRISTINE in record: del record[PRISTINE]
@@ -150,7 +158,10 @@ class DbAccess(object):
         none = {table: {orderKey: [], 'entities': {}, 'fields': {}, 'perm': {}}}
         (good, result) = Perm.getPerm(controller, table, 'list')
         if not good:
-            msgs.append(dict(kind='error', text=result or 'Cannot list {}'.format(table)))
+            if result == None:
+                msgs.append(dict(kind='warning', text='{} list is empty'.format(table)))
+            else:
+                msgs.append(dict(kind='error', text=result or 'Cannot list {}'.format(table)))
             return
         (rowFilter, fieldFilter) = result
         details = tableInfo.get('details', {})
@@ -416,7 +427,7 @@ class DbAccess(object):
             if len(documents) != 1:
                 return self.stop(data=none, text='Unidentified item to update')
             document = documents[0]
-            (mayUpdate, updFields) = Perm.may(table, 'update', document=document)
+            (mayUpdate, updFields) = Perm.may(table, 'update', document=document, newValues=newData.get('values', {}))
             (fieldOrder, fieldSpecs, fieldFilter) = self.theseFields(table, fieldFilter)
             uFields = set()
             for uField in updFields:

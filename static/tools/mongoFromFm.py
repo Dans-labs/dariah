@@ -428,24 +428,33 @@ class FMConvert(object):
         self.allFields[mt]['longitude'] = ('float', 1)
 
     def userTable(self):
+        groupMapping = dict()
+        groups = []
+        collectionName = 'permissionGroup'
+        for (name, description) in sorted(self.groups.items()):
+            g = dict(rep=name, description=description)
+            g['_id'] = self.mongo.newId('group')
+            groups.append(g)
+            groupMapping[name] = g['_id']
+        self.allData[collectionName] = groups
+
+        self.allFields[collectionName] = dict(
+            _id=('id', 1),
+            name=('string', 1),
+            description=('string', 1),
+        )
+
         existingUsers = []
         idMapping = dict()
-        inGroup = []
 
         # CREATOR USER: used as creator of non-contrib legacy records
 
         creatorUser = self.CREATOR
-        cu = dict(x for x in creatorUser.items() if x[0] != 'group')
+        cu = dict(x for x in creatorUser.items())
+        cu['group'] = groupMapping[cu['group']]
         cu['_id'] = self.mongo.newId('user')
         idMapping[cu['eppn']] = cu['_id']
         existingUsers.append(cu)
-        inGroup.append(dict(
-            _id=self.mongo.newId('inGroup'),
-            eppn=cu['eppn'],
-            authority=cu['authority'],
-            group=creatorUser['group'],
-        ))
-
 
         # LEGACY USERS: used as creator of non-contrib legacy records
 
@@ -457,43 +466,21 @@ class FMConvert(object):
                 eppnSet.add(cr)
 
         for eppn in sorted(eppnSet): # deterministic order
-            lu = dict(eppn=eppn, mayLogin=False, authority='legacy')
+            lu = dict(eppn=eppn, mayLogin=False, authority='legacy', group=groupMapping['auth'])
             lu['_id'] = self.mongo.newId('user')
             idMapping[lu['eppn']] = lu['_id']
             existingUsers.append(lu)
-            inGroup.append(dict(
-                _id=self.mongo.newId('inGroup'),
-                eppn=eppn,
-                authority='legacy',
-                group='auth',
-            ))
 
         # TEST USERS: used in development mode only
 
         for testUser in self.testUsers if isDevel else []: # deterministic order
-            tu = dict(x for x in testUser.items() if x[0] != 'group')
+            tu = dict(x for x in testUser.items())
+            tu['group'] = groupMapping[tu['group']]
             tu['_id'] = self.mongo.newId('user')
             idMapping[tu['eppn']] = tu['_id']
             existingUsers.append(tu)
-            inGroup.append(dict(
-                _id=self.mongo.newId('inGroup'),
-                eppn=tu['eppn'],
-                authority=tu['authority'],
-                group=testUser['group'],
-            ))
-
-        # KEY USERS: pre-baked group assignments for production mode
-
-        for ku in [] if isDevel else self.inGroup: # deterministic order
-            inGroup.append(dict(
-                _id=self.mongo.newId('inGroup'),
-                eppn=ku['eppn'],
-                authority=ku['authority'],
-                group=ku['group'],
-            ))
 
         self.allData['user'] = existingUsers
-        self.allData['inGroup'] = inGroup
         
         self.allFields['user'] = dict(
             _id=('id', 1),
@@ -503,12 +490,7 @@ class FMConvert(object):
             authority=('string', 1),
             firstName=('string', 1),
             lastName=('string', 1),
-        )
-        self.allFields['inGroup'] = dict(
-            _id=('id', 1),
-            eppn=('string', 1),
-            authority=('string', 1),
-            group=('string', 1),
+            group=('id', 1),
         )
         self.uidMapping.update(idMapping)
 
@@ -517,6 +499,12 @@ class FMConvert(object):
         for c in self.allData['contrib']:
             c['creator'] = idMapping[c['creator']]
 
+    def delTestUsers(self, db):
+        for testUser in self.testUsers if isDevel else []: # deterministic order
+            eppn = testUser['eppn']
+            authority = testUser['authority']
+            info('Deleting test user {} @ {}'.format(eppn, authority))
+            db.user.delete_one(dict(eppn=eppn, authority=authority))
 
     def provenance(self):
         for c in self.allData['contrib']:
@@ -652,6 +640,7 @@ class FMConvert(object):
     def importMongo(self):
         client = MongoClient()
         db = client.dariah
+        self.delTestUsers(db)
         pristine = self.PRISTINE
         tableFmt = '| {:<20} |'
         lineFmt = ' {:>4} |' * 6

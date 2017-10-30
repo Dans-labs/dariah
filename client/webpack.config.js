@@ -5,6 +5,8 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const extractCSS = new ExtractTextPlugin('main.css')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
+const isProd = process.env.NODE_ENV == 'production'
+
 module.exports = {
   context: __dirname + '/src',
   entry: {
@@ -119,8 +121,7 @@ module.exports = {
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
-    new UglifyJSPlugin(),
-  ],
+  ].concat(isProd ? [new UglifyJSPlugin()] : []),
   devtool: 'cheap-module-sourcemap',
   devServer: {
     //hot: true, // currently, if this is present, browser will not refresh!

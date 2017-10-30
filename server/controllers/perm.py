@@ -1,16 +1,18 @@
+from controllers.utils import oid
+
 class PermApi(object):
-    def __init__(self, auth, DM, PM):
+    def __init__(self, Auth, DM, PM):
         self.PM = PM
         self.DM = DM
-        self.userInfo = auth.userInfo
+        self.userInfo = Auth.userInfo
+        self.groupFromId = Auth.groupFromId
         self.uid = self.userInfo.get('_id', None)
         self.eppn = self.userInfo.get('eppn', None)
-        self.group = self.userInfo['group']
+        self.group = self.userInfo['groupRep']
         self.rank = dict((lev, n) for (n, lev) in enumerate(self.PM.levels))
 
     def getUid(self): return self.uid
     def getEppn(self): return self.eppn
-    def getGroup(self): return self.group
 
     def getPerm(self, controller, table, action):
         methods = self.PM.methods
@@ -26,7 +28,7 @@ class PermApi(object):
             return (False, None) # this is not an error: the set of permitted rows/fields is just empty
         return (True, (rowFilter, fieldFilter))
 
-    def may(self, table, action, document=None):
+    def may(self, table, action, document=None, newValues=None):
         tables = self.PM.tables
         fields = self.PM.fields
         actions = self.PM.actions
@@ -39,7 +41,7 @@ class PermApi(object):
         else:
             isOwn = self._isOwn(table, document)
             authorized = self._authorize(level, isOwn=isOwn)
-            fieldSet = self._fieldSet(table, document, action, isOwn)
+            fieldSet = self._fieldSet(table, document, action, isOwn, newValues=newValues)
         if not authorized: return (False, {})
         return (True, fieldSet)
 
@@ -50,11 +52,16 @@ class PermApi(object):
         if ownField == None or ownField not in document: return False
         return document[ownField] == self.uid
 
-    def _authorize(self, level, asInt=False, isOwn=None):
+    def _authorize(self, level, asInt=False, isOwn=None, newValue=None):
         group = self.group
         authorize = self.PM.authorize
         may = self.PM.authorize.get(group, {}).get(level, 0)
         if may == -1 and isOwn == False: may = 0
+        if may == -2:
+            if newValue != None:
+                if newValue in {'own', 'nobody'}: may = 0
+                elif newValue not in self.rank: may = 0
+                elif self.rank[newValue] > self.rank[group]: may = 0
         return may if asInt else (may != 0)
 
     def _orderLevels(self, levs):
@@ -83,13 +90,17 @@ class PermApi(object):
                 projection[field] = True
         return projection
 
-    def _fieldSet(self, table, document, action, isOwn):
+    def _fieldSet(self, table, document, action, isOwn, newValues=None):
         fields = self.PM.fields
         projection = {}
         for (field, levelInfo) in fields[table].items():
             level = levelInfo.get(action, None)
             if level == None: continue
-            if self._authorize(level, isOwn=isOwn):
+            newValue = None
+            if level == 'ownLT':
+                newValueId = None if newValues == None else newValues.get(field, None) 
+                newValue = None if newValueId == None else self.groupFromId[oid(newValueId)]
+            if self._authorize(level, isOwn=isOwn, newValue=newValue):
                 projection[field] = True
         return projection
 

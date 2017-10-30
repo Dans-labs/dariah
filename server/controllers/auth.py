@@ -33,18 +33,23 @@ class AuthApi(UserApi):
         }
         self._session_key = 'dariah.session'
         self.app = SessionMiddleware(self.app, session_opts, environ_key=self._session_key)
+        DB.getGroups(self)
 
     def required(self, f): # decorator
         unauth = self.PM.unauth
+        unauthId = self.idFromGroup[unauth]
         def g(*args, **kwargs):
             self.authenticate()
-            if self.userInfo.get('group', unauth) == unauth:
+            if self.userInfo.get('group', unauthId) == unauthId:
                 return dict(data=[], msgs=[dict(kind='warning', text='You need to be logged in to get this data')], good=True)
             return f(*args, **kwargs)
         return g
 
     def authenticate(self, login=False):
         unauth = self.PM.unauth
+        unauthId = self.idFromGroup[unauth]
+        auth = self.PM.auth
+        authId = self.idFromGroup[auth]
         env = bottle.request.environ
         self.userInfo = None
         eppn = self._get_session()
@@ -65,19 +70,21 @@ class AuthApi(UserApi):
             self._delete_session
 
         if self.userInfo == None:
-            self.userInfo = dict(group=unauth)
+            self.userInfo = dict(group=unauthId, groupRep=unauth)
         else:
             eppn = self.userInfo.get('eppn', None)
             if eppn == None:
-                self.userInfo['group'] = unauth
+                self.userInfo['group'] = unauthId
+                self.userInfo['groupRep'] = unauth
             else:
-                authority = self.userInfo['authority']
-                inGroup = self.getInGroup()
-                self.userInfo['group'] = inGroup.get((eppn, authority), 'auth')
+                if 'group' not in self.userInfo:
+                    self.userInfo['group'] = authId
+                self.userInfo['groupRep'] = self.groupFromId[self.userInfo['group']]
 
     def deauthenticate(self):
         unauth = self.PM.unauth
-        self.userInfo = dict(group=unauth);
+        unauthId = self.idFromGroup[unauth]
+        self.userInfo = dict(group=unauthId, groupRep=unauth);
         self._delete_session()
 
     def _create_session(self):

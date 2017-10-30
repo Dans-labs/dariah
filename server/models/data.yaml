@@ -18,6 +18,25 @@ generic:
       multiple: false
 
 tables:
+  permissionGroup:
+    title: rep
+    item:
+      - permission group
+      - permission groups
+    sort:
+      - [rep, 1]
+    fieldOrder:
+      - rep
+      - description
+    fieldSpecs:
+      rep:
+        label: Permission group
+        valType: text
+        multiple: false
+      description:
+        label: Description
+        valType: text
+        multiple: false
   user:
     title: eppn
     item:
@@ -34,6 +53,7 @@ tables:
       - lastName
       - mayLogin
       - authority
+      - group
       - dateLastLogin
       - statusLastLogin
       - creator
@@ -63,6 +83,12 @@ tables:
       authority:
         label: Authentication authority
         valType: text
+        multiple: false
+      group:
+        label: Permission group
+        valType:
+          relTable: permissionGroup
+          allowNew: false
         multiple: false
       dateModified:
         label: modified on
