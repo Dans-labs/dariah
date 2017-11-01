@@ -14,6 +14,7 @@ const MarkdownArea = ({
   const alterTag = `${table}-${eId}-${name}`
   const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 1, dispatch)(alterTag)
   const alt = getAlt(alter)
+  const mdcode = 'mdcode'
   return (
     <div className={'md-field'}>
       <p className={'stick'} >
@@ -30,14 +31,24 @@ const MarkdownArea = ({
             key={'fmt'}
             source={value}
           />
-        : <span key={'src'} className={'field-content'}>
+        : <div key={'src'} className={'field-content'}>
             <textarea
               className={`input ${editClass(dirty, invalid)}`}
               {...input}
               wrap={'soft'}
             />
             {error && <span className={'invalid diag'}>{error}</span>}
-          </span>
+            <div className="mddoc">
+              <div className="mditem"><span className={mdcode}>{'*'}</span><i>{'italic'}</i><span className={mdcode}>{'*'}</span></div>
+              <div className="mditem"><span className={mdcode}>{'**'}</span><b>{'bold'}</b><span className={mdcode}>{'**'}</span></div>
+              <div><span className={mdcode}>{'`'}</span><code>{'code'}</code><span className={mdcode}>{'`'}</span></div>
+              <div className="mditem"><span className={mdcode}>{'# '}</span><span className={'mdh1'}>{'Heading1'}</span></div>
+              <div className="mditem"><span className={mdcode}>{'## '}</span><span className={'mdh2'}>{'Heading2'}</span></div>
+              <div className="mditem"><span className={mdcode}>{'* '}</span><span className={'mduli'}>{'bullet item'}</span></div>
+              <div className="mditem"><span className={mdcode}>{'1. '}</span><span className={'mdoli'}>{'numbered item'}</span></div>
+              <div className="mditem"><span className={mdcode}>{'> '}</span><span className={'mdbq'}>{'block quote'}</span></div>
+            </div>
+          </div>
       }
     </div>
   )

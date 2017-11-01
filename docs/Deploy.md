@@ -10,7 +10,22 @@ title: Deployment
 
 **server** [dariah-beta.dans.knaw.nl](https://dariah-beta.dans.knaw.nl)
 
-**database** Mongodb via pymongo (no connection information needed)
+**database** Mongodb via pymongo (no connection information needed). Version 3.4.10 or higher.
+On the Mac: installing: 
+
+```sh
+brew install mongodb
+```
+
+On the Mac: upgrading: 
+
+```sh
+brew update
+brew upgrade mongodb
+brew link --overwrite mongodb
+brew services stop mongodb
+brew services start mongodb
+```
 
 # Web-app overview
 
@@ -19,10 +34,15 @@ For the *server* application code we use
 a Python3 micro framework to route urls to functions that perform requests and return responses.
 It contains a development webserver.
 
+The list of Python dependencies to be installed is in
+[requirements.txt](https://github.com/Dans-labs/dariah/blob/master/server/config/requirements.txt).
+
 The production webserver is **httpd (Apache)**. Bottle connects to it through
 [mod_wsgi](https://modwsgi.readthedocs.io/en/develop/index.html)
 (take care to use a version that speaks Python3).
-This connection is defined in the default config file (for contents, see *default_example.conf* in the github repo):
+This connection is defined in the default config file
+See
+[default_example.conf](https://github.com/Dans-labs/dariah/blob/master/server/config/default_example.conf).
 
 - `/etc/httpd/config.d/`
   - `default.conf` (config for this site)

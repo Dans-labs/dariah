@@ -30,7 +30,7 @@ class UserApi(object):
         groupId = self.userInfo.get('group', unauth)
         group = self.groupFromId[groupId]
         self.userInfo['groupRep'] = group
-        self.userInfo['groupDesc'] = groups.get('group', '??')
+        self.userInfo['groupDesc'] = groups.get(group, '??')
         return dict(data=dict(x for x in self.userInfo.items() if x[0] != '_id'), msgs=[], good=True)
 
     def _store(self, newUserInfo):

@@ -48,6 +48,13 @@ testUsers:
     lastName: Roorda
     mayLogin: true
     authority: local
+    group: root
+  - eppn: carsten
+    email: carsten@test.eu
+    firstName: Carsten
+    lastName: Thiel
+    mayLogin: true
+    authority: local
     group: system
 
 CREATOR:
