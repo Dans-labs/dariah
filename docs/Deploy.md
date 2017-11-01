@@ -154,7 +154,7 @@ On a development server, install `python3`.*x*`.`*y* from its
 [download page](https://www.python.org/downloads/).
 Then install additional modules by means of `pip3`:
 
-    pip3 install pymongo bottle beaker jwt
+    pip3 install pymongo bottle beaker
 
 More info about running python3 in the webserver
 [mod_wsgi guide](https://modwsgi.readthedocs.io/en/develop/user-guides/quick-installation-guide.html).
