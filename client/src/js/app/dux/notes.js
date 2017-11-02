@@ -26,6 +26,7 @@ const subFlows = {
     return update(state, {
       messages: { $push: [...extraMsgs, { kind: 'info', text: `${desc} ok` }] },
       busy: { $set: busy - 1 },
+      show: { $set: extraMsgs.some(m => m.kind === 'warning' || m.kind === 'error') },
     })
   },
   error(state, { desc, busy, extraMsgs }) {

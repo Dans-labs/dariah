@@ -13,7 +13,7 @@ const rootUrl = '/api/'
 const progress = (path, desc) => ({ type: 'async', status: 'progress', path, desc })
 const ask = (path, desc) => ({ type: 'async', status: 'pending', path, desc })
 const err = (path, desc, msgs) => ({ type: 'async', status: 'error', path, desc, msgs })
-const succeed = (path, desc) => ({ type: 'async', status: 'success', path, desc })
+const succeed = (path, desc, msgs) => ({ type: 'async', status: 'success', path, desc, msgs })
 
 /* global process */
 
@@ -42,7 +42,7 @@ export const accessData = task => (dispatch, getState) => {
   .then(json => {
     const { msgs, good, data } = json
     if (good) {
-      dispatch(succeed(path, desc))
+      dispatch(succeed(path, desc, msgs))
       dispatch({ ...task, data })
     }
     else {

@@ -33,7 +33,7 @@ class PermApi(object):
         fields = self.PM.fields
         actions = self.PM.actions
         if table not in tables or table not in fields or action not in actions or action not in tables[table]:
-            return (False, {})
+            return (False, {}, [])
         level = tables[table][action]
         if document == None:
             authorized = self._authorize(level)
@@ -41,9 +41,9 @@ class PermApi(object):
         else:
             isOwn = self._isOwn(table, document)
             authorized = self._authorize(level, isOwn=isOwn)
-            fieldSet = self._fieldSet(table, document, action, isOwn, newValues=newValues)
-        if not authorized: return (False, {})
-        return (True, fieldSet)
+            (warnings, fieldSet) = self._fieldSet(table, document, action, isOwn, newValues=newValues)
+        if not authorized: return (False, {}, [])
+        return (True, fieldSet, warnings)
 
     def _isOwn(self, table, document):
         uid = self.uid
@@ -52,16 +52,26 @@ class PermApi(object):
         if ownField == None or ownField not in document: return False
         return document[ownField] == self.uid
 
-    def _authorize(self, level, asInt=False, isOwn=None, newValue=None):
+    def _authorize(self, level, asInt=False, isOwn=None, uid=None, oldValue=None, newValue=None, warnings=[]):
         group = self.group
         authorize = self.PM.authorize
         may = self.PM.authorize.get(group, {}).get(level, 0)
         if may == -1 and isOwn == False: may = 0
         if may == -2:
             if newValue != None:
-                if newValue in {'own', 'nobody'}: may = 0
-                elif newValue not in self.rank: may = 0
-                elif self.rank[newValue] > self.rank[group]: may = 0
+                if newValue in {'own', 'nobody'}:
+                    may = 0
+                    warnings.append('Cannot change permission role: {} is not an assignable role'.format(newValue))
+                elif newValue not in self.rank:
+                    warnings.append('Cannot change permission role: the power of role {} is unknown'.format(newValue))
+                    may = 0
+                elif self.rank[newValue] > self.rank[group]:
+                    warnings.append('Cannot change permission role: the role {} has more power than you have as {}'.format(newValue, self.group))
+                    may = 0
+                if oldValue != None:
+                    if uid != self.uid and self.rank[oldValue] >= self.rank[group]:
+                        warnings.append('Cannot change permission role: the other user is a {} with at least as much power as you have as {}'.format(oldValue, self.group))
+                        may = 0
         return may if asInt else (may != 0)
 
     def _orderLevels(self, levs):
@@ -93,14 +103,18 @@ class PermApi(object):
     def _fieldSet(self, table, document, action, isOwn, newValues=None):
         fields = self.PM.fields
         projection = {}
+        warnings = []
         for (field, levelInfo) in fields[table].items():
             level = levelInfo.get(action, None)
             if level == None: continue
             newValue = None
+            oldValue = None
             if level == 'ownLT':
+                oldValueId = document.get(field, None) 
+                oldValue = None if oldValueId == None else self.groupFromId[oid(oldValueId)]
                 newValueId = None if newValues == None else newValues.get(field, None) 
                 newValue = None if newValueId == None else self.groupFromId[oid(newValueId)]
-            if self._authorize(level, isOwn=isOwn, newValue=newValue):
+            if self._authorize(level, isOwn=isOwn, uid=document['_id'], oldValue=oldValue, newValue=newValue, warnings=warnings):
                 projection[field] = True
-        return projection
+        return (warnings, projection)
 

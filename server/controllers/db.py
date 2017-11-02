@@ -41,7 +41,7 @@ class DbAccess(object):
 
         def basicList(table, rowFilter, fieldFilter, sort=None):
             Perm = self.Perm
-            (mayRead, readFields) = Perm.may(table, 'read')
+            (mayRead, readFields, warnings) = Perm.may(table, 'read')
             theFieldFilter = readFields if fieldFilter == True else dict(x for x in fieldFilter.items() if x[0] in readFields)
             if sort == None:
                 result = list(_DBM[table].find(rowFilter, theFieldFilter))
@@ -152,7 +152,7 @@ class DbAccess(object):
         title = tableInfo.get('title', self.DM.generic['title'])
         item = tableInfo.get('item', self.DM.generic['item'])
         sort =  tableInfo.get('sort', None)
-        (mayInsert, iFields) = Perm.may(table, 'insert')
+        (mayInsert, iFields, warnings) = Perm.may(table, 'insert')
         perm = dict(insert=mayInsert, needMaster=tableInfo.get('needMaster', False))
         orderKey = 'myIds' if my else 'allIds' 
         none = {table: {orderKey: [], 'entities': {}, 'fields': {}, 'perm': {}}}
@@ -188,8 +188,8 @@ class DbAccess(object):
             )))) for d in documents)
         if not titleOnly:
             for d in documents:
-                (mayDelete, dFields) = Perm.may(table, 'delete', document=d)
-                (mayUpdate, uFields) = Perm.may(table, 'update', document=d)
+                (mayDelete, dFields, warnings) = Perm.may(table, 'delete', document=d)
+                (mayUpdate, uFields, warnings) = Perm.may(table, 'update', document=d)
                 thisPerm = dict(update=uFields, delete=mayDelete)
                 entities[str(d['_id'])]['perm'] = thisPerm
 
@@ -371,7 +371,7 @@ class DbAccess(object):
             errors.append('Unidentified item to delete')
             return
         document = documents[0]
-        (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
+        (mayDelete, dFields, warnings) = Perm.may(table, 'delete', document=document)
         if not mayDelete:
             errors.append('Not allowed to delete item {} from {}'.format(ident, table))
             return
@@ -433,7 +433,8 @@ class DbAccess(object):
             if len(documents) != 1:
                 return self.stop(data=none, text='Unidentified item to update')
             document = documents[0]
-            (mayUpdate, updFields) = Perm.may(table, 'update', document=document, newValues=newData.get('values', {}))
+            (mayUpdate, updFields, warnings) = Perm.may(table, 'update', document=document, newValues=newData.get('values', {}))
+            permMsgs = [dict(kind='warning', text=warning) for warning in warnings]
             (fieldOrder, fieldSpecs, fieldFilter) = self.theseFields(table, fieldFilter)
             uFields = set()
             for uField in updFields:
@@ -441,7 +442,8 @@ class DbAccess(object):
                 if type(valType) is not dict or not valType.get('fixed', False):
                     uFields.add(uField)
             if not mayUpdate:
-                return self.stop(data=none, text='Not allowed to update this item')
+                text = 'Not allowed to update this item' if len(warnings) == 0 else None
+                return self.stop(data=none, text=text, msgs=permMsgs)
             newValues = dict(x for x in newData.get('values', {}).items())
             (valItemValues, newValues) = self.validate(table, newValues, uFields)
             validationMsgs = []
@@ -477,11 +479,11 @@ class DbAccess(object):
                 {'$set': updateSaveValues, '$unset': {PRISTINE: ''}},
             )
             # here system values are updated in the database
-            return self.stop(data=dict(values=updateSaveValues, newValues=newValues)) # ??? but modified is not always returned
+            return self.stop(data=dict(values=updateSaveValues, newValues=newValues), msgs=permMsgs) # ??? but modified is not always returned
 
     def stop(self, data=None, text=None, msgs=None):
-        good = text == None and (msgs == None or len(msgs) == 0)
-        msgs = [] if good else [dict(kind='error', text=text)] if msgs == None else msgs
+        good = text == None and (msgs == None or all(msg['kind'] != 'error' for msg in msgs))
+        msgs = [dict(kind='error', text=text)] if msgs == None and text != None else msgs
         return dict(data=data, msgs=msgs, good=good)
 
     def findDoc(self, table, rowFilter, fieldFilter, failData, failText, multiple=False):
@@ -496,8 +498,8 @@ class DbAccess(object):
         if multiple:
             data = []
             for document in documents:
-                (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
-                (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
+                (mayDelete, dFields, warnings) = Perm.may(table, 'delete', document=document)
+                (mayUpdate, uFields, warnings) = Perm.may(table, 'update', document=document)
                 perm = dict(update=uFields, delete=mayDelete)
                 data.append(dict(
                     values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
@@ -507,8 +509,8 @@ class DbAccess(object):
             return self.stop(data=data)
         else:
             document = documents[0]
-            (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
-            (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
+            (mayDelete, dFields, warnings) = Perm.may(table, 'delete', document=document)
+            (mayUpdate, uFields, warnings) = Perm.may(table, 'update', document=document)
             perm = dict(update=uFields, delete=mayDelete)
             return self.stop(data=dict(
                 values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
@@ -531,8 +533,8 @@ class DbAccess(object):
                 errors.append('Could not find back record {} in table {}'.format(ident, table))
                 continue
             document = documents[0]
-            (mayDelete, dFields) = Perm.may(table, 'delete', document=document)
-            (mayUpdate, uFields) = Perm.may(table, 'update', document=document)
+            (mayDelete, dFields, warnings) = Perm.may(table, 'delete', document=document)
+            (mayUpdate, uFields, warnings) = Perm.may(table, 'update', document=document)
             perm = dict(update=uFields, delete=mayDelete)
             data.append(dict(
                 table=table,
