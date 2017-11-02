@@ -355,6 +355,7 @@ class DbAccess(object):
                     result = self._insertItem(controller, detailTable, detailRecord, records)
                     if not result['good']:
                         return result
+        return self.stop(data=none)
 
     def _deleteItem(self, controller, table, newData, records, errors):
         Perm = self.Perm
