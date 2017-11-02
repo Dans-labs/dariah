@@ -276,7 +276,6 @@ class DbAccess(object):
 
     def getItem(self, controller, table, ident):
         Perm = self.Perm
-        none = {}
         (good, result) = Perm.getPerm(controller, table, 'read')
         if not good:
             return self.stop(text=result or 'Cannot read {}'.format(table))
@@ -299,6 +298,7 @@ class DbAccess(object):
         noTitle = tableInfo.get('noTitle', self.DM.generic['noTitle'])
         item = tableInfo.get('item')[0]
         sort = tableInfo.get('title', self.DM.generic['sort'])
+        none = None
         (readGood, readResult) = self.Perm.getPerm(controller, table, 'read')
         if not readGood:
             return self.stop(data=none, text=readResult or 'Cannot read table {}'.format(table))
@@ -332,10 +332,12 @@ class DbAccess(object):
             insertValues[title] = '{} of {}'.format(item, masterDocument[masterTitle]) if masterDocument else noTitle
 
         # hook for workflow-specific actions: extra fields, extra details
-        extraData = detailInsert(self.basicList,
+        (extraGood, extraText, extraData) = detailInsert(self.basicList,
             table=table,
             masterDocument=masterDocument,
         )
+        if not extraGood:
+            return self.stop(data=none, text=extraText)
 
         # use the extra fields, if any
         if extraData and 'insertValues' in extraData:
@@ -350,7 +352,9 @@ class DbAccess(object):
             for (detailTable, detailRecords) in extraData['detailData'].items():
                 for detailRecord in detailRecords:
                     detailRecord['masterId'] = ident
-                    self._insertItem(controller, detailTable, detailRecord, records)
+                    result = self._insertItem(controller, detailTable, detailRecord, records)
+                    if not result['good']:
+                        return result
 
     def _deleteItem(self, controller, table, newData, records, errors):
         Perm = self.Perm
@@ -403,7 +407,8 @@ class DbAccess(object):
         if action == 'insert':
             newData = request.json
             records = []
-            self._insertItem(controller, table, newData, records)
+            result = self._insertItem(controller, table, newData, records)
+            if not result['good']: return result
             return self.findDocs(records)
 
         elif action == 'delete':
