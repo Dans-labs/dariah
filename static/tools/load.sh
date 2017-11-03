@@ -35,6 +35,7 @@ if [ "$HOSTNAME" == "tclarin11.dans.knaw.nl" ]; then
 fi
 
 if [ "$1" == "-r" ]; then
+    cd static/tools
     python3 mongoFromFm.py production -r
 else
     if [ $ON_CLARIN ]; then
