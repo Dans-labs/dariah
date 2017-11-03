@@ -34,23 +34,20 @@ if [ "$HOSTNAME" == "tclarin11.dans.knaw.nl" ]; then
         ADIR="/opt/web-apps"
 fi
 
-if [ $ON_CLARIN ]; then
-    service httpd stop
+if [ "$1" == "-r"]; then
+    python3 mongoFromFm.py production -r
+else
+    if [ $ON_CLARIN ]; then
+        service httpd stop
+    fi
+
+    cd $ADIR/$APP
+    git pull origin master
+
+    cd static/tools
+    python3 mongoFromFm.py production $*
+
+    if [ $ON_CLARIN ]; then
+        service httpd start
+    fi
 fi
-
-cd $ADIR/$APP
-git pull origin master
-
-cd static/tools
-python3 mongoFromFm.py production $*
-
-if [ $ON_CLARIN ]; then
-    service httpd start
-fi
-
-#!/bin/sh
-
-# USAGE
-# 
-# ./load.sh
-
