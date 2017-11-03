@@ -216,7 +216,7 @@
   position: fixed;
   top: 40;
   right: 10;
-  width: 400;
+  width: 50%;
   height: 100;
   overflow: auto;
   -webkit-overflow-scrolling: touch;

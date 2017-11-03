@@ -5,7 +5,7 @@ import { emptyO } from 'utils'
 import { dealWithProvenance } from 'fields'
 
 import { getSettings } from 'settings'
-import { needValues, fetchItem } from 'tables'
+import { needValues, fetchItem, headEntity } from 'tables'
 
 import ItemForm from 'ItemForm'
 
@@ -55,9 +55,10 @@ class ItemContainer extends Component {
     )
   }
   openItem() {
-    const { props: { tables, table, eId, inhibitFetch, dispatch } } = this
+    const { props: { settings, tables, table, eId, inhibitFetch, dispatch } } = this
     const { [table]: { entities = emptyO } } = tables
-    if (!inhibitFetch && needValues(entities, eId)) {dispatch(fetchItem(table, eId))}
+    const head = headEntity(tables, table, eId, settings)
+    if (!inhibitFetch && needValues(entities, eId)) {dispatch(fetchItem(table, eId, head))}
   }
   componentDidMount() {this.openItem()}
   componentDidUpdate() {this.openItem()}

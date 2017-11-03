@@ -7,7 +7,7 @@ def _getActiveItems(basicList):
         dict(),
         dict(_id=True, mainType=True, subType=True),
     )
-    typeInfo = dict((doc['_id'], '{}/{}'.format(doc.get('mainType', '-'), doc.get('subType', '-'))) for doc in types)
+    typeInfo = dict((doc['_id'], doc) for doc in types)
 
     packages = basicList(
         'package',
@@ -41,7 +41,9 @@ def _getActiveItems(basicList):
     )
     return result
 
-def detailInsert(basicList,
+def detailInsert(
+    basicList,
+    head,
     table=None,
     masterDocument=None,
 ):
@@ -63,23 +65,26 @@ def detailInsert(basicList,
             if masterType == None:
                 good = False
                 message = 'Contribution has no type'
-            elif masterType not in typeIds:
-                good = False
-                message = 'Contribution type {} is a legacy type'.format(typeInfo[masterType])
-            elif masterType not in typeCriteria:
-                good = False
-                message = 'No criteria defined for contribution type {}'.format(typeInfo[masterType])
             else:
-                criteria = typeCriteria[masterType]
-                theseCriteriaIds = [c for c in criteriaIds if c in criteria]
-                for (n, critId) in enumerate(theseCriteriaIds):
-                    critDoc = criteriaEntities[str(critId)]
-                    detailData.append({
-                        'linkField': 'assessment',
-                        'seq': n + 1,
-                        'criteria': critId,
-                        'evidence': [],
-                    })
+                typeDoc = typeInfo[masterType]
+                typeHead = head('typeContribution', typeDoc)
+                if masterType not in typeIds:
+                    good = False
+                    message = 'Contribution type {} is a legacy type'.format(typeHead)
+                elif masterType not in typeCriteria:
+                    good = False
+                    message = 'No criteria defined for contribution type {}'.format(typeHead)
+                else:
+                    criteria = typeCriteria[masterType]
+                    theseCriteriaIds = [c for c in criteriaIds if c in criteria]
+                    for (n, critId) in enumerate(theseCriteriaIds):
+                        critDoc = criteriaEntities[str(critId)]
+                        detailData.append({
+                            'linkField': 'assessment',
+                            'seq': n + 1,
+                            'criteria': critId,
+                            'evidence': [],
+                        })
         data = dict(
             detailData=dict(criteriaEntry=detailData),
             insertValues=insertValues,

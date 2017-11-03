@@ -31,11 +31,11 @@ export const fetchTables = (tables, tableList, dispatch) => {
   })
 }
 
-export const fetchItem = (table, eId) => accessData({
+export const fetchItem = (table, eId, head) => accessData({
   type: 'fetchItem',
   contentType: 'db',
   path: `/view?table=${table}&id=${eId}`,
-  desc: `${table} record ${eId}`,
+  desc: `${table} record ${head}`,
   table,
 })
 
@@ -49,11 +49,11 @@ export const fetchItems = (table, eIds, alterSection, alt) => accessData({
   eIds, alterSection, alt,
 })
 
-export const modItem = (table, eId, values) => accessData({
+export const modItem = (table, eId, head, values) => accessData({
   type: 'modItem',
   contentType: 'db',
   path: `/mod?table=${table}&action=update`,
-  desc: `${table} update record ${eId}`,
+  desc: `${table} update record ${head}`,
   sendData: { _id: eId, values },
   table,
 })
@@ -68,11 +68,11 @@ export const insertItem = (table, select = ALLIDS, masterId = null, linkField = 
   select,
 })
 
-export const delItem = (table, eId) => accessData({
+export const delItem = (table, eId, head) => accessData({
   type: 'delItem',
   contentType: 'db',
   path: `/mod?table=${table}&action=delete`,
-  desc: `${table} delete record ${eId}`,
+  desc: `${table} delete record ${head}`,
   sendData: { _id: eId },
   table,
 })
@@ -199,7 +199,7 @@ export const getTables = ({ tables }) => ({ tables })
 
 /* HELPERS */
 
-export const toDb = memoize((table, eId, dispatch) => values => dispatch(modItem(table, eId, values)))
+export const toDb = memoize((table, eId, head, dispatch) => values => dispatch(modItem(table, eId, head, values)))
 
 const hasTableKey = (tables, table, key, value = null) => {
   if (tables == null) {return false}
@@ -381,8 +381,8 @@ const headSwitch = {
 /* The generic head function is exported
  */
 
-export const headEntity = (tables, relTable, valId, settings) =>
-  (headSwitch[relTable] || headSwitch.default(relTable))(tables, valId, settings)
+export const headEntity = (tables, table, valId, settings) =>
+  (headSwitch[table] || headSwitch.default(table))(tables, valId, settings)
 
 const trimDate = (text, dateOnly) =>
   text == null

@@ -332,7 +332,9 @@ class DbAccess(object):
             insertValues[title] = '{} of {}'.format(item, masterDocument[masterTitle]) if masterDocument else noTitle
 
         # hook for workflow-specific actions: extra fields, extra details
-        (extraGood, extraText, extraData) = detailInsert(self.basicList,
+        (extraGood, extraText, extraData) = detailInsert(
+            self.basicList,
+            self.head,
             table=table,
             masterDocument=masterDocument,
         )

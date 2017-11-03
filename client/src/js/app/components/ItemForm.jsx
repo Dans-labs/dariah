@@ -6,7 +6,7 @@ import { combineSelectors, emptyS } from 'utils'
 import { handle } from 'handle'
 import { makeFields, makeDetails, someEditable } from 'fields'
 
-import { delItem, DETAILS } from 'tables'
+import { delItem, headEntity, DETAILS } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
 import { getSettings } from 'settings'
 
@@ -51,6 +51,7 @@ const ItemForm = props => {
       ? 'edit'
       : emptyS
 
+  const head = headEntity(tables, table, eId, settings)
   return (
     <div className={`itemRecord ${borderSwitch} ${editSwitch} ${isactive}`} >
       {
@@ -60,7 +61,7 @@ const ItemForm = props => {
               perm={perm}
               fixed={fixed}
               button={'button-medium'}
-              onClick={handle(dispatch, delItem, table, eId)}
+              onClick={handle(dispatch, delItem, table, eId, head)}
             />
             <ItemEdit
               settings={settings}
@@ -90,7 +91,7 @@ const ItemForm = props => {
               perm={perm}
               fixed={fixed}
               button={'button-medium'}
-              onClick={handle(dispatch, delItem, table, eId)}
+              onClick={handle(dispatch, delItem, table, eId, head)}
             />
             <ItemRead
               settings={settings}

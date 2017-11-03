@@ -6,7 +6,7 @@ import { emptyO } from 'utils'
 
 import { applyEditTemplate } from 'templates'
 import { onSubmitSuccess } from 'fields'
-import { toDb } from 'tables'
+import { toDb, headEntity } from 'tables'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
@@ -22,10 +22,11 @@ const ItemEdit = ({
   nextAlt,
   dispatch,
 }) => {
+  const head = headEntity(tables, table, eId, settings)
   const editControlProps = {
     form: `${table}-${eId}`,
     dirty, invalid, submitting, reset, error,
-    nextAlt, handleSubmit: handleSubmit(toDb(table, eId, dispatch)),
+    nextAlt, handleSubmit: handleSubmit(toDb(table, eId, head, dispatch)),
   }
   const editButton = <EditControl {...editControlProps} />
   const {
