@@ -57,6 +57,10 @@ testUsers:
     authority: local
     group: system
 
+rootUser:
+  development: dirk
+  production: DirkRoorda@dariah.eu
+
 CREATOR:
   eppn: HaSProject
   authority: DARIAH

@@ -1,6 +1,12 @@
 # This script is documented at 
 # https://dans-labs.github.io/dariah/Content.html
-#
+
+# ARGS: 
+# -(obligatory) production | development
+# -(optional) -r
+
+# if -r is present, no data conversion will be done,
+# In this case the role 'root' will be assigned to the user configured as root user.
 
 import os,sys,re,collections,json,yaml
 from os.path import splitext, basename
@@ -12,7 +18,18 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from hashlib import md5
 
-isDevel = len(sys.argv) > 1 and sys.argv[1] == 'development'
+runMode = sys.argv[1] if len(sys.argv) > 1 else None
+makeRoot = len(sys.argv) > 2 and sys.argv[2] == '-r'
+isDevel = runMode == 'development'
+
+def makeUserRoot():
+    with open('./config.yaml') as ch:
+        config = yaml.load(ch)
+    client = MongoClient()
+    db = client.dariah
+    rootEppn = config['rootUser'][runMode]
+    permRoot = db.permissionGroup.find({'rep': 'root'}, {'_id': True})[0]['_id']
+    db.user.update_one({'eppn': rootEppn}, {'$set': {'group': permRoot}})
 
 def info(x): sys.stdout.write('{}\n'.format(x))
 def warning(x): sys.stderr.write('{}\n'.format(x))
@@ -745,7 +762,10 @@ INSR = documents to be inserted, avoiding overwriting
         #self.showMoney()
         #if isDevel: self.exportXlsx()
 
-FMConvert().run()
+if makeRoot:
+    makeUserRoot()
+else:
+    FMConvert().run()
 
 
 

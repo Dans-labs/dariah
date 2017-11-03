@@ -4,8 +4,11 @@
 # run it as follows:
 #
 # ./load.sh                              
+# ./load.sh -r
 #
 
+# WITHOUT arguments:
+#
 # loads legacy data into mongo database data for the DARIAH application
 # Legacy data consists of documents that have a field isPristine: true
 #
@@ -17,6 +20,10 @@
 # This script is set up to work at specific servers.
 # Currently it supports 
 #   tclarin11.dans.knaw.nl (SELINUX)
+
+# WITH argument -r
+# Does not perform data import, but does a modification:
+# It assigns the role 'root' to a user, configured as rootUser in the config file
 
 # ADIR   : directory where the web app $APP resides (and also web2py itself)
 
@@ -35,7 +42,7 @@ cd $ADIR/$APP
 git pull origin master
 
 cd static/tools
-python3 mongoFromFm.py production
+python3 mongoFromFm.py production $*
 
 if [ $ON_CLARIN ]; then
     service httpd start
