@@ -34,7 +34,7 @@ if [ "$HOSTNAME" == "tclarin11.dans.knaw.nl" ]; then
         ADIR="/opt/web-apps"
 fi
 
-if [ "$1" == "-r"]; then
+if [ "$1" == "-r" ]; then
     python3 mongoFromFm.py production -r
 else
     if [ $ON_CLARIN ]; then
