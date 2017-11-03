@@ -36,6 +36,7 @@ const ItemForm = props => {
   const hasEditable = someEditable(fields, perm)
   const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, startMode, dispatch)('edit')
   const alt = getAlt(alter)
+
   const borderSwitch = border == null
   ? emptyS
   : hasEditable && alt === 1
@@ -45,8 +46,13 @@ const ItemForm = props => {
     : border.read != null && !border.read
       ? 'noBorder'
       : emptyS
+
+    const editSwitch = hasEditable && alt === 1
+    ? 'edit'
+    : emptyS
+
   return (
-    <div className={`itemRecord ${borderSwitch} ${isactive}`} >
+    <div className={`itemRecord ${borderSwitch} ${editSwitch} ${isactive}`} >
       {
         hasEditable && alt === 1
         ? <div>

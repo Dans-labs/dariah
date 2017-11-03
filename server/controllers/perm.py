@@ -32,6 +32,7 @@ class PermApi(object):
         tables = self.PM.tables
         fields = self.PM.fields
         actions = self.PM.actions
+        warnings = []
         if table not in tables or table not in fields or action not in actions or action not in tables[table]:
             return (False, {}, [])
         level = tables[table][action]
