@@ -474,7 +474,7 @@ class DbAccess(object):
                 if (sysField not in updateValues or updateValues[sysField] == None) and sysField in document:
                         updateSaveValues[sysField] = document[sysField] # add the system field
 
-            updateSaveValues[modified].append('{} on {}'.format(modBy, modDate))
+            updateSaveValues.setdefault('modified', []).append('{} on {}'.format(modBy, modDate))
             if PRISTINE in updateSaveValues: del updateSaveValues[PRISTINE]
             _DBM[table].update_one(
                 rowFilter,
