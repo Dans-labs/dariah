@@ -47,9 +47,9 @@ const ItemForm = props => {
       ? 'noBorder'
       : emptyS
 
-    const editSwitch = hasEditable && alt === 1
-    ? 'edit'
-    : emptyS
+  const editSwitch = hasEditable && alt === 1
+      ? 'edit'
+      : emptyS
 
   return (
     <div className={`itemRecord ${borderSwitch} ${editSwitch} ${isactive}`} >
