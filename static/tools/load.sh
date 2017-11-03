@@ -34,6 +34,8 @@ if [ "$HOSTNAME" == "tclarin11.dans.knaw.nl" ]; then
         ADIR="/opt/web-apps"
 fi
 
+cd $ADIR/$APP
+
 if [ "$1" == "-r" ]; then
     cd static/tools
     python3 mongoFromFm.py production -r
@@ -42,7 +44,6 @@ else
         service httpd stop
     fi
 
-    cd $ADIR/$APP
     git pull origin master
 
     cd static/tools
