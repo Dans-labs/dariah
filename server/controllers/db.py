@@ -471,7 +471,7 @@ class DbAccess(object):
             updateSaveValues = {}
             updateSaveValues.update(updateValues) # shallow copy of updateValues
             for sysField in self.SYSTEM_FIELDS:
-                if sysField not in updateValues or updateValues[sysField] == None:
+                if (sysField not in updateValues or updateValues[sysField] == None) and sysField in document:
                         updateSaveValues[sysField] = document[sysField] # add the system field
 
             updateSaveValues[modified].append('{} on {}'.format(modBy, modDate))
