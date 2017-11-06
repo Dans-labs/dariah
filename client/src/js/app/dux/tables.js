@@ -82,6 +82,7 @@ export const delItem = (table, eId, head) => accessData({
 const updateItemWithFields = (state, table, _id, fields, values) => {
   const newVals = {}
   fields.forEach(field => {newVals[field] = values[field]})
+  console.warn({ fields, values })
   return updateAuto(
     state,
     [table, 'entities', _id, 'values'],
@@ -140,14 +141,13 @@ const flows = {
   modItem(state, { data, table }) {
     if (data == null) {return state}
     const { values, values: { _id }, newValues } = data
-    const useRelFields = ['_id', 'rep']
     const fieldUpdates = {}
     Object.entries(values).forEach(([key, value]) => {fieldUpdates[key] = { $set: value }})
     let newState = updateAuto(state, [table, 'entities', _id, 'values'], fieldUpdates)
     if (newValues != null) {
-      for (const { _id, rep, relTable, field } of newValues) {
+      for (const { _id, rep, repName, relTable, field } of newValues) {
         newState = update(newState, { [table]: { valueLists: { [field]: { $push: [_id] } } } })
-        newState = updateItemWithFields(newState, relTable, _id, useRelFields, { _id, rep })
+        newState = updateItemWithFields(newState, relTable, _id, ['_id', repName], { _id, [repName]: rep })
       }
     }
     return newState

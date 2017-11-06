@@ -8,6 +8,24 @@ import Expand, { ExpandHead, ExpandBody } from 'Expand'
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
 
+/* templates for related records
+ * These are records in related tables pointed to by fields in the main records.
+ * These are NOT the detail records of a main record.
+ * See below for detail records.
+ *
+ * This object is keyed by the names of the main tables.
+ * For each main table it contains an object of functions,
+ * named by the table name of the related records.
+ *
+ * A template is a function that can be passed a few functions that deliver
+ * field value information:
+ *
+ * - v = field => readonly string value for that field
+ * - f = field => <FieldRead> react component for that field
+ * - e = field => whether that field has an empty value
+ *
+ * The template can also be passed a hyperlink to the main record: linkMe
+ */
 const relatedTemplates = {
   contrib: {
     assessment(v, e, f, linkMe) {

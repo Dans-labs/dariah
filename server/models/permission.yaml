@@ -549,6 +549,14 @@ fields:
       list:   auth
       read:   auth
       update: own
+    reviewer1:
+      list: auth
+      read: auth
+      update: office
+    reviewer2:
+      list: auth
+      read: auth
+      update: office
     creator:
       list: office
       read: office

@@ -523,6 +523,8 @@ tables:
       - assessmentType
       - contrib
       - remarks
+      - reviewer1
+      - reviewer2
       - creator
       - dateCreated
       - modified
@@ -554,6 +556,18 @@ tables:
         label: Remarks
         valType: textarea
         multiple: true
+      reviewer1:
+        label: First reviewer
+        valType:
+          relTable: user
+          allowNew: email
+        multiple: false
+      reviewer2:
+        label: Second reviewer
+        valType:
+          relTable: user
+          allowNew: email
+        multiple: false
       creator:
         label: creator
         valType:

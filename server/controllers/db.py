@@ -124,10 +124,11 @@ class DbAccess(object):
                                 valid = False
                                 diags.append('Unknown value "{}"'.format(v))
                             else:
-                                result = _DBM[f].insert_one(dict(rep=v))
+                                rep = self.DM.tables.get(relTable, {}).get('title', self.DM.generic['title']) if allowNew == True else allowNew 
+                                result = _DBM[relTable].insert_one({rep: v})
                                 _id = result.inserted_id
                                 valValues.append(result.inserted_id)
-                                newValues.append(dict(_id=_id, rep=v, relTable=relTable, field=f))
+                                newValues.append(dict(_id=_id, repName=rep, rep=v, relTable=relTable, field=f))
                                 diags.append(None)
                         else:
                             valValues.append(oid(v))
