@@ -313,6 +313,14 @@ fields:
       list:   own
       read:   own
       update: office
+    org:
+      list:   public
+      read:   public
+      update: office
+    membership:
+      list:   auth
+      read:   auth
+      update: office
     mayLogin:
       list:   own
       read:   own

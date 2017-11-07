@@ -622,17 +622,17 @@ class DbAccess(object):
     def head_user(self, doc):
         firstName = doc.get('firstName', '')
         lastName = doc.get('lastName', '')
+        org = doc.get('org', None)
         email = doc.get('email', '')
         eppn = doc.get('eppn', '')
         authority = doc.get('authority', '')
         nameSection = '{}{}{}'.format(firstName, ' ' if firstName and lastName else '', lastName)
+        orgSection = ' ({})'.format(org) if org else ''
         emailSection = '[{}](mailto:{})'.format(email, email) if email else ''
         identitySection = '{}{}{}{}'.format('identified as ' if eppn else '', eppn, ' authorized by ' if authority else '', authority)
-        return '{} {} {}'.format(
-            nameSection,
-            emailSection,
-            identitySection,
-        )
+        if nameSection: return '{}{}'.format(nameSection, orgSection)
+        if emailSection: return '{}{}'.format(emailSection, orgSection)
+        if identitySection: return '{}{}'.format(identitySection, orgSection)
         return 'user'
         
     def head_country(self, doc):

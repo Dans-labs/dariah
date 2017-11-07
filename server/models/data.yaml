@@ -51,6 +51,8 @@ tables:
       - email
       - firstName
       - lastName
+      - org
+      - membership
       - mayLogin
       - authority
       - group
@@ -74,6 +76,14 @@ tables:
         multiple: false
       lastName:
         label: Last name
+        valType: text
+        multiple: false
+      org:
+        label: Organization
+        valType: text
+        multiple: false
+      membership:
+        label: Memberships
         valType: text
         multiple: false
       mayLogin:

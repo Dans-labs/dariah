@@ -82,7 +82,6 @@ export const delItem = (table, eId, head) => accessData({
 const updateItemWithFields = (state, table, _id, fields, values) => {
   const newVals = {}
   fields.forEach(field => {newVals[field] = values[field]})
-  console.warn({ fields, values })
   return updateAuto(
     state,
     [table, 'entities', _id, 'values'],
@@ -315,11 +314,15 @@ const headUser = memoize((tables, valId) => {
         firstName = emptyS,
         lastName = emptyS,
         email = emptyS,
+        org = emptyS,
       },
     } = entity
+    const orgRep = org
+    ? ` (${org})`
+    : emptyS
     const nameParts = [firstName, lastName].filter(x => x)
-    if (nameParts.length) {return nameParts.join(' ')}
-    return [email, eppn, 'no name'].filter(x => x)[0]
+    if (nameParts.length) {return (nameParts.join(' ')) + orgRep}
+    return ([email, eppn, 'no name'].filter(x => x)[0]) + orgRep
   }
   else {return 'UNKNOWN'}
 }, emptyO)
