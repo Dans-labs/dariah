@@ -33,7 +33,8 @@ class ListPlain extends Component {
 
   scroll = domElem => {
     if (domElem != null) {
-      domElem.scrollIntoViewIfNeeded()
+      //domElem.scrollIntoViewIfNeeded() // this is a non-standard function, only supported by webkit, not by firefox
+      domElem.scrollIntoView()
     }
   }
 
