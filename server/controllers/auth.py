@@ -106,11 +106,20 @@ class AuthApi(UserApi):
     def _checkLogin(self, force=False):
         env = bottle.request.environ
         if force and self.isDevel:
-            eppn = input('{}: '.format('|'.join(self.testUsers)))
+            eppn = input('{}|email address: '.format('|'.join(self.testUsers)))
             if eppn in self.testUsers:
                 self.userInfo = self.testUsers[eppn]
             else:
-                self.userInfo = None
+                parts = eppn.split('@', 1)
+                if len(parts) == 1:
+                    self.userInfo = None
+                else:
+                    (name, domain) = parts
+                    self.userInfo = dict(
+                        eppn='{}@local.host'.format(name),
+                        email=eppn,
+                        authority='local'
+                    )
         else:
             sKey = 'Shib-Session-ID'
             authenticated =  sKey in env and env[sKey] 
@@ -120,6 +129,7 @@ class AuthApi(UserApi):
                     email=env['mail'],
                     authority='DARIAH',
                 )
+                print(env)
             else:
                 self.userInfo = None
 

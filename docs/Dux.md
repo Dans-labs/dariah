@@ -390,16 +390,6 @@ The login procedure caters for shibboleth logins.
 Upon successful login, the server sends information about the currently logged in user
 to the client.
 
-![diag](design/design.003.jpeg)
-
-The actual login/logout actions take place at the server, by visiting `/login`,
-`/logout` or `/slogout`.
-The server delegates the actual authentication to the
-[DARIAH Identity provider](https://wiki.de.dariah.eu/display/publicde/DARIAH+AAI+Documentation).
-
-Currently, `/logout` performs a logout from this app, but not from the DARIAH Identity Provider.
-To do the latter, one has to go to `/slogout` and close the browser.
-
 The main task of Login is to fetch the current authentication status:
 is there an authenticated user, and if so, what is his/her name?
 

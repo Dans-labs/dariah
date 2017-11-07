@@ -60,13 +60,19 @@ class DbAccess(object):
             dest.idFromGroup[group] = gid
             dest.groupFromId[gid] = group
 
-    def userFind(self, eppn, authority): return _DBM.user.find_one({'eppn': eppn, 'authority': authority})
+    def userFind(self, eppn, email, authority):
+        eppnCrit =  {'eppn': eppn, 'authority': authority}
+        emailCrit = {'email': email, 'eppn': {'$exists': False}, 'authority': {'$exists': False}}
+        criterion = eppnCrit if email == None else {'$or': [eppnCrit, emailCrit]}
+        return _DBM.user.find_one(criterion)
     def userLocal(self): return _DBM.user.find({'authority': 'local'})
     def userAdd(self, record): _DBM.user.insert_one(record)
     def userMod(self, record):
         if PRISTINE in record: del record[PRISTINE]
+        criterion = {'_id': record['_id']} if '_id' in record else {'eppn': record['eppn']}
+        if '_id' in record: del record['_id']
         _DBM.user.update_one(
-            {'eppn': record['eppn']},
+            criterion,
             {'$set': record, '$unset': {PRISTINE: ''}},
         )
 
@@ -124,11 +130,15 @@ class DbAccess(object):
                                 valid = False
                                 diags.append('Unknown value "{}"'.format(v))
                             else:
-                                rep = self.DM.tables.get(relTable, {}).get('title', self.DM.generic['title']) if allowNew == True else allowNew 
-                                result = _DBM[relTable].insert_one({rep: v})
-                                _id = result.inserted_id
-                                valValues.append(result.inserted_id)
-                                newValues.append(dict(_id=_id, repName=rep, rep=v, relTable=relTable, field=f))
+                                repName = self.DM.tables.get(relTable, {}).get('title', self.DM.generic['title']) if allowNew == True else allowNew 
+                                existing = _DBM[relTable].find({repName: v})
+                                if existing:
+                                    _id = existing[0]['_id']
+                                else:
+                                    result = _DBM[relTable].insert_one({repName: v})
+                                    _id = result.inserted_id
+                                    newValues.append(dict(_id=_id, repName=repName, rep=v, relTable=relTable, field=f))
+                                valValues.append(_id)
                                 diags.append(None)
                         else:
                             valValues.append(oid(v))
@@ -612,7 +622,6 @@ class DbAccess(object):
     def head_user(self, doc):
         firstName = doc.get('firstName', '')
         lastName = doc.get('lastName', '')
-        email = doc.get('email', '')
         email = doc.get('email', '')
         eppn = doc.get('eppn', '')
         authority = doc.get('authority', '')

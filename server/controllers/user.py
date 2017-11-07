@@ -5,8 +5,8 @@ class UserApi(object):
         self.DB = DB
         self.PM = PM
 
-    def getUser(self, eppn):
-        return self.DB.userFind(eppn, authority = 'local' if self.isDevel else 'DARIAH')
+    def getUser(self, eppn, email=None):
+        return self.DB.userFind(eppn, email, authority = 'local' if self.isDevel else 'DARIAH')
 
     def getTestUsers(self):
         testUsers = {}
@@ -17,7 +17,8 @@ class UserApi(object):
 
     def storeUpdate(self, newUserInfo):
         eppn = newUserInfo['eppn']
-        record = self.getUser(eppn)
+        email = newUserInfo['email']
+        record = self.getUser(eppn, email=email)
         if not record:
             record = self._store(newUserInfo)
         else:
@@ -56,7 +57,7 @@ class UserApi(object):
             dateLastLogin=now,
             statusLastLogin='Approved' if userInfo.get('mayLogin', False) else 'Rejected',
         ))
-        if '_id' in userInfo: del userInfo['_id']
         self.DB.userMod(userInfo)
+        if '_id' in userInfo: del userInfo['_id']
         return userInfo
 
