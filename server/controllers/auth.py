@@ -132,7 +132,7 @@ class AuthApi(UserApi):
                 attributes = {}
                 if 'o' in env: attributes['org'] = env['o']
                 if 'givenName' in env: attributes['firstName'] = env['givenName']
-                if 'sn' in env: attributes['lastName'] = env['lastName']
+                if 'sn' in env: attributes['lastName'] = env['sn']
                 if 'isMemberOf' in env: attributes['membership'] = env['isMemberOf']
                 self.userInfo.update(attributes)
             else:
