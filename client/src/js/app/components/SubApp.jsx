@@ -22,12 +22,6 @@ const tableLinks = (me, { path, name, own, details }) => !own || me.eppn
 
 const navBarItems = [
   {
-    path: '/data/overview',
-    name: 'Overview',
-    own: true,
-    details: [],
-  },
-  {
     path: '/data/contrib',
     name: 'Contributions',
     own: false,
