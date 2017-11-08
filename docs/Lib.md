@@ -40,7 +40,7 @@ See [settings](Dux#settings).
 Used in component [ItemContainer](Components#itemcontainer) and others.
 
 ### editClass
-Returns the proper css class for styling content that is being edited,
+Returns the proper CSS class for styling content that is being edited,
 depending on the state it may be in:
 
 * `dirty`: a changed value that has not been saved to the database yet, and/or
@@ -78,14 +78,14 @@ Needed in a workaround for an
 See [ItemEdit](Components#itemedit)
 
 ### getValType(valType)
-For a given value type, such as `text`, `url`, `number`, return a component and subtype
-for handling the input of such values, e.g. `<input type="url" />`.
+For a given value type, such as `text`, `URL`, `number`, return a component and subtype
+for handling the input of such values, e.g. `<input type="URL" />`.
 
 Example: [FieldEdit](Components#fieldedit)
 
 ### readonlyValue
-For a given value type, such as `text`, `url`, `number`, return
-a formatted value for readonly display.
+For a given value type, such as `text`, `URL`, `number`, return
+a formatted value for read-only display.
 If the value comes from a value list or a related table, it will have a link
 that shows you the value as an item in its list.
 
@@ -107,11 +107,11 @@ Used in [workflow](Dux#workflow).
 Sort by time interval.
 Sorting by time intervals should works as follows:
 
-* if both intervals are fully specified, the interval with the earlier startdate comes first;
-* if the startdates are equal, the one with the LATER enddate comes first,
+* if both intervals are fully specified, the interval with the earlier start date comes first;
+* if the start dates are equal, the one with the LATER end date comes first,
   in this way, containing intervals come before contained intervals;
-* if the startdate is missing, the startdate is assumed to be in the infinite past;
-* if the enddate is missing, the enddate is assumed to be in the infinite future.
+* if the start date is missing, the start date is assumed to be in the infinite past;
+* if the end date is missing, the end date is assumed to be in the infinite future.
 
 ### validation
 An object with validation functions, named after the types of the values they validate.
@@ -169,7 +169,7 @@ The following functions are conveniences for doing exactly that.
 This is a memoized action *creator* wrapper. It return a function, that can be called
 with an event. After receiving the event, the passed `actionCreator` will be called
 with the given arguments to produce an action.
-Subsequently, this action will be *dispatched* to the store that helds the state,
+Subsequently, this action will be *dispatched* to the store that holds the state,
 which will result in the intended state change. 
 
 This particular function `handle` will not use the information in the event.
@@ -202,7 +202,7 @@ Here memoization is a solution.
 Turns the function `f` into a memoized function `memF` that yields the same results
 for the same parameters.
 It stores computed results under a key dependent on the parameters for which the result
-is computed. When the function is called with the same parmeters again, it delivers its
+is computed. When the function is called with the same parameters again, it delivers its
 result from cache, rather than to recompute it.
 
 In development mode, if you call the memoized function without arguments, 
@@ -289,7 +289,7 @@ memBaseFunction(a, b, c) // retrieves baseFunction(a, b, c) from cache instead o
 ```
 
 #### Level
-If the `level` param is `null` or `undefined`, all arguments will be stringified in one go.
+If the `level` paramter is `null` or `undefined`, all arguments will be stringified in one go.
 
 If `levels` is an empty object, all object arguments will be treated by object identity.
 
@@ -353,7 +353,7 @@ after the related/detail table they are for.
 **Related records** are records pointed to by a field in a main record.
 For example, a `assessment` record has a field `contribution`, containing the
 identifier of the contribution record that the assessment is targeting.
-Here the assessment record wants to display a contribution record as readonly information.
+Here the assessment record wants to display a contribution record as read-only information.
 A template for this can be defined as follows:  
 
 ```jsx
@@ -387,7 +387,7 @@ If you want related records to be treated as detail records, you have to say so 
 [data model]({{site.serverbase}}/models/data.yaml).
 
 **Readonly versus Edit**
-For detail records, we have two sets of templates; one for presentation of records in readonly
+For detail records, we have two sets of templates; one for presentation of records in read-only
 mode, and one for presenting records as forms with editable fields.
 
 **Consolidated records** are records for which all related values and relevant details have been 
@@ -400,7 +400,7 @@ the assessment has finished, and other cases where we have to preserve a record 
 ### Applying templates
 A template is a function that can be passed a few functions that deliver
 field value information:
-* `v = field => ` *readonly string value for* `field`
+* `v = field => ` *read-only string value for* `field`
 * `f = field => <FieldRead> ` *react component for* `field`
 * `fe = field => <FieldEdit> ` *react component for* `field`
 * `e = field => ` *whether that field has an empty value*
@@ -479,9 +479,9 @@ The contract with ourselves is: do not ever use one of
 if you need an empty value, but use an `empty`*X* (*X* in `S`, `A`, `O`, `F`) instead.
 
 ### getUrlParts
-Analyse urls in order to extract a part `/item/`*itemID* from it (if present).
+Analyse URLs in order to extract a part `/item/`*itemID* from it (if present).
 
-This is needed if we open and close items in a list and want the url to reflect that.
+This is needed if we open and close items in a list and want the URL to reflect that.
 
 See [ListPlain](Components#listplain) for an example.
 
@@ -496,7 +496,7 @@ due to different orders of keys.
 
 Our function `jString` fixes that.
 It is a bit more expensive to run than the plain `JSON.stringify`, but the penalty of not using
-it has the consequence that we fail to say the equalness of objects, which results
+it has the consequence that we fail to detect the equality of objects, which results
 in spurious re-rendering of components.
 If that happens too often, the cost adds up or even multiplies quickly.
 
@@ -526,7 +526,7 @@ The documentation points to a
 but the code for that becomes tedious quickly.
 
 The idea, however, is right, and this function is a variant of the `update()` function
-with autovification.
+with auto vivification.
 
 ### withParams(Component)
 Higher order function that turns a Component (which is a function) into

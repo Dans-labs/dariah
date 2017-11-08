@@ -26,7 +26,7 @@ added later, using the contribution tool itself. Read [more](Content).
 ### 2017-07-01
 
 #### Functionally
-The app can now create assessments and populate an essessment with the relevant
+The app can now create assessments and populate an assessment with the relevant
 criteria based on the type of the contribution being assessed and the current
 package.
 

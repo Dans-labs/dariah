@@ -42,8 +42,8 @@ expand action, and the `tables` slice is changed by receiving additional data fo
 
 In Redux, the slices of the state are not sealed off from each other.
 In the end, there is one and only one reducer, that examines every dispatched action for its `type` property,
-and hands it over to a subfunction that has "subscribed" to handle actions for that type.
-It is prefectly possible that multiple subfunctions will deal with a single action.
+and hands it over to a sub-reducer that has "subscribed" to handle actions for that type.
+It is perfectly possible that multiple sub-reducers will deal with a single action.
 
 A good example is when a record is displayed with multiple detail records, displayed as a list of titles.
 There is a button "Open All" on the interface.
@@ -52,8 +52,8 @@ When it is pressed, data for all detail records is fetched, and the titles expan
 The way it is implemented, is that pressing "Open All" leads to the dispatch of an action
 with type `fetchItems`, and with payload the list of ids of the entities that must be fetched.
 
-To this action, the `tables` reducer subfunction reacts by fetching the corresponding entity data from the server,
-and the `alter` reducer subfunction reacts by expanding the corresponding entity titles into full records.
+To this action, the `tables` sub-reducer reacts by fetching the corresponding entity data from the server,
+and the `alter` sub-reducer reacts by expanding the corresponding entity titles into full records.
 
 Whenever you are tempted to write complicated,
 time-sensitive logic to orchestrate what happens at multiple slices of the state,
@@ -62,7 +62,7 @@ all that is needed is in fact just an extra response of an other sub reducer.
 [alter]({{site.appBase}}/dux/alter.js)
 =============================================================================================
 A mechanism for switching between alternative representations of a component, such
-as: expanded / collapsed, editable / readonly.
+as: expanded / collapsed, editable / read-only.
 It is a bit more general than that: you can supply *n* alternatives and *n* controls,
 and let the user cycle through the alternatives by clicking the controls.
 
@@ -121,9 +121,9 @@ and setting the alternatives of that particular instance.
 ### Caution
 It is tempting to make one alterSection for all components in the app that need
 alternatives.
-The flip side of doing so is that all those components will be triggered for rerender
+The flip side of doing so is that all those components will be triggered for re-render
 whenever any single one of them switches alternatives.
-That is why offer the possibility of grouping related componenents under the
+That is why offer the possibility of grouping related components under the
 same `alterSection` and be shielded from updates in the components that belong to other
 `alterSections`.
 
@@ -140,7 +140,7 @@ It is still in development.
 
 ### Active items
 The `package` table determines a lot about the assessment process.
-It has records with a specified startDate end endData.
+It has records with a specified startDate end endDate.
 The packages that have started and are not yet passed there endDate are the
 *active* packages. Normally there will be exactly one package.
 
@@ -211,7 +211,7 @@ a list with items filtered by those.
 
 Lists and filters form a complex system of components, involving
 
-* fetching list data from the the server,
+* fetching list data from the server,
 * fetching filter specifications
 * fetching the metadata that is used by the filtering
 * handling the user interactions with the filters
@@ -291,7 +291,7 @@ I have created my own [memoizer](Lib#memo).
 
 ### initFilterSettings
 Computes initial filter settings, after `compileFieldIds`.
-For all fulltext filters and faceted filters new, initial filtersettings
+For all full-text filters and faceted filters new, initial filter settings
 are computed.
 This is the information that will be influenced by subsequent user clicks.
 
@@ -304,7 +304,7 @@ For each of its facets, it displays how many items of this relative total corres
 
 So this function delivers exactly that: `filteredData`, `filteredAmountOthers`, `amounts`.
 
-It is also a costly function, but it does neet to be invoked upon each rendering caused by a click or a key press.
+It is also a costly function, but it does need to be invoked upon each rendering caused by a click or a key press.
 
 ### makeTag
 Makes a `filterTag`, depending on the situation of the List of items that needs the filtering.
@@ -449,10 +449,10 @@ Clears the existing list of notifications.
 ### display
 Turns the visibility of notification panel on or off.
 
-Other components can issue notifactions easily, either by importing these
+Other components can issue notifications easily, either by importing these
 actions, or by dispatching the right actions themselves.
 The helper function [accessData](Lib#server) can issue notifications.
-These notifications are given a the type `async` and convey a status `pending`,
+These notifications are given the type `async` and convey a status `pending`,
 `success`, or `error`.
 
 Reducer
@@ -563,18 +563,18 @@ the first one has been completed. The request will not be made, but the
 request counter will be increased.
 
 #### ask
-Just before a request is made, this action sets the the request counter to 1.
+Just before a request is made, this action sets the request counter to 1.
 
 #### err
 When a request returns failure, the request counter is set to -1.
 
 #### succeed
-When a request returns succes, the request counter is set to 0.
+When a request returns success, the request counter is set to 0.
 
 Reducer
 ---------------------------------------------------------------------------
 Manages the request counter and puts it under a key under the `server` slice of the state.
-The key is identical to the `path` of the request (the url that is fired to the server). 
+The key is identical to the `path` of the request (the URL that is fired to the server). 
 
 ### Note
 But all actions except `accessData` are also picked up by the [notes](#notes) reducer,
@@ -625,7 +625,7 @@ Principal data consuming components are [ListContainer](Components#listcontainer
 
 In order to do the job properly, a fair amount of metadata about tables and fields is also fetched and stored.
 In particular, tables specify which filters can be used on which fields.
-This filter setup is not hardwired into the client app, but comes from the server, where it is configured in 
+This filter setup is not hard-wired into the client app, but comes from the server, where it is configured in 
 the data model, a set of *yaml* files.
 
 Actions
@@ -664,7 +664,7 @@ A table is stored under its name as key.
 The table information is an object of entities (rows), keyed by their database id.
 Next to the entities their is an array, called `order`, of ids that specifies the order.
 If only *my* rows are being retrieved, there is an alternative array, called `my`, that contains 
-the ids of the retrieved intities in the right order.
+the ids of the retrieved entities in the right order.
 
 Next to the entity and order information there is field type information.
 There is also information about permissions (read, insert, delete, update).
@@ -722,7 +722,7 @@ Return the whole `tables` slice of the state.
 Helpers
 ---------------------------------------------------------------------------
 ### entityHead
-Computes the a title for an item, based on the
+Computes the title for an item, based on the
 [data model]({{site.serverBase}}/models/data.yaml)
 or on specialized functions, defined here.
 See also [repr](#repr).
@@ -750,10 +750,10 @@ an id of a record in an other table, the value for that id will be looked up and
 Makes a streamlined string representation out of a field value. It looks up ids 
 in related value list tables.
 For some tables, special representation functions will be invoked.
-(users, countries, etc).
+(users, countries, etc.).
 
 ### toDb
-Dispactches an item modification action to the store.
+Dispatches an item modification action to the store.
 
 [win]({{site.appBase}}/dux/win.js)
 =============================================================================================

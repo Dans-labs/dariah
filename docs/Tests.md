@@ -75,5 +75,5 @@ This is the first order error.
 If the pragmatics is wrong, the app will show sluggish behaviour.
 For example, if you have a big list on the screen, and there are many occurrences where a new state
 is semantically equal, but wrapped in a fresh object, all list items will be rendered twice,
-or, foour times, or eight times, depending on the cascades of actions that are being triggered by these
+or, four times, or eight times, depending on the cascades of actions that are being triggered by these
 spurious state changes.

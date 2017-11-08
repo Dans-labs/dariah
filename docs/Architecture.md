@@ -29,7 +29,7 @@ The reducer is given the action, which has a *type* and a payload, and on that b
 it produces a new state from the old state.
 
 An app has many concerns, some of which are pretty well separable from others.
-Such a concern tends to be centered around a specific slice of the state,
+Such a concern tends to be centred around a specific slice of the state,
 involving a specific set of actions, and a dedicated partial reducer of that slice.
 The components involved do not need the whole state, but only this specific slice of the state.
 Some of the actions may become really specialized, involved, and complex, and for those
@@ -93,7 +93,7 @@ Currently, these are the dux of this app:
 * [notes](Dux#notes): the notification system; this is what displays progress and error messages; it can be accessed by the user
   by clicking the unobtrusive open circle in the upper right corner of the browser window;
 * [roots](Dux#roots): combining all the other dux;
-* [select](Dux#select): the state of all multiselect widgets in the app;
+* [select](Dux#select): the state of all multi-select widgets in the app;
 * [server](Dux#server): handling asynchronous actions and reporting about success, failure
   and pending requests; it also prevents subsequent requests of data between the first request and the arrival of the data;
 * [settings](Dux#settings): cross-cutting operational parameters, such as whether to show or hide

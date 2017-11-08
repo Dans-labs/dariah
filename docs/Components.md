@@ -6,7 +6,7 @@ These are the [React](React) components, that make up the
 part of the app that is visible in the browser.
 They lean on the [dux](Dux) that work for them in the background.
 
-Click on the names in the titles to view their source code on Github.
+Click on the names in the titles to view their source code on GitHub.
 
 ### Standard props
 
@@ -38,7 +38,7 @@ When we mention these props later on, we omit the types.
   you find it in the `render` function of the component;
   it is everything between `<Component>` and `</Component>`;
 * `className` **string**;
-  a className to be put in the top level element of the rendered component;
+  a class name to be put in the top level element of the rendered component;
 * `compact` **bool**;
   whether the component should minimize the real estate on the screen that it uses;
 * `detailFragments` **array of object**;
@@ -104,7 +104,7 @@ When we mention these props later on, we omit the types.
   when rendering a list of records that are details of some master record,
   this is the field of the detail records that holds the `masterId`; in this way the detail record
   links to its master record;
-  when the component creates a new detail record, it will prefill this field with the current
+  when the component creates a new detail record, it will pre-fill this field with the current
   `masterId`;
 * `listIds` **array of string**;
   a sequence of strings which are essentially MongoDB identifiers of entities in a table;
@@ -293,7 +293,7 @@ of the `<EUMap/>` component.
 The map is a [Leaflet](http://leafletjs.com) module on a blank pane,
 with a [geojson]({{site.libBase}}/europe.geo.js) file of country boundaries laid out on it.
 The map is not React-aware, it will be rendered in its own `<div/>`.
-The [lifecycle](React#life-cycle) methods of this component set up the map and update when new filter settings have been applied.
+The [life cycle](React#life-cycle) methods of this component set up the map and update when new filter settings have been applied.
 
 ### Compute Marker Radius
 
@@ -302,7 +302,7 @@ with a radius in proportion to their scores.
 However, if the scores are very far apart, either the small markers get invisible,
 or the big markers get too big.
 We mitigate this effect, by using proportional radii only for values below a certain
-threshold (`LEVEL_OFF`). For higher values we essentiall take the square root.
+threshold (`LEVEL_OFF`). For higher values we essentially take the square root.
 
 [Facet]({{site.appBase}}/components/Facet.jsx)
 =============================================================================================
@@ -352,12 +352,12 @@ Note that we do not pass the actual values to these components.
 They know how to get the current values from the state, and what actions
 must be dispatched to change them.
 
-However, both `<Field />` and `<FieldArray />` still do not actully present
+However, both `<Field />` and `<FieldArray />` still do not actually present
 the edit control. They only do the plumbing.
 
-For the actual presentation, you can plugin a component of choice.
+For the actual presentation, you can plug in a component of choice.
 We will use `<input type="..." />`, `<textarea>...</textarea>` elements and
-our own custom component [RelSelect](#relselect) for multiselect controls.
+our own custom component [RelSelect](#relselect) for multi-select controls.
 
 We enhance *textareas* by offering markdown previews of their content.
 See [MarkdownArea](#markdownarea).
@@ -399,11 +399,11 @@ Both turned out to be related to Redux-Form.
   [this](http://redux-form.com/6.8.0/docs/api/Field.md/), section **2. A stateless function**
 
   > You must define the stateless function outside of your render() method,
-  or else it will be recreated on every render and will force the Field to rerender
+  or else it will be recreated on every render and will force the Field to re-render
   because its component prop will be different.
   If you are defining your stateless function inside of render(),
   it will not only be slower, but your input will lose focus
-  whenever the entire form component rerenders.
+  whenever the entire form component re-renders.
 
   and
   
@@ -416,7 +416,7 @@ Both turned out to be related to Redux-Form.
   that should be bound to the proper form, becomes bound to the wrong form.
   As far as I can see, all other things work as expected, so it was difficult to see
   why this occurred. The explanation is in a 
-  [Github issue](https://github.com/erikras/redux-form/issues/2886).
+  [GitHub issue](https://github.com/erikras/redux-form/issues/2886).
   Summarized: the construction of the `onChange` function is effectively memoized.
   It is determined upon mounting of the component, but not on updating it.
   The workaround is easy: add an extra key property to the form.
@@ -510,7 +510,7 @@ Transforms the entered value into a normalized value for saving.
 ###### `fields` array
 The names of the individual fields.
 If the collective name of this field is `foo`, than this array contains
-`foo[0]`, `foo[1]`, etc, as many as their are values. These names are just strings.
+`foo[0]`, `foo[1]`, etc., as many as their are values. These names are just strings.
 
 ###### `meta` object
 Contains attributes related to validation and edit state; is the value changed and unsaved,
@@ -563,7 +563,7 @@ connected via [tables](Dux#tables)
 ###### tables table eId fieldFragments dispatch
 
 ###### `nextAlt` function
-This function can be used to switch this component from readonly view to edit view
+This function can be used to switch this component from read-only view to edit view
 and back. 
 It will be passed on to the widget that also has the edit controls for
 submitting and resetting the form.
@@ -616,7 +616,7 @@ The component also shows *save* and *reset* buttons (if appropriate).
 
 The component has two render modes: read-only view and edit-view.
 When a user has edited the form, he can switch to the read only view to see the result.
-In readonly view, markdown fields are rendered as formatted text, and tags in select controls
+In read-only view, markdown fields are rendered as formatted text, and tags in select controls
 do not open the choice when you click on it. 
 Instead such a click takes to an item view of that value in its own table.
 
@@ -675,7 +675,7 @@ connected via [tables](Dux#tables)
 An object with the initial values of all fields that are being managed by the form as a whole.
 
 ###### `isactive` string
-A CSS className to add extra formatting if the record in question is deemed *inactive*.
+A CSS class name to add extra formatting if the record in question is deemed *inactive*.
 The notion of active items is defined in the duct [workflow](Dux#workflow).
 
 ### Task
@@ -692,7 +692,7 @@ connected via [tables](Dux#tables)
 ###### tables eId fieldFragments
 
 ### Task
-Manages the display (readonly) of a single record.
+Manages the display (read-only) of a single record.
 It is used if no fields need to be edited.
 For editing records, [ItemEdit](#itemedit) is being used.
 
@@ -711,7 +711,7 @@ An object with the initial values of all fields that are being managed by the fo
 ###### `widthStyles` object
 Since this component has to render records in a grid view, it must know something about
 the widths of the columns.
-That information is contained in this prop, as a css style per column.
+That information is contained in this prop, as a CSS style per column.
 
 ###### `alt` bool
 The component must know whether it is an ordinary grid row, or whether the fields should
@@ -722,7 +722,7 @@ This function can be used by a control by which the user can switch between row 
 view of the record.
 
 ###### `isactive` string
-A CSS className to add extra formatting if the record in question is deemed *inactive*.
+A CSS class name to add extra formatting if the record in question is deemed *inactive*.
 The notion of active items is defined in the duct [workflow](Dux#workflow).
 
 ### Task
@@ -741,7 +741,7 @@ The display of the (filtered) table is left to other components,
 such as [ListFilter](#listfilter).
 
 It can be instructed to navigate to a specific item.
-This is used when the id of the item to navigate to is contained in the url.
+This is used when the id of the item to navigate to is contained in the URL.
 
 The `eId` prop is the one that contains the item to navigate to.
 
@@ -782,16 +782,16 @@ and direction.
 
 ### Task
 This component shows a table as a grid.
-It uses [CSS flex-box](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
+It uses [CSS flex-box](https://CSS-tricks.com/snippets/CSS/a-guide-to-flexbox/)
 for the grid layout. 
-There is also [CSS grid](https://css-tricks.com/snippets/css/complete-guide-grid/)
+There is also [CSS grid](https://CSS-tricks.com/snippets/CSS/complete-guide-grid/)
 but at the time of writing this app, browser support for grid was substantially inferior to
 browser support for flex.
 
 The grid can be sorted by column, in ascending and descending order.
 You can sort on one column first and then on another and so on.
 
-Every grid remembers its sorting state in the ... grid slice of the state, where it is 
+Every grid remembers its sorting state in the grid slice of the state, where it is 
 available under a key.
 
 [ListPlain]({{site.appBase}}/components/ListPlain.jsx)
@@ -807,7 +807,7 @@ It will be opened and scrolled into view.
 Displays a list of items from a table.
 Every items is represented as a heading, usually consisting of the title field of 
 the item. 
-If the user has permission to see more, there is a control on each item to expand the
+If the user has permission to see more, there is a control on each item to expand
 the heading into the fields and values of the item.
 If the user has edit permissions, he can edit the item from here.
 
@@ -905,7 +905,7 @@ It hints at the current status of asynchronous operations. A click on it will sh
 [Overview]({{site.appBase}}/components/Overview.jsx)
 =============================================================================================
 Under construction.
-Meant to become a customized dashboard for the backoffice functions.
+Meant to become a customized dashboard for the back office functions.
 
 [RelSelect]({{site.appBase}}/components/RelSelect.jsx)
 =============================================================================================
@@ -929,7 +929,7 @@ search text the user has entered in the filter box.
 The notion of active items is defined in the duct [workflow](Dux#workflow).
 
 ###### `isactive` string
-A CSS className to add extra formatting if the record in question is deemed *inactive*.
+A CSS class name to add extra formatting if the record in question is deemed *inactive*.
 
 ###### `allowed` object
 An array of entity ids that are the allowed elements when the field is a multiple
@@ -942,14 +942,14 @@ These attributes are passed verbatim to the underlying `<input />`.
 ![diag](design/design.009.jpeg)
 
 ### Task
-An implementation of multiselect widgets. 
-There is a fairly complete [react-select](https://github.com/JedWatson/react-select) component on Github.
+An implementation of multi-select widgets. 
+There is a fairly complete [react-select](https://github.com/JedWatson/react-select) component on GitHub.
 However, it has some flaws that prevents a successful usage of it in our app.
 That is why I have written this component.
 
 The capabilities of this widget are:
 
-* single select or multiselect, depending on the property `multiple`;
+* single select or multi-select, depending on the property `multiple`;
 * fixed list of values or the possibility to create new values on the fly, depending on the prop `allowNew`;
 * options can be filtered by a full text filter;
 * only one copy of an option can be chosen;

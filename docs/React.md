@@ -22,7 +22,7 @@ a static template, it can be (and will be) coded as a pure function.
 ## Simple Stateful components
 If a component needs to store the effects of the outside world
 (incoming server data or user interaction), it is stateful.
-If the component does not need [lifecycle](life-cycle) methods, it can be programmed
+If the component does not need [life cycle](life-cycle) methods, it can be programmed
 as a pure function that will be connected to the Redux state
 by means of a simple binding: [connect](#connect).
 
@@ -30,7 +30,7 @@ by means of a simple binding: [connect](#connect).
 
 ## Complex components
 If a component has to handle the DOM after it has been constructed,
-e.g. apply some hiding and showing, fill a div with a third party component,
+e.g. apply some hiding and showing, fill a DIV with a third party component,
 or get data from the state in a sophisticated way,
 then we need to program the component as a class with so-called
 [life cycle methods](#life-cycle).
@@ -78,10 +78,10 @@ with React components, which look nearly the same in **jsx**:
 DOM is an abbreviation for
 [Document Object Model](https://developer.mozilla.org/en-US/docs/Web/API/document).
 The DOM is what the browser gets in memory once it has loaded an HTML document.
-One of the principal tasks of Javascript in the browser is to manipulate this DOM.
+One of the principal tasks of JavaScript in the browser is to manipulate this DOM.
 
 The DOM and its API are exceedingly bloated, hence DOM operations are slow, no matter how
-fast Javascript currently is.
+fast JavaScript currently is.
 
 This is one of the reasons that a niche for React exists, with its [MiniDOM](#minidom).
 
@@ -97,7 +97,7 @@ See [Reconciliation](#reconciliation).
 [PropTypes](https://facebook.github.io/react/docs/typechecking-with-proptypes.html)
 are a means to do type checking for React Components is done by *PropTypes*.
 
-Proptype checking in react only happens in development mode.
+PropType checking in react only happens in development mode.
 React checks whether the named props that are passed to a component
 correspond to the props declared. In addition, it performs a basic type check on the values
 inside those props.
@@ -105,7 +105,7 @@ inside those props.
 I find the `PropType` verbose, and no match for the otherwise clean and pleasant
 syntax of JSX. Additionally, most of the mistakes I make, do not reveal themselves as value
 type mistakes. On top it this all: declaring `PropTypes` forces you to repeat all
-the names of your proptypes, so is against the principle of *do't repeat yourself*.
+the names of your PropTypes, so is against the principle of *do't repeat yourself*.
 In this application, the property names are always clear in the code, either as
 
 ```
@@ -135,7 +135,7 @@ The main function of a
 is to act as a template to be [rendered](#render).
 But if there is additional work to be done, this can be hooked up at various
 stages in the component's
-[lifecycle](https://facebook.github.io/react/docs/react-component.html#the-component-lifecycle).
+[life cycle](https://facebook.github.io/react/docs/react-component.html#the-component-life cycle).
 Most stages occur during (re)rendering, and there is a stage of construction and unmounting.
 
 ### Constructor
@@ -210,7 +210,7 @@ During rendering the template will be used as a set of instructions to build a r
 somewhere on the actual web page.
 
 ## Controlled Component
-For elements that can receive user input (forms, inputs, etc) there is the option
+For elements that can receive user input (forms, inputs, etc.) there is the option
 to handle input in a way controlled by React, and not by the default HTML behaviour.
 We say that those elements are used as
 [controlled Components](https://facebook.github.io/react/docs/forms.html).
@@ -222,7 +222,7 @@ to be checked (or unchecked).
 
 ## State
 There are two main reasons for a component to maintain
-[state](https://facebook.github.io/react/docs/state-and-lifecycle.html):
+[state](https://facebook.github.io/react/docs/state-and-life cycle.html):
 
 * getting external data,
 * reacting to user events.
@@ -233,7 +233,7 @@ Components remember these things in their
 They can compute derived data from their state and pass that as properties
 to their children.
 State updates trigger these computations automatically, and children
-whose properties are dependent on this state, are rerendered automatically
+whose properties are dependent on this state, are re-rendered automatically
 (and economically).
 
 ### Local State
@@ -277,7 +277,7 @@ which get separated from the components for which it is used.
 
 However, there is a way to do it nicely.
 There is a way of writing *idiomatic* redux, beautifully advocated by its creator,
-Dan Abramov, in [30 videos](https://egghead.io/courses/getting-started-with-redux).
+Dan Abramov, in [30 videos](https://egghead.io/courses/getting-started-with-redux),
 and that is by means of
 [ducks](https://github.com/erikras/ducks-modular-redux).
 (we call them *dux*).
@@ -302,21 +302,21 @@ Every duct manages a slice of the state has four sections:
 ## Merge
 When a reducer transforms a state, it must happen in such a way that
 * unaffected parts of the state do not change,
-* all intermediate objects between the toplevel state and a changed leaf are fresh objects.
+* all intermediate objects between the top-level state and a changed leaf are fresh objects.
 
 The handiest way to achieve this is to use 
 [lodash merge](https://lodash.com/docs/#merge)
 and
 [lodash mergeWith](https://lodash.com/docs/#mergewith).
 Most reducers use it.
-The hint to use lodash functions for this is given
+The hint to use Lodash functions for this is given
 [here](http://redux.js.org/docs/recipes/reducers/UpdatingNormalizedData.html).
 
 These functions take an object, and transform it on the bases of an other object, precisely as needed for our purposes.
 And if a little tweak is needed for certain keys of the state, `mergeWith()` provides a hook for that.
 See [notes.js]({{site.appBase}}/dux/notes.js), the function `addItem()`.
 There, if the old state has an array of items, and we need to append some items, we create a new array, consisting of the 
-items of the orginal array, with the new items concatenated after them.
+items of the original array, with the new items concatenated after them.
 
 ## Select
 The opposite of merging data into the state is selecting data from the state.
@@ -373,7 +373,7 @@ See also [Architecture](Architecture#overview).
 # Routing
 [React-router](https://github.com/ReactTraining/react-router)
 is a convenient library to manage the connection between
-the url and the part of your app that should be active in response to it.
+the URL and the part of your app that should be active in response to it.
 
 ```
 <Router history={browserHistory} >
@@ -387,7 +387,7 @@ the url and the part of your app that should be active in response to it.
 The router and its routes are basically React
 [components](#react-components).
 But they come loaded with some extra behaviour.
-Basically, when a route is rendered, it checks its `path` attribute with the current url.
+Basically, when a route is rendered, it checks its `path` attribute with the current URL.
 If it matches, it renders itself. Otherwise, it does not mount, or if it was mounted,
 it will unmount.
 

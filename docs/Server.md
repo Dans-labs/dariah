@@ -7,31 +7,31 @@ coded at the client side, there are a bunch of things that are handled at the se
 
 All data access is handled by server side controllers that implement a data api.
 These controllers are informed by a
-[data model]({{site.serverBase}}/models/data.yaml)
+[data model]({{site.serverBase}}/models/data.YAML)
 and a
-[permissions model]({{site.serverBase}}/models/permission.yaml)
+[permissions model]({{site.serverBase}}/models/permission.YAML)
 
-Both models are specified in a `yaml` file.
-When the webserver starts, these model files are read,
+Both models are specified in a `YAML` file.
+When the web server starts, these model files are read,
 and converted to python modules with the same base name
-that encapsulate the information in the yaml files.
+that encapsulate the information in the YAML files.
 
 These modules are then imported by all controllers, so that all data access happens in conformance
 with the data model and its permissions.
 
-[Data model]({{site.serverBase}}/models/data.yaml)
+[Data model]({{site.serverBase}}/models/data.YAML)
 ==========
 
 MongoDB
 -------
 We store the data in a [MongoDB](https://docs.mongodb.com).
 A MongoDB does not work with a fixed scheme. A MongoDB *collection* consists of
-*documents*, which are essentially json-like structures, arbitrarily large and arbitrarily nested.
+*documents*, which are essentially JSON-like structures, arbitrarily large and arbitrarily nested.
 That makes it easy to add new kinds of data to documents and collections
 when the need arises to do so.
 This will not break the existing code. 
 
-The MongoDB way favors storing of related data inside the main document.
+The MongoDB way favours storing of related data inside the main document.
 This increases the redundancy of the data and may lead to consistency problems,
 unless the application not tries to enforce consistency somehow.
 MongoDB is optimized to read quickly, at the cost of more expensive data manipulation operations.
@@ -44,8 +44,8 @@ we only store references to related records inside the main records.
 Configuration
 -------------
 The data model consists of the dictionaries *generic* and *tables*.
-The generic dict contains field names that are used in many tables, such as `createdBy`.
-The tables dict has a key for each table, and contains all model information that the
+The generic dictionary contains field names that are used in many tables, such as `createdBy`.
+The tables dictionary has a key for each table, and contains all model information that the
 application needs to work with that table.
 
 Here is a description of the table model information.
@@ -64,7 +64,7 @@ A list of the fields, in the order by which will we displayed when the interface
 
 fieldSpecs
 ----------
-A dictionary of the fields and their characteristics, needed to accomodate the display and manipulation
+A dictionary of the fields and their characteristics, needed to accommodate the display and manipulation
 of its values. A field spec may contain the following bits of information:
 
 * **label**: a user-friendly name of the field
@@ -74,7 +74,7 @@ of its values. A field spec may contain the following bits of information:
   * `datetime`: a date time, mostly represented in its [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
   * `number`: an integer or real number.
   * `text`: a string of characters, usually just a one-liner.
-  * `url`: a syntactically valid url: i.e. a string of text that can be interpreted as a url. A validation routine will check this.
+  * `URL`: a syntactically valid URL: i.e. a string of text that can be interpreted as a URL. A validation routine will check this.
   * `email`: a syntactically valid email address. A validation routine will check this.
   * `textarea`: a string of characters, which may extend to several pages.
     It is assumed that this is Markdown text, and its formatted version will be shown on the interface, see
@@ -112,7 +112,7 @@ Each filter is a dictionary with the following information.
 * **maxCols**: facets are displayed in a table with at most this amount of columns.
 * **expanded**: whether the table of facets is initially expanded or collapsed.
 
-[Permission model]({{site.serverBase}}/models/permission.yaml)
+[Permission model]({{site.serverBase}}/models/permission.YAML)
 =================
 
 The authorization system is built up from permissions.
@@ -127,7 +127,7 @@ for the thing.
 
 In some cases, the identity of the user is relevant, namely when users
 want to modify things they themselves have created.
-For those things, users are in a pseado group called *own*.
+For those things, users are in a pseudo group called *own*.
 
 Here are the details.
 
@@ -164,7 +164,7 @@ Authorize
 A table which specify the power of each group over each level that a thing may require. It is a dictionary of dictionaries: the first key is
 the user group, the second key is the level of the thing.
 
-If the dict of a user group does not contain a key for a certain level, then those users have no power to do that thing.
+If the dictionary of a user group does not contain a key for a certain level, then those users have no power to do that thing.
 
 Otherwise the value is either 1 or -1, meaning:
 
@@ -233,7 +233,7 @@ The result has three parts:
 
 * a boolean which tells: yes, allowed, or no: forbidden;
 * a rowFilter, which specifies, in case of a yes, to which rows the action may be applied;
-* a fieldFilter, which specfies, in case of yes, which fields in those rows may be acted upon.
+* a fieldFilter, which specifies, in case of yes, which fields in those rows may be acted upon.
 
 may( table, action, document=None)
 ---------------
@@ -246,7 +246,7 @@ Without a document, permissions are calculated as if the user does not own any d
 The result has two parts:
 
 * a boolean which tells: yes, allowed, or no: forbidden;
-* a fieldFilter, which specfies, in case of yes, which fields in those rows may be acted upon.
+* a fieldFilter, which specifies, in case of yes, which fields in those rows may be acted upon.
 
 [db]({{site.serverBase}}/controllers/db.py)
 ==============
@@ -257,9 +257,9 @@ in such a way that no data is sent from server to client that the current user i
 
 The code in `db` is generic, it does not contain explicit reference to particular tables and fields.
 All specifics are derived form the
-[data model config file]({{site.serverBase}}/models/data.yaml)
+[data model config file]({{site.serverBase}}/models/data.YAML)
 and
-[the permissions config file]({{site.serverBase}}/models/permission.yaml).
+[the permissions config file]({{site.serverBase}}/models/permission.YAML).
 
 There are also *hooks*, where specific behaviour for certain tables can be specified.
 That behaviour is coded in the [workflow module](#workflow).
@@ -326,7 +326,7 @@ The `controller` is the name of the top-level method that called this function.
 ==============
 Contains the logic needed to maintain the user table.
 When new users log in through the DARIAH infrastructure, it collects their `eppn`, i.e. the names by which they
-are identified by the autentication systems.
+are identified by the authentication systems.
 It also retrieves to what permission groups users belong.
 
 [auth]({{site.serverBase}}/controllers/auth.py)
@@ -339,7 +339,7 @@ It builds on the bottle web framework.
 ==============
 Contains the methods to get file data from the server.
 There is a method to serve static files by calling the web framework bottle.
-And there is a method to read a file and deliver its content as json.
+And there is a method to read a file and deliver its content as JSON.
 
 [utils]({{site.serverBase}}/controllers/utils.py)
 ==============
@@ -364,7 +364,7 @@ Method invoked by [db](#db), just before an item is inserted.
 This method has the opportunity to generate extra fields for that record, 
 and to generate extra details in other tables, to be inserted.
 
-It needs to deliver a dict of insertValues (field=value pairs) and a dict of detail records,
+It needs to deliver a dictionary of insertValues (field=value pairs) and a dictionary of detail records,
 keyed by detail table name.
 The values are lists of field=value dictionaries.
 Before [db](#db) will proceed to insert them, the detail records will get the id

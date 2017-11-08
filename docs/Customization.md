@@ -5,10 +5,10 @@ This application contains a generic engine to display MongoDB data according to
 any specified data model, respecting access privileges.
 
 Both the
-[data model]({{site.serverbase}}/models/data.yaml)
+[data model]({{site.serverbase}}/models/data.YAML)
 and the
-[permission model]({{site.serverbase}}/models/permission.yaml)
-are yaml configuration files, and by tweaking them you can achieve a lot of customization.
+[permission model]({{site.serverbase}}/models/permission.YAML)
+are YAML configuration files, and by tweaking them you can achieve a lot of customization.
 
 However, for some parts of the application this is just not good enough,
 e.g. the display of assessments.
@@ -23,9 +23,9 @@ Looking up a field value might seem a very innocent operation: you retrieve the
 appropriate document from the database, look up the field in question, and read out the value 
 that you find there.
 Alas, there are several complicating factors:
-* That value might be a mongo object identifier pointing to a related record.
+* That value might be a MongoDB object identifier pointing to a related record.
   We do not want to display that identifier, but the corresponding record, but not
-  the whole record. Only an informative heading. For that we have to look up addtional
+  the whole record. Only an informative heading. For that we have to look up additional
   fields in the related table, and possibly apply logic depending on what we encounter.
 * We should not show fields that the current user is not entitled to view.
   We should not put in edit controls for fields that the current user is not allowed to 
@@ -43,7 +43,7 @@ field values are merged dynamically.
 
 Instead, our templates are *functions* that take functions as arguments.
 These function arguments deliver the actual field values, in several forms.
-These functions use the general machinery to compute readonly values for fields so 
+These functions use the general machinery to compute read-only values for fields so 
 that related values are looked up and permissions are being respected.
 
 The field values can be delivered as string values, but also as 
