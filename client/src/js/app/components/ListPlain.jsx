@@ -106,13 +106,11 @@ class ListPlain extends Component {
             const active = alt !== initial
             const scrollProps = active ? { ref: this.scroll } : emptyO
             const showStatus = isComplete && someEditable(fields, perm)
-            const isactive = (activeItems != null && activeItems.has(eId))
-            ? 'isactive'
-            : emptyS
+            const isactive = activeItems != null && activeItems.has(eId)
             const thisStartMode = startMode === 0 ? startMode : startMode(values)
 
             return (
-              <div key={eId} className={isactive} >
+              <div key={eId} className={isactive ? 'isactive' : emptyS} >
                 {
                   active
                   ? <div {...scrollProps} >

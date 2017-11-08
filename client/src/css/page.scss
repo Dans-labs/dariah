@@ -26,3 +26,12 @@ div.sized {
 .inlineR {
     float: right;
 }
+div.error-boundary {
+    font-size: medium;
+    font-weight: normal;
+    background-color: #ffdddd;
+    color: #000000;
+    border: 2pt dashed #ff0000;
+    border-radius: 4pt;
+    padding: 0.3em;
+}

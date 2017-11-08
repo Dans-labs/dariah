@@ -53,7 +53,7 @@ const ItemForm = props => {
 
   const head = headEntity(tables, table, eId, settings)
   return (
-    <div className={`itemRecord ${borderSwitch} ${editSwitch} ${isactive}`} >
+    <div className={`itemRecord ${borderSwitch} ${editSwitch} ${isactive ? 'isactive' : emptyS}`} >
       {
         hasEditable && alt === 1
         ? <div>

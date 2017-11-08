@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import { getWinDim } from 'win'
 
+import ErrorBoundary from 'ErrorBoundary'
 import Login from 'Login'
 import Static from 'Static'
 import Notification from 'Notification'
@@ -12,17 +13,23 @@ const App = ({ children, win }) => {
   const text = `${width} x ${height}`
   return (
     <div>
-      <Notification />
+      <ErrorBoundary>
+        <Notification />
+      </ErrorBoundary>
       <p className={'nav small top'} >
         <img
           src={'/static/images/inkind_logo_small.png'}
           title={'information about this site'}
         />
-        <Static />
+        <ErrorBoundary>
+          <Static />
+        </ErrorBoundary>
         <span className={'resize'} title={text}>{text}</span>
-        <Login />
+        <ErrorBoundary>
+          <Login />
+        </ErrorBoundary>
       </p>
-      <div>{children}</div>
+      <ErrorBoundary>{children}</ErrorBoundary>
     </div>
   )
 }

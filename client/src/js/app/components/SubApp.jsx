@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { withParams, emptyA } from 'utils'
 import { getMe } from 'me'
 
+import ErrorBoundary from 'ErrorBoundary'
 import NavLink from 'NavLink'
 
 const tableLinks = (me, { path, name, own, details }) => !own || me.eppn
@@ -105,26 +106,32 @@ const navBarItems = [
 const SubApp = ({ me, table, routes, children }) => (
   <div className={'sub-app'} >
     <div className={'nav bar'} >
-      {navBarItems.map(item => tableLinks(me, item))}
+      <ErrorBoundary>
+        {navBarItems.map(item => tableLinks(me, item))}
+      </ErrorBoundary>
     </div>
     <div className={'details'} >
-      {
-        routes[1].path === 'data' && routes.length === 1
-        ? <div>{'All tables'}</div>
-        : routes[1].path === 'data' && routes.length === 2
-          ? <div>
-              <h3>{'Registry'}</h3>
-              <p>{'Use the side bar to navigate to a section'}</p>
-            </div>
-            : routes[1].path === 'data' && routes.length === 3
-              ? <div>
-                  <h3>{'Registry'}</h3>
-                  <h4>{`Table ${table}`}</h4>
-                  <p>{'Use the side bar to navigate to a particular view on this table'}</p>
-                </div>
-              : null
-      }
-      { children }
+      <ErrorBoundary>
+        {
+          routes[1].path === 'data' && routes.length === 1
+          ? <div>{'All tables'}</div>
+          : routes[1].path === 'data' && routes.length === 2
+            ? <div>
+                <h3>{'Registry'}</h3>
+                <p>{'Use the side bar to navigate to a section'}</p>
+              </div>
+              : routes[1].path === 'data' && routes.length === 3
+                ? <div>
+                    <h3>{'Registry'}</h3>
+                    <h4>{`Table ${table}`}</h4>
+                    <p>{'Use the side bar to navigate to a particular view on this table'}</p>
+                  </div>
+                : null
+        }
+      </ErrorBoundary>
+      <ErrorBoundary>
+        { children }
+      </ErrorBoundary>
     </div>
   </div>
 )

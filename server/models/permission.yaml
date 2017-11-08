@@ -2,10 +2,10 @@ unauth: public
 auth:   auth
 
 groups:
-  public: unauthenticated user
+  public: user, not logged in
   auth:   authenticated user
   own:    authenticated user and creator of records in question
-  office: management user
+  office: back office user
   system: system administrator
   root: all powerful
   nobody: nobody

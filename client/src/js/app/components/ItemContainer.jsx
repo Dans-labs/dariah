@@ -7,8 +7,8 @@ import { dealWithProvenance } from 'fields'
 import { getSettings } from 'settings'
 import { needValues, fetchItem, headEntity } from 'tables'
 
+import ErrorBoundary from 'ErrorBoundary'
 import ItemForm from 'ItemForm'
-
 
 class ItemContainer extends Component {
   render() {
@@ -35,23 +35,25 @@ class ItemContainer extends Component {
 
     const alterSection = `edit-${table}-${eId}`
     return (
-      <ItemForm
-        filters={filters}
-        tables={tables}
-        table={table}
-        eId={eId}
-        masterId={masterId}
-        linkField={linkField}
-        alterSection={alterSection}
-        isactive={isactive}
-        startMode={startMode}
-        key={`${table}-${eId}`}
-        initialValues={initialValues}
-        perm={perm}
-        fields={dealWithProvenance(settings, fields)}
-        fixed={fixed}
-        border={border}
-      />
+      <ErrorBoundary>
+        <ItemForm
+          filters={filters}
+          tables={tables}
+          table={table}
+          eId={eId}
+          masterId={masterId}
+          linkField={linkField}
+          alterSection={alterSection}
+          isactive={isactive}
+          startMode={startMode}
+          key={`${table}-${eId}`}
+          initialValues={initialValues}
+          perm={perm}
+          fields={dealWithProvenance(settings, fields)}
+          fixed={fixed}
+          border={border}
+        />
+      </ErrorBoundary>
     )
   }
   openItem() {

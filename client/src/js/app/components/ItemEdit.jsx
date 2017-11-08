@@ -8,6 +8,7 @@ import { applyEditTemplate } from 'templates'
 import { onSubmitSuccess } from 'fields'
 import { toDb, headEntity } from 'tables'
 
+import ErrorBoundary from 'ErrorBoundary'
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
 import { EditControl } from 'EditControls'
@@ -53,23 +54,25 @@ const ItemEdit = ({
               >
                 <div className={`grid-head-cell label-col ${editable ? 'edit' : ''}`}>{`${label}:`}</div>
                 <div className={'grid-cell value-col edit'} >
-                  {
-                    editable && (typeof valType != 'object' || !valType.fixed)
-                    ? <FieldEdit
-                        field={field}
-                        tables={tables}
-                        table={table}
-                        eId={eId}
-                        {...fieldProps}
-                      />
-                    : <FieldRead
-                        field={field}
-                        tables={tables}
-                        table={table}
-                        eId={eId}
-                        myValues={myValues}
-                      />
-                  }
+                  <ErrorBoundary>
+                    {
+                      editable && (typeof valType != 'object' || !valType.fixed)
+                      ? <FieldEdit
+                          field={field}
+                          tables={tables}
+                          table={table}
+                          eId={eId}
+                          {...fieldProps}
+                        />
+                      : <FieldRead
+                          field={field}
+                          tables={tables}
+                          table={table}
+                          eId={eId}
+                          myValues={myValues}
+                        />
+                    }
+                  </ErrorBoundary>
                 </div>
               </div>
             ))

@@ -8,6 +8,8 @@ import { combineSelectors } from 'utils'
 import { getDoc, needDoc, changedDoc, fetchDoc } from 'docs'
 import { getAltSection, compileAlternatives } from 'alter'
 
+import ErrorBoundary from 'ErrorBoundary'
+
 const RouterLink = ({ children, href }) => (
   href.match(/^(https?:)?\/\//)
   ? <a href={href} >{children}</a>
@@ -25,28 +27,30 @@ class DocMd extends Component {
     const alt = getAlt(alter)
 
     return (
-      <div style={{paddingLeft: '0.5em'}} >
-        <p style={{float: 'right'}} >
-          <a
-            href={'#'}
-            className={`control fa fa-${alt === 0 ? 'hand-o-down' : 'file-code-o'}`}
-            title={`${alt === 0 ? 'markdown source' : 'formatted'}`}
-            onClick={nextAlt}
-          />
-        </p>
-        {
-          alt === 0
-          ? <div>
-              <Markdown
-                source={text}
-                renderers={renderers}
-              />
-            </div>
-          : <div>
-              <pre className={'md-source'} >{text}</pre>
-            </div>
-        }
-      </div>
+      <ErrorBoundary>
+        <div style={{paddingLeft: '0.5em'}} >
+          <p style={{float: 'right'}} >
+            <a
+              href={'#'}
+              className={`control fa fa-${alt === 0 ? 'hand-o-down' : 'file-code-o'}`}
+              title={`${alt === 0 ? 'markdown source' : 'formatted'}`}
+              onClick={nextAlt}
+            />
+          </p>
+          {
+            alt === 0
+            ? <div>
+                <Markdown
+                  source={text}
+                  renderers={renderers}
+                />
+              </div>
+            : <div>
+                <pre className={'md-source'} >{text}</pre>
+              </div>
+          }
+        </div>
+      </ErrorBoundary>
     )
   }
   componentDidMount() {

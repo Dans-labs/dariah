@@ -7,6 +7,7 @@ import { loadExtra } from 'workflow'
 import { getTables, needTables, fetchTables, MYIDS } from 'tables'
 import { getFilters, makeTag } from 'filters'
 
+import ErrorBoundary from 'ErrorBoundary'
 import ListGrid from 'ListGrid'
 import ListPlain from 'ListPlain'
 import ListFilter from 'ListFilter'
@@ -21,45 +22,51 @@ class ListContainer extends Component {
     const things = item[1]
     const listIds = select === MYIDS ? myIds : allIds
     const filterTag = makeTag(select, null, null)
-    return filtered
-    ? <ListFilter
-        filters={filters}
-        tables={tables}
-        table={table}
-        navItem={eId}
-        listIds={listIds}
-        perm={perm}
-        select={select}
-        mode={mode}
-        title={title}
-        filterTag={filterTag}
-        gridTag={table}
-      />
-    : mode === 'list'
-      ? <ListPlain
-          alterSection={`list-${table}-${select}`}
-          filters={filters}
-          tables={tables}
-          table={table}
-          navItem={eId}
-          listIds={listIds}
-          select={select}
-          perm={perm}
-          title={title}
-        />
-      : mode === 'grid'
-        ? <ListGrid
-            alterSection={`list-${table}-${select}`}
-            filters={filters}
-            tables={tables}
-            table={table}
-            navItem={eId}
-            listIds={listIds}
-            select={select}
-            perm={perm}
-            gridTag={table}
-          />
-        : <span>{`unknown display mode "${mode}" for ${things}`}</span>
+    return (
+      <ErrorBoundary>
+        {
+          filtered
+          ? <ListFilter
+              filters={filters}
+              tables={tables}
+              table={table}
+              navItem={eId}
+              listIds={listIds}
+              perm={perm}
+              select={select}
+              mode={mode}
+              title={title}
+              filterTag={filterTag}
+              gridTag={table}
+            />
+          : mode === 'list'
+            ? <ListPlain
+                alterSection={`list-${table}-${select}`}
+                filters={filters}
+                tables={tables}
+                table={table}
+                navItem={eId}
+                listIds={listIds}
+                select={select}
+                perm={perm}
+                title={title}
+              />
+            : mode === 'grid'
+              ? <ListGrid
+                  alterSection={`list-${table}-${select}`}
+                  filters={filters}
+                  tables={tables}
+                  table={table}
+                  navItem={eId}
+                  listIds={listIds}
+                  select={select}
+                  perm={perm}
+                  gridTag={table}
+                />
+              : <span>{`unknown display mode "${mode}" for ${things}`}</span>
+        }
+      </ErrorBoundary>
+    )
   }
   componentDidMount() {
     const { props: { tables, table, select, mode, dispatch } } = this

@@ -579,12 +579,18 @@ tables:
       reviewer1:
         label: First reviewer
         valType:
+          select:
+            authority:
+              $ne: legacy
           relTable: user
           allowNew: email
         multiple: false
       reviewer2:
         label: Second reviewer
         valType:
+          select:
+            authority:
+              $ne: legacy
           relTable: user
           allowNew: email
         multiple: false

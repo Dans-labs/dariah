@@ -76,7 +76,7 @@ const ItemRow = ({
   const hasForm = form.has(formTag)
   const alterSection = `edit-${table}-${eId}`
   return (
-    <div className={isactive}>
+    <div className={isactive ? 'isactive' : emptyS}>
       {
         alt === 0
         ? <div>
