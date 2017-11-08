@@ -524,7 +524,7 @@ class FMConvert(object):
                 info('Deleting test user {} @ {}'.format(eppn, authority))
                 db.user.delete_one(dict(eppn=eppn, authority=authority))
         else:
-            db.user.delete(dict(authority=self.testAuthority))
+            db.user.delete_many(dict(authority=self.testAuthority))
 
     def provenance(self):
         for c in self.allData['contrib']:
