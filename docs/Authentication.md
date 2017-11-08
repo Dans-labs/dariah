@@ -15,7 +15,11 @@ To do the latter, one has to go to `/slogout` and close the browser.
 
 User records
 -------------
-When users log in, there details will be stored in the user table.
+When users log in, their details will be stored in the user table.
+This happens on every login, so the user table updates itself when the DARIAH identity provider updates
+attributes.
+These updates reach our user table only for those users that actually log in, 
+at the moment that they do log in.
 Most details are provided directly by the DARIAH identity provider upon login.
 
 The system may contain records for users that have never logged in.

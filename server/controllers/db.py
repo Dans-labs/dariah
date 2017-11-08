@@ -131,8 +131,8 @@ class DbAccess(object):
                                 diags.append('Unknown value "{}"'.format(v))
                             else:
                                 repName = self.DM.tables.get(relTable, {}).get('title', self.DM.generic['title']) if allowNew == True else allowNew 
-                                existing = _DBM[relTable].find({repName: v})
-                                if existing:
+                                existing = list(_DBM[relTable].find({repName: v}))
+                                if existing and len(existing) > 1:
                                     _id = existing[0]['_id']
                                 else:
                                     result = _DBM[relTable].insert_one({repName: v})
