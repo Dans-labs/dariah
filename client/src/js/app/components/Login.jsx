@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
 
+import { presentUser } from 'tables'
 import { getMe, fetchMe } from 'me'
 
 class Login extends Component {
@@ -11,8 +12,7 @@ class Login extends Component {
         {
           me.eppn
           ? <span>
-              <span className={'fa fa-user'} title={me.eppn} /><strong>{me.eppn.split('@')[0]}</strong>
-              <span className={'fa fa-hashtag'} />{me.authority}{' '}
+              <span className={'fa fa-user'} /><strong>{presentUser(me)}</strong>{' '}
               <em>{me.groupDesc || 'not authenticated'}</em>
               <a href={'/logout'} className={'control fa fa-user-times'} title={'log out'} />
               <a href={'/slogout'} className={'control fa fa-users'} title={'sign out'} />

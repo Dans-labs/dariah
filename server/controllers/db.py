@@ -620,20 +620,24 @@ class DbAccess(object):
         return str(doc.get(title, 'no {}'.format(title))).rstrip('\n')
 
     def head_user(self, doc):
+        name = doc.get('name', '')
+        org = doc.get('org', '')
+        if org: org = ' ({})'.format(org)
+        if name:
+            return name + org
         firstName = doc.get('firstName', '')
         lastName = doc.get('lastName', '')
-        org = doc.get('org', None)
+        if firstName or lastName:
+            return '{}{}{}{}'.format(firstName, ' ' if firstName and lastName else '', lastName, org)
         email = doc.get('email', '')
+        if email:
+            return email + org
         eppn = doc.get('eppn', '')
         authority = doc.get('authority', '')
-        nameSection = '{}{}{}'.format(firstName, ' ' if firstName and lastName else '', lastName)
-        orgSection = ' ({})'.format(org) if org else ''
-        emailSection = '[{}](mailto:{})'.format(email, email) if email else ''
-        identitySection = '{}{}{}{}'.format('identified as ' if eppn else '', eppn, ' authorized by ' if authority else '', authority)
-        if nameSection: return '{}{}'.format(nameSection, orgSection)
-        if emailSection: return '{}{}'.format(emailSection, orgSection)
-        if identitySection: return '{}{}'.format(identitySection, orgSection)
-        return 'user'
+        if authority: authority = ' - {}'.format(authority)
+        if eppn:
+            return '{}{}{}'.format(eppn, authority, org)
+        return '!unidentified user!'
         
     def head_country(self, doc):
         return '{} = {}, {}a DARIAH member'.format(

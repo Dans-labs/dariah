@@ -2,6 +2,7 @@ import os
 import bottle
 from beaker.middleware import SessionMiddleware
 from controllers.user import UserApi
+from controllers.utils import utf8FromLatin1
 
 class AuthApi(UserApi):
     def __init__(self, DB, PM, secret_file):
@@ -125,16 +126,17 @@ class AuthApi(UserApi):
             authenticated =  sKey in env and env[sKey] 
             if authenticated:
                 self.userInfo = dict(
-                    eppn=env['eppn'],
-                    email=env['mail'],
+                    eppn=utf8FromLatin1(env['eppn']),
+                    email=utf8FromLatin1(env['mail']),
                     authority='DARIAH',
                 )
                 attributes = {}
-                if 'o' in env: attributes['org'] = env['o']
-                if 'givenName' in env: attributes['firstName'] = env['givenName']
-                if 'sn' in env: attributes['lastName'] = env['sn']
-                if 'isMemberOf' in env: attributes['membership'] = env['isMemberOf']
-                if 'affiliation' in env: attributes['rel'] = env['affiliation']
+                if 'o' in env: attributes['org'] = utf8FromLatin1(env['o'])
+                if 'sn' in env: attributes['name'] = utf8FromLatin1(env['cn'])
+                if 'givenName' in env: attributes['firstName'] = utf8FromLatin1(env['givenName'])
+                if 'sn' in env: attributes['lastName'] = utf8FromLatin1(env['sn'])
+                if 'isMemberOf' in env: attributes['membership'] = utf8FromLatin1(env['isMemberOf'])
+                if 'affiliation' in env: attributes['rel'] = utf8FromLatin1(env['affiliation'])
                 self.userInfo.update(attributes)
             else:
                 self.userInfo = None

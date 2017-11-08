@@ -308,24 +308,24 @@ export const listValues = memoize(({ tables, table, eId, field }) => (
 const headUser = memoize((tables, valId) => {
   const { user: { entities: { [valId]: entity } } } = tables
   if (entity) {
-    const {
-      values: {
-        eppn = emptyS,
-        firstName = emptyS,
-        lastName = emptyS,
-        email = emptyS,
-        org = emptyS,
-      },
-    } = entity
-    const orgRep = org
-    ? ` (${org})`
-    : emptyS
-    const nameParts = [firstName, lastName].filter(x => x)
-    if (nameParts.length) {return (nameParts.join(' ')) + orgRep}
-    return ([email, eppn, 'no name'].filter(x => x)[0]) + orgRep
+    const { values } = entity
+    return presentUser(values)
   }
   else {return 'UNKNOWN'}
 }, emptyO)
+
+export const presentUser = userInfo => {
+  const { name, firstName, lastName, email, eppn, authority, org } = userInfo
+  const orgRep = org ? ` (${org})` : emptyS
+  if (name) {return `${name}${orgRep}`}
+  if (firstName || lastName) {
+    return `${firstName || emptyS}${(firstName && lastName) ? ' ' : ''}${lastName || emptyS}`
+  }
+  if (email) {return `${email}${orgRep}`}
+  const authorityRep = authority ? ` - ${authority}` : emptyS
+  if (eppn) {return `${eppn}${authorityRep}${orgRep}`}
+  return '!unidentified user!'
+}
 
 const headCountry = memoize((tables, valId) => {
   const { country: { entities: { [valId]: entity } } } = tables

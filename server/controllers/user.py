@@ -32,7 +32,7 @@ class UserApi(object):
         group = self.groupFromId[groupId]
         self.userInfo['groupRep'] = group
         self.userInfo['groupDesc'] = groups.get(group, '??')
-        return dict(data=dict(x for x in self.userInfo.items() if x[0] != '_id'), msgs=[], good=True)
+        return dict(data=self.userInfo, msgs=[], good=True)
 
     def _store(self, newUserInfo):
         now = datetime.utcnow()
