@@ -134,6 +134,7 @@ class AuthApi(UserApi):
                 if 'givenName' in env: attributes['firstName'] = env['givenName']
                 if 'sn' in env: attributes['lastName'] = env['sn']
                 if 'isMemberOf' in env: attributes['membership'] = env['isMemberOf']
+                if 'affiliation' in env: attributes['rel'] = env['affiliation']
                 self.userInfo.update(attributes)
             else:
                 self.userInfo = None

@@ -517,11 +517,14 @@ class FMConvert(object):
             c['creator'] = idMapping[c['creator']]
 
     def delTestUsers(self, db):
-        for testUser in self.testUsers if isDevel else []: # deterministic order
-            eppn = testUser['eppn']
-            authority = testUser['authority']
-            info('Deleting test user {} @ {}'.format(eppn, authority))
-            db.user.delete_one(dict(eppn=eppn, authority=authority))
+        if isDevel:
+            for testUser in self.testUsers:
+                eppn = testUser['eppn']
+                authority = testUser['authority']
+                info('Deleting test user {} @ {}'.format(eppn, authority))
+                db.user.delete_one(dict(eppn=eppn, authority=authority))
+        else:
+            db.user.delete(dict(authority=self.testAuthority))
 
     def provenance(self):
         for c in self.allData['contrib']:

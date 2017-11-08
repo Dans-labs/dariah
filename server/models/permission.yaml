@@ -297,6 +297,10 @@ fields:
       update: nobody
 
   user:
+    name:
+      list:   public
+      read:   public
+      update: office
     firstName:
       list:   public
       read:   public
@@ -314,6 +318,10 @@ fields:
       read:   own
       update: office
     org:
+      list:   public
+      read:   public
+      update: office
+    rel:
       list:   public
       read:   public
       update: office

@@ -49,9 +49,11 @@ tables:
     fieldOrder:
       - eppn
       - email
+      - name
       - firstName
       - lastName
       - org
+      - rel
       - membership
       - mayLogin
       - authority
@@ -70,6 +72,10 @@ tables:
         label: Email
         valType: email
         multiple: false
+      name:
+        label: Name
+        valType: text
+        multiple: false
       firstName:
         label: First name
         valType: text
@@ -80,6 +86,10 @@ tables:
         multiple: false
       org:
         label: Organization
+        valType: text
+        multiple: false
+      rel:
+        label: Relationship
         valType: text
         multiple: false
       membership:

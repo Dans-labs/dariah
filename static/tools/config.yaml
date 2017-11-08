@@ -13,6 +13,8 @@ xml:
   FMNS: >-
     {http://www.filemaker.com/fmpxmlresult}
 
+testAuthority: local
+
 testUsers:
   - eppn: suzan
     email: suzan@test.eu
@@ -80,22 +82,6 @@ groups:
   system: system administrator
   root:   all powerful
   nobody: nobody
-
-
-# not used anymore!
-inGroup:
-  - eppn: DirkRoorda@dariah.eu
-    authority: DARIAH
-    group: system
-  - eppn: LisaDeLeeuw@dariah.eu
-    authority: DARIAH
-    group: office
-  - eppn: CarstenThiel@dariah.eu
-    authority: DARIAH
-    group: system
-  - eppn: PaulinRibbe@dariah.eu
-    authority: DARIAH
-    group: office
 
 countryExtra:
   AM:
