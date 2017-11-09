@@ -87,7 +87,7 @@ export const getNotes = ({ notes }) => {
       }
     }
   })
-  return { messages, busy, show, lastMsg: messages.length - 1, lastNote, lastKind }
+  return { messages, busy, show: show || lastKind, lastMsg: messages.length - 1, lastNote, lastKind }
 }
 
 /* HELPERS */

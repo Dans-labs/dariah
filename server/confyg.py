@@ -7,7 +7,7 @@ def doRoot(root):
     for path in glob('{}/*.yaml'.format(root)):
         fName = os.path.splitext(os.path.basename(path))[0]
         model = fName[0].upper()+fName[1:]
-        print('\t{}: .yaml => .py'.format(fName))
+        serverprint('\t{}: .yaml => .py'.format(fName))
         src = '{}/{}.yaml'.format(root, fName)
         dst = '{}/{}.py'.format(root, fName)
         with open(src) as sh:

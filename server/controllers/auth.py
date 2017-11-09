@@ -107,7 +107,20 @@ class AuthApi(UserApi):
     def _checkLogin(self, force=False):
         env = bottle.request.environ
         if force and self.isDevel:
-            eppn = input('{}|email address: '.format('|'.join(self.testUsers)))
+            MAX_ITER = 3
+            i = 0
+            stop = False
+            while not stop and i < MAX_ITER:
+                try:
+                    eppn = input('{}|email address: '.format('|'.join(self.testUsers)))
+                    stop = True
+                except Exception as err:
+                    serverprint('Low level error: {}'.format(err))
+                    if eppn:
+                        stop = True
+                    else:
+                        serverprint('Try again')
+
             if eppn in self.testUsers:
                 self.userInfo = self.testUsers[eppn]
             else:

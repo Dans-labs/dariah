@@ -37,8 +37,13 @@ export const accessData = task => (dispatch, getState) => {
       },
     }
   }
-  return fetch(`${rootUrl}${contentType}${path}`, settings)
-  .then(response => response.json())
+  const actionUrl = `${rootUrl}${contentType}${path}`
+  return fetch(actionUrl, settings)
+  .then(
+    response => response.ok
+    ? response.json()
+    : { good: false, msgs: [{ kind: 'error', text: `No valid response from the server to ${actionUrl}` }] }
+  )
   .then(json => {
     const { msgs, good, data } = json
     if (good) {

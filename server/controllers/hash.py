@@ -37,9 +37,6 @@ from hmac import compare_digest
 now = datetime.utcnow()
 expired = now + timedelta(days=30)
 
-print(now)
-print(expired)
-
 salt = os.urandom(16)
 
 def hash(data, expired): return pbkdf2_hmac('sha256', data+bytes(str(expired), encoding='utf-8'), salt, 100000)

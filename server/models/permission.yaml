@@ -7,7 +7,7 @@ groups:
   own:    authenticated user and creator of records in question
   office: back office user
   system: system administrator
-  root: all powerful
+  root: full control
   nobody: nobody
 
 levels:

@@ -1,3 +1,4 @@
+import traceback
 from bottle import request
 
 getq = lambda name: request.query[name][0:64]
@@ -7,13 +8,7 @@ class Controller(object):
         self.DB = DB
 
     def data(self, controller, Perm):
-        self.DB.Perm = Perm
-        self.DB.uid = Perm.getUid()
-        self.DB.eppn = Perm.getEppn()
-        method = getattr(self, controller, None)
-        return method(controller) if callable(method) else self.DB.stop(
-            text='wrong method: {}'.format(controller),
-        )
+        return self._errorWrap(lambda: self._data(controller, Perm), controller, controller=='mod')
 
     def list(self, name):
         table = getq('table')
@@ -34,3 +29,29 @@ class Controller(object):
         table = getq('table')
         action = getq('action')
         return self.DB.modList(name, table, action)
+
+    def _data(self, controller, Perm):
+        self.DB.Perm = Perm
+        self.DB.uid = Perm.getUid()
+        self.DB.eppn = Perm.getEppn()
+        method = getattr(self, controller, None)
+        if callable(method):
+            result = method(controller)
+        else:
+            result = self.DB.stop(text='wrong method: {}'.format(controller))
+        return result
+
+    def _errorWrap(self, action, controller, addData):
+        try:
+            result = action()
+        except Exception as err:
+            message = getattr(err, 'message', repr(err))
+            data = {'_error': message} if addData else None
+            serverprint('\n')
+            serverprint('ERROR IN CONTROLLER {}'.format(controller))
+            traceback.print_exc()
+            serverprint('END                 {}'.format(controller))
+            serverprint('\n')
+            result = self.DB.stop(data=data, text='server error: {}'.format(message))
+        return result
+

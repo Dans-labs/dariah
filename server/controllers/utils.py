@@ -1,4 +1,4 @@
-import datetime
+import sys,datetime
 from datetime import datetime
 from bson.objectid import ObjectId
 
@@ -26,3 +26,5 @@ def json_string(obj):
     raise TypeError('Not sure how to serialize %s' % (obj,))
 
 def utf8FromLatin1(s): return str(bytes(s, encoding='latin1'), encoding='utf8')
+
+def serverprint(msg): sys.stdout.write('o-o-o {}\n'.format(msg))
