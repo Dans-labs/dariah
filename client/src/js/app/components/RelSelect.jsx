@@ -89,9 +89,14 @@ const Head = ({ optionLookup, value, popUpIfEmpty, activeItems, inactive, select
   const { [value]: lab = value } = optionLookup
   label = lab
   const classes = ['option-head', 'tag']
-  if (value === emptyS && !popUpIfEmpty) {
-    label = 'click to enter a value'
-    classes.push('new')
+  if (value === emptyS) {
+    if (popUpIfEmpty) {
+      return null
+    }
+    else {
+      label = 'click to enter a value'
+      classes.push('new')
+    }
   }
   const attributes = makeAttributes(value, classes.join(' '))
   return (
@@ -205,6 +210,8 @@ const RelSelect = ({
 }) => {
   const { [selectTag]: { search, popUp } = emptyO } = select
   const { options, optionLookup } = compileOptions(tables, table, allowed, field, settings)
+  const realPopUp = popUp
+  || (popUpIfEmpty && (value == null || (multiple && value.length == 0) || (!multiple && !value)))
   const itemType = allowNew === true
   ? 'value'
   : allowNew || emptyS
@@ -239,7 +246,7 @@ const RelSelect = ({
           />
       }
       {
-        popUp && !suppressTyping
+        realPopUp && !suppressTyping
         ? <Typing
             selectTag={selectTag}
             search={search}
@@ -249,7 +256,7 @@ const RelSelect = ({
         : null
       }
       {
-        popUp
+        realPopUp
         ? <Options
             selectTag={selectTag}
             optionLookup={optionLookup}

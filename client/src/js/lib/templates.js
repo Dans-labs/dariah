@@ -168,15 +168,13 @@ const detailTemplates = {
             }
           </div>
           {
-            e('evidence')
-            ? null
-            : <ExpandBody
-                alterSection={`criteriaEntry${v('_id')}`}
-                alterTag={'evidence'}
-                  initAlt={1}
-                full={f('evidence')}
-                className={'evidence'}
-              />
+            <ExpandBody
+              alterSection={`criteriaEntry${v('_id')}`}
+              alterTag={'evidence'}
+              initAlt={1}
+              full={f('evidence')}
+              className={'evidence'}
+            />
           }
         </div>
       )
@@ -199,7 +197,13 @@ const detailEditTemplates = {
             </div>
             <div className={'slim'}>{fe('score', { suppressTyping: true })}</div>
           </div>
-          <div key={'E'}>{fe('evidence')}</div>
+          <div
+            key={'E'}
+            data-rh={'Give evidence'}
+            data-rh-at={'top'}
+          >
+            {fe('evidence')}
+          </div>
         </div>
       )
     },
