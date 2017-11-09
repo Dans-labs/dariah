@@ -111,6 +111,17 @@ const Head = ({ optionLookup, value, popUpIfEmpty, activeItems, inactive, select
 
 const Typing = ({ selectTag, search, dispatch, placeHolder }) => (
   <span className={'option-type'} >
+    {
+      search
+      ? <span
+          className={'button-tag'}
+          data-rh={'clear typing'}
+          data-rh-at={'bottom'}
+          onClick={handle(dispatch, setSearch, selectTag, emptyS)}
+        >{'×'}</span>
+        : <span>{'\xa0'}</span>
+    }
+    {'\xa0'}
     <input
       className={'invisible'}
       type={'text'}
@@ -121,16 +132,6 @@ const Typing = ({ selectTag, search, dispatch, placeHolder }) => (
       onFocus={handle(dispatch, setPopUp, selectTag, true)}
       onChange={handlEV(dispatch, setSearch, selectTag)}
     />
-    {
-      search
-      ? <span
-          className={'button-tag'}
-          data-rh={'clear typing'}
-          data-rh-at={'bottom'}
-          onClick={handle(dispatch, setSearch, selectTag, emptyS)}
-        >{'×'}</span>
-      : null
-    }
   </span>
 )
 
