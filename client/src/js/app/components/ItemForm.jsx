@@ -82,7 +82,8 @@ const ItemForm = props => {
               hasEditable
               ? <span
                   className={`button-medium inlineL fa fa-pencil`}
-                  title={`open an edit form for this record`}
+                  data-rh={`open an edit form for this record`}
+                  data-rh-at={'bottom'}
                   onClick={nextAlt}
                 />
               : null

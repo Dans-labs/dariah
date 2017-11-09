@@ -17,7 +17,7 @@ const Fulltext = ({
   compact,
   dispatch,
 }) => (
-  <div className={'fulltext'} title={`Search in ${filterLabel}`} >
+  <div className={'fulltext'} data-rh={`Search in ${filterLabel}`} >
     <input
       type={'text'}
       className={`search ${compact ? 'compact' : emptyS}`}

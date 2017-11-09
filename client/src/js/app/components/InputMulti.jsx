@@ -37,13 +37,14 @@ const InputMulti = ({
         />
         <span
           className={'button-small fa fa-trash'}
-          title={'remove'}
+          data-rh={'remove'}
           onClick={fieldRemove(fields, i)}
         />
       </div>
     )}
     <div
       className={'button-small fa fa-plus multi-control'}
+      data-rh={'more entries'}
       onClick={fieldPush(fields)}
     />
     {error && <p className={'invalid diag'}>{error}</p>}

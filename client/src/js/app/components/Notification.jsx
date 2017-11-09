@@ -35,7 +35,8 @@ class Notification extends Component {
       <div>
         <p className={'msg-spinner'} >
           <span
-            title={'show/hide notifications and progress messages'}
+            data-rh={'click circle to show/hide notifications and progress messages'}
+            data-rh-at={'left'}
             className={highlight ? `spin-${lastKind}` : 'spin-ok'}
           >
             { busyBlocks.map((b, i) => <span key={i} className={'msg-dot fa fa-caret-left'} />) }
@@ -50,6 +51,8 @@ class Notification extends Component {
           ? <div
               ref={this.refDom('notbox')}
               className={'msg-box'}
+              data-rh={'click panel to hide it'}
+              data-rh-at={'bottom'}
               onClick={this.handleHide}
             >{
               messages.map((msg, i) => (
@@ -64,7 +67,7 @@ class Notification extends Component {
               <p className={'msg-trash'} >
                 <a
                   href={'#'}
-                  title={'clear messages'}
+                  data-rh={'clear messages'}
                   className={'control fa fa-trash'}
                   onClick={this.handleClear}
                 />

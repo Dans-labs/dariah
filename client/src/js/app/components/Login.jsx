@@ -11,13 +11,31 @@ class Login extends Component {
       <span className={'login'} >
         {
           me.eppn
-          ? <span>
+          ? <span
+              data-rh={'you are logged in'}
+              data-rh-at={'bottom'}
+            >
               <span className={'fa fa-user'} /><strong>{presentUser(me)}</strong>{' '}
               <em>{me.groupDesc || 'not authenticated'}</em>
-              <a href={'/logout'} className={'control fa fa-user-times'} title={'log out'} />
-              <a href={'/slogout'} className={'control fa fa-users'} title={'sign out'} />
+              <a
+                href={'/logout'}
+                className={'control fa fa-user-times'}
+                data-rh={'log out of this tool'}
+                data-rh-at={'bottom'}
+              />
+              <a
+                href={'/slogout'}
+                className={'control fa fa-users'}
+                data-rh={'sign out from DARIAH'}
+                data-rh-at={'bottom'}
+              />
             </span>
-          : <a href={'/login'} className={'control'} >
+          : <a
+              href={'/login'}
+              className={'control'}
+              data-rh={'click to log in'}
+              data-rh-at={'bottom'}
+            >
               <strong className={'fa fa-user-plus'} /><strong>{' login'}</strong>
             </a>
         }

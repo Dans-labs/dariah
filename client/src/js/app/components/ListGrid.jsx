@@ -126,7 +126,7 @@ const ListGrid = ({
             }
             <span
               className={'fa fa-close button-small'}
-              title={'remove all sort options'}
+              data-rh={'remove all sort options'}
               onClick={handle(dispatch, resetSort, gridTag)}
             />{' '}
           </p>
@@ -150,12 +150,12 @@ const ListGrid = ({
                     direction
                     ? <span
                         className={'sorted button-small'}
-                        title={'remove column from sort options'}
+                        data-rh={'remove column from sort options'}
                         onClick={handle(dispatch, delColumn, gridTag, field)}
                       >{field}</span>
                     : <span
                         className={'unsorted button-small'}
-                        title={'sort on this column'}
+                        data-rh={'sort on this column'}
                         onClick={handle(dispatch, addColumn, gridTag, field, 1)}
                       >{field}</span>
                   }
@@ -163,7 +163,7 @@ const ListGrid = ({
                     direction
                     ? <span
                         className={`sorted button-small fa fa-arrow-${direction === 1 ? 'up' : 'down'}`}
-                        title={'change sort direction'}
+                        data-rh={'change sort direction'}
                         onClick={handle(dispatch, turnColumn, gridTag, field)}
                       />
                     : null

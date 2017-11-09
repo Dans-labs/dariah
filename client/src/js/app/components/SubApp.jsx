@@ -13,8 +13,13 @@ const tableLinks = (me, { path, name, own, details }) => !own || me.eppn
       <div className={'nav subsection'} >
         {
           (details || emptyA).filter(({ own: subOwn }) => !subOwn || me.eppn).map(
-            ({ path: subPath, name: subName }) =>
-              <NavLink key={subPath} to={`${path}/${subPath}`} >{subName}</NavLink>
+            ({ path: subPath, name: subName, hint }) =>
+              <NavLink
+                key={subPath}
+                to={`${path}/${subPath}`}
+                data-rh={hint}
+                data-rh-at={'right'}
+              >{subName}</NavLink>
            )
         }
       </div>
@@ -27,8 +32,8 @@ const navBarItems = [
     name: 'Contributions',
     own: false,
     details: [
-      { path: 'filter', name: 'All items', own: false },
-      { path: 'mylist', name: 'My items', own: true },
+      { path: 'filter', name: 'All items', own: false, hint: 'Overview of all contributions' },
+      { path: 'mylist', name: 'My items', own: true, hint: 'Start here to add a contribution' },
     ],
   },
   {
@@ -36,8 +41,8 @@ const navBarItems = [
     name: 'Assessments',
     own: true,
     details: [
-      { path: 'filter', name: 'All items', own: false },
-      { path: 'mylist', name: 'My items', own: true },
+      { path: 'filter', name: 'All items', own: false, hint: 'overview of all assessments' },
+      { path: 'mylist', name: 'My items', own: true, hint: 'Look here to see the status of your assessments' },
     ],
   },
   {
@@ -45,8 +50,8 @@ const navBarItems = [
     name: 'Packages',
     own: true,
     details: [
-      { path: 'filter', name: 'list', own: false },
-      { path: 'grid', name: 'table', own: true },
+      { path: 'filter', name: 'list', own: false, hint: 'the setup of contribution types and criteria' },
+      { path: 'grid', name: 'table', own: true, hint: 'the setup of contribution types and criteria' },
     ],
   },
   {
@@ -54,8 +59,8 @@ const navBarItems = [
     name: 'Contribution types',
     own: true,
     details: [
-      { path: 'filter', name: 'list', own: false },
-      { path: 'grid', name: 'table', own: true },
+      { path: 'filter', name: 'list', own: false, hint: 'overview of all contribution types' },
+      { path: 'grid', name: 'table', own: true, hint: 'overview of all contribution types' },
     ],
   },
   {
@@ -63,8 +68,8 @@ const navBarItems = [
     name: 'Criteria',
     own: true,
     details: [
-      { path: 'filter', name: 'list', own: false },
-      { path: 'grid', name: 'table', own: true },
+      { path: 'filter', name: 'list', own: false, hint: 'overview of all criteria' },
+      { path: 'grid', name: 'table', own: true, hint: 'overview of all criteria' },
     ],
   },
   {
@@ -72,8 +77,8 @@ const navBarItems = [
     name: 'Scores',
     own: true,
     details: [
-      { path: 'filter', name: 'list', own: false },
-      { path: 'grid', name: 'table', own: true },
+      { path: 'filter', name: 'list', own: false, hint: 'overview of all scores' },
+      { path: 'grid', name: 'table', own: true, hint: 'overview of all scores' },
     ],
   },
   {
@@ -81,8 +86,8 @@ const navBarItems = [
     name: 'Users',
     own: true,
     details: [
-      { path: 'filter', name: 'list', own: false },
-      { path: 'grid', name: 'table', own: true },
+      { path: 'filter', name: 'list', own: false, hint: 'User management' },
+      { path: 'grid', name: 'table', own: true, hint: 'User management' },
     ],
   },
   {
@@ -90,8 +95,8 @@ const navBarItems = [
     name: 'Countries',
     own: true,
     details: [
-      { path: 'filter', name: 'list', own: false },
-      { path: 'grid', name: 'table', own: true },
+      { path: 'filter', name: 'list', own: false, hint: 'Country membership management' },
+      { path: 'grid', name: 'table', own: true, hint: 'Country membership management' },
     ],
   },
   /*

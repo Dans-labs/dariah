@@ -19,7 +19,8 @@ const editStatusGeneric = canSubmit => ({
       (canSubmit && !dirty && !submitting)
       ? <span
           className={'button-medium fa fa-fw fa-eye'}
-          title={'close the edit form'}
+          data-rh={'close the edit form'}
+          data-rh-at={'bottom'}
           onClick={nextAlt}
         />
       : null
@@ -29,12 +30,14 @@ const editStatusGeneric = canSubmit => ({
       ? canSubmit
         ? <span
             className={'button-medium edit-action fa fa-fw fa-save'}
-            title={'save'}
+            data-rh={'save your changes to this record'}
+            data-rh-at={'bottom'}
             onClick={handleSubmit}
           />
         : <span
             className={'warning-o fa fa-fw fa-pencil'}
-            title={'changed'}
+            data-rh={'you have modified this record'}
+            data-rh-at={'bottom'}
           />
       : null
     }
@@ -42,7 +45,8 @@ const editStatusGeneric = canSubmit => ({
       (dirty && invalid && !submitting)
       ? <span
           className={'error-o fa fa-fw fa-exclamation-circle'}
-          title={'invalid data'}
+          data-rh={'some fields contain invalid data'}
+            data-rh-at={'bottom'}
         />
       : null
     }
@@ -50,7 +54,8 @@ const editStatusGeneric = canSubmit => ({
       (!dirty && invalid && !submitting && !canSubmit)
       ? <span
           className={'error-o fa fa-fw fa-exclamation-circle'}
-          title={'invalid data'}
+          data-rh={'some fields contain invalid data'}
+          data-rh-at={'bottom'}
         />
       : null
     }
@@ -58,7 +63,8 @@ const editStatusGeneric = canSubmit => ({
       (!dirty && !invalid && !submitting && !canSubmit)
       ? <span
           className={`fa fa-fw fa-${active ? 'pencil' : 'check'}`}
-          title={'no changes'}
+          data-rh={'you have not changed this record'}
+          data-rh-at={'bottom'}
         />
       : null
     }
@@ -66,7 +72,8 @@ const editStatusGeneric = canSubmit => ({
       submitting
       ? <span
           className={'special-o fa fa-fw fa-spinner fa-spin'}
-          title={'saving'}
+          data-rh={'busy saving this record'}
+          data-rh-at={'bottom'}
         />
       : null
     }
@@ -77,7 +84,8 @@ const editStatusGeneric = canSubmit => ({
         ? <button
             type={'button'}
             className={'button-medium error-o fa fa-fw fa-close'}
-            title={'reset values to last saved'}
+            data-rh={'undo your changes since the last save'}
+            data-rh-at={'bottom'}
             onClick={reset}
           />
         : null
@@ -102,7 +110,8 @@ export const EditDelete = ({ perm, fixed, button, onClick }) => (
   !fixed && perm.delete
   ? <div
       className={`grid-cell ${button} inlineR error-o fa fa-trash delete`}
-      title={'delete this record'}
+      data-rh={'delete this record'}
+      data-rh-at={'bottom'}
       onClick={onClick}
     />
     : null
@@ -134,7 +143,8 @@ export const EditInsert = ({
   return (!fixed && perm != null && perm.insert && (!perm.needMaster || select == DETAILS))
     ? <span
         className={`fa fa-plus ${button}`}
-        title={`new ${thing}`}
+        data-rh={`make a new ${thing}`}
+        data-rh-at={'bottom'}
         onClick={onInsert}
       />
     : null
@@ -156,7 +166,8 @@ const OpenCloseAllPure = ({
     ? <div
         key="O"
         className={`fa fa-angle-double-down ${button}`}
-        title={`Open all ${itemsRep}`}
+        data-rh={`open all ${itemsRep}`}
+        data-rh-at={'bottom'}
         onClick={handleOpenAll(alter, alterSection, nAlts, initial, table, listIds, dispatch)}
       />
     : null,
@@ -164,7 +175,8 @@ const OpenCloseAllPure = ({
     ? <div
         key="C"
         className={`fa fa-angle-double-up ${button}`}
-        title={`Close all opened ${itemsRep}`}
+        data-rh={`close all opened ${itemsRep}`}
+        data-rh-at={'bottom'}
         onClick={handleCloseAll(alter, alterSection, nAlts, initial, listIds, dispatch)}
       />
     : null,

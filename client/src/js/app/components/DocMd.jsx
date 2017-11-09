@@ -33,7 +33,7 @@ class DocMd extends Component {
             <a
               href={'#'}
               className={`control fa fa-${alt === 0 ? 'hand-o-down' : 'file-code-o'}`}
-              title={`${alt === 0 ? 'markdown source' : 'formatted'}`}
+              data-rh={`${alt === 0 ? 'markdown source' : 'formatted'}`}
               onClick={nextAlt}
             />
           </p>

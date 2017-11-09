@@ -33,6 +33,7 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
                 !expand
                 ? <div
                     className={'link detail-control'}
+                    data-rh={'show detail records'}
                     onClick={nextAlt}
                   >
                     <span className={`fa fa-angle-${alt === 0 ? 'down' : 'up'}`} />

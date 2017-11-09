@@ -1,4 +1,63 @@
 /* imports */
+.react-hint {
+  padding: 5px;
+  position: absolute;
+  z-index: 9999;
+  cursor: default;
+  -webkit-animation: 1s fadeIn;
+          animation: 1s fadeIn; }
+
+.react-hint__content {
+  padding: 10px;
+  border-radius: 5px;
+  background: #ddffaa;
+  color: #000000; }
+
+.react-hint:after {
+  content: '';
+  width: 0;
+  height: 0;
+  margin: auto;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 5px solid transparent; }
+
+.react-hint--top:after {
+  top: auto;
+  border-bottom: none;
+  border-top-color: #000; }
+
+.react-hint--left:after {
+  left: auto;
+  border-right: none;
+  border-left-color: #000; }
+
+.react-hint--right:after {
+  right: auto;
+  border-left: none;
+  border-right-color: #000; }
+
+.react-hint--bottom:after {
+  bottom: auto;
+  border-top: none;
+  border-bottom-color: #000; }
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+
 /* generic functions */
 .hidden {
   color: #eeeeee; }
@@ -1518,7 +1577,7 @@ input.invisible {
   padding: 0.1em 0.2em 0.1em 0.2em;
   margin: 0.2em 0.3em 0.2em 0.3em;
   color: rgba(0, 80, 0, 0.9);
-  background-color: rgba(220, 220, 220, 0.6);
+  background-color: rgba(220, 250, 220, 0.6);
   border-radius: 0.4em;
   border: 1px solid rgba(220, 220, 220, 0.9);
   max-width: 95%;
@@ -1545,7 +1604,7 @@ input.invisible {
 
 .option.tag.selected {
   color: rgba(0, 80, 0, 0.9);
-  background-color: rgba(220, 220, 220, 0.6); }
+  background-color: rgba(220, 250, 220, 0.6); }
 
 .button-tag {
   cursor: pointer; }

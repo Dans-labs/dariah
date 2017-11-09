@@ -149,7 +149,7 @@ const detailTemplates = {
               e('evidence')
               ? <div className={'xSlim'}>
                   <span
-                    title={'No evidence yet'}
+                    data-rh={'No evidence yet'}
                     className={'slim fa fa-file-o tError'}
                   />
                 </div>

@@ -20,7 +20,7 @@ const MarkdownArea = ({
       <p className={'stick'} >
         <span
           className={`button-medium field-control fa fa-${alt === 0 ? 'pencil' : 'hand-o-down'}`}
-          title={`${alt === 0 ? 'edit text' : 'preview formatted text'}`}
+          data-rh={`${alt === 0 ? 'edit text' : 'preview formatted text'}`}
           onClick={nextAlt}
         />
       </p>

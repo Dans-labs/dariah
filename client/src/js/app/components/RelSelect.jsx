@@ -12,6 +12,8 @@ import { getSelect, compileOptions, setSearch, setPopUp, togglePopUp } from 'sel
 const RelOption = ({ label, attributes, selected, onHit }) => (
   <p
     {...attributes}
+    data-rh={'select this option'}
+    data-rh-at={'bottom'}
     onClick={selected ? null : onHit}
   >{label}</p>
 )
@@ -49,6 +51,8 @@ const Tags = ({ selectTag, optionLookup, activeItems, inactive, value, onChange,
   return (
     <div
       className={'tags'}
+      data-rh={'click anywhere on this line to hide/show the remaining options'}
+      data-rh-at={'top'}
       onClick={handle(dispatch, togglePopUp, selectTag)}
     >
       {
@@ -64,6 +68,8 @@ const Tags = ({ selectTag, optionLookup, activeItems, inactive, value, onChange,
                 >
                   <span
                     className={`button-tag`}
+                    data-rh={'UNselect this option'}
+                    data-rh-at={'bottom'}
                     onClick={removeVal(value, onChange, val)}
                   >{'×'}</span>{' '}
                   <span>{lab}</span>
@@ -91,6 +97,8 @@ const Head = ({ optionLookup, value, popUpIfEmpty, activeItems, inactive, select
   return (
     <span
       {...attributes}
+      data-rh={'click here to see the other options'}
+      data-rh-at={'top'}
       onClick={handle(dispatch, togglePopUp, selectTag)}
     >{label}</span>
   )
@@ -101,7 +109,9 @@ const Typing = ({ selectTag, search, dispatch, placeHolder }) => (
     <input
       className={'invisible'}
       type={'text'}
-      placeholder={placeHolder}
+      data-rh={placeHolder}
+      data-rh-at={'left'}
+      placeholder={'type here ...'}
       value={search || emptyS}
       onFocus={handle(dispatch, setPopUp, selectTag, true)}
       onChange={handlEV(dispatch, setSearch, selectTag)}
@@ -110,6 +120,8 @@ const Typing = ({ selectTag, search, dispatch, placeHolder }) => (
       search
       ? <span
           className={'button-tag'}
+          data-rh={'clear typing'}
+          data-rh-at={'bottom'}
           onClick={handle(dispatch, setSearch, selectTag, emptyS)}
         >{'×'}</span>
       : null
@@ -132,9 +144,11 @@ const Options = ({
         multiple || value == null || value == emptyS
         ? null
         : <span
-            className={'button-tag'}
+            className={'button-tag tag option'}
+            data-rh={'do not select any option'}
+            data-rh-at={'bottom'}
             onClick={changeSel(selectTag, multiple, null, null, onChange, dispatch)}
-          >{'×'}</span>
+          >{'( × )'}</span>
       }
       {
         (
@@ -145,6 +159,8 @@ const Options = ({
         )
         ? <span
             className={'new tag'}
+            data-rh={'add this as a NEW option'}
+            data-rh-at={'bottom'}
             onClick={addVal(optionLookup, multiple, value, onChange, search)}
           >{search}</span>
         : null
@@ -193,9 +209,9 @@ const RelSelect = ({
   ? 'value'
   : allowNew || emptyS
   const addItem = itemType
-  ? ` or to add a new ${itemType}`
+    ? ` or add a new ${itemType}`
   : emptyS
-  const placeHolder = `type to filter remaining options${addItem}`
+  const placeHolder = `filter remaining options${addItem}`
   return (
     <div
       className={`select ${multiple ? 'multiselect' : emptyS}`}

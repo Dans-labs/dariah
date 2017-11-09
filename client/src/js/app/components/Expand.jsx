@@ -36,7 +36,7 @@ const Expand = ({
         {nbsp}
         <span
           className={`link vtop fa fa-${alt === 0 ? iOpen : iClose}`}
-          title={alt === 0 ? tOpen : tClose}
+          data-rh={alt === 0 ? tOpen : tClose}
           onClick={nextAlt}
         >
           {cleanWrap(headActive, headLine, 'body')}
@@ -72,7 +72,7 @@ const ExpandHeadPure = ({
     <div className={`vtop ${className}`}>
       <span
         className={`link vtop fa fa-${alt === 0 ? iOpen : iClose}`}
-        title={alt === 0 ? tOpen : tClose}
+        data-rh={alt === 0 ? tOpen : tClose}
         onClick={nextAlt}
       >
         {cleanWrap(headActive, headLine, 'body')}

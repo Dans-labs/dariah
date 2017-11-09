@@ -52,7 +52,7 @@ const fieldsButton = memoize((nextAlt, table, eId, mayUpdate, on) => (
   mayUpdate
   ? <span
       className={`link fa fa-angle-${on ? 'down' : 'up'}`}
-      title={`${on ? 'show' : 'close'} details of this record`}
+      data-rh={`${on ? 'show' : 'close'} details of this record`}
       onClick={nextAlt}
     />
   : null
