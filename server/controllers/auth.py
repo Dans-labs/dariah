@@ -2,7 +2,7 @@ import os
 import bottle
 from beaker.middleware import SessionMiddleware
 from controllers.user import UserApi
-from controllers.utils import utf8FromLatin1
+from controllers.utils import utf8FromLatin1, serverprint
 
 class AuthApi(UserApi):
     def __init__(self, DB, PM, secret_file):

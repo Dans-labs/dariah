@@ -1,6 +1,8 @@
 import sys,os,collections,yaml
 from glob import glob
 
+from controllers.utils import serverprint
+
 roots = sys.argv[1:]
 
 def doRoot(root):

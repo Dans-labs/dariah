@@ -189,7 +189,6 @@ const RelSelect = ({
 }) => {
   const { [selectTag]: { search, popUp } = emptyO } = select
   const { options, optionLookup } = compileOptions(tables, table, allowed, field, settings)
-  const realPopUp = popUp || value == null || value == emptyS || value.length == 0
   return (
     <div
       className={`select ${multiple ? 'multiselect' : emptyS}`}
@@ -217,7 +216,7 @@ const RelSelect = ({
           />
       }
       {
-        realPopUp && !suppressTyping
+        popUp && !suppressTyping
         ? <Typing
             selectTag={selectTag}
             search={search}
@@ -226,7 +225,7 @@ const RelSelect = ({
         : null
       }
       {
-        realPopUp
+        popUp
         ? <Options
             selectTag={selectTag}
             optionLookup={optionLookup}
