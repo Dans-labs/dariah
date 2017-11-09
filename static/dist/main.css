@@ -113,7 +113,7 @@
 .button-large, .button-medium, .button-small {
   color: #0000aa;
   cursor: pointer;
-  background-color: #ffffee;
+  background-color: #ffffff;
   border-color: #ffffdd;
   white-space: nowrap; }
 
@@ -269,8 +269,8 @@
   padding: 1ex; }
 
 input {
-  color: #0000aa;
-  background-color: #ffffee;
+  color: #000000;
+  background-color: #ffffff;
   font-size: large;
   font-family: monospace;
   border: 0; }
@@ -279,8 +279,15 @@ input[type="text"] {
   width: 95%;
   max-width: 95%; }
 
-input.dirty {
+input[type="text"]:focus, textarea:focus {
   color: #0000aa;
+  background-color: #ffffee;
+  font-size: large;
+  font-family: monospace;
+  outline: 2pt solid #ffcc88; }
+
+input.dirty {
+  color: #000000;
   background-color: #ffffcc;
   font-size: large;
   font-family: monospace; }
@@ -292,8 +299,8 @@ input.invalid {
   font-family: monospace; }
 
 textarea {
-  color: #0000aa;
-  background-color: #ffffee;
+  color: #000000;
+  background-color: #ffffff;
   font-size: large;
   font-family: monospace;
   width: 100%;
@@ -301,7 +308,7 @@ textarea {
   border: 0; }
 
 textarea.dirty {
-  color: #0000aa;
+  color: #000000;
   background-color: #ffffcc;
   font-size: large;
   font-family: monospace; }
@@ -318,7 +325,7 @@ textarea.invalid {
   background-color: #ffcccc; }
 
 .input.invalid {
-  color: #0000aa;
+  color: #000000;
   background-color: #ffcccc; }
 
 /* edit status */
@@ -575,7 +582,7 @@ div.detail-body {
 
 pre.md-source {
   font-size: medium;
-  color: #0000aa;
+  color: #000000;
   white-space: pre-wrap; }
 
 /* PAGE LAYOUT */
@@ -732,7 +739,7 @@ a.active {
   border-radius: 2px; }
 
 .nav a.active, a.nav.active {
-  background-color: #ffffee;
+  background-color: #ffffff;
   border: 1px solid #ffffdd; }
 
 .nav a, a.nav {
@@ -772,13 +779,13 @@ input.search {
   font-size: large;
   font-family: monospace;
   color: #0000aa;
-  background-color: #ffffee; }
+  background-color: #ffffff; }
 
 input.search.compact {
   font-size: medium;
   font-family: monospace;
   color: #0000aa;
-  background-color: #ffffee;
+  background-color: #ffffff;
   height: 1.2em;
   line-height: 1em;
   width: 10em;
@@ -1487,7 +1494,7 @@ div.select.multiselect {
   color: rgba(40, 40, 40, 0.9);
   background-color: rgba(255, 255, 255, 0.9); }
 
-input .invisible {
+input.invisible {
   border-radius: 3px;
   border: 0;
   -webkit-box-shadow: none;

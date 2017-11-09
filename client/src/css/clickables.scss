@@ -1,10 +1,12 @@
-$action-back: #ffffee;
+$action-back: #ffffff;
 $action-high: #ffffcc;
 $action-error-back: #ffdddd;
 $action-error-fore: #aa0000;
 $action-fore: #0000aa;
 $action-border: #ffffdd;
-$action-text: #0000aa;
+$action-text: #000000;
+$focus-text: #0000aa;
+$focus-back: #ffffee;
 
 @mixin action() {
     color: $action-fore;
@@ -25,6 +27,13 @@ $action-text: #0000aa;
 @mixin actiontext() {
     color: $action-text;
     background-color: $action-back;
+    font-size: large;
+    font-family: monospace;
+}
+
+@mixin focustext() {
+    color: $focus-text;
+    background-color: $focus-back;
     font-size: large;
     font-family: monospace;
 }

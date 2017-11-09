@@ -96,12 +96,12 @@ const Head = ({ optionLookup, value, popUpIfEmpty, activeItems, inactive, select
   )
 }
 
-const Typing = ({ selectTag, search, dispatch }) => (
+const Typing = ({ selectTag, search, dispatch, placeHolder }) => (
   <span className={'option-type'} >
     <input
       className={'invisible'}
       type={'text'}
-      placeholder={'filter ...'}
+      placeholder={placeHolder}
       value={search || emptyS}
       onFocus={handle(dispatch, setPopUp, selectTag, true)}
       onChange={handlEV(dispatch, setSearch, selectTag)}
@@ -189,6 +189,13 @@ const RelSelect = ({
 }) => {
   const { [selectTag]: { search, popUp } = emptyO } = select
   const { options, optionLookup } = compileOptions(tables, table, allowed, field, settings)
+  const itemType = allowNew === true
+  ? 'value'
+  : allowNew || emptyS
+  const addItem = itemType
+  ? ` or to add a new ${itemType}`
+  : emptyS
+  const placeHolder = `type to filter remaining options${addItem}`
   return (
     <div
       className={`select ${multiple ? 'multiselect' : emptyS}`}
@@ -221,6 +228,7 @@ const RelSelect = ({
             selectTag={selectTag}
             search={search}
             dispatch={dispatch}
+            placeHolder={placeHolder}
           />
         : null
       }
