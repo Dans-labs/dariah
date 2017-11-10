@@ -7,7 +7,6 @@ import { ALLIDS, MYIDS } from 'tables'
 import Root from 'Root'
 import App from 'App'
 import SubApp from 'SubApp'
-import Overview from 'Overview'
 import ListContainer from 'ListContainer'
 import Doc from 'Doc'
 import NotFound from 'NotFound'
@@ -28,7 +27,6 @@ render(
         <Route path={'tech/docs/gen/:docFile'} component={Doc} />
         <Route path={'tech/docs/:docFile'} component={Doc} />
         <Route path={'data'} component={SubApp} >
-          <Route path={'overview'} component={Overview} />
           <Route path={':table'} >
             <Route path={'mylist(/item/:eId)'} component={ListContainer} select={MYIDS} mode={'list'} />
             <Route path={'list(/item/:eId)'} component={ListContainer} select={ALLIDS} mode={'list'} />

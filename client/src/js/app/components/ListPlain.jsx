@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router'
 import { memoize } from 'memo'
 import { combineSelectors, withParams, getUrlParts, emptyS, emptyO } from 'utils'
 import { someEditable } from 'fields'
-import { editMode } from 'templates'
+import { editMode } from 'custom'
 
 import { insertItem, needValues, headEntity, DETAILS, handleOpenAll } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'

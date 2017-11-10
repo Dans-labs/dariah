@@ -83,7 +83,7 @@ def detailInsert(
                             'linkField': 'assessment',
                             'seq': n + 1,
                             'criteria': critId,
-                            'evidence': ['# Evidence\n'],
+                            'evidence': [''],
                         })
         data = dict(
             detailData=dict(criteriaEntry=detailData),

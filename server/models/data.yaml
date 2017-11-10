@@ -543,6 +543,7 @@ tables:
       - assessmentType
       - contrib
       - remarks
+      - submitted
       - reviewer1
       - reviewer2
       - creator
@@ -576,6 +577,10 @@ tables:
         label: Remarks
         valType: textarea
         multiple: true
+      submitted:
+        label: Submitted for review
+        valType: bool
+        multiple: false
       reviewer1:
         label: First reviewer
         valType:
@@ -671,7 +676,7 @@ tables:
           fixed: true
         multiple: false
       evidence:
-        label: evidence
+        label: Evidence
         valType: textarea
         multiple: true
       creator:

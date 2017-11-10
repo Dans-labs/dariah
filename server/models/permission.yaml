@@ -565,6 +565,10 @@ fields:
       list:   auth
       read:   auth
       update: own
+    submitted:
+      list:   auth
+      read:   auth
+      update: own
     reviewer1:
       list: auth
       read: auth

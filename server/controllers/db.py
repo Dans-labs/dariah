@@ -462,19 +462,19 @@ class DbAccess(object):
             validationMsgs = []
             validationDiags = {}
             updateValues = dict()
-            stop = False
+            hasInvalid = False
             for (f, (valid, diags, msgs, vals)) in sorted(valItemValues.items()):
                 if valid:
                     updateValues[f] = vals
                 else:
-                    stop = True
+                    hasInvalid = True
                     validationMsgs.extend(msgs)
                     validationDiags[f] = diags
-            if stop:
+            if hasInvalid:
                 invalidFields = ', '.join(sorted(validationDiags))
                 validationDiags['_error'] = 'invalid values in fields {}'.format(invalidFields)
                 validationMsgs.append(dict(kind='warning', text='table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)))
-                return self.stop(data=validationDiags, msgs=validationMsgs)
+                #return self.stop(data=validationDiags, msgs=validationMsgs)
 
 
             modDate = now()
@@ -492,7 +492,7 @@ class DbAccess(object):
                 {'$set': updateSaveValues, '$unset': {PRISTINE: ''}},
             )
             # here system values are updated in the database
-            return self.stop(data=dict(values=updateSaveValues, newValues=newValues), msgs=permMsgs) # ??? but modified is not always returned
+            return self.stop(data=dict(values=updateSaveValues, newValues=newValues, diags=validationDiags), msgs=permMsgs+validationMsgs) # ??? but modified is not always returned
 
     def stop(self, data=None, text=None, msgs=None):
         good = text == None and (msgs == None or all(msg['kind'] != 'error' for msg in msgs))

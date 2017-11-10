@@ -5,7 +5,7 @@ import Markdown from 'react-markdown'
 
 import { memoize } from 'memo'
 import { emptyS, emptyA, emptyO } from 'utils'
-import { applyTemplate } from 'templates'
+import { applyTemplate } from 'custom'
 
 import { repr } from 'tables'
 
@@ -49,6 +49,31 @@ export const makeSubmit = memoize((dirty, invalid, submitting, submit) =>
 )
 
 export const makeSubmitTime = memoize(submit => () => setTimeout(submit, 100))
+
+export const itemReadField = (field, label, fvalue) => (
+  <div
+    key={field}
+    className={'grid-row form'}
+  >
+    <div className={'grid-head-cell label-col'}>{label}{':'}</div>
+    <div className={'grid-cell value-col'} >
+      {fvalue}
+    </div>
+  </div>
+)
+
+export const itemEditField = (field, label, fevalue, editable) => (
+  <div
+    key={field}
+    className={'grid-row form'}
+  >
+    <div className={`grid-head-cell label-col ${editable ? 'edit' : ''}`}>{label}{':'}</div>
+    <div className={`grid-cell value-col ${editable ? 'edit' : ''}`} >
+      {fevalue}
+    </div>
+  </div>
+)
+
 
 const iso2s = new Set(countryBorders.features.map(({ properties: { iso2 } }) => iso2))
 

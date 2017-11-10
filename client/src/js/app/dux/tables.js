@@ -233,6 +233,7 @@ export const needValues = (entities, eId) => (
   entities == null
   || entities[eId] == null
   || entities[eId].fields == null
+  || entities[eId].perm == null
 )
 
 export const listValues = memoize(({ tables, table, eId, field }) => (

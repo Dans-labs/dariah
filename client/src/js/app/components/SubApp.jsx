@@ -7,12 +7,22 @@ import { getMe } from 'me'
 import ErrorBoundary from 'ErrorBoundary'
 import NavLink from 'NavLink'
 
-const tableLinks = (me, { path, name, own, details }) => !own || me.eppn
+const levels = {
+  public: 1,
+  auth: 2,
+  office: 3,
+  system: 4,
+  root: 5,
+}
+
+const forMe = (my, item) => levels[my] >= levels[item]
+
+const tableLinks = (me, { path, name, forWhom, details }) => forMe(me.groupRep, forWhom)
   ? <div key={path} className={'nav section'} >
       <NavLink to={path} className={'head'} >{name}</NavLink>
       <div className={'nav subsection'} >
         {
-          (details || emptyA).filter(({ own: subOwn }) => !subOwn || me.eppn).map(
+          (details || emptyA).filter(({ forWhom: subFor }) => forMe(me.groupRep, subFor)).map(
             ({ path: subPath, name: subName, hint }) =>
               <NavLink
                 key={subPath}
@@ -30,82 +40,75 @@ const navBarItems = [
   {
     path: '/data/contrib',
     name: 'Contributions',
-    own: false,
+    forWhom: 'public',
     details: [
-      { path: 'filter', name: 'All items', own: false, hint: 'Overview of all contributions' },
-      { path: 'mylist', name: 'My items', own: true, hint: 'Start here to add a contribution' },
+      { path: 'filter', name: 'All items', forWhom: 'public', hint: 'Overview of all contributions' },
+      { path: 'mylist', name: 'My items', forWhom: 'auth', hint: 'Start here to add a contribution' },
     ],
   },
   {
     path: '/data/assessment',
     name: 'Assessments',
-    own: true,
+    forWhom: 'auth',
     details: [
-      { path: 'filter', name: 'All items', own: false, hint: 'overview of all assessments' },
-      { path: 'mylist', name: 'My items', own: true, hint: 'Look here to see the status of your assessments' },
+      { path: 'filter', name: 'All items', forWhom: 'auth', hint: 'overview of all assessments' },
+      { path: 'mylist', name: 'My items', forWhom: 'auth', hint: 'Look here to see the status of your assessments' },
     ],
   },
   {
     path: '/data/package',
     name: 'Packages',
-    own: true,
+    forWhom: 'office',
     details: [
-      { path: 'filter', name: 'list', own: false, hint: 'the setup of contribution types and criteria' },
-      { path: 'grid', name: 'table', own: true, hint: 'the setup of contribution types and criteria' },
+      { path: 'filter', name: 'list', forWhom: 'office', hint: 'the setup of contribution types and criteria' },
+      { path: 'grid', name: 'table', forWhom: 'office', hint: 'the setup of contribution types and criteria' },
     ],
   },
   {
     path: '/data/typeContribution',
     name: 'Contribution types',
-    own: true,
+    forWhom: 'office',
     details: [
-      { path: 'filter', name: 'list', own: false, hint: 'overview of all contribution types' },
-      { path: 'grid', name: 'table', own: true, hint: 'overview of all contribution types' },
+      { path: 'filter', name: 'list', forWhom: 'office', hint: 'overview of all contribution types' },
+      { path: 'grid', name: 'table', forWhom: 'office', hint: 'overview of all contribution types' },
     ],
   },
   {
     path: '/data/criteria',
     name: 'Criteria',
-    own: true,
+    forWhom: 'office',
     details: [
-      { path: 'filter', name: 'list', own: false, hint: 'overview of all criteria' },
-      { path: 'grid', name: 'table', own: true, hint: 'overview of all criteria' },
+      { path: 'filter', name: 'list', forWhom: 'office', hint: 'overview of all criteria' },
+      { path: 'grid', name: 'table', forWhom: 'office', hint: 'overview of all criteria' },
     ],
   },
   {
     path: '/data/score',
     name: 'Scores',
-    own: true,
+    forWhom: 'office',
     details: [
-      { path: 'filter', name: 'list', own: false, hint: 'overview of all scores' },
-      { path: 'grid', name: 'table', own: true, hint: 'overview of all scores' },
+      { path: 'filter', name: 'list', forWhom: 'office', hint: 'overview of all scores' },
+      { path: 'grid', name: 'table', forWhom: 'office', hint: 'overview of all scores' },
     ],
   },
   {
     path: '/data/user',
     name: 'Users',
-    own: true,
+    forWhom: 'office',
     details: [
-      { path: 'filter', name: 'list', own: false, hint: 'User management' },
-      { path: 'grid', name: 'table', own: true, hint: 'User management' },
+      { path: 'filter', name: 'list', forWhom: 'office', hint: 'User management' },
+      { path: 'grid', name: 'table', forWhom: 'office', hint: 'User management' },
     ],
   },
   {
     path: '/data/country',
     name: 'Countries',
-    own: true,
+    forWhom: 'office',
     details: [
-      { path: 'filter', name: 'list', own: false, hint: 'Country membership management' },
-      { path: 'grid', name: 'table', own: true, hint: 'Country membership management' },
+      { path: 'filter', name: 'list', forWhom: 'office', hint: 'Country membership management' },
+      { path: 'grid', name: 'table', forWhom: 'office', hint: 'Country membership management' },
     ],
   },
-  /*
-  {
-    path: '/data',
-    name: 'All tables',
-    own: false,
-  },
-  */
 ]
 
 const SubApp = ({ me, table, routes, children }) => (

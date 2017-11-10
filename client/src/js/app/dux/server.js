@@ -52,9 +52,9 @@ export const accessData = task => (dispatch, getState) => {
     }
     else {
       dispatch(err(path, desc, msgs))
-      if (data) {
-        throw new SubmissionError(data)
-      }
+    }
+    if (data && data.diags && Object.keys(data.diags).length > 0) {
+      throw new SubmissionError(data.diags)
     }
   })
   .catch(error => {

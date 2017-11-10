@@ -2,8 +2,8 @@ import React from 'react'
 
 import { emptyO } from 'utils'
 
-import { applyTemplate } from 'templates'
-import { toFieldInfo } from 'fields'
+import { applyTemplate } from 'custom'
+import { toFieldInfo, itemReadField } from 'fields'
 
 import FieldRead from 'FieldRead'
 
@@ -19,31 +19,26 @@ const ItemRead = ({
         } = emptyO },
     },
   } = tables
+  const kind = masterTable ? 'detail' : 'main'
   return (
-    applyTemplate(settings, tables, table, 'detail', masterTable, toFieldInfo(eId, fieldFragments))
+    applyTemplate(settings, tables, table, kind, masterTable, toFieldInfo(eId, fieldFragments))
     || <div>
         <div className={'grid fragments'}>{
           fieldFragments.map(({
             field, label,
             fragment: { table: relTable, myValues },
           }) => (
-            <div
-              key={field}
-              className={'grid-row form'}
-            >
-              <div className={'grid-head-cell label-col'}>{`${label}:`}</div>
-              <div className={'grid-cell value-col'} >
-                {
-                  <FieldRead
-                    field={field}
-                    tables={tables}
-                    table={relTable}
-                    eId={eId}
-                    myValues={myValues}
-                  />
-                }
-              </div>
-            </div>
+            itemReadField(
+              field,
+              label,
+              <FieldRead
+                field={field}
+                tables={tables}
+                table={relTable}
+                eId={eId}
+                myValues={myValues}
+              />
+            )
           ))
         }
         </div>

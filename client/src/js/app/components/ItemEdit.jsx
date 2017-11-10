@@ -4,8 +4,8 @@ import { reduxForm } from 'redux-form'
 
 import { emptyO } from 'utils'
 
-import { applyEditTemplate } from 'templates'
-import { onSubmitSuccess } from 'fields'
+import { applyEditTemplate } from 'custom'
+import { onSubmitSuccess, itemEditField } from 'fields'
 import { toDb, headEntity } from 'tables'
 
 import ErrorBoundary from 'ErrorBoundary'
@@ -39,8 +39,9 @@ const ItemEdit = ({
         } = emptyO },
     },
   } = tables
+  const kind = masterTable ? 'detail' : 'main'
   return (
-    applyEditTemplate(settings, tables, table, 'detailEdit', masterTable, eId, fieldFragments, editButton, submitValues)
+    applyEditTemplate(settings, tables, table, `${kind}Edit`, masterTable, eId, fieldFragments, editButton, submitValues)
     || <div>
         <form>
           {editButton}
@@ -48,16 +49,15 @@ const ItemEdit = ({
             fieldFragments.map(({
               field, label, valType,
               fragment: { editable, table, myValues, ...fieldProps },
-            }) => (
-              <div
-                key={field}
-                className={'grid-row form'}
-              >
-                <div className={`grid-head-cell label-col ${editable ? 'edit' : ''}`}>{`${label}:`}</div>
-                <div className={'grid-cell value-col edit'} >
-                  <ErrorBoundary>
-                    {
-                      editable && (typeof valType != 'object' || !valType.fixed)
+            }) => {
+              const thisEditable = editable && (typeof valType != 'object' || !valType.fixed)
+              return (
+                <ErrorBoundary key={field}>
+                  {
+                    itemEditField(
+                      field,
+                      label,
+                      thisEditable
                       ? <FieldEdit
                           field={field}
                           tables={tables}
@@ -72,12 +72,13 @@ const ItemEdit = ({
                           table={table}
                           eId={eId}
                           myValues={myValues}
-                        />
-                    }
-                  </ErrorBoundary>
-                </div>
-              </div>
-            ))
+                        />,
+                      thisEditable,
+                    )
+                  }
+                </ErrorBoundary>
+              )
+            })
           }
           </div>
         </form>

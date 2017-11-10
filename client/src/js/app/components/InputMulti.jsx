@@ -29,6 +29,12 @@ const InputMulti = ({
           key={field}
           className={'multi-content'}
         >
+          <span
+            className={'button-small'}
+            data-rh={'remove'}
+            onClick={fieldRemove(fields, i, submitTime)}
+          >{'×'}</span>
+          {'\xa0'}
           <Field
             name={field}
             component={componentSingle}
@@ -39,11 +45,6 @@ const InputMulti = ({
             eId={eId}
             submitValues={submit}
             {...props}
-          />
-          <span
-            className={'button-small fa fa-trash'}
-            data-rh={'remove'}
-            onClick={fieldRemove(fields, i, submitTime)}
           />
         </div>
       )}
