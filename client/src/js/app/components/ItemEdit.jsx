@@ -24,10 +24,11 @@ const ItemEdit = ({
   dispatch,
 }) => {
   const head = headEntity(tables, table, eId, settings)
+  const submitValues = handleSubmit(toDb(table, eId, head, dispatch))
   const editControlProps = {
     form: `${table}-${eId}`,
     dirty, invalid, submitting, reset, error,
-    nextAlt, handleSubmit: handleSubmit(toDb(table, eId, head, dispatch)),
+    nextAlt, handleSubmit: submitValues,
   }
   const editButton = <EditControl {...editControlProps} />
   const {
@@ -62,6 +63,7 @@ const ItemEdit = ({
                           tables={tables}
                           table={table}
                           eId={eId}
+                          submitValues={submitValues}
                           {...fieldProps}
                         />
                       : <FieldRead
@@ -86,6 +88,8 @@ const ItemEdit = ({
 export default connect()(reduxForm({
   destroyOnUnmount: false,
   enableReinitialize: true,
-  keepDirtyOnReinitialize: true,
+  keepDirtyOnReinitialize: false,
+  touchOnBlur: true,
+  touchOnChange: false,
   onSubmitSuccess,
 })(ItemEdit))

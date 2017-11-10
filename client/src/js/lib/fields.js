@@ -42,6 +42,14 @@ export const getValType = valType => {
   return typing
 }
 
+export const makeSubmit = memoize((dirty, invalid, submitting, submit) =>
+  dirty && !invalid && !submitting
+  ? submit
+  : () => null
+)
+
+export const makeSubmitTime = memoize(submit => () => setTimeout(submit, 100))
+
 const iso2s = new Set(countryBorders.features.map(({ properties: { iso2 } }) => iso2))
 
 const mergeClassnames = (classNames, attributes) => {

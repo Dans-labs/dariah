@@ -2,13 +2,14 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Markdown from 'react-markdown'
 
-import { editClass } from 'fields'
+import { editClass, makeSubmit } from 'fields'
 
 import { getAltSection, compileAlternatives } from 'alter'
 
 const MarkdownArea = ({
-  alter, alterSection, table, eId, meta: { dirty, invalid, error },
+  alter, alterSection, table, eId, meta: { dirty, invalid, submitting, error },
   input: { name, value }, input,
+  submitValues,
   dispatch,
 }) => {
   const alterTag = `${table}-${eId}-${name}`
@@ -36,6 +37,7 @@ const MarkdownArea = ({
               className={`input ${editClass(dirty, invalid)}`}
               {...input}
               wrap={'soft'}
+              onBlur={makeSubmit(dirty, invalid, submitting, submitValues)}
             />
             {error && <span className={'invalid diag'}>{error}</span>}
             <div className="mddoc">

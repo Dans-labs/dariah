@@ -8,7 +8,13 @@ import { validation, normalization, getValType } from 'fields'
 import InputMulti from 'InputMulti'
 import RelSelect from 'RelSelect'
 
-const FieldEdit = ({ alter, field, tables, table, eId, dispatch, allowed, ...props }) => {
+const FieldEdit = ({
+  alter, field,
+  tables, table, eId,
+  dispatch, allowed,
+  submitValues,
+  ...props
+}) => {
   const { [table]: { fieldSpecs } } = tables
   const { [field]: { valType, valid, multiple } } = fieldSpecs
   if (typeof valType === 'string') {
@@ -30,6 +36,8 @@ const FieldEdit = ({ alter, field, tables, table, eId, dispatch, allowed, ...pro
           eId={eId}
           type={type}
           valType={valType}
+          rerenderOnEveryChange={true}
+          submitValues={submitValues}
           {...props}
         />
       )
@@ -46,6 +54,7 @@ const FieldEdit = ({ alter, field, tables, table, eId, dispatch, allowed, ...pro
           table={table}
           eId={eId}
           type={type}
+          submitValues={submitValues}
           {...props}
         />
       )
@@ -70,6 +79,7 @@ const FieldEdit = ({ alter, field, tables, table, eId, dispatch, allowed, ...pro
         allowed={allowed}
         activeItems={activeItems}
         inactive={inactive}
+        submitValues={submitValues}
         {...props}
       />
     )

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { memoize } from 'memo'
 import { combineSelectors, emptyS, emptyO } from 'utils'
 import { handle, handlEV } from 'handle'
-import { composeAttributes, checkDisabled } from 'fields'
+import { composeAttributes, checkDisabled, makeSubmitTime } from 'fields'
 
 import { getSettings } from 'settings'
 import { getSelect, compileOptions, setSearch, setPopUp, togglePopUp } from 'select'
@@ -208,7 +208,10 @@ const RelSelect = ({
   input: { value, onChange },
   multiple, allowNew, popUpIfEmpty, select, dispatch,
   suppressTyping,
+  submitValues,
 }) => {
+  const submitTime = makeSubmitTime(submitValues)
+  const onChangeSave = event => {onChange(event); submitTime()}
   const { [selectTag]: { search, popUp } = emptyO } = select
   const { options, optionLookup } = compileOptions(tables, table, allowed, field, settings)
   const realPopUp = popUp
@@ -233,7 +236,7 @@ const RelSelect = ({
             value={value}
             selectTag={selectTag}
             dispatch={dispatch}
-            onChange={onChange}
+            onChange={onChangeSave}
           />
         : <Head
             optionLookup={optionLookup}
@@ -269,7 +272,7 @@ const RelSelect = ({
             value={value}
             search={search}
             dispatch={dispatch}
-            onChange={onChange}
+            onChange={onChangeSave}
           />
         : null
       }

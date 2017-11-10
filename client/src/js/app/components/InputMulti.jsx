@@ -1,10 +1,10 @@
 import React from 'react'
 import { Field } from 'redux-form'
 
-import { editClass } from 'fields'
+import { editClass, makeSubmit, makeSubmitTime } from 'fields'
 
-const fieldRemove = (fields, i) => () => {fields.remove(i)}
-const fieldPush = fields => () => {fields.push()}
+const fieldRemove = (fields, i, submit) => () => {fields.remove(i); submit()}
+const fieldPush = (fields, submit) => () => {fields.push(); submit()}
 /* N.B.
  * fieldRemove and fieldPush MUST NOT be memoized.
  * Otherwise they may become bound to the wrong form.
@@ -13,42 +13,48 @@ const fieldPush = fields => () => {fields.push()}
 
 const InputMulti = ({
   componentSingle, validateSingle, normalizeSingle,
-  meta: { dirty, invalid, error },
-  fields, table, eId, name, valType,
+  meta: { dirty, invalid, submitting, error },
+  fields, table, eId, valType,
+  nameC, submitValues,
   ...props
-}) => (
-  <div
-    className={`${editClass(dirty, invalid)} multi-field ${valType}`}
-  >
-    {fields.map((field, i) =>
-      <div
-        key={field}
-        className={'multi-content'}
-      >
-        <Field
-          name={field}
-          component={componentSingle}
-          validate={validateSingle}
-          normalize={normalizeSingle}
-          label={i}
-          table={table}
-          eId={eId}
-          {...props}
-        />
-        <span
-          className={'button-small fa fa-trash'}
-          data-rh={'remove'}
-          onClick={fieldRemove(fields, i)}
-        />
-      </div>
-    )}
+}) => {
+  const submit = makeSubmit(dirty, invalid, submitting, submitValues)
+  const submitTime = makeSubmitTime(submitValues)
+  return (
     <div
-      className={'button-small fa fa-plus multi-control'}
-      data-rh={'more entries'}
-      onClick={fieldPush(fields)}
-    />
-    {error && <p className={'invalid diag'}>{error}</p>}
-  </div>
-)
+      className={`${editClass(dirty, invalid)} multi-field ${valType}`}
+    >
+      {fields.map((field, i) =>
+        <div
+          key={field}
+          className={'multi-content'}
+        >
+          <Field
+            name={field}
+            component={componentSingle}
+            validate={validateSingle}
+            normalize={normalizeSingle}
+            label={i}
+            table={table}
+            eId={eId}
+            submitValues={submit}
+            {...props}
+          />
+          <span
+            className={'button-small fa fa-trash'}
+            data-rh={'remove'}
+            onClick={fieldRemove(fields, i, submitTime)}
+          />
+        </div>
+      )}
+      <div
+        className={'button-small fa fa-plus multi-control'}
+        data-rh={'more entries'}
+        onClick={fieldPush(fields, submitTime)}
+      />
+      {error && <p className={'invalid diag'}>{error}</p>}
+    </div>
+  )
+}
 
 export default InputMulti
