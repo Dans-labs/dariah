@@ -293,7 +293,7 @@ export const applyTemplate = (settings, tables, table, kind, otherTable, values,
   return template(v, e, f, linkMe)
 }
 
-export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId, fieldFragments, editButton) => {
+export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId, fieldFragments, editButton, submitValues) => {
   const { [kind]: templates } = switchTemplateKind
   const { [table]: { [otherTable]: template } = emptyO } = templates
   if (template == null) {return null}
@@ -346,6 +346,7 @@ export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId
         eId={eId}
         {...fieldProps}
         {...editOptions}
+        submitValues={submitValues}
       />
     : <FieldRead
         field={field}

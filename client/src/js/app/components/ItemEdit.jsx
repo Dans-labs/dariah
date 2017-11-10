@@ -40,7 +40,7 @@ const ItemEdit = ({
     },
   } = tables
   return (
-    applyEditTemplate(settings, tables, table, 'detailEdit', masterTable, eId, fieldFragments, editButton)
+    applyEditTemplate(settings, tables, table, 'detailEdit', masterTable, eId, fieldFragments, editButton, submitValues)
     || <div>
         <form>
           {editButton}
