@@ -206,6 +206,11 @@ export const detailTemplates = {
 }
 
 export const detailEditTemplates = {
+  assessment: {
+    contrib(l, v, e, f, fe, m, editButton) {
+      return mainEditTemplates['assessment'](l, v, e, f, fe, m, editButton)
+    },
+  },
   criteriaEntry: {
     assessment(l, v, e, f, fe, m, editButton) {
       const statusClass = (e('evidence') || e('score')) ? 'incomplete' : 'complete'
