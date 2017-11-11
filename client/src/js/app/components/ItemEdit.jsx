@@ -4,7 +4,7 @@ import { reduxForm } from 'redux-form'
 
 import { emptyO } from 'utils'
 
-import { applyEditTemplate } from 'custom'
+import { applyEditTemplate } from 'presentation'
 import { onSubmitSuccess, itemEditField } from 'fields'
 import { toDb, headEntity } from 'tables'
 

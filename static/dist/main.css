@@ -1389,6 +1389,17 @@ div.fulltext .search {
 .isactive {
   background-color: #ccffcc; }
 
+.ass-score {
+  color: #448800;
+  background-color: #ffffff;
+  font-size: xx-large;
+  float: left; }
+
+.ass-score-deriv {
+  color: #448800;
+  background-color: #ffffff;
+  font-size: medium; }
+
 div.criteriaEntryRead, div.criteraEntryEdit {
   border-radius: 6pt;
   margin: 2pt; }

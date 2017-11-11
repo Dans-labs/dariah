@@ -75,3 +75,7 @@ export const getUrlParts = browserHistory => {
   const url = browserHistory.getCurrentLocation().pathname.replace(/\/$/, emptyS)
   return (url.match(/^(.*)\/item\/?([^/]*)\/?$/) || [url, url, '']).slice(1)
 }
+
+export const max = arr => arr.reduce((a, b) => Math.max(a, b), Number.NEGATIVE_INFINITY)
+export const min = arr => arr.reduce((a, b) => Math.min(a, b), Number.POSITIVE_INFINITY)
+export const sum = arr => arr.reduce((a, b) => a + b, 0)

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { emptyO } from 'utils'
 
-import { applyTemplate } from 'custom'
+import { applyTemplate } from 'presentation'
 import { toFieldInfo, itemReadField } from 'fields'
 
 import FieldRead from 'FieldRead'

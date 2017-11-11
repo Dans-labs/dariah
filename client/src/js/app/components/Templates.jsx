@@ -2,6 +2,7 @@ import React from 'react'
 
 import { emptyS } from 'utils'
 import { itemReadField, itemEditField } from 'fields'
+import { assessmentScore } from 'custom'
 
 import Expand, { ExpandHead, ExpandBody } from 'Expand'
 
@@ -9,22 +10,65 @@ const rField = (field, l, f) => itemReadField(field, l(field), f(field))
 const eField = (field, l, fe, m) => itemEditField(field, l(field), fe(field), m(field))
 
 export const mainTemplates = {
-  assessment(l, v, e, f) {
+  assessment({ tables, l, v, e, f }) {
+    const { average, relevantScore, relevantMax, allMax, relevantN, allN } = assessmentScore(tables, v('_id'))
+    const irrelevantN = allN - relevantN
     return (
-      <div className={'grid fragments'}>
-        {rField('title', l, f)}
-        {rField('assessmentType', l, f)}
-        {rField('contrib', l, f)}
-        {rField('submitted', l, f)}
-        {e('submitted') ? null : rField('reviewer1', l, f)}
-        {e('submitted') ? null : rField('reviewer2', l, f)}
+      <div>
+        <div className={'grid fragments'}>
+          {rField('title', l, f)}
+          {rField('assessmentType', l, f)}
+          {rField('contrib', l, f)}
+          {rField('submitted', l, f)}
+          {e('submitted') ? null : rField('reviewer1', l, f)}
+          {e('submitted') ? null : rField('reviewer2', l, f)}
+        </div>
+        <div>
+          <span
+            className={'ass-score'}
+            data-rh={'overall-score of this assessment'}
+            data-rh-at={'right'}
+          >{`${average} %`}</span>
+          <Expand
+            alterSection={`assessment{v('_id')}`}
+            alterTag={'score'}
+            iconOpen={'calculator'}
+            iconClose={'minus-circle'}
+            titleOpen={'Show derivation'}
+            titleClose={'Hide derivation'}
+            headActive={emptyS}
+            headLine={emptyS}
+            full={
+              <div className={'ass-score-deriv'}>
+                <p>{`This contribution scores ${relevantScore} points.`}</p>
+                <p>{`For this type of contribution there is a total of ${allMax} points,
+                    divided over ${allN} criteria.`}</p>
+                {
+                  irrelevantN
+                  ? <p>{`However,
+                        ${irrelevantN} rule${irrelevantN == 1 ? ' is' : 's are'}
+                        not applicable to this contribution,
+                        which leaves the total amount to
+                        ${relevantMax} points,
+                        divided over ${relevantN} criteria.`}
+                    </p>
+                  : ''
+                }
+                <p>{`The total score is expressed as a percentage:
+                    the fraction of ${relevantScore} scored points with respect to 
+                    ${relevantMax} scorable points.`}
+                </p>
+              </div>
+            }
+          />
+        </div>
       </div>
     )
   },
 }
 
 export const mainEditTemplates = {
-  assessment(l, v, e, f, fe, m, editButton) {
+  assessment({ l, e, fe, m, editButton }) {
     return (
       <div>
         {editButton}
@@ -43,7 +87,7 @@ export const mainEditTemplates = {
 
 export const relatedTemplates = {
   contrib: {
-    assessment(l, v, e, f, linkMe) {
+    assessment({ v, e, f, linkMe }) {
       const cTitle = v('title')
       return (
         <div>
@@ -141,12 +185,10 @@ export const relatedTemplates = {
 
 export const detailTemplates = {
   assessment: {
-    contrib(l, v, e, f) {
-      return mainTemplates['assessment'](l, v, e, f)
-    },
+    contrib: mainTemplates['assessment'],
   },
   criteriaEntry: {
-    assessment(l, v, e, f) {
+    assessment({ l, v, e, f }) {
       const statusClass = (e('evidence') || e('score')) ? 'incomplete' : 'complete'
       return (
         <div className={`criteriaEntryRead ${statusClass}`}>
@@ -207,12 +249,10 @@ export const detailTemplates = {
 
 export const detailEditTemplates = {
   assessment: {
-    contrib(l, v, e, f, fe, m, editButton) {
-      return mainEditTemplates['assessment'](l, v, e, f, fe, m, editButton)
-    },
+    contrib: mainEditTemplates['assessment'],
   },
   criteriaEntry: {
-    assessment(l, v, e, f, fe, m, editButton) {
+    assessment({ l, v, e, f, fe, editButton }) {
       const statusClass = (e('evidence') || e('score')) ? 'incomplete' : 'complete'
       return (
         <div className={`criteriaEntryEdit ${statusClass}`}>
@@ -239,7 +279,7 @@ export const detailEditTemplates = {
 
 export const consolidatedTemplates = {
   assessment: {
-    trail(l, v) { // consolidated assessment within a trail record
+    trail({ v }) { // consolidated assessment within a trail record
       return (
         <div>
           <div>{v('title')}</div>
