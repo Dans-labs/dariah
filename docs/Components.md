@@ -665,6 +665,14 @@ An editable field will be handled by a
 and a read-only field by a
 [`<FieldRead />](#fieldread) component.
 
+### Using templates
+Before setting up the fields of an item,
+[applyEditTemplate](presentation#applyedittemplate)
+is called.
+If it finds a suitable template in [Templates](#templates)
+it will be applied.
+If not, all fields will be displayed in a generic presentation.
+
 [ItemForm]({{site.appBase}}/components/ItemForm.jsx)
 =============================================================================================
 connected via [tables](Dux#tables)
@@ -698,6 +706,13 @@ For editing records, [ItemEdit](#itemedit) is being used.
 
 You might wonder why `table` is missing in the props.
 The `fieldFragment`s prop contains that information.
+
+Before setting up the fields of an item,
+[applyTemplate](presentation#applytemplate)
+is called.
+If it finds a suitable template in [Templates](#templates)
+it will be applied.
+If not, all fields will be displayed in a generic presentation.
 
 [ItemRow]({{site.appBase}}/components/ItemRow.jsx)
 =============================================================================================
@@ -1007,6 +1022,160 @@ This is one of the components just below [App](#app).
 It contains a set of panes and navigation links to main subcomponents to
 display in those panes.
 Most of those subcomponents are linked to a main table, which is passed in the `table` prop.
+
+[Templates]({{site.appBase}}/components/Templates.jsx)
+=============================================================================================
+For some parts of the application the generic ways of presenting records and fields
+is just not good enough, e.g. for the display of assessments.
+We need a deeper customization there, where the criteriaEntry detail records should
+appear in one big form.
+
+The challenge is to use as much of the generic machinery when we define custom presentations.
+Our solution here is by using *templates*.
+
+Looking up a field value might seem a very innocent operation: you retrieve the
+appropriate document from the database, look up the field in question, and read out the value 
+that you find there.
+Alas, there are several complicating factors:
+* That value might be a MongoDB object identifier pointing to a related record.
+  We do not want to display that identifier, but the corresponding record, but not
+  the whole record. Only an informative heading. For that we have to look up additional
+  fields in the related table, and possibly apply logic depending on what we encounter.
+* We should not show fields that the current user is not entitled to view.
+  We should not put in edit controls for fields that the current user is not allowed to 
+  edit.
+
+These concerns are built into the generic logic, in the components
+* [ItemRead](Components#itemread)
+* [ItemEdit](Components#itemedit)
+* [FieldRead](Components#fieldread)
+* [FieldEdit](Components#fieldedit)
+and we do not want to reimplement this logic when we do templates.
+
+Our solution is that templates are not static strings into which 
+field values are merged dynamically.
+
+Instead, our templates are *functions* that take a properties object as arguments.
+The properties are functions that can furnish representations for fields.
+These functions use the general machinery to
+* compute string values for fields;
+* compute read-only values for fields including looking up headings of related records,
+  for fields pointing to them, and wrap them in
+  [FieldRead](Components#fieldread) components;
+* present appropriate edit controls for fields whenever the user may change their values
+  and wrap them in
+  [FieldEdit](Components#fieldedit) components.
+
+Applying a template means feeding a higher order React component with
+a properties object of field rendering functions, which results in 
+a concrete React component.
+
+The templates will be applied by
+[ItemRead](#itemread)
+and
+[ItemEdit](#itemedit).
+using the functions
+[applyTemplate](presentation#applytemplate)
+and
+[applyEditTemplate](presentation#applyedittemplate)
+
+### Task
+There are several situations that ask for templates:
+* related records (read only)
+* detail records (read only)
+* detail records (editable)
+* consolidated records
+
+In all those cases the templates are organized in objects, that are first keyed
+by the name of a main table.
+For each main table there is an object of functions, the template functions, named
+after the related/detail table they are for.
+
+#### Explanation
+**Related records** are records pointed to by a field in a main record.
+For example, a `assessment` record has a field `contribution`, containing the
+identifier of the contribution record that the assessment is targeting.
+Here the assessment record wants to display a contribution record as read-only information.
+A template for this can be defined as follows:  
+
+```jsx
+const relatedTemplates = {
+  contrib: {
+    assessment(v, e, f, linkMe) {
+      const cTitle = v('title')
+      return (
+        <div>
+        presentation of fields, using v, e, f
+        </div>
+      )
+    },
+    ...
+  },
+  ...
+```
+
+**Detail records** are records that point to another record.
+For an example, an `assessment` record is accompanied by a series of 
+`criteriaEntry` records. The `assessment` record has no pointers to the `criteriaEntry`
+records. Rather each `criteriaEntry` record points to an assessment record.
+
+If record A points to record B, you could say that record B is as master record and A is a detail of it.
+But in our application, this is not automatically so.
+
+For example, a contribution points to a `year` record, to indicate the year of the contribution.
+Yet we do not consider a contribution to be a detail of a year.
+
+If you want related records to be treated as detail records, you have to say so in the
+[data model]({{site.serverbase}}/models/data.yaml).
+
+**Readonly versus Edit**
+For detail records, we have two sets of templates; one for presentation of records in read-only
+mode, and one for presenting records as forms with editable fields.
+
+**Consolidated records** are records for which all related values and relevant details have been 
+collected and represented as strings. 
+A consolidated record is a frozen snapshot of the logical content of a record.
+It will not change if related records and detail records are modified.
+We use consolidated records for storing contribution metadata in assessment records when
+the assessment has finished, and other cases where we have to preserve a record of activities.
+
+### Applying templates
+A template is a function that can be passed a few functions that deliver
+field value information:
+* `v = field => ` *read-only string value for* `field`
+* `f = field => <FieldRead> ` *react component for* `field`
+* `fe = field => <FieldEdit> ` *react component for* `field`
+* `e = field => ` *whether that field has an empty value*
+* `m = field => ` *whether that field is editable by the current user*
+
+### relatedTemplates
+Object is keyed by the names of the related tables.
+For each related table it contains an object of functions,
+named by the table name of the main records.
+
+These template functions do not accept the `fe` parameter,
+but they accept an extra parameter: `linkMe`, a hyperlink to the main record: `linkMe`.
+
+### detailTemplates
+Object is keyed by the names of the detail tables.
+For each detail table it contains an object of functions,
+named by the table name of the master records.
+
+These template functions do not accept the `fe` parameter.
+
+### detailEditTemplates
+Object is keyed by the names of the detail tables.
+For each detail table it contains an object of functions,
+named by the table name of the master records.
+
+These template functions do also accept the `fe` parameter.
+There is an extra parameter `editButton`, which is a React component that 
+holds the edit/save button for this record.
+
+### consolidatedTemplates
+Object is keyed by the names of the related tables.
+For each related table it contains an object of functions,
+named by the table name of the main records.
 
 [Window]({{site.appBase}}/components/Window.jsx)
 =============================================================================================

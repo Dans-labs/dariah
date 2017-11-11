@@ -330,111 +330,12 @@ slice of the state. As a consequence, opening a contribution record within the l
 all contributions, took a full 3 seconds. It took me long to pinpoint the memoizer
 as the root cause of this particular slowness.
 
-[templates]({{site.libBase}}/templates.js)
+[presentation]({{site.libBase}}/presentation.js)
 =============================================================================================
 This library contains templates that customize the presentation of records and fields.
-See [Customization](Customization) for how the template system is structured.
+See [Teamplates](Components#templates) for how the template system is structured.
+This library contains the functions to *apply* templates.
 
-In addition to the templates, this library also contain the function to *apply* 
-the templates.
-
-There are several situations that ask for templates:
-* related records (read only)
-* detail records (read only)
-* detail records (editable)
-* consolidated records
-
-In all those cases the templates are organized in objects, that are first keyed
-by the name of a main table.
-For each main table there is an object of functions, the template functions, named
-after the related/detail table they are for.
-
-#### Explanation
-**Related records** are records pointed to by a field in a main record.
-For example, a `assessment` record has a field `contribution`, containing the
-identifier of the contribution record that the assessment is targeting.
-Here the assessment record wants to display a contribution record as read-only information.
-A template for this can be defined as follows:  
-
-```jsx
-const relatedTemplates = {
-  contrib: {
-    assessment(v, e, f, linkMe) {
-      const cTitle = v('title')
-      return (
-        <div>
-        presentation of fields, using v, e, f
-        </div>
-      )
-    },
-    ...
-  },
-  ...
-```
-
-**Detail records** are records that point to another record.
-For an example, an `assessment` record is accompanied by a series of 
-`criteriaEntry` records. The `assessment` record has no pointers to the `criteriaEntry`
-records. Rather each `criteriaEntry` record points to an assessment record.
-
-If record A points to record B, you could say that record B is as master record and A is a detail of it.
-But in our application, this is not automatically so.
-
-For example, a contribution points to a `year` record, to indicate the year of the contribution.
-Yet we do not consider a contribution to be a detail of a year.
-
-If you want related records to be treated as detail records, you have to say so in the
-[data model]({{site.serverbase}}/models/data.yaml).
-
-**Readonly versus Edit**
-For detail records, we have two sets of templates; one for presentation of records in read-only
-mode, and one for presenting records as forms with editable fields.
-
-**Consolidated records** are records for which all related values and relevant details have been 
-collected and represented as strings. 
-A consolidated record is a frozen snapshot of the logical content of a record.
-It will not change if related records and detail records are modified.
-We use consolidated records for storing contribution metadata in assessment records when
-the assessment has finished, and other cases where we have to preserve a record of activities.
-
-### Applying templates
-A template is a function that can be passed a few functions that deliver
-field value information:
-* `v = field => ` *read-only string value for* `field`
-* `f = field => <FieldRead> ` *react component for* `field`
-* `fe = field => <FieldEdit> ` *react component for* `field`
-* `e = field => ` *whether that field has an empty value*
-
-### relatedTemplates
-Object is keyed by the names of the related tables.
-For each related table it contains an object of functions,
-named by the table name of the main records.
-
-These template functions do not accept the `fe` parameter,
-but they accept an extra parameter: `linkMe`, a hyperlink to the main record: `linkMe`.
-
-### detailTemplates
-Object is keyed by the names of the detail tables.
-For each detail table it contains an object of functions,
-named by the table name of the master records.
-
-These template functions do not accept the `fe` parameter.
-
-### detailEditTemplates
-Object is keyed by the names of the detail tables.
-For each detail table it contains an object of functions,
-named by the table name of the master records.
-
-These template functions do also accept the `fe` parameter.
-There is an extra parameter `editButton`, which is a React component that 
-holds the edit/save button for this record.
-
-### consolidatedTemplates
-Object is keyed by the names of the related tables.
-For each related table it contains an object of functions,
-named by the table name of the main records.
-
-These template functions do not accept the `e, f, fe` parameters.
 
 [utils]({{site.libBase}}/utils.js)
 =============================================================================================

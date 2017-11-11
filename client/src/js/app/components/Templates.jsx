@@ -23,7 +23,7 @@ export const mainTemplates = {
           {e('submitted') ? null : rField('reviewer1', l, f)}
           {e('submitted') ? null : rField('reviewer2', l, f)}
         </div>
-        <div>
+        <div className={'ass-score-box'}>
           <span
             className={'ass-score'}
             data-rh={'overall-score of this assessment'}

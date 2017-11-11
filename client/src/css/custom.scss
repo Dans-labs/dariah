@@ -11,14 +11,22 @@
     background-color: #ccffcc;
 }
 
+.ass-score-box {
+    background-color: #ffffff;
+    padding: 0.3em;
+    margin-bottom: 0.3em;
+    border: 3pt solid #448800;
+    border-radius: 0.3em;
+    display: inline-flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
 .ass-score {
     color: #448800;
-    background-color: #ffffff;
     font-size: xx-large;
-    float: left;
 }
 .ass-score-deriv {
     color: #448800;
-    background-color: #ffffff;
     font-size: medium;
 }
