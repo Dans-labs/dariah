@@ -14,6 +14,7 @@ import { getSettings } from 'settings'
 
 import { EditStatus, EditInsert, OpenCloseAll } from 'EditControls'
 import ItemContainer from 'ItemContainer'
+import ErrorBoundary from 'ErrorBoundary'
 
 const initial = 0
 const nAlts = 2
@@ -121,19 +122,21 @@ class ListPlain extends Component {
                           </span>
                         : null
                       }
-                      <ItemContainer
-                        filters={filters}
-                        tables={tables}
-                        table={table}
-                        eId={eId}
-                        masterId={masterId}
-                        linkField={linkField}
-                        isactive={isactive}
-                        startMode={thisStartMode}
-                        fixed={fixed}
-                        inhibitFetch={expand}
-                        border={border}
-                      />
+                      <ErrorBoundary>
+                        <ItemContainer
+                          filters={filters}
+                          tables={tables}
+                          table={table}
+                          eId={eId}
+                          masterId={masterId}
+                          linkField={linkField}
+                          isactive={isactive}
+                          startMode={thisStartMode}
+                          fixed={fixed}
+                          inhibitFetch={expand}
+                          border={border}
+                        />
+                      </ErrorBoundary>
                     </div>
                   : <span className={'item-head'} >
                       {

@@ -76,6 +76,11 @@ When we mention these props later on, we omit the types.
 * `filterField` **string**;
   the name of the field that the current filter is acting upon;
   (as in the [data model]({{site.serverBase}}/models/data.yaml);
+* `filterRelField` **string**;
+  the name of the related field that the current filter is acting upon;
+  this is relevant for fields that point to a related table: you can filter
+  on the values of a specific field in the related table;
+  (as in the [data model]({{site.serverBase}}/models/data.yaml);
 * `filterId` **number**;
   the sequence number of a specific filter which identifies it among all filters
   for the same table;
@@ -135,6 +140,12 @@ When we mention these props later on, we omit the types.
   settings are pieces of custom information that are relevant to many components of the app;
 * `table` **string**;
   name of the table that the component must deal with;
+* `submitValues` **function**;
+  a callback that is used to save form values to the database;
+  used for components that supply edit controls for form values:
+  they can call `submitValues` after a change or upon loss of focus;
+  it is basically the `handleSubmit` from Redux-From, with a specific
+  first argument passed (`toDb`) that saves values to the database;
 * `tables` **object**;
   a slice of the state from [getTables](Dux#gettables);
   all data that comes from database tables;
@@ -174,7 +185,7 @@ It is only used to display the height and the width somewhere on the screen.
 =============================================================================================
 connected via [filters](Dux#filters)
 #### [Props](#standard-props)
-###### alter alterSection tables table filterTag filterSetting filterId filterField filterLabel  listIds compact dispatch
+###### alter alterSection tables table filterTag filterSetting filterId filterField filterRelField filterLabel  filteredAmount filteredAmountOthers listIds compact dispatch
 
 ###### `maxCols` number
 The maximum number of columns in which the facets have to be stacked.
@@ -273,6 +284,16 @@ Displays a PDF document by linking to it in an OBJECT.
 we work around it by just displaying a link to open the PDF in a new tab.
 We only do that when we detect an iOS browser.
 
+[ErrorBoundary]({{site.appBase}}/components/ErrorBoundary.jsx)
+=============================================================================================
+Generic component, using new error handling functionality of React 16.
+We use it to wrap components inside which errors may occur.
+Those errors are then propagated to an enclosing `ErrorBoundary`, where they will be catched.
+The console will log the error, and at the `ErrorBoundary` will be rendered
+in place of its normal contents.
+
+Currently we render the error boundary as a red block with a single diagnostic message.
+
 [EUMap]({{site.appBase}}/components/EUMap.jsx)
 =============================================================================================
 (life cycle) connected via [filters](Dux#filters)
@@ -325,7 +346,7 @@ Note that we use the strategy of [controlled components](React#controlled-compon
 =============================================================================================
 connected via [tables](Dux#tables)
 #### [Props](#standard-props)
-###### alter tables table eId field dispatch
+###### alter tables table eId field dispatch submitValues
 
 ###### `allowed` object
 An array of entity ids that are the allowed elements when the field is a multiple
@@ -420,7 +441,7 @@ Both turned out to be related to Redux-Form.
   Summarized: the construction of the `onChange` function is effectively memoized.
   It is determined upon mounting of the component, but not on updating it.
   The workaround is easy: add an extra key property to the form.
-  Another cause for the same problem I encountered in [InputMulti](Components#inputmulti),
+  Another cause for the same problem I encountered in [InputMulti](#inputmulti),
   where I had memoized the callbacks for adding and removing values to/from a sequence.
 
 [FieldRead]({{site.appBase}}/components/FieldRead.jsx)
@@ -432,6 +453,28 @@ connected via [tables](Dux#tables)
 ### Task
 Presents the value(s) of a read-only field, based on *initial values*.
 Note that value of type `textarea` will be rendered as formatted markdown.
+
+[FieldSet]({{site.appBase}}/components/FieldSet.jsx)
+=============================================================================================
+presents [tables](Dux#tables)
+#### [Props](#standard-props)
+###### submitValues
+###### `input` object
+Contains the attribute `onChange` by which the form value of this field can be changed.
+
+###### `widget` function
+A function that when passed a handler, will return a React fragment.
+When this fragment receives a click, the event handler will be called.
+
+###### `setValue` any value
+The value that will be passed to the handler of `widget`, when it receives a click.
+
+### Task
+This is a form input component meant to be passed to a 
+[Field](http://redux-form.com/6.8.0/docs/api/Field.md/) component, like [Input](#input).
+But unlike an `Input`, it only handles a click event, upon which it will change
+the value in the field to `setValue`, and save the form to the database.
+
 
 [Filter]({{site.appBase}}/components/Filter.jsx)
 =============================================================================================
@@ -475,6 +518,7 @@ Note that we use the strategy of [controlled components](React#controlled-compon
 =============================================================================================
 presents [tables](Dux#tables)
 #### [Props](#standard-props)
+###### submitValues
 ###### `meta` object
 Contains attributes related to validation and edit state; is the value changed and unsaved,
 invalid, and of so, for what reason?
@@ -496,6 +540,7 @@ It is a [controlled component](React#controlled-component).
 =============================================================================================
 presents [tables](Dux#tables)
 #### [Props](#standard-props)
+###### submitValues
 ###### table eId fields
 
 ###### `componentSingle` function
@@ -535,6 +580,45 @@ There are controls to remove values, and to add fresh, empty values.
 Validation and normalization are done per individual *Field*.
 
 It is a [controlled component](React#controlled-component).
+
+[ItemAction]({{site.appBase}}/components/ItemAction.jsx)
+=============================================================================================
+connected via [tables](Dux#tables)
+#### [Props](#standard-props)
+###### settings tables table eId linkField fieldFragments dispatch
+
+These are all the properties that `ItemForm` gets from its parent and from its connection with the
+state.
+But we wrap `ItemForm` in `reduxForm()` and this will inject a number of other properties
+into it.
+We list the few that we visibly use.
+There are more injected properties, and these we pass carefully
+on to other components.
+
+###### `handleSubmit` function
+A function that is invoked when the form is submitted.
+This function is passed from [redux-form](https://redux-form.com) and handles all
+the form submission machinery.
+See [ItemEdit](#itemedit).
+
+### Task
+Manages the display of a single record, but only as far as an [ActionTemplate](#templates)
+has been provided for that table.
+The action template may contain controls that modify fields and save them to the database,
+exactly as [ItemEdit](#itemedit).
+
+The component does not show *save* and *reset* buttons.
+It is meant for controls that save changed values on their own.
+
+This component is meant for stuff that needs to be present both in read-only view
+and in edit-view.
+
+### Using templates
+This component uses
+[applyEditTemplate](Lib#applyedittemplate)
+to see whether there is an action template defined in
+[Templates](#templates).
+If yes, that template will be applied, if no, nothing will be rendered.
 
 [ItemContainer]({{site.appBase}}/components/ItemContainer.jsx)
 =============================================================================================
@@ -599,7 +683,8 @@ Resetting means: changing all edited values back to the initialValues.
 
 ###### `handleSubmit` function
 A function that is invoked when the form is submitted.
-This function handles all the [redux-form](https://redux-form.com) machinery that is needed.
+This function is passed from [redux-form](https://redux-form.com) and handles all
+the form submission machinery.
 It also calls a function that you can pass to it as first argument.
 We pass it our `toDb(table, eId, mod)` function.
 This is a function that takes a `values` object, and calls `mod(table, eId, values)`,
@@ -643,14 +728,17 @@ The basic flow is this:
 * *redux-form* manages its own slice of the state (`form`) and has its own set of actions to respond
   to user interactions;
 * when the user interacts with the form, the work ends up in the `form` slice of the state;
-* until the user *submits* the form:
+* when the form is *submitted*:
   * the current values are sent to the database, and the updated record is read back from the database;
   * the updated values are passed to the form as new initial values
   * the form re-initializes itself, and the user can start again;
 * when the user interrupts editing the form, and switches to another component, nothing is lost:
   * the edits are saved in the state;
   * when the form is mounted again, not only the initial values are fetched back, but also
-    the edit state is restored.
+    the edit state is restored;
+* submitting happens with *auto save*: whenever an input field looses focus, the form is submitted;
+  submitting happens also for those fields in which you can not have a cursor: whenever a field
+  value is changed by a click, the form is submitted.
 
 Hence it is easy to edit two forms at the same time, which can be handy if (s)he edits two
 contributions that need to have a consistent wording.
@@ -842,7 +930,7 @@ is there an authenticated user, and if so, what is his/her name?
 =============================================================================================
 connected via [tables](Dux#tables)
 #### [Props](#standard-props)
-###### alter alterSection table eId dispatch
+###### alter alterSection table eId dispatch submitValues
 ###### `meta` object
 Contains attributes related to validation and edit state; is the value changed and unsaved,
 invalid, and of so, for what reason?
@@ -926,7 +1014,7 @@ Meant to become a customized dashboard for the back office functions.
 =============================================================================================
 presents [select](Dux#select)
 #### [Props](#standard-props)
-###### settings tables table select field dispatch
+###### settings tables table select field dispatch submitValues
 
 ### `multiple` bool
 Whether to display a select widget where the user can make multi-selections or only
@@ -1046,10 +1134,10 @@ Alas, there are several complicating factors:
   edit.
 
 These concerns are built into the generic logic, in the components
-* [ItemRead](Components#itemread)
-* [ItemEdit](Components#itemedit)
-* [FieldRead](Components#fieldread)
-* [FieldEdit](Components#fieldedit)
+* [ItemRead](#itemread)
+* [ItemEdit](#itemedit)
+* [FieldRead](#fieldread)
+* [FieldEdit](#fieldedit)
 and we do not want to reimplement this logic when we do templates.
 
 Our solution is that templates are not static strings into which 
@@ -1061,19 +1149,24 @@ These functions use the general machinery to
 * compute string values for fields;
 * compute read-only values for fields including looking up headings of related records,
   for fields pointing to them, and wrap them in
-  [FieldRead](Components#fieldread) components;
+  [FieldRead](#fieldread) components;
 * present appropriate edit controls for fields whenever the user may change their values
   and wrap them in
-  [FieldEdit](Components#fieldedit) components.
+  [FieldEdit](#fieldedit) components.
+* present custom controls for fields upon click events
+  and wrap them in
+  [FieldSet](#fieldset) components.
 
 Applying a template means feeding a higher order React component with
 a properties object of field rendering functions, which results in 
 a concrete React component.
 
 The templates will be applied by
-[ItemRead](#itemread)
+[ItemRead](#itemread),
+[ItemEdit](#itemedit),
 and
-[ItemEdit](#itemedit).
+[ItemAction](#itemaction),
+.
 using the functions
 [applyTemplate](presentation#applytemplate)
 and
@@ -1101,7 +1194,7 @@ A template for this can be defined as follows:
 ```jsx
 const relatedTemplates = {
   contrib: {
-    assessment(v, e, f, linkMe) {
+    assessment({ v, e, f, linkMe }) {
       const cTitle = v('title')
       return (
         <div>
@@ -1128,9 +1221,20 @@ Yet we do not consider a contribution to be a detail of a year.
 If you want related records to be treated as detail records, you have to say so in the
 [data model]({{site.serverbase}}/models/data.yaml).
 
-**Readonly versus Edit**
-For detail records, we have two sets of templates; one for presentation of records in read-only
-mode, and one for presenting records as forms with editable fields.
+**Readonly** versus **Edit** versus **Action**
+For main and detail records, we have several sets of templates;
+* **Read** for presentation of records in read-only mode,
+* **Edit** for presenting records as forms with editable fields,
+* **Action** for presenting actions upon records.
+
+The idea is that the form can switch between **Read** and **Edit** by means of a standard
+control, and that the **Action** part is independent of that switch: it is always displayed.
+
+In the **Read** part, you cannot have edit controls, but in the **Edit** and **Action** parts
+you can have them.
+However, in the **Action** part, you do not have `save` and `reset` buttons.
+This part is meant for buttons, that change a field to a predefined value and save
+them immediately.
 
 **Consolidated records** are records for which all related values and relevant details have been 
 collected and represented as strings. 
@@ -1140,37 +1244,60 @@ We use consolidated records for storing contribution metadata in assessment reco
 the assessment has finished, and other cases where we have to preserve a record of activities.
 
 ### Applying templates
-A template is a function that can be passed a few functions that deliver
+A template is a function that can be passed a `props` object containing functions that deliver
 field value information:
 * `v = field => ` *read-only string value for* `field`
-* `f = field => <FieldRead> ` *react component for* `field`
-* `fe = field => <FieldEdit> ` *react component for* `field`
+* `f = field => <FieldRead> ` *react component for reading* `field`
+* `fe = field => <FieldEdit> ` *react component for editing* `field`
+* `fs = field => <FieldSet> ` *customizable react component for setting* `field`
+  to a predefined value
 * `e = field => ` *whether that field has an empty value*
 * `m = field => ` *whether that field is editable by the current user*
 
+### mainTemplates
+Object, keyed by the names of tables.
+The values are *read* templates for records in those (main) tables.
+
+These templates are not passed the `fe` function.
+
+### mainActionTemplates
+Like *mainTemplates*, but now the values are *action* templates.
+
+These template functions are passed the `fe` function.
+
+### mainEditTemplates
+Like *mainTemplates*, but now the values are *edit* templates.
+
+These template functions are passed the `fe` function.
+There is an extra parameter `editButton`, which is a React component that 
+holds the edit/save button for this record.
+
+### detailTemplates
+Object, keyed by the names of the detail tables and then by the names of master tables.
+The values are *read* templates for records in those detail tables, when they
+are presented as details of a record in the master table.
+
+These templates are not passed the `fe` function.
+
+### detailActionTemplates
+Like *detailTemplates*, but now the values are *action* templates.
+
+These template functions are passed the `fe` function.
+
+### detailEditTemplates
+Like *detailTemplates*, but now the values are *edit* templates.
+
+These template functions are passed the `fe` function.
+There is an extra parameter `editButton`, which is a React component that 
+holds the edit/save button for this record.
+
 ### relatedTemplates
-Object is keyed by the names of the related tables.
+Object, keyed by the names of the related tables.
 For each related table it contains an object of functions,
 named by the table name of the main records.
 
-These template functions do not accept the `fe` parameter,
-but they accept an extra parameter: `linkMe`, a hyperlink to the main record: `linkMe`.
-
-### detailTemplates
-Object is keyed by the names of the detail tables.
-For each detail table it contains an object of functions,
-named by the table name of the master records.
-
-These template functions do not accept the `fe` parameter.
-
-### detailEditTemplates
-Object is keyed by the names of the detail tables.
-For each detail table it contains an object of functions,
-named by the table name of the master records.
-
-These template functions do also accept the `fe` parameter.
-There is an extra parameter `editButton`, which is a React component that 
-holds the edit/save button for this record.
+These template functions are not passed the `fe` function,
+but they get an extra parameter: `linkMe`, a hyperlink to the main record: `linkMe`.
 
 ### consolidatedTemplates
 Object is keyed by the names of the related tables.

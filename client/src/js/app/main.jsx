@@ -10,33 +10,36 @@ import SubApp from 'SubApp'
 import ListContainer from 'ListContainer'
 import Doc from 'Doc'
 import NotFound from 'NotFound'
+import ErrorBoundary from 'ErrorBoundary'
 
 render(
   <Root>
-    <Router history={browserHistory}>
-      <Redirect from={'/about'} to={'/docs/about.md'} />
-      <Redirect from={'/docs/about'} to={'/docs/about.md'} />
-      <Redirect from={'/about.md'} to={'/docs/about.md'} />
-      <Redirect from={'/login'} to={'/docs/about.md'} />
-      <Redirect from={'/logout'} to={'/docs/about.md'} />
-      <Redirect from={'/slogout'} to={'/docs/about.md'} />
-      <Route path={'/'} component={App} >
-        <IndexRoute component={App} />
-        <IndexRedirect to={'/docs/about.md'} />
-        <Route path={'docs/:docFile'} component={Doc} />
-        <Route path={'tech/docs/gen/:docFile'} component={Doc} />
-        <Route path={'tech/docs/:docFile'} component={Doc} />
-        <Route path={'data'} component={SubApp} >
-          <Route path={':table'} >
-            <Route path={'mylist(/item/:eId)'} component={ListContainer} select={MYIDS} mode={'list'} />
-            <Route path={'list(/item/:eId)'} component={ListContainer} select={ALLIDS} mode={'list'} />
-            <Route path={'grid(/item/:eId)'} component={ListContainer} select={ALLIDS} mode={'grid'} />
-            <Route path={'filter(/item/:eId)'} component={ListContainer} select={ALLIDS} mode={'list'} filtered={true} />
+    <ErrorBoundary>
+      <Router history={browserHistory}>
+        <Redirect from={'/about'} to={'/docs/about.md'} />
+        <Redirect from={'/docs/about'} to={'/docs/about.md'} />
+        <Redirect from={'/about.md'} to={'/docs/about.md'} />
+        <Redirect from={'/login'} to={'/docs/about.md'} />
+        <Redirect from={'/logout'} to={'/docs/about.md'} />
+        <Redirect from={'/slogout'} to={'/docs/about.md'} />
+        <Route path={'/'} component={App} >
+          <IndexRoute component={App} />
+          <IndexRedirect to={'/docs/about.md'} />
+          <Route path={'docs/:docFile'} component={Doc} />
+          <Route path={'tech/docs/gen/:docFile'} component={Doc} />
+          <Route path={'tech/docs/:docFile'} component={Doc} />
+          <Route path={'data'} component={SubApp} >
+            <Route path={':table'} >
+              <Route path={'mylist(/item/:eId)'} component={ListContainer} select={MYIDS} mode={'list'} />
+              <Route path={'list(/item/:eId)'} component={ListContainer} select={ALLIDS} mode={'list'} />
+              <Route path={'grid(/item/:eId)'} component={ListContainer} select={ALLIDS} mode={'grid'} />
+              <Route path={'filter(/item/:eId)'} component={ListContainer} select={ALLIDS} mode={'list'} filtered={true} />
+            </Route>
           </Route>
         </Route>
-      </Route>
-      <Route path={'*'} component={NotFound} />
-    </Router>
+        <Route path={'*'} component={NotFound} />
+      </Router>
+    </ErrorBoundary>
   </Root>
   ,
   document.getElementById('body')

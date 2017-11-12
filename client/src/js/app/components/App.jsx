@@ -15,7 +15,7 @@ const App = ({ children, win }) => {
   const { height, width } = win
   const text = `${width} x ${height}`
   return (
-    <div>
+    <ErrorBoundary>
       <ReactHint events={true} delay={100} />
       <ErrorBoundary>
         <Notification />
@@ -39,7 +39,7 @@ const App = ({ children, win }) => {
         </ErrorBoundary>
       </p>
       <ErrorBoundary>{children}</ErrorBoundary>
-    </div>
+    </ErrorBoundary>
   )
 }
 

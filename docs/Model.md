@@ -1,5 +1,5 @@
 ---
-title: Customization
+title: Model
 ---
 This application contains a generic engine to display MongoDB data according to
 any specified data model, respecting access privileges.
