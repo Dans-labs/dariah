@@ -4,9 +4,11 @@ from beaker.middleware import SessionMiddleware
 from controllers.user import UserApi
 from controllers.utils import utf8FromLatin1, serverprint
 
+EPPN_FIELD = None
+
 class AuthApi(UserApi):
-    def __init__(self, DB, PM, secret_file):
-        super().__init__(DB, PM)
+    def __init__(self, DB, DM, PM, secret_file):
+        super().__init__(DB, DM, PM)
 
         # determine production or devel
         self.isDevel = os.environ.get('REGIME', None) == 'devel'
@@ -35,6 +37,9 @@ class AuthApi(UserApi):
         self._session_key = 'dariah.session'
         self.app = SessionMiddleware(self.app, session_opts, environ_key=self._session_key)
         DB.getGroups(self)
+        userFields = DM.generic['userFields']
+        global EPPN_FIELD
+        EPPN_FIELD = userFields[0]
 
     def required(self, f): # decorator
         unauth = self.PM.unauth
@@ -73,7 +78,7 @@ class AuthApi(UserApi):
         if self.userInfo == None:
             self.userInfo = dict(group=unauthId, groupRep=unauth)
         else:
-            eppn = self.userInfo.get('eppn', None)
+            eppn = self.userInfo.get(EPPN_FIELD, None)
             if eppn == None:
                 self.userInfo['group'] = unauthId
                 self.userInfo['groupRep'] = unauth
@@ -91,7 +96,7 @@ class AuthApi(UserApi):
     def _create_session(self):
         env = bottle.request.environ
         session = bottle.request.environ.get(self._session_key)
-        session['eppn'] = self.userInfo['eppn']
+        session[EPPN_FIELD] = self.userInfo[EPPN_FIELD]
         session.save()
 
     def _delete_session(self):
@@ -102,7 +107,7 @@ class AuthApi(UserApi):
     def _get_session(self):
         env = bottle.request.environ
         session = bottle.request.environ.get(self._session_key)
-        return session.get('eppn', None)
+        return session.get(EPPN_FIELD, None)
 
     def _checkLogin(self, force=False):
         env = bottle.request.environ
@@ -139,7 +144,7 @@ class AuthApi(UserApi):
             authenticated =  sKey in env and env[sKey] 
             if authenticated:
                 self.userInfo = dict(
-                    eppn=utf8FromLatin1(env['eppn']),
+                    eppn=utf8FromLatin1(env[EPPN_FIELD]),
                     email=utf8FromLatin1(env['mail']),
                     authority='DARIAH',
                 )

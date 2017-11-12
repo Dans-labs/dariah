@@ -58,9 +58,8 @@ honouring the good work of Redux.
 At the server side we store the data in a [MongoDB](https://docs.mongodb.com).
 This data is served by a [Python-Bottle](http://bottlepy.org/docs/dev/) web framework.
 The authentication of users is outsourced to the DARIAH infrastructure, see
-[here](Dux#me). The authorization is defined by the [data model](Server#data-model) and
-[permission model](Server#permission-model),
-which govern all data access.
+[here](Dux#me). The authorization is defined by the [data model](Model)
+which governs all data access.
 
 ## [Tests](Tests)
 Testing becomes a life saver when your app is growing in complexity.

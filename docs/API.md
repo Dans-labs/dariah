@@ -36,7 +36,8 @@ Get the records of the table with name **table name**.
 If `complete=false`, fetch only the titles of each record.
 Otherwise, fetch all fields that you are entitled to read.
 
-The result is a `json` object, containing sub objects for the specification of the data model of this table.
+The result is a `json` object, containing sub objects for the specification of the
+[data model](Model) of this table.
 
 The actual records are under `entities`, keyed by their MongoDB `_id`.
 

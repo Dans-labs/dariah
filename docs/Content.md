@@ -36,7 +36,7 @@ The machinery for this is programmed in the script, and the configuration detail
 are spelled out in a [config](https://github.com/Dans-labs/dariah/blob/master/static/tools/config.yaml).
 
 # Importing and reimporting
-The source data model is complex, the target data model is complex, and the
+The source data model is complex, the [target data model](Model) is complex, and the
 app as a whole must support a complex workflow.
 It is impossible to design everything up-front, so we need to be able to retrace and our steps
 and redo the import.

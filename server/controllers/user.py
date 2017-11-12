@@ -1,9 +1,22 @@
 from datetime import datetime
 
+DATECREATED_FIELD = None
+EPPN_FIELD = None
+EMAIL_FIELD = None
+
 class UserApi(object):
-    def __init__(self, DB, PM):
+    def __init__(self, DB, DM, PM):
         self.DB = DB
+        self.DM = DM
         self.PM = PM
+        systemFields = DM.generic['systemFields']
+        userFields = DM.generic['userFields']
+        global DATECREATED_FIELD
+        DATECREATED_FIELD = systemFields[0]
+        global EPPN_FIELD
+        EPPN_FIELD = userFields[0]
+        global EMAIL_FIELD
+        EMAIL_FIELD = userFields[1]
 
     def getUser(self, eppn, email=None):
         return self.DB.userFind(eppn, email, authority = 'local' if self.isDevel else 'DARIAH')
@@ -12,12 +25,12 @@ class UserApi(object):
         testUsers = {}
         records = self.DB.userLocal() 
         for r in records:
-            testUsers[r['eppn']] = r
+            testUsers[r[EPPN_FIELD]] = r
         return testUsers
 
     def storeUpdate(self, newUserInfo):
-        eppn = newUserInfo['eppn']
-        email = newUserInfo['email']
+        eppn = newUserInfo[EPPN_FIELD]
+        email = newUserInfo[EMAIL_FIELD]
         record = self.getUser(eppn, email=email)
         if not record:
             record = self._store(newUserInfo)
@@ -38,18 +51,17 @@ class UserApi(object):
         now = datetime.utcnow()
         record = {}
         record.update(newUserInfo)
-        record.update(dict(
-            dateCreated=now,
-            dateModified=now,
-            dateLastLogin=now,
-            statusLastLogin='Approved',
-            mayLogin=True,
-        ))
+        record.update({
+            DATECREATED_FIELD: now,
+            'dateLastLogin': now,
+            'statusLastLogin': 'Approved',
+            'mayLogin': True,
+        })
         self.DB.userAdd(record)
         return record
 
     def _update(self, userInfo, newUserInfo):
-        eppn = newUserInfo['eppn']
+        eppn = newUserInfo[EPPN_FIELD]
         now = datetime.utcnow()
         userInfo.update(newUserInfo)
         userInfo.update(dict(

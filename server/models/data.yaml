@@ -1,7 +1,13 @@
 generic:
-  createdDate: dateCreated
-  createdBy: creator
-  modified: modified
+  # DO NOT CHANGE THE ORDER OF THE SYSTEM FIELDS
+  systemFields:
+    - dateCreated
+    - creator
+    - modified
+  # DO NOT CHANGE THE ORDER OF THE USER FIELDS
+  userFields:
+    - eppn
+    - email
   title: rep
   noTitle: no title
   item:

@@ -80,7 +80,8 @@ The absolute location is not important. Here we assume everything resides in `/o
   - `web-apps`
     - `dariah`
       - `README.md` short description for humans
-      - `build.sh` script for build/development tasks, the options are documented inside, or run it without arguments for help
+      - `build.sh` script for build/development tasks,
+        the options are documented inside, or run it without arguments for help
       - `server`
         - `controllers` routes and controllers
           - `index.py` entry point
@@ -89,7 +90,8 @@ The absolute location is not important. Here we assume everything resides in `/o
           - `auth.py` handle the login process
           - `user.py` handle the user data
           - `perm.py` permission control
-        - `models` yaml files and python files generated on the basis of the yaml files
+        - `models` yaml files defining the [data model](Model)
+          (these files have been converted to python files):
           - `data.yaml` the data model
           - `permission.yaml` the permissions model
         - `views` html templates

@@ -131,7 +131,7 @@ same `alterSection` and be shielded from updates in the components that belong t
 =============================================================================================
 
 A lot of the logic of showing lists, items, related items and fields is purely
-generic and driven by the [data model]({{site.serverBase}}/models/data.yaml).
+generic and driven by the [data model](Model).
 
 But there is considerably more to an app than this kind of generic logic.
 The `workflow` duct is the entry point for additional, non-trivial business logic.
@@ -155,7 +155,7 @@ Active items can be formatted specially, and likewise the non-active items,
 which can also be disabled in some contexts.
 
 The way (in)active items are displayed is controlled by the 
-[data model]({{site.serverBase}}/models/data.yaml).
+[data model](Model).
 See for example the field `typeContribution` in the tables `package` and `criteria`.
 
 Actions
@@ -623,10 +623,11 @@ all data consuming components look at the same data.
 Principal data consuming components are [ListContainer](Components#listcontainer) and
 [Items](Components#itemmy).
 
-In order to do the job properly, a fair amount of metadata about tables and fields is also fetched and stored.
+In order to do the job properly,
+a fair amount of metadata about tables and fields is also fetched and stored.
 In particular, tables specify which filters can be used on which fields.
-This filter setup is not hard-wired into the client app, but comes from the server, where it is configured in 
-the data model, a set of *yaml* files.
+This filter setup is not hard-wired into the client app, but comes from the server,
+where it is configured in the [data model](Model).
 
 Actions
 ---------------------------------------------------------------------------
@@ -723,7 +724,7 @@ Helpers
 ---------------------------------------------------------------------------
 ### entityHead
 Computes the title for an item, based on the
-[data model]({{site.serverBase}}/models/data.yaml)
+[data model](Model)
 or on specialized functions, defined here.
 See also [repr](#repr).
 

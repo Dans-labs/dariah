@@ -64,7 +64,7 @@ When we mention these props later on, we omit the types.
 * `filtered` **bool**;
   whether the list should be accompanied by filters;
   the specification of the filters themselves is in the
-  [data model]({{site.serverBase}}/models/data.yaml);
+  [data model](Model);
 * `fields` **objects**;
   defines a subset of all fields: these are the fields that the component has to deal with;
 * `filteredAmount` **number**;
@@ -75,12 +75,12 @@ When we mention these props later on, we omit the types.
   see [computeFiltering](Dux#computefiltering);
 * `filterField` **string**;
   the name of the field that the current filter is acting upon;
-  (as in the [data model]({{site.serverBase}}/models/data.yaml);
+  (as in the [data model](Model);
 * `filterRelField` **string**;
   the name of the related field that the current filter is acting upon;
   this is relevant for fields that point to a related table: you can filter
   on the values of a specific field in the related table;
-  (as in the [data model]({{site.serverBase}}/models/data.yaml);
+  (as in the [data model](Model);
 * `filterId` **number**;
   the sequence number of a specific filter which identifies it among all filters
   for the same table;
@@ -283,6 +283,15 @@ Displays a PDF document by linking to it in an OBJECT.
 **NB:** On iOS this does not work well, only the first page of the PDF gets shown,
 we work around it by just displaying a link to open the PDF in a new tab.
 We only do that when we detect an iOS browser.
+
+[EditControl]({{site.appBase}}/components/EditControls.jsx)
+=============================================================================================
+
+[EditStatus]({{site.appBase}}/components/EditControls.jsx)
+=============================================================================================
+
+[EditInsert]({{site.appBase}}/components/EditControls.jsx)
+=============================================================================================
 
 [ErrorBoundary]({{site.appBase}}/components/ErrorBoundary.jsx)
 =============================================================================================
@@ -1005,6 +1014,9 @@ The user can click it away and also clear the notifications.
 There is also a progress indicator, a little circle fixed at the top right corner of the screen.
 It hints at the current status of asynchronous operations. A click on it will show the notifications panel.
 
+[OpenCloseAll]({{site.appBase}}/components/EditControls.jsx)
+=============================================================================================
+
 [Overview]({{site.appBase}}/components/Overview.jsx)
 =============================================================================================
 Under construction.
@@ -1219,7 +1231,7 @@ For example, a contribution points to a `year` record, to indicate the year of t
 Yet we do not consider a contribution to be a detail of a year.
 
 If you want related records to be treated as detail records, you have to say so in the
-[data model]({{site.serverbase}}/models/data.yaml).
+[data model](Model).
 
 **Readonly** versus **Edit** versus **Action**
 For main and detail records, we have several sets of templates;

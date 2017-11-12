@@ -21,13 +21,14 @@ In this app we use YAML for configuration details.
 
 * the conversion of legacy contribution data into MongoDB is steered by a 
   [config.yaml]({{site.repBase}}/static/tools/config.yaml).
-* the [data model]({{site.serverBase}}/models/data.yaml) lists all the tables
+* the [data model](Model) lists all the tables
   and fields, including how they hang together and how we want to represent them on screen.
-  If you, as developer, need to add new tables and fields, you can do so by modifying this
-  file. No extra coding is needed.
-* the [permissions]({{site.serverBase}}/models/permission.yaml) define a system of
-  access control. There are groups, levels, actions, tables and fields. This config file
-  utterly defines who may do what operations on which data.
+  It also defines access control.
+  If you, as developer, need to add new tables and fields, you can do so by modifying these
+  files:
+  [data model]({{site.serverBase}}/models/data.yaml)
+  [permissions]({{site.serverBase}}/models/permission.yaml).
+  No extra coding is needed.
 
 [Markdown](https://guides.GitHub.com/features/mastering-markdown/)
 -----------------------------------------------------------------------------------------

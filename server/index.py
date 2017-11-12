@@ -13,7 +13,7 @@ File = FileApi()
 DM = DataModel()
 PM = PermissionModel()
 DB = DbAccess(DM)
-Auth = AuthApi(DB, PM, '/opt/web-apps/dariah_jwt.secret')
+Auth = AuthApi(DB, DM, PM, '/opt/web-apps/dariah_jwt.secret')
 Controller = Controller(DB)
 app = Auth.app
 

@@ -1,13 +1,22 @@
 from controllers.utils import oid
 
+EPPN_FIELD = None
+
 class PermApi(object):
     def __init__(self, Auth, DM, PM):
         self.PM = PM
         self.DM = DM
+        systemFields = DM.generic['systemFields']
+        userFields = DM.generic['userFields']
+        global CREATOR_FIELD
+        CREATOR_FIELD = systemFields[1]
+        global EPPN_FIELD
+        EPPN_FIELD = userFields[0]
+
         self.userInfo = Auth.userInfo
         self.groupFromId = Auth.groupFromId
         self.uid = self.userInfo.get('_id', None)
-        self.eppn = self.userInfo.get('eppn', None)
+        self.eppn = self.userInfo.get(EPPN_FIELD, None)
         self.group = self.userInfo['groupRep']
         self.rank = dict((lev, n) for (n, lev) in enumerate(self.PM.levels))
 
@@ -49,7 +58,7 @@ class PermApi(object):
     def _isOwn(self, table, document):
         uid = self.uid
         owners = self.PM.owners
-        ownField = owners.get(table, self.DM.generic['createdBy'])
+        ownField = owners.get(table, CREATOR_FIELD)
         if ownField == None or ownField not in document: return False
         return document[ownField] == self.uid
 
@@ -84,7 +93,7 @@ class PermApi(object):
 
     def _rowSet(self, table, level):
         owners = self.PM.owners
-        ownField = owners.get(table, self.DM.generic['createdBy'])
+        ownField = owners.get(table, CREATOR_FIELD)
         authorized = self._authorize(level, asInt=True)
         if authorized == 1: return {}
         if authorized == 0: return False

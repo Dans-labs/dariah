@@ -8,6 +8,12 @@ from controllers.workflow import detailInsert, timing
 
 PRISTINE = 'isPristine'
 
+DATECREATED_FIELD = None
+CREATOR_FIELD = None
+MODIFIED_FIELD = None
+EPPN_FIELD = None
+EMAIL_FIELD = None
+
 # We store the mongo db connection here as a module global variable
 # No other module is supposed to import the connection
 # Only the DbAccess methods are supposed to eaccess the db.
@@ -20,18 +26,23 @@ _DBM = None
 
 class DbAccess(object):
     def __init__(self, DM):
-        global _DBM
         self.DM = DM
+        systemFields = DM.generic['systemFields']
+        userFields = DM.generic['userFields']
+        global _DBM
+        global DATECREATED_FIELD
+        DATECREATED_FIELD = systemFields[0]
+        global CREATOR_FIELD
+        CREATOR_FIELD = systemFields[1]
+        global MODIFIED_FIELD
+        MODIFIED_FIELD = systemFields[2]
+        global EPPN_FIELD
+        EPPN_FIELD = userFields[0]
+        global EMAIL_FIELD
+        EMAIL_FIELD = userFields[1]
         install(JSONPlugin(json_dumps=lambda body: json.dumps(body, default=json_string)))
         clientm = MongoClient()
         _DBM = clientm.dariah
-# the fields 'creator', 'dateCreated' and 'modified' are under system control.
-        self.SYSTEM_FIELDS = {
-            self.DM.generic['createdDate'],
-            self.DM.generic['createdBy'],
-            self.DM.generic['modified'],
-        }
-        self.CREATOR = self.DM.generic['createdBy']
 
         # this function is a simple table getter from mongoDB, but it does respect the permissions.
         # The workflow module needs to read tables, but we do not want code for the reading
@@ -61,15 +72,15 @@ class DbAccess(object):
             dest.groupFromId[gid] = group
 
     def userFind(self, eppn, email, authority):
-        eppnCrit =  {'eppn': eppn, 'authority': authority}
-        emailCrit = {'email': email, 'eppn': {'$exists': False}, 'authority': {'$exists': False}}
+        eppnCrit =  {EPPN_FIELD: eppn, 'authority': authority}
+        emailCrit = {EMAIL_FIELD: email, EPPN_FIELD: {'$exists': False}, 'authority': {'$exists': False}}
         criterion = eppnCrit if email == None else {'$or': [eppnCrit, emailCrit]}
         return _DBM.user.find_one(criterion)
     def userLocal(self): return _DBM.user.find({'authority': 'local'})
     def userAdd(self, record): _DBM.user.insert_one(record)
     def userMod(self, record):
         if PRISTINE in record: del record[PRISTINE]
-        criterion = {'_id': record['_id']} if '_id' in record else {'eppn': record['eppn']}
+        criterion = {'_id': record['_id']} if '_id' in record else {EPPN_FIELD: record[EPPN_FIELD]}
         if '_id' in record: del record['_id']
         _DBM.user.update_one(
             criterion,
@@ -78,7 +89,6 @@ class DbAccess(object):
 
     def validate(self, table, itemValues, uFields):
         tableInfo = self.DM.tables.get(table, {})
-        modified = self.DM.generic['modified']
         (fieldOrder, fieldSpecs, allFields) = self.theseFields(table, True)
         valItemValues = dict()
         newValues = []
@@ -184,8 +194,7 @@ class DbAccess(object):
             coreFields[f] = True
 
         theFieldFilter = coreFields if titleOnly else fieldFilter 
-        creatorField = self.CREATOR
-        theFieldFilter[creatorField] = True
+        theFieldFilter[CREATOR_FIELD] = True
         if rFilter != None:
             rowFilter.update(rFilter)
         if sort == None:
@@ -195,7 +204,7 @@ class DbAccess(object):
         allIds=[d['_id'] for d in documents]
         entities=dict((str(d['_id']), dict(values=dict((f, d[f]) for f in d if (
                 (not titleOnly or f in coreFields) and
-                (f != creatorField or f in fieldFilter)
+                (f != CREATOR_FIELD or f in fieldFilter)
             )))) for d in documents)
         if not titleOnly:
             for d in documents:
@@ -316,13 +325,10 @@ class DbAccess(object):
         (readRowFilter, readFieldFilter) = readResult
         modDate = now()
         modBy = self.eppn
-        createdDate = self.DM.generic['createdDate']
-        createdBy = self.DM.generic['createdBy']
-        modified = self.DM.generic['modified']
         insertValues = {
-            createdDate: now(),
-            createdBy: self.uid,
-            modified: ['{} on {}'.format(modBy, modDate)],
+            DATECREATED_FIELD: now(),
+            CREATOR_FIELD: self.uid,
+            MODIFIED_FIELD: ['{} on {}'.format(modBy, modDate)],
         }
         masterDocument = None
         masterTitle = None
@@ -410,7 +416,6 @@ class DbAccess(object):
 
     def modList(self, controller, table, action):
         Perm = self.Perm
-        modified = self.DM.generic['modified']
         (good, result) = Perm.getPerm(controller, table, action)
         none = '' if action == 'insert' else {}
         if not good:
@@ -490,18 +495,18 @@ class DbAccess(object):
                 if timingField != None:
                     updateSaveValues[timingField] = now()
 
-            for sysField in self.SYSTEM_FIELDS:
+            for sysField in self.DM.generic['systemFields']:
                 if (sysField not in updateValues or updateValues[sysField] == None) and sysField in document:
                         updateSaveValues[sysField] = document[sysField] # add the system field
 
-            updateSaveValues.setdefault('modified', []).append('{} on {}'.format(modBy, modDate))
+            updateSaveValues.setdefault(MODIFIED_FIELD, []).append('{} on {}'.format(modBy, modDate))
             if PRISTINE in updateSaveValues: del updateSaveValues[PRISTINE]
             _DBM[table].update_one(
                 rowFilter,
                 {'$set': updateSaveValues, '$unset': {PRISTINE: ''}},
             )
             # here system values are updated in the database
-            return self.stop(data=dict(values=updateSaveValues, newValues=newValues, diags=validationDiags), msgs=permMsgs+validationMsgs) # ??? but modified is not always returned
+            return self.stop(data=dict(values=updateSaveValues, newValues=newValues, diags=validationDiags), msgs=permMsgs+validationMsgs) # ??? but MODIFIED_FIELD is not always returned
 
     def stop(self, data=None, text=None, msgs=None):
         good = text == None and (msgs == None or all(msg['kind'] != 'error' for msg in msgs))
@@ -510,9 +515,8 @@ class DbAccess(object):
 
     def findDoc(self, table, rowFilter, fieldFilter, failData, failText, multiple=False):
         Perm = self.Perm
-        creatorField = self.CREATOR
         theFieldFilter = dict(x for x in fieldFilter.items())
-        theFieldFilter[creatorField] = True
+        theFieldFilter[CREATOR_FIELD] = True
         documents = list(_DBM[table].find(rowFilter, theFieldFilter))
         ldoc = len(documents)
         if ldoc == 0:
@@ -524,7 +528,7 @@ class DbAccess(object):
                 (mayUpdate, uFields, warnings) = Perm.may(table, 'update', document=document)
                 perm = dict(update=uFields, delete=mayDelete)
                 data.append(dict(
-                    values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
+                    values=dict((f,v) for (f,v) in document.items() if f != CREATOR_FIELD or f in fieldFilter),
                     perm=perm,
                     fields=fieldFilter,
                 ))
@@ -535,20 +539,19 @@ class DbAccess(object):
             (mayUpdate, uFields, warnings) = Perm.may(table, 'update', document=document)
             perm = dict(update=uFields, delete=mayDelete)
             return self.stop(data=dict(
-                values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
+                values=dict((f,v) for (f,v) in document.items() if f != CREATOR_FIELD or f in fieldFilter),
                 perm=perm,
                 fields=fieldFilter),
             )
 
     def findDocs(self, records):
         Perm = self.Perm
-        creatorField = self.CREATOR
         errors = []
         data = []
         for (table, ident, fieldFilter) in records:
             rowFilter = dict(_id=ident)
             theFieldFilter = dict(x for x in fieldFilter.items())
-            theFieldFilter[creatorField] = True
+            theFieldFilter[CREATOR_FIELD] = True
             documents = list(_DBM[table].find(rowFilter, theFieldFilter))
             ldoc = len(documents)
             if ldoc == 0:
@@ -560,7 +563,7 @@ class DbAccess(object):
             perm = dict(update=uFields, delete=mayDelete)
             data.append(dict(
                 table=table,
-                values=dict((f,v) for (f,v) in document.items() if f != creatorField or f in fieldFilter),
+                values=dict((f,v) for (f,v) in document.items() if f != CREATOR_FIELD or f in fieldFilter),
                 perm=perm,
                 fields=fieldFilter,
             ))
@@ -638,10 +641,10 @@ class DbAccess(object):
         lastName = doc.get('lastName', '')
         if firstName or lastName:
             return '{}{}{}{}'.format(firstName, ' ' if firstName and lastName else '', lastName, org)
-        email = doc.get('email', '')
+        email = doc.get(EMAIL_FIELD, '')
         if email:
             return email + org
-        eppn = doc.get('eppn', '')
+        eppn = doc.get(EPPN_FIELD, '')
         authority = doc.get('authority', '')
         if authority: authority = ' - {}'.format(authority)
         if eppn:
