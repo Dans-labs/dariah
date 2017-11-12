@@ -115,7 +115,7 @@ const ItemForm = props => {
           initialValues={initialValues}
           linkField={linkField}
           fieldFragments={fieldFragments}
-        />
+      />
       <ItemDetails
         alterSection={`list-${table}-${DETAILS}`}
         detailFragments={detailFragments}
