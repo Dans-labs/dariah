@@ -37,7 +37,8 @@ const ItemRead = ({
                 table={relTable}
                 eId={eId}
                 myValues={myValues}
-              />
+              />,
+              field,
             )
           ))
         }

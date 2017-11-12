@@ -121,7 +121,7 @@ else
     echo "dev         : development - build client app (js and sass)"
     echo "hot         : development - start client app server with hot module reload"
     echo "data        : development - convert legacy FileMaker data and import it into MongoDB"
-    echo "root \$1    : development - assign role root to user with email address \$1"
+    echo "root        : development - assign role root to user indicated in config file"
     echo "prod        : production - build client app and docs"
     echo "shipdocs \$  : production - build docs, commit and push to github. \$=commit message"
     echo "shipcode \$1 : production - build client app and docs, commit and push to github. \$=commit message!"

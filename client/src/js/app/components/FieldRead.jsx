@@ -12,8 +12,7 @@ const FieldRead = ({ settings, tables, table, field, relField, myValues }) => {
   const { [field]: { valType, multiple } } = fieldSpecs
   const { inactive = null } = typeof valType === 'object' ? valType : emptyO
   const activeItems = inactive ? compileActive(tables, field) : null
-  const repr = wrappedRepr(tables, table, valType, multiple, relField, activeItems, inactive, myValues, settings)
-  return repr
+  return wrappedRepr(tables, table, field, valType, multiple, relField, activeItems, inactive, myValues, settings)
 }
 
 export default connect(getSettings)(FieldRead)

@@ -59,7 +59,7 @@ export const compileOptions = memoize((tables, table, allowed, field, settings) 
   const { [field]: { valType } } = fieldSpecs
   const allowedOptions = allowed == null ? valueList : valueList.filter(_id => allowed.includes(_id))
   const options = allowedOptions.map(val => ({
-    value: val, label: repr(tables, table, valType, false, null, val, settings, ', '),
+    value: val, label: repr(tables, table, field, valType, false, null, val, settings, ', '),
   }))
   const optionLookup = {}
   options.forEach(({ value: val, label: lab }) => {optionLookup[val] = lab})

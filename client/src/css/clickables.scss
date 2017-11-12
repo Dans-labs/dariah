@@ -1,8 +1,10 @@
 $action-back: #ffffff;
+$action-back-invert: #000000;
 $action-high: #ffffcc;
 $action-error-back: #ffdddd;
 $action-error-fore: #aa0000;
 $action-fore: #0000aa;
+$action-fore-invert: #ffffff;
 $action-border: #ffffdd;
 $action-text: #000000;
 $focus-text: #0000aa;
@@ -44,9 +46,18 @@ $focus-back: #ffffee;
     border-color: $action-border;
     white-space: nowrap;
 }
-.button-large { @include sizing(medium, 6px, 2) }
-.button-medium { @include sizing(medium, 4px, 1) }
-.button-small { @include sizing(small, 2px, 0 ) }
+.button-large.invert,.button-medium.invert,.button-small.invert  {
+    @include action();
+    font-weight: bold;
+    color: $action-fore-invert;
+    background-color: $action-back-invert;
+    border-color: $action-border;
+    white-space: nowrap;
+    padding: 0.5em;
+}
+.button-large, .button-large.invert { @include sizing(medium, 6px, 2) }
+.button-medium, .button-medium.invert { @include sizing(medium, 4px, 1) }
+.button-small, .button-small.invert { @include sizing(small, 2px, 0 ) }
 
 .link {
     @include action();

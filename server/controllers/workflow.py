@@ -90,3 +90,13 @@ def detailInsert(
             insertValues=insertValues,
         )
     return (good, message, data)
+
+timing = dict(
+    assessment=dict(
+        submitted={
+            True: 'dateSubmitted',
+            False: 'dateWithdrawn',
+        },
+    ),
+)
+

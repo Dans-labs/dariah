@@ -4,7 +4,7 @@ from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
 
 from controllers.utils import oid, now, dtm, json_string
-from controllers.workflow import detailInsert
+from controllers.workflow import detailInsert, timing
 
 PRISTINE = 'isPristine'
 
@@ -481,6 +481,15 @@ class DbAccess(object):
             modBy = self.eppn
             updateSaveValues = {}
             updateSaveValues.update(updateValues) # shallow copy of updateValues
+
+            # hook for recording custom timing fields
+
+            for (field, newVal) in updateValues.items():
+                if document[field] == newVal: continue
+                timingField = timing.get(table, {}).get(field, {}).get(newVal, None)
+                if timingField != None:
+                    updateSaveValues[timingField] = now()
+
             for sysField in self.SYSTEM_FIELDS:
                 if (sysField not in updateValues or updateValues[sysField] == None) and sysField in document:
                         updateSaveValues[sysField] = document[sysField] # add the system field

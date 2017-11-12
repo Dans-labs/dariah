@@ -50,9 +50,9 @@ export const makeSubmit = memoize((dirty, invalid, submitting, submit) =>
 
 export const makeSubmitTime = memoize(submit => () => setTimeout(submit, 100))
 
-export const itemReadField = (field, label, fvalue) => (
+export const itemReadField = (field, label, fvalue, key) => (
   <div
-    key={field}
+    {...(key == null ? emptyO : { key })}
     className={'grid-row form'}
   >
     <div className={'grid-head-cell label-col'}>{label}{':'}</div>
@@ -62,9 +62,9 @@ export const itemReadField = (field, label, fvalue) => (
   </div>
 )
 
-export const itemEditField = (field, label, fevalue, editable) => (
+export const itemEditField = (field, label, fevalue, editable, key) => (
   <div
-    key={field}
+    {...(key == null ? emptyO : { key })}
     className={'grid-row form'}
   >
     <div className={`grid-head-cell label-col ${editable ? 'edit' : ''}`}>{label}{':'}</div>
@@ -162,9 +162,9 @@ const putElem = ([rep, attributes, elem], i) => {
  * Depending on settings and active items it might be wrapped into elements with attributes.
  */
 export const wrappedRepr = memoize(
-  (tables, table, valType, multiple, relField, activeItems, inactive, values, settings) => {
+  (tables, table, field, valType, multiple, relField, activeItems, inactive, values, settings) => {
     const prepare = valuePrepare(settings, tables, table, valType, relField, activeItems, inactive)
-    const reps = repr(tables, table, valType, multiple, relField, values, settings)
+    const reps = repr(tables, table, field, valType, multiple, relField, values, settings)
     const xReps = multiple
     ? (values || emptyA).map((value, i) => prepare(value, reps[i])).filter(x => x != null)
     : prepare(values, reps)

@@ -366,7 +366,7 @@ const headRelated = relTable =>
     if (entity) {
       const { values: { [title]: rep } } = entity
       const { [title]: { valType } } = fieldSpecs
-      return repr1Head(tables, relTable, valType, rep, settings)
+      return repr1Head(tables, relTable, title, valType, rep, settings)
     }
     else {return 'UNKNOWN'}
   }, emptyO)
@@ -388,10 +388,10 @@ const headSwitch = {
 export const headEntity = (tables, table, valId, settings) =>
   (headSwitch[table] || headSwitch.default(table))(tables, valId, settings)
 
-const trimDate = (text, dateOnly) =>
+const trimDate = (text, table, field, settings) =>
   text == null
   ? emptyS
-  : dateOnly
+  : !(settings.longDates[table] && settings.longDates[table][field])
     ? text.replace(/T.*$/, emptyS)
     : text.replace(/\.[0-9]+/, emptyS)
 
@@ -416,11 +416,11 @@ const trimDate = (text, dateOnly) =>
  * The result is a string, except when the field is multiple and sep is null.
  *
  */
-const repr1Head = (tables, table, valType, value, settings) => {
+const repr1Head = (tables, table, field, valType, value, settings) => {
   if (value == null) {return emptyS}
   if (valType == null || typeof valType === 'string') {
     switch (valType) {
-      case 'datetime': return trimDate(value, settings && settings.shortDates)
+      case 'datetime': return trimDate(value, table, field, settings)
       case 'bool': return value ? 'Yes' : 'No'
       default: return value
     }
@@ -433,10 +433,10 @@ const repr1Head = (tables, table, valType, value, settings) => {
   }
 }
 
-const reprHead = (tables, table, valType, multiple, value, settings, sep) => {
+const reprHead = (tables, table, field, valType, multiple, value, settings, sep) => {
   const rep = multiple
-  ? (value || emptyA).map(val => repr1Head(tables, table, valType, val, settings))
-  : repr1Head(tables, table, valType, value, settings)
+  ? (value || emptyA).map(val => repr1Head(tables, table, field, valType, val, settings))
+  : repr1Head(tables, table, field, valType, value, settings)
   return multiple && sep != null
   ? rep.join(sep)
   : rep
@@ -451,9 +451,9 @@ const reprHead = (tables, table, valType, multiple, value, settings, sep) => {
  * If not, we take a single space as default.
  */
 export const repr = memoize(
-  (tables, table, valType, multiple, relField, value, settings, sep, relSep) => {
+  (tables, table, field, valType, multiple, relField, value, settings, sep, relSep) => {
     if (relField == null) {
-      return reprHead(tables, table, valType, multiple, value, settings, sep)
+      return reprHead(tables, table, field, valType, multiple, value, settings, sep)
     }
 
     const { relTable } = valType
@@ -471,8 +471,8 @@ export const repr = memoize(
     ? ' '
     : relSep
     const rep = multiple
-    ? relValues.map(relValue => reprHead(tables, relTable, relValType, relMultiple, relValue, settings, theRelSep))
-    : reprHead(tables, relTable, relValType, relMultiple, relValues, settings, relSep)
+    ? relValues.map(relValue => reprHead(tables, relTable, relField, relValType, relMultiple, relValue, settings, theRelSep))
+    : reprHead(tables, relTable, relField, relValType, relMultiple, relValues, settings, relSep)
 
     return multiple && sep != null
     ? rep.join(sep)

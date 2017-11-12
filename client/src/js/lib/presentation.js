@@ -1,4 +1,5 @@
 import React from 'react'
+import { Field } from 'redux-form'
 
 import { memoize } from 'memo'
 import { emptyS, emptyO } from 'utils'
@@ -7,33 +8,14 @@ import { repr } from 'tables'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
+import FieldSet from 'FieldSet'
+
 import {
-  mainTemplates, mainEditTemplates,
-  detailTemplates, detailEditTemplates,
+  mainTemplates, mainEditTemplates, mainActionTemplates,
+  detailTemplates, detailEditTemplates, detailActionTemplates,
   relatedTemplates,
   consolidatedTemplates,
 } from 'Templates'
-
-/* templates for related records
- * These are records in related tables pointed to by fields in the main records.
- * These are NOT the detail records of a main record.
- * See below for detail records.
- *
- * This object is keyed by the names of the main tables.
- * For each main table it contains an object of functions,
- * named by the table name of the related records.
- *
- * A template is a function that can be passed a few functions that deliver
- * field value information:
- *
- * - v  = field => readonly string value for that field
- * - l  = field => label for that field
- * - f  = field => <FieldRead> react component for that field
- * - fe = field => <FieldEdit> react component for that field
- * - e  = field => whether that field has an empty value
- *
- * The template of a detail record can also be passed a hyperlink to the main record: linkMe
- */
 
 const detailEdit = {
   criteriaEntry: {
@@ -48,8 +30,10 @@ const relatedEdit = {}
 const switchTemplateKind = {
   main: mainTemplates,
   mainEdit: mainEditTemplates,
+  mainAction: mainActionTemplates,
   detail: detailTemplates,
   detailEdit: detailEditTemplates,
+  detailAction: detailActionTemplates,
   related: relatedTemplates,
   consolidated: consolidatedTemplates,
 }
@@ -70,7 +54,7 @@ const makeL = memoize((tables, table) => field => {
 // NB: [''] == '' and this is what we intend here
 
 export const applyTemplate = (settings, tables, table, kind, otherTable, values, linkMe) => {
-  const { [kind]: templates } = switchTemplateKind
+  const { [kind]: templates = emptyO } = switchTemplateKind
   const { [table]: theseTemplates = emptyO } = templates
   const template = otherTable ? theseTemplates[otherTable] : theseTemplates
   if (template == null || template == emptyO) {return null}
@@ -94,7 +78,7 @@ export const applyTemplate = (settings, tables, table, kind, otherTable, values,
   const vLive = (field, relField, sep, relSep) => {
     const { [field]: value } = values
     const { [field]: { valType, multiple } = emptyO } = fieldSpecs
-    return repr(tables, table, valType, multiple, relField, value, settings, sep, relSep)
+    return repr(tables, table, field, valType, multiple, relField, value, settings, sep, relSep)
   }
   const v = isConsolidated ? vConsolidated : vLive
 
@@ -116,7 +100,7 @@ export const applyTemplate = (settings, tables, table, kind, otherTable, values,
 }
 
 export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId, fieldFragments, editButton, submitValues) => {
-  const { [kind]: templates } = switchTemplateKind
+  const { [kind]: templates = emptyO } = switchTemplateKind
   const { [table]: theseTemplates = emptyO } = templates
   const template = otherTable ? theseTemplates[otherTable] : theseTemplates
   if (template == null || template == emptyO) {return null}
@@ -137,7 +121,7 @@ export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId
   const v = (field, relField, sep, relSep) => {
     const { [field]: { fragment: { myValues } } } = fieldInfo
     const { [field]: { valType, multiple } = emptyO } = fieldSpecs
-    return repr(tables, table, valType, multiple, relField, myValues, settings, sep, relSep)
+    return repr(tables, table, field, valType, multiple, relField, myValues, settings, sep, relSep)
   }
 
   const l = makeL(tables, table)
@@ -169,7 +153,7 @@ export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId
   const fe = (field, editOptions) => {
     const {
       [field]: {
-        fragment: { table, myValues, ...fieldProps },
+        fragment: { myValues, ...fieldProps },
       },
     } = fieldInfo
     const editable = m(field)
@@ -192,7 +176,23 @@ export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId
       />
   }
 
-  return template({ settings, tables, l, v, e, f, fe, m, editButton })
+  const fs = (field, setValue, widget) => {
+    const editable = m(field)
+    return editable
+    ? <Field
+        name={field}
+        component={FieldSet}
+        setValue={setValue}
+        widget={widget}
+        tables={tables}
+        table={table}
+        eId={eId}
+        submitValues={submitValues}
+      />
+    : null
+  }
+
+  return template({ settings, tables, l, v, e, f, fe, fs, m, editButton })
 }
 
 export const editMode = (tables, table, kind, otherTable) => values => {

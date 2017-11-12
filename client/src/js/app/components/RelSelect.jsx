@@ -211,7 +211,7 @@ const RelSelect = ({
   submitValues,
 }) => {
   const submitTime = makeSubmitTime(submitValues)
-  const onChangeSave = event => {onChange(event); submitTime()}
+  const onChangeSave = val => {onChange(val); submitTime()}
   const { [selectTag]: { search, popUp } = emptyO } = select
   const { options, optionLookup } = compileOptions(tables, table, allowed, field, settings)
   const realPopUp = popUp

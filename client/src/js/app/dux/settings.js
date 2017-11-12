@@ -14,7 +14,12 @@ const flows = {
 const initSettings = () => ({
   provenanceFields: new Set(['creator', 'dateCreated', 'modified']),
   hideProvenance: true,
-  shortDates: true,
+  longDates: {
+    assessment: {
+      dateSubmitted: true,
+      dateWithdrawn: true,
+    },
+  },
 })
 
 export default makeReducer(flows, initSettings())

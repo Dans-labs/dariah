@@ -55,7 +55,7 @@ const reprX = (tables, table, settings) => {
   return (myValues, field) => {
     if (field === '_id') {return myValues}
     const { [field]: { valType, multiple } } = fieldSpecs
-    return repr(tables, table, valType, multiple, null, myValues, settings, '|')
+    return repr(tables, table, field, valType, multiple, null, myValues, settings, '|')
   }
 }
 

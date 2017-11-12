@@ -544,6 +544,8 @@ tables:
       - contrib
       - remarks
       - submitted
+      - dateSubmitted
+      - dateWithdrawn
       - reviewer1
       - reviewer2
       - creator
@@ -580,6 +582,14 @@ tables:
       submitted:
         label: Submitted for review
         valType: bool
+        multiple: false
+      dateSubmitted:
+        label: Submitted on
+        valType: datetime
+        multiple: false
+      dateWithdrawn:
+        label: Withdrawn on
+        valType: datetime
         multiple: false
       reviewer1:
         label: First reviewer

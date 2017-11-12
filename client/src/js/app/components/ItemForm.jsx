@@ -10,6 +10,7 @@ import { delItem, headEntity, DETAILS } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
 import { getSettings } from 'settings'
 
+import ItemAction from 'ItemAction'
 import ItemEdit from 'ItemEdit'
 import ItemRead from 'ItemRead'
 import ItemDetails from 'ItemDetails'
@@ -105,6 +106,16 @@ const ItemForm = props => {
             />
           </div>
       }
+      <ItemAction
+          settings={settings}
+          tables={tables}
+          table={table}
+          eId={eId}
+          form={`${table}-${eId}`}
+          initialValues={initialValues}
+          linkField={linkField}
+          fieldFragments={fieldFragments}
+        />
       <ItemDetails
         alterSection={`list-${table}-${DETAILS}`}
         detailFragments={detailFragments}
