@@ -1,6 +1,10 @@
 unauth: public
 auth:   auth
 
+generic:
+  fields:
+    - perm
+
 groups:
   public: user, not logged in
   auth:   authenticated user

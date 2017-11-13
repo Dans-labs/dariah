@@ -1,36 +1,24 @@
 from datetime import datetime
-
-DATECREATED_FIELD = None
-EPPN_FIELD = None
-EMAIL_FIELD = None
+from models.permission import PermissionModel as PM
+from models.names import *
 
 class UserApi(object):
-    def __init__(self, DB, DM, PM):
+    def __init__(self, DB):
         self.DB = DB
-        self.DM = DM
-        self.PM = PM
-        systemFields = DM.generic['systemFields']
-        userFields = DM.generic['userFields']
-        global DATECREATED_FIELD
-        DATECREATED_FIELD = systemFields[0]
-        global EPPN_FIELD
-        EPPN_FIELD = userFields[0]
-        global EMAIL_FIELD
-        EMAIL_FIELD = userFields[1]
 
     def getUser(self, eppn, email=None):
-        return self.DB.userFind(eppn, email, authority = 'local' if self.isDevel else 'DARIAH')
+        return self.DB.userFind(eppn, email, authority = N_local if self.isDevel else N_DARIAH)
 
     def getTestUsers(self):
         testUsers = {}
         records = self.DB.userLocal() 
         for r in records:
-            testUsers[r[EPPN_FIELD]] = r
+            testUsers[r[N_eppn]] = r
         return testUsers
 
     def storeUpdate(self, newUserInfo):
-        eppn = newUserInfo[EPPN_FIELD]
-        email = newUserInfo[EMAIL_FIELD]
+        eppn = newUserInfo[N_eppn]
+        email = newUserInfo[N_email]
         record = self.getUser(eppn, email=email)
         if not record:
             record = self._store(newUserInfo)
@@ -39,37 +27,36 @@ class UserApi(object):
         return record
 
     def deliver(self):
-        unauth = self.idFromGroup[self.PM.unauth]
-        groups = self.PM.groups
-        groupId = self.userInfo.get('group', unauth)
+        unauth = self.idFromGroup[PM[N_unauth]]
+        groups = PM[N_groups]
+        groupId = self.userInfo.get(N_group, unauth)
         group = self.groupFromId[groupId]
-        self.userInfo['groupRep'] = group
-        self.userInfo['groupDesc'] = groups.get(group, '??')
-        return dict(data=self.userInfo, msgs=[], good=True)
+        self.userInfo[N_groupRep] = group
+        self.userInfo[N_groupDesc] = groups.get(group, '??')
+        return {N_data: self.userInfo, N_msgs: [], N_good: True}
 
     def _store(self, newUserInfo):
         now = datetime.utcnow()
         record = {}
         record.update(newUserInfo)
         record.update({
-            DATECREATED_FIELD: now,
-            'dateLastLogin': now,
-            'statusLastLogin': 'Approved',
-            'mayLogin': True,
+            N_dateCreated: now,
+            N_dateLastLogin: now,
+            N_statusLastLogin: N_Approved,
+            N_mayLogin: True,
         })
         self.DB.userAdd(record)
         return record
 
     def _update(self, userInfo, newUserInfo):
-        eppn = newUserInfo[EPPN_FIELD]
+        eppn = newUserInfo[N_eppn]
         now = datetime.utcnow()
         userInfo.update(newUserInfo)
-        userInfo.update(dict(
-            dateModified=now,
-            dateLastLogin=now,
-            statusLastLogin='Approved' if userInfo.get('mayLogin', False) else 'Rejected',
-        ))
+        userInfo.update({
+            N_dateLastLogin: now,
+            N_statusLastLogin: N_Approved if userInfo.get(N_mayLogin, False) else N_Rejected,
+        })
         self.DB.userMod(userInfo)
-        if '_id' in userInfo: del userInfo['_id']
+        if N__id in userInfo: del userInfo[N__id]
         return userInfo
 

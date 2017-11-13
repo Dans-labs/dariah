@@ -5,14 +5,8 @@ from pymongo import MongoClient
 
 from controllers.utils import oid, now, dtm, json_string
 from controllers.workflow import detailInsert, timing
-
-PRISTINE = 'isPristine'
-
-DATECREATED_FIELD = None
-CREATOR_FIELD = None
-MODIFIED_FIELD = None
-EPPN_FIELD = None
-EMAIL_FIELD = None
+from models.data import DataModel as DM
+from models.names import *
 
 # We store the mongo db connection here as a module global variable
 # No other module is supposed to import the connection
@@ -24,22 +18,11 @@ EMAIL_FIELD = None
 
 _DBM = None 
 
+NA = 'N/A'
+
 class DbAccess(object):
-    def __init__(self, DM):
-        self.DM = DM
-        systemFields = DM.generic['systemFields']
-        userFields = DM.generic['userFields']
+    def __init__(self):
         global _DBM
-        global DATECREATED_FIELD
-        DATECREATED_FIELD = systemFields[0]
-        global CREATOR_FIELD
-        CREATOR_FIELD = systemFields[1]
-        global MODIFIED_FIELD
-        MODIFIED_FIELD = systemFields[2]
-        global EPPN_FIELD
-        EPPN_FIELD = userFields[0]
-        global EMAIL_FIELD
-        EMAIL_FIELD = userFields[1]
         install(JSONPlugin(json_dumps=lambda body: json.dumps(body, default=json_string)))
         clientm = MongoClient()
         _DBM = clientm.dariah
@@ -52,7 +35,7 @@ class DbAccess(object):
 
         def basicList(table, rowFilter, fieldFilter, sort=None):
             Perm = self.Perm
-            (mayRead, readFields, warnings) = Perm.may(table, 'read')
+            (mayRead, readFields, warnings) = Perm.may(table, N_read)
             theFieldFilter = readFields if fieldFilter == True else dict(x for x in fieldFilter.items() if x[0] in readFields)
             if sort == None:
                 result = list(_DBM[table].find(rowFilter, theFieldFilter))
@@ -63,41 +46,42 @@ class DbAccess(object):
         self.basicList = basicList
 
     def getGroups(self, dest):
-        dest.idFromGroup = dict()
-        dest.groupFromId = dict()
+        dest.idFromGroup = {}
+        dest.groupFromId = {}
         for doc in _DBM.permissionGroup.find():
-            gid = doc['_id']
-            group = doc['rep']
+            gid = doc[N__id]
+            group = doc[N_rep]
             dest.idFromGroup[group] = gid
             dest.groupFromId[gid] = group
 
     def userFind(self, eppn, email, authority):
-        eppnCrit =  {EPPN_FIELD: eppn, 'authority': authority}
-        emailCrit = {EMAIL_FIELD: email, EPPN_FIELD: {'$exists': False}, 'authority': {'$exists': False}}
+        eppnCrit =  {N_eppn: eppn, N_authority: authority}
+        emailCrit = {N_email: email, N_eppn: {'$exists': False}, N_authority: {'$exists': False}}
         criterion = eppnCrit if email == None else {'$or': [eppnCrit, emailCrit]}
         return _DBM.user.find_one(criterion)
-    def userLocal(self): return _DBM.user.find({'authority': 'local'})
+
+    def userLocal(self): return _DBM.user.find({N_authority: N_local})
     def userAdd(self, record): _DBM.user.insert_one(record)
     def userMod(self, record):
-        if PRISTINE in record: del record[PRISTINE]
-        criterion = {'_id': record['_id']} if '_id' in record else {EPPN_FIELD: record[EPPN_FIELD]}
-        if '_id' in record: del record['_id']
+        if N_isPristine in record: del record[N_isPristine]
+        criterion = {N__id: record[N__id]} if N__id in record else {N_eppn: record[N_eppn]}
+        if N__id in record: del record[N__id]
         _DBM.user.update_one(
             criterion,
-            {'$set': record, '$unset': {PRISTINE: ''}},
+            {'$set': record, '$unset': {N_isPristine: ''}},
         )
 
     def validate(self, table, itemValues, uFields):
-        tableInfo = self.DM.tables.get(table, {})
+        tableInfo = DM[N_tables].get(table, {})
         (fieldOrder, fieldSpecs, allFields) = self.theseFields(table, True)
-        valItemValues = dict()
+        valItemValues = {}
         newValues = []
         for (f, values) in itemValues.items():
-            if f == '_id':
+            if f == N__id:
                 valItemValues[f] = (True, {}, [], oid(values))
                 continue
-            valType = fieldSpecs[f]['valType']
-            multiple = fieldSpecs[f]['multiple']
+            valType = fieldSpecs[f][N_valType]
+            multiple = fieldSpecs[f][N_multiple]
 
             if multiple: values = [] if values == None else values
             else: values = [values] if values != None else []
@@ -110,7 +94,7 @@ class DbAccess(object):
 # later on, the system will append the correct value
                 continue
             elif type(valType) is str:
-                if valType == 'datetime':
+                if valType == N_datetime:
                     good = True
                     valValues = []
                     for v in values:
@@ -126,28 +110,28 @@ class DbAccess(object):
                 else:
                     valValues = [v for v in values]
             else: 
-                if 'relTable' not in valType: continue
+                if N_relTable not in valType: continue
                 valueLists = self.getValueLists(table, {}, msgs, noTables=True)
                 if len(msgs):
                     valid = False
                     diags.append('Could not get the valuelists')
                 else:
-                    allowNew = valType['allowNew']
-                    relTable = valType['relTable']
+                    allowNew = valType[N_allowNew]
+                    relTable = valType[N_relTable]
                     for v in values:
                         if v not in valueLists.get(f, {}):
                             if not allowNew:
                                 valid = False
                                 diags.append('Unknown value "{}"'.format(v))
                             else:
-                                repName = self.DM.tables.get(relTable, {}).get('title', self.DM.generic['title']) if allowNew == True else allowNew 
+                                repName = DM[N_tables].get(relTable, {}).get(N_title, DM[N_generic][N_title]) if allowNew == True else allowNew 
                                 existing = list(_DBM[relTable].find({repName: v}))
                                 if existing and len(existing) > 1:
-                                    _id = existing[0]['_id']
+                                    _id = existing[0][N__id]
                                 else:
                                     result = _DBM[relTable].insert_one({repName: v})
                                     _id = result.inserted_id
-                                    newValues.append(dict(_id=_id, repName=repName, rep=v, relTable=relTable, field=f))
+                                    newValues.append({N__id: _id, N_repName: repName, N_rep: v, N_relTable: relTable, N_field: f})
                                 valValues.append(_id)
                                 diags.append(None)
                         else:
@@ -169,68 +153,68 @@ class DbAccess(object):
         ):
         if table in data: return
         Perm = self.Perm
-        tableInfo = self.DM.tables.get(table, {})
-        title = tableInfo.get('title', self.DM.generic['title'])
-        item = tableInfo.get('item', self.DM.generic['item'])
-        sort =  tableInfo.get('sort', None)
-        (mayInsert, iFields, warnings) = Perm.may(table, 'insert')
-        perm = dict(insert=mayInsert, needMaster=tableInfo.get('needMaster', False))
-        orderKey = 'myIds' if my else 'allIds' 
-        none = {table: {orderKey: [], 'entities': {}, 'fields': {}, 'perm': {}}}
-        (good, result) = Perm.getPerm(controller, table, 'list')
+        tableInfo = DM[N_tables].get(table, {})
+        title = tableInfo.get(N_title, DM[N_generic][N_title])
+        item = tableInfo.get(N_item, DM[N_generic][N_item])
+        sort =  tableInfo.get(N_sort, None)
+        (mayInsert, iFields, warnings) = Perm.may(table, N_insert)
+        perm = {N_insert: mayInsert, N_needMaster: tableInfo.get(N_needMaster, False)}
+        orderKey = N_myIds if my else N_allIds 
+        none = {table: {orderKey: [], N_entities: {}, N_fields: {}, N_perm: {}}}
+        (good, result) = Perm.getPerm(controller, table, N_list)
         if not good:
             if result == None:
-                msgs.append(dict(kind='warning', text='{} list is empty'.format(table)))
+                msgs.append({N_kind: N_warning, N_text: '{} list is empty'.format(table)})
             else:
-                msgs.append(dict(kind='error', text=result or 'Cannot list {}'.format(table)))
+                msgs.append({N_kind: N_error, N_text: result or 'Cannot list {}'.format(table)})
             return
         (rowFilter, fieldFilter) = result
-        details = tableInfo.get('details', {})
-        detailOrder = tableInfo.get('detailOrder', [])
+        details = tableInfo.get(N_details, {})
+        detailOrder = tableInfo.get(N_detailOrder, [])
         (fieldOrder, fieldSpecs, fieldFilter) = self.theseFields(table, fieldFilter)
-        coreFields = dict(_id=True)
+        coreFields = {N__id: True}
         getFields = set(fieldFilter)
         for f in getFields:
             coreFields[f] = True
 
         theFieldFilter = coreFields if titleOnly else fieldFilter 
-        theFieldFilter[CREATOR_FIELD] = True
+        theFieldFilter[N_creator] = True
         if rFilter != None:
             rowFilter.update(rFilter)
         if sort == None:
             documents = list(_DBM[table].find(rowFilter, theFieldFilter))
         else:
             documents = list(_DBM[table].find(rowFilter, theFieldFilter).sort(sort))
-        allIds=[d['_id'] for d in documents]
-        entities=dict((str(d['_id']), dict(values=dict((f, d[f]) for f in d if (
+        allIds=[d[N__id] for d in documents]
+        entities=dict((str(d[N__id]), {N_values: dict((f, d[f]) for f in d if (
                 (not titleOnly or f in coreFields) and
-                (f != CREATOR_FIELD or f in fieldFilter)
-            )))) for d in documents)
+                (f != N_creator or f in fieldFilter)
+            ))}) for d in documents)
         if not titleOnly:
             for d in documents:
-                (mayDelete, dFields, warnings) = Perm.may(table, 'delete', document=d)
-                (mayUpdate, uFields, warnings) = Perm.may(table, 'update', document=d)
-                thisPerm = dict(update=uFields, delete=mayDelete)
-                entities[str(d['_id'])]['perm'] = thisPerm
+                (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=d)
+                (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=d)
+                thisPerm = {N_update: uFields, N_delete: mayDelete}
+                entities[str(d[N__id])][N_perm] = thisPerm
 
-        result = dict(
-            entities=entities,
-            fields=theFieldFilter,
-            title=title,
-            item=item,
-            perm=perm,
-            fieldOrder=fieldOrder,
-            fieldSpecs=fieldSpecs,
-            details=details,
-            detailOrder=detailOrder,
-            complete=not titleOnly,
-        )
-        if my: result['myIds'] = allIds
-        else: result['allIds'] = allIds
+        result = {
+            N_entities: entities,
+            N_fields: theFieldFilter,
+            N_title: title,
+            N_item: item,
+            N_perm: perm,
+            N_fieldOrder: fieldOrder,
+            N_fieldSpecs: fieldSpecs,
+            N_details: details,
+            N_detailOrder: detailOrder,
+            N_complete: not titleOnly,
+        }
+        if my: result[N_myIds] = allIds
+        else: result[N_allIds] = allIds
 
         data[table] = result
-        data[table]['filterList'] = tableInfo.get('filters', [])
-        if withValueLists: data[table]['valueLists'] = self.getValueLists(table, data, msgs)
+        data[table][N_filterList] = tableInfo.get(N_filters, [])
+        if withValueLists: data[table][N_valueLists] = self.getValueLists(table, data, msgs)
         if withDetails: self.getDetails(table, data, msgs)
         return
 
@@ -240,7 +224,7 @@ class DbAccess(object):
             withValueLists=True, withDetails=True,
             my=False,
         ):
-        data = dict()
+        data = {}
         msgs = []
         self._getList(
             controller, table,
@@ -250,85 +234,85 @@ class DbAccess(object):
             withValueLists=withValueLists, withDetails=withDetails,
             my=my,
         )
-        return self.stop(data=data, msgs=msgs)
+        return self.stop({N_data: data, N_msgs: msgs})
 
     def getValueLists(self, table, data, msgs, noTables=False):
         Perm = self.Perm
-        (good, result) = Perm.getPerm('list', table, 'list')
-        if not good: return dict()
-        tableInfo = self.DM.tables.get(table, {})
+        (good, result) = Perm.getPerm(N_list, table, N_list)
+        if not good: return {}
+        tableInfo = DM[N_tables].get(table, {})
         valueLists = {}
         (rowFilter, fieldFilter) = result
         getFields = set(fieldFilter)
-        fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder']) if x in fieldFilter]
-        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
+        fieldOrder = [x for x in tableInfo.get(N_fieldSpecs, DM[N_generic][N_fieldSpecs]) if x in fieldFilter]
+        fieldSpecs = dict(x for x in tableInfo.get(N_fieldSpecs, DM[N_generic][N_fieldSpecs]).items() if x[0] in fieldOrder)
 
         relFields = [
             f for (f, fSpec) in fieldSpecs.items()\
                 if f in getFields and\
-                type(fSpec['valType']) is dict and\
-                'relTable' in fSpec['valType']
+                type(fSpec[N_valType]) is dict and\
+                N_relTable in fSpec[N_valType]
         ]  
-        relTables = {fieldSpecs[f]['valType']['relTable'] for f in relFields}
+        relTables = {fieldSpecs[f][N_valType][N_relTable] for f in relFields}
         good = True
         if not noTables:
             for t in relTables:
-                self._getList('list', t, data, msgs, titleOnly=False)
+                self._getList(N_list, t, data, msgs, titleOnly=False)
 
         for f in relFields:
-            fSpec = fieldSpecs[f]['valType']
-            t = fSpec['relTable']
-            thisTableInfo = self.DM.tables.get(t, {})
-            select = fSpec.get('select', {})
-            valueOrder = thisTableInfo.get('sort', self.DM.generic['sort'])
-            rows = [str(row['_id']) for row in _DBM[t].find(select, dict(_id=True)).sort(valueOrder)]
+            fSpec = fieldSpecs[f][N_valType]
+            t = fSpec[N_relTable]
+            thisTableInfo = DM[N_tables].get(t, {})
+            select = fSpec.get(N_select, {})
+            valueOrder = thisTableInfo.get(N_sort, DM[N_generic][N_sort])
+            rows = [str(row[N__id]) for row in _DBM[t].find(select, {N__id: True}).sort(valueOrder)]
             valueLists[f] = rows
         return valueLists
 
     def getDetails(self, table, data, msgs):
         Perm = self.Perm
-        tableInfo = self.DM.tables.get(table, {})
-        details = tableInfo.get('details', {})
+        tableInfo = DM[N_tables].get(table, {})
+        details = tableInfo.get(N_details, {})
         msgs = []
         for (name, detailProps) in details.items():
-            t = detailProps['table']
-            self._getList('list', t, data, msgs, titleOnly=False)
+            t = detailProps[N_table]
+            self._getList(N_list, t, data, msgs, titleOnly=False)
 
     def getItem(self, controller, table, ident):
         Perm = self.Perm
-        (good, result) = Perm.getPerm(controller, table, 'read')
+        (good, result) = Perm.getPerm(controller, table, N_read)
         if not good:
-            return self.stop(text=result or 'Cannot read {}'.format(table))
-        tableInfo = self.DM.tables.get(table, {})
+            return self.stop({N_text: result or 'Cannot read {}'.format(table)})
+        tableInfo = DM[N_tables].get(table, {})
         (rowFilter, fieldFilter) = result
         (fieldOrder, fieldSpecs, fieldFilter) = self.theseFields(table, fieldFilter)
 
         if ident != None:
-            rowFilter.update({'_id': oid(ident)})
+            rowFilter.update({N__id: oid(ident)})
             return self.findDoc(table, rowFilter, fieldFilter, {}, '{} item does not exist'.format(table))
         else:
-            rowFilter.update({'_id': {'$in': [oid(i) for i in request.json]}})
+            rowFilter.update({N__id: {'$in': [oid(i) for i in request.json]}})
             return self.findDoc(table, rowFilter, fieldFilter, {}, '{} cannot find items'.format(table), multiple=True)
 
     def _insertItem(self, controller, table, newData, records):
-        masterId = newData.get('masterId', None)
-        linkField = newData.get('linkField', None)
-        tableInfo = self.DM.tables.get(table, {})
-        title = tableInfo.get('title', self.DM.generic['title'])
-        noTitle = tableInfo.get('noTitle', self.DM.generic['noTitle'])
-        item = tableInfo.get('item')[0]
-        sort = tableInfo.get('title', self.DM.generic['sort'])
+        masterId = newData.get(N_masterId, None)
+        linkField = newData.get(N_linkField, None)
+        tableInfo = DM[N_tables].get(table, {})
+        title = tableInfo.get(N_title, DM[N_generic][N_title])
+        noTitle = tableInfo.get(N_noTitle, DM[N_generic][N_noTitle])
+        item = tableInfo.get(N_item)[0]
+        sort = tableInfo.get(N_title, DM[N_generic][N_sort])
         none = None
-        (readGood, readResult) = self.Perm.getPerm(controller, table, 'read')
+        (readGood, readResult) = self.Perm.getPerm(controller, table, N_read)
         if not readGood:
-            return self.stop(data=none, text=readResult or 'Cannot read table {}'.format(table))
+            return self.stop({N_data: none, N_text: readResult or 'Cannot read table {}'.format(table)})
         (readRowFilter, readFieldFilter) = readResult
         modDate = now()
         modBy = self.eppn
         insertValues = {
-            DATECREATED_FIELD: now(),
-            CREATOR_FIELD: self.uid,
-            MODIFIED_FIELD: ['{} on {}'.format(modBy, modDate)],
+            N_dateCreated: now(),
+            N_creator: self.uid,
+            N_modified: ['{} on {}'.format(modBy, modDate)],
         }
         masterDocument = None
         masterTitle = None
@@ -337,12 +321,12 @@ class DbAccess(object):
             oMasterId = oid(masterId)
             insertValues[linkField] = oMasterId
             linkFieldSpecs = fieldSpecs[linkField]
-            masterTable = linkFieldSpecs['valType']['relTable']
-            masterDocument = list(_DBM[masterTable].find({'_id': oMasterId}))[0]
-            masterTableInfo = self.DM.tables.get(masterTable, {})
-            masterTitle = masterTableInfo.get('title', self.DM.generic['title'])
+            masterTable = linkFieldSpecs[N_valType][N_relTable]
+            masterDocument = list(_DBM[masterTable].find({N__id: oMasterId}))[0]
+            masterTableInfo = DM[N_tables].get(masterTable, {})
+            masterTitle = masterTableInfo.get(N_title, DM[N_generic][N_title])
         for (field, value) in newData.items():
-            if field != 'linkField' and field != 'masterId':
+            if field != N_linkField and field != N_masterId:
                 insertValues[field] = value
 
         if title not in insertValues:
@@ -356,60 +340,60 @@ class DbAccess(object):
             masterDocument=masterDocument,
         )
         if not extraGood:
-            return self.stop(data=none, text=extraText)
+            return self.stop({N_data: none, N_text: extraText})
 
         # use the extra fields, if any
-        if extraData and 'insertValues' in extraData:
-            insertValues.update(extraData['insertValues'])
+        if extraData and N_insertValues in extraData:
+            insertValues.update(extraData[N_insertValues])
 
         result = _DBM[table].insert_one(insertValues)
         ident = result.inserted_id
         records.append((table, ident, readFieldFilter))
 
         # use the extra details, if any
-        if extraData and 'detailData' in extraData:
-            for (detailTable, detailRecords) in extraData['detailData'].items():
+        if extraData and N_detailData in extraData:
+            for (detailTable, detailRecords) in extraData[N_detailData].items():
                 for detailRecord in detailRecords:
-                    detailRecord['masterId'] = ident
+                    detailRecord[N_masterId] = ident
                     result = self._insertItem(controller, detailTable, detailRecord, records)
-                    if not result['good']:
+                    if not result[N_good]:
                         return result
-        return self.stop(data=none)
+        return self.stop({N_data: none})
 
     def _deleteItem(self, controller, table, newData, records, errors):
         Perm = self.Perm
-        ident = newData.get('_id', None)
+        ident = newData.get(N__id, None)
         if ident == None:
             errors.append('Not specified which item to delete from table {}'.format(table))
             return
-        (good, result) = Perm.getPerm(controller, table, 'delete')
+        (good, result) = Perm.getPerm(controller, table, N_delete)
         (rowFilter, fieldFilter) = result
-        rowFilter.update({'_id': oid(ident)})
+        rowFilter.update({N__id: oid(ident)})
         documents = list(_DBM[table].find(rowFilter))
         if len(documents) != 1:
             errors.append('Unidentified item to delete')
             return
         document = documents[0]
-        (mayDelete, dFields, warnings) = Perm.may(table, 'delete', document=document)
+        (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
         if not mayDelete:
             errors.append('Not allowed to delete item {} from {}'.format(ident, table))
             return
         else:
             # first delete detail records
-            tableInfo = self.DM.tables.get(table, {})
-            details = tableInfo.get('details', {})
+            tableInfo = DM[N_tables].get(table, {})
+            details = tableInfo.get(N_details, {})
             for detail in details.values():
-                cascade = detail.get('cascade', False)
+                cascade = detail.get(N_cascade, False)
                 if not cascade: continue
-                detailTable = detail['table']
-                linkField = detail['linkField']
-                (good, result) = self.Perm.getPerm(controller, detailTable, 'delete')
+                detailTable = detail[N_table]
+                linkField = detail[N_linkField]
+                (good, result) = self.Perm.getPerm(controller, detailTable, N_delete)
                 if not good: continue
                 (detailRowFilter, fieldFilter) = result
                 detailRowFilter.update({linkField: oid(ident)})
-                detailDocuments = list(_DBM[detailTable].find(detailRowFilter, {'_id': True}))
+                detailDocuments = list(_DBM[detailTable].find(detailRowFilter, {N__id: True}))
                 for detailDoc in detailDocuments:
-                    self._deleteItem(controller, detailTable, {'_id': detailDoc['_id']}, records, errors)
+                    self._deleteItem(controller, detailTable, {N__id: detailDoc[N__id]}, records, errors)
             # finally delete the main record
             _DBM[table].delete_one(rowFilter)
             records.append((table, str(ident)))
@@ -417,56 +401,56 @@ class DbAccess(object):
     def modList(self, controller, table, action):
         Perm = self.Perm
         (good, result) = Perm.getPerm(controller, table, action)
-        none = '' if action == 'insert' else {}
+        none = '' if action == N_insert else {}
         if not good:
-            return self.stop(data=none, text=result or 'Cannot do {} in table {}'.format(table, action))
+            return self.stop({N_data: none, N_text: result or 'Cannot do {} in table {}'.format(table, action)})
 
         (rowFilter, fieldFilter) = result
 
-        if action == 'insert':
+        if action == N_insert:
             newData = request.json
             records = []
             result = self._insertItem(controller, table, newData, records)
-            if not result['good']: return result
+            if not result[N_good]: return result
             return self.findDocs(records)
 
-        elif action == 'delete':
+        elif action == N_delete:
             newData = request.json
             records = []
             errors = []
             self._deleteItem(controller, table, newData, records, errors)
             if errors:
-                return self.stop(
-                    data=records,
-                    text='\n'.join(errors),
-                )
-            return self.stop(data=records)
-        elif action == 'update':
+                return self.stop({
+                    N_data: records,
+                    N_text: '\n'.join(errors),
+                })
+            return self.stop({N_data: records})
+        elif action == N_update:
             newData = request.json
-            ident = newData.get('_id', None)
+            ident = newData.get(N__id, None)
             if ident == None:
-                return self.stop(data=none, text='Not specified which item to update')
-            rowFilter.update({'_id': oid(ident)})
+                return self.stop({N_data: none, N_text: 'Not specified which item to update'})
+            rowFilter.update({N__id: oid(ident)})
             documents = list(_DBM[table].find(rowFilter))
             if len(documents) != 1:
-                return self.stop(data=none, text='Unidentified item to update')
+                return self.stop({N_data: none, N_text: 'Unidentified item to update'})
             document = documents[0]
-            (mayUpdate, updFields, warnings) = Perm.may(table, 'update', document=document, newValues=newData.get('values', {}))
-            permMsgs = [dict(kind='warning', text=warning) for warning in warnings]
+            (mayUpdate, updFields, warnings) = Perm.may(table, N_update, document=document, newValues=newData.get(N_values, {}))
+            permMsgs = [{N_kind: N_warning, N_text: warning} for warning in warnings]
             (fieldOrder, fieldSpecs, fieldFilter) = self.theseFields(table, fieldFilter)
             uFields = set()
             for uField in updFields:
-                valType = fieldSpecs[uField]['valType']
-                if type(valType) is not dict or not valType.get('fixed', False):
+                valType = fieldSpecs[uField][N_valType]
+                if type(valType) is not dict or not valType.get(N_fixed, False):
                     uFields.add(uField)
             if not mayUpdate:
                 text = 'Not allowed to update this item' if len(warnings) == 0 else None
-                return self.stop(data=none, text=text, msgs=permMsgs)
-            newValues = dict(x for x in newData.get('values', {}).items())
+                return self.stop({N_data: none, N_text: text, N_msgs: permMsgs})
+            newValues = dict(x for x in newData.get(N_values, {}).items())
             (valItemValues, newValues) = self.validate(table, newValues, uFields)
             validationMsgs = []
             validationDiags = {}
-            updateValues = dict()
+            updateValues = {}
             hasInvalid = False
             for (f, (valid, diags, msgs, vals)) in sorted(valItemValues.items()):
                 if valid:
@@ -477,10 +461,8 @@ class DbAccess(object):
                     validationDiags[f] = diags
             if hasInvalid:
                 invalidFields = ', '.join(sorted(validationDiags))
-                validationDiags['_error'] = 'invalid values in fields {}'.format(invalidFields)
-                validationMsgs.append(dict(kind='warning', text='table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)))
-                #return self.stop(data=validationDiags, msgs=validationMsgs)
-
+                validationDiags[N__error] = 'invalid values in fields {}'.format(invalidFields)
+                validationMsgs.append({N_kind: N_warning, N_text: 'table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)})
 
             modDate = now()
             modBy = self.eppn
@@ -495,113 +477,125 @@ class DbAccess(object):
                 if timingField != None:
                     updateSaveValues[timingField] = now()
 
-            for sysField in self.DM.generic['systemFields']:
+            for sysField in DM[N_generic][N_systemFields]:
                 if (sysField not in updateValues or updateValues[sysField] == None) and sysField in document:
                         updateSaveValues[sysField] = document[sysField] # add the system field
 
-            updateSaveValues.setdefault(MODIFIED_FIELD, []).append('{} on {}'.format(modBy, modDate))
-            if PRISTINE in updateSaveValues: del updateSaveValues[PRISTINE]
+            updateSaveValues.setdefault(N_modified, []).append('{} on {}'.format(modBy, modDate))
+            if N_isPristine in updateSaveValues: del updateSaveValues[N_isPristine]
             _DBM[table].update_one(
                 rowFilter,
-                {'$set': updateSaveValues, '$unset': {PRISTINE: ''}},
+                {'$set': updateSaveValues, '$unset': {N_isPristine: ''}},
             )
             # here system values are updated in the database
-            return self.stop(data=dict(values=updateSaveValues, newValues=newValues, diags=validationDiags), msgs=permMsgs+validationMsgs) # ??? but MODIFIED_FIELD is not always returned
+            return self.stop({
+                N_data: {
+                    N_values: updateSaveValues,
+                    N_newValues: newValues,
+                    N_diags: validationDiags,
+                },
+                N_msgs: permMsgs+validationMsgs,
+            }) # ??? but N_modified is not always returned
 
-    def stop(self, data=None, text=None, msgs=None):
-        good = text == None and (msgs == None or all(msg['kind'] != 'error' for msg in msgs))
-        msgs = [dict(kind='error', text=text)] if msgs == None and text != None else msgs
-        return dict(data=data, msgs=msgs, good=good)
+    def stop(self, info):
+        data = info.get(N_data, None)
+        text = info.get(N_text, None)
+        msgs = info.get(N_msgs, None)
+        good = text == None and (msgs == None or all(msg[N_kind] != N_error for msg in msgs))
+        msgs = [{N_kind: N_error, N_text: text}] if msgs == None and text != None else msgs
+        return {N_data: data, N_msgs: msgs, N_good: good}
 
     def findDoc(self, table, rowFilter, fieldFilter, failData, failText, multiple=False):
         Perm = self.Perm
         theFieldFilter = dict(x for x in fieldFilter.items())
-        theFieldFilter[CREATOR_FIELD] = True
+        theFieldFilter[N_creator] = True
         documents = list(_DBM[table].find(rowFilter, theFieldFilter))
         ldoc = len(documents)
         if ldoc == 0:
-            return self.stop(data=failData, text=failText)
+            return self.stop({N_data: failData, N_text: failText})
         if multiple:
             data = []
             for document in documents:
-                (mayDelete, dFields, warnings) = Perm.may(table, 'delete', document=document)
-                (mayUpdate, uFields, warnings) = Perm.may(table, 'update', document=document)
-                perm = dict(update=uFields, delete=mayDelete)
-                data.append(dict(
-                    values=dict((f,v) for (f,v) in document.items() if f != CREATOR_FIELD or f in fieldFilter),
-                    perm=perm,
-                    fields=fieldFilter,
-                ))
-            return self.stop(data=data)
+                (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
+                (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
+                perm = {N_update: uFields, N_delete: mayDelete}
+                data.append({
+                    N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
+                    N_perm: perm,
+                    N_fields: fieldFilter,
+                })
+            return self.stop({N_data: data})
         else:
             document = documents[0]
-            (mayDelete, dFields, warnings) = Perm.may(table, 'delete', document=document)
-            (mayUpdate, uFields, warnings) = Perm.may(table, 'update', document=document)
-            perm = dict(update=uFields, delete=mayDelete)
-            return self.stop(data=dict(
-                values=dict((f,v) for (f,v) in document.items() if f != CREATOR_FIELD or f in fieldFilter),
-                perm=perm,
-                fields=fieldFilter),
-            )
+            (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
+            (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
+            perm = {N_update: uFields, N_delete: mayDelete}
+            return self.stop({
+                N_data: {
+                    N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
+                    N_perm: perm,
+                    N_fields: fieldFilter,
+                },
+            })
 
     def findDocs(self, records):
         Perm = self.Perm
         errors = []
         data = []
         for (table, ident, fieldFilter) in records:
-            rowFilter = dict(_id=ident)
+            rowFilter = {N__id: ident}
             theFieldFilter = dict(x for x in fieldFilter.items())
-            theFieldFilter[CREATOR_FIELD] = True
+            theFieldFilter[N_creator] = True
             documents = list(_DBM[table].find(rowFilter, theFieldFilter))
             ldoc = len(documents)
             if ldoc == 0:
                 errors.append('Could not find back record {} in table {}'.format(ident, table))
                 continue
             document = documents[0]
-            (mayDelete, dFields, warnings) = Perm.may(table, 'delete', document=document)
-            (mayUpdate, uFields, warnings) = Perm.may(table, 'update', document=document)
-            perm = dict(update=uFields, delete=mayDelete)
-            data.append(dict(
-                table=table,
-                values=dict((f,v) for (f,v) in document.items() if f != CREATOR_FIELD or f in fieldFilter),
-                perm=perm,
-                fields=fieldFilter,
-            ))
+            (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
+            (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
+            perm = {N_update: uFields, N_delete: mayDelete}
+            data.append({
+                N_table: table,
+                N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
+                N_perm: perm,
+                N_fields: fieldFilter,
+            })
         if errors:
-            return self.stop(
-                data=data,
-                text='\n'.join(errors),
-            )
-        return self.stop(data=data)
+            return self.stop({
+                N_data: data,
+                N_text: '\n'.join(errors),
+            })
+        return self.stop({N_data: data})
 
     def consolidateDocs(self, table, documents, level=0, withDetails=False):
-        tableInfo = self.DM.tables.get(table, {})
-        fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder'])]
-        fieldSpecs = dict(x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder)
-        detailOrder = tableInfo.get('detailOrder', None)
-        details = tableInfo.get('details', None)
-        title = tableInfo.get('title', self.DM.generic['title'])
-        item = tableInfo.get('item', self.DM.generic['item'])
+        tableInfo = DM[N_tables].get(table, {})
+        fieldOrder = [x for x in tableInfo.get(N_fieldOrder, DM[N_generic][N_fieldOrder])]
+        fieldSpecs = dict(x for x in tableInfo.get(N_fieldSpecs, DM[N_generic][N_fieldSpecs]).items() if x[0] in fieldOrder)
+        detailOrder = tableInfo.get(N_detailOrder, None)
+        details = tableInfo.get(N_details, None)
+        title = tableInfo.get(N_title, DM[N_generic][N_title])
+        item = tableInfo.get(N_item, DM[N_generic][N_item])
         consolidatedDocs = []
         docs = documents if type(documents) is list else [documents]
         nDocs = len(docs)
         for document in docs:
-            consDoc = dict()
+            consDoc = {}
             for field in fieldOrder:
                 if field not in document:
                     consDoc[field] = None
                     continue
                 fieldSpec = fieldSpecs[field]
-                valType = fieldSpec['valType']
-                multiple = fieldSpec['multiple']
+                valType = fieldSpec[N_valType]
+                multiple = fieldSpec[N_multiple]
                 docVal = document[field]
                 if type(valType) is str:
                     consDoc[field] = [simpleVal(valType, val) for val in docVal] if multiple else simpleVal(valType, docVal)
                     continue
                 else:
-                    valueTable = valType['relTable']
+                    valueTable = valType[N_relTable]
                     relatedDocs = list(_DBM[valueTable].find(
-                        {'_id': {'$in': [_id for _id in (docVal if multiple else [docVal])]}}
+                        {N__id: {'$in': [_id for _id in (docVal if multiple else [docVal])]}}
                     ))
                     if len(relatedDocs) == 0:
                         valRep = None
@@ -612,10 +606,10 @@ class DbAccess(object):
             if withDetails and detailOrder and details:
                 for detail in detailOrder:
                     detailSpec = details[detail]
-                    detailTable = detailSpec['table']
-                    linkField = detailSpec['linkField']
-                    detailDocs = list(_DBM[detailTable].find({linkField: document['_id']}))
-                    consDoc.setdefault('details', []).append((detail, self.consolidateDocs(
+                    detailTable = detailSpec[N_table]
+                    linkField = detailSpec[N_linkField]
+                    detailDocs = list(_DBM[detailTable].find({linkField: document[N__id]}))
+                    consDoc.setdefault(N_details, []).append((detail, self.consolidateDocs(
                         detailTable, detailDocs,
                         level=level+1,
                         withDetails=False,
@@ -627,25 +621,25 @@ class DbAccess(object):
         methodName = 'head_{}'.format(table)
         if hasattr(self, methodName):
             return getattr(self, methodName)(doc)
-        tableInfo = self.DM.tables.get(table, {})
-        title = tableInfo.get('title', self.DM.generic['title'])
+        tableInfo = DM[N_tables].get(table, {})
+        title = tableInfo.get(N_title, DM[N_generic][N_title])
         return str(doc.get(title, 'no {}'.format(title))).rstrip('\n')
 
     def head_user(self, doc):
-        name = doc.get('name', '')
-        org = doc.get('org', '')
+        name = doc.get(N_name, '')
+        org = doc.get(N_org, '')
         if org: org = ' ({})'.format(org)
         if name:
             return name + org
-        firstName = doc.get('firstName', '')
-        lastName = doc.get('lastName', '')
+        firstName = doc.get(N_firstName, '')
+        lastName = doc.get(N_lastName, '')
         if firstName or lastName:
             return '{}{}{}{}'.format(firstName, ' ' if firstName and lastName else '', lastName, org)
-        email = doc.get(EMAIL_FIELD, '')
+        email = doc.get(N_email, '')
         if email:
             return email + org
-        eppn = doc.get(EPPN_FIELD, '')
-        authority = doc.get('authority', '')
+        eppn = doc.get(N_eppn, '')
+        authority = doc.get(N_authority, '')
         if authority: authority = ' - {}'.format(authority)
         if eppn:
             return '{}{}{}'.format(eppn, authority, org)
@@ -653,14 +647,14 @@ class DbAccess(object):
         
     def head_country(self, doc):
         return '{} = {}, {}a DARIAH member'.format(
-            doc.get('iso', ''),
-            doc.get('name', ''),
-            '' if doc.get('isMember', False) else 'not ',
+            doc.get(N_iso, ''),
+            doc.get(N_name, ''),
+            '' if doc.get(N_isMember, False) else 'not ',
         )
         
     def head_typeContribution(self, doc):
-        mainType = doc.get('mainType', '')
-        subType = doc.get('subType', '')
+        mainType = doc.get(N_mainType, '')
+        subType = doc.get(N_subType, '')
         sep = ' / ' if mainType and subType else ''
         return '{}{}{}'.format(
             mainType,
@@ -669,16 +663,16 @@ class DbAccess(object):
         )
         
     def head_score(self, doc):
-        score = doc.get('score', 'N/A')
-        level = doc.get('level', 'N/A')
-        description = doc.get('description', '')
+        score = doc.get(N_score, NA)
+        level = doc.get(N_level, NA)
+        description = doc.get(N_description, '')
         return '{} - {}'.format(score, level) if score or level else description
 
     def theseFields(self, table, fieldFilter):
-        tableInfo = self.DM.tables.get(table, {})
-        fieldOrder = [x for x in tableInfo.get('fieldOrder', self.DM.generic['fieldOrder']) if fieldFilter == True or x in fieldFilter]
+        tableInfo = DM[N_tables].get(table, {})
+        fieldOrder = [x for x in tableInfo.get(N_fieldOrder, DM[N_generic][N_fieldOrder]) if fieldFilter == True or x in fieldFilter]
         fieldSpecs = dict(
-            x for x in tableInfo.get('fieldSpecs', self.DM.generic['fieldSpecs']).items() if x[0] in fieldOrder
+            x for x in tableInfo.get(N_fieldSpecs, DM[N_generic][N_fieldSpecs]).items() if x[0] in fieldOrder
         )
         fieldFilterPost = dict(
             (f, True) for f in fieldOrder
@@ -687,11 +681,11 @@ class DbAccess(object):
 
 def simpleVal(valType, val):
     result = \
-        '[{}](mailto:{})'.format(val, val) if valType == 'email' \
-    else '[{}]({})'.format(val, val) if valType == 'url' \
-    else str(val).split('.', 1)[0] if valType == 'datetime' \
-    else ('Yes' if val else 'No') if valType == 'bool' \
-    else str(val) if valType == 'number' \
+        '[{}](mailto:{})'.format(val, val) if valType == N_email \
+    else '[{}]({})'.format(val, val) if valType == N_url \
+    else str(val).split('.', 1)[0] if valType == N_datetime \
+    else (N_Yes if val else N_No) if valType == N_bool \
+    else str(val) if valType == N_number \
     else val
     return result.rstrip('\n')
 

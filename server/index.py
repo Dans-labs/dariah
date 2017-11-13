@@ -10,10 +10,8 @@ from models.data import DataModel
 from models.permission import PermissionModel
 
 File = FileApi()
-DM = DataModel()
-PM = PermissionModel()
-DB = DbAccess(DM)
-Auth = AuthApi(DB, DM, PM, '/opt/web-apps/dariah_jwt.secret')
+DB = DbAccess()
+Auth = AuthApi(DB, '/opt/web-apps/dariah_jwt.secret')
 Controller = Controller(DB)
 app = Auth.app
 
@@ -42,7 +40,7 @@ def serveApiDbWho():
 @get('/api/db/<verb:re:[a-z0-9_]+>')
 def serveApiDb(verb):
     Auth.authenticate()
-    Perm = PermApi(Auth, DM, PM)
+    Perm = PermApi(Auth)
     return Controller.data(verb, Perm)
 
 @route('/slogout')

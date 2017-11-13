@@ -35,19 +35,6 @@ elif [[ "$1" == "test" ]]; then
     else
         npm test src/js/test/$2.js
     fi
-elif [[ "$1" == "devenv" ]]; then
-    # documentation server
-    pushd docs
-    bundle exec jekyll serve &
-    popd
-    # hot module reload client app builder and server
-    pushd client
-    export NODE_ENV="development"; webpack-dev-server &
-    popd
-    # development webserver
-	pushd server
-    python3 confyg.py models
-    export REGIME=devel; python3 -m bottle --debug --reload --bind localhost:8001 index:app
 elif [[ "$1" == "docs" ]]; then
     codestats
     cd docs
@@ -58,7 +45,7 @@ elif [[ "$1" == "dev" ]]; then
     webpack
 elif [[ "$1" == "serve" ]]; then
 	cd server
-    python3 confyg.py models
+    python3 confyg.py models controllers
     export REGIME=devel; python3 -m bottle --debug --reload --bind localhost:8001 index:app
 elif [[ "$1" == "hot" ]]; then
     cd client
@@ -115,7 +102,6 @@ else
     echo "stats       : reporting - collect codebase statistics"
     echo "test        : testing - run all tests"
     echo "test \$1     : testing - run specific test \$1"
-    echo "devenv      : development - start webserver, docserver, client app server"
     echo "serve       : development - start webserver"
     echo "docs        : development - build and serve github pages documentation"
     echo "dev         : development - build client app (js and sass)"

@@ -1,15 +1,42 @@
 generic:
-  # DO NOT CHANGE THE ORDER OF THE SYSTEM FIELDS
   systemFields:
     - dateCreated
     - creator
     - modified
-  # DO NOT CHANGE THE ORDER OF THE USER FIELDS
-  userFields:
-    - eppn
-    - email
+  specialFields:
+    - _id
+    - isPristine
+    - groupRep
+    - groupDesc
+    - message
+  specialValues:
+    - Approved
+    - Rejected
+    - local
+    - DARIAH
+    - REGIME
+    - devel
+    - 'No'
+    - 'Yes'
+    - 'true'
   title: rep
   noTitle: no title
+  validationFields:
+    - _error
+    -  diags
+  containerNames:
+    - allIds
+    - detailData
+    - entities
+    - field
+    - filterList
+    - insertValues
+    - masterId
+    - myIds
+    - newValues
+    - repName
+    - values
+    - valueLists
   item:
     - item
     - items
@@ -22,6 +49,45 @@ generic:
       label: representation
       valType: text
       multiple: false
+  responseFields:
+    - data
+    - good
+    - msgs
+    - text
+  messageFields:
+    - kind
+    - text
+  messageKinds:
+    - good
+    - info
+    - warning
+    - error
+  shibboleth:
+    - affiliation
+    - cn
+    - givenName
+    - isMemberOf
+    - mail
+    - o
+    - sn
+  request:
+    - id
+    - complete
+    - action
+  dataTypes:
+    - bool
+    - number
+    - text
+    - email
+    - url
+    - datetime
+
+custom:
+  - type
+  - typeInfo
+  - criteriaIds
+  - criteriaEntities
+  - typeCriteria
 
 tables:
   permissionGroup:

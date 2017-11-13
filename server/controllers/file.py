@@ -2,6 +2,8 @@ import os
 
 from bottle import static_file
 
+from models.names import *
+
 STATIC_ROOT = '../static/'
 
 origins = {
@@ -31,6 +33,6 @@ class FileApi(object):
         if os.path.exists(filepath):
             with open(filepath) as fh:
                 text = fh.read()
-            return dict(data=text, msgs=[], good=True)
+            return {N_data: text, N_msgs: [], N_good: True}
         else:
-            return dict(data='not found', msgs=[dict(kind='error', text='file {} not found'.format(filepath))], good=False)
+            return {N_data: 'not found', N_msgs: [{N_kind: N_error, N_text: 'file {} not found'.format(filepath)}], N_good: False}

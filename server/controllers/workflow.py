@@ -1,44 +1,45 @@
 from controllers.utils import now
+from models.names import *
 
 def _getActiveItems(basicList):
     present = now()
     types = basicList(
-        'typeContribution',
-        dict(),
-        dict(_id=True, mainType=True, subType=True),
+        N_typeContribution,
+        {},
+        {N__id: True, N_mainType: True, N_subType: True},
     )
-    typeInfo = dict((doc['_id'], doc) for doc in types)
+    typeInfo = dict((doc[N__id], doc) for doc in types)
 
     packages = basicList(
-        'package',
-        dict(startDate={'$lte': present}, endDate={'$gte': present}),
-        dict(_id=True, typeContribution=True),
+        N_package,
+        {N_startDate: {'$lte': present}, N_endDate: {'$gte': present}},
+        {N__id: True, N_typeContribution: True},
     )
-    packageIds = [doc['_id'] for doc in packages]  
-    activeFilter = dict(package={'$in': packageIds})
+    packageIds = [doc[N__id] for doc in packages]  
+    activeFilter = {N_package: {'$in': packageIds}}
     criteria = basicList(
-        'criteria',
+        N_criteria,
         activeFilter,
         True,
-        sort=(('criterion', 1),),
+        sort=((N_criterion, 1),),
     )
-    typeCriteria = dict()
-    criteriaEntities = dict()
-    criteriaIds = [doc['_id'] for doc in criteria]  
+    typeCriteria = {}
+    criteriaEntities = {}
+    criteriaIds = [doc[N__id] for doc in criteria]  
     for doc in criteria:
-        criteriaEntities[str(doc['_id'])] = doc
-        tps =  doc.get('typeContribution', [])
+        criteriaEntities[str(doc[N__id])] = doc
+        tps =  doc.get(N_typeContribution, [])
         for tp in tps:
-            typeCriteria.setdefault(tp, set()).add(doc['_id'])
-    typeIds = {tp for doc in packages for tp in doc.get('typeContribution', [])}
-    result = dict(
-        package=set(packageIds),
-        type=typeIds,
-        typeInfo=typeInfo,
-        criteriaIds=criteriaIds,
-        criteriaEntities=criteriaEntities,
-        typeCriteria=typeCriteria,
-    )
+            typeCriteria.setdefault(tp, set()).add(doc[N__id])
+    typeIds = {tp for doc in packages for tp in doc.get(N_typeContribution, [])}
+    result = {
+        N_package: set(packageIds),
+        N_type: typeIds,
+        N_typeInfo: typeInfo,
+        N_criteriaIds: criteriaIds,
+        N_criteriaEntities: criteriaEntities,
+        N_typeCriteria: typeCriteria,
+    }
     return result
 
 def detailInsert(
@@ -50,24 +51,24 @@ def detailInsert(
     good = True
     message = None
     data = None
-    if table == 'assessment':
+    if table == N_assessment:
         detailData = []
-        insertValues = dict()
+        insertValues = {}
         if masterDocument != None:
             activeItems = _getActiveItems(basicList)
-            criteriaIds = activeItems['criteriaIds']
-            criteriaEntities = activeItems['criteriaEntities']
-            typeCriteria = activeItems['typeCriteria']
-            typeIds = activeItems['type']
-            typeInfo = activeItems['typeInfo']
-            masterType = masterDocument.get('typeContribution', None)
-            insertValues['assessmentType'] = masterType
+            criteriaIds = activeItems[N_criteriaIds]
+            criteriaEntities = activeItems[N_criteriaEntities]
+            typeCriteria = activeItems[N_typeCriteria]
+            typeIds = activeItems[N_type]
+            typeInfo = activeItems[N_typeInfo]
+            masterType = masterDocument.get(N_typeContribution, None)
+            insertValues[N_assessmentType] = masterType
             if masterType == None:
                 good = False
                 message = 'Contribution has no type'
             else:
                 typeDoc = typeInfo[masterType]
-                typeHead = head('typeContribution', typeDoc)
+                typeHead = head(N_typeContribution, typeDoc)
                 if masterType not in typeIds:
                     good = False
                     message = 'Contribution type {} is a legacy type'.format(typeHead)
@@ -80,23 +81,23 @@ def detailInsert(
                     for (n, critId) in enumerate(theseCriteriaIds):
                         critDoc = criteriaEntities[str(critId)]
                         detailData.append({
-                            'linkField': 'assessment',
-                            'seq': n + 1,
-                            'criteria': critId,
-                            'evidence': [''],
+                            N_linkField: N_assessment,
+                            N_seq: n + 1,
+                            N_criteria: critId,
+                            N_evidence: [''],
                         })
-        data = dict(
-            detailData=dict(criteriaEntry=detailData),
-            insertValues=insertValues,
-        )
+        data = {
+            N_detailData: {N_criteriaEntry: detailData},
+            N_insertValues: insertValues,
+        }
     return (good, message, data)
 
-timing = dict(
-    assessment=dict(
-        submitted={
-            True: 'dateSubmitted',
-            False: 'dateWithdrawn',
+timing = {
+    N_assessment: {
+        N_submitted: {
+            True: N_dateSubmitted,
+            False: N_dateWithdrawn,
         },
-    ),
-)
+    },
+}
 

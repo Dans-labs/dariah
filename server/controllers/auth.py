@@ -3,15 +3,15 @@ import bottle
 from beaker.middleware import SessionMiddleware
 from controllers.user import UserApi
 from controllers.utils import utf8FromLatin1, serverprint
-
-EPPN_FIELD = None
+from models.permission import PermissionModel as PM
+from models.names import *
 
 class AuthApi(UserApi):
-    def __init__(self, DB, DM, PM, secret_file):
-        super().__init__(DB, DM, PM)
+    def __init__(self, DB, secret_file):
+        super().__init__(DB)
 
         # determine production or devel
-        self.isDevel = os.environ.get('REGIME', None) == 'devel'
+        self.isDevel = os.environ.get(N_REGIME, None) == N_devel
 
         if self.isDevel: self.testUsers = self.getTestUsers()
 
@@ -37,24 +37,21 @@ class AuthApi(UserApi):
         self._session_key = 'dariah.session'
         self.app = SessionMiddleware(self.app, session_opts, environ_key=self._session_key)
         DB.getGroups(self)
-        userFields = DM.generic['userFields']
-        global EPPN_FIELD
-        EPPN_FIELD = userFields[0]
 
     def required(self, f): # decorator
-        unauth = self.PM.unauth
+        unauth = PM[N_unauth]
         unauthId = self.idFromGroup[unauth]
         def g(*args, **kwargs):
             self.authenticate()
-            if self.userInfo.get('group', unauthId) == unauthId:
-                return dict(data=[], msgs=[dict(kind='warning', text='You need to be logged in to get this data')], good=True)
+            if self.userInfo.get(N_group, unauthId) == unauthId:
+                return {N_data: [], N_msgs: [{N_kind: N_warning, N_text: 'You need to be logged in to get this data'}], N_good: True}
             return f(*args, **kwargs)
         return g
 
     def authenticate(self, login=False):
-        unauth = self.PM.unauth
+        unauth = PM[N_unauth]
         unauthId = self.idFromGroup[unauth]
-        auth = self.PM.auth
+        auth = PM[N_auth]
         authId = self.idFromGroup[auth]
         env = bottle.request.environ
         self.userInfo = None
@@ -68,7 +65,7 @@ class AuthApi(UserApi):
             if self.userInfo != None:
                 self.userInfo = self.storeUpdate(self.userInfo)
                 if self.userInfo != None:
-                    if self.userInfo.get('mayLogin', False):
+                    if self.userInfo.get(N_mayLogin, False):
                         self._create_session()
                     else:
                         self.userInfo = None
@@ -76,27 +73,27 @@ class AuthApi(UserApi):
             self._delete_session
 
         if self.userInfo == None:
-            self.userInfo = dict(group=unauthId, groupRep=unauth)
+            self.userInfo = {N_group: unauthId, N_groupRep: unauth}
         else:
-            eppn = self.userInfo.get(EPPN_FIELD, None)
+            eppn = self.userInfo.get(N_eppn, None)
             if eppn == None:
-                self.userInfo['group'] = unauthId
-                self.userInfo['groupRep'] = unauth
+                self.userInfo[N_group] = unauthId
+                self.userInfo[N_groupRep] = unauth
             else:
-                if 'group' not in self.userInfo:
-                    self.userInfo['group'] = authId
-                self.userInfo['groupRep'] = self.groupFromId[self.userInfo['group']]
+                if N_group not in self.userInfo:
+                    self.userInfo[N_group] = authId
+                self.userInfo[N_groupRep] = self.groupFromId[self.userInfo[N_group]]
 
     def deauthenticate(self):
-        unauth = self.PM.unauth
+        unauth = PM[N_unauth]
         unauthId = self.idFromGroup[unauth]
-        self.userInfo = dict(group=unauthId, groupRep=unauth);
+        self.userInfo = {N_group: unauthId, N_groupRep: unauth};
         self._delete_session()
 
     def _create_session(self):
         env = bottle.request.environ
         session = bottle.request.environ.get(self._session_key)
-        session[EPPN_FIELD] = self.userInfo[EPPN_FIELD]
+        session[N_eppn] = self.userInfo[N_eppn]
         session.save()
 
     def _delete_session(self):
@@ -107,7 +104,7 @@ class AuthApi(UserApi):
     def _get_session(self):
         env = bottle.request.environ
         session = bottle.request.environ.get(self._session_key)
-        return session.get(EPPN_FIELD, None)
+        return session.get(N_eppn, None)
 
     def _checkLogin(self, force=False):
         env = bottle.request.environ
@@ -134,27 +131,27 @@ class AuthApi(UserApi):
                     self.userInfo = None
                 else:
                     (name, domain) = parts
-                    self.userInfo = dict(
-                        eppn='{}@local.host'.format(name),
-                        email=eppn,
-                        authority='local'
-                    )
+                    self.userInfo = {
+                        N_eppn: '{}@local.host'.format(name),
+                        N_email: eppn,
+                        N_authority: N_local,
+                    }
         else:
             sKey = 'Shib-Session-ID'
             authenticated =  sKey in env and env[sKey] 
             if authenticated:
-                self.userInfo = dict(
-                    eppn=utf8FromLatin1(env[EPPN_FIELD]),
-                    email=utf8FromLatin1(env['mail']),
-                    authority='DARIAH',
-                )
+                self.userInfo = {
+                    N_eppn: utf8FromLatin1(env[N_eppn]),
+                    N_email: utf8FromLatin1(env[N_mail]),
+                    N_authority: N_DARIAH,
+                }
                 attributes = {}
-                if 'o' in env: attributes['org'] = utf8FromLatin1(env['o'])
-                if 'sn' in env: attributes['name'] = utf8FromLatin1(env['cn'])
-                if 'givenName' in env: attributes['firstName'] = utf8FromLatin1(env['givenName'])
-                if 'sn' in env: attributes['lastName'] = utf8FromLatin1(env['sn'])
-                if 'isMemberOf' in env: attributes['membership'] = utf8FromLatin1(env['isMemberOf'])
-                if 'affiliation' in env: attributes['rel'] = utf8FromLatin1(env['affiliation'])
+                if N_o in env: attributes[N_org] = utf8FromLatin1(env[N_o])
+                if N_cn in env: attributes[N_name] = utf8FromLatin1(env[N_cn])
+                if N_givenName in env: attributes[N_firstName] = utf8FromLatin1(env[N_givenName])
+                if N_sn in env: attributes[N_lastName] = utf8FromLatin1(env[N_sn])
+                if N_isMemberOf in env: attributes[N_membership] = utf8FromLatin1(env[N_isMemberOf])
+                if N_affiliation in env: attributes[N_rel] = utf8FromLatin1(env[N_affiliation])
                 self.userInfo.update(attributes)
             else:
                 self.userInfo = None
