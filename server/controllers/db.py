@@ -472,7 +472,7 @@ class DbAccess(object):
             # hook for recording custom timing fields
 
             for (field, newVal) in updateValues.items():
-                if document[field] == newVal: continue
+                if document.get(field, None) == newVal: continue
                 timingField = timing.get(table, {}).get(field, {}).get(newVal, None)
                 if timingField != None:
                     updateSaveValues[timingField] = now()

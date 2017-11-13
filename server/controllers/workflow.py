@@ -1,6 +1,15 @@
 from controllers.utils import now
 from models.names import *
 
+timing = {
+    N_assessment: {
+        N_submitted: {
+            True: N_dateSubmitted,
+            False: N_dateWithdrawn,
+        },
+    },
+}
+
 def _getActiveItems(basicList):
     present = now()
     types = basicList(
@@ -91,13 +100,4 @@ def detailInsert(
             N_insertValues: insertValues,
         }
     return (good, message, data)
-
-timing = {
-    N_assessment: {
-        N_submitted: {
-            True: N_dateSubmitted,
-            False: N_dateWithdrawn,
-        },
-    },
-}
 
