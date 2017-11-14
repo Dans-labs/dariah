@@ -46,7 +46,33 @@ const changeSel = memoize((selectTag, multiple, value, val, onChange, dispatch) 
   }
 })
 
-const Tags = ({ selectTag, optionLookup, activeItems, inactive, value, onChange, dispatch }) => {
+const Head = ({ optionLookup, value, popUpIfEmpty, activeItems, inactive, selectTag, dispatch }) => {
+  const makeAttributes = composeAttributes(activeItems, inactive)
+  let label = emptyS
+  const { [value]: lab = value } = optionLookup
+  label = lab
+  const classes = ['option-head', 'tag']
+  if (value === emptyS) {
+    if (popUpIfEmpty) {
+      return null
+    }
+    else {
+      label = 'click to enter a value'
+      classes.push('new')
+    }
+  }
+  const attributes = makeAttributes(value, classes.join(' '))
+  return (
+    <span
+      {...attributes}
+      data-rh={'click here to see the other options'}
+      data-rh-at={'top'}
+      onClick={handle(dispatch, togglePopUp, selectTag)}
+    >{label}</span>
+  )
+}
+
+const Tags = ({ selectTag, optionLookup, popUpIfEmpty, activeItems, inactive, value, onChange, dispatch }) => {
   const makeAttributes = composeAttributes(activeItems, inactive)
   return (
     <div
@@ -77,35 +103,11 @@ const Tags = ({ selectTag, optionLookup, activeItems, inactive, value, onChange,
               )
             }
           )
-        : <span className={'tag empty'}>{'click to enter values'}</span>
+        : popUpIfEmpty
+          ? null
+          : <span className={'tag empty'}>{'click to enter values'}</span>
       }
     </div>
-  )
-}
-
-const Head = ({ optionLookup, value, popUpIfEmpty, activeItems, inactive, selectTag, dispatch }) => {
-  const makeAttributes = composeAttributes(activeItems, inactive)
-  let label = emptyS
-  const { [value]: lab = value } = optionLookup
-  label = lab
-  const classes = ['option-head', 'tag']
-  if (value === emptyS) {
-    if (popUpIfEmpty) {
-      return null
-    }
-    else {
-      label = 'click to enter a value'
-      classes.push('new')
-    }
-  }
-  const attributes = makeAttributes(value, classes.join(' '))
-  return (
-    <span
-      {...attributes}
-      data-rh={'click here to see the other options'}
-      data-rh-at={'top'}
-      onClick={handle(dispatch, togglePopUp, selectTag)}
-    >{label}</span>
   )
 }
 
@@ -235,6 +237,7 @@ const RelSelect = ({
             inactive={inactive}
             value={value}
             selectTag={selectTag}
+            popUpIfEmpty={popUpIfEmpty}
             dispatch={dispatch}
             onChange={onChangeSave}
           />
@@ -243,7 +246,6 @@ const RelSelect = ({
             activeItems={activeItems}
             inactive={inactive}
             value={value}
-            popUp={popUp}
             popUpIfEmpty={popUpIfEmpty}
             selectTag={selectTag}
             dispatch={dispatch}

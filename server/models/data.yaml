@@ -498,7 +498,7 @@ tables:
           inactive:
             attributes:
               className: inactive
-              title: this value does not belong to the current package
+              data-rh: this value does not belong to the current package
             disabled: true
         multiple: false
       typeContributionOther:
@@ -644,7 +644,7 @@ tables:
           inactive:
             attributes:
               className: inactive
-              title: this value does not belong to the current package
+              data-rh: this value does not belong to the current package
             disabled: true
         multiple: false
       remarks:
@@ -825,7 +825,7 @@ tables:
           inactive:
             attributes:
               className: inactive
-              title: this value does not belong to the current package
+              data-rh: this value does not belong to the current package
             disabled: false
         multiple: true
       remarks:
@@ -889,7 +889,7 @@ tables:
           inactive:
             attributes:
               className: inactive
-              title: this value does not belong to the current package
+              data-rh: this value does not belong to the current package
             disabled: true
         multiple: true
       criterion:

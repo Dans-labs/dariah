@@ -140,7 +140,7 @@ const valuePrepare = memoize((settings, tables, table, valType, relField, active
   if (disabled) {classNames.push('disabled')}
   return [
     rep,
-    { ...(classNames.length ? mergeClassnames(classNames, attributes) : attributes), ...link },
+    { ...link, ...(classNames.length ? mergeClassnames(classNames, attributes) : attributes) },
     elem,
   ]
 }, emptyO)

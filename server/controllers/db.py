@@ -470,9 +470,11 @@ class DbAccess(object):
             updateSaveValues.update(updateValues) # shallow copy of updateValues
 
             # hook for recording custom timing fields
+            # only for single value fields!
 
             for (field, newVal) in updateValues.items():
                 if document.get(field, None) == newVal: continue
+                if fieldSpecs[field][N_multiple]: continue
                 timingField = timing.get(table, {}).get(field, {}).get(newVal, None)
                 if timingField != None:
                     updateSaveValues[timingField] = now()
