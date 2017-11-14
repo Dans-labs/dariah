@@ -261,7 +261,7 @@ By some definition, certain records can be marked as
   tooltips.
 
 **Example:** 
-The `typeContribution` field of a `contrib` record maybe obsolete, because it is not
+The `typeContribution` field of a `contrib` record may be obsolete, because it is not
 specified in the current package (see [Workflow](Workflow).
 In the `valType` for this field we see the following specification:
 
@@ -273,7 +273,17 @@ inactive:
     disabled: true
 ```
 
-it HTML element that will render it, will get the following attributes:
+This is the rendered HTML for this value:
+
+```html
+<a
+    href="/data/typeContribution/list/item/00000000cca4bbd9fe00000b"
+    data-rh="this value does not belong to the current package"
+    class="tag disabled inactive"
+>Tools and Software</a>
+```
+
+Note the `data-rh` attribute (the tooltip) and the `class`, which contains the word `inactive`.
 
 #### Listing related records
 When we need to show a related record as a single value, we use its title field, as
@@ -405,19 +415,22 @@ of contribution types.
 
 Permission model
 --------------------
-The authorization system is built up from permissions.
+The authorization system is built on the basis of *permission* levels.
 
-Users are assigned to groups, which determine their power.
+Users are assigned to groups, which determine their permission level.
+In practice, we identify the concepts of *groups* and *permission levels*.
 
-Users may perform methods which undertake actions on tables and fields.
+Users may call *methods* which undertake *actions* on tables and fields.
 
-Users are authorized to command these actions, if the authorization level
-of the group they are in, matches the level of authorization that is needed
-for the thing.
+These actions are authorized to happen on behalf of a certain user if the permission level
+of the user, is at least the permission level that the thing requires for that action.
 
 In some cases, the identity of the user is relevant, namely when users
 want to modify things they themselves have created.
 For those things, users are in a pseudo group called *own*.
+
+In yet other cases, when users change the permission levels of users, the permission levels
+of both users need to be taken into account.
 
 Here are the details.
 
@@ -426,35 +439,37 @@ The following groups are distinguished, from least powerful to most powerful:
 
 * `public`: unauthenticated user
 * `auth`:   authenticated user
-* `own`:    authenticated user and creator of records in question
 * `office`: management user
 * `system`: system administrator
 * `root`:   root access
-* `nobody`: no restrictions (however: nobody can be member of this group)
 
 #### Levels
 Things may require the following access levels, from least powerful to most powerful:
 
-* *public*
-* *auth*
-* *own*
-* *OWN*
-* *ownLT*
-* *office*
-* *system*
+* `public`
+* `auth`
+* `own`:    authenticated user and creator of records in question
+* `OWN`:    idem, cannot be overridden by higher levels
+* `ownLT`:  only if owner's power is less than editor's power
+* `office`
+* `system`
+* `root`
+* `nobody`: omnipotent access (however: nobody can be member of this group, so this effectively means:
+  nobody is allowed to do this)
 
 The difference between *own* and *OWN* is subtle and only relevant for
 groups more powerful than *own*.
 If a thing requires level *own*, but the user is in a more powerful group, such as *system*,
 that user has access to the thing, even if it is not his own thing.
 
-Sometimes this is undesirable.
-For example if you want to show to a user the things that are really their own things.
-In that case, you have to specify level *OWN* for that thing.
+In some circumstances this is undesirable.
+For example if you want to show a user a list of *My items*, we want to show
+the items this user owns, not the items he is allowed to change.
+In such a case, we specify level *OWN* for *My items*.
 
 The level *ownLT* is only relevant when one user modifies the group of another user.
-The level *ownLT* means that this operation is only permitted if the group of the
-user that undergoes modification is currently less powerful than the group of
+The level *ownLT* means that this operation is only permitted if the
+user that undergoes modification is currently less powerful than
 the user that performs the modification.
 
 #### Authorize
@@ -463,7 +478,7 @@ It is a dictionary of dictionaries: the first key is
 the user group, the second key is the level of the thing.
 
 If the dictionary of a user group does not contain a key for a certain level,
-then those users have no power to do that thing.
+then the users in that group have no power to do that things that require that level.
 
 Otherwise the value is either 1, -1, or -2, meaning:
 
