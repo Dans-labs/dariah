@@ -11,7 +11,7 @@ const docType = {
   html: DocHtml,
 }
 
-const Doc = ({ location: { pathname: docPath } }) => {
+export default ({ location: { pathname: docPath } }) => {
   const [docDir, docFile] = /^(.*)\/([^/]+)$/g.exec(docPath).slice(1)
   const [docName, docExt] = /^(.*)\.([^.]+)$/g.exec(docFile).slice(1)
   const { [docExt]: DocClass } = docType
@@ -25,5 +25,3 @@ const Doc = ({ location: { pathname: docPath } }) => {
       docExt={docExt}
     />
 }
-
-export default Doc

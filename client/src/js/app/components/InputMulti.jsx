@@ -11,7 +11,7 @@ const fieldPush = (fields, submit) => () => {fields.push(); submit()}
  * This happens if you navigate with react-router between forms.
  */
 
-const InputMulti = ({
+export default ({
   componentSingle, validateSingle, normalizeSingle,
   meta: { dirty, invalid, submitting, error },
   fields, table, eId, valType,
@@ -57,5 +57,3 @@ const InputMulti = ({
     </div>
   )
 }
-
-export default InputMulti

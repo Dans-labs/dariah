@@ -14,7 +14,7 @@ import ItemAction from 'ItemAction'
 import ItemEdit from 'ItemEdit'
 import ItemRead from 'ItemRead'
 import ItemDetails from 'ItemDetails'
-import { EditDelete } from 'EditControls'
+import EditDelete from 'EditDelete'
 
 const ItemForm = props => {
   const {

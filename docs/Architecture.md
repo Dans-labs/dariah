@@ -16,7 +16,7 @@ Redux itself is a very small library, under 600 lines of code, but using it will
 all your React components, especially if you use Redux in an *idiomatic* way.
 
 # Overview
-![diag](design/design.007.jpeg)
+![diag](design/design.007.png)
 
 # [Components](Components) and [Dux](Dux)
 In Redux, every component may obtain read access to the state,
@@ -67,7 +67,7 @@ In this way, most components that deal with change can still be written as pure 
 while the response to change is expressed in a very simple pattern.
 This will reduce the potential bugs considerably.
 
-![diag](design/design.008.jpeg)
+![diag](design/design.008.png)
 
 Note that all code to make the connection between components and a (slice of the) state are located in a duct.
 We are talking about the *selectors*, the *actions*, and possibly the *helpers*.

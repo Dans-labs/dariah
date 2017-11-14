@@ -7,10 +7,11 @@ import { handle } from 'handle'
 import { initFiltering, computeFiltering } from 'filters'
 import { insertItem, DETAILS } from 'tables'
 
-import { EditInsert, OpenCloseAll } from 'EditControls'
 import ListPlain from 'ListPlain'
 import ListGrid from 'ListGrid'
 import Filter from 'Filter'
+import OpenCloseAll from 'OpenCloseAll'
+import EditInsert from 'EditInsert'
 
 const initial = 0
 const nAlts = 2

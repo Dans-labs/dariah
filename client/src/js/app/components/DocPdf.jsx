@@ -1,6 +1,6 @@
 import React from 'react'
 
-const DocPdf = ({ docDir, docName, docExt }) => {
+export default ({ docDir, docName, docExt }) => {
   const href = `/api/file${docDir}/${docName}.${docExt}`
   const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
   return iOS
@@ -16,5 +16,3 @@ const DocPdf = ({ docDir, docName, docExt }) => {
       <a target={'_blank'} rel={'noopener noreferrer'} href={href} >{docName}</a>{' (open pdf in a new tab)'}
     </object>
 }
-
-export default DocPdf

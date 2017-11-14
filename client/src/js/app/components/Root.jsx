@@ -4,12 +4,10 @@ import { Provider } from 'react-redux'
 import store from 'roots'
 import Window from 'Window'
 
-const Root = ({ children }) => (
+export default ({ children }) => (
   <Provider store={store}>
     <Window>
       {children}
     </Window>
   </Provider>
 )
-
-export default Root

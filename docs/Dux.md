@@ -207,7 +207,7 @@ Check whether a component has new props in such a way that a new document should
 Supports the display of filtered lists, where there is a bunch of filters and
 a list with items filtered by those.
 
-![diag](design/design.002.jpeg)
+![diag](design/design.002.png)
 
 Lists and filters form a complex system of components, involving
 
@@ -436,7 +436,7 @@ The panel also shows up if there is a new important message, and it will scroll 
 
 The user can click away the panel and hide the messages.
 
-![diag](design/design.005.jpeg)
+![diag](design/design.005.png)
 
 Actions
 ---------------------------------------------------------------------------

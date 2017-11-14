@@ -14,7 +14,7 @@ Redux [Provider](React#redux) component, which will be ancestor to all other com
 
 ## Routing
 The second priority is to set up the routes configuration, i.e. the way URLs give rise to activating certain components.
-![diag](design/design.006.jpeg)
+![diag](design/design.006.png)
 
 We are still talking about *client* side routing.
 

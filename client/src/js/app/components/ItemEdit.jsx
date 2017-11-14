@@ -11,7 +11,7 @@ import { toDb, headEntity } from 'tables'
 import ErrorBoundary from 'ErrorBoundary'
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
-import { EditControl } from 'EditControls'
+import EditControl from 'EditControl'
 
 const ItemEdit = ({
   settings,

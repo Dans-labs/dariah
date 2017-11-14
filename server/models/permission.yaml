@@ -498,8 +498,8 @@ fields:
       read:   auth
       update: own
     costDescription:
-      list:   auth
-      read:   auth
+      list:   office
+      read:   office
       update: own
     year:
       list:   public

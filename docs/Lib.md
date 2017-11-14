@@ -3,11 +3,13 @@ title: Library
 ---
 
 Table of Contents
+* [custom](#custom)
+* [edit](#edit)
 * [europe.geo](#europe-geo)
 * [fields](#fields)
 * [handle](#handle)
 * [memo](#memo)
-* [templates](#templates)
+* [presentation](#presentation)
 * [utils](#utils)
 
 [europe.geo]({{site.libBase}}/europe.geo.js)

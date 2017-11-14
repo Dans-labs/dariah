@@ -1,6 +1,6 @@
 import React from 'react'
 
-const DocHtml = ({ docDir, docName, docExt }) => {
+export default ({ docDir, docName, docExt }) => {
   const src = `/api/file${docDir}/${docName}.${docExt}`
   return (
     <iframe
@@ -10,5 +10,3 @@ const DocHtml = ({ docDir, docName, docExt }) => {
     />
   )
 }
-
-export default DocHtml

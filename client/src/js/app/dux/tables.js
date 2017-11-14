@@ -1,10 +1,12 @@
 import update from 'immutability-helper'
 
+import { browserHistory } from 'react-router'
+
 import { accessData } from 'server'
 import { memoize } from 'memo'
-import { makeReducer, updateAuto, emptyS, emptyA, emptyO } from 'utils'
+import { makeReducer, updateAuto, getUrlParts, emptyS, emptyA, emptyO } from 'utils'
 
-import { compileAlternatives } from 'alter'
+import { compileAlternatives, closeItems } from 'alter'
 
 /* DEFS */
 
@@ -493,6 +495,25 @@ export const handleOpenAll = memoize((alter, alterSection, nAlts, initial, table
     })
     if (alts.length) {
       dispatch(fetchItems(table, alts, alterSection, theAlt))
+    }
+  }
+}, emptyO)
+
+export const handleCloseAll = memoize((alter, alterSection, nAlts, initial, items, dispatch) => {
+  const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
+  const base = getUrlParts(browserHistory)[0]
+  return () => {
+    browserHistory.push(`${base}/`)
+    const alts = []
+    items.forEach(eId => {
+      const { getAlt } = makeAlternatives(eId)
+      const alt = getAlt(alter)
+      if (alt !== initial) {
+        alts.push(eId)
+      }
+    })
+    if (alts.length) {
+      dispatch(closeItems(alts, alterSection, initial))
     }
   }
 }, emptyO)

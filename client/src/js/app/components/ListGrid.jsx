@@ -12,8 +12,9 @@ import { compileActive } from 'workflow'
 
 import { dealWithProvenance } from 'fields'
 
-import { EditInsert, OpenCloseAll } from 'EditControls'
 import ItemRow from 'ItemRow'
+import EditInsert from 'EditInsert'
+import OpenCloseAll from 'OpenCloseAll'
 
 const initial = 0
 const nAlts = 2

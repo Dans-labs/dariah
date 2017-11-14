@@ -7,7 +7,7 @@ import { makeFields, makeDetails } from 'fields'
 
 import { getForms } from 'forms'
 
-import { EditStatus } from 'EditControls'
+import EditStatus from 'EditStatus'
 import FieldRead from 'FieldRead'
 import ItemForm from 'ItemForm'
 

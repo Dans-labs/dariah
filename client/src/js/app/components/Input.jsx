@@ -2,7 +2,7 @@ import React from 'react'
 
 import { editClass, makeSubmit, makeSubmitTime } from 'fields'
 
-const Input = ({ meta: { dirty, invalid, submitting, error }, input, type, submitValues }) => {
+export default ({ meta: { dirty, invalid, submitting, error }, input, type, submitValues }) => {
   const submit = type === 'checkbox'
   ? makeSubmitTime(submitValues)
   : makeSubmit(dirty, invalid, submitting, submitValues)
@@ -21,5 +21,3 @@ const Input = ({ meta: { dirty, invalid, submitting, error }, input, type, submi
     </span>
   )
 }
-
-export default Input

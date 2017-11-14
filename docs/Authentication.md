@@ -2,7 +2,7 @@
 title: Authentication
 ---
 
-![diag](design/design.003.jpeg)
+![diag](design/design.003.png)
 
 The login/logout actions take place at the server after visiting `/login`,
 `/logout` or `/slogout`.

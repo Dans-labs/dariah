@@ -284,13 +284,16 @@ Displays a PDF document by linking to it in an OBJECT.
 we work around it by just displaying a link to open the PDF in a new tab.
 We only do that when we detect an iOS browser.
 
-[EditControl]({{site.appBase}}/components/EditControls.jsx)
+[EditControl]({{site.appBase}}/components/EditControl.jsx)
 =============================================================================================
 
-[EditStatus]({{site.appBase}}/components/EditControls.jsx)
+[EditDelete]({{site.appBase}}/components/EditDelete.jsx)
 =============================================================================================
 
-[EditInsert]({{site.appBase}}/components/EditControls.jsx)
+[EditInsert]({{site.appBase}}/components/EditInsert.jsx)
+=============================================================================================
+
+[EditStatus]({{site.appBase}}/components/EditStatus.jsx)
 =============================================================================================
 
 [ErrorBoundary]({{site.appBase}}/components/ErrorBoundary.jsx)
@@ -302,6 +305,8 @@ The console will log the error, and at the `ErrorBoundary` will be rendered
 in place of its normal contents.
 
 Currently we render the error boundary as a red block with a single diagnostic message.
+
+![diag](design/design.010.png)
 
 [EUMap]({{site.appBase}}/components/EUMap.jsx)
 =============================================================================================
@@ -706,7 +711,7 @@ It is only used if there are editable field.
 If that is not the case, [ItemRead](#itemread) is being used.
 We do this to avoid to invoke the costly machinery of editable forms when it is not needed.
 
-The component also shows *save* and *reset* buttons (if appropriate).
+The component also shows [save](EditControl) and [reset](EditControl) buttons (if appropriate).
 
 The component has two render modes: read-only view and edit-view.
 When a user has edited the form, he can switch to the read only view to see the result.
@@ -1014,7 +1019,7 @@ The user can click it away and also clear the notifications.
 There is also a progress indicator, a little circle fixed at the top right corner of the screen.
 It hints at the current status of asynchronous operations. A click on it will show the notifications panel.
 
-[OpenCloseAll]({{site.appBase}}/components/EditControls.jsx)
+[OpenCloseAll]({{site.appBase}}/components/OpenCloseAll.jsx)
 =============================================================================================
 
 [Overview]({{site.appBase}}/components/Overview.jsx)
@@ -1054,7 +1059,7 @@ choice field.
 Contains attributes related to the actual value that is being held.
 These attributes are passed verbatim to the underlying `<input />`.
 
-![diag](design/design.009.jpeg)
+![diag](design/design.009.png)
 
 ### Task
 An implementation of multi-select widgets. 
@@ -1245,7 +1250,7 @@ control, and that the **Action** part is independent of that switch: it is alway
 In the **Read** part, you cannot have edit controls, but in the **Edit** and **Action** parts
 you can have them.
 However, in the **Action** part, you do not have `save` and `reset` buttons.
-This part is meant for buttons, that change a field to a predefined value and save
+This part is meant for action buttons, which change a field to a predefined value and save
 them immediately.
 
 **Consolidated records** are records for which all related values and relevant details have been 
@@ -1282,7 +1287,7 @@ Like *mainTemplates*, but now the values are *edit* templates.
 
 These template functions are passed the `fe` function.
 There is an extra parameter `editButton`, which is a React component that 
-holds the edit/save button for this record.
+holds the [edit/save button](EditCOntrol) for this record.
 
 ### detailTemplates
 Object, keyed by the names of the detail tables and then by the names of master tables.

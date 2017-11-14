@@ -45,7 +45,10 @@
   - ListFilter
   - ListPlain
   - Overview
-  - EditControls
+  - EditControl
+  - EditDelete
+  - EditInsert
+  - EditStatus
   - FieldEdit
   - FieldRead
   - FieldSet
@@ -56,6 +59,7 @@
   - ItemRow
   - ListGrid
   - MarkdownArea
+  - OpenCloseAll
   - RelSelect
   - Input
   - InputMulti

@@ -12,9 +12,11 @@ import { getAltSection, compileAlternatives } from 'alter'
 import { compileActive } from 'workflow'
 import { getSettings } from 'settings'
 
-import { EditStatus, EditInsert, OpenCloseAll } from 'EditControls'
-import ItemContainer from 'ItemContainer'
 import ErrorBoundary from 'ErrorBoundary'
+import ItemContainer from 'ItemContainer'
+import EditStatus from 'EditStatus'
+import EditInsert from 'EditInsert'
+import OpenCloseAll from 'OpenCloseAll'
 
 const initial = 0
 const nAlts = 2

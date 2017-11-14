@@ -114,7 +114,7 @@ really hurts.
 So we do not do anything here, and rely on debugging away the typos the hard way.
 
 Data model
-----------------------------------------------
+========================================================================================
 The data model consists of the dictionaries *generic*, *custom* and *tables*.
 
 The *generic* dictionary contains field names that are used in many tables, such as `dateCreated`.
@@ -127,14 +127,15 @@ application needs to work with that table.
 
 Here is a description of the table model information.
 
-### `generic`
+`generic`
+-----------------------------------------------------------------------------------
 Most branches of the *generic* dictionary are lists of names with the purpose
 of triggering the creation of a `N_`*name*, so that we can refer to those names
 in a consistent way.
 
 A few branches will actually be used as such by the app.
 
-#### `systemFields`
+### `systemFields`
 A list of field names that occur in most records.
 The fields themselves must still be specified in the tables where they occur,
 including their types.
@@ -306,13 +307,14 @@ For example, if a non-authenticated user is shown the creator of a record,
 But the permissions are such that (s)he may not see the email address of that user.
 So the email address does not even reach the client.
 
-### `tables`
+`tables`
+-----------------------------------------------------------------------------------------------
 For every table we specify its fields, filters, details and a few other attributes.
 We have already seen branches under `generic` for the default specification.
 The specific tables may have these branches too, with
 table-specific values. There are some more.
 
-#### `filters`
+### `filters`
 A list of filters by which to constrain the set of records to be displayed.
 There are *fulltext* filters and *faceted* filters.
 
@@ -336,7 +338,7 @@ Each filter is a dictionary with the following information.
 * `expanded`: (*not needed for `Fulltext` filters*)
   whether the table of facets is initially expanded or collapsed.
 
-#### `details` and `detailOrder`
+### `details` and `detailOrder`
 A record may have *detail records* associated with it.
 We call such a record a *master record* with respect to its details.
 Details are records, usually in another table, having a field that points to 
@@ -392,7 +394,7 @@ For each originating kind there is the following information:
   anymore.
   But the user is still be able to fill out the `criteriaEntry` records.
 
-#### `needMaster`
+### `needMaster`
 *optional: default:* `false`.
 Some tables act as containers for detail records exclusively, and it makes no sense
 to create a detail record if there is no master record to point to.
@@ -414,7 +416,7 @@ Rather, you create a package, and in its `typeContribution` field you select a n
 of contribution types.
 
 Permission model
---------------------
+========================================================================================
 The authorization system is built on the basis of *permission* levels.
 
 Users are assigned to groups, which determine their permission level.
@@ -434,7 +436,8 @@ of both users need to be taken into account.
 
 Here are the details.
 
-#### Groups
+Groups
+----------------------------------------------------------------------
 The following groups are distinguished, from least powerful to most powerful:
 
 * `public`: unauthenticated user
@@ -443,7 +446,8 @@ The following groups are distinguished, from least powerful to most powerful:
 * `system`: system administrator
 * `root`:   root access
 
-#### Levels
+Levels
+----------------------------------------------------------------------
 Things may require the following access levels, from least powerful to most powerful:
 
 * `public`
@@ -472,7 +476,7 @@ The level *ownLT* means that this operation is only permitted if the
 user that undergoes modification is currently less powerful than
 the user that performs the modification.
 
-#### Authorize
+### Authorize
 A table which specify the power of each group over each level that a thing may require.
 It is a dictionary of dictionaries: the first key is
 the user group, the second key is the level of the thing.
@@ -488,7 +492,7 @@ Otherwise the value is either 1, -1, or -2, meaning:
   * like *ownLT* above: users cannot modify the power of more powerful users
   * and users cannot assign more power (to themselves or others) than they themselves have.
 
-#### Methods
+### Methods
 If a user needs to do something, (s)he interacts with the user interface at the client.
 That will lead to an API call to the server, which will translate into the invocation of a *method*.
 At that point, the first check will be made: is this user allowed to invoke this method?
@@ -503,7 +507,7 @@ Currently we have the following methods:
 * `view` get the details of a record
 * `mod` modify the details of a record, or insert/delete a record
 
-#### Actions
+### Actions
 Methods give rise to *actions*. We distinguish:
 
 * `insert`: create an item
@@ -517,7 +521,7 @@ An item may allow `list` to *public* but not `read`.
 In that case, unauthenticated user may see the list of items, usually their titles,
 but they cannot drill down to see the full details of records.
 
-#### Tables and Fields
+### Tables and Fields
 For every table and every field in it, we specify an access level.
 That means: for every action on that field we state the required access level.
 

@@ -7,7 +7,7 @@ import { toFieldInfo, itemReadField } from 'fields'
 
 import FieldRead from 'FieldRead'
 
-const ItemRead = ({
+export default ({
   settings, tables, table, eId, fieldFragments,
   linkField,
 }) => {
@@ -46,5 +46,3 @@ const ItemRead = ({
       </div>
   )
 }
-
-export default ItemRead

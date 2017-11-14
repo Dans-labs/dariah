@@ -1,6 +1,6 @@
 import { makeSubmitTime } from 'fields'
 
-const FieldSet = ({
+export default ({
   widget,
   setValue,
   input: { onChange },
@@ -10,5 +10,3 @@ const FieldSet = ({
   const onChangeSave = () => {onChange(setValue); submitTime()}
   return widget(onChangeSave)
 }
-
-export default FieldSet
