@@ -89,6 +89,10 @@ the initial value will be used to start from.
 ### setAlt
 Switch to specified alternative.
 
+### setItems
+This function is used to switch a bunch of records from an open to a closed state or
+vice versa.
+
 Reducer
 ---------------------------------------------------------------------------
 Increases the index of the alternative by one, cyclically, and puts it under the right
@@ -126,53 +130,6 @@ whenever any single one of them switches alternatives.
 That is why offer the possibility of grouping related components under the
 same `alterSection` and be shielded from updates in the components that belong to other
 `alterSections`.
-
-[workflow]({{site.appBase}}/dux/workflow.js)
-=============================================================================================
-
-A lot of the logic of showing lists, items, related items and fields is purely
-generic and driven by the [data model](Model).
-
-But there is considerably more to an app than this kind of generic logic.
-The `workflow` duct is the entry point for additional, non-trivial business logic.
-
-It is still in development.
-
-### Active items
-The `package` table determines a lot about the assessment process.
-It has records with a specified startDate end endDate.
-The packages that have started and are not yet passed there endDate are the
-*active* packages. Normally there will be exactly one package.
-
-From the active package derive a number of other active concepts:
-
-* the contribution types listed in the `typeContribution` field of the active package
-  are the *active types*
-* the criteria that are details of the active package are *active criteria*.
-
-The generic List and Item components can be made sensitive to this notion of activity.
-Active items can be formatted specially, and likewise the non-active items,
-which can also be disabled in some contexts.
-
-The way (in)active items are displayed is controlled by the 
-[data model](Model).
-See for example the field `typeContribution` in the tables `package` and `criteria`.
-
-Actions
----------------------------------------------------------------------------
-
-Reducer
----------------------------------------------------------------------------
-
-Selectors
----------------------------------------------------------------------------
-
-Helpers
----------------------------------------------------------------------------
-### compileActive
-
-Computes the active packages, types and criteria and deliver them in an object,
-keyed by kind of item and containing an array of active item MongoDB ids for that kind.
 
 [docs]({{site.appBase}}/dux/docs.js)
 =============================================================================================
@@ -266,10 +223,6 @@ the props of the receiving components, which are typically the filter widgets th
 
 Helpers
 ---------------------------------------------------------------------------
-### compileFieldIds
-For all the faceted fields a list of all possible values is made and returned as
-their MongoDB ids.
-
 ### compileValues
 For every field that is chosen for faceted browsing, the list of values will be compiled.
 
@@ -287,13 +240,6 @@ but in this case we do not want to redo the compilation all the time.
 The solution is to use a
 [memoized function](http://redux.js.org/docs/recipes/ComputingDerivedData.html).
 I have created my own [memoizer](Lib#memo). 
-
-
-### initFilterSettings
-Computes initial filter settings, after `compileFieldIds`.
-For all full-text filters and faceted filters new, initial filter settings
-are computed.
-This is the information that will be influenced by subsequent user clicks.
 
 ### computeFiltering
 Applies the filters, according to the current filter settings.
@@ -315,7 +261,7 @@ only, or is it a list of detail records of some master record in an other table?
 Looks if all facets are checked, or all unchecked, of none of both.
 Used to steer the *collective* checkbox that governs all facets.
 
-[forms]({{site.appBase}}/dux/win.js)
+[forms]({{site.appBase}}/dux/forms.js)
 =============================================================================================
 
 The `forms` slice of the state is under control of the
@@ -343,8 +289,9 @@ exactly the same set object is being returned.
 
 Helpers
 ---------------------------------------------------------------------------
+No helpers.
 
-[grid]({{site.appBase}}/dux/win.js)
+[grid]({{site.appBase}}/dux/grid.js)
 =============================================================================================
 This duct support grid views of tables,
 by managing sorting information of the grid columns.
@@ -471,6 +418,7 @@ the index of the last important notification message is also computed, and its k
 
 Helpers
 ---------------------------------------------------------------------------
+No helpers.
 
 [roots]({{site.appBase}}/dux/roots.js)
 =============================================================================================
@@ -578,8 +526,7 @@ The key is identical to the `path` of the request (the URL that is fired to the 
 
 ### Note
 But all actions except `accessData` are also picked up by the [notes](#notes) reducer,
-where they
-result in notification.
+where they result in notifications.
 
 Selectors
 ---------------------------------------------------------------------------
@@ -588,6 +535,7 @@ So far, no component needs this slice of the state.
 
 Helpers
 ---------------------------------------------------------------------------
+No helpers.
 
 [settings]({{site.appBase}}/dux/settings.js)
 =============================================================================================
@@ -611,6 +559,7 @@ Returns the `settings` slice of the state.
 
 Helpers
 ---------------------------------------------------------------------------
+No helpers.
 
 [tables]({{site.appBase}}/dux/tables.js)
 =============================================================================================
@@ -643,6 +592,11 @@ The server decides which fields I am allowed to retrieve.
 
 If fields refer to other tables for their values, the above actions will
 fetch these tables as well.
+
+### fetchItems
+Fetches a selection of rows from a table, all fields.
+The selection is given by a list of `_id`s to fetch.
+The server decides which fields may be retrieved.
 
 ### modItem
 Sends a request to update an item to the server, and merges the answer (the updated values)
@@ -740,12 +694,17 @@ Checks a single entity in a single table to see if it contains values for all fi
 ### listValues
 Gives the list of all values of a specified field in a table. 
 
+### presentUser
+Presents a user, by means of name, email address, and/or `eppn`, depending on
+what information is available, which also depends on what information
+may be shared with the currently logged in user.
+
 ### changedItem
 Checks if properties have changed in such a few that new data should be fetched.
 
-### repRelated
-Makes a representation of a related value. If a field in a table contains
-an id of a record in an other table, the value for that id will be looked up and returned.
+### headEntity
+The head line of a record, based on its title field and/or other data.
+For some specific tables custom logic is used.
 
 ### repr
 Makes a streamlined string representation out of a field value. It looks up ids 
@@ -755,6 +714,16 @@ For some tables, special representation functions will be invoked.
 
 ### toDb
 Dispatches an item modification action to the store.
+
+### handleOpenAll
+When a user clicks on an *Open All* button, this function is invoked
+to fetch the corresponding records (if needed).
+
+### handleCloseAll
+When a user clicks on an *Close All* button, this function is invoked
+to collapse the corresponding records and remove the `_id`s of the
+previously open records from the URL, using
+[browserHistory](https://github.com/reactjs/react-router-tutorial/tree/master/lessons/10-clean-urls).
 
 [win]({{site.appBase}}/dux/win.js)
 =============================================================================================
@@ -784,4 +753,65 @@ Returns the `win` slice of the state, which is just the current width and height
 
 Helpers
 ---------------------------------------------------------------------------
+No helpers.
 
+[workflow]({{site.appBase}}/dux/workflow.js)
+=============================================================================================
+
+A lot of the logic of showing lists, items, related items and fields is purely
+generic and driven by the [data model](Model).
+
+But there is considerably more to an app than this kind of generic logic.
+The `workflow` duct is the entry point for additional, non-trivial business logic.
+
+It is still in development.
+
+### Active items
+The `package` table determines a lot about the assessment process.
+It has records with a specified startDate end endDate.
+The packages that have started and are not yet passed there endDate are the
+*active* packages. Normally there will be exactly one package.
+
+From the active package derive a number of other active concepts:
+
+* the contribution types listed in the `typeContribution` field of the active package
+  are the *active types*
+* the criteria that are details of the active package are *active criteria*.
+
+The generic List and Item components can be made sensitive to this notion of activity.
+Active items can be formatted specially, and likewise the non-active items,
+which can also be disabled in some contexts.
+
+The way (in)active items are displayed is controlled by the 
+[data model](Model).
+See for example the field `typeContribution` in the tables `package` and `criteria`.
+
+Actions
+---------------------------------------------------------------------------
+
+Reducer
+---------------------------------------------------------------------------
+
+Selectors
+---------------------------------------------------------------------------
+
+Helpers
+---------------------------------------------------------------------------
+### compileActive
+Computes the active packages, types and criteria and deliver them in an object,
+keyed by kind of item and containing an array of active item MongoDB ids for that kind.
+
+### assessmentScore
+Computes the overall score of an assessment, based on information that is
+on the client.
+
+The data returned is an object containing:
+* `overall`: the overall score as percentage of points scored with respect
+  to total of scorable points
+* `relevantScore`: the sum of the scores for all criteria that have not been
+  scored as `-1` (non-applicable)
+* `relevantMax`: the total of the maximum scores for all criteria that have not
+  been scored as `-1`
+* `allMax`: the total of the maximum scores for all criteria
+* `relevantN`: the number of criteria that have not been scored as `-1`
+* `allN`: the number of criteria.

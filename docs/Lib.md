@@ -3,7 +3,6 @@ title: Library
 ---
 
 Table of Contents
-* [custom](#custom)
 * [edit](#edit)
 * [europe.geo](#europe-geo)
 * [fields](#fields)
@@ -11,6 +10,35 @@ Table of Contents
 * [memo](#memo)
 * [presentation](#presentation)
 * [utils](#utils)
+
+[edit]({{site.libBase}}/edit.js)
+=============================================================================================
+### editControl
+
+This is nearly a React component, except it needs a boolean parameter `canSubmit`,
+to direct it into one behaviour or another.
+
+The basic function of this component is to give an indication of the edit status of a record.
+Whether values have changed (`dirty`), values are `invalid`, or values are being `submitted`.
+
+If this component is put inside a `<form>` element under the control of 
+[redux-form](http://redux-form.com), it is also capable to trigger a submit and save action.
+
+#### `canSubmit = true`
+The component [EditControl](Components#editcontrol) calls this function with submit capacity.
+It also has to provide the resulting component with typical form properties, such as
+`dirty`, `valid`, `handleSubmit`.
+
+Because in this case the component lives inside a component that is already 
+enhanced with `reduxForm`, namely [ItemEdit](Components#itemedit),
+these properties have been injected higher up in the component tree
+and can be passed down as props.
+
+#### `canSubmit = false`
+The the component [EditStatus](Components#editstatus) calls this function without submit capacity.
+The typical form properties are now obtained by enhancing this very component with `reduxForm`.
+However, because this component is not assumed to be within a `<form>` context,
+it cannot perform a submit.
 
 [europe.geo]({{site.libBase}}/europe.geo.js)
 =============================================================================================
@@ -53,13 +81,31 @@ Convert a datetime object or string into a numerical value, so you can make comp
 If absent, yield negative infinity for start dates and positive infinity for end dates.
 Used in [workflow](Dux#workflow).
 
+### itemEditField
+Render an edit field in standard presentation, like [ItemEdit](Components#itemedit) does it.
+In fact, ItemEdit uses this very function to render its editable fields.
+
+This function can be conveniently used in custom templates to render some fields in the 
+standard way.
+
+**Example**: [Templates](Components#templates)
+
+### itemReadField
+Render an read-only field in standard presentation, like [ItemRead](Components#itemread) does it.
+In fact, ItemRead uses this very function to render its read-only fields.
+
+This function can be conveniently used in custom templates to render some fields in the 
+standard way.
+
+**Example**: [Templates](Components#templates)
+
 ### makeFields
 Prepare field components for an item of a table.
 Collect the specs and put all information in an array objects,
 each corresponding to a field, from which components can easily
 construct a widget for showing or editing that field.
 
-Example: [ItemForm](Components#itemform)
+**Example**: [ItemForm](Components#itemform)
 
 ### makeDetails
 Prepare lists of details for an item of a table.
@@ -68,7 +114,25 @@ each corresponding to a details list,
 from which components can easily
 construct a widget for handling lists of details
 
-Example: [ItemForm](Components#itemform)
+**Example**: [ItemForm](Components#itemform)
+
+### makeSubmit
+Produces a submit action or a null-returning function, depending on parameters.
+The parameters tell whether some record is dirty, valid and not currently submitting.
+In that case, the result is a submit function (which is also passed as parameter).
+
+This function is used in those cases where an input field looses focus.
+It then generates a submit action if all is well.
+
+### makeSubmitTime
+Given a (submit)-function, transforms it into the same function that will
+be invoked with a small delay.
+
+This can be used after events that change a form, without a blur event.
+The event should trigger a submit and save, but first the triggering action
+should have done its work.
+
+**Example**: [Input](Components#input)
 
 ### normalization
 An object with normalization functions, named after the types of the values they normalize.
@@ -83,20 +147,12 @@ See [ItemEdit](Components#itemedit)
 For a given value type, such as `text`, `URL`, `number`, return a component and subtype
 for handling the input of such values, e.g. `<input type="URL" />`.
 
-Example: [FieldEdit](Components#fieldedit)
-
-### readonlyValue
-For a given value type, such as `text`, `URL`, `number`, return
-a formatted value for read-only display.
-If the value comes from a value list or a related table, it will have a link
-that shows you the value as an item in its list.
-
-Example: [FieldRead](Components#fieldread)
+**Example**: [FieldEdit](Components#fieldedit)
 
 ### someEditable
 Checks whether a list of fields contains at least one that the current user may edit.
 
-Example: [ItemForm](Components#itemform)
+**Example**: [ItemForm](Components#itemform)
 
 ### sortStringTemplate
 Compare function for sorting. Wraps the values to be compared in a template before actually
@@ -115,12 +171,26 @@ Sorting by time intervals should works as follows:
 * if the start date is missing, the start date is assumed to be in the infinite past;
 * if the end date is missing, the end date is assumed to be in the infinite future.
 
+Used in [workflow](Dux#workflow).
+
+### toFieldInfo
+Reduces the information in the fragments produced by [makeFields](#makefields)
+to a simple object with only the value(s) of that field.
+
+Used in [ItemRead](Components#itemread) to pass an argument to 
+[applyTemplate](#applytemplate).
+
 ### validation
 An object with validation functions, named after the types of the values they validate.
 All functions take a value, and return undefined if the value passes validation or is itself undefined.
 If a value does not pass validation, a simple string expressing the reason is returned.
 
-Used in [workflow](Dux#workflow).
+### wrappedRepr
+Produces a representation for a field value, complete with
+surrounding elements and attributes.
+Values of link fields will be wrapped in `<a href="...">` elements, 
+
+Used in [FieldRead](Components#fieldread).
 
 [handle]({{site.libBase}}/handle.js)
 =============================================================================================
@@ -198,7 +268,7 @@ Well, it is easy to turn an object into a `Set`.
 But if you do it twice, based on an identical state, you get two
 copies of the same set, which is a waste.
 Here memoization is a solution.
-`makeSet` is e memoized function that takes an array and returns its values as a `Set`.
+`makeSet` is a memoized function that takes an array and returns its values as a `Set`.
 
 ### memoize
 Turns the function `f` into a memoized function `memF` that yields the same results
@@ -335,9 +405,55 @@ as the root cause of this particular slowness.
 [presentation]({{site.libBase}}/presentation.js)
 =============================================================================================
 This library contains templates that customize the presentation of records and fields.
-See [Teamplates](Components#templates) for how the template system is structured.
+See [Templates](Components#templates) for how the template system is structured.
 This library contains the functions to *apply* templates.
 
+### applyTemplate
+Applies a template by preparing field information in such a way
+that it can be easily called for from within a template.
+You can merge a template with [FieldRead](Components#fieldread) components.
+This is for read-only templates.
+
+### applyEditTemplate
+Applies an edit template by preparing field information in such a way
+that it can be easily called for from within a template.
+There is a bit of extra data here compared to read-only templates,
+namely whether fields are editable or not.
+You can merge a template with [FieldRead](Components#fieldread) components,
+as well as with [FieldEdit](Components#fieldedit) components.
+
+**Examples**:
+[ItemRead](Components#itemread)
+[ItemEdit](Components#itemedit)
+
+See also
+[Templates](Components#templates).
+
+### editMode
+This function computes a test function for a record, and the test
+function is customized per table, in the same way as templates are 
+customized per table.
+
+Per table you can define any function, and in doing so you
+are given the information which fields are empty.
+
+In practice we use this function to determine whether we start
+the presentation of a record in read-only mode or in edit mode.
+
+**Example**
+In [ListPlain](Components#listplain) we invoke this function to determine
+the `startMode` function, which computes for each record a choice between
+alternatives (edit mode or read-only mode), called `thisStartMode`.
+
+When ListPlain is called to display the `criteriaEntry` detail records of
+an `assessment` record, there a test function is invoked, defined in
+[detailEdit]({{site.libBase}}/presentation.js)
+telling to return `1` if the `score` is empty or if the `evidence` is empty.
+Alternative `1` corresponds to edit mode.
+
+So, whenever a `criteriaEntry` record is certainly incomplete, it will be opened
+in edit mode. 
+If it is possibly complete, it will be opened in read-only mode.  
 
 [utils]({{site.libBase}}/utils.js)
 =============================================================================================
@@ -412,11 +528,23 @@ These functions define how a new state must be produced when an action has been
 This function helps to write down complex reducer function as small components
 with a clean syntax.
 
+### max
+Returns the maximum of an array of numbers.
+If the array is empty, return negative infinity.
+
+### min
+Returns the minimum of an array of numbers.
+If the array is empty, return positive infinity.
+
 ### propsChanged(newProps, need, oldProps, keyPropNames)
 Determines whether `newProps` differ significantly from `oldProps`, based on 
 the props with `keyPropNames` only.
 If the props are sufficiently changed, it uses the `need` function to
 finally determine whether the change should result in an action.
+
+### sum
+Returns the sum of an array of numbers.
+If the array is empty, return `0`.
 
 ### updateAuto
 The `update()` function of the

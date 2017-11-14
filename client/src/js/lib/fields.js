@@ -48,7 +48,7 @@ export const makeSubmit = memoize((dirty, invalid, submitting, submit) =>
   : () => null
 )
 
-export const makeSubmitTime = memoize(submit => () => setTimeout(submit, 100))
+export const makeSubmitTime = memoize(submit => () => setTimeout(submit, 10))
 
 export const itemReadField = (field, label, fvalue, key) => (
   <div

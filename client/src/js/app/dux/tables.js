@@ -6,7 +6,7 @@ import { accessData } from 'server'
 import { memoize } from 'memo'
 import { makeReducer, updateAuto, getUrlParts, emptyS, emptyA, emptyO } from 'utils'
 
-import { compileAlternatives, closeItems } from 'alter'
+import { compileAlternatives, setItems } from 'alter'
 
 /* DEFS */
 
@@ -513,7 +513,7 @@ export const handleCloseAll = memoize((alter, alterSection, nAlts, initial, item
       }
     })
     if (alts.length) {
-      dispatch(closeItems(alts, alterSection, initial))
+      dispatch(setItems(alts, alterSection, initial))
     }
   }
 }, emptyO)

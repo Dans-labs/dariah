@@ -2,7 +2,7 @@ import React from 'react'
 
 import { emptyS } from 'utils'
 import { itemReadField, itemEditField } from 'fields'
-import { assessmentScore } from 'custom'
+import { assessmentScore } from 'presentation'
 
 import Expand, { ExpandHead, ExpandBody } from 'Expand'
 
@@ -40,7 +40,7 @@ export const mainEditTemplates = {
 
 export const mainActionTemplates = {
   assessment({ tables, l, e, v, fe, fs, m }) {
-    const { average, relevantScore, relevantMax, allMax, relevantN, allN } = assessmentScore(tables, v('_id'))
+    const { overall, relevantScore, relevantMax, allMax, relevantN, allN } = assessmentScore(tables, v('_id'))
     const irrelevantN = allN - relevantN
     const isWithdrawn = !e('dateWithdrawn')
     const isSubmitted = !e('submitted')
@@ -51,7 +51,7 @@ export const mainActionTemplates = {
             className={'ass-score'}
             data-rh={'overall-score of this assessment'}
             data-rh-at={'right'}
-          >{`${average} %`}</span>
+          >{`${overall} %`}</span>
           <Expand
             alterSection={`assessment{v('_id')}`}
             alterTag={'score'}

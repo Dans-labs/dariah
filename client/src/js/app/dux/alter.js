@@ -10,8 +10,8 @@ export const nextAlt = (alterSection, alterTag, nAlts, initial) =>
   ({ type: 'nextAlt', alterSection, alterTag, nAlts, initial })
 export const setAlt = (alterSection, alterTag, alt) =>
   ({ type: 'setAlt', alterSection, alterTag, alt })
-export const closeItems = (alts, alterSection, alt) =>
-  ({ type: 'closeItems', eIds: alts, alterSection, alt })
+export const setItems = (alts, alterSection, alt) =>
+  ({ type: 'setItems', eIds: alts, alterSection, alt })
 
 /* REDUCER */
 
@@ -33,7 +33,7 @@ const flows = {
     }
     return newState
   },
-  closeItems(state, { eIds, alterSection, alt }) {
+  setItems(state, { eIds, alterSection, alt }) {
     let newState = state
     if (eIds != null) {
       for (const eId of eIds) {
