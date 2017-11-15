@@ -223,7 +223,7 @@ The criterion may be an arbitrary MongoDb selction constraint.
 So when we choose a country for a contribution, we will be presented with a choice between those
 countries that are a member of DARIAH.
 
-**Example 2:** the `reviewer1` field in the `assessment` table points to the user table, but it has
+**Example 2:** the `reviewerE` field in the `assessment` table points to the user table, but it has
 a `select` condition:
 
 ```yaml

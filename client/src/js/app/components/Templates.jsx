@@ -106,8 +106,8 @@ export const mainActionTemplates = {
               m('submitted'),
             )
           }
-          {e('submitted') ? null : eField('reviewer1', l, fe, m)}
-          {e('submitted') ? null : eField('reviewer2', l, fe, m)}
+          {e('submitted') ? null : eField('reviewerE', l, fe, m)}
+          {e('submitted') ? null : eField('reviewerF', l, fe, m)}
         </div>
       </div>
     )

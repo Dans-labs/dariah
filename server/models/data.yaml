@@ -310,6 +310,50 @@ tables:
         maxCols: 1
         expanded: true
 
+  year:
+    title: rep
+    item:
+      - year
+      - years
+    sort:
+      - [rep, 1]
+    fieldOrder:
+      - rep
+      - creator
+      - dateCreated
+      - modified
+    fieldSpecs:
+      rep:
+        label: Year
+        valType: number
+        multiple: false
+        grid:
+          width: 3em
+          grow: 0
+      creator:
+        label: creator
+        valType:
+          relTable: user
+          allowNew: false
+        multiple: false
+        grid:
+          width: 10em
+          grow: 1
+      dateCreated:
+        label: created on
+        valType: datetime
+        multiple: false
+        grid:
+          width: 10em
+          grow: 1
+      modified:
+        label: modified
+        valType: text
+        multiple: true
+        grid:
+          width: 10em
+          grow: 1
+
   typeContribution:
     title: subType
     item:
@@ -473,6 +517,9 @@ tables:
         label: Year
         valType:
           relTable: year
+          select:
+            rep:
+              $lte: $curYear
           allowNew: true
         multiple: false
       vcc:
@@ -621,8 +668,8 @@ tables:
       - submitted
       - dateSubmitted
       - dateWithdrawn
-      - reviewer1
-      - reviewer2
+      - reviewerE
+      - reviewerF
       - creator
       - dateCreated
       - modified
@@ -666,8 +713,8 @@ tables:
         label: Withdrawn on
         valType: datetime
         multiple: false
-      reviewer1:
-        label: First reviewer
+      reviewerE:
+        label: Reviewer (expert)
         valType:
           select:
             authority:
@@ -675,8 +722,8 @@ tables:
           relTable: user
           allowNew: email
         multiple: false
-      reviewer2:
-        label: Second reviewer
+      reviewerF:
+        label: Reviewer (final say)
         valType:
           select:
             authority:

@@ -1,9 +1,10 @@
 import json
 from functools import reduce
+from copy import deepcopy
 from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
 
-from controllers.utils import oid, now, dtm, json_string
+from controllers.utils import oid, now, dtm, json_string, fillInSelect
 from controllers.workflow import detailInsert, getWorkflow, timing
 from models.data import DataModel as DM
 from models.names import *
@@ -394,7 +395,8 @@ class DbAccess(object):
             fSpec = fieldSpecs[f][N_valType]
             t = fSpec[N_relTable]
             thisTableInfo = DM[N_tables].get(t, {})
-            select = fSpec.get(N_select, {})
+            select = deepcopy(fSpec.get(N_select, {}))
+            fillInSelect(select)
             valueOrder = thisTableInfo.get(N_sort, DM[N_generic][N_sort])
             rows = [str(row[N__id]) for row in _DBM[t].find(select, {N__id: True}).sort(valueOrder)]
             valueLists[f] = rows

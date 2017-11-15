@@ -31,3 +31,21 @@ def json_string(obj):
 def utf8FromLatin1(s): return str(bytes(s, encoding='latin1'), encoding='utf8')
 
 def serverprint(msg): sys.stdout.write('o-o-o {}\n'.format(msg))
+
+def fillInSelect(select):
+    params = {
+        'curYear': now().year,
+    }
+    changed = False
+    for (key, value) in select.items():
+        if type(value) is str:
+            newValue = value
+            for (p, pValue) in params.items():
+                if '${}'.format(p) == value: 
+                    newValue = pValue
+                    break
+            if newValue != value:
+                select[key] = newValue
+        elif type(value) is dict:
+            fillInSelect(value)
+

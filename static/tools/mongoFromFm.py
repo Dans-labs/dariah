@@ -397,11 +397,12 @@ class FMConvert(object):
     def yearTable(self):
         mt = 'year'
         existingYears = dict((int(row['rep']), row) for row in self.allData[mt])
+        for (year, row) in existingYears.items(): row['rep'] = int(row['rep'])
         targetInterval = set(range(2010, 2030))
         allYears = set(existingYears) | targetInterval
         interval = range(min(allYears), max(allYears) + 1)
         self.allData[mt] = [
-            existingYears[year] if year in existingYears else dict(_id=self.mongo.newId(mt), rep=str(year)) \
+            existingYears[year] if year in existingYears else dict(_id=self.mongo.newId(mt), rep=year) \
             for year in interval
         ]
 

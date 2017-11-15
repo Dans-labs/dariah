@@ -103,12 +103,12 @@ Two reviewers will be selected, and they will get access to the self assessment.
 Upon asking for review, the assessment and the contribution will be made immutable, temporarily.
 
 The two reviewers have distinct roles:
-* reviewer 1 takes decisions.
-* reviewer 2 is advisory.
+* **reviewer (expert)** inspects the assessment closely and proposes a decision;
+* **reviewer (final say)** take the decision.
 
-Reviewer 1 and 2 can enter comments in a comment stream, which are detail records of the assessment.
+Both reviewers can enter comments in a comment stream, which are detail records of the assessment.
 
-At a certain point, Reviewer 1 can take a three fold decision:
+At a certain point, the reviewer with the final say can take a three fold decision:
 
 * **approve**
 * **reject**

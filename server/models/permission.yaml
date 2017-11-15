@@ -575,11 +575,11 @@ fields:
       list: auth
       read: auth
       update: nobody
-    reviewer1:
+    reviewerE:
       list: auth
       read: auth
       update: office
-    reviewer2:
+    reviewerF:
       list: auth
       read: auth
       update: office
