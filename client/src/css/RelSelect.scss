@@ -37,6 +37,23 @@ div.select.multiselect {
     border-radius: 3px;
     background-color: $options-back;
     max-width: 100%;
+    resize: both;
+    @include sized();
+}
+.options.x-large {
+    height: 10em;
+}
+.options.large {
+    height: 8em;
+}
+.options.medium {
+    height: 6em;
+}
+.options.small {
+    height: 4em;
+}
+.options.x-small {
+    height: fit-content;
 }
 .option {
     @include action();

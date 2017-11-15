@@ -146,8 +146,19 @@ const Options = ({
   const pat = (search || emptyS).toLowerCase()
   const makeAttributes = composeAttributes(activeItems, inactive)
   const testDisabled = checkDisabled(activeItems, inactive)
+  const oLen = options.length
+  const sizeClass = oLen >= 50
+  ? 'x-large'
+    : oLen >= 30
+      ? 'large'
+      : oLen >= 20
+        ? 'medium'
+        : oLen >= 10
+          ? 'small'
+          : 'x-small'
+
   return (
-    <div className={'options'} >
+    <div className={`options ${sizeClass}`} >
       {
         multiple || value == null || value == emptyS
         ? null
