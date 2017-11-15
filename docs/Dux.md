@@ -815,3 +815,5 @@ The data returned is an object containing:
 * `allMax`: the total of the maximum scores for all criteria
 * `relevantN`: the number of criteria that have not been scored as `-1`
 * `allN`: the number of criteria.
+
+See more about the computation in [Workflow](Workflow#scoring).

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { emptyS } from 'utils'
 import { itemReadField, itemEditField } from 'fields'
-import { assessmentScore } from 'presentation'
+import { assessmentScore } from 'workflow'
 
 import Expand, { ExpandHead, ExpandBody } from 'Expand'
 

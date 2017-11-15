@@ -81,6 +81,9 @@ generic:
     - email
     - url
     - datetime
+  workflow:
+    - locked
+    - lockedReason
 
 custom:
   - type

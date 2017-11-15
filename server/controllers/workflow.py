@@ -10,45 +10,23 @@ timing = {
     },
 }
 
-def _getActiveItems(basicList):
-    present = now()
-    types = basicList(
-        N_typeContribution,
-        {},
-        {N__id: True, N_mainType: True, N_subType: True},
-    )
-    typeInfo = dict((doc[N__id], doc) for doc in types)
+def getWorkflow(basicList, table, eIds):
+    result = {}
+    if table == N_contrib:
+        details = basicList(
+            N_assessment,
+            {table: {'$in': eIds}},
+            {N__id: False, table: True, N_submitted: True},
+        )
+        #print(details)
+        for detail in details:
+            if N_submitted:
+                result[detail[table]] = {
+                    N_locked: True,
+                    N_lockedReason: 'being assessed',
+                }
 
-    packages = basicList(
-        N_package,
-        {N_startDate: {'$lte': present}, N_endDate: {'$gte': present}},
-        {N__id: True, N_typeContribution: True},
-    )
-    packageIds = [doc[N__id] for doc in packages]  
-    activeFilter = {N_package: {'$in': packageIds}}
-    criteria = basicList(
-        N_criteria,
-        activeFilter,
-        True,
-        sort=((N_criterion, 1),),
-    )
-    typeCriteria = {}
-    criteriaEntities = {}
-    criteriaIds = [doc[N__id] for doc in criteria]  
-    for doc in criteria:
-        criteriaEntities[str(doc[N__id])] = doc
-        tps =  doc.get(N_typeContribution, [])
-        for tp in tps:
-            typeCriteria.setdefault(tp, set()).add(doc[N__id])
-    typeIds = {tp for doc in packages for tp in doc.get(N_typeContribution, [])}
-    result = {
-        N_package: set(packageIds),
-        N_type: typeIds,
-        N_typeInfo: typeInfo,
-        N_criteriaIds: criteriaIds,
-        N_criteriaEntities: criteriaEntities,
-        N_typeCriteria: typeCriteria,
-    }
+    #print('workflow: {}: {}'.format(table, result))
     return result
 
 def detailInsert(
@@ -100,4 +78,45 @@ def detailInsert(
             N_insertValues: insertValues,
         }
     return (good, message, data)
+
+def _getActiveItems(basicList):
+    present = now()
+    types = basicList(
+        N_typeContribution,
+        {},
+        {N__id: True, N_mainType: True, N_subType: True},
+    )
+    typeInfo = dict((doc[N__id], doc) for doc in types)
+
+    packages = basicList(
+        N_package,
+        {N_startDate: {'$lte': present}, N_endDate: {'$gte': present}},
+        {N__id: True, N_typeContribution: True},
+    )
+    packageIds = [doc[N__id] for doc in packages]  
+    activeFilter = {N_package: {'$in': packageIds}}
+    criteria = basicList(
+        N_criteria,
+        activeFilter,
+        True,
+        sort=((N_criterion, 1),),
+    )
+    typeCriteria = {}
+    criteriaEntities = {}
+    criteriaIds = [doc[N__id] for doc in criteria]  
+    for doc in criteria:
+        criteriaEntities[str(doc[N__id])] = doc
+        tps =  doc.get(N_typeContribution, [])
+        for tp in tps:
+            typeCriteria.setdefault(tp, set()).add(doc[N__id])
+    typeIds = {tp for doc in packages for tp in doc.get(N_typeContribution, [])}
+    result = {
+        N_package: set(packageIds),
+        N_type: typeIds,
+        N_typeInfo: typeInfo,
+        N_criteriaIds: criteriaIds,
+        N_criteriaEntities: criteriaEntities,
+        N_typeCriteria: typeCriteria,
+    }
+    return result
 
