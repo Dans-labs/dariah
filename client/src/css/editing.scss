@@ -22,7 +22,8 @@ input[type="text"] {
 }
 input[type="text"]:focus, textarea:focus {
     @include focustext();
-    outline: 2pt solid $warning-back;
+    outline: none;
+    border: 2pt solid $warning-back;
 }
 input.dirty {
     @include actiontextdirty();

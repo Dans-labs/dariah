@@ -33,6 +33,7 @@ div.select.multiselect {
 .options {
     display: flex;
     flex-flow: row wrap;
+    align-items: baseline;
     border: 1px solid $options-border;
     border-radius: 3px;
     background-color: $options-back;
@@ -40,20 +41,11 @@ div.select.multiselect {
     resize: both;
     @include sized();
 }
-.options.x-large {
-    height: 10em;
-}
-.options.large {
+.options.o-large {
     height: 8em;
 }
-.options.medium {
-    height: 6em;
-}
-.options.small {
-    height: 4em;
-}
-.options.x-small {
-    height: fit-content;
+.options.o-small {
+    height: min-content;
 }
 .option {
     @include action();
@@ -77,13 +69,23 @@ div.select.multiselect {
 }
 input.invisible {
     border-radius: 3px;
-    border: 0;
+    border: inset;
     box-shadow: none;
     width: 90%;
+}
+input[type="text"].invisible:focus {
+    outline: none;
+    border: inset;
 }
 
 /* tags */
 
+.fa.up {
+    cursor: nw-resize;
+}
+.fa.down {
+    cursor: se-resize;
+}
 .tags {
     display: flex;
     flex-flow: row wrap;

@@ -353,7 +353,8 @@ input[type="text"]:focus, textarea:focus {
   background-color: #ffffee;
   font-size: large;
   font-family: monospace;
-  outline: 2pt solid #ffcc88; }
+  outline: none;
+  border: 2pt solid #ffcc88; }
 
 input.dirty {
   color: #000000;
@@ -1569,6 +1570,10 @@ div.select.multiselect {
   -webkit-flex-flow: row wrap;
       -ms-flex-flow: row wrap;
           flex-flow: row wrap;
+  -webkit-box-align: baseline;
+  -webkit-align-items: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
   border: 1px solid rgba(200, 200, 200, 0.5);
   border-radius: 3px;
   background-color: rgba(200, 200, 200, 0.8);
@@ -1577,22 +1582,13 @@ div.select.multiselect {
   overflow: auto;
   -webkit-overflow-scrolling: touch; }
 
-.options.x-large {
-  height: 10em; }
-
-.options.large {
+.options.o-large {
   height: 8em; }
 
-.options.medium {
-  height: 6em; }
-
-.options.small {
-  height: 4em; }
-
-.options.x-small {
-  height: -webkit-fit-content;
-  height: -moz-fit-content;
-  height: fit-content; }
+.options.o-small {
+  height: -webkit-min-content;
+  height: -moz-min-content;
+  height: min-content; }
 
 .option {
   color: #0000aa;
@@ -1617,12 +1613,22 @@ div.select.multiselect {
 
 input.invisible {
   border-radius: 3px;
-  border: 0;
+  border: inset;
   -webkit-box-shadow: none;
           box-shadow: none;
   width: 90%; }
 
+input[type="text"].invisible:focus {
+  outline: none;
+  border: inset; }
+
 /* tags */
+.fa.up {
+  cursor: nw-resize; }
+
+.fa.down {
+  cursor: se-resize; }
+
 .tags {
   display: -webkit-box;
   display: -webkit-flex;

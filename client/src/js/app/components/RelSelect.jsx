@@ -46,7 +46,7 @@ const changeSel = memoize((selectTag, multiple, value, val, onChange, dispatch) 
   }
 })
 
-const Head = ({ optionLookup, value, popUpIfEmpty, activeItems, inactive, selectTag, dispatch }) => {
+const Head = ({ optionLookup, value, popUp, popUpIfEmpty, activeItems, inactive, selectTag, dispatch }) => {
   const makeAttributes = composeAttributes(activeItems, inactive)
   let label = emptyS
   const { [value]: lab = value } = optionLookup
@@ -62,22 +62,30 @@ const Head = ({ optionLookup, value, popUpIfEmpty, activeItems, inactive, select
     }
   }
   const attributes = makeAttributes(value, classes.join(' '))
+  const dir = popUp ? 'up' : 'down'
+  const present = popUp ? 'hide' : 'show'
   return (
     <span
       {...attributes}
-      data-rh={'click here to see the other options'}
+      data-rh={`click here to ${present} the other options`}
       data-rh-at={'top'}
       onClick={handle(dispatch, togglePopUp, selectTag)}
-    >{label}</span>
+    >
+      {label}
+      {' '}
+      <span className={`fa fa-arrow-${dir} ${dir}`} />
+    </span>
   )
 }
 
-const Tags = ({ selectTag, optionLookup, popUpIfEmpty, activeItems, inactive, value, onChange, dispatch }) => {
+const Tags = ({ selectTag, optionLookup, popUp, popUpIfEmpty, activeItems, inactive, value, onChange, dispatch }) => {
   const makeAttributes = composeAttributes(activeItems, inactive)
+  const dir = popUp ? 'up' : 'down'
+  const present = popUp ? 'hide' : 'show'
   return (
     <div
       className={'tags'}
-      data-rh={'click anywhere on this line to hide/show the remaining options'}
+      data-rh={`click to ${present} the remaining options`}
       data-rh-at={'top'}
       onClick={handle(dispatch, togglePopUp, selectTag)}
     >
@@ -107,6 +115,7 @@ const Tags = ({ selectTag, optionLookup, popUpIfEmpty, activeItems, inactive, va
           ? null
           : <span className={'tag empty'}>{'click to enter values'}</span>
       }
+      <span className={`fa fa-arrow-${dir} ${dir}`} />
     </div>
   )
 }
@@ -147,15 +156,9 @@ const Options = ({
   const makeAttributes = composeAttributes(activeItems, inactive)
   const testDisabled = checkDisabled(activeItems, inactive)
   const oLen = options.length
-  const sizeClass = oLen >= 50
-  ? 'x-large'
-    : oLen >= 30
-      ? 'large'
-      : oLen >= 20
-        ? 'medium'
-        : oLen >= 10
-          ? 'small'
-          : 'x-small'
+  const sizeClass = oLen >= 20
+  ? 'o-large'
+  : 'o-small'
 
   return (
     <div className={`options ${sizeClass}`} >
@@ -248,6 +251,7 @@ const RelSelect = ({
             inactive={inactive}
             value={value}
             selectTag={selectTag}
+            popUp={realPopUp}
             popUpIfEmpty={popUpIfEmpty}
             dispatch={dispatch}
             onChange={onChangeSave}
@@ -257,6 +261,7 @@ const RelSelect = ({
             activeItems={activeItems}
             inactive={inactive}
             value={value}
+            popUp={realPopUp}
             popUpIfEmpty={popUpIfEmpty}
             selectTag={selectTag}
             dispatch={dispatch}
