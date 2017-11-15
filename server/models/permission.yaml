@@ -480,7 +480,7 @@ fields:
     country:
       list:   public
       read:   public
-      update: office
+      update: own
     contactPersonName:
       list:   public
       read:   public
