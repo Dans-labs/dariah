@@ -650,6 +650,52 @@ div.detail-body {
 .delete {
   float: right; }
 
+div.edit-help {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-flow: row  wrap;
+      -ms-flex-flow: row  wrap;
+          flex-flow: row  wrap;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  margin-top: 0.5em;
+  border: 1pt solid #aaaaaa;
+  background-color: #eeeeee;
+  font-size: small;
+  color: #777777; }
+
+div.help-item {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 1 auto;
+      -ms-flex: 0 1 auto;
+          flex: 0 1 auto;
+  background-color: #ffffff;
+  border-radius: 3pt;
+  padding: 0.1em;
+  margin-top: 0.2em;
+  margin-bottom: 0.1em;
+  margin-left: 0.5em;
+  margin-right: 0.5em; }
+
+.help-code {
+  color: #000000;
+  font-size: medium;
+  font-family: monospace; }
+
+.mdh1 {
+  font-weight: bold;
+  font-size: 120%; }
+
+.mdh2 {
+  font-weight: bold;
+  font-size: 110%; }
+
 pre.md-source {
   font-size: medium;
   color: #000000;
@@ -1509,48 +1555,6 @@ div.evidence {
 
 .tGood {
   color: #00bb00; }
-
-div.mddoc {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -webkit-flex-flow: row  wrap;
-      -ms-flex-flow: row  wrap;
-          flex-flow: row  wrap;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  margin-top: 0.5em;
-  border: 1pt solid #aaaaaa;
-  background-color: #eeeeee;
-  font-size: small;
-  color: #777777; }
-
-div.mditem {
-  -webkit-box-flex: 0;
-  -webkit-flex: 0 1 auto;
-      -ms-flex: 0 1 auto;
-          flex: 0 1 auto;
-  background-color: #ffffff;
-  border-radius: 3pt;
-  padding: 0.1em; }
-
-.mdcode {
-  color: #000000;
-  font-size: medium;
-  font-family: monospace; }
-
-.mdh1 {
-  font-weight: bold;
-  font-size: 120%; }
-
-.mdh2 {
-  font-weight: bold;
-  font-size: 110%; }
 
 div.select {
   display: inline-block;

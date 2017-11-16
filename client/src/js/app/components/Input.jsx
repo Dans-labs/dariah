@@ -2,7 +2,7 @@ import React from 'react'
 
 import { editClass, makeSubmit, makeSubmitTime, makeReset } from 'fields'
 
-import EditCancel from 'EditCancel'
+import EditHelp from 'EditHelp'
 
 export default ({
   meta: { dirty, invalid, submitting, error },
@@ -26,7 +26,7 @@ export default ({
         {...onCancel}
       />
       {error && <span className={'invalid diag'}>{error}</span>}
-      <EditCancel dirty={dirty} />
+      <EditHelp type={'text'} dirty={dirty} />
     </span>
   )
 }

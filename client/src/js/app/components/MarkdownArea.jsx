@@ -6,7 +6,7 @@ import { editClass, makeSubmit, makeReset } from 'fields'
 
 import { getAltSection, compileAlternatives } from 'alter'
 
-import EditCancel from 'EditCancel'
+import EditHelp from 'EditHelp'
 
 const MarkdownArea = ({
   alter, alterSection, table, eId, meta: { dirty, invalid, submitting, error },
@@ -17,7 +17,6 @@ const MarkdownArea = ({
   const alterTag = `${table}-${eId}-${name}`
   const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 1, dispatch)(alterTag)
   const alt = getAlt(alter)
-  const mdcode = 'mdcode'
   return (
     <div className={'md-field'}>
       <p className={'stick'} >
@@ -43,18 +42,7 @@ const MarkdownArea = ({
               {...makeReset('text', reset)}
             />
             {error && <span className={'invalid diag'}>{error}</span>}
-            <div className="mddoc">
-              <div className="mditem"><span className={mdcode}>{'['}</span>{'link text'}<span className={mdcode}>{']('}</span>{'url'}<span className={mdcode}>{')'}</span></div>
-              <div className="mditem"><span className={mdcode}>{'*'}</span><i>{'italic'}</i><span className={mdcode}>{'*'}</span></div>
-              <div className="mditem"><span className={mdcode}>{'**'}</span><b>{'bold'}</b><span className={mdcode}>{'**'}</span></div>
-              <div><span className={mdcode}>{'`'}</span><code>{'code'}</code><span className={mdcode}>{'`'}</span></div>
-              <div className="mditem"><span className={mdcode}>{'# '}</span><span className={'mdh1'}>{'Heading1'}</span></div>
-              <div className="mditem"><span className={mdcode}>{'## '}</span><span className={'mdh2'}>{'Heading2'}</span></div>
-              <div className="mditem"><span className={mdcode}>{'* '}</span><span className={'mduli'}>{'bullet item'}</span></div>
-              <div className="mditem"><span className={mdcode}>{'1. '}</span><span className={'mdoli'}>{'numbered item'}</span></div>
-              <div className="mditem"><span className={mdcode}>{'> '}</span><span className={'mdbq'}>{'block quote'}</span></div>
-            </div>
-            <EditCancel dirty={dirty} />
+            <EditHelp type={'markdown'} dirty={dirty} />
           </div>
       }
     </div>

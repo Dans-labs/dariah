@@ -48,6 +48,7 @@
   - EditControl
   - EditDelete
   - EditInsert
+  - EditHelp
   - EditStatus
   - FieldEdit
   - FieldRead

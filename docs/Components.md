@@ -299,6 +299,11 @@ Button to delete the record that is displayed with it.
 The component is rather dumb, it needs to be passed an `onClick` handler that
 will perform the delete action.
 
+[EditHelp]({{site.appBase}}/components/EditHelp.jsx)
+=============================================================================================
+Information panel below input fields and markdown fields, telling
+how to save and cancel, and showing the markdown constructs.
+
 [EditInsert]({{site.appBase}}/components/EditInsert.jsx)
 =============================================================================================
 Button to insert a blank record into the currently displayed table.
