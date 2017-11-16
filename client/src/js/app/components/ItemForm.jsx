@@ -28,13 +28,13 @@ const ItemForm = props => {
     fixed,
     border,
     initialValues,
-    fields, perm,
+    fields, perm, workflow,
     dispatch,
   } = props
   let { fieldFragments, detailFragments } = props
   if (fieldFragments == null) {fieldFragments = makeFields(props)}
   if (detailFragments == null) {detailFragments = makeDetails(props)}
-  const hasEditable = someEditable(fields, perm)
+  const hasEditable = someEditable(fields, perm, workflow)
   const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, startMode, dispatch)('edit')
   const alt = getAlt(alter)
 

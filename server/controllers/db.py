@@ -5,7 +5,7 @@ from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
 
 from controllers.utils import oid, now, dtm, json_string, fillInSelect
-from controllers.workflow import detailInsert, getWorkflow, timing
+from controllers.workflow import detailInsert, getWorkflow, modWorkflow, timing
 from models.data import DataModel as DM
 from models.names import *
 
@@ -169,16 +169,21 @@ class DbAccess(object):
 
             updateSaveValues.setdefault(N_modified, []).append('{} on {}'.format(modBy, modDate))
             if N_isPristine in updateSaveValues: del updateSaveValues[N_isPristine]
+
+            # here system values are updated in the database
             _DBM[table].update_one(
                 rowFilter,
                 {'$set': updateSaveValues, '$unset': {N_isPristine: ''}},
             )
-            # here system values are updated in the database
+
+            # check for updates in the workflow information
+            workflow = modWorkflow(self.basicList, table, document, updateValues) 
             return self.stop({
                 N_data: {
                     N_values: updateSaveValues,
                     N_newValues: newValues,
                     N_diags: validationDiags,
+                    N_workflow: workflow,
                 },
                 N_msgs: permMsgs+validationMsgs,
             }) # ??? but N_modified is not always returned
@@ -534,6 +539,7 @@ class DbAccess(object):
                     N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
                     N_perm: perm,
                     N_fields: fieldFilter,
+                    N_workflow: workflow.get(document[N__id], {})
                 })
             return self.stop({N_data: data})
         else:
@@ -546,6 +552,7 @@ class DbAccess(object):
                     N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
                     N_perm: perm,
                     N_fields: fieldFilter,
+                    N_workflow: workflow.get(document[N__id], {})
                 },
             })
 

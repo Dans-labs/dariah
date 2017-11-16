@@ -39,6 +39,13 @@ export const mainEditTemplates = {
 }
 
 export const mainActionTemplates = {
+  contrib({ w }) {
+    return w('locked')
+    ? <div className={'workflow-large invert'} >
+        {`This contribution is locked because it is ${w('lockedReason')}.`}
+      </div>
+    : null
+  },
   assessment({ tables, l, e, v, fe, fs, m }) {
     const { overall, relevantScore, relevantMax, allMax, relevantN, allN } = assessmentScore(tables, v('_id'))
     const irrelevantN = allN - relevantN

@@ -63,7 +63,7 @@ const ListGrid = ({
   const activeItems = compileActive(tables, table)
   const rows = []
   for (const eId of sortedData) {
-    const { [eId]: { values: initialValues, perm } } = entities
+    const { [eId]: { values: initialValues, perm, workflow } } = entities
     const { getAlt, nextAlt } = makeAlternatives(eId)
     const alt = getAlt(alter)
     const isactive = (activeItems != null && activeItems.has(eId))
@@ -81,6 +81,7 @@ const ListGrid = ({
         isactive={isactive}
         initialValues={initialValues}
         perm={perm}
+        workflow={workflow}
         fields={fields}
         widthStyles={widthStyles}
         fixed={fixed}

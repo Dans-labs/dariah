@@ -100,7 +100,7 @@ class ListPlain extends Component {
         }
         {
           listIds.map(eId => {
-            const { [eId]: { fields, perm, values } } = entities
+            const { [eId]: { fields, perm, workflow, values } } = entities
             const head = headEntity(tables, table, eId, settings)
             const formTag = `${table}-${eId}`
             const isComplete = !needValues(entities, eId)
@@ -108,7 +108,7 @@ class ListPlain extends Component {
             const alt = getAlt(alter)
             const active = alt !== initial
             const scrollProps = active ? { ref: this.scroll } : emptyO
-            const showStatus = isComplete && someEditable(fields, perm)
+            const showStatus = isComplete && someEditable(fields, perm, workflow)
             const isactive = activeItems != null && activeItems.has(eId)
             const thisStartMode = startMode === 0 ? startMode : startMode(values)
 

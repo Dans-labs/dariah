@@ -59,7 +59,8 @@ const fieldsButton = memoize((nextAlt, table, eId, mayUpdate, on) => (
 ))
 
 const ItemRow = ({
-  alt, nextAlt, filters, tables, form, table, eId, initialValues, perm,
+  alt, nextAlt, filters, tables, form, table, eId, initialValues,
+  perm, workflow,
   masterId, linkField,
   isactive, fixed,
   fields,
@@ -105,6 +106,7 @@ const ItemRow = ({
               startMode={0}
               initialValues={initialValues}
               perm={perm}
+              workflow={workflow}
               fields={fields}
               fieldFragments={fieldFragments}
               detailFragments={detailFragments}

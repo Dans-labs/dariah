@@ -1,14 +1,15 @@
 $action-back: #ffffff;
-$action-back-invert: #000000;
 $action-high: #ffffcc;
 $action-error-back: #ffdddd;
 $action-error-fore: #aa0000;
 $action-fore: #0000aa;
-$action-fore-invert: #ffffff;
 $action-border: #ffffdd;
 $action-text: #000000;
 $focus-text: #0000aa;
 $focus-back: #ffffee;
+$back-invert: #000000;
+$border-invert: #000000;
+$fore-invert: #ffffff;
 
 @mixin action() {
     color: $action-fore;
@@ -49,8 +50,8 @@ $focus-back: #ffffee;
 .button-large.invert,.button-medium.invert,.button-small.invert  {
     @include action();
     font-weight: bold;
-    color: $action-fore-invert;
-    background-color: $action-back-invert;
+    color: $fore-invert;
+    background-color: $back-invert;
     border-color: $action-border;
     white-space: nowrap;
     padding: 0.5em;
@@ -58,6 +59,18 @@ $focus-back: #ffffee;
 .button-large, .button-large.invert { @include sizing(medium, 6px, 2) }
 .button-medium, .button-medium.invert { @include sizing(medium, 4px, 1) }
 .button-small, .button-small.invert { @include sizing(small, 2px, 0 ) }
+
+.workflow-large.invert,.workflow-medium.invert,.workflow-small.invert  {
+    font-weight: bold;
+    color: $fore-invert;
+    background-color: $back-invert;
+    border-color: $border-invert;
+    white-space: nowrap;
+    padding: 0.5em;
+}
+.workflow-large, .workflow-large.invert { @include sizing(medium, 6px, 2) }
+.workflow-medium, .workflow-medium.invert { @include sizing(medium, 4px, 1) }
+.workflow-small, .workflow-small.invert { @include sizing(small, 2px, 0 ) }
 
 .link {
     @include action();

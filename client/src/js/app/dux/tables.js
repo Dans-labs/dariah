@@ -141,7 +141,7 @@ const flows = {
   },
   modItem(state, { data, table }) {
     if (data == null) {return state}
-    const { values, values: { _id }, newValues } = data
+    const { values, values: { _id }, newValues, workflow } = data
     const fieldUpdates = {}
     Object.entries(values).forEach(([key, value]) => {fieldUpdates[key] = { $set: value }})
     let newState = updateAuto(state, [table, 'entities', _id, 'values'], fieldUpdates)
@@ -150,6 +150,9 @@ const flows = {
         newState = update(newState, { [table]: { valueLists: { [field]: { $push: [_id] } } } })
         newState = updateItemWithFields(newState, relTable, _id, ['_id', repName], { _id, [repName]: rep })
       }
+    }
+    for (const [relTable, relId, wf] of workflow) {
+      newState = updateAuto(newState, [relTable, 'entities', relId, 'workflow'], { $set: wf })
     }
     return newState
   },

@@ -16,12 +16,18 @@ export default ({
       fieldSpecs: {
         [linkField]: {
           valType: { relTable: masterTable } = emptyO,
-        } = emptyO },
+        } = emptyO,
+      },
+      entities: {
+        [eId]: {
+          workflow,
+        },
+      },
     },
   } = tables
   const kind = masterTable ? 'detail' : 'main'
   return (
-    applyTemplate(settings, tables, table, kind, masterTable, toFieldInfo(eId, fieldFragments))
+    applyTemplate(settings, tables, table, kind, masterTable, toFieldInfo(eId, fieldFragments), workflow)
     || <div>
         <div className={'grid fragments'}>{
           fieldFragments.map(({

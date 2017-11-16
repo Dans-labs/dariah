@@ -27,6 +27,7 @@ class ItemContainer extends Component {
                 fields,
                 values: initialValues,
                 perm,
+                workflow,
             } = emptyO,
           },
       } = emptyO,
@@ -49,6 +50,7 @@ class ItemContainer extends Component {
           key={`${table}-${eId}`}
           initialValues={initialValues}
           perm={perm}
+          workflow={workflow}
           fields={dealWithProvenance(settings, fields)}
           fixed={fixed}
           border={border}

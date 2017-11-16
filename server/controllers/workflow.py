@@ -18,16 +18,24 @@ def getWorkflow(basicList, table, eIds):
             {table: {'$in': eIds}},
             {N__id: False, table: True, N_submitted: True},
         )
-        #print(details)
         for detail in details:
-            if N_submitted:
+            if detail[N_submitted]:
+                # detail[table] is the contrib Id, must be one of the eIds
                 result[detail[table]] = {
                     N_locked: True,
                     N_lockedReason: 'being assessed',
                 }
-
-    #print('workflow: {}: {}'.format(table, result))
     return result
+
+def modWorkflow(basicList, table, document, updateValues):
+    result = []
+    if table == N_assessment and document.get(N_submitted, None) != updateValues.get(N_submitted, None):
+        contribId = document.get(N_contrib, None)
+        if contribId:
+            workflow = getWorkflow(basicList, N_contrib, [contribId]).get(contribId, {})
+            result.append([N_contrib, contribId, workflow])
+    return result
+
 
 def detailInsert(
     basicList,

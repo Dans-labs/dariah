@@ -53,7 +53,7 @@ const makeL = memoize((tables, table) => field => {
 
 // NB: [''] == '' and this is what we intend here
 
-export const applyTemplate = (settings, tables, table, kind, otherTable, values, linkMe) => {
+export const applyTemplate = (settings, tables, table, kind, otherTable, values, workflow, linkMe) => {
   const { [kind]: templates = emptyO } = switchTemplateKind
   const { [table]: theseTemplates = emptyO } = templates
   const template = otherTable ? theseTemplates[otherTable] : theseTemplates
@@ -82,6 +82,8 @@ export const applyTemplate = (settings, tables, table, kind, otherTable, values,
   }
   const v = isConsolidated ? vConsolidated : vLive
 
+  const w = field => workflow[field]
+
   const l = makeL(tables, table)
 
   const f = isConsolidated
@@ -96,7 +98,7 @@ export const applyTemplate = (settings, tables, table, kind, otherTable, values,
         myValues={values[field]}
       />
 
-  return template({ settings, tables, l, v, e, f, linkMe })
+  return template({ settings, tables, l, v, w, e, f, linkMe })
 }
 
 export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId, fieldFragments, editButton, submitValues) => {
@@ -122,6 +124,20 @@ export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId
     const { [field]: { fragment: { myValues } } } = fieldInfo
     const { [field]: { valType, multiple } = emptyO } = fieldSpecs
     return repr(tables, table, field, valType, multiple, relField, myValues, settings, sep, relSep)
+  }
+  const w = field => {
+    const {
+      [table]: {
+        entities: {
+          [eId]: {
+            workflow: {
+              [field]: info,
+            } = emptyO,
+          },
+        },
+      },
+    } = tables
+    return info
   }
 
   const l = makeL(tables, table)
@@ -192,7 +208,7 @@ export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId
     : null
   }
 
-  return template({ settings, tables, l, v, e, f, fe, fs, m, editButton })
+  return template({ settings, tables, l, v, w, e, f, fe, fs, m, editButton })
 }
 
 export const editMode = (tables, table, kind, otherTable) => values => {

@@ -109,7 +109,7 @@ const valuePrepare = memoize((settings, tables, table, valType, relField, active
     const relRecord = tables[relTable].entities[value]
     const linkMe = `/data/${relTable}/list/item/${value}`
     if (value != null) {
-      const templateApplied = applyTemplate(settings, tables, relTable, 'related', table, relRecord.values, linkMe)
+      const templateApplied = applyTemplate(settings, tables, relTable, 'related', table, relRecord.values, null, linkMe)
       if (templateApplied) {return [templateApplied]}
     }
     if (relField == null) {
@@ -195,8 +195,10 @@ export const composeAttributes = memoize((activeItems, inactive) => (value, clas
 export const checkDisabled = (activeItems, inactive) => value =>
   inactive && inactive.disabled && activeItems != null && !activeItems.has(value)
 
-export const someEditable = (fields, perm) =>
-  fields && Object.keys(fields).some(field => perm && perm.update && perm.update[field])
+export const someEditable = (fields, perm, workflow) =>
+  !(workflow && workflow.locked)
+  && fields
+  && Object.keys(fields).some(field => perm && perm.update && perm.update[field])
 
 export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
   const { initialValues } = props
