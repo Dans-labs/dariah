@@ -12,6 +12,7 @@ const FieldEdit = ({
   alter, field,
   tables, table, eId,
   dispatch, allowed,
+  reset,
   submitValues,
   ...props
 }) => {
@@ -37,6 +38,7 @@ const FieldEdit = ({
           type={type}
           valType={valType}
           rerenderOnEveryChange={true}
+          reset={reset}
           submitValues={submitValues}
           {...props}
         />
@@ -54,6 +56,7 @@ const FieldEdit = ({
           table={table}
           eId={eId}
           type={type}
+          reset={reset}
           submitValues={submitValues}
           {...props}
         />

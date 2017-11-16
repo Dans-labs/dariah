@@ -17,13 +17,14 @@ input {
     border: 0;
 }
 input[type="text"] {
-    width: 95%;
-    max-width: 95%;
+    width: 50%;
+    max-width: 75%;
 }
 input[type="text"]:focus, textarea:focus {
     @include focustext();
-    outline: none;
-    border: 2pt solid $warning-back;
+    //outline: none;
+    outline: 2pt outset $warning-back;
+    padding: 0.2em;
 }
 input.dirty {
     @include actiontextdirty();

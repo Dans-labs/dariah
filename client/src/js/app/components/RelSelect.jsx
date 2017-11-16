@@ -134,7 +134,7 @@ const Typing = ({ selectTag, search, dispatch, placeHolder }) => (
     }
     {'\xa0'}
     <input
-      className={'invisible'}
+      className={'typing'}
       type={'text'}
       data-rh={placeHolder}
       data-rh-at={'left'}

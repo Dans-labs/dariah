@@ -2,7 +2,7 @@ import React from 'react'
 
 export const editControl = canSubmit => ({
     active,
-    dirty, invalid, submitting, reset, error, handleSubmit,
+    dirty, invalid, submitting, error, handleSubmit,
     nextAlt,
 }) => (
   <span>
@@ -66,20 +66,6 @@ export const editControl = canSubmit => ({
           data-rh={'busy saving this record'}
           data-rh-at={'bottom'}
         />
-      : null
-    }
-    {' '}
-    {
-      (dirty && !submitting)
-      ? canSubmit
-        ? <button
-            type={'button'}
-            className={'button-medium error-o fa fa-fw fa-close'}
-            data-rh={'undo your changes since the last save'}
-            data-rh-at={'bottom'}
-            onClick={reset}
-          />
-        : null
       : null
     }
     {' '}

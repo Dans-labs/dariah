@@ -64,6 +64,7 @@ const ItemEdit = ({
                           table={table}
                           eId={eId}
                           submitValues={submitValues}
+                          reset={reset}
                           {...fieldProps}
                         />
                       : <FieldRead

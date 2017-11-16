@@ -15,7 +15,8 @@ export default ({
   componentSingle, validateSingle, normalizeSingle,
   meta: { dirty, invalid, submitting, error },
   fields, table, eId, valType,
-  nameC, submitValues,
+  nameC,
+  reset, submitValues,
   ...props
 }) => {
   const submit = makeSubmit(dirty, invalid, submitting, submitValues)
@@ -43,6 +44,7 @@ export default ({
             label={i}
             table={table}
             eId={eId}
+            reset={reset}
             submitValues={submit}
             {...props}
           />

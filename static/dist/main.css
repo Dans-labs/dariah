@@ -345,16 +345,16 @@ input {
   border: 0; }
 
 input[type="text"] {
-  width: 95%;
-  max-width: 95%; }
+  width: 50%;
+  max-width: 75%; }
 
 input[type="text"]:focus, textarea:focus {
   color: #0000aa;
   background-color: #ffffee;
   font-size: large;
   font-family: monospace;
-  outline: none;
-  border: 2pt solid #ffcc88; }
+  outline: 2pt outset #ffcc88;
+  padding: 0.2em; }
 
 input.dirty {
   color: #000000;
@@ -1611,16 +1611,15 @@ div.select.multiselect {
   color: rgba(40, 40, 40, 0.9);
   background-color: rgba(255, 255, 255, 0.9); }
 
-input.invisible {
-  border-radius: 3px;
-  border: inset;
-  -webkit-box-shadow: none;
-          box-shadow: none;
-  width: 90%; }
+input.typing {
+  outline: 2pt inset #bbbbbb;
+  padding: 0.2em;
+  width: 80%; }
 
-input[type="text"].invisible:focus {
-  outline: none;
-  border: inset; }
+input.typing[type="text"]:focus {
+  color: #000000;
+  background-color: #ffffee;
+  outline: 3pt inset #aaaaaa; }
 
 /* tags */
 .fa.up {

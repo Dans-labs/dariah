@@ -62,6 +62,12 @@ export const itemReadField = (field, label, fvalue, key) => (
   </div>
 )
 
+export const makeReset = memoize((type, reset) =>
+  type == 'checkbox'
+  ? emptyO
+  : { onKeyUp: e => {if (e.keyCode == 27) {e.preventDefault(); reset()}} }
+)
+
 export const itemEditField = (field, label, fevalue, editable, key) => (
   <div
     {...(key == null ? emptyO : { key })}

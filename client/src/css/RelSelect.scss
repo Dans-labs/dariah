@@ -67,15 +67,15 @@ div.select.multiselect {
     color: $typing-fore;
     background-color: $typing-back;
 }
-input.invisible {
-    border-radius: 3px;
-    border: inset;
-    box-shadow: none;
-    width: 90%;
+input.typing {
+    outline: 2pt inset #bbbbbb;
+    padding: 0.2em;
+    width: 80%;
 }
-input[type="text"].invisible:focus {
-    outline: none;
-    border: inset;
+input.typing[type="text"]:focus {
+    color: #000000;
+    background-color: #ffffee;
+    outline: 3pt inset #aaaaaa;
 }
 
 /* tags */
