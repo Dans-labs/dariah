@@ -1,0 +1,14 @@
+.itemRecord {
+    border: 0.4ex solid #eeeeee;
+    border-radius: 1ex;
+    background-color: #eeeeee;
+}
+.itemRecord.edit {
+    border: 0.4ex solid #99bb99;
+    border-radius: 1ex;
+    background-color: #ddeedd;
+}
+
+.itemRecord.noBorder,.itemRecord.edit.noBorder {
+    border: 0;
+}

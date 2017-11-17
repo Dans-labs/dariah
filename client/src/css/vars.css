@@ -1,0 +1,55 @@
+:root {
+    --action-text: #000000;
+    --action-back: #ffffff;
+    --action-fore: #0000aa;
+    --action-high: #ffffcc;
+    --action-border: #ffffdd;
+    --action-error-back: #ffdddd;
+    --action-error-fore: #aa0000;
+
+    --focus-text: #0000aa;
+    --focus-back: #ffffee;
+    --fore-invert: #ffffff;
+    --back-invert: #000000;
+    --border-invert: #000000;
+    --error-fore-o: #880000;
+    --error-fore: #ee0000;
+    --error-back: #ffcccc;
+
+    --warning-fore-o: #bb7700;
+    --warning-fore: #000000;
+    --warning-back: #ffcc88;
+
+    --good-fore-o: #00aa00;
+    --good-fore: #000000;
+    --good-back: #88ff88;
+
+    --info-fore-o: #222222;
+    --info-fore: #226622;
+    --info-back: #eeeeee;
+
+    --special-fore-o: #000000;
+    --special-fore: #000000;
+    --special-back: #ffeeff;
+
+    --dim-fore-o: #666666;
+    --dim-fore: #888888;
+    --dim-back: #f3f3f3;
+
+    --widget-fixed-fore: #226622; 
+    --widget-fixed-back: #eeeeee; 
+    --widget-fixed-edit-back: #ffeedd; 
+    --widget-border: #aaaaaa; 
+    --widget-varia-fore: #000000; 
+    --widget-varia-back: #ffffff; 
+    --widget-high-fore: #ffffff; 
+    --widget-high-back: #444444; 
+    --value-back: #fafafa;
+    --value-edit-back: #faffff;
+
+    --tag-fore: rgba(0, 80, 0, 0.9);
+    --tag-back: rgba(220, 250, 220, 0.6);
+    --tag-back-var: rgba(240, 240, 240, 0.9);
+    --tag-back-link: rgba(240, 240, 255, 0.9);
+    --tag-border: rgba(220, 220, 220, 0.9);
+}

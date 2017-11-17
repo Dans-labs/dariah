@@ -1,0 +1,134 @@
+div.select {
+    --select-back: rgba(255, 255, 255, 0.5);
+    --select-high: rgba(255, 255, 128, 0.5);
+    --select-fore: rgba(0, 0, 128, 0.9);
+    --select-border: rgba(150, 150, 100, 0.5);
+    --options-back: rgba(200, 200, 200, 0.8);
+    --options-border: rgba(200, 200, 200, 0.5);
+    --typing-fore: rgba(40, 40, 40, 0.9);
+    --typing-back: rgba(255, 255, 255, 0.9);
+    --opt-fore: rgba(80, 0, 0, 0.9);
+    --opt-back: rgba(250, 250, 250, 0.9);
+    --opt-border: rgba(250, 250, 250, 0.9);
+    --opthover-fore: rgba(80, 80, 0, 0.9);
+    --opthover-back: rgba(255, 255, 220, 0.6);
+    --opthover-border: rgba(0, 255, 0, 0.95);
+    --newtag-fore: rgba(0, 0, 255, 0.9);
+    --newtag-back: rgba(255, 255, 160, 0.7);
+    --emptytag-fore: rgba(0, 0, 255, 0.9);
+    --emptytag-back: rgba(255, 255, 160, 0.4);
+    display: inline-block;
+    width: 100%;
+    max-width: 100%;
+}
+div.select.multiselect {
+    background-color: var(--select-back);
+}
+.options {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: baseline;
+    border: 1px solid var(--options-border);
+    border-radius: 0.8ex;
+    background-color: var(--options-back);
+    max-width: 100%;
+    resize: both;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.options.o-large {
+    height: 8em;
+}
+.options.o-small {
+    height: min-content;
+}
+.option {
+    color: var(--action-fore);
+    cursor: pointer;
+    color: var(--select-fore);
+    background-color: var(--opt-border);
+}
+.option.selected {
+    background-color: var(--select-high);
+    border: 1px solid var(--select-border);
+}
+.option-type, .option-head, .option {
+    margin: 0 0 0 0;
+    padding: 1 3 1 3;
+}
+.option-type, .option-head {
+    padding: 0.1em 0.2em 0.1em 0.2em;
+}
+.option-type {
+    color: var(--typing-fore);
+    background-color: var(--typing-back);
+}
+input.typing {
+    outline: 2pt inset #bbbbbb;
+    padding: 0.2em;
+    width: 80%;
+}
+input.typing[type="text"]:focus {
+    color: #000000;
+    background-color: #ffffee;
+    outline: 3pt inset #aaaaaa;
+}
+
+/* tags */
+
+.fa.up {
+    cursor: nw-resize;
+}
+.fa.down {
+    cursor: se-resize;
+}
+.tags {
+    display: flex;
+    flex-flow: row wrap;
+}
+.tag {
+    display: inline-block;
+    padding: 0.1em 0.2em 0.1em 0.2em;
+    margin: 0.2em 0.3em 0.2em 0.3em;
+    color: var(--tag-fore);
+    background-color: var(--tag-back);
+    border-radius: 1ex;
+    border: 1px solid var(--tag-border);
+    max-width: 95%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: se-resize;
+}
+.tag.new {
+    color: var(--newtag-fore);
+    background-color: var(--newtag-back);
+}
+.tag.empty {
+    color: var(--emptytag-fore);
+    background-color: var(--emptytag-back);
+}
+.option.tag {
+    color: var(--opt-fore);
+    background-color: var(--opt-back);
+}
+.option.tag:hover {
+    color: var(--opthover-fore);
+    background-color: var(--opthover-back);
+    border-color: var(--opthover-border);
+}
+.option.tag.selected {
+    color: var(--tag-fore);
+    background-color: var(--tag-back);
+}
+
+.button-tag {
+    cursor: pointer;
+}
+.tag .button-tag {
+    background-color: var(--tag-back-var);
+    cursor: pointer;
+}
+a.tag, a.tag .button-tag {
+    background-color: var(--tag-back-link);
+    cursor: pointer;
+}

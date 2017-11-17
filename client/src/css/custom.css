@@ -1,0 +1,32 @@
+.tag.option.inactive, .tag.inactive, .inactive {
+    color: #000000;
+    background-color: #ffcc88;
+}
+.tag.option.inactive.disabled, .tag.inactive.disabled, .inactive.disabled {
+    color: #ffffff;
+    background-color: #dd0000;
+}
+
+.isactive {
+    background-color: #ccffcc;
+}
+
+.ass-score-box {
+    background-color: #ffffff;
+    padding: 0.3em;
+    margin-bottom: 0.3em;
+    border: 3px solid #448800;
+    border-radius: 1ex;
+    display: inline-flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+.ass-score {
+    color: #448800;
+    font-size: xx-large;
+}
+.ass-score-deriv {
+    color: #448800;
+    font-size: medium;
+}

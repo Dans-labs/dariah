@@ -4,13 +4,17 @@ import Markdown from 'react-markdown'
 
 import { editClass, makeSubmit, makeReset } from 'fields'
 
+import { withEditHelp } from 'tooltip'
+
 import { getAltSection, compileAlternatives } from 'alter'
 
+import TooltipContainer from 'TooltipContainer'
 import EditHelp from 'EditHelp'
 
 const MarkdownArea = ({
   alter, alterSection, table, eId, meta: { dirty, invalid, submitting, error },
   input: { name, value }, input,
+  rh,
   reset, submitValues,
   dispatch,
 }) => {
@@ -18,7 +22,10 @@ const MarkdownArea = ({
   const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 1, dispatch)(alterTag)
   const alt = getAlt(alter)
   return (
-    <div className={'md-field'}>
+    <div
+      className={'md-field'}
+      {...rh}
+    >
       <p className={'stick'} >
         <span
           className={`button-medium field-control fa fa-${alt === 0 ? 'pencil' : 'hand-o-down'}`}
@@ -42,11 +49,10 @@ const MarkdownArea = ({
               {...makeReset('text', reset)}
             />
             {error && <span className={'invalid diag'}>{error}</span>}
-            <EditHelp type={'markdown'} dirty={dirty} />
           </div>
       }
     </div>
   )
 }
 
-export default connect(getAltSection)(MarkdownArea)
+export default withEditHelp(connect(getAltSection)(MarkdownArea), TooltipContainer, EditHelp, 'markdown', 'bottom')

@@ -9,10 +9,20 @@ import { composeAttributes, checkDisabled, makeSubmitTime } from 'fields'
 import { getSettings } from 'settings'
 import { getSelect, compileOptions, setSearch, setPopUp, togglePopUp } from 'select'
 
-const RelOption = ({ label, attributes, selected, onHit }) => (
+import { withTooltip } from 'tooltip'
+
+import TooltipContainer from 'TooltipContainer'
+
+const RelOption = ({ label, attributes, selected, multiple, onHit }) => (
   <p
     {...attributes}
-    data-rh={'select this option'}
+    data-rh={
+      selected
+      ? `${label} is currently selected`
+      : multiple
+        ? `add ${label}`
+        : `select ${label}`
+    }
     data-rh-at={'bottom'}
     onClick={selected ? null : onHit}
   >{label}</p>
@@ -46,7 +56,13 @@ const changeSel = memoize((selectTag, multiple, value, val, onChange, dispatch) 
   }
 })
 
-const Head = ({ optionLookup, value, popUp, popUpIfEmpty, activeItems, inactive, selectTag, dispatch }) => {
+const HeadBare = ({
+  optionLookup, value,
+  popUp, popUpIfEmpty,
+  activeItems, inactive,
+  rh,
+  selectTag, dispatch,
+}) => {
   const makeAttributes = composeAttributes(activeItems, inactive)
   let label = emptyS
   const { [value]: lab = value } = optionLookup
@@ -63,12 +79,10 @@ const Head = ({ optionLookup, value, popUp, popUpIfEmpty, activeItems, inactive,
   }
   const attributes = makeAttributes(value, classes.join(' '))
   const dir = popUp ? 'up' : 'down'
-  const present = popUp ? 'hide' : 'show'
   return (
     <span
       {...attributes}
-      data-rh={`click here to ${present} the other options`}
-      data-rh-at={'top'}
+      {...rh}
       onClick={handle(dispatch, togglePopUp, selectTag)}
     >
       {label}
@@ -77,16 +91,28 @@ const Head = ({ optionLookup, value, popUp, popUpIfEmpty, activeItems, inactive,
     </span>
   )
 }
+const HeadTip = ({ popUp }) =>
+  <div className={'react-hint__content'} >
+    {`click here to ${popUp ? 'hide' : 'show'} the other options`}
+  </div>
 
-const Tags = ({ selectTag, optionLookup, popUp, popUpIfEmpty, activeItems, inactive, value, onChange, dispatch }) => {
+const Head = withTooltip(HeadBare, TooltipContainer, HeadTip, 'popUp', 'top')
+
+const TagsBare = ({
+  selectTag,
+  optionLookup,
+  popUp, popUpIfEmpty,
+  activeItems, inactive,
+  rh,
+  value,
+  onChange, dispatch,
+}) => {
   const makeAttributes = composeAttributes(activeItems, inactive)
   const dir = popUp ? 'up' : 'down'
-  const present = popUp ? 'hide' : 'show'
   return (
     <div
       className={'tags'}
-      data-rh={`click to ${present} the remaining options`}
-      data-rh-at={'top'}
+      {...rh}
       onClick={handle(dispatch, togglePopUp, selectTag)}
     >
       {
@@ -102,7 +128,7 @@ const Tags = ({ selectTag, optionLookup, popUp, popUpIfEmpty, activeItems, inact
                 >
                   <span
                     className={`button-tag`}
-                    data-rh={'UNselect this option'}
+                    data-rh={`remove ${lab}`}
                     data-rh-at={'bottom'}
                     onClick={removeVal(value, onChange, val)}
                   >{'×'}</span>{' '}
@@ -119,6 +145,13 @@ const Tags = ({ selectTag, optionLookup, popUp, popUpIfEmpty, activeItems, inact
     </div>
   )
 }
+
+const TagsTip = ({ popUp }) =>
+  <div className={'react-hint__content'} >
+    {`click to ${popUp ? 'hide' : 'show'} the remaining options`}
+  </div>
+
+const Tags = withTooltip(TagsBare, TooltipContainer, TagsTip, 'popUp', 'top')
 
 const Typing = ({ selectTag, search, dispatch, placeHolder }) => (
   <span className={'option-type'} >
@@ -167,7 +200,7 @@ const Options = ({
         ? null
         : <span
             className={'button-tag tag option'}
-            data-rh={'do not select any option'}
+            data-rh={'clear selection'}
             data-rh-at={'bottom'}
             onClick={changeSel(selectTag, multiple, null, null, onChange, dispatch)}
           >{'( × )'}</span>
@@ -181,7 +214,7 @@ const Options = ({
         )
         ? <span
             className={'new tag'}
-            data-rh={'add this as a NEW option'}
+            data-rh={`add ${search} as a NEW option`}
             data-rh-at={'bottom'}
             onClick={addVal(optionLookup, multiple, value, onChange, search)}
           >{search}</span>
@@ -202,6 +235,7 @@ const Options = ({
                 label={lab}
                 attributes={attributes}
                 selected={selected}
+                multiple={multiple}
                 onHit={changeSel(selectTag, multiple, value, val, onChange, dispatch)}
               />
             )
@@ -217,11 +251,11 @@ const Options = ({
 
 const RelSelect = ({
   settings,
-  tables, table,
+  tables, table, eId,
   field, selectTag,
   activeItems, inactive,
   allowed,
-  input: { value, onChange },
+  input: { name, value, onChange },
   multiple, allowNew, popUpIfEmpty, select, dispatch,
   suppressTyping,
   submitValues,
@@ -249,6 +283,9 @@ const RelSelect = ({
             optionLookup={optionLookup}
             activeItems={activeItems}
             inactive={inactive}
+            table={table}
+            eId={eId}
+            name={name}
             value={value}
             selectTag={selectTag}
             popUp={realPopUp}
@@ -260,6 +297,9 @@ const RelSelect = ({
             optionLookup={optionLookup}
             activeItems={activeItems}
             inactive={inactive}
+            table={table}
+            eId={eId}
+            name={name}
             value={value}
             popUp={realPopUp}
             popUpIfEmpty={popUpIfEmpty}

@@ -1,0 +1,38 @@
+/* PAGE LAYOUT */
+
+td {
+    vertical-align: top;
+}
+
+.body,body,p,div,td,li {
+    font-family: sans-serif;
+}
+span.login {
+    float: right;
+    color: var(--widget-fixed-fore);
+    font-size: small;
+}
+.small {
+    font-size: small;
+}
+
+div.sized {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.inlineL {
+    float: left;
+}
+.inlineR {
+    float: right;
+}
+div.error-boundary {
+    font-size: medium;
+    font-weight: normal;
+    background-color: #ffdddd;
+    color: #000000;
+    border: 2px dashed #ff0000;
+    border-radius: 1.5ex;
+    padding: 0.3em;
+}

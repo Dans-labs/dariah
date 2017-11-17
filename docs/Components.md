@@ -1163,6 +1163,8 @@ Most of those subcomponents are linked to a main table, which is passed in the `
 
 [Templates]({{site.appBase}}/components/Templates.jsx)
 =============================================================================================
+presents __none__
+
 For some parts of the application the generic ways of presenting records and fields
 is just not good enough, e.g. for the display of assessments.
 We need a deeper customization there, where the criteriaEntry detail records should
@@ -1353,6 +1355,37 @@ but they get an extra parameter: `linkMe`, a hyperlink to the main record: `link
 Object is keyed by the names of the related tables.
 For each related table it contains an object of functions,
 named by the table name of the main records.
+
+[TooltipContainer]({{site.appBase}}/components/TooltipContainer.jsx)
+=============================================================================================
+presents __none__
+
+A dynamic tooltip, based on [react-hint](https://react-hint.js.org).
+If you follow react-hint, you get a single tooltip container, which will
+be targeted to an element that fires certain events, such as hover or click.
+But if the targeted component is updated while the tooltip is displayed,
+the tooltip is not refreshed, because it only reacts to DOM events, not
+to what is happening at the React level (in the miniDOM).
+
+The solution is: make the tooltip container more local, tie it
+to the component, and let it re-render with the component.
+
+This component is meant to be a localized tooltip container.
+
+A tooltip container provides tooltips for every element that has certain `data-` attributes.
+By choosing the part after `-data` we can separate localized tooltip providers.
+
+#### Props
+###### `att` string
+The suffix of the data attribute name to which the tooltip should react.
+
+###### `refresh` string
+A value that changes when the underlying component changes.
+The value will only be used to trigger a re-render of the tooltip container.
+
+###### `showTip` function
+When called it delivers a React component that will be the contents of the tooltip.
+If this prop is `null`, a standard tooltip will be generated.
 
 [Window]({{site.appBase}}/components/Window.jsx)
 =============================================================================================

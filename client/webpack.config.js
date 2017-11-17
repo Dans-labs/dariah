@@ -11,7 +11,7 @@ module.exports = {
   context: __dirname + '/src',
   entry: {
     app: './js/app/main.jsx',
-    main: './css/main.scss',
+    main: './css/main.css',
     _hrp: 'react-hot-loader/patch',
     _wpds: 'webpack-dev-server/client?http://localhost:8080',
     _who: 'webpack/hot/only-dev-server',
@@ -78,20 +78,6 @@ module.exports = {
             loader: 'postcss-loader',
             options: { plugins: [autoprefixer] },
           },
-        ]),
-      },
-      {
-        test: /\.scss$/,
-        use: extractCSS.extract([
-          {
-            loader: 'css-loader',
-            options: { minimize: false },
-          },
-          {
-            loader: 'postcss-loader',
-            options: { plugins: [autoprefixer] },
-          },
-          { loader: 'sass-loader' },
         ]),
       },
     ]

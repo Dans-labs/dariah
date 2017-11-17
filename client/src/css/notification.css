@@ -1,0 +1,107 @@
+
+.error {
+    color: var(--error-fore);
+    background-color: var(--error-back);
+}
+.error-o {
+    color: var(--error-fore-o);
+}
+.warning {
+    color: var(--warning-fore);
+    background-color: var(--warning-back);
+}
+.warning-o {
+    color: var(--warning-fore-o);
+}
+.good {
+    color: var(--good-fore);
+    background-color: var(--good-back);
+}
+.good-o {
+    color: var(--good-fore-o);
+}
+.info {
+    color: var(--info-fore);
+    background-color: var(--info-back);
+}
+.info-o {
+    color: var(--info-fore-o);
+}
+.special {
+    color: var(--special-fore);
+    background-color: var(--special-back);
+}
+.special-o {
+    color: var(--special-fore-o);
+}
+.msg-high {
+    font-weight: bold;
+}
+.msg-line {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.msg-trash {
+    padding-top: 2;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: medium;
+    float: left;
+}
+.msg-dismiss {
+    padding-top: 2;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-style: italic;
+    font-size: x-small;
+    float: right;
+}
+.msg-box {
+    position: fixed;
+    top: 40;
+    right: 10;
+    width: 50%;
+    height: 100;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-left: 10;
+    padding-right: 10;
+    z-index: 2000;
+    opacity: 0.9;
+    vertical-align: middle;
+    cursor: pointer;
+    background-color: #eeeeee;
+    border: 2px solid #aaaaaa;
+    border-radius: 1.5ex;
+    font-size: small;
+}
+.msg-spinner {
+    color: var(--action-fore);
+    cursor: pointer;
+    position: fixed;
+    top: 0.05em;
+    right: 1em;
+    width: 5em;
+    height: 2em;
+    text-align: right;
+    padding-left: 0;
+    padding-right: 0;
+    z-index: 2000;
+    opacity: 0.9;
+    vertical-align: middle;
+}
+.msg-dot {
+    font-size: small;
+}
+
+.progress {
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+}
+
+

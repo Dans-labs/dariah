@@ -455,6 +455,26 @@ So, whenever a `criteriaEntry` record is certainly incomplete, it will be opened
 in edit mode. 
 If it is possibly complete, it will be opened in read-only mode.  
 
+[tooltip]({{site.libBase}}/tooltip.js)
+=============================================================================================
+Utility functions to decorate components with tooltip functionality.
+See [TooltipContainer](Components#tooltipcontainer).
+
+### withEditHelp(Component, TooltipContainer, TooltipContent, type, position)
+Decorates `Component` with a localized tooltip, e.g. editing help.
+The tooltip container is passed, and the actual content of the tooltip
+is passed as a react component, e.g. [EditHelp](Compoinents#edithelp).
+
+`type` is either `text` or `markdown`. If `markdown`, it shows help for markdown symtax.
+
+`position` is where the tooltip is positioned relative the component.
+
+### withTooltip(Component, TooltipContainer, TooltipContent, refreshName, position)
+Decorates `Component` with a localized tooltip, a bit more generic than `withEditHelp`.
+
+`refreshName` is the name of a prop of the component, to whose changes the tooltip
+should be sensitive.
+
 [utils]({{site.libBase}}/utils.js)
 =============================================================================================
 ### combineSelectors(...selectors)

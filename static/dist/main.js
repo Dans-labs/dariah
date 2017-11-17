@@ -1,1 +1,1 @@
-webpackJsonp([2],{"./css/main.scss":function(s,c){}},["./css/main.scss"]);
+webpackJsonp([2],{"./css/main.css":function(s,c){}},["./css/main.css"]);
