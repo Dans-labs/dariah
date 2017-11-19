@@ -1,22 +1,22 @@
 div.criteriaEntryRead, div.criteraEntryEdit {
     border-radius: 1ex;
-    margin: 2pt;
+    margin: 2px;
 }
 div.criteriaEntryRead.complete {
-    border: 2px solid #00ff00;
-    background-color: #ffffff;
+    border: 2px solid var(--entry-complete-border);
+    background-color: var(--entry-complete-back);
 }
 div.criteriaEntryRead.incomplete {
-    border: 2px solid #ff0000;
-    background-color: #ffeeee;
+    border: 2px dashed var(--entry-incomplete-border);
+    background-color: var(--entry-incomplete-back);
 }
 div.criteriaEntryEdit.complete {
-    border: 2px solid #00ff00;
-    background-color: #ffffee;
+    border: 2px solid var(--entry-edit-complete-border);
+    background-color: var(--entry-edit-complete-back);
 }
 div.criteriaEntryEdit.incomplete {
-    border: 2px solid #ff0000;
-    background-color: #ffffee;
+    border: 2px dashed var(--entry-edit-incomplete-border);
+    background-color: var(--entry-edit-incomplete-back);
 }
 
 div.criteriaEntry {
@@ -35,8 +35,8 @@ div.xSlim {
     flex: 0 1 2em;
 }
 div.criteriaRemarks {
-    color: #002200;
-    background-color: #fffffa;
+    color: var(--remarks-fore);
+    background-color: var(--remarks-back);
     font-size: small;
     margin-left: 0em;
     margin-right: 3.5em;
@@ -45,15 +45,15 @@ div.criteriaRemarks {
 div.evidence {
     margin-left: 2em;
     margin-right: 3.5em;
-    background-color: #ffffff;
+    background-color: var(--evidence-back);
 }
 .vtop {
     vertical-align: top;
 }
 .tError {
-    color: #bb0000;
+    color: var(--template-error);
 }
 .tGood {
-    color: #00bb00;
+    color: var(--template-good);
 }
 

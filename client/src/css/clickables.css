@@ -9,8 +9,8 @@
     color: var(--action-fore);
     cursor: pointer;
     font-weight: bold;
-    color: var(--fore-invert);
-    background-color: var(--back-invert);
+    color: var(--invert-fore);
+    background-color: var(--invert-back);
     border-color: var(--action-border);
     white-space: nowrap;
     padding: 0.5em;
@@ -57,9 +57,9 @@
 
 .workflow-large.invert,.workflow-medium.invert,.workflow-small.invert  {
     font-weight: bold;
-    color: var(--fore-invert);
-    background-color: var(--back-invert);
-    border-color: var(--border-invert);
+    color: var(--invert-fore);
+    background-color: var(--invert-back);
+    border-color: var(--invert-border);
     white-space: nowrap;
     padding: 0.5em;
 }

@@ -1,6 +1,7 @@
 pre.md-source {
     font-size: medium;
-    color: var(--action-text);
+    color: var(--edit-text-fore);
+    background-color: var(--edit-text-back);
     white-space: pre-wrap;
 }
 

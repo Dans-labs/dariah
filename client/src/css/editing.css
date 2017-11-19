@@ -1,13 +1,14 @@
 .dirty {
-    background-color: #ffff88;
+    color: var(--edit-dirty-fore);
+    background-color: var(--edit-dirty-back);
 }
 .invalid {
-    color: #aa0000;
-    background-color: #ffdddd;
+    color: var(--edit-invalid-fore);
+    background-color: var(--edit-invalid-back);
 }
 .invalid.diag {
-    color: #ffffff;
-    background-color: #dd0000;
+    color: var(--edit-invalid-diag-fore);
+    background-color: var(--edit-invalid-diag-back);
     font-size: small;
     display: block;
     padding: 1ex;
@@ -16,66 +17,40 @@ input {
     color: var(--action-fore);
     background-color: var(--action-back);
     border: 0;
+    padding: 0.2em;
+}
+input[type="text"],textarea {
+    color: var(--edit-text-fore);
+    background-color: var(--edit-text-back);
+    outline: 2px inset var(--edit-text-border);
+    border: 0;
+    font-size: large;
+    font-family: monospace;
 }
 input[type="text"] {
     width: 50%;
     max-width: 75%;
-    font-size: large;
-    font-family: monospace;
-    outline: 2pt inset var(--action-border);
-}
-input[type="text"]:focus, textarea:focus {
-    color: var(--focus-text);
-    background-color: var(--focus-back);
-    font-size: large;
-    font-family: monospace;
-    outline: 2pt inset var(--warning-back);
-    padding: 0.2em;
-}
-input.dirty {
-    color: var(--action-text);
-    background-color: var(--action-high);
-    font-size: large;
-    font-family: monospace;
-}
-input.invalid {
-    color: var(--action-error-fore);
-    background-color: var(--action-error-back);
-    font-size: large;
-    font-family: monospace;
 }
 textarea {
-    color: var(--action-fore);
-    background-color: var(--action-back);
-    font-size: large;
-    font-family: monospace;
     width: calc(100% - 1em);
     height: 10em;
     margin: 0.5ex 0.5ex;
+}
+input[type="text"]:focus, textarea:focus {
+    color: var(--edit-focus-text);
+    background-color: var(--edit-focus-back);
+    outline: 4px inset var(--edit-focus-border);
     border: 0;
-    outline: 2pt inset var(--action-border);
 }
-textarea.dirty {
-    color: var(--action-fore);
-    background-color: var(--action-high);
-    font-size: large;
-    font-family: monospace;
+input.dirty, input.dirty:focus, textarea.dirty, textarea.dirty:focus {
+    color: var(--edit-dirty-fore);
+    background-color: var(--edit-dirty-back);
+    outline: 4px dashed var(--edit-dirty-border);
 }
-textarea.invalid {
-    color: var(--action-error-fore);
-    background-color: var(--action-error-back);
-    font-size: large;
-    font-family: monospace;
-}
-
-.reason {
-    vertical-align: top;
-    color: var(--error-fore);
-    background-color: var(--error-back);
-}
-.input.invalid {
-    color: var(--action-text);
-    background-color: var(--error-back);
+input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.invalid:focus {
+    color: var(--edit-invalid-fore);
+    background-color: var(--edit-invalid-back);
+    outline: 4px dashed var(--edit-invalid-border);
 }
 
 /* edit status */
@@ -264,7 +239,7 @@ div.detail-body {
 .value-col {
     text-align: left;
     padding: 0.2em 0.1em 0.2em 0.2em;
-    background-color: #fafafa; 
+    background-color: var(--value-back); 
     flex: 1 1 20em;
     overflow: visible;
     /*-webkit-overflow-scrolling: touch;*/
@@ -272,7 +247,7 @@ div.detail-body {
 .value-col-grid {
     text-align: left;
     padding: 0.1em 0.1em 0.1em 0.1em;
-    border-bottom: 2px solid #dddddd; 
+    border-bottom: 2px solid var(--value-border); 
     background-color: var(--value-back);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -285,30 +260,32 @@ div.detail-body {
 }
 
 div.edit-help {
+    color: var(--edit-help-fore);
+    background-color: var(--edit-help-back);
+    border: 2px solid var(--edit-help-border);
+    box-shadow: inset 0 0 1em var(--edit-help-shadow1), 0 0 1em var(--edit-help-shadow2);
     display: flex;
     flex-flow: row  wrap;
     justify-content: flex-start;
     margin-top: 0.5em;
-    border: 2px solid #bbdd88;
-    background-color: #ddffaa;
-    box-shadow: inset 0 0 1em #ddffaa, 0 0 1em #99bb66;
     font-size: small;
-    color: #777777;
 }
 div.help-item {
-    flex: 0 1 auto;
-    background-color: #ffffff;
+    color: var(--edit-help-fore);
+    background-color: var(--edit-help-item-back);
+    border: 0;
     border-radius: 1ex;
+    flex: 0 1 auto;
     padding: 0.1em;
     margin-top: 0.2em;
     margin-bottom: 0.1em;
     margin-left: 0.5em;
     margin-right: 0.5em;
-    border: 0;
 }
 .help-code {
-    color: #000000;
-    font-size: medium;
+    color: var(--edit-help-code-fore);
+    font-weight: bold;
+    font-size: large;
     font-family: monospace;
 }
 .mdh1 {

@@ -74,8 +74,8 @@
     opacity: 0.9;
     vertical-align: middle;
     cursor: pointer;
-    background-color: #eeeeee;
-    border: 2px solid #aaaaaa;
+    background-color: var(msg-box-back);
+    border: 2px solid var(msg-box-border);
     border-radius: 1.5ex;
     font-size: small;
 }

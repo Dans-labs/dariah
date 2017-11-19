@@ -30,9 +30,9 @@ div.sized {
 div.error-boundary {
     font-size: medium;
     font-weight: normal;
-    background-color: #ffdddd;
-    color: #000000;
-    border: 2px dashed #ff0000;
+    background-color: var(--errorboundary-back);
+    color: var(--errorboundary-fore);
+    border: 2px dashed var(--errorboundary-border);
     border-radius: 1.5ex;
     padding: 0.3em;
 }

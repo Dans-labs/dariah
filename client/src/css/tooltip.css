@@ -9,8 +9,8 @@
 .react-hint__content {
 	padding: 10px;
 	border-radius: 1ex;
-	background: #ddffaa;
-	color: #000000;
+	background: var(--tooltip-back);
+	color: var(--tooltip-fore);
 }
 
 .react-hint:after {
@@ -24,31 +24,31 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	border: 5px solid transparent;
+	border: 5px solid var(--tooltip-border1);
 }
 
 .react-hint--top:after {
 	top: auto;
 	border-bottom: none;
-	border-top-color: #000;
+	border-top-color: var(--tooltip-border2);
 }
 
 .react-hint--left:after {
 	left: auto;
 	border-right: none;
-	border-left-color: #000;
+	border-left-color: var(--tooltip-border2);
 }
 
 .react-hint--right:after {
 	right: auto;
 	border-left: none;
-	border-right-color: #000;
+	border-right-color: var(--tooltip-border2);
 }
 
 .react-hint--bottom:after {
 	bottom: auto;
 	border-top: none;
-	border-bottom-color: #000;
+	border-bottom-color: var(--tooltip-border2);
 }
 
 @keyframes fadeIn {

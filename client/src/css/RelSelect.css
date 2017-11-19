@@ -1,22 +1,4 @@
 div.select {
-    --select-back: rgba(255, 255, 255, 0.5);
-    --select-high: rgba(255, 255, 128, 0.5);
-    --select-fore: rgba(0, 0, 128, 0.9);
-    --select-border: rgba(150, 150, 100, 0.5);
-    --options-back: rgba(200, 200, 200, 0.8);
-    --options-border: rgba(200, 200, 200, 0.5);
-    --typing-fore: rgba(40, 40, 40, 0.9);
-    --typing-back: rgba(255, 255, 255, 0.9);
-    --opt-fore: rgba(80, 0, 0, 0.9);
-    --opt-back: rgba(250, 250, 250, 0.9);
-    --opt-border: rgba(250, 250, 250, 0.9);
-    --opthover-fore: rgba(80, 80, 0, 0.9);
-    --opthover-back: rgba(255, 255, 220, 0.6);
-    --opthover-border: rgba(0, 255, 0, 0.95);
-    --newtag-fore: rgba(0, 0, 255, 0.9);
-    --newtag-back: rgba(255, 255, 160, 0.7);
-    --emptytag-fore: rgba(0, 0, 255, 0.9);
-    --emptytag-back: rgba(255, 255, 160, 0.4);
     display: inline-block;
     width: 100%;
     max-width: 100%;
@@ -28,9 +10,9 @@ div.select.multiselect {
     display: flex;
     flex-flow: row wrap;
     align-items: baseline;
-    border: 1px solid var(--options-border);
+    border: 1px solid var(--select-options-border);
     border-radius: 0.8ex;
-    background-color: var(--options-back);
+    background-color: var(--select-options-back);
     max-width: 100%;
     resize: both;
     overflow: auto;
@@ -46,11 +28,7 @@ div.select.multiselect {
     color: var(--action-fore);
     cursor: pointer;
     color: var(--select-fore);
-    background-color: var(--opt-border);
-}
-.option.selected {
-    background-color: var(--select-high);
-    border: 1px solid var(--select-border);
+    background-color: var(--select-option-border);
 }
 .option-type, .option-head, .option {
     margin: 0 0 0 0;
@@ -60,18 +38,18 @@ div.select.multiselect {
     padding: 0.1em 0.2em 0.1em 0.2em;
 }
 .option-type {
-    color: var(--typing-fore);
-    background-color: var(--typing-back);
+    color: var(--select-typing-fore);
+    background-color: var(--select-typing-back);
 }
 input.typing {
-    outline: 2pt inset #bbbbbb;
+    outline: 2px inset var(select-typing-border);
     padding: 0.2em;
     width: 80%;
 }
 input.typing[type="text"]:focus {
-    color: #000000;
-    background-color: #ffffee;
-    outline: 3pt inset #aaaaaa;
+    color: var(--select-typing-focus-fore);
+    background-color: var(--select-typing-focus-back);
+    outline: 3px inset var(--select-typing-focus-border);
 }
 
 /* tags */
@@ -100,35 +78,40 @@ input.typing[type="text"]:focus {
     cursor: se-resize;
 }
 .tag.new {
-    color: var(--newtag-fore);
-    background-color: var(--newtag-back);
+    color: var(--select-newtag-fore);
+    background-color: var(--select-newtag-back);
+    border: 1px dashed var(--select-newtag-border);
 }
 .tag.empty {
-    color: var(--emptytag-fore);
-    background-color: var(--emptytag-back);
+    color: var(--select-emptytag-fore);
+    background-color: var(--select-emptytag-back);
+    border: 1px solid var(--select-emptytag-border);
 }
 .option.tag {
-    color: var(--opt-fore);
-    background-color: var(--opt-back);
+    color: var(--select-option-fore);
+    background-color: var(--select-option-back);
 }
 .option.tag:hover {
-    color: var(--opthover-fore);
-    background-color: var(--opthover-back);
-    border-color: var(--opthover-border);
+    color: var(--select-option-hover-fore);
+    background-color: var(--select-option-hover-back);
+    border-color: var(--select-option-hover-border);
 }
-.option.tag.selected {
-    color: var(--tag-fore);
-    background-color: var(--tag-back);
+.option.tag.selected, .option.tag.selected:hover {
+    color: var(--select-active-fore);
+    background-color: var(--select-active-back);
+    border: 1px solid var(--select-active-border);
 }
 
 .button-tag {
     cursor: pointer;
 }
 .tag .button-tag {
-    background-color: var(--tag-back-var);
+    color: var(--tag-var-fore);
+    background-color: var(--tag-var-back);
     cursor: pointer;
 }
 a.tag, a.tag .button-tag {
-    background-color: var(--tag-back-link);
+    color: var(--tag-link-fore);
+    background-color: var(--tag-link-back);
     cursor: pointer;
 }

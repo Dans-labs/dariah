@@ -1,24 +1,59 @@
 :root {
-    --action-text: #000000;
-    --action-back: #ffffff;
-    --action-fore: #0000aa;
-    --action-high: #ffffcc;
-    --action-border: #ffffdd;
-    --action-error-back: #ffdddd;
-    --action-error-fore: #aa0000;
+    /* COLORS */
+    --action-fore:                     hsla(210, 100%,  30%, 1  );
+    --action-back:                     hsla(210, 100%,  90%, 1  );
+    --action-border:                   hsla(210, 100%,  50%, 0.5);
+    --action-link-fore:                hsla(210, 100%,  20%, 1  );
+    --action-link-back:                hsla(210, 100%,  90%, 1  );
+    --action-active-fore:              hsla(210, 100%,  40%, 1  );
+    --action-active-back:              hsla(060,  80%,  90%, 0.8);
+    --action-active-border:            hsla(060, 100%,  50%, 0.5);
 
-    --focus-text: #0000aa;
-    --focus-back: #ffffee;
-    --fore-invert: #ffffff;
-    --back-invert: #000000;
-    --border-invert: #000000;
-    --error-fore-o: #880000;
-    --error-fore: #ee0000;
-    --error-back: #ffcccc;
+    --entry-complete-back:             hsla(120, 100%, 100%, 1  );
+    --entry-complete-border:           hsla(120, 100%,  50%, 0.5);
+    --entry-incomplete-back:           hsla(  0, 100%, 100%, 1  );
+    --entry-incomplete-border:         hsla(  0, 100%,  50%, 0.5);
+    --entry-edit-complete-back:        hsla(120, 100%, 100%, 1  );
+    --entry-edit-complete-border:      hsla(120, 100%,  50%, 0.5);
+    --entry-edit-incomplete-back:      hsla(  0, 100%, 100%, 1  );
+    --entry-edit-incomplete-border:    hsla(  0, 100%,  50%, 0.5);
 
-    --warning-fore-o: #bb7700;
-    --warning-fore: #000000;
-    --warning-back: #ffcc88;
+    --dim-fore-o:                      hsla(  0,   0%,  30%, 1  );
+    --dim-fore:                        hsla(  0,   0%,  50%, 1  );
+    --dim-back:                        hsla(  0,   0%,  85%, 0.5);
+
+    --edit-help-fore:                  hsla( 60, 100%,  20%, 1  );
+    --edit-help-back:                  hsla( 60, 100%,  80%, 0.9);
+    --edit-help-border:                hsla( 60, 100%,  50%, 0.5);
+    --edit-help-code-fore:             hsla(210, 100%,  40%, 1  );
+    --edit-help-shadow1:               hsla( 60, 100%,  60%, 1  );
+    --edit-help-shadow2:               hsla( 60, 100%,  20%, 1  );
+    --edit-help-item-back:             hsla( 60, 100%,  95%, 1  );
+
+    --edit-text-fore:                  hsla(240,  50%,  30%, 1  );
+    --edit-text-back:                  hsla(210, 100%,  98%, 1  );
+    --edit-text-border:                hsla(210, 100%,  50%, 0.5);
+    --edit-focus-fore:                 hsla(240, 100%,  40%, 1  );
+    --edit-focus-back:                 hsla(210, 100%,  95%, 1  );
+    --edit-focus-border:               hsla(210, 100%,  50%, 0.9);
+    --edit-dirty-fore:                 hsla( 30, 100%,  20%, 1  );
+    --edit-dirty-back:                 hsla(210, 100%,  90%, 1  );
+    --edit-dirty-border:               hsla( 30, 100%,  40%, 0.9);
+    --edit-invalid-fore:               hsla(240,  70%, 100%, 1  );
+    --edit-invalid-back:               hsla(  0, 100%,  30%, 1  );
+    --edit-invalid-border:             hsla(  0, 100%,  30%, 0.5);
+    --edit-invalid-diag-fore:          hsla(  0, 100%,  30%, 1  );
+    --edit-invalid-diag-back:          hsla(  0, 100%,  80%, 0.5);
+
+    --error-fore-o:                    hsla(  0, 100%,  30%, 1  );
+    --error-fore:                      hsla(  0, 100%,  50%, 1  );
+    --error-back:                      hsla(  0, 100%,  80%, 0.5);
+
+    --errorboundary-fore:              hsla(  0, 100%,   0%, 1  );
+    --errorboundary-back:              hsla(  0, 100%,  80%, 0.8);
+    --errorboundary-border:            hsla(  0, 100%,  50%, 0.5);
+
+    --evidence-back: #ffffff;
 
     --good-fore-o: #00aa00;
     --good-fore: #000000;
@@ -28,28 +63,104 @@
     --info-fore: #226622;
     --info-back: #eeeeee;
 
+    --invert-fore: #ffffff;
+    --invert-back: #000000;
+    --invert-border: #000000;
+
+    --link-active-back: #eeeeee;
+
+    --msg-box-back: #eeeeee;
+    --msg-box-border: #aaaaaa;
+
+    --record-back:                     hsla(  0,   0%,  90%, 0.8);
+    --record-border:                   hsla(  0,   0%,  70%, 0.5);
+    --record-edit-back:                hsla(  0,   0%,  80%, 0.8);
+    --record-edit-border:              hsla(  0,   0%,  80%, 0.5);
+    --record-border-no:                hsla(  0,   0%,   0%, 0  );
+
+    --remarks-fore: #002200;
+    --remarks-back: #fffffa;
+
+    --resize-fore: #bbbbbb;
+
+    --score-fore: #448800;
+    --score-back: #ffffff;
+    --score-border: #448800;
+
+    --select-fore:                     hsla(240,  50%,  30%, 1  );
+    --select-back:                     hsla(240, 100%, 100%, 0.5);
+    --select-border:                   hsla(210, 100%,  50%, 0.5);
+    --select-emptytag-fore:            hsla(210, 100%,  30%, 1  );
+    --select-emptytag-back:            hsla(210, 100%,  90%, 1  );
+    --select-emptytag-border:          hsla(210, 100%,  50%, 0.5);
+    --select-active-fore:              hsla(210, 100%,  40%, 1  );
+    --select-active-back:              hsla(060,  80%,  50%, 0.8);
+    --select-active-border:            hsla(060, 100%,  50%, 0.5);
+    --select-newtag-fore:              hsla(210, 100%,  30%, 1  );
+    --select-newtag-back:              hsla( 30, 100%,  90%, 1  );
+    --select-newtag-border:            hsla( 30, 100%,  50%, 0.5);
+    --select-option-fore:              hsla(210, 100%,  30%, 1  );
+    --select-option-back:              hsla(270, 100%,  95%, 1  );
+    --select-option-border:            hsla(270, 100%,  50%, 0.5);
+    --select-option-hover-fore:        hsla(210, 100%,  30%, 1  );
+    --select-option-hover-back:        hsla(210, 100%,  90%, 1  );
+    --select-option-hover-border:      hsla(210, 100%,  50%, 0.5);
+    --select-options-back:             hsla(240, 100%,  99%, 0.9);
+    --select-options-border:           hsla(210, 100%,  50%, 0.5);
+    --select-typing-fore:              hsla(210,  50%,  30%, 1  );
+    --select-typing-back:              hsla( 30, 100%,  98%, 1  );
+    --select-typing-border:            hsla( 30, 100%,  50%, 0.5);
+    --select-typing-focus-fore:        hsla(240, 100%,  40%, 1  );
+    --select-typing-focus-back:        hsla( 30, 100%,  95%, 1  );
+    --select-typing-focus-border:      hsla( 30, 100%,  50%, 0.9);
+
+    --sort-col-back: #eeeeee;
+    --sort-specs-fore: #777777;
+
+    --sorted-back: #ddffdd;
+
     --special-fore-o: #000000;
     --special-fore: #000000;
     --special-back: #ffeeff;
 
-    --dim-fore-o: #666666;
-    --dim-fore: #888888;
-    --dim-back: #f3f3f3;
+    --tag-fore:                        hsla(240,  50%,  30%, 1  );
+    --tag-back:                        hsla(210, 100%,  98%, 1  );
+    --tag-border:                      hsla(210, 100%,  50%, 0.5);
+    --tag-var-fore:                    hsla(  0,  50%,  50%, 1  );
+    --tag-var-back:                    hsla(210, 100%,  95%, 1  );
+    --tag-link-fore:                   hsla(210,  50%,  30%, 1  );
+    --tag-link-back:                   hsla(210,  50%,  98%, 1  );
+    --tag-inactive-fore:               hsla(  0, 100%,   0%, 1  );
+    --tag-inactive-back:               hsla(  0, 100%,  80%, 1  );
+    --tag-inactive-border:             hsla(  0, 100%,  50%, 0.5);
+    --tag-disabled-fore:               hsla(  0,   0%, 100%, 1  );
+    --tag-disabled-back:               hsla(  0, 100%,  40%, 1  );
+    --tag-disabled-border:             hsla(  0, 100%,  50%, 0.5);
 
-    --widget-fixed-fore: #226622; 
-    --widget-fixed-back: #eeeeee; 
-    --widget-fixed-edit-back: #ffeedd; 
-    --widget-border: #aaaaaa; 
+    --template-error: #bb0000;
+    --template-good: #00bb00;
+
+    --tooltip-fore:                    hsla( 60, 100%,  20%, 1  );
+    --tooltip-back:                    hsla( 60, 100%,  80%, 1  );
+    --tooltip-border1:                 hsla( 60,   0%,   0%, 0  );
+    --tooltip-border:                  hsla( 60, 100%,  50%, 0.5);
+
+    --value-back: #fafafa;
+    --value-border: #dddddd;
+    --value-edit-back: #faffff;
+
+    --warning-fore-o: #bb7700;
+    --warning-fore: #000000;
+    --warning-back: #ffcc88;
+
+    --widget-fixed-fore:               hsla(120,  40%,  10%, 1  );
+    --widget-fixed-back:               hsla(120,  40%,  98%, 1  );
+    --widget-fixed-edit-back:          hsla(  0,   0%,  80%, 0.8);
+    --widget-border:                   hsla(120,  40%,  90%, 1  );
     --widget-varia-fore: #000000; 
     --widget-varia-back: #ffffff; 
     --widget-high-fore: #ffffff; 
     --widget-high-back: #444444; 
-    --value-back: #fafafa;
-    --value-edit-back: #faffff;
 
-    --tag-fore: rgba(0, 80, 0, 0.9);
-    --tag-back: rgba(220, 250, 220, 0.6);
-    --tag-back-var: rgba(240, 240, 240, 0.9);
-    --tag-back-link: rgba(240, 240, 255, 0.9);
-    --tag-border: rgba(220, 220, 220, 0.9);
+    --workflow-active: #ccffcc;
 }

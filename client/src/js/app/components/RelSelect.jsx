@@ -224,7 +224,7 @@ const Options = ({
         options.map(({ value: val, label: lab }) => {
           if (
             (!multiple || !value.includes(val))
-            && (pat == null || pat === emptyS || lab == null || lab.toLowerCase().indexOf(pat) !== -1)
+            && (pat == null || pat === emptyS || lab == null || lab.toString().toLowerCase().indexOf(pat) !== -1)
             && !testDisabled(val)
           ) {
             const selected = (multiple && value.includes(val)) || (!multiple && value === val)

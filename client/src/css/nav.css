@@ -64,14 +64,10 @@ a.control {
     margin-left: 2em;
     font-size: small;
 }
-a.active {
-    background-color: #eeeeee;
-    border: 1px solid var(--action-border);
-    border-radius: 0.5ex;
-}
-.nav a.active,a.nav.active {
-    background-color: var(--action-back);
-    border: 1px solid var(--action-border);
+a.active,.nav a.active,a.nav.active {
+    color: var(--action-active-fore);
+    background-color: var(--action-active-back);
+    border: 1px solid var(--action-active-border);
 }
 .nav a,a.nav {
     color: var(--action-fore);
@@ -82,5 +78,5 @@ a.active {
 }
 .resize {
     font-size: x-small;
-    color: #bbbbbb;
+    color: var(--resize-for);
 }

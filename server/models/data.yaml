@@ -520,7 +520,7 @@ tables:
           select:
             rep:
               $lte: $curYear
-          allowNew: true
+          allowNew: false
         multiple: false
       vcc:
         label: VCC
