@@ -42,7 +42,7 @@ div.select.multiselect {
     background-color: var(--select-typing-back);
 }
 input.typing {
-    outline: 2px inset var(select-typing-border);
+    outline: 2px inset var(--select-typing-border);
     padding: 0.2em;
     width: 80%;
 }

@@ -81,15 +81,3 @@ export const min = arr => arr.reduce((a, b) => Math.min(a, b), Number.POSITIVE_I
 export const sum = arr => arr.reduce((a, b) => a + b, 0)
 
 
-export const makeRhAtts = (table, eId, name, position) => {
-  const tag = name.replace(/[[\].]/g, '_').toLowerCase()
-  const rhTag = `${table}-${eId}-${tag}`
-  const rhAtt = `data-${rhTag}`
-  const rhAt = `${rhAtt}-at`
-  const rh = {
-    [rhAtt]: true,
-    [rhAt]: position,
-  }
-  return { rhAtt, rh }
-}
-

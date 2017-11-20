@@ -1,5 +1,9 @@
 import React from 'react'
 
+import { emptyS } from 'utils'
+
+export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : emptyS
+
 export const editControl = canSubmit => ({
     active,
     dirty, invalid, submitting, error, handleSubmit,

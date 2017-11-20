@@ -1,57 +1,154 @@
 :root {
-    --action-text: #000000;
-    --action-back: #ffffff;
-    --action-fore: #0000aa;
-    --action-high: #ffffcc;
-    --action-border: #ffffdd;
-    --action-error-back: #ffdddd;
-    --action-error-fore: #aa0000;
+    /* COLORS */
+    --action-fore:                     hsla(210, 100%,  30%, 1  );
+    --action-back:                     hsla(210, 100%,  90%, 1  );
+    --action-border:                   hsla(210, 100%,  50%, 0.5);
+    --action-link-fore:                hsla(210, 100%,  20%, 1  );
+    --action-link-back:                hsla(210, 100%,  90%, 1  );
+    --action-active-fore:              hsla(210, 100%,  40%, 1  );
+    --action-active-back:              hsla(060,  80%,  90%, 0.8);
+    --action-active-border:            hsla(060, 100%,  50%, 0.5);
 
-    --focus-text: #0000aa;
-    --focus-back: #ffffee;
-    --fore-invert: #ffffff;
-    --back-invert: #000000;
-    --border-invert: #000000;
-    --error-fore-o: #880000;
-    --error-fore: #ee0000;
-    --error-back: #ffcccc;
+    --entry-complete-back:             hsla(120, 100%, 100%, 1  );
+    --entry-complete-border:           hsla(120, 100%,  50%, 0.5);
+    --entry-incomplete-back:           hsla(  0, 100%, 100%, 1  );
+    --entry-incomplete-border:         hsla(  0, 100%,  50%, 0.5);
+    --entry-edit-complete-back:        hsla(120, 100%, 100%, 1  );
+    --entry-edit-complete-border:      hsla(120, 100%,  50%, 0.5);
+    --entry-edit-incomplete-back:      hsla(  0, 100%, 100%, 1  );
+    --entry-edit-incomplete-border:    hsla(  0, 100%,  50%, 0.5);
 
-    --warning-fore-o: #bb7700;
-    --warning-fore: #000000;
-    --warning-back: #ffcc88;
+    --dim-fore-o:                      hsla(  0,   0%,  30%, 1  );
+    --dim-fore:                        hsla(  0,   0%,  50%, 1  );
+    --dim-back:                        hsla(  0,   0%,  85%, 0.5);
 
-    --good-fore-o: #00aa00;
-    --good-fore: #000000;
-    --good-back: #88ff88;
+    --edit-help-fore:                  hsla( 60, 100%,  20%, 1  );
+    --edit-help-back:                  hsla( 60, 100%,  80%, 0.9);
+    --edit-help-border:                hsla( 60, 100%,  50%, 0.5);
+    --edit-help-code-fore:             hsla(210, 100%,  40%, 1  );
+    --edit-help-shadow1:               hsla( 60, 100%,  60%, 1  );
+    --edit-help-shadow2:               hsla( 60, 100%,  20%, 1  );
+    --edit-help-item-back:             hsla( 60, 100%,  95%, 1  );
 
-    --info-fore-o: #222222;
-    --info-fore: #226622;
-    --info-back: #eeeeee;
+    --edit-text-fore:                  hsla(240,  50%,  30%, 1  );
+    --edit-text-back:                  hsla(210, 100%,  98%, 1  );
+    --edit-text-border:                hsla(210, 100%,  50%, 0.5);
+    --edit-focus-fore:                 hsla(240, 100%,  40%, 1  );
+    --edit-focus-back:                 hsla(210, 100%,  95%, 1  );
+    --edit-focus-border:               hsla(210, 100%,  50%, 0.9);
+    --edit-dirty-fore:                 hsla( 30, 100%,  20%, 1  );
+    --edit-dirty-back:                 hsla(210, 100%,  90%, 1  );
+    --edit-dirty-border:               hsla( 30, 100%,  40%, 0.9);
+    --edit-invalid-fore:               hsla(240,  70%, 100%, 1  );
+    --edit-invalid-back:               hsla(  0, 100%,  30%, 1  );
+    --edit-invalid-border:             hsla(  0, 100%,  30%, 0.5);
+    --edit-invalid-diag-fore:          hsla(  0, 100%,  30%, 1  );
+    --edit-invalid-diag-back:          hsla(  0, 100%,  80%, 0.5);
 
-    --special-fore-o: #000000;
-    --special-fore: #000000;
-    --special-back: #ffeeff;
+    --error-fore-o:                    hsla(  0, 100%,  30%, 1  );
+    --error-fore:                      hsla(  0, 100%,  50%, 1  );
+    --error-back:                      hsla(  0, 100%,  80%, 0.5);
 
-    --dim-fore-o: #666666;
-    --dim-fore: #888888;
-    --dim-back: #f3f3f3;
+    --errorboundary-fore:              hsla(  0, 100%,   0%, 1  );
+    --errorboundary-back:              hsla(  0, 100%,  80%, 0.8);
+    --errorboundary-border:            hsla(  0, 100%,  50%, 0.5);
 
-    --widget-fixed-fore: #226622; 
-    --widget-fixed-back: #eeeeee; 
-    --widget-fixed-edit-back: #ffeedd; 
-    --widget-border: #aaaaaa; 
-    --widget-varia-fore: #000000; 
-    --widget-varia-back: #ffffff; 
-    --widget-high-fore: #ffffff; 
-    --widget-high-back: #444444; 
-    --value-back: #fafafa;
-    --value-edit-back: #faffff;
+    --good-fore-o:                     hsla(120, 100%,  30%, 1  );
+    --good-fore:                       hsla(120, 100%,  50%, 1  );
+    --good-back:                       hsla(120, 100%,  80%, 0.5);
 
-    --tag-fore: rgba(0, 80, 0, 0.9);
-    --tag-back: rgba(220, 250, 220, 0.6);
-    --tag-back-var: rgba(240, 240, 240, 0.9);
-    --tag-back-link: rgba(240, 240, 255, 0.9);
-    --tag-border: rgba(220, 220, 220, 0.9);
+    --info-fore-o:                     hsla(120,   0%,  30%, 1  );
+    --info-fore:                       hsla(120,   0%,  50%, 1  );
+    --info-back:                       hsla(120,   0%,  80%, 0.5);
+
+    --invert-fore:                     hsla(  0, 100%, 100%, 1  );
+    --invert-back:                     hsla(  0,   0%,   0%, 0.8);
+    --invert-border:                   hsla(  0,   0%,   0%, 0.5);
+
+    --msg-box-back:                    hsla(  0,   0%,  90%, 0.8);
+    --msg-box-border:                  hsla(  0,   0%,  50%, 0.5);
+
+    --record-back:                     hsla(  0,   0%,  90%, 0.8);
+    --record-border:                   hsla(  0,   0%,  70%, 0.5);
+    --record-edit-back:                hsla(  0,   0%,  80%, 0.8);
+    --record-edit-border:              hsla(  0,   0%,  80%, 0.5);
+    --record-border-no:                hsla(  0,   0%,   0%, 0  );
+
+    --score-fore:                      hsla(120,  80%,  30%, 1  );
+    --score-back:                      hsla(120, 100%,  98%, 1  );
+    --score-border:                    hsla(120,  80%,  50%, 0.5);
+
+    --select-fore:                     hsla(240,  50%,  30%, 1  );
+    --select-back:                     hsla(240, 100%, 100%, 0.5);
+    --select-border:                   hsla(210, 100%,  50%, 0.5);
+    --select-emptytag-fore:            hsla(210, 100%,  30%, 1  );
+    --select-emptytag-back:            hsla(210, 100%,  90%, 1  );
+    --select-emptytag-border:          hsla(210, 100%,  50%, 0.5);
+    --select-active-fore:              hsla(210, 100%,  40%, 1  );
+    --select-active-back:              hsla(060,  80%,  50%, 0.8);
+    --select-active-border:            hsla(060, 100%,  50%, 0.5);
+    --select-newtag-fore:              hsla(210, 100%,  30%, 1  );
+    --select-newtag-back:              hsla( 30, 100%,  90%, 1  );
+    --select-newtag-border:            hsla( 30, 100%,  50%, 0.5);
+    --select-option-fore:              hsla(210, 100%,  30%, 1  );
+    --select-option-back:              hsla(270, 100%,  95%, 1  );
+    --select-option-border:            hsla(270, 100%,  50%, 0.5);
+    --select-option-hover-fore:        hsla(210, 100%,  30%, 1  );
+    --select-option-hover-back:        hsla(210, 100%,  90%, 1  );
+    --select-option-hover-border:      hsla(210, 100%,  50%, 0.5);
+    --select-options-back:             hsla(240, 100%,  99%, 0.9);
+    --select-options-border:           hsla(210, 100%,  50%, 0.5);
+    --select-typing-fore:              hsla(210,  50%,  30%, 1  );
+    --select-typing-back:              hsla( 30, 100%,  98%, 1  );
+    --select-typing-border:            hsla( 30, 100%,  50%, 0.5);
+    --select-typing-focus-fore:        hsla(240, 100%,  40%, 1  );
+    --select-typing-focus-back:        hsla( 30, 100%,  95%, 1  );
+    --select-typing-focus-border:      hsla( 30, 100%,  50%, 0.9);
+
+    --sort-back:                       hsla(120, 100%,  95%, 1  );
+    --sort--col-back:                  hsla(120,   0%,  95%, 1  );
+    --sort--specs-fore:                hsla(120,   0%,  40%, 1  );
+
+    --special-fore-o:                  hsla(120,  00%,  30%, 1  );
+    --special-fore:                    hsla(120,  00%,  50%, 1  );
+    --special-back:                    hsla(120, 100%,  95%, 0.5);
+
+    --tag-fore:                        hsla(240,  50%,  30%, 1  );
+    --tag-back:                        hsla(210, 100%,  98%, 1  );
+    --tag-border:                      hsla(210, 100%,  50%, 0.5);
+    --tag-var-fore:                    hsla(  0,  50%,  50%, 1  );
+    --tag-var-back:                    hsla(210, 100%,  95%, 1  );
+    --tag-link-fore:                   hsla(210,  50%,  30%, 1  );
+    --tag-link-back:                   hsla(210,  50%,  98%, 1  );
+    --tag-inactive-fore:               hsla(  0, 100%,   0%, 1  );
+    --tag-inactive-back:               hsla(  0, 100%,  80%, 1  );
+    --tag-inactive-border:             hsla(  0, 100%,  50%, 0.5);
+    --tag-disabled-fore:               hsla(  0,   0%, 100%, 1  );
+    --tag-disabled-back:               hsla(  0, 100%,  40%, 1  );
+    --tag-disabled-border:             hsla(  0, 100%,  50%, 0.5);
+
+    --template-error:                  hsla(  0,  80%,  50%, 1  );
+    --template-good:                   hsla(120,  80%,  50%, 1  );
+
+    --tooltip-fore:                    hsla( 60, 100%,  20%, 1  );
+    --tooltip-back:                    hsla( 60, 100%,  80%, 1  );
+    --tooltip-border1:                 hsla( 60,   0%,   0%, 0  );
+    --tooltip-border:                  hsla( 60, 100%,  50%, 0.5);
+
+    --value-back:                      hsla(120, 100%, 100%, 1  );
+    --value-edit-back:                 hsla(  0,   0%,  95%, 1  );
+    --value-border:                    hsla(120,  40%,  90%, 1  );
+
+    --warning-fore-o:                  hsla( 30, 100%,  30%, 1  );
+    --warning-fore:                    hsla( 30, 100%,  50%, 1  );
+    --warning-back:                    hsla( 30, 100%,  80%, 0.5);
+
+    --widget-fixed-fore:               hsla(120,  40%,  10%, 1  );
+    --widget-fixed-back:               hsla(120,  40%, 100%, 1  );
+    --widget-fixed-edit-back:          hsla(  0,   0%,  80%, 0.8);
+    --widget-border:                   hsla(120,  40%,  90%, 1  );
+
+    --workflow-active:                 hsla(120, 100%,  80%, 0.8);
 }
 *, *:before, *:after {
   box-sizing: content-box;
@@ -67,8 +164,8 @@
 .react-hint__content {
 	padding: 10px;
 	border-radius: 1ex;
-	background: #ddffaa;
-	color: #000000;
+	background: var(--tooltip-back);
+	color: var(--tooltip-fore);
 }
 
 .react-hint:after {
@@ -82,31 +179,31 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	border: 5px solid transparent;
+	border: 5px solid var(--tooltip-border1);
 }
 
 .react-hint--top:after {
 	top: auto;
 	border-bottom: none;
-	border-top-color: #000;
+	border-top-color: var(--tooltip-border2);
 }
 
 .react-hint--left:after {
 	left: auto;
 	border-right: none;
-	border-left-color: #000;
+	border-left-color: var(--tooltip-border2);
 }
 
 .react-hint--right:after {
 	right: auto;
 	border-left: none;
-	border-right-color: #000;
+	border-right-color: var(--tooltip-border2);
 }
 
 .react-hint--bottom:after {
 	bottom: auto;
 	border-top: none;
-	border-bottom-color: #000;
+	border-bottom-color: var(--tooltip-border2);
 }
 
 @keyframes fadeIn {
@@ -224,51 +321,6 @@
     padding-right: var(--hor);
     font-weight: bold;
 }
-
-.varia-large,.varia-medium,.varia-small  {
-    color: var(--widget-varia-fore);
-    background-color: var(--widget-varia-back);
-}
-.varia-large {
-    --size: large;
-    --hor: 1em;
-    --ver: 1ex;
-    --border: 0;
-    font-size: var(--size);
-    border-style: solid;
-    border-width: var(--border);
-    padding-top: var(--ver);
-    padding-bottom: var(--ver);
-    padding-left: var(--hor);
-    padding-right: var(--hor);
-}
-.varia-medium {
-    --size: medium;
-    --hor: 0.5em;
-    --ver: 0.5ex;
-    --border: 0;
-    font-size: var(--size);
-    border-style: solid;
-    border-width: var(--border);
-    padding-top: var(--ver);
-    padding-bottom: var(--ver);
-    padding-left: var(--hor);
-    padding-right: var(--hor);
-}
-.varia-small {
-    --size: small;
-    --hor: 0.2em;
-    --ver: 0;
-    --border: 0;
-    font-size: var(--size);
-    border-style: solid;
-    border-width: var(--border);
-    padding-top: var(--ver);
-    padding-bottom: var(--ver);
-    padding-left: var(--hor);
-    padding-right: var(--hor);
-}
-
 .button-large,.button-medium,.button-small  {
     color: var(--action-fore);
     cursor: pointer;
@@ -280,8 +332,8 @@
     color: var(--action-fore);
     cursor: pointer;
     font-weight: bold;
-    color: var(--fore-invert);
-    background-color: var(--back-invert);
+    color: var(--invert-fore);
+    background-color: var(--invert-back);
     border-color: var(--action-border);
     white-space: nowrap;
     padding: 0.5em;
@@ -328,9 +380,9 @@
 
 .workflow-large.invert,.workflow-medium.invert,.workflow-small.invert  {
     font-weight: bold;
-    color: var(--fore-invert);
-    background-color: var(--back-invert);
-    border-color: var(--border-invert);
+    color: var(--invert-fore);
+    background-color: var(--invert-back);
+    border-color: var(--invert-border);
     white-space: nowrap;
     padding: 0.5em;
 }
@@ -454,8 +506,8 @@
     opacity: 0.9;
     vertical-align: middle;
     cursor: pointer;
-    background-color: #eeeeee;
-    border: 2px solid #aaaaaa;
+    background-color: var(--msg-box-back);
+    border: 2px solid var(--msg-box-border);
     border-radius: 1.5ex;
     font-size: small;
 }
@@ -486,15 +538,16 @@
 
 
 .dirty {
-    background-color: #ffff88;
+    color: var(--edit-dirty-fore);
+    background-color: var(--edit-dirty-back);
 }
 .invalid {
-    color: #aa0000;
-    background-color: #ffdddd;
+    color: var(--edit-invalid-fore);
+    background-color: var(--edit-invalid-back);
 }
 .invalid.diag {
-    color: #ffffff;
-    background-color: #dd0000;
+    color: var(--edit-invalid-diag-fore);
+    background-color: var(--edit-invalid-diag-back);
     font-size: small;
     display: block;
     padding: 1ex;
@@ -503,66 +556,40 @@ input {
     color: var(--action-fore);
     background-color: var(--action-back);
     border: 0;
-}
-input[type="text"] {
-    width: 50%;
-    max-width: 75%;
-    font-size: large;
-    font-family: monospace;
-    outline: 2pt inset var(--action-border);
-}
-input[type="text"]:focus, textarea:focus {
-    color: var(--focus-text);
-    background-color: var(--focus-back);
-    font-size: large;
-    font-family: monospace;
-    outline: 2pt inset var(--warning-back);
     padding: 0.2em;
 }
-input.dirty {
-    color: var(--action-text);
-    background-color: var(--action-high);
+input[type="text"],textarea {
+    color: var(--edit-text-fore);
+    background-color: var(--edit-text-back);
+    outline: 2px inset var(--edit-text-border);
+    border: 0;
     font-size: large;
     font-family: monospace;
 }
-input.invalid {
-    color: var(--action-error-fore);
-    background-color: var(--action-error-back);
-    font-size: large;
-    font-family: monospace;
+input[type="text"] {
+    width: 100%;
+    margin: 0.5ex 0.5ex;
 }
 textarea {
-    color: var(--action-fore);
-    background-color: var(--action-back);
-    font-size: large;
-    font-family: monospace;
     width: calc(100% - 1em);
     height: 10em;
     margin: 0.5ex 0.5ex;
+}
+input[type="text"]:focus, textarea:focus {
+    color: var(--edit-focus-text);
+    background-color: var(--edit-focus-back);
+    outline: 4px inset var(--edit-focus-border);
     border: 0;
-    outline: 2pt inset var(--action-border);
 }
-textarea.dirty {
-    color: var(--action-fore);
-    background-color: var(--action-high);
-    font-size: large;
-    font-family: monospace;
+input.dirty, input.dirty:focus, textarea.dirty, textarea.dirty:focus {
+    color: var(--edit-dirty-fore);
+    background-color: var(--edit-dirty-back);
+    outline: 4px dashed var(--edit-dirty-border);
 }
-textarea.invalid {
-    color: var(--action-error-fore);
-    background-color: var(--action-error-back);
-    font-size: large;
-    font-family: monospace;
-}
-
-.reason {
-    vertical-align: top;
-    color: var(--error-fore);
-    background-color: var(--error-back);
-}
-.input.invalid {
-    color: var(--action-text);
-    background-color: var(--error-back);
+input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.invalid:focus {
+    color: var(--edit-invalid-fore);
+    background-color: var(--edit-invalid-back);
+    outline: 4px dashed var(--edit-invalid-border);
 }
 
 /* edit status */
@@ -645,25 +672,14 @@ textarea.invalid {
 .right {
     float: right;
 }
-.stick {
-    /*
-    float: left;
-    overflow: visible;
-    position: relative;
-    width: 0em;
-    height: 0em;
-    top: -2em;
-    left: -1em;
-    */
-}
 .multi-field {
     margin-left: 0em;
     padding-left: 0em;
     width: 100%;
     display: inline-flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    align-items: baseline;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: top;
     align-content: flex-start;
 }
 .multi-field.textarea {
@@ -676,39 +692,38 @@ textarea.invalid {
     align-items: top;
     align-content: flex-start;
 }
-.md-field {
-    margin-left: 0em;
-    padding-left: 0em;
-    width: 100%;
+.multi-content {
+    overflow: visible;
     display: inline-flex;
     flex-flow: row nowrap;
-}
-.multi-content {
-    padding: 0 0 0 1em;
-    flex: 1 2 40%;
-    overflow: visible;
+    align-content: flex-start;
+    align-items: flex-start;
+    width: calc(100% - 1em);
     /*-webkit-overflow-scrolling: touch;*/
 }
 .textarea .multi-content {
     padding: 0 0 0 1em;
-    flex: 1 2 auto;
-    width: 90%;
+    width: calc(100% - 1em);
     overflow: visible;
     /*-webkit-overflow-scrolling: touch;*/
 }
-.multi-control {
-    padding: 0 0 0 0;
-    flex: 0 0 2em;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+.wideInput {
+    width: calc(100% - 1em);
+}
+.md-field {
+    margin-left: 0em;
+    padding-left: 0em;
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
 }
 .field-content {
-    flex: 0 1 100%;
     overflow: auto;
+    width: 100%;
     -webkit-overflow-scrolling: touch;
 }
 .field-control {
-    flex: 0 0 2em;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -751,15 +766,15 @@ div.detail-body {
 .value-col {
     text-align: left;
     padding: 0.2em 0.1em 0.2em 0.2em;
-    background-color: #fafafa; 
-    flex: 1 1 20em;
+    background-color: var(--value-back); 
+    flex: 1 1 auto;
     overflow: visible;
     /*-webkit-overflow-scrolling: touch;*/
 }
 .value-col-grid {
     text-align: left;
     padding: 0.1em 0.1em 0.1em 0.1em;
-    border-bottom: 2px solid #dddddd; 
+    border-bottom: 2px solid var(--value-border); 
     background-color: var(--value-back);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -772,30 +787,32 @@ div.detail-body {
 }
 
 div.edit-help {
+    color: var(--edit-help-fore);
+    background-color: var(--edit-help-back);
+    border: 2px solid var(--edit-help-border);
+    box-shadow: inset 0 0 1em var(--edit-help-shadow1), 0 0 1em var(--edit-help-shadow2);
     display: flex;
     flex-flow: row  wrap;
     justify-content: flex-start;
     margin-top: 0.5em;
-    border: 2px solid #bbdd88;
-    background-color: #ddffaa;
-    box-shadow: inset 0 0 1em #ddffaa, 0 0 1em #99bb66;
     font-size: small;
-    color: #777777;
 }
 div.help-item {
-    flex: 0 1 auto;
-    background-color: #ffffff;
+    color: var(--edit-help-fore);
+    background-color: var(--edit-help-item-back);
+    border: 0;
     border-radius: 1ex;
+    flex: 0 1 auto;
     padding: 0.1em;
     margin-top: 0.2em;
     margin-bottom: 0.1em;
     margin-left: 0.5em;
     margin-right: 0.5em;
-    border: 0;
 }
 .help-code {
-    color: #000000;
-    font-size: medium;
+    color: var(--edit-help-code-fore);
+    font-weight: bold;
+    font-size: large;
     font-family: monospace;
 }
 .mdh1 {
@@ -808,7 +825,8 @@ div.help-item {
 }
 pre.md-source {
     font-size: medium;
-    color: var(--action-text);
+    color: var(--edit-text-fore);
+    background-color: var(--edit-text-back);
     white-space: pre-wrap;
 }
 
@@ -844,9 +862,9 @@ div.sized {
 div.error-boundary {
     font-size: medium;
     font-weight: normal;
-    background-color: #ffdddd;
-    color: #000000;
-    border: 2px dashed #ff0000;
+    background-color: var(--errorboundary-back);
+    color: var(--errorboundary-fore);
+    border: 2px dashed var(--errorboundary-border);
     border-radius: 1.5ex;
     padding: 0.3em;
 }
@@ -916,14 +934,10 @@ a.control {
     margin-left: 2em;
     font-size: small;
 }
-a.active {
-    background-color: #eeeeee;
-    border: 1px solid var(--action-border);
-    border-radius: 0.5ex;
-}
-.nav a.active,a.nav.active {
-    background-color: var(--action-back);
-    border: 1px solid var(--action-border);
+a.active,.nav a.active,a.nav.active {
+    color: var(--action-active-fore);
+    background-color: var(--action-active-back);
+    border: 1px solid var(--action-active-border);
 }
 .nav a,a.nav {
     color: var(--action-fore);
@@ -934,7 +948,7 @@ a.active {
 }
 .resize {
     font-size: x-small;
-    color: #bbbbbb;
+    color: var(--resize-for);
 }
 .facetFilter {
     margin-top: 0.3em;
@@ -1096,7 +1110,7 @@ input.search.compact {
 }
 .sortspecs {
     font-size: small;
-    color: #777777;
+    color: var(--sort-specs-fore);
     display: flex;
     flex-flow: row wrap;
     justify-content: flex-start;
@@ -1104,11 +1118,11 @@ input.search.compact {
 }
 .sortcol {
     margin: 0 1em 0 1em;
-    background-color: #eeeeee;
+    background-color: var(--sort-col-back);
     border-radius: 0.5ex;
 }
 .sorted {
-    background-color: #ddffdd;
+    background-color: var(--sort-back);
 }
 .unsorted {
 }
@@ -1208,37 +1222,39 @@ div.fulltext .search {
     align-items: baseline;
 }
 .itemRecord {
-    border: 0.4ex solid #eeeeee;
+    border: 0.4ex solid var(--record-border);
     border-radius: 1ex;
-    background-color: #eeeeee;
+    background-color: var(--record-back);
 }
 .itemRecord.edit {
-    border: 0.4ex solid #99bb99;
+    border: 0.4ex solid var(--record-edit-border);
     border-radius: 1ex;
-    background-color: #ddeedd;
+    background-color: var(--record-edit-back);
 }
 
 .itemRecord.noBorder,.itemRecord.edit.noBorder {
-    border: 0;
+    border: 0.4ex solid var(--record-border-no);
 }
 .tag.option.inactive, .tag.inactive, .inactive {
-    color: #000000;
-    background-color: #ffcc88;
+    color: var(--tag-inactive-fore);
+    background-color: var(--tag-inactive-back);
+    border: 1px solid var(--tag-inactive-border);
 }
 .tag.option.inactive.disabled, .tag.inactive.disabled, .inactive.disabled {
-    color: #ffffff;
-    background-color: #dd0000;
+    color: var(--tag-disabled-fore);
+    background-color: var(--tag-disabled-back);
+    border: 1px solid var(--tag-disabled-border);
 }
 
 .isactive {
-    background-color: #ccffcc;
+    background-color: var(--workflow-active);
 }
 
 .ass-score-box {
-    background-color: #ffffff;
+    background-color: var(--score-back);
     padding: 0.3em;
     margin-bottom: 0.3em;
-    border: 3px solid #448800;
+    border: 3px solid var(--score-border);
     border-radius: 1ex;
     display: inline-flex;
     flex-flow: row nowrap;
@@ -1246,32 +1262,32 @@ div.fulltext .search {
     align-items: flex-start;
 }
 .ass-score {
-    color: #448800;
+    color: var(--score-fore);
     font-size: xx-large;
 }
 .ass-score-deriv {
-    color: #448800;
+    color: var(--score-fore);
     font-size: medium;
 }
 div.criteriaEntryRead, div.criteraEntryEdit {
     border-radius: 1ex;
-    margin: 2pt;
+    margin: 2px;
 }
 div.criteriaEntryRead.complete {
-    border: 2px solid #00ff00;
-    background-color: #ffffff;
+    border: 2px solid var(--entry-complete-border);
+    background-color: var(--entry-complete-back);
 }
 div.criteriaEntryRead.incomplete {
-    border: 2px solid #ff0000;
-    background-color: #ffeeee;
+    border: 2px dashed var(--entry-incomplete-border);
+    background-color: var(--entry-incomplete-back);
 }
 div.criteriaEntryEdit.complete {
-    border: 2px solid #00ff00;
-    background-color: #ffffee;
+    border: 2px solid var(--entry-edit-complete-border);
+    background-color: var(--entry-edit-complete-back);
 }
 div.criteriaEntryEdit.incomplete {
-    border: 2px solid #ff0000;
-    background-color: #ffffee;
+    border: 2px dashed var(--entry-edit-incomplete-border);
+    background-color: var(--entry-edit-incomplete-back);
 }
 
 div.criteriaEntry {
@@ -1290,8 +1306,6 @@ div.xSlim {
     flex: 0 1 2em;
 }
 div.criteriaRemarks {
-    color: #002200;
-    background-color: #fffffa;
     font-size: small;
     margin-left: 0em;
     margin-right: 3.5em;
@@ -1300,37 +1314,18 @@ div.criteriaRemarks {
 div.evidence {
     margin-left: 2em;
     margin-right: 3.5em;
-    background-color: #ffffff;
 }
 .vtop {
     vertical-align: top;
 }
 .tError {
-    color: #bb0000;
+    color: var(--template-error);
 }
 .tGood {
-    color: #00bb00;
+    color: var(--template-good);
 }
 
 div.select {
-    --select-back: rgba(255, 255, 255, 0.5);
-    --select-high: rgba(255, 255, 128, 0.5);
-    --select-fore: rgba(0, 0, 128, 0.9);
-    --select-border: rgba(150, 150, 100, 0.5);
-    --options-back: rgba(200, 200, 200, 0.8);
-    --options-border: rgba(200, 200, 200, 0.5);
-    --typing-fore: rgba(40, 40, 40, 0.9);
-    --typing-back: rgba(255, 255, 255, 0.9);
-    --opt-fore: rgba(80, 0, 0, 0.9);
-    --opt-back: rgba(250, 250, 250, 0.9);
-    --opt-border: rgba(250, 250, 250, 0.9);
-    --opthover-fore: rgba(80, 80, 0, 0.9);
-    --opthover-back: rgba(255, 255, 220, 0.6);
-    --opthover-border: rgba(0, 255, 0, 0.95);
-    --newtag-fore: rgba(0, 0, 255, 0.9);
-    --newtag-back: rgba(255, 255, 160, 0.7);
-    --emptytag-fore: rgba(0, 0, 255, 0.9);
-    --emptytag-back: rgba(255, 255, 160, 0.4);
     display: inline-block;
     width: 100%;
     max-width: 100%;
@@ -1342,9 +1337,9 @@ div.select.multiselect {
     display: flex;
     flex-flow: row wrap;
     align-items: baseline;
-    border: 1px solid var(--options-border);
+    border: 1px solid var(--select-options-border);
     border-radius: 0.8ex;
-    background-color: var(--options-back);
+    background-color: var(--select-options-back);
     max-width: 100%;
     resize: both;
     overflow: auto;
@@ -1360,11 +1355,7 @@ div.select.multiselect {
     color: var(--action-fore);
     cursor: pointer;
     color: var(--select-fore);
-    background-color: var(--opt-border);
-}
-.option.selected {
-    background-color: var(--select-high);
-    border: 1px solid var(--select-border);
+    background-color: var(--select-option-border);
 }
 .option-type, .option-head, .option {
     margin: 0 0 0 0;
@@ -1374,18 +1365,18 @@ div.select.multiselect {
     padding: 0.1em 0.2em 0.1em 0.2em;
 }
 .option-type {
-    color: var(--typing-fore);
-    background-color: var(--typing-back);
+    color: var(--select-typing-fore);
+    background-color: var(--select-typing-back);
 }
 input.typing {
-    outline: 2pt inset #bbbbbb;
+    outline: 2px inset var(--select-typing-border);
     padding: 0.2em;
     width: 80%;
 }
 input.typing[type="text"]:focus {
-    color: #000000;
-    background-color: #ffffee;
-    outline: 3pt inset #aaaaaa;
+    color: var(--select-typing-focus-fore);
+    background-color: var(--select-typing-focus-back);
+    outline: 3px inset var(--select-typing-focus-border);
 }
 
 /* tags */
@@ -1414,36 +1405,41 @@ input.typing[type="text"]:focus {
     cursor: se-resize;
 }
 .tag.new {
-    color: var(--newtag-fore);
-    background-color: var(--newtag-back);
+    color: var(--select-newtag-fore);
+    background-color: var(--select-newtag-back);
+    border: 1px dashed var(--select-newtag-border);
 }
 .tag.empty {
-    color: var(--emptytag-fore);
-    background-color: var(--emptytag-back);
+    color: var(--select-emptytag-fore);
+    background-color: var(--select-emptytag-back);
+    border: 1px solid var(--select-emptytag-border);
 }
 .option.tag {
-    color: var(--opt-fore);
-    background-color: var(--opt-back);
+    color: var(--select-option-fore);
+    background-color: var(--select-option-back);
 }
 .option.tag:hover {
-    color: var(--opthover-fore);
-    background-color: var(--opthover-back);
-    border-color: var(--opthover-border);
+    color: var(--select-option-hover-fore);
+    background-color: var(--select-option-hover-back);
+    border-color: var(--select-option-hover-border);
 }
-.option.tag.selected {
-    color: var(--tag-fore);
-    background-color: var(--tag-back);
+.option.tag.selected, .option.tag.selected:hover {
+    color: var(--select-active-fore);
+    background-color: var(--select-active-back);
+    border: 1px solid var(--select-active-border);
 }
 
 .button-tag {
     cursor: pointer;
 }
 .tag .button-tag {
-    background-color: var(--tag-back-var);
+    color: var(--tag-var-fore);
+    background-color: var(--tag-var-back);
     cursor: pointer;
 }
 a.tag, a.tag .button-tag {
-    background-color: var(--tag-back-link);
+    color: var(--tag-link-fore);
+    background-color: var(--tag-link-back);
     cursor: pointer;
 }
 /* imports */

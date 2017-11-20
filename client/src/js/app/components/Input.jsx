@@ -1,6 +1,8 @@
 import React from 'react'
 
-import { editClass, makeSubmit, makeSubmitTime, makeReset } from 'fields'
+import { emptyO } from 'utils'
+import { editClass } from 'edit'
+import { makeSubmit, makeSubmitTime, makeReset } from 'fields'
 
 import { withEditHelp } from 'tooltip'
 
@@ -21,9 +23,13 @@ const Input = ({
   const onAction = type === 'checkbox'
   ? { onClick: submit }
   : { onBlur: submit }
+  const className = type == 'checkbox'
+  ? emptyO
+  : { className: 'wideInput' }
   return (
-    <span
+    <div
       {...rh}
+      {...className}
     >
       <input
         type={type}
@@ -33,7 +39,7 @@ const Input = ({
         {...onCancel}
       />
       {error && <span className={'invalid diag'}>{error}</span>}
-    </span>
+    </div>
   )
 }
 

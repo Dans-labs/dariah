@@ -14,8 +14,6 @@ import { countryBorders } from 'europe.geo'
 import Input from 'Input'
 import MarkdownArea from 'MarkdownArea'
 
-export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : emptyS
-
 /* Workaround (6.6.3) for issue https://github.com/erikras/redux-form/issues/2841
  * We do a mostly unnecessary reset() after a successful submit.
  * There is bug in redux-form: if you remove a field from a field array, a spurious

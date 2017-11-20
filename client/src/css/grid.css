@@ -48,7 +48,7 @@
 }
 .sortspecs {
     font-size: small;
-    color: var(sort-specs-fore);
+    color: var(--sort-specs-fore);
     display: flex;
     flex-flow: row wrap;
     justify-content: flex-start;
@@ -60,7 +60,7 @@
     border-radius: 0.5ex;
 }
 .sorted {
-    background-color: var(--sorted-back);
+    background-color: var(--sort-back);
 }
 .unsorted {
 }

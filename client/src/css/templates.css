@@ -35,8 +35,6 @@ div.xSlim {
     flex: 0 1 2em;
 }
 div.criteriaRemarks {
-    color: var(--remarks-fore);
-    background-color: var(--remarks-back);
     font-size: small;
     margin-left: 0em;
     margin-right: 3.5em;
@@ -45,7 +43,6 @@ div.criteriaRemarks {
 div.evidence {
     margin-left: 2em;
     margin-right: 3.5em;
-    background-color: var(--evidence-back);
 }
 .vtop {
     vertical-align: top;

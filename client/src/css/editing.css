@@ -28,8 +28,8 @@ input[type="text"],textarea {
     font-family: monospace;
 }
 input[type="text"] {
-    width: 50%;
-    max-width: 75%;
+    width: 100%;
+    margin: 0.5ex 0.5ex;
 }
 textarea {
     width: calc(100% - 1em);
@@ -133,25 +133,14 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
 .right {
     float: right;
 }
-.stick {
-    /*
-    float: left;
-    overflow: visible;
-    position: relative;
-    width: 0em;
-    height: 0em;
-    top: -2em;
-    left: -1em;
-    */
-}
 .multi-field {
     margin-left: 0em;
     padding-left: 0em;
     width: 100%;
     display: inline-flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    align-items: baseline;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: top;
     align-content: flex-start;
 }
 .multi-field.textarea {
@@ -164,39 +153,38 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
     align-items: top;
     align-content: flex-start;
 }
-.md-field {
-    margin-left: 0em;
-    padding-left: 0em;
-    width: 100%;
+.multi-content {
+    overflow: visible;
     display: inline-flex;
     flex-flow: row nowrap;
-}
-.multi-content {
-    padding: 0 0 0 1em;
-    flex: 1 2 40%;
-    overflow: visible;
+    align-content: flex-start;
+    align-items: flex-start;
+    width: calc(100% - 1em);
     /*-webkit-overflow-scrolling: touch;*/
 }
 .textarea .multi-content {
     padding: 0 0 0 1em;
-    flex: 1 2 auto;
-    width: 90%;
+    width: calc(100% - 1em);
     overflow: visible;
     /*-webkit-overflow-scrolling: touch;*/
 }
-.multi-control {
-    padding: 0 0 0 0;
-    flex: 0 0 2em;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+.wideInput {
+    width: calc(100% - 1em);
+}
+.md-field {
+    margin-left: 0em;
+    padding-left: 0em;
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
 }
 .field-content {
-    flex: 0 1 100%;
     overflow: auto;
+    width: 100%;
     -webkit-overflow-scrolling: touch;
 }
 .field-control {
-    flex: 0 0 2em;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -240,7 +228,7 @@ div.detail-body {
     text-align: left;
     padding: 0.2em 0.1em 0.2em 0.2em;
     background-color: var(--value-back); 
-    flex: 1 1 20em;
+    flex: 1 1 auto;
     overflow: visible;
     /*-webkit-overflow-scrolling: touch;*/
 }

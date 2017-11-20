@@ -1,7 +1,18 @@
 import React from 'react'
 
-import { makeRhAtts } from 'utils'
 import { memoize } from 'memo'
+
+const makeRhAtts = (table, eId, name, position) => {
+  const tag = name.replace(/[[\].]/g, '_').toLowerCase()
+  const rhTag = `${table}-${eId}-${tag}`
+  const rhAtt = `data-${rhTag}`
+  const rhAt = `${rhAtt}-at`
+  const rh = {
+    [rhAtt]: true,
+    [rhAt]: position,
+  }
+  return { rhAtt, rh }
+}
 
 const showEditTip = memoize((Content, type, dirty) => () =>
   <Content

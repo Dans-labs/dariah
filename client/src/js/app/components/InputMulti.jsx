@@ -1,7 +1,8 @@
 import React from 'react'
 import { Field } from 'redux-form'
 
-import { editClass, makeSubmit, makeSubmitTime } from 'fields'
+import { editClass } from 'edit'
+import { makeSubmit, makeSubmitTime } from 'fields'
 
 const fieldRemove = (fields, i, submit) => () => {fields.remove(i); submit()}
 const fieldPush = (fields, submit) => () => {fields.push(); submit()}
@@ -30,12 +31,11 @@ export default ({
           key={field}
           className={'multi-content'}
         >
-          <span
-            className={'button-small'}
+          <div
+            className={'button-medium'}
             data-rh={'remove'}
             onClick={fieldRemove(fields, i, submitTime)}
-          >{'×'}</span>
-          {'\xa0'}
+          >{'×'}</div>
           <Field
             name={field}
             component={componentSingle}
@@ -51,10 +51,14 @@ export default ({
         </div>
       )}
       <div
-        className={'button-small fa fa-plus multi-control'}
-        data-rh={'more entries'}
-        onClick={fieldPush(fields, submitTime)}
-      />
+        className={'multi-content'}
+      >
+        <div
+          className={'button-medium'}
+          data-rh={'more entries'}
+          onClick={fieldPush(fields, submitTime)}
+        >{'+'}</div>
+      </div>
       {error && <p className={'invalid diag'}>{error}</p>}
     </div>
   )
