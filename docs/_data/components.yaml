@@ -73,6 +73,6 @@
   - Static
   - NavLink
   - NotFound
-  - TooltipContainer
+  - Tooltip
 - workflow:
   - Overview

@@ -1356,36 +1356,52 @@ Object is keyed by the names of the related tables.
 For each related table it contains an object of functions,
 named by the table name of the main records.
 
-[TooltipContainer]({{site.appBase}}/components/TooltipContainer.jsx)
+[Tooltip]({{site.appBase}}/components/Tooltip.jsx)
 =============================================================================================
 presents __none__
 
-A dynamic tooltip, based on [react-hint](https://react-hint.js.org).
-If you follow react-hint, you get a single tooltip container, which will
-be targeted to an element that fires certain events, such as hover or click.
-But if the targeted component is updated while the tooltip is displayed,
-the tooltip is not refreshed, because it only reacts to DOM events, not
-to what is happening at the React level (in the miniDOM).
+A dynamic tooltip, based on CSS3 techniques.
+The tooltip is initially put as content with an absolute position and with opcaity 0.
+A lot can happen on the page: scrolling, re-rendering of components, and they may all cause
+changes in the positions of elements.
+So the position of the invisible tooltip is not where it should be, most of the time.
+That does not matter, as long as we adjust it just in time, before it becomes visible.
+When that happens, the positioning of the tooltip will be adjusted to the current position
+of the element.
+The trigger to make a tooltip visible is a focus event or a mouse-over event.
 
-The solution is: make the tooltip container more local, tie it
-to the component, and let it re-render with the component.
+It is possible to switch all tooltips off.
+This is governed by `showTooltips`, a boolean setting in [settings](Dux#settings). 
 
-This component is meant to be a localized tooltip container.
-
-A tooltip container provides tooltips for every element that has certain `data-` attributes.
-By choosing the part after `-data` we can separate localized tooltip providers.
+Apart from this, the tooltip machinery does not use special React/Redux mechanisms.
+All is done at DOM level and with CSS3.
 
 #### Props
-###### `att` string
-The suffix of the data attribute name to which the tooltip should react.
+###### `tip` string or fragment
+The content of the tooltip. Any content will do.
 
-###### `refresh` string
-A value that changes when the underlying component changes.
-The value will only be used to trigger a re-render of the tooltip container.
+###### `at` string
+The position of the tooltip relative to its target.
+Should be one of `top bottom left right`.
 
-###### `showTip` function
-When called it delivers a React component that will be the contents of the tooltip.
-If this prop is `null`, a standard tooltip will be generated.
+The positioning algorithm looks whether there is sufficient room for the tooltip.
+If not, it will change `top` to bottom and vice versa, and `left` to right` and vice versa.
+
+It will also shift the tooltip so that it does not extends beyond the page.
+
+###### `focusOnly` boolean
+Whether the tooltip should be triggered by focus actions only, or hovering as well.
+Handy for text input elements (`<input type="text">` or `<textarea>`)
+if you want to show editing help, but only if the user is actually typing in the field.
+
+###### `className` string
+An additional CSS class to pass on to the `<Tooltip>` outermost element.
+
+###### `classTip` string
+An additional CSS class to pass on to the element that holds the tooltip.
+
+###### `classArrow` string
+An additional CSS class to pass on to the element that holds the little arrow of the tooltip.
 
 [Window]({{site.appBase}}/components/Window.jsx)
 =============================================================================================
