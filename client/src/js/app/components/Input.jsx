@@ -4,15 +4,12 @@ import { emptyO } from 'utils'
 import { editClass } from 'edit'
 import { makeSubmit, makeSubmitTime, makeReset } from 'fields'
 
-import { withEditHelp } from 'tooltip'
-
-import TooltipContainer from 'TooltipContainer'
 import EditHelp from 'EditHelp'
+import Tooltip from 'Tooltip'
 
-const Input = ({
+export default ({
   meta: { dirty, invalid, submitting, error },
   input, type,
-  rh,
   reset, submitValues,
 }) => {
 
@@ -28,19 +25,22 @@ const Input = ({
   : { className: 'wideInput' }
   return (
     <div
-      {...rh}
       {...className}
     >
-      <input
-        type={type}
-        className={editClass(dirty, invalid)}
-        {...input}
-        {...onAction}
-        {...onCancel}
-      />
+      <Tooltip
+        tip={<EditHelp type={'text'} dirty={dirty} />}
+        at={'top'}
+        focusOnly={true}
+      >
+        <input
+          type={type}
+          className={editClass(dirty, invalid)}
+          {...input}
+          {...onAction}
+          {...onCancel}
+        />
+      </Tooltip>
       {error && <span className={'invalid diag'}>{error}</span>}
     </div>
   )
 }
-
-export default withEditHelp(Input, TooltipContainer, EditHelp, 'text', 'bottom')

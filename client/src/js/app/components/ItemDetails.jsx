@@ -10,6 +10,7 @@ import { getAltSection, compileAlternatives } from 'alter'
 import ListGrid from 'ListGrid'
 import ListPlain from 'ListPlain'
 import ListFilter from 'ListFilter'
+import Tooltip from 'Tooltip'
 
 const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailFragments, dispatch }) => {
   if (detailFragments.length == 0) {return null}
@@ -31,18 +32,22 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
             <div key={name} className={'grid-row'} >
               {
                 !expand
-                ? <div
-                    className={'link detail-control'}
-                    data-rh={'show detail records'}
-                    onClick={nextAlt}
-                  >
-                    <span className={`fa fa-angle-${alt === 0 ? 'down' : 'up'}`} />
-                    {
-                      alt === 0
-                      ? `${nDetails} ${nDetails === 1 ? detailThing : detailThings}`
-                      : emptyS
-                    }
-                  </div>
+                  ? <Tooltip
+                      tip={`${alt == 0 ? 'show' : 'hide'} detail records`}
+                      at={'left'}
+                    >
+                      <div
+                        className={'link detail-control'}
+                        onClick={nextAlt}
+                      >
+                        <span className={`button-small fa fa-angle-${alt === 0 ? 'down' : 'up'}`} />
+                        {
+                          alt === 0
+                          ? `${nDetails} ${nDetails === 1 ? detailThing : detailThings}`
+                          : emptyS
+                        }
+                      </div>
+                    </Tooltip>
                 : null
               }
               <div className={'detail-body'} >

@@ -32,7 +32,7 @@ div.error-boundary {
     font-weight: normal;
     background-color: var(--errorboundary-back);
     color: var(--errorboundary-fore);
-    border: 2px dashed var(--errorboundary-border);
+    border: 2px dotted var(--errorboundary-border);
     border-radius: 1.5ex;
     padding: 0.3em;
 }

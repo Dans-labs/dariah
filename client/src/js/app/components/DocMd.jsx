@@ -8,6 +8,7 @@ import { combineSelectors } from 'utils'
 import { getDoc, needDoc, changedDoc, fetchDoc } from 'docs'
 import { getAltSection, compileAlternatives } from 'alter'
 
+import Tooltip from 'Tooltip'
 import ErrorBoundary from 'ErrorBoundary'
 
 const RouterLink = ({ children, href }) => (
@@ -30,12 +31,16 @@ class DocMd extends Component {
       <ErrorBoundary>
         <div style={{paddingLeft: '0.5em'}} >
           <p style={{float: 'right'}} >
-            <a
-              href={'#'}
-              className={`control fa fa-${alt === 0 ? 'hand-o-down' : 'file-code-o'}`}
-              data-rh={`${alt === 0 ? 'markdown source' : 'formatted'}`}
-              onClick={nextAlt}
-            />
+            <Tooltip
+              tip={`${alt === 0 ? 'markdown source' : 'formatted'}`}
+              at={'right'}
+            >
+              <a
+                href={'#'}
+                className={`control fa fa-${alt === 0 ? 'hand-o-down' : 'file-code-o'}`}
+                onClick={nextAlt}
+              />
+            </Tooltip>
           </p>
           {
             alt === 0

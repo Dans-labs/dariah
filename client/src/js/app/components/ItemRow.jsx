@@ -10,6 +10,7 @@ import { getForms } from 'forms'
 import EditStatus from 'EditStatus'
 import FieldRead from 'FieldRead'
 import ItemForm from 'ItemForm'
+import Tooltip from 'Tooltip'
 
 const putFieldFragments = (tables, fieldFragments, widthStyles) => fieldFragments.map(({
   field,
@@ -50,11 +51,15 @@ const putDetailFragments = (table, eId, detailFragments, widthStyles, nFields) =
 
 const fieldsButton = memoize((nextAlt, table, eId, mayUpdate, on) => (
   mayUpdate
-  ? <span
-      className={`link fa fa-angle-${on ? 'down' : 'up'}`}
-      data-rh={`${on ? 'show' : 'close'} details of this record`}
-      onClick={nextAlt}
-    />
+  ? <Tooltip
+        tip={`${on ? 'show' : 'close'} details of this record`}
+        at={'left'}
+    >
+      <span
+        className={`button-small fa fa-angle-${on ? 'down' : 'up'}`}
+        onClick={nextAlt}
+      />
+    </Tooltip>
   : null
 ))
 

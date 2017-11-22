@@ -6,6 +6,7 @@ import { getMe } from 'me'
 
 import ErrorBoundary from 'ErrorBoundary'
 import NavLink from 'NavLink'
+import Tooltip from 'Tooltip'
 
 const levels = {
   public: 1,
@@ -24,12 +25,15 @@ const tableLinks = (me, { path, name, forWhom, details }) => forMe(me.groupRep, 
         {
           (details || emptyA).filter(({ forWhom: subFor }) => forMe(me.groupRep, subFor)).map(
             ({ path: subPath, name: subName, hint }) =>
-              <NavLink
+              <Tooltip
                 key={subPath}
-                to={`${path}/${subPath}`}
-                data-rh={hint}
-                data-rh-at={'right'}
-              >{subName}</NavLink>
+                tip={hint}
+                at={'right'}
+              >
+                <NavLink
+                  to={`${path}/${subPath}`}
+                >{subName}</NavLink>
+              </Tooltip>
            )
         }
       </div>

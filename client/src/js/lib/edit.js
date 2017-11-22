@@ -2,6 +2,8 @@ import React from 'react'
 
 import { emptyS } from 'utils'
 
+import Tooltip from 'Tooltip'
+
 export const editClass = (dirty, invalid) => invalid ? 'invalid' : dirty ? 'dirty' : emptyS
 
 export const editControl = canSubmit => ({
@@ -12,64 +14,85 @@ export const editControl = canSubmit => ({
   <span>
     {
       (canSubmit && !dirty && !submitting)
-      ? <span
-          className={'button-medium fa fa-fw fa-eye'}
-          data-rh={'close the edit form'}
-          data-rh-at={'bottom'}
-          onClick={nextAlt}
-        />
+      ? <Tooltip
+          tip={'close the edit form'}
+          at={'right'}
+        >
+          <span
+            className={'button-medium fa fa-fw fa-eye'}
+            onClick={nextAlt}
+          />
+        </Tooltip>
       : null
     }
     {
       (dirty && !invalid && !submitting)
       ? canSubmit
-        ? <span
-            className={'button-medium edit-action fa fa-fw fa-save'}
-            data-rh={'save your changes to this record'}
-            data-rh-at={'bottom'}
-            onClick={handleSubmit}
-          />
-        : <span
-            className={'warning-o fa fa-fw fa-pencil'}
-            data-rh={'you have modified this record'}
-            data-rh-at={'bottom'}
-          />
+        ? <Tooltip
+            tip={'save your changes to this record'}
+            at={'right'}
+          >
+            <span
+              className={'button-medium edit-action fa fa-fw fa-save'}
+              onClick={handleSubmit}
+            />
+          </Tooltip>
+        : <Tooltip
+            tip={'you have modified this record'}
+            at={'right'}
+          >
+            <span
+              className={'warning-o fa fa-fw fa-pencil'}
+            />
+          </Tooltip>
       : null
     }
     {
       (dirty && invalid && !submitting)
-      ? <span
-          className={'error-o fa fa-fw fa-exclamation-circle'}
-          data-rh={'some fields contain invalid data'}
-            data-rh-at={'bottom'}
-        />
+      ? <Tooltip
+          tip={'some fields contain invalid data'}
+          at={'right'}
+        >
+          <span
+            className={'error-o fa fa-fw fa-exclamation-circle'}
+          />
+        </Tooltip>
       : null
     }
     {
       (!dirty && invalid && !submitting && !canSubmit)
-      ? <span
-          className={'error-o fa fa-fw fa-exclamation-circle'}
-          data-rh={'some fields contain invalid data'}
-          data-rh-at={'bottom'}
-        />
+      ? <Tooltip
+          tip={'some fields contain invalid data'}
+          at={'right'}
+        >
+          <span
+            className={'error-o fa fa-fw fa-exclamation-circle'}
+          />
+        </Tooltip>
       : null
     }
     {
       (!dirty && !invalid && !submitting && !canSubmit)
-      ? <span
-          className={`fa fa-fw fa-${active ? 'pencil' : 'check'}`}
-          data-rh={'you have not changed this record'}
-          data-rh-at={'bottom'}
-        />
+      ? <Tooltip
+          tip={'you have not changed this record'}
+          at={'right'}
+        >
+          <span
+            className={`fa fa-fw fa-${active ? 'pencil' : 'check'}`}
+          />
+        </Tooltip>
       : null
     }
     {
       submitting
-      ? <span
-          className={'special-o fa fa-fw fa-spinner fa-spin'}
-          data-rh={'busy saving this record'}
-          data-rh-at={'bottom'}
-        />
+      ? <Tooltip
+          tip={'busy saving this record'}
+          at={'right'}
+        >
+          <span
+            className={'special-o fa fa-fw fa-spinner fa-spin'}
+          />
+        </Tooltip>
       : null
     }
     {' '}

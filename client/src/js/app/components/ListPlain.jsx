@@ -120,7 +120,7 @@ class ListPlain extends Component {
                       {
                         !expand
                         ? <span className={'link head'} onClick={this.showHide(table, select, eId, false, nextAlt)} >
-                            <span className={`fa fa-angle-up`} />
+                            <span className={`button-small fa fa-angle-up`} />
                           </span>
                         : null
                       }
@@ -150,7 +150,7 @@ class ListPlain extends Component {
                           </span>
                       }
                       <span className={'link head'} onClick={this.showHide(table, select, eId, true, nextAlt)} >
-                        <span className={`fa fa-angle-down`} />
+                        <span className={`button-small fa fa-angle-down`} />
                         {' '}{head}
                       </span>
                     </span>

@@ -1,62 +1,62 @@
-.react-hint {
-	padding: 5px;
-	position: absolute;
-	z-index: 9999;
-	cursor: default;
-	animation: 1s fadeIn;
+.tooltips-on {
+    background-color: var(--tooltip-back);
+}
+.tooltips-off {
+    background-color: var(--action-back);
+}
+.tooltip {
+    position: absolute;
+    color: var(--tooltip-fore);
+    background-color: var(--tooltip-back);
+    border-radius: 1rem;
+    padding: 0.6rem 0.5rem;
+    text-transform: none;
+    width: max-content;
+    font-size: 1rem;
 }
 
-.react-hint__content {
-	padding: 10px;
-	border-radius: 1ex;
-	background: var(--tooltip-back);
-	color: var(--tooltip-fore);
-}
-
-.react-hint:after {
+.toolarrow {
+    position: absolute;
 	content: '';
 	width: 0;
 	height: 0;
 	margin: auto;
 	display: block;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	border: 5px solid var(--tooltip-border1);
+	border: 5px solid transparent;
 }
 
-.react-hint--top:after {
-	top: auto;
+.toolarrow-top {
 	border-bottom: none;
-	border-top-color: var(--tooltip-border2);
+	border-top-color: var(--tooltip-arrow);
 }
 
-.react-hint--left:after {
-	left: auto;
+.toolarrow-left {
 	border-right: none;
-	border-left-color: var(--tooltip-border2);
+	border-left-color: var(--tooltip-arrow);
 }
 
-.react-hint--right:after {
-	right: auto;
+.toolarrow-right {
 	border-left: none;
-	border-right-color: var(--tooltip-border2);
+	border-right-color: var(--tooltip-arrow);
 }
 
-.react-hint--bottom:after {
-	bottom: auto;
+.toolarrow-bottom {
 	border-top: none;
-	border-bottom-color: var(--tooltip-border2);
+	border-bottom-color: var(--tooltip-arrow);
 }
 
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
+
+.tooltip,
+.toolarrow {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tooltipped.focus:focus-within + span > .tooltip,
+.tooltipped.focus:focus-within + span > .toolarrow,
+.tooltipped.hover:hover + span > .tooltip,
+.tooltipped.hover:hover + span > .toolarrow {
+    opacity: 0.95;
+    transition: all 0.75s ease;
 }
 

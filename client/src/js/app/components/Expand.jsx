@@ -5,6 +5,8 @@ import { emptyS } from 'utils'
 
 import { getAltSection, compileAlternatives } from 'alter'
 
+import Tooltip from 'Tooltip'
+
 const nbsp = ' '
 
 const cleanPut = text => text || null
@@ -34,13 +36,15 @@ const Expand = ({
     <div className={className}>
       <span className={'vtop'}>
         {nbsp}
-        <span
-          className={`link vtop fa fa-${alt === 0 ? iOpen : iClose}`}
-          data-rh={alt === 0 ? tOpen : tClose}
-          onClick={nextAlt}
+        <Tooltip
+          tip={alt === 0 ? tOpen : tClose}
+          at={'top'}
         >
-          {cleanWrap(headActive, headLine, 'body')}
-        </span>
+          <span
+            className={`link vtop fa fa-${alt === 0 ? iOpen : iClose}`}
+            onClick={nextAlt}
+          >{cleanWrap(headActive, headLine, 'body')}</span>
+        </Tooltip>
         {cleanPut(headLine)}
       </span>
       {
@@ -70,13 +74,15 @@ const ExpandHeadPure = ({
   const tClose = titleClose || 'collapse'
   return (
     <div className={`vtop ${className}`}>
-      <span
-        className={`link vtop fa fa-${alt === 0 ? iOpen : iClose}`}
-        data-rh={alt === 0 ? tOpen : tClose}
-        onClick={nextAlt}
+      <Tooltip
+        tip={alt === 0 ? tOpen : tClose}
+        at={'top'}
       >
-        {cleanWrap(headActive, headLine, 'body')}
-      </span>
+        <span
+          className={`link vtop fa fa-${alt === 0 ? iOpen : iClose}`}
+          onClick={nextAlt}
+        >{cleanWrap(headActive, headLine, 'body')}</span>
+      </Tooltip>
       {cleanPut(headLine)}
     </div>
   )

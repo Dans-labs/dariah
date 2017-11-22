@@ -4,6 +4,8 @@ import { Field } from 'redux-form'
 import { editClass } from 'edit'
 import { makeSubmit, makeSubmitTime } from 'fields'
 
+import Tooltip from 'Tooltip'
+
 const fieldRemove = (fields, i, submit) => () => {fields.remove(i); submit()}
 const fieldPush = (fields, submit) => () => {fields.push(); submit()}
 /* N.B.
@@ -31,11 +33,15 @@ export default ({
           key={field}
           className={'multi-content'}
         >
-          <div
-            className={'button-medium'}
-            data-rh={'remove'}
-            onClick={fieldRemove(fields, i, submitTime)}
-          >{'×'}</div>
+          <Tooltip
+            tip={'remove entry'}
+            at={'left'}
+          >
+            <div
+              className={'button-medium'}
+              onClick={fieldRemove(fields, i, submitTime)}
+            >{'×'}</div>
+          </Tooltip>
           <Field
             name={field}
             component={componentSingle}
@@ -53,11 +59,15 @@ export default ({
       <div
         className={'multi-content'}
       >
-        <div
-          className={'button-medium'}
-          data-rh={'more entries'}
-          onClick={fieldPush(fields, submitTime)}
-        >{'+'}</div>
+        <Tooltip
+          tip={'more entries'}
+          at={'left'}
+        >
+          <div
+            className={'button-medium'}
+            onClick={fieldPush(fields, submitTime)}
+          >{'+'}</div>
+        </Tooltip>
       </div>
       {error && <p className={'invalid diag'}>{error}</p>}
     </div>

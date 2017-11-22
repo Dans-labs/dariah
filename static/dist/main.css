@@ -22,13 +22,11 @@
     --dim-fore:                        hsla(  0,   0%,  50%, 1  );
     --dim-back:                        hsla(  0,   0%,  85%, 0.5);
 
-    --edit-help-fore:                  hsla( 60, 100%,  20%, 1  );
-    --edit-help-back:                  hsla( 60, 100%,  80%, 0.9);
-    --edit-help-border:                hsla( 60, 100%,  50%, 0.5);
+    --edit-help-fore:                  hsla( 50, 100%,  20%, 1  );
+    --edit-help-back:                  hsla( 50, 100%,  80%, 0.9);
+    --edit-help-border:                hsla( 50, 100%,  50%, 0.5);
     --edit-help-code-fore:             hsla(210, 100%,  40%, 1  );
-    --edit-help-shadow1:               hsla( 60, 100%,  60%, 1  );
-    --edit-help-shadow2:               hsla( 60, 100%,  20%, 1  );
-    --edit-help-item-back:             hsla( 60, 100%,  95%, 1  );
+    --edit-help-item-back:             hsla( 50, 100%,  95%, 1  );
 
     --edit-text-fore:                  hsla(240,  50%,  30%, 1  );
     --edit-text-back:                  hsla(210, 100%,  98%, 1  );
@@ -73,6 +71,8 @@
     --record-edit-back:                hsla(  0,   0%,  80%, 0.8);
     --record-edit-border:              hsla(  0,   0%,  80%, 0.5);
     --record-border-no:                hsla(  0,   0%,   0%, 0  );
+
+    --resize-fore:                      hsla(  0,   0%,  50%, 0.1);
 
     --score-fore:                      hsla(120,  80%,  30%, 1  );
     --score-back:                      hsla(120, 100%,  98%, 1  );
@@ -130,10 +130,9 @@
     --template-error:                  hsla(  0,  80%,  50%, 1  );
     --template-good:                   hsla(120,  80%,  50%, 1  );
 
-    --tooltip-fore:                    hsla( 60, 100%,  20%, 1  );
-    --tooltip-back:                    hsla( 60, 100%,  80%, 1  );
-    --tooltip-border1:                 hsla( 60,   0%,   0%, 0  );
-    --tooltip-border:                  hsla( 60, 100%,  50%, 0.5);
+    --tooltip-fore:                    hsla( 50, 100%,  20%, 1  );
+    --tooltip-back:                    hsla( 50, 100%,  70%, 1  );
+    --tooltip-arrow:                   hsla( 30, 100%,  40%, 1  );
 
     --value-back:                      hsla(120, 100%, 100%, 1  );
     --value-edit-back:                 hsla(  0,   0%,  95%, 1  );
@@ -150,69 +149,66 @@
 
     --workflow-active:                 hsla(120, 100%,  80%, 0.8);
 }
-*, *:before, *:after {
-  box-sizing: content-box;
+.tooltips-on {
+    background-color: var(--tooltip-back);
 }
-.react-hint {
-	padding: 5px;
-	position: absolute;
-	z-index: 9999;
-	cursor: default;
-	animation: 1s fadeIn;
+.tooltips-off {
+    background-color: var(--action-back);
+}
+.tooltip {
+    position: absolute;
+    color: var(--tooltip-fore);
+    background-color: var(--tooltip-back);
+    border-radius: 1rem;
+    padding: 0.6rem 0.5rem;
+    text-transform: none;
+    width: max-content;
+    font-size: 1rem;
 }
 
-.react-hint__content {
-	padding: 10px;
-	border-radius: 1ex;
-	background: var(--tooltip-back);
-	color: var(--tooltip-fore);
-}
-
-.react-hint:after {
+.toolarrow {
+    position: absolute;
 	content: '';
 	width: 0;
 	height: 0;
 	margin: auto;
 	display: block;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	border: 5px solid var(--tooltip-border1);
+	border: 5px solid transparent;
 }
 
-.react-hint--top:after {
-	top: auto;
+.toolarrow-top {
 	border-bottom: none;
-	border-top-color: var(--tooltip-border2);
+	border-top-color: var(--tooltip-arrow);
 }
 
-.react-hint--left:after {
-	left: auto;
+.toolarrow-left {
 	border-right: none;
-	border-left-color: var(--tooltip-border2);
+	border-left-color: var(--tooltip-arrow);
 }
 
-.react-hint--right:after {
-	right: auto;
+.toolarrow-right {
 	border-left: none;
-	border-right-color: var(--tooltip-border2);
+	border-right-color: var(--tooltip-arrow);
 }
 
-.react-hint--bottom:after {
-	bottom: auto;
+.toolarrow-bottom {
 	border-top: none;
-	border-bottom-color: var(--tooltip-border2);
+	border-bottom-color: var(--tooltip-arrow);
 }
 
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
+
+.tooltip,
+.toolarrow {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tooltipped.focus:focus-within + span > .tooltip,
+.tooltipped.focus:focus-within + span > .toolarrow,
+.tooltipped.hover:hover + span > .tooltip,
+.tooltipped.hover:hover + span > .toolarrow {
+    opacity: 0.95;
+    transition: all 0.75s ease;
 }
 
 .hidden {
@@ -489,7 +485,7 @@
     margin-top: 0;
     margin-bottom: 0;
     font-style: italic;
-    font-size: x-small;
+    font-size: small;
     float: right;
 }
 .msg-box {
@@ -515,16 +511,26 @@
     color: var(--action-fore);
     cursor: pointer;
     position: fixed;
-    top: 0.05em;
-    right: 1em;
-    width: 5em;
-    height: 2em;
+    top: 0.05rem;
+    right: 1rem;
+    width: 5rem;
+    height: 2rem;
     text-align: right;
     padding-left: 0;
     padding-right: 0;
     z-index: 2000;
     opacity: 0.9;
     vertical-align: middle;
+}
+.msg-spinner-tip {
+    position: fixed;
+    top: 0.3rem;
+    right: 2.2rem;
+}
+.msg-spinner-arrow {
+    position: fixed;
+    top: 1.2rem;
+    right: 2rem;
 }
 .msg-dot {
     font-size: small;
@@ -572,7 +578,7 @@ input[type="text"] {
 }
 textarea {
     width: calc(100% - 1em);
-    height: 10em;
+    height: 10rem;
     margin: 0.5ex 0.5ex;
 }
 input[type="text"]:focus, textarea:focus {
@@ -789,25 +795,23 @@ div.detail-body {
 div.edit-help {
     color: var(--edit-help-fore);
     background-color: var(--edit-help-back);
-    border: 2px solid var(--edit-help-border);
-    box-shadow: inset 0 0 1em var(--edit-help-shadow1), 0 0 1em var(--edit-help-shadow2);
+    border-radius: 1rem;
     display: flex;
     flex-flow: row  wrap;
     justify-content: flex-start;
-    margin-top: 0.5em;
     font-size: small;
 }
 div.help-item {
     color: var(--edit-help-fore);
     background-color: var(--edit-help-item-back);
     border: 0;
-    border-radius: 1ex;
+    border-radius: 0.2rem;
     flex: 0 1 auto;
-    padding: 0.1em;
-    margin-top: 0.2em;
-    margin-bottom: 0.1em;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+    padding: 0.1rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.1rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 }
 .help-code {
     color: var(--edit-help-code-fore);
@@ -864,7 +868,7 @@ div.error-boundary {
     font-weight: normal;
     background-color: var(--errorboundary-back);
     color: var(--errorboundary-fore);
-    border: 2px dashed var(--errorboundary-border);
+    border: 2px dotted var(--errorboundary-border);
     border-radius: 1.5ex;
     padding: 0.3em;
 }
@@ -948,7 +952,7 @@ a.active,.nav a.active,a.nav.active {
 }
 .resize {
     font-size: x-small;
-    color: var(--resize-for);
+    color: var(--resize-fore);
 }
 .facetFilter {
     margin-top: 0.3em;
@@ -1278,7 +1282,7 @@ div.criteriaEntryRead.complete {
     background-color: var(--entry-complete-back);
 }
 div.criteriaEntryRead.incomplete {
-    border: 2px dashed var(--entry-incomplete-border);
+    border: 2px dotted var(--entry-incomplete-border);
     background-color: var(--entry-incomplete-back);
 }
 div.criteriaEntryEdit.complete {
@@ -1286,7 +1290,7 @@ div.criteriaEntryEdit.complete {
     background-color: var(--entry-edit-complete-back);
 }
 div.criteriaEntryEdit.incomplete {
-    border: 2px dashed var(--entry-edit-incomplete-border);
+    border: 2px dotted var(--entry-edit-incomplete-border);
     background-color: var(--entry-edit-incomplete-back);
 }
 

@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import { presentUser } from 'tables'
 import { getMe, fetchMe } from 'me'
 
+import Tooltip from 'Tooltip'
+
 class Login extends Component {
   render() {
     const { props: { me } } = this
@@ -11,33 +13,45 @@ class Login extends Component {
       <span className={'login'} >
         {
           me.eppn
-          ? <span
-              data-rh={'you are logged in'}
-              data-rh-at={'bottom'}
+          ? [
+            <Tooltip
+              key={'desc'}
+              tip={'you are logged in'}
+              at={'bottom'}
             >
               <span className={'fa fa-user'} /><strong>{presentUser(me)}</strong>{' '}
               <em>{me.groupDesc || 'not authenticated'}</em>
+            </Tooltip>,
+            <Tooltip
+              key={'logout'}
+              tip={'log out of this tool'}
+              at={'bottom'}
+            >
               <a
                 href={'/logout'}
                 className={'control fa fa-user-times'}
-                data-rh={'log out of this tool'}
-                data-rh-at={'bottom'}
               />
+            </Tooltip>,
+            <Tooltip
+              key={'signout'}
+              tip={'sign out from DARIAH'}
+              at={'top'}
+            >
               <a
                 href={'/slogout'}
                 className={'control fa fa-users'}
-                data-rh={'sign out from DARIAH'}
-                data-rh-at={'bottom'}
               />
-            </span>
-          : <a
-              href={'/login'}
-              className={'control'}
-              data-rh={'click to log in'}
-              data-rh-at={'bottom'}
+            </Tooltip>,
+          ]
+          : <Tooltip
+              tip={'click to log in'}
+              at={'bottom'}
             >
-              <strong className={'fa fa-user-plus'} /><strong>{' login'}</strong>
-            </a>
+              <a
+                href={'/login'}
+                className={'control'}
+              ><strong className={'fa fa-user-plus'} /><strong>{' login'}</strong></a>
+            </Tooltip>
         }
       </span>
     )

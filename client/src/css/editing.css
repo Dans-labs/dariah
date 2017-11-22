@@ -33,7 +33,7 @@ input[type="text"] {
 }
 textarea {
     width: calc(100% - 1em);
-    height: 10em;
+    height: 10rem;
     margin: 0.5ex 0.5ex;
 }
 input[type="text"]:focus, textarea:focus {
@@ -250,25 +250,23 @@ div.detail-body {
 div.edit-help {
     color: var(--edit-help-fore);
     background-color: var(--edit-help-back);
-    border: 2px solid var(--edit-help-border);
-    box-shadow: inset 0 0 1em var(--edit-help-shadow1), 0 0 1em var(--edit-help-shadow2);
+    border-radius: 1rem;
     display: flex;
     flex-flow: row  wrap;
     justify-content: flex-start;
-    margin-top: 0.5em;
     font-size: small;
 }
 div.help-item {
     color: var(--edit-help-fore);
     background-color: var(--edit-help-item-back);
     border: 0;
-    border-radius: 1ex;
+    border-radius: 0.2rem;
     flex: 0 1 auto;
-    padding: 0.1em;
-    margin-top: 0.2em;
-    margin-bottom: 0.1em;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+    padding: 0.1rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.1rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 }
 .help-code {
     color: var(--edit-help-code-fore);

@@ -5,6 +5,8 @@ import { emptyS } from 'utils'
 
 import { getNotes, clear, display } from 'notes'
 
+import Tooltip from 'Tooltip'
+
 class Notification extends Component {
   constructor(props) {
     super(props)
@@ -26,6 +28,9 @@ class Notification extends Component {
     dispatch(clear())
   }
 
+    /*
+    */
+
   render() {
     const { props: { messages, lastNote, lastKind, busy, show } } = this
 
@@ -33,26 +38,30 @@ class Notification extends Component {
     const busyBlocks = new Array(busy < 0 ? 0 : busy).fill(1)
     return (
       <div>
-        <p className={'msg-spinner'} >
-          <span
-            data-rh={'click circle to show/hide notifications and progress messages'}
-            data-rh-at={'left'}
-            className={highlight ? `spin-${lastKind}` : 'spin-ok'}
-          >
-            { busyBlocks.map((b, i) => <span key={i} className={'msg-dot fa fa-caret-left'} />) }
+        <Tooltip
+          tip={'click circle to show/hide notifications and progress messages'}
+          at={'left'}
+          fixed={true}
+          classTip={'msg-spinner-tip'}
+          classArrow={'msg-spinner-arrow'}
+        >
+          <p className={'msg-spinner'} >
             <span
-              className={`fa fa-${busy === 0 ? 'circle-o' : 'spinner fa-spin'}`}
-              onClick={this.handleBox}
-            />
-          </span>
-        </p>
+              className={highlight ? `spin-${lastKind}` : 'spin-ok'}
+            >
+              {busyBlocks.map((b, i) => <span key={i} className={'msg-dot fa fa-caret-left'} />)}
+              <span
+                className={`fa fa-${busy === 0 ? 'circle-o' : 'spinner fa-spin'}`}
+                onClick={this.handleBox}
+              />
+            </span>
+          </p>
+        </Tooltip>
         {
           show
           ? <div
               ref={this.refDom('notbox')}
               className={'msg-box'}
-              data-rh={'click panel to hide it'}
-              data-rh-at={'bottom'}
               onClick={this.handleHide}
             >{
               messages.map((msg, i) => (
@@ -64,14 +73,17 @@ class Notification extends Component {
               ))
             }
               <p className={'msg-dismiss'} >{'(click panel to hide)'}</p>
-              <p className={'msg-trash'} >
-                <a
-                  href={'#'}
-                  data-rh={'clear messages'}
-                  className={'control fa fa-trash'}
-                  onClick={this.handleClear}
-                />
-              </p>
+              {
+                messages.length > 1
+                ? <p className={'msg-trash'} >
+                    <a
+                      href={'#'}
+                      className={'control'}
+                      onClick={this.handleClear}
+                    ><span className={'control fa fa-trash'} />{' clear messages'}</a>
+                  </p>
+                : null
+              }
             </div>
           : null
         }

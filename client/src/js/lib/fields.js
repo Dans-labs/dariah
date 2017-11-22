@@ -113,7 +113,6 @@ const valuePrepare = memoize((settings, tables, table, valType, relField, active
     if (relField == null) {
       classNames.push('tag')
       link.href = linkMe
-      link['data-rh'] = 'more info about this value'
       elem = 'a'
     }
     else {

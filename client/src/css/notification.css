@@ -57,7 +57,7 @@
     margin-top: 0;
     margin-bottom: 0;
     font-style: italic;
-    font-size: x-small;
+    font-size: small;
     float: right;
 }
 .msg-box {
@@ -83,16 +83,26 @@
     color: var(--action-fore);
     cursor: pointer;
     position: fixed;
-    top: 0.05em;
-    right: 1em;
-    width: 5em;
-    height: 2em;
+    top: 0.05rem;
+    right: 1rem;
+    width: 5rem;
+    height: 2rem;
     text-align: right;
     padding-left: 0;
     padding-right: 0;
     z-index: 2000;
     opacity: 0.9;
     vertical-align: middle;
+}
+.msg-spinner-tip {
+    position: fixed;
+    top: 0.3rem;
+    right: 2.2rem;
+}
+.msg-spinner-arrow {
+    position: fixed;
+    top: 1.2rem;
+    right: 2rem;
 }
 .msg-dot {
     font-size: small;

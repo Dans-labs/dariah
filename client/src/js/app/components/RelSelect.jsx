@@ -9,23 +9,24 @@ import { composeAttributes, checkDisabled, makeSubmitTime } from 'fields'
 import { getSettings } from 'settings'
 import { getSelect, compileOptions, setSearch, setPopUp, togglePopUp } from 'select'
 
-import { withTooltip } from 'tooltip'
-
-import TooltipContainer from 'TooltipContainer'
+import Tooltip from 'Tooltip'
 
 const RelOption = ({ label, attributes, selected, multiple, onHit }) => (
-  <p
-    {...attributes}
-    data-rh={
+  <Tooltip
+    tip={
       selected
       ? `${label} is currently selected`
       : multiple
         ? `add ${label}`
         : `select ${label}`
     }
-    data-rh-at={'bottom'}
-    onClick={selected ? null : onHit}
-  >{label}</p>
+    at={'bottom'}
+  >
+    <p
+      {...attributes}
+      onClick={selected ? null : onHit}
+    >{label}</p>
+  </Tooltip>
 )
 
 const removeVal = (value, onChange, val) => event => {
@@ -56,11 +57,10 @@ const changeSel = memoize((selectTag, multiple, value, val, onChange, dispatch) 
   }
 })
 
-const HeadBare = ({
+const Head = ({
   optionLookup, value,
   popUp, popUpIfEmpty,
   activeItems, inactive,
-  rh,
   selectTag, dispatch,
 }) => {
   const makeAttributes = composeAttributes(activeItems, inactive)
@@ -80,102 +80,105 @@ const HeadBare = ({
   const attributes = makeAttributes(value, classes.join(' '))
   const dir = popUp ? 'up' : 'down'
   return (
-    <span
-      {...attributes}
-      {...rh}
-      onClick={handle(dispatch, togglePopUp, selectTag)}
+    <Tooltip
+      tip={`click here to ${popUp ? 'hide' : 'show'} the other options`}
+      at={'right'}
     >
-      {label}
-      {' '}
-      <span className={`fa fa-arrow-${dir} ${dir}`} />
-    </span>
+      <span
+        {...attributes}
+        onClick={handle(dispatch, togglePopUp, selectTag)}
+      >
+        {label}
+        {' '}
+        <span className={`fa fa-arrow-${dir} ${dir}`} />
+      </span>
+    </Tooltip>
   )
 }
-const HeadTip = ({ popUp }) =>
-  <div className={'react-hint__content'} >
-    {`click here to ${popUp ? 'hide' : 'show'} the other options`}
-  </div>
 
-const Head = withTooltip(HeadBare, TooltipContainer, HeadTip, 'popUp', 'top')
-
-const TagsBare = ({
+const Tags = ({
   selectTag,
   optionLookup,
   popUp, popUpIfEmpty,
   activeItems, inactive,
-  rh,
   value,
   onChange, dispatch,
 }) => {
   const makeAttributes = composeAttributes(activeItems, inactive)
   const dir = popUp ? 'up' : 'down'
   return (
-    <div
-      className={'tags'}
-      {...rh}
-      onClick={handle(dispatch, togglePopUp, selectTag)}
+    <Tooltip
+      tip={`click on this line to ${popUp ? 'hide' : 'show'} the remaining options`}
+      at={'top'}
     >
-      {
-        (value != null && value.length)
-        ? value.map(
-            val => {
-              const { [val]: lab = val } = optionLookup
-              const attributes = makeAttributes(val, 'tag')
-              return (
-                <span
-                  key={val}
-                  {...attributes}
-                >
+      <div
+        className={'tags'}
+        onClick={handle(dispatch, togglePopUp, selectTag)}
+      >
+        {
+          (value != null && value.length)
+          ? value.map(
+              val => {
+                const { [val]: lab = val } = optionLookup
+                const attributes = makeAttributes(val, 'tag')
+                return (
                   <span
-                    className={`button-tag`}
-                    data-rh={`remove ${lab}`}
-                    data-rh-at={'bottom'}
-                    onClick={removeVal(value, onChange, val)}
-                  >{'×'}</span>{' '}
-                  <span>{lab}</span>
-                </span>
-              )
-            }
-          )
-        : popUpIfEmpty
-          ? null
-          : <span className={'tag empty'}>{'click to enter values'}</span>
-      }
-      <span className={`fa fa-arrow-${dir} ${dir}`} />
-    </div>
+                    key={val}
+                    {...attributes}
+                  >
+                    <Tooltip
+                      tip={`remove ${lab}`}
+                      at={'bottom'}
+                    >
+                      <span
+                        className={`button-tag`}
+                        onClick={removeVal(value, onChange, val)}
+                      >{'×'}</span>{' '}
+                    </Tooltip>
+                    <span>{lab}</span>
+                  </span>
+                )
+              }
+            )
+          : popUpIfEmpty
+            ? null
+            : <span className={'tag empty'}>{'click to enter values'}</span>
+        }
+        <span className={`fa fa-arrow-${dir} ${dir}`} />
+      </div>
+    </Tooltip>
   )
 }
-
-const TagsTip = ({ popUp }) =>
-  <div className={'react-hint__content'} >
-    {`click to ${popUp ? 'hide' : 'show'} the remaining options`}
-  </div>
-
-const Tags = withTooltip(TagsBare, TooltipContainer, TagsTip, 'popUp', 'top')
 
 const Typing = ({ selectTag, search, dispatch, placeHolder }) => (
   <span className={'option-type'} >
     {
       search
-      ? <span
-          className={'button-tag'}
-          data-rh={'clear typing'}
-          data-rh-at={'bottom'}
-          onClick={handle(dispatch, setSearch, selectTag, emptyS)}
-        >{'×'}</span>
-        : <span>{'\xa0'}</span>
+      ? <Tooltip
+          tip={'clear typing'}
+          at={'bottom'}
+        >
+          <span
+            className={'button-tag'}
+            onClick={handle(dispatch, setSearch, selectTag, emptyS)}
+          >{'×'}</span>
+        </Tooltip>
+      : <span>{'\xa0'}</span>
     }
     {'\xa0'}
-    <input
-      className={'typing'}
-      type={'text'}
-      data-rh={placeHolder}
-      data-rh-at={'left'}
-      placeholder={'type here ...'}
-      value={search || emptyS}
-      onFocus={handle(dispatch, setPopUp, selectTag, true)}
-      onChange={handlEV(dispatch, setSearch, selectTag)}
-    />
+    <Tooltip
+      tip={placeHolder}
+      at={'left'}
+    >
+      <input
+        className={'typing'}
+        type={'text'}
+        placeholder={'type here ...'}
+        value={search || emptyS}
+        onFocus={handle(dispatch, setPopUp, selectTag, true)}
+        onChange={handlEV(dispatch, setSearch, selectTag)}
+      />
+    </Tooltip>
   </span>
 )
 
@@ -198,12 +201,15 @@ const Options = ({
       {
         multiple || value == null || value == emptyS
         ? null
-        : <span
-            className={'button-tag tag option'}
-            data-rh={'clear selection'}
-            data-rh-at={'bottom'}
-            onClick={changeSel(selectTag, multiple, null, null, onChange, dispatch)}
-          >{'( × )'}</span>
+        : <Tooltip
+            tip={'clear selection'}
+            at={'bottom'}
+          >
+            <span
+              className={'button-tag tag option'}
+              onClick={changeSel(selectTag, multiple, null, null, onChange, dispatch)}
+            >{'( × )'}</span>
+          </Tooltip>
       }
       {
         (
@@ -212,12 +218,15 @@ const Options = ({
           && !options.some(({ label }) => label === search)
           && !value.includes(search)
         )
-        ? <span
-            className={'new tag'}
-            data-rh={`add ${search} as a NEW option`}
-            data-rh-at={'bottom'}
-            onClick={addVal(optionLookup, multiple, value, onChange, search)}
-          >{search}</span>
+        ? <Tooltip
+            tip={`add ${search} as a NEW option`}
+            at={'bottom'}
+          >
+            <span
+              className={'new tag'}
+              onClick={addVal(optionLookup, multiple, value, onChange, search)}
+            >{search}</span>
+          </Tooltip>
         : null
       }
       {

@@ -78,5 +78,5 @@ a.active,.nav a.active,a.nav.active {
 }
 .resize {
     font-size: x-small;
-    color: var(--resize-for);
+    color: var(--resize-fore);
 }

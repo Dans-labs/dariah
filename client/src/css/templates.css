@@ -7,7 +7,7 @@ div.criteriaEntryRead.complete {
     background-color: var(--entry-complete-back);
 }
 div.criteriaEntryRead.incomplete {
-    border: 2px dashed var(--entry-incomplete-border);
+    border: 2px dotted var(--entry-incomplete-border);
     background-color: var(--entry-incomplete-back);
 }
 div.criteriaEntryEdit.complete {
@@ -15,7 +15,7 @@ div.criteriaEntryEdit.complete {
     background-color: var(--entry-edit-complete-back);
 }
 div.criteriaEntryEdit.incomplete {
-    border: 2px dashed var(--entry-edit-incomplete-border);
+    border: 2px dotted var(--entry-edit-incomplete-border);
     background-color: var(--entry-edit-incomplete-back);
 }
 

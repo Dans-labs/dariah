@@ -3,12 +3,12 @@ import { makeReducer } from 'utils'
 
 /* ACTIONS */
 
-export const set = (key, value) => ({ type: 'setSetting', key, value })
+export const adjust = (key, value) => ({ type: 'setSetting', key, value })
 
 /* REDUCER */
 
 const flows = {
-  set(state, { key, value }) {return update(state, { [key]: { $set: value } })},
+  setSetting(state, { key, value }) {return update(state, { [key]: { $set: value } })},
 }
 
 const initSettings = () => ({
@@ -20,6 +20,7 @@ const initSettings = () => ({
       dateWithdrawn: true,
     },
   },
+  showTooltips: true,
 })
 
 export default makeReducer(flows, initSettings())

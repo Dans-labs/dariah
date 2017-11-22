@@ -15,6 +15,7 @@ import ItemEdit from 'ItemEdit'
 import ItemRead from 'ItemRead'
 import ItemDetails from 'ItemDetails'
 import EditDelete from 'EditDelete'
+import Tooltip from 'Tooltip'
 
 const ItemForm = props => {
   const {
@@ -81,12 +82,15 @@ const ItemForm = props => {
         : <div>
             {
               hasEditable
-              ? <span
-                  className={`button-medium inlineL fa fa-pencil`}
-                  data-rh={`open an edit form for this record`}
-                  data-rh-at={'bottom'}
-                  onClick={nextAlt}
-                />
+              ? <Tooltip
+                  tip={`open an edit form for this record`}
+                  at={'right'}
+                >
+                  <span
+                    className={`button-medium fa fa-pencil`}
+                    onClick={nextAlt}
+                  />
+                </Tooltip>
               : null
             }
             <EditDelete

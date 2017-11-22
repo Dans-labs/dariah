@@ -22,13 +22,11 @@
     --dim-fore:                        hsla(  0,   0%,  50%, 1  );
     --dim-back:                        hsla(  0,   0%,  85%, 0.5);
 
-    --edit-help-fore:                  hsla( 60, 100%,  20%, 1  );
-    --edit-help-back:                  hsla( 60, 100%,  80%, 0.9);
-    --edit-help-border:                hsla( 60, 100%,  50%, 0.5);
+    --edit-help-fore:                  hsla( 50, 100%,  20%, 1  );
+    --edit-help-back:                  hsla( 50, 100%,  80%, 0.9);
+    --edit-help-border:                hsla( 50, 100%,  50%, 0.5);
     --edit-help-code-fore:             hsla(210, 100%,  40%, 1  );
-    --edit-help-shadow1:               hsla( 60, 100%,  60%, 1  );
-    --edit-help-shadow2:               hsla( 60, 100%,  20%, 1  );
-    --edit-help-item-back:             hsla( 60, 100%,  95%, 1  );
+    --edit-help-item-back:             hsla( 50, 100%,  95%, 1  );
 
     --edit-text-fore:                  hsla(240,  50%,  30%, 1  );
     --edit-text-back:                  hsla(210, 100%,  98%, 1  );
@@ -73,6 +71,8 @@
     --record-edit-back:                hsla(  0,   0%,  80%, 0.8);
     --record-edit-border:              hsla(  0,   0%,  80%, 0.5);
     --record-border-no:                hsla(  0,   0%,   0%, 0  );
+
+    --resize-fore:                      hsla(  0,   0%,  50%, 0.1);
 
     --score-fore:                      hsla(120,  80%,  30%, 1  );
     --score-back:                      hsla(120, 100%,  98%, 1  );
@@ -130,10 +130,9 @@
     --template-error:                  hsla(  0,  80%,  50%, 1  );
     --template-good:                   hsla(120,  80%,  50%, 1  );
 
-    --tooltip-fore:                    hsla( 60, 100%,  20%, 1  );
-    --tooltip-back:                    hsla( 60, 100%,  80%, 1  );
-    --tooltip-border1:                 hsla( 60,   0%,   0%, 0  );
-    --tooltip-border:                  hsla( 60, 100%,  50%, 0.5);
+    --tooltip-fore:                    hsla( 50, 100%,  20%, 1  );
+    --tooltip-back:                    hsla( 50, 100%,  70%, 1  );
+    --tooltip-arrow:                   hsla( 30, 100%,  40%, 1  );
 
     --value-back:                      hsla(120, 100%, 100%, 1  );
     --value-edit-back:                 hsla(  0,   0%,  95%, 1  );

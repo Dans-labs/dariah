@@ -15,6 +15,7 @@ import { dealWithProvenance } from 'fields'
 import ItemRow from 'ItemRow'
 import EditInsert from 'EditInsert'
 import OpenCloseAll from 'OpenCloseAll'
+import Tooltip from 'Tooltip'
 
 const initial = 0
 const nAlts = 2
@@ -126,11 +127,15 @@ const ListGrid = ({
                 </span>
               ))
             }
-            <span
-              className={'fa fa-close button-small'}
-              data-rh={'remove all sort options'}
-              onClick={handle(dispatch, resetSort, gridTag)}
-            />{' '}
+            <Tooltip
+              tip={'remove all sort options'}
+              at={'right'}
+            >
+              <span
+                className={'fa fa-close button-small'}
+                onClick={handle(dispatch, resetSort, gridTag)}
+              />{' '}
+            </Tooltip>
           </p>
         : null
       }
@@ -150,24 +155,36 @@ const ListGrid = ({
                 >
                   {
                     direction
-                    ? <span
-                        className={'sorted button-small'}
-                        data-rh={'remove column from sort options'}
-                        onClick={handle(dispatch, delColumn, gridTag, field)}
-                      >{field}</span>
-                    : <span
-                        className={'unsorted button-small'}
-                        data-rh={'sort on this column'}
-                        onClick={handle(dispatch, addColumn, gridTag, field, 1)}
-                      >{field}</span>
+                    ? <Tooltip
+                        tip={'remove column from sort options'}
+                        at={'top'}
+                      >
+                        <span
+                          className={'sorted button-small'}
+                          onClick={handle(dispatch, delColumn, gridTag, field)}
+                        >{field}</span>
+                      </Tooltip>
+                    : <Tooltip
+                        tip={'sort on this column'}
+                        at={'top'}
+                      >
+                        <span
+                          className={'unsorted button-small'}
+                          onClick={handle(dispatch, addColumn, gridTag, field, 1)}
+                        >{field}</span>
+                      </Tooltip>
                   }
                   {
                     direction
-                    ? <span
-                        className={`sorted button-small fa fa-arrow-${direction === 1 ? 'up' : 'down'}`}
-                        data-rh={'change sort direction'}
-                        onClick={handle(dispatch, turnColumn, gridTag, field)}
-                      />
+                    ? <Tooltip
+                        tip={'change sort direction'}
+                        at={'top'}
+                      >
+                        <span
+                          className={`sorted button-small fa fa-arrow-${direction === 1 ? 'up' : 'down'}`}
+                          onClick={handle(dispatch, turnColumn, gridTag, field)}
+                        />
+                      </Tooltip>
                     : null
                   }
                 </div>

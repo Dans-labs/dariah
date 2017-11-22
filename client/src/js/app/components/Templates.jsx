@@ -5,6 +5,7 @@ import { itemReadField, itemEditField } from 'fields'
 import { assessmentScore } from 'workflow'
 
 import Expand, { ExpandHead, ExpandBody } from 'Expand'
+import Tooltip from 'Tooltip'
 
 const rField = (field, l, f, key) => itemReadField(field, l(field), f(field), key)
 const eField = (field, l, fe, m, key) => itemEditField(field, l(field), fe(field), m(field), key)
@@ -54,11 +55,14 @@ export const mainActionTemplates = {
     return (
       <div>
         <div className={'ass-score-box'}>
-          <span
-            className={'ass-score'}
-            data-rh={'overall-score of this assessment'}
-            data-rh-at={'right'}
-          >{`${overall} %`}</span>
+          <Tooltip
+            tip={'overall-score of this assessment'}
+            at={'right'}
+          >
+            <span
+              className={'ass-score'}
+            >{`${overall} %`}</span>
+          </Tooltip>
           <Expand
             alterSection={`assessment{v('_id')}`}
             alterTag={'score'}
@@ -148,10 +152,14 @@ export const detailTemplates = {
             {
               e('evidence')
               ? <div className={'xSlim'}>
-                  <span
-                    data-rh={'No evidence yet'}
-                    className={'slim fa fa-file-o tError'}
-                  />
+                  <Tooltip
+                    tip={'No evidence yet'}
+                    at={'top'}
+                  >
+                    <span
+                      className={'slim fa fa-file-o tError'}
+                    />
+                  </Tooltip>
                 </div>
               : <ExpandHead
                   alterSection={`criteriaEntry${v('_id')}`}
@@ -205,10 +213,13 @@ export const detailEditTemplates = {
           </div>
           <p
             key={'E'}
-            data-rh={'Give evidence'}
-            data-rh-at={'bottom'}
           ><b>{l('evidence')}</b></p>
-          {fe('evidence')}
+          <Tooltip
+            tip={'Give evidence'}
+            at={'top'}
+          >
+            {fe('evidence')}
+          </Tooltip>
         </div>
       )
     },
