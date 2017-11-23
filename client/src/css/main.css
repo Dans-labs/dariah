@@ -12,6 +12,7 @@
 @import 'filtering.css';
 @import 'grid.css';
 @import 'tables.css';
+@import 'RelSelect.css';
 @import 'custom.css';
 @import 'templates.css';
-@import 'RelSelect.css';
+@import 'workflow.css';

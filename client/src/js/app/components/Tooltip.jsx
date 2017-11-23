@@ -147,13 +147,6 @@ class Tooltip extends Component {
     arrow.style.top = arrowPos.top + window.scrollY
     arrow.style.left = arrowPos.left + window.scrollX
   }
-
-  componentDidMount() {
-    this.handlePositioning()
-  }
-  componentDidUpdate() {
-    this.handlePositioning()
-  }
 }
 
 export default connect(getSettings)(Tooltip)

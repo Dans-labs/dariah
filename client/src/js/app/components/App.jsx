@@ -18,16 +18,19 @@ const App = ({ children, win }) => {
       <ErrorBoundary>
         <Notification />
       </ErrorBoundary>
-      <p className={'nav small top'} >
+      <div className={'topnavbar'} >
         <Tooltip
           tip={'information about this site'}
           at={'right'}
         >
-          <img src={'/static/images/inkind_logo_small.png'} />
+          <span className={'logo-container'} >
+            <img src={'/static/images/inkind_logo_small.png'} />
+          </span>
         </Tooltip>
         <ErrorBoundary>
           <Static />
         </ErrorBoundary>
+        <TooltipSwitch />
         <Tooltip
           tip={`current window size: ${text} pixels`}
           at={'bottom'}
@@ -36,11 +39,10 @@ const App = ({ children, win }) => {
             className={'resize'}
           >{text}</span>
         </Tooltip>
-        <TooltipSwitch />
         <ErrorBoundary>
           <Login />
         </ErrorBoundary>
-      </p>
+      </div>
       <ErrorBoundary>{children}</ErrorBoundary>
     </ErrorBoundary>
   )

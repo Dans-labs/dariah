@@ -3,7 +3,7 @@ import React from 'react'
 import NavLink from 'NavLink'
 
 export default () => (
-  <span className={'small'} >
+  <span className={'toplinks'} >
     <NavLink to={'/docs/about.md'} >{'Home'}</NavLink>
     <NavLink to={'/data'} >{'Registry'}</NavLink>
     <a href={'https://github.com/Dans-labs/dariah/wiki'} target={'_blank'} rel={'noopener noreferrer'} >{'Help'}</a>

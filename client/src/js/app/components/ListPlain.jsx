@@ -28,10 +28,13 @@ class ListPlain extends Component {
     this.gotoNew = true
   }
   gotoItem = eId => {
-    const { props: { alterSection, dispatch } } = this
+    const { props: { table, alterSection, dispatch } } = this
     const { putAlt } = compileAlternatives(alterSection, nAlts, initial, dispatch)(eId)
     const theAlt = (initial + 1) % nAlts
     putAlt(theAlt)
+    const { putAlt: putAltE } = compileAlternatives(`edit-${table}-${eId}`, nAlts, initial, dispatch)('edit')
+    const theAltE = (initial + 1) % nAlts
+    putAltE(theAltE)
   }
 
   scroll = domElem => {
@@ -72,7 +75,7 @@ class ListPlain extends Component {
     ? 0
     : editMode(tables, table, 'detail', masterTable)
     return (
-      <div className={'list-generic'} >
+      <div className={'list-plain'} >
         {
           !(filtered && select === DETAILS)
           ? <div>
@@ -145,7 +148,7 @@ class ListPlain extends Component {
                         showStatus
                         ? <EditStatus form={formTag} active={active} />
                         : <span>
-                            <span className={'fa fa-fw'} />
+                            <span className={'fa'} />
                             {' '}
                           </span>
                       }
@@ -168,15 +171,16 @@ class ListPlain extends Component {
       nextAlt()
       return
     }
-    const [base, origEid] = getUrlParts(browserHistory)
+    const { base, controller, eId: origEid } = getUrlParts(browserHistory)
+    const xBase = `${base}/${table}/${controller}`
     if (active) {
       if (origEid !== eId) {
-        browserHistory.push(`${base}/item/${eId}/`)
+        browserHistory.push(`${xBase}/item/${eId}/`)
       }
     }
     else {
-      if (origEid !== '') {
-        browserHistory.push(`${base}/`)
+      if (origEid !== emptyS) {
+        browserHistory.push(`${xBase}/`)
       }
       nextAlt()
     }

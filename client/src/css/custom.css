@@ -15,10 +15,10 @@
 
 .ass-score-box {
     background-color: var(--score-back);
-    padding: 0.3em;
-    margin-bottom: 0.3em;
+    padding: 0.3rem;
+    margin-bottom: 0.3rem;
     border: 3px solid var(--score-border);
-    border-radius: 1ex;
+    border-radius: 0.5rem;
     display: inline-flex;
     flex-flow: row nowrap;
     justify-content: flex-start;

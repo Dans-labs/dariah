@@ -1,5 +1,5 @@
 div.criteriaEntryRead, div.criteraEntryEdit {
-    border-radius: 1ex;
+    border-radius: 0.5rem;
     margin: 2px;
 }
 div.criteriaEntryRead.complete {
@@ -29,20 +29,20 @@ div.fat {
     flex: 0 1 80%;
 }
 div.slim {
-    flex: 0 1 10em;
+    flex: 0 1 10rem;
 }
 div.xSlim {
-    flex: 0 1 2em;
+    flex: 0 1 2rem;
 }
 div.criteriaRemarks {
     font-size: small;
-    margin-left: 0em;
-    margin-right: 3.5em;
+    margin-left: 0;
+    margin-right: 3.5rem;
 }
 
 div.evidence {
-    margin-left: 2em;
-    margin-right: 3.5em;
+    margin-left: 2rem;
+    margin-right: 3.5rem;
 }
 .vtop {
     vertical-align: top;

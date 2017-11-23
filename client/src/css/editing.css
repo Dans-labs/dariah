@@ -11,13 +11,13 @@
     background-color: var(--edit-invalid-diag-back);
     font-size: small;
     display: block;
-    padding: 1ex;
+    padding: 0.5rem;
 }
 input {
     color: var(--action-fore);
     background-color: var(--action-back);
     border: 0;
-    padding: 0.2em;
+    padding: 0.2rem;
 }
 input[type="text"],textarea {
     color: var(--edit-text-fore);
@@ -28,13 +28,13 @@ input[type="text"],textarea {
     font-family: monospace;
 }
 input[type="text"] {
-    width: 100%;
-    margin: 0.5ex 0.5ex;
+    width: calc(100% - 1rem);
+    margin: 0.3rem 0.3rem;
 }
 textarea {
-    width: calc(100% - 1em);
+    width: calc(100% - 1rem);
     height: 10rem;
-    margin: 0.5ex 0.5ex;
+    margin: 0.3rem 0.3rem;
 }
 input[type="text"]:focus, textarea:focus {
     color: var(--edit-focus-text);
@@ -58,7 +58,7 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
     color: var(--action-fore);
     cursor: pointer;
     --size: medium;
-    --radius: 1ex;
+    --radius: 0.5rem;
     --border: 2px;
     font-size: var(--size);
     border-radius: var(--radius);
@@ -74,7 +74,7 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
     color: var(--action-fore);
     cursor: pointer;
     --size: small;
-    --radius: 0.8ex;
+    --radius: 0.4rem;
     --border: 1px;
     font-size: var(--size);
     border-radius: var(--radius);
@@ -90,7 +90,7 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
     color: var(--action-fore);
     cursor: pointer;
     --size: medium;
-    --radius: 0.5ex;
+    --radius: 0.3rem;
     --border: 2px;
     font-size: var(--size);
     border-radius: var(--radius);
@@ -134,9 +134,9 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
     float: right;
 }
 .multi-field {
-    margin-left: 0em;
-    padding-left: 0em;
     width: 100%;
+    margin-left: 0;
+    padding-left: 0;
     display: inline-flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
@@ -144,9 +144,9 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
     align-content: flex-start;
 }
 .multi-field.textarea {
-    margin-left: 0em;
-    padding-left: 0em;
     width: 100%;
+    margin-left: 0;
+    padding-left: 0;
     display: inline-flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
@@ -154,34 +154,34 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
     align-content: flex-start;
 }
 .multi-content {
+    width: 100%;
     overflow: visible;
     display: inline-flex;
     flex-flow: row nowrap;
     align-content: flex-start;
     align-items: flex-start;
-    width: calc(100% - 1em);
     /*-webkit-overflow-scrolling: touch;*/
 }
 .textarea .multi-content {
-    padding: 0 0 0 1em;
-    width: calc(100% - 1em);
+    width: calc(100% - 1rem);
+    padding: 0 0 0 1rem;
     overflow: visible;
     /*-webkit-overflow-scrolling: touch;*/
 }
 .wideInput {
-    width: calc(100% - 1em);
+    width: 100%;
 }
 .md-field {
-    margin-left: 0em;
-    padding-left: 0em;
     width: 100%;
+    margin-left: 0;
+    padding-left: 0;
     display: flex;
     flex-flow: column nowrap;
     align-items: flex-start;
 }
 .field-content {
-    overflow: auto;
     width: 100%;
+    overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
 .field-control {
@@ -189,20 +189,20 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
     -webkit-overflow-scrolling: touch;
 }
 .fragments {
-    width: 100%;
-    max-width: 100%;
+    width: calc(100% - 1rem);
+    max-width: calc(100% - 1rem);
 }
 div.detail-control {
-    flex: 0 0 1em;
+    flex: 0 0 1rem;
 }
 div.detail-body {
     flex: 1 0 90%;
 }
 .label-col {
     text-align: right;
-    padding: 0.2em 0.2em 0.2em 0.1em;
+    padding: 0.2rem 0.2rem 0.2rem 0.1rem;
     background-color: var(--widget-fixed-back); 
-    flex: 0 0 10em;
+    flex: 0 0 10rem;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -211,14 +211,14 @@ div.detail-body {
 }
 .list-title {
     text-align: left;
-    padding: 0.2em;
+    padding: 0.2rem;
     background-color: var(--widget-fixed-back); 
     font-weight: bold;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
 .label-col-grid {
-    padding: 0.2em 0.2em 0.2em 0.2em;
+    padding: 0.2rem 0.2rem 0.2rem 0.2rem;
     background-color: var(--widget-fixed-back); 
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -226,7 +226,7 @@ div.detail-body {
 }
 .value-col {
     text-align: left;
-    padding: 0.2em 0.1em 0.2em 0.2em;
+    padding: 0.2rem 0.1rem 0.2rem 0.2rem;
     background-color: var(--value-back); 
     flex: 1 1 auto;
     overflow: visible;
@@ -234,7 +234,7 @@ div.detail-body {
 }
 .value-col-grid {
     text-align: left;
-    padding: 0.1em 0.1em 0.1em 0.1em;
+    padding: 0.1rem 0.1rem 0.1rem 0.1rem;
     border-bottom: 2px solid var(--value-border); 
     background-color: var(--value-back);
     overflow: auto;

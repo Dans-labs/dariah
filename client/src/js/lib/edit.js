@@ -19,7 +19,7 @@ export const editControl = canSubmit => ({
           at={'right'}
         >
           <span
-            className={'button-medium fa fa-fw fa-eye'}
+            className={'button-medium fa fa-eye'}
             onClick={nextAlt}
           />
         </Tooltip>
@@ -33,7 +33,7 @@ export const editControl = canSubmit => ({
             at={'right'}
           >
             <span
-              className={'button-medium edit-action fa fa-fw fa-save'}
+              className={'button-medium edit-action fa fa-save'}
               onClick={handleSubmit}
             />
           </Tooltip>
@@ -42,7 +42,7 @@ export const editControl = canSubmit => ({
             at={'right'}
           >
             <span
-              className={'warning-o fa fa-fw fa-pencil'}
+              className={'warning-o fa fa-pencil'}
             />
           </Tooltip>
       : null
@@ -54,7 +54,7 @@ export const editControl = canSubmit => ({
           at={'right'}
         >
           <span
-            className={'error-o fa fa-fw fa-exclamation-circle'}
+            className={'error-o fa fa-exclamation-circle'}
           />
         </Tooltip>
       : null
@@ -66,7 +66,7 @@ export const editControl = canSubmit => ({
           at={'right'}
         >
           <span
-            className={'error-o fa fa-fw fa-exclamation-circle'}
+            className={'error-o fa fa-exclamation-circle'}
           />
         </Tooltip>
       : null
@@ -78,7 +78,7 @@ export const editControl = canSubmit => ({
           at={'right'}
         >
           <span
-            className={`fa fa-fw fa-${active ? 'pencil' : 'check'}`}
+            className={`fa fa-${active ? 'pencil' : 'check'}`}
           />
         </Tooltip>
       : null
@@ -90,7 +90,7 @@ export const editControl = canSubmit => ({
           at={'right'}
         >
           <span
-            className={'special-o fa fa-fw fa-spinner fa-spin'}
+            className={'special-o fa fa-spinner fa-spin'}
           />
         </Tooltip>
       : null

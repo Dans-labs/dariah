@@ -47,6 +47,7 @@ class ListFilter extends Component {
         mode, compact,
         title,
         filterTag, gridTag,
+        topLevel,
         dispatch,
       },
     } = this
@@ -54,7 +55,11 @@ class ListFilter extends Component {
       filteredIds, filteredAmountOthers, amounts,
     } = computeFiltering(tables, filters, table, filterTag, listIds)
     if (filteredIds == null) {return <div />}
-    const compactClass = compact ? 'compact' : emptyS
+    const compactClass = compact
+    ? 'compact'
+    : topLevel
+      ? 'outer'
+      : emptyS
     const { [table]: { item } } = tables
     const things = item[1]
     const alterSection = `list-${table}-${select}`

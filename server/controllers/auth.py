@@ -115,7 +115,9 @@ class AuthApi(UserApi):
             while not stop and i < MAX_ITER:
                 try:
                     eppn = input('{}|email address: '.format('|'.join(self.testUsers)))
-                    stop = True
+                    if eppn != None:
+                        eppn = eppn.split('\n', 1)[0]
+                        stop = True
                 except Exception as err:
                     serverprint('Low level error: {}'.format(err))
                     if eppn:

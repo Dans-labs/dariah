@@ -73,7 +73,27 @@ export const jString = (o, indent) => JSON.stringify(
 
 export const getUrlParts = browserHistory => {
   const url = browserHistory.getCurrentLocation().pathname.replace(/\/$/, emptyS)
-  return (url.match(/^(.*)\/item\/?([^/]*)\/?$/) || [url, url, '']).slice(1)
+  let parts
+  parts = url.match(/^(.*)\/([^/]+)\/([^/]+)\/item\/([^/]+)\/?$/)
+  if (!parts) {
+    parts = url.match(/^(.*)\/([^/]+)\/([^/]+)\/item\/?$/)
+  }
+  if (!parts) {
+    parts = url.match(/^(.*)\/([^/]+)\/([^/]+)\/?$/)
+  }
+  if (!parts) {
+    parts = url.match(/^(.*)\/([^/]+)\/?$/)
+  }
+  if (!parts) {
+    parts = url.match(/^(.*)\/?$/)
+  }
+  parts = parts.slice(1)
+  return {
+    base: parts[0] || emptyS,
+    table: parts[1] || emptyS,
+    controller: parts[2] || emptyS,
+    eId: parts[3] || emptyS,
+  }
 }
 
 export const max = arr => arr.reduce((a, b) => Math.max(a, b), Number.NEGATIVE_INFINITY)

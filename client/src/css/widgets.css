@@ -8,7 +8,7 @@
 }
 .widget-large {
     --size: medium;
-    --radius: 1ex;
+    --radius: 0.5rem;
     --border: 2px;
     font-size: var(--size);
     border-radius: var(--radius);
@@ -21,7 +21,7 @@
 }
 .widget-medium {
     --size: medium;
-    --radius: 0.8ex;
+    --radius: 0.4rem;
     --border: 1px;
     font-size: var(--size);
     border-radius: var(--radius);
@@ -34,7 +34,7 @@
 }
 .widget-small {
     --size: small;
-    --radius: 0.5ex;
+    --radius: 0.3rem;
     --border: 0px;
     font-size: var(--size);
     border-radius: var(--radius);
@@ -52,8 +52,8 @@
 }
 .fixed-large {
     --size: large;
-    --hor: 1em;
-    --ver: 1ex;
+    --hor: 1rem;
+    --ver: 0.5rem;
     --border: 0;
     font-size: var(--size);
     border-style: solid;
@@ -65,8 +65,8 @@
 }
 .fixed-medium {
     --size: medium;
-    --hor: 0.5em;
-    --ver: 0.5ex;
+    --hor: 0.5rem;
+    --ver: 0.3rem;
     --border: 0;
     font-size: var(--size);
     border-style: solid;
@@ -78,7 +78,7 @@
 }
 .fixed-small {
     --size: small;
-    --hor: 0.2em;
+    --hor: 0.2rem;
     --ver: 0;
     --border: 0;
     font-size: var(--size);
@@ -92,8 +92,8 @@
 
 .label {
     --size: medium;
-    --hor: 0.5em;
-    --ver: 0.5ex;
+    --hor: 0.5rem;
+    --ver: 0.3rem;
     --border: 0;
     font-size: var(--size);
     border-style: solid;

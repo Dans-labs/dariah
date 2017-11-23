@@ -6,6 +6,7 @@ import { getMe } from 'me'
 
 import ErrorBoundary from 'ErrorBoundary'
 import NavLink from 'NavLink'
+import Insert from 'Insert'
 import Tooltip from 'Tooltip'
 
 const levels = {
@@ -19,21 +20,23 @@ const levels = {
 const forMe = (my, item) => levels[my] >= levels[item]
 
 const tableLinks = (me, { path, name, forWhom, details }) => forMe(me.groupRep, forWhom)
-  ? <div key={path} className={'nav section'} >
+  ? <div key={path} className={'section'} >
       <NavLink to={path} className={'head'} >{name}</NavLink>
-      <div className={'nav subsection'} >
+      <div className={'subsection'} >
         {
           (details || emptyA).filter(({ forWhom: subFor }) => forMe(me.groupRep, subFor)).map(
-            ({ path: subPath, name: subName, hint }) =>
-              <Tooltip
-                key={subPath}
-                tip={hint}
-                at={'right'}
-              >
-                <NavLink
-                  to={`${path}/${subPath}`}
-                >{subName}</NavLink>
-              </Tooltip>
+            ({ component, path: subPath, name: subName, hint }) =>
+              component == null
+              ? <Tooltip
+                  key={subPath}
+                  tip={hint}
+                  at={'right'}
+                >
+                  <NavLink
+                    to={`${path}/${subPath}`}
+                  >{subName}</NavLink>
+                </Tooltip>
+              : component
            )
         }
       </div>
@@ -47,7 +50,18 @@ const navBarItems = [
     forWhom: 'public',
     details: [
       { path: 'filter', name: 'All items', forWhom: 'public', hint: 'Overview of all contributions' },
-      { path: 'mylist', name: 'My items', forWhom: 'auth', hint: 'Start here to add a contribution' },
+      { path: 'mylist', name: 'My items', forWhom: 'auth', hint: 'My contribution' },
+      {
+        component: (
+          <Insert
+            key={'newcontrib'}
+            table={'contrib'}
+            thing={'contribution'}
+          />
+        ),
+        forWhom: 'auth',
+        hint: 'Start here to add a contribution',
+      },
     ],
   },
   {
@@ -117,12 +131,12 @@ const navBarItems = [
 
 const SubApp = ({ me, table, routes, children }) => (
   <div className={'sub-app'} >
-    <div className={'nav bar'} >
+    <div className={'subnavbar'} >
       <ErrorBoundary>
         {navBarItems.map(item => tableLinks(me, item))}
       </ErrorBoundary>
     </div>
-    <div className={'details'} >
+    <div className={'submaterial'} >
       <ErrorBoundary>
         {
           routes[1].path === 'data' && routes.length === 1

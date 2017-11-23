@@ -109,6 +109,8 @@
     --sort--col-back:                  hsla(120,   0%,  95%, 1  );
     --sort--specs-fore:                hsla(120,   0%,  40%, 1  );
 
+    --subbar-back:                     hsla( 30,  30%,  80%, 0.4);
+
     --special-fore-o:                  hsla(120,  00%,  30%, 1  );
     --special-fore:                    hsla(120,  00%,  50%, 1  );
     --special-back:                    hsla(120, 100%,  95%, 0.5);
@@ -134,6 +136,8 @@
     --tooltip-back:                    hsla( 50, 100%,  70%, 1  );
     --tooltip-arrow:                   hsla( 30, 100%,  40%, 1  );
 
+    --topbar-back:                     hsla( 30,  30%,  80%, 0.4);
+
     --value-back:                      hsla(120, 100%, 100%, 1  );
     --value-edit-back:                 hsla(  0,   0%,  95%, 1  );
     --value-border:                    hsla(120,  40%,  90%, 1  );
@@ -148,4 +152,15 @@
     --widget-border:                   hsla(120,  40%,  90%, 1  );
 
     --workflow-active:                 hsla(120, 100%,  80%, 0.8);
+    --workflow-item-back:              hsla(120,   0%,  50%, 0.8);
+
+    /* SIZES */
+
+    --logo-height:                     3rem;
+
+    --subapp-top:                      calc(0rem - var(--topbar-bottom));
+    --subapp-height:                   calc(100vh - var(--topbar-height) + var(--topbar-bottom));
+
+    --topbar-height:                   2rem;
+    --topbar-bottom:                   calc(var(--topbar-height) - var(--logo-height));
 }

@@ -323,7 +323,7 @@ export const presentUser = userInfo => {
   const orgRep = org ? ` (${org})` : emptyS
   if (name) {return `${name}${orgRep}`}
   if (firstName || lastName) {
-    return `${firstName || emptyS}${(firstName && lastName) ? ' ' : ''}${lastName || emptyS}`
+    return `${firstName || emptyS}${(firstName && lastName) ? ' ' : emptyS}${lastName || emptyS}`
   }
   if (email) {return `${email}${orgRep}`}
   const authorityRep = authority ? ` - ${authority}` : emptyS
@@ -504,9 +504,10 @@ export const handleOpenAll = memoize((alter, alterSection, nAlts, initial, table
 
 export const handleCloseAll = memoize((alter, alterSection, nAlts, initial, items, dispatch) => {
   const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
-  const base = getUrlParts(browserHistory)[0]
+  const { base, table, controller } = getUrlParts(browserHistory)
+  const xBase = `${base}/${table}/${controller}`
   return () => {
-    browserHistory.push(`${base}/`)
+    browserHistory.push(`${xBase}/`)
     const alts = []
     items.forEach(eId => {
       const { getAlt } = makeAlternatives(eId)

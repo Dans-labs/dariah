@@ -1,21 +1,12 @@
-.button-large,.button-medium,.button-small  {
-    color: var(--action-fore);
-    cursor: pointer;
-    background-color: var(--action-back);
-    border-color: var(--action-border);
-    white-space: nowrap;
-}
-.button-large.invert,.button-medium.invert,.button-small.invert  {
-    color: var(--action-fore);
-    cursor: pointer;
+.workflow-large.invert,.workflow-medium.invert,.workflow-small.invert  {
     font-weight: bold;
     color: var(--invert-fore);
     background-color: var(--invert-back);
-    border-color: var(--action-border);
+    border-color: var(--invert-border);
     white-space: nowrap;
     padding: 0.5rem;
 }
-.button-large, .button-large.invert {
+.workflow-large, .workflow-large.invert {
     --size: medium;
     --radius: 0.5rem;
     --border: 2px;
@@ -28,7 +19,7 @@
     padding-left: calc(var(--radius) * 1.2);
     padding-right: calc(var(--radius) * 1.2);
 }
-.button-medium, .button-medium.invert {
+.workflow-medium, .workflow-medium.invert {
     --size: medium;
     --radius: 0.4rem;
     --border: 1px;
@@ -41,7 +32,7 @@
     padding-left: calc(var(--radius) * 1.2);
     padding-right: calc(var(--radius) * 1.2);
 }
-.button-small, .button-small.invert {
+.workflow-small, .workflow-small.invert {
     --size: small;
     --radius: 0.3rem;
     --border: 0;
@@ -55,7 +46,4 @@
     padding-right: calc(var(--radius) * 1.2);
 }
 
-.link {
-    color: var(--action-fore);
-    cursor: pointer;
-}
+

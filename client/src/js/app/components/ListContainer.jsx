@@ -38,6 +38,7 @@ class ListContainer extends Component {
               title={title}
               filterTag={filterTag}
               gridTag={table}
+              topLevel={true}
             />
           : mode === 'list'
             ? <ListPlain

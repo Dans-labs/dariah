@@ -5,6 +5,7 @@ import { itemReadField, itemEditField } from 'fields'
 import { assessmentScore } from 'workflow'
 
 import Expand, { ExpandHead, ExpandBody } from 'Expand'
+import Insert from 'Insert'
 import Tooltip from 'Tooltip'
 
 const rField = (field, l, f, key) => itemReadField(field, l(field), f(field), key)
@@ -40,12 +41,28 @@ export const mainEditTemplates = {
 }
 
 export const mainActionTemplates = {
-  contrib({ w }) {
-    return w('locked')
-    ? <div className={'workflow-large invert'} >
-        {`This contribution is locked because it is ${w('lockedReason')}.`}
+  contrib({ v, w }) {
+    return (
+      <div>
+        {
+          w('locked')
+          ? <div className={'workflow-large invert'} >
+              {`This contribution is locked because it is ${w('lockedReason')}.`}
+            </div>
+          : null
+        }
+        {
+          w('nAss')
+          ? null
+          : <Insert
+              table={'assessment'}
+              thing={'assessment'}
+              masterId={v('_id')}
+              linkField={'contrib'}
+            />
+        }
       </div>
-    : null
+    )
   },
   assessment({ tables, l, e, v, fe, fs, m }) {
     const { overall, relevantScore, relevantMax, allMax, relevantN, allN } = assessmentScore(tables, v('_id'))
@@ -86,7 +103,7 @@ export const mainActionTemplates = {
                         ${relevantMax} points,
                         divided over ${relevantN} criteria.`}
                     </p>
-                  : ''
+                  : emptyS
                 }
                 <p>{`The total score is expressed as a percentage:
                     the fraction of ${relevantScore} scored points with respect to 
@@ -143,7 +160,7 @@ export const detailTemplates = {
               iconClose={'minus-circle'}
               titleOpen={'Show criteria details'}
               titleClose={'Hide criteria details'}
-              headActive={''}
+              headActive={emptyS}
               headLine={f('criteria')}
               full={<div className={'criteriaRemarks'}>{f('criteria', 'remarks')}</div>}
               className={'fat'}
@@ -169,8 +186,8 @@ export const detailTemplates = {
                   iconClose={'minus-square'}
                   titleOpen={'Show evidence'}
                   titleClose={'Hide evidence'}
-                  headActive={''}
-                  headLine={''}
+                  headActive={emptyS}
+                  headLine={emptyS}
                   className={'xSlim tGood'}
                 />
             }

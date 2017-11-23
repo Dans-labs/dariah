@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 
@@ -26,12 +28,18 @@ const ItemAction = ({
     },
   } = tables
   const kind = masterTable ? 'detail' : 'main'
-  return applyEditTemplate(
-    settings, tables, table,
-    `${kind}Action`,
-    masterTable, eId,
-    fieldFragments, null,
-    submitValues,
+  return (
+    <div className={'item-workflow'}>
+      {
+        applyEditTemplate(
+          settings, tables, table,
+          `${kind}Action`,
+          masterTable, eId,
+          fieldFragments, null,
+          submitValues,
+        )
+      }
+    </div>
   )
 }
 

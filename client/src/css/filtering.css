@@ -1,18 +1,18 @@
 .facetFilter {
-    margin-top: 0.3em;
-    margin-bottom: 0.1em;
+    margin-top: 0.3rem;
+    margin-bottom: 0.1rem;
     border: 1px solid var(--widget-border);
-    border-radius: 1ex;
+    border-radius: 0.5rem;
     color: var(--widget-fixed-fore);
     background-color: var(--widget-fixed-back);
 }
 .facetHead {
-    margin-top: 0.05em;
-    margin-bottom: 0.05em;
+    margin-top: 0.05rem;
+    margin-bottom: 0.05rem;
     font-size: small;
     font-weight: bold;
-    padding-left: 0em;
-    padding-right: 0em;
+    padding-left: 0;
+    padding-right: 0;
 }
 input.facet {
     color: var(--action-fore);
@@ -28,14 +28,14 @@ input.search {
     background-color: var(--action-back);
 }
 input.search.compact {
+    height: 1.2rem;
+    width: 10rem;
+    max-width: 10rem;
     font-size: medium;
     font-family: monospace;
     color: var(--action-fore);
     background-color: var(--action-back);
-    height: 1.2em;
-    line-height: 1em;
-    width: 10em;
-    max-width: 10em;
+    line-height: 1rem;
 }
 
 .facet-container {
@@ -52,18 +52,18 @@ input.search.compact {
     justify-content: space-between;
     align-items: baseline;
     align-content: flex-start;
-    padding-left: 0.2em;
-    padding-right: 0.2em;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
 }
 .facet-value {
     flex: 1 0 80%;
     font-size: small;
 }
 .facetFilter.compact {
-    margin-top: 0.3em;
-    margin-bottom: 0.1em;
+    margin-top: 0.3rem;
+    margin-bottom: 0.1rem;
     border: 1px solid var(--widget-border);
-    border-radius: 1ex;
+    border-radius: 0.5rem;
     color: var(--widget-fixed-fore);
     background-color: var(--widget-fixed-back);
     display: flex;
@@ -78,12 +78,12 @@ input.search.compact {
     flex: 0 0 auto;
 }
 .facet-container.compact {
+    max-width: 100%;
     display: inline-flex;
     flex-flow: row wrap;
     justify-content: flex-start;
     align-content: flex-start;
     flex: 0 0 auto;
-    max-width: 100%;
 }
 .facet-row.compact {
     flex: 0 0 auto;
@@ -92,8 +92,8 @@ input.search.compact {
     justify-content: flex-start;
     align-items: baseline;
     align-content: flex-start;
-    padding-left: 0.2em;
-    padding-right: 0.4em;
+    padding-left: 0.2rem;
+    padding-right: 0.4rem;
     border-left: 1px solid white;
     border-right: 1px solid white;
 }

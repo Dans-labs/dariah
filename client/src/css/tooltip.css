@@ -5,21 +5,25 @@
     background-color: var(--action-back);
 }
 .tooltip {
+    width: max-content;
     position: absolute;
+    top: 0;
+    left: 0;
     color: var(--tooltip-fore);
     background-color: var(--tooltip-back);
     border-radius: 1rem;
     padding: 0.6rem 0.5rem;
     text-transform: none;
-    width: max-content;
     font-size: 1rem;
 }
 
 .toolarrow {
-    position: absolute;
-	content: '';
 	width: 0;
 	height: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+	content: '';
 	margin: auto;
 	display: block;
 	border: 5px solid transparent;
@@ -45,7 +49,6 @@
 	border-bottom-color: var(--tooltip-arrow);
 }
 
-
 .tooltip,
 .toolarrow {
     opacity: 0;
@@ -57,6 +60,6 @@
 .tooltipped.hover:hover + span > .tooltip,
 .tooltipped.hover:hover + span > .toolarrow {
     opacity: 0.95;
-    transition: all 0.75s ease;
+    transition: opacity 1s 0.5s ease, top 1s ease, left 1s ease;
 }
 

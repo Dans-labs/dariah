@@ -71,8 +71,8 @@ export const itemEditField = (field, label, fevalue, editable, key) => (
     {...(key == null ? emptyO : { key })}
     className={'grid-row form'}
   >
-    <div className={`grid-head-cell label-col ${editable ? 'edit' : ''}`}>{label}{':'}</div>
-    <div className={`grid-cell value-col ${editable ? 'edit' : ''}`} >
+    <div className={`grid-head-cell label-col ${editable ? 'edit' : emptyS}`}>{label}{':'}</div>
+    <div className={`grid-cell value-col ${editable ? 'edit' : emptyS}`} >
       {fevalue}
     </div>
   </div>

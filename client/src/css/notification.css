@@ -61,11 +61,11 @@
     float: right;
 }
 .msg-box {
+    width: 50%;
+    height: 100;
     position: fixed;
     top: 40;
     right: 10;
-    width: 50%;
-    height: 100;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     padding-left: 10;
@@ -76,17 +76,17 @@
     cursor: pointer;
     background-color: var(--msg-box-back);
     border: 2px solid var(--msg-box-border);
-    border-radius: 1.5ex;
+    border-radius: 0.8rem;
     font-size: small;
 }
 .msg-spinner {
+    width: 5rem;
+    height: 2rem;
     color: var(--action-fore);
     cursor: pointer;
     position: fixed;
     top: 0.05rem;
     right: 1rem;
-    width: 5rem;
-    height: 2rem;
     text-align: right;
     padding-left: 0;
     padding-right: 0;
