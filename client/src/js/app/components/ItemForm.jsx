@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { combineSelectors, emptyS } from 'utils'
 
 import { handle } from 'handle'
-import { makeFields, makeDetails, someEditable } from 'fields'
+import { makeFields, makeDetails, someEditable, makeKeepInfo } from 'fields'
 
 import { delItem, headEntity, DETAILS } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
@@ -35,6 +35,7 @@ const ItemForm = props => {
   let { fieldFragments, detailFragments } = props
   if (fieldFragments == null) {fieldFragments = makeFields(props)}
   if (detailFragments == null) {detailFragments = makeDetails(props)}
+  const keep = makeKeepInfo(detailFragments)
   const hasEditable = someEditable(fields, perm, workflow)
   const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, startMode, dispatch)('edit')
   const alt = getAlt(alter)
@@ -61,6 +62,7 @@ const ItemForm = props => {
         ? <div>
             <EditDelete
               perm={perm}
+              keep={keep}
               fixed={fixed}
               button={'button-medium'}
               onClick={handle(dispatch, delItem, table, eId, head)}
@@ -95,6 +97,7 @@ const ItemForm = props => {
             }
             <EditDelete
               perm={perm}
+              keep={keep}
               fixed={fixed}
               button={'button-medium'}
               onClick={handle(dispatch, delItem, table, eId, head)}

@@ -98,18 +98,17 @@ class DbAccess(object):
 
         if action == N_insert:
             self._insertItem(controller, table, newData, records, msgs, workflow)
-            if not self._hasErrors(msgs): self._findDocs(records, msgs, workflow)
+            if not self._hasErrors(msgs):
+                self._findDocs(records, msgs, workflow)
         elif action == N_delete:
             self._deleteItem(controller, table, newData, rowFilter, records, msgs, workflow)
         elif action == N_update:
             self._updateItem(controller, table, newData, rowFilter, fieldFilter, records, msgs, workflow)
 
-        if self._hasErrors(msgs):
-            return self.stop({
-                N_data: {'records': records, 'workflow': workflow},
-                N_msgs: msgs,
-            })
-        return self.stop({N_data: {'records': records, 'workflow': workflow}})
+        return self.stop({
+            N_data: {'records': records, 'workflow': workflow},
+            N_msgs: msgs,
+        })
 
     # UTILITY FUNCTIONS FOR OTHER MODULES
 
@@ -147,7 +146,7 @@ class DbAccess(object):
         msgs = [{N_kind: N_error, N_text: text}] if msgs == None and text != None else msgs
         return {N_data: data, N_msgs: msgs, N_good: good}
 
-    def _hasErrors(self, msgs): return any(msg[N_kind] != N_error for msg in msgs)
+    def _hasErrors(self, msgs): return any(msg[N_kind] == N_error for msg in msgs)
 
     # IMPLEMENTATION METHODS
 
@@ -352,7 +351,7 @@ class DbAccess(object):
         (readGood, readResult) = self.Perm.getPerm(controller, table, N_read)
         if not readGood:
             msgs.append({N_kind: N_error, N_text: readResult or 'Cannot read table {}'.format(table)})
-            return
+            return False
         (readRowFilter, readFieldFilter) = readResult
         modDate = now()
         modBy = self.eppn
@@ -388,7 +387,7 @@ class DbAccess(object):
         )
         if not extraGood:
             msgs.append({N_kind: N_error, N_text: extraText})
-            return
+            return False
 
         # use the extra fields, if any
         if extraData and N_insertValues in extraData:
@@ -418,43 +417,79 @@ class DbAccess(object):
         ident = newData.get(N__id, None)
         if ident == None:
             msgs.append({N_kind: N_error, N_text: 'Not specified which item to delete from table {}'.format(table)})
-            return
-        thisRowFilter = deepcopy(rowFilter)
-        thisRowFilter.update({N__id: oid(ident)})
-        documents = list(_DBM[table].find(thisRowFilter))
+            return False
+        rowFilter.update({N__id: oid(ident)})
+        documents = list(_DBM[table].find(rowFilter))
         if len(documents) != 1:
             msgs.append({N_kind: N_error, N_text: 'Unidentified item to delete'})
-            return
+            return False
         document = documents[0]
         (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
         if not mayDelete:
             msgs.append({N_kind: N_error, N_text: 'Not allowed to delete item {} from {}'.format(ident, table)})
-            return
-        # first delete detail records
+            return False
+        # first cascade delete detail records that are marked for it
+        # if there are remaining detail records, prevent delete!
         tableInfo = DM[N_tables].get(table, {})
         details = tableInfo.get(N_details, {})
+        detailsToKeep = {}
+        detailsToRemove = []
+
+        # first check if everything is OK without deleting anything
         for detail in details.values():
             cascade = detail.get(N_cascade, False)
-            if not cascade: continue
             detailTable = detail[N_table]
             linkField = detail[N_linkField]
-            (good, result) = self.Perm.getPerm(controller, detailTable, N_delete)
-            if not good: continue
-            (detailRowFilter, fieldFilter) = result
+            (good, result) = Perm.getPerm(controller, detailTable, N_read)
+            if good:
+                (detailRowFilter, fieldFilter) = result
+            else:
+                msgs.append({N_kind: N_error, N_text: result or 'Cannot read details in table {}'.format(detailTable)})
+                continue
             detailRowFilter.update({linkField: oid(ident)})
             detailDocuments = list(_DBM[detailTable].find(detailRowFilter, {N__id: True}))
+            nDetails = len(detailDocuments)
+            if nDetails == 0: continue
+            if cascade:
+                # in this case: check whether we have permission to delete
+                (good, result) = Perm.getPerm(controller, detailTable, N_delete)
+                if not good:
+                    msgs.append({N_kind: N_error, N_text: result or 'Cannot delete details in table {}'.format(detailTable)})
+                    continue
+                (rowFilter, fieldFilter) = result
+                detailsToRemove.append((detailDocuments, rowFilter))
+            else:
+                # in this case: check whether there is nothing to delete
+                n = detailsToKeep.setdefault(detailTable, 0)
+                detailsToKeep[detailTable] += nDetails
+
+        # if there is any error so far, we do not proceed
+        if self._hasErrors(msgs): return False
+
+        # if there are non-cascaded details, we do not proceed
+        if detailsToKeep:
+            eText = ', '.join('{}({}x)'.format(*x) for x in sorted(detailsToKeep.items())) 
+            msgs.extend([
+                {N_kind: N_warning, N_text: 'Cannot delete record with dependent details:'},
+                {N_kind: N_warning, N_text: eText},
+            ])
+            return False
+        
+        # only here we start removing details, but we stop if something goes wrong
+        for (detailDocuments, rowFilter) in detailsToRemove:
             for detailDoc in detailDocuments:
-                if detailTable != table:
-                    (good, result) = Perm.getPerm(controller, detailTable, N_delete)
-                    if not good:
-                        msgs.append({N_kind: N_error, N_text: result or 'Cannot do {} in table {}'.format(detailTable, N_delete)})
-                        return
-                    (rowFilter, fieldFilter) = result
-                self._deleteItem(controller, detailTable, {N__id: detailDoc[N__id]}, rowFilter, records, msgs, workflow)
-        # finally delete the main record
-        _DBM[table].delete_one(rowFilter)
-        workflow.extend(adjustWorkflow(self.basicList, table, document, {}))
-        records.append((table, str(ident)))
+                good = self._deleteItem(controller, detailTable, {N__id: detailDoc[N__id]}, rowFilter, records, msgs, workflow)
+                if not good:
+                    return False
+
+        # only if all details have been deleted, we proceed with deleting the main record
+        if not self._hasErrors(msgs):
+            # finally delete the main record
+            _DBM[table].delete_one(rowFilter)
+            workflow.extend(adjustWorkflow(self.basicList, table, document, {}))
+            records.append((table, str(ident)))
+
+        return not self._hasErrors(msgs)
 
     def _updateItem(self, controller, table, newData, rowFilter, fieldFilter, records, msgs, workflow):
         Perm = self.Perm

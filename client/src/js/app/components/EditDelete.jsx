@@ -1,18 +1,30 @@
 import React from 'react'
 
+import { emptyO } from 'utils'
+
 import Tooltip from 'Tooltip'
 
-export default ({ perm, fixed, button, onClick }) => (
-  !fixed && perm.delete
-  ? <Tooltip
-      tip={'delete this record'}
-      at={'left'}
-      className={'inlineR'}
-    >
-      <div
-        className={`grid-cell ${button} error-o fa fa-trash delete`}
-        onClick={onClick}
-      />
-    </Tooltip>
-    : null
-)
+export default ({ perm, keep, fixed, button, onClick }) => {
+  const doKeep = Object.keys(keep).length > 0
+  const keepInfo = Object.keys(keep).sort().map(table => keep[table]).join(', ')
+  const tipInfo = doKeep
+  ? `cannot delete because of related items: ${keepInfo}`
+  : 'delete this record'
+  const icon = doKeep ? 'puzzle-piece' : 'trash'
+  const disabled = doKeep ? 'disabled' : 'error-o'
+  const activate = doKeep ? emptyO : { onClick }
+  return (
+    !fixed && perm.delete
+    ? <Tooltip
+        tip={tipInfo}
+        at={'left'}
+        className={'inlineR'}
+      >
+        <div
+          className={`grid-cell ${button} ${disabled} fa fa-${icon} delete`}
+          {...activate}
+        />
+      </Tooltip>
+      : null
+  )
+}

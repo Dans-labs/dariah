@@ -5,6 +5,10 @@
     border-color: var(--action-border);
     white-space: nowrap;
 }
+.button-large.disabled,.button-medium.disabled,.button-small.disabled  {
+    cursor: default;
+    background-color: var(--action-disabled-back);
+}
 .button-large.invert,.button-medium.invert,.button-small.invert  {
     color: var(--action-fore);
     cursor: pointer;

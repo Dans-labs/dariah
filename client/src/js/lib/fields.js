@@ -271,6 +271,17 @@ export const makeDetails = ({ tables, table, eId }) => {
   .filter(x => x != null)
 }
 
+export const makeKeepInfo = detailFragments => {
+  const keep = {}
+  for (const detailFragment of detailFragments) {
+    const { detailSpecs: { cascade }, detailTable, detailItem, detailListIds } = detailFragment
+    if (!cascade && detailListIds.length) {
+      keep[detailTable] = `${detailItem[0]}(${detailListIds.length}x)`
+    }
+  }
+  return keep
+}
+
 export const getDateTime = (iso, absent = Number.NEGATIVE_INFINITY) => {
   if (iso == null) {return absent}
   let times
