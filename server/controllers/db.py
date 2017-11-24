@@ -5,7 +5,7 @@ from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
 
 from controllers.utils import oid, now, dtm, json_string, fillInSelect
-from controllers.workflow import detailInsert, getWorkflow, modWorkflow, timing
+from controllers.workflow import detailInsert, readWorkflow, adjustWorkflow, timing
 from models.data import DataModel as DM
 from models.names import *
 
@@ -91,102 +91,25 @@ class DbAccess(object):
 
         (rowFilter, fieldFilter) = result
 
+        newData = request.json
+        records = []
+        msgs = []
+        workflow = []
+
         if action == N_insert:
-            newData = request.json
-            records = []
-            result = self._insertItem(controller, table, newData, records)
-            if not result[N_good]: return result
-            return self._findDocs(records)
-
+            self._insertItem(controller, table, newData, records, msgs, workflow)
+            if not self._hasErrors(msgs): self._findDocs(records, msgs, workflow)
         elif action == N_delete:
-            newData = request.json
-            records = []
-            errors = []
-            self._deleteItem(controller, table, newData, records, errors)
-            if errors:
-                return self.stop({
-                    N_data: records,
-                    N_text: '\n'.join(errors),
-                })
-            return self.stop({N_data: records})
+            self._deleteItem(controller, table, newData, rowFilter, records, msgs, workflow)
         elif action == N_update:
-            newData = request.json
-            ident = newData.get(N__id, None)
-            if ident == None:
-                return self.stop({N_data: none, N_text: 'Not specified which item to update'})
-            rowFilter.update({N__id: oid(ident)})
-            documents = list(_DBM[table].find(rowFilter))
-            if len(documents) != 1:
-                return self.stop({N_data: none, N_text: 'Unidentified item to update'})
-            document = documents[0]
-            (mayUpdate, updFields, warnings) = Perm.may(table, N_update, document=document, newValues=newData.get(N_values, {}))
-            permMsgs = [{N_kind: N_warning, N_text: warning} for warning in warnings]
-            (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, fieldFilter)
-            uFields = set()
-            for uField in updFields:
-                valType = fieldSpecs[uField][N_valType]
-                if type(valType) is not dict or not valType.get(N_fixed, False):
-                    uFields.add(uField)
-            if not mayUpdate:
-                text = 'Not allowed to update this item' if len(warnings) == 0 else None
-                return self.stop({N_data: none, N_text: text, N_msgs: permMsgs})
-            newValues = dict(x for x in newData.get(N_values, {}).items())
-            (valItemValues, newValues) = self._validate(table, newValues, uFields)
-            validationMsgs = []
-            validationDiags = {}
-            updateValues = {}
-            hasInvalid = False
-            for (f, (valid, diags, msgs, vals)) in sorted(valItemValues.items()):
-                if valid:
-                    updateValues[f] = vals
-                else:
-                    hasInvalid = True
-                    validationMsgs.extend(msgs)
-                    validationDiags[f] = diags
-            if hasInvalid:
-                invalidFields = ', '.join(sorted(validationDiags))
-                validationDiags[N__error] = 'invalid values in fields {}'.format(invalidFields)
-                validationMsgs.append({N_kind: N_warning, N_text: 'table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)})
+            self._updateItem(controller, table, newData, rowFilter, fieldFilter, records, msgs, workflow)
 
-            modDate = now()
-            modBy = self.eppn
-            updateSaveValues = {}
-            updateSaveValues.update(updateValues) # shallow copy of updateValues
-
-            # hook for recording custom timing fields
-            # only for single value fields!
-
-            for (field, newVal) in updateValues.items():
-                if document.get(field, None) == newVal: continue
-                if fieldSpecs[field][N_multiple]: continue
-                timingField = timing.get(table, {}).get(field, {}).get(newVal, None)
-                if timingField != None:
-                    updateSaveValues[timingField] = now()
-
-            for sysField in DM[N_generic][N_systemFields]:
-                if (sysField not in updateValues or updateValues[sysField] == None) and sysField in document:
-                        updateSaveValues[sysField] = document[sysField] # add the system field
-
-            updateSaveValues.setdefault(N_modified, []).append('{} on {}'.format(modBy, modDate))
-            if N_isPristine in updateSaveValues: del updateSaveValues[N_isPristine]
-
-            # here system values are updated in the database
-            _DBM[table].update_one(
-                rowFilter,
-                {'$set': updateSaveValues, '$unset': {N_isPristine: ''}},
-            )
-
-            # check for updates in the workflow information
-            workflow = modWorkflow(self.basicList, table, document, updateValues) 
+        if self._hasErrors(msgs):
             return self.stop({
-                N_data: {
-                    N_values: updateSaveValues,
-                    N_newValues: newValues,
-                    N_diags: validationDiags,
-                    N_workflow: workflow,
-                },
-                N_msgs: permMsgs+validationMsgs,
-            }) # ??? but N_modified is not always returned
+                N_data: {'records': records, 'workflow': workflow},
+                N_msgs: msgs,
+            })
+        return self.stop({N_data: {'records': records, 'workflow': workflow}})
 
     # UTILITY FUNCTIONS FOR OTHER MODULES
 
@@ -223,6 +146,8 @@ class DbAccess(object):
         good = text == None and (msgs == None or all(msg[N_kind] != N_error for msg in msgs))
         msgs = [{N_kind: N_error, N_text: text}] if msgs == None and text != None else msgs
         return {N_data: data, N_msgs: msgs, N_good: good}
+
+    def _hasErrors(self, msgs): return any(msg[N_kind] != N_error for msg in msgs)
 
     # IMPLEMENTATION METHODS
 
@@ -416,7 +341,7 @@ class DbAccess(object):
             t = detailProps[N_table]
             self._getList(N_list, t, data, msgs, titleOnly=False)
 
-    def _insertItem(self, controller, table, newData, records):
+    def _insertItem(self, controller, table, newData, records, msgs, workflow):
         masterId = newData.get(N_masterId, None)
         linkField = newData.get(N_linkField, None)
         tableInfo = DM[N_tables].get(table, {})
@@ -424,10 +349,10 @@ class DbAccess(object):
         noTitle = tableInfo.get(N_noTitle, DM[N_generic][N_noTitle])
         item = tableInfo.get(N_item)[0]
         sort = tableInfo.get(N_title, DM[N_generic][N_sort])
-        none = None
         (readGood, readResult) = self.Perm.getPerm(controller, table, N_read)
         if not readGood:
-            return self.stop({N_data: none, N_text: readResult or 'Cannot read table {}'.format(table)})
+            msgs.append({N_kind: N_error, N_text: readResult or 'Cannot read table {}'.format(table)})
+            return
         (readRowFilter, readFieldFilter) = readResult
         modDate = now()
         modBy = self.eppn
@@ -462,7 +387,8 @@ class DbAccess(object):
             masterDocument=masterDocument,
         )
         if not extraGood:
-            return self.stop({N_data: none, N_text: extraText})
+            msgs.append({N_kind: N_error, N_text: extraText})
+            return
 
         # use the extra fields, if any
         if extraData and N_insertValues in extraData:
@@ -477,48 +403,137 @@ class DbAccess(object):
             for (detailTable, detailRecords) in extraData[N_detailData].items():
                 for detailRecord in detailRecords:
                     detailRecord[N_masterId] = ident
-                    result = self._insertItem(controller, detailTable, detailRecord, records)
-                    if not result[N_good]:
-                        return result
-        return self.stop({N_data: none})
+                    good = self._insertItem(controller, detailTable, detailRecord, records, msgs, workflow)
+                    if not good:
+                        msgs.append({N_kind: N_error, N_text: result})
+                        return False
 
-    def _deleteItem(self, controller, table, newData, records, errors):
+        # check for updates in the workflow information
+        workflow.extend(adjustWorkflow(self.basicList, table, {}, insertValues))
+
+        return not self._hasErrors(msgs)
+
+    def _deleteItem(self, controller, table, newData, rowFilter, records, msgs, workflow):
         Perm = self.Perm
         ident = newData.get(N__id, None)
         if ident == None:
-            errors.append('Not specified which item to delete from table {}'.format(table))
+            msgs.append({N_kind: N_error, N_text: 'Not specified which item to delete from table {}'.format(table)})
             return
-        (good, result) = Perm.getPerm(controller, table, N_delete)
-        (rowFilter, fieldFilter) = result
-        rowFilter.update({N__id: oid(ident)})
-        documents = list(_DBM[table].find(rowFilter))
+        thisRowFilter = deepcopy(rowFilter)
+        thisRowFilter.update({N__id: oid(ident)})
+        documents = list(_DBM[table].find(thisRowFilter))
         if len(documents) != 1:
-            errors.append('Unidentified item to delete')
+            msgs.append({N_kind: N_error, N_text: 'Unidentified item to delete'})
             return
         document = documents[0]
         (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
         if not mayDelete:
-            errors.append('Not allowed to delete item {} from {}'.format(ident, table))
+            msgs.append({N_kind: N_error, N_text: 'Not allowed to delete item {} from {}'.format(ident, table)})
             return
-        else:
-            # first delete detail records
-            tableInfo = DM[N_tables].get(table, {})
-            details = tableInfo.get(N_details, {})
-            for detail in details.values():
-                cascade = detail.get(N_cascade, False)
-                if not cascade: continue
-                detailTable = detail[N_table]
-                linkField = detail[N_linkField]
-                (good, result) = self.Perm.getPerm(controller, detailTable, N_delete)
-                if not good: continue
-                (detailRowFilter, fieldFilter) = result
-                detailRowFilter.update({linkField: oid(ident)})
-                detailDocuments = list(_DBM[detailTable].find(detailRowFilter, {N__id: True}))
-                for detailDoc in detailDocuments:
-                    self._deleteItem(controller, detailTable, {N__id: detailDoc[N__id]}, records, errors)
-            # finally delete the main record
-            _DBM[table].delete_one(rowFilter)
-            records.append((table, str(ident)))
+        # first delete detail records
+        tableInfo = DM[N_tables].get(table, {})
+        details = tableInfo.get(N_details, {})
+        for detail in details.values():
+            cascade = detail.get(N_cascade, False)
+            if not cascade: continue
+            detailTable = detail[N_table]
+            linkField = detail[N_linkField]
+            (good, result) = self.Perm.getPerm(controller, detailTable, N_delete)
+            if not good: continue
+            (detailRowFilter, fieldFilter) = result
+            detailRowFilter.update({linkField: oid(ident)})
+            detailDocuments = list(_DBM[detailTable].find(detailRowFilter, {N__id: True}))
+            for detailDoc in detailDocuments:
+                if detailTable != table:
+                    (good, result) = Perm.getPerm(controller, detailTable, N_delete)
+                    if not good:
+                        msgs.append({N_kind: N_error, N_text: result or 'Cannot do {} in table {}'.format(detailTable, N_delete)})
+                        return
+                    (rowFilter, fieldFilter) = result
+                self._deleteItem(controller, detailTable, {N__id: detailDoc[N__id]}, rowFilter, records, msgs, workflow)
+        # finally delete the main record
+        _DBM[table].delete_one(rowFilter)
+        workflow.extend(adjustWorkflow(self.basicList, table, document, {}))
+        records.append((table, str(ident)))
+
+    def _updateItem(self, controller, table, newData, rowFilter, fieldFilter, records, msgs, workflow):
+        Perm = self.Perm
+        ident = newData.get(N__id, None)
+        if ident == None:
+            msgs.append({N_kind: N_error, N_text: 'Not specified which item to update in table {}'.format(table)})
+            return
+        rowFilter.update({N__id: oid(ident)})
+        documents = list(_DBM[table].find(rowFilter))
+        if len(documents) != 1:
+            msgs.append({N_kind: N_error, N_text: 'Unidentified item to update'})
+            return
+        document = documents[0]
+        (mayUpdate, updFields, warnings) = Perm.may(table, N_update, document=document, newValues=newData.get(N_values, {}))
+        msgs.extend([{N_kind: N_warning, N_text: warning} for warning in warnings])
+        (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, fieldFilter)
+        uFields = set()
+        for uField in updFields:
+            valType = fieldSpecs[uField][N_valType]
+            if type(valType) is not dict or not valType.get(N_fixed, False):
+                uFields.add(uField)
+        if not mayUpdate:
+            if len(warnings == 0):
+                msgs.append({N_kind: N_error, N_text: 'Not allowed to update this item'})
+            return
+        newValues = dict(x for x in newData.get(N_values, {}).items())
+        (valItemValues, newValues) = self._validate(table, newValues, uFields)
+        validationDiags = {}
+        updateValues = {}
+        hasInvalid = False
+        for (f, (valid, diags, valMsgs, vals)) in sorted(valItemValues.items()):
+            if valid:
+                updateValues[f] = vals
+            else:
+                hasInvalid = True
+                msgs.extend(valMsgs)
+                validationDiags[f] = diags
+        if hasInvalid:
+            invalidFields = ', '.join(sorted(validationDiags))
+            validationDiags[N__error] = 'invalid values in fields {}'.format(invalidFields)
+            msgs.append({N_kind: N_warning, N_text: 'table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)})
+
+        modDate = now()
+        modBy = self.eppn
+        updateSaveValues = {}
+        updateSaveValues.update(updateValues) # shallow copy of updateValues
+
+        # hook for recording custom timing fields
+        # only for single value fields!
+
+        for (field, newVal) in updateValues.items():
+            if document.get(field, None) == newVal: continue
+            if fieldSpecs[field][N_multiple]: continue
+            timingField = timing.get(table, {}).get(field, {}).get(newVal, None)
+            if timingField != None:
+                updateSaveValues[timingField] = now()
+
+        for sysField in DM[N_generic][N_systemFields]:
+            if (sysField not in updateValues or updateValues[sysField] == None) and sysField in document:
+                    updateSaveValues[sysField] = document[sysField] # add the system field
+
+        updateSaveValues.setdefault(N_modified, []).append('{} on {}'.format(modBy, modDate))
+        if N_isPristine in updateSaveValues: del updateSaveValues[N_isPristine]
+
+        # here system values are updated in the database
+        _DBM[table].update_one(
+            rowFilter,
+            {'$set': updateSaveValues, '$unset': {N_isPristine: ''}},
+        )
+
+        ownWorkflow = readWorkflow(self.basicList, table, [document[N__id]]) 
+        # check for updates in the workflow information
+        workflow.extend(adjustWorkflow(self.basicList, table, document, updateValues)) 
+        records.append({
+            N_values: updateSaveValues,
+            N_newValues: newValues,
+            N_diags: validationDiags,
+            N_workflow: ownWorkflow.get(document[N__id], {}),
+        })
 
     def _findDoc(self, table, rowFilter, fieldFilter, failData, failText, multiple=False):
         Perm = self.Perm
@@ -526,9 +541,9 @@ class DbAccess(object):
         theFieldFilter[N_creator] = True
         documents = list(_DBM[table].find(rowFilter, theFieldFilter))
         ldoc = len(documents)
-        workflow = getWorkflow(self.basicList, table, [doc[N__id] for doc in documents]) 
         if ldoc == 0:
             return self.stop({N_data: failData, N_text: failText})
+        workflow = readWorkflow(self.basicList, table, [doc[N__id] for doc in documents]) 
         if multiple:
             data = []
             for document in documents:
@@ -556,10 +571,9 @@ class DbAccess(object):
                 },
             })
 
-    def _findDocs(self, records):
+    def _findDocs(self, records, msgs, workflow):
         Perm = self.Perm
-        errors = []
-        data = []
+        tables = []
         for (table, ident, fieldFilter) in records:
             rowFilter = {N__id: ident}
             theFieldFilter = dict(x for x in fieldFilter.items())
@@ -567,24 +581,22 @@ class DbAccess(object):
             documents = list(_DBM[table].find(rowFilter, theFieldFilter))
             ldoc = len(documents)
             if ldoc == 0:
-                errors.append('Could not find back record {} in table {}'.format(ident, table))
+                msgs.append({N_kind: N_error, N_text: 'Could not find back record {} in table {}'.format(ident, table)})
                 continue
             document = documents[0]
             (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
             (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
             perm = {N_update: uFields, N_delete: mayDelete}
-            data.append({
+            ownWorkflow = readWorkflow(self.basicList, table, [document[N__id]]) 
+            tables.append({
                 N_table: table,
                 N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
                 N_perm: perm,
                 N_fields: fieldFilter,
+                N_workflow: ownWorkflow.get(document[N__id], {})
             })
-        if errors:
-            return self.stop({
-                N_data: data,
-                N_text: '\n'.join(errors),
-            })
-        return self.stop({N_data: data})
+        records.clear()
+        records.extend(tables)
 
     def _consolidateDocs(self, table, documents, level=0, withDetails=False):
         tableInfo = DM[N_tables].get(table, {})

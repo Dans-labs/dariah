@@ -110,6 +110,14 @@ const updateEntities = (stateEntities, entities) => {
   return update(stateEntities, { $merge: newEntities })
 }
 
+const updateWorkflow = (state, workflow) => {
+  let newState = state
+  for (const [relTable, relId, wf] of workflow) {
+    newState = updateAuto(newState, [relTable, 'entities', relId, 'workflow'], { $set: wf })
+  }
+  return newState
+}
+
 const flows = {
   fetchTable(state, { data }) {
     if (data == null) {return state}
@@ -133,34 +141,38 @@ const flows = {
   fetchItems(state, { data, table }) {
     if (data == null || data.length == 0) {return state}
     let newState = state
-    for (const dataSlice of data) {
-      const { values: { _id } } = dataSlice
-      newState = updateAuto(newState, [table, 'entities', _id], { $set: dataSlice })
+    for (const record of data) {
+      const { values: { _id } } = record
+      newState = updateAuto(newState, [table, 'entities', _id], { $set: record })
     }
     return newState
   },
   modItem(state, { data, table }) {
     if (data == null) {return state}
-    const { values, values: { _id }, newValues, workflow } = data
-    const fieldUpdates = {}
-    Object.entries(values).forEach(([key, value]) => {fieldUpdates[key] = { $set: value }})
-    let newState = updateAuto(state, [table, 'entities', _id, 'values'], fieldUpdates)
-    if (newValues != null) {
-      for (const { _id, rep, repName, relTable, field } of newValues) {
-        newState = update(newState, { [table]: { valueLists: { [field]: { $push: [_id] } } } })
-        newState = updateItemWithFields(newState, relTable, _id, ['_id', repName], { _id, [repName]: rep })
+    const { records, workflow } = data
+    let newState = state
+    for (const record of records) {
+      const { values, values: { _id }, newValues, workflow: ownWorkflow } = record
+      const fieldUpdates = {}
+      Object.entries(values).forEach(([key, value]) => {fieldUpdates[key] = { $set: value }})
+      newState = updateAuto(newState, [table, 'entities', _id, 'values'], fieldUpdates)
+      newState = updateAuto(newState, [table, 'entities', _id, 'workflow'], ownWorkflow)
+      if (newValues != null) {
+        for (const { _id, rep, repName, relTable, field } of newValues) {
+          newState = update(newState, { [table]: { valueLists: { [field]: { $push: [_id] } } } })
+          newState = updateItemWithFields(newState, relTable, _id, ['_id', repName], { _id, [repName]: rep })
+        }
       }
     }
-    for (const [relTable, relId, wf] of workflow) {
-      newState = updateAuto(newState, [relTable, 'entities', relId, 'workflow'], { $set: wf })
-    }
+    newState = updateWorkflow(newState, workflow)
     return newState
   },
   insertItem(state, { data, table, select }) {
-    if (data == null || data.length == 0) {return state}
+    if (data == null) {return state}
+    const { records, workflow } = data
     let newState = state
-    for (const dataSlice of data) {
-      const { table: thisTable, ...dataRest } = dataSlice
+    for (const record of records) {
+      const { table: thisTable, ...dataRest } = record
       const { values: { _id } } = dataRest
       newState = updateAuto(newState, [thisTable, 'entities', _id], { $set: dataRest })
       if (newState[thisTable][ALLIDS] != null) {
@@ -175,13 +187,15 @@ const flows = {
         },
       })
     }
+    newState = updateWorkflow(newState, workflow)
     return newState
   },
   delItem(state, { data }) {
-    if (data == null || data.length == 0) {return state}
+    if (data == null) {return state}
+    const { records, workflow } = data
     let newState = state
-    for (const dataSlice of data) {
-      const [thisTable, _id] = dataSlice
+    for (const record of records) {
+      const [thisTable, _id] = record
       newState = update(newState, { [thisTable]: { entities: { $unset: [_id] } } })
       const { [thisTable]: { myIds, allIds } } = newState
       for (const [name, list] of Object.entries({ myIds, allIds})) {
@@ -191,6 +205,7 @@ const flows = {
         }
       }
     }
+    newState = updateWorkflow(newState, workflow)
     return newState
   },
 }

@@ -10,7 +10,7 @@ timing = {
     },
 }
 
-def getWorkflow(basicList, table, eIds):
+def readWorkflow(basicList, table, eIds):
     result = {}
     if table == N_contrib:
         details = basicList(
@@ -19,24 +19,25 @@ def getWorkflow(basicList, table, eIds):
             {N__id: False, table: True, N_submitted: True},
         )
         for detail in details:
-            n = result.setdefault(detail[table], {}).setdefault('nAss', 0)
-            result[detail[table]]['nAss'] = n + 1
             if detail.get(N_submitted, None):
                 # detail[table] is the contrib Id, must be one of the eIds
-                result.setdefault(detail[table], {})[N_locked] = True
-                result[detail[table]][_lockedReason] = 'being assessed'
+                result[detail[table]] = {
+                    N_locked: True,
+                    N_lockedReason: 'being assessed',
+                }
     return result
 
-def modWorkflow(basicList, table, document, updateValues):
+def adjustWorkflow(basicList, table, document, adjustedValues):
     result = []
     if table == N_assessment:
-        if document.get(N_submitted, None) != updateValues.get(N_submitted, None):
-            contribId = document.get(N_contrib, None)
-            if contribId:
-                workflow = getWorkflow(basicList, N_contrib, [contribId]).get(contribId, {})
-                result.append([N_contrib, contribId, workflow])
+        if document.get(N_submitted, None) != adjustedValues.get(N_submitted, None) \
+        or document.get(N_contrib, None) != adjustedValues.get(N_contrib, None) \
+        :
+            contribIds = [doc[N_contrib] for doc in (document, adjustedValues) if N_contrib in doc]
+            workflow = readWorkflow(basicList, N_contrib, contribIds)
+            for contribId in contribIds:
+                result.append([N_contrib, contribId, workflow.get(contribId, {})])
     return result
-
 
 def detailInsert(
     basicList,
