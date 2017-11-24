@@ -10,7 +10,7 @@ import { getGrid, compileSortedData, resetSort, addColumn, turnColumn, delColumn
 import { insertItem, DETAILS } from 'tables'
 import { compileActive } from 'workflow'
 
-import { dealWithProvenance } from 'fields'
+import { dealWithProvenance, getMasterTable } from 'fields'
 
 import ItemRow from 'ItemRow'
 import EditInsert from 'EditInsert'
@@ -62,6 +62,7 @@ const ListGrid = ({
   const sortedData = compileSortedData(tables, table, listIds, sortSpec, settings)
   const makeAlternatives = compileAlternatives(alterSection, 2, 0, dispatch)
   const activeItems = compileActive(tables, table)
+  const masterTable = getMasterTable(tables, table, linkField)
   const rows = []
   for (const eId of sortedData) {
     const { [eId]: { values: initialValues, perm, workflow } } = entities
@@ -95,8 +96,11 @@ const ListGrid = ({
         !(filtered && select === DETAILS)
         ? <div>
             <EditInsert
+              table={table}
               perm={tablePerm}
               select={select}
+              masterTable={masterTable}
+              nItems={listIds.length}
               fixed={fixed}
               item={item}
               button={'button-medium'}

@@ -8,7 +8,7 @@ export default ({ perm, keep, fixed, button, onClick }) => {
   const doKeep = Object.keys(keep).length > 0
   const keepInfo = Object.keys(keep).sort().map(table => keep[table]).join(', ')
   const tipInfo = doKeep
-  ? `cannot delete because of related items: ${keepInfo}`
+  ? `This item cannot deleted because related item exist: ${keepInfo}`
   : 'delete this record'
   const icon = doKeep ? 'puzzle-piece' : 'trash'
   const disabled = doKeep ? 'disabled' : 'error-o'

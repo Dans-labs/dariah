@@ -32,22 +32,23 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
             <div key={name} className={'grid-row'} >
               {
                 !expand
-                  ? <Tooltip
-                      tip={`${alt == 0 ? 'show' : 'hide'} detail records`}
-                      at={'left'}
+                ? <Tooltip
+                    tip={`${alt == 0 ? 'show' : 'hide'} detail records`}
+                    at={'left'}
+                    className={'detail-control'}
+                  >
+                    <span
+                      className={'link'}
+                      onClick={nextAlt}
                     >
-                      <div
-                        className={'link detail-control'}
-                        onClick={nextAlt}
-                      >
-                        <span className={`button-small fa fa-angle-${alt === 0 ? 'down' : 'up'}`} />
-                        {
-                          alt === 0
-                          ? `${nDetails} ${nDetails === 1 ? detailThing : detailThings}`
-                          : emptyS
-                        }
-                      </div>
-                    </Tooltip>
+                      <span className={`button-small fa fa-angle-${alt === 0 ? 'down' : 'up'}`} />
+                      {
+                        alt === 0
+                        ? `${nDetails} ${nDetails === 1 ? detailThing : detailThings}`
+                        : emptyS
+                      }
+                    </span>
+                  </Tooltip>
                 : null
               }
               <div className={'detail-body'} >

@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router'
 
 import { memoize } from 'memo'
 import { combineSelectors, withParams, getUrlParts, emptyS, emptyO } from 'utils'
-import { someEditable } from 'fields'
+import { someEditable, getMasterTable } from 'fields'
 import { editMode } from 'presentation'
 
 import { insertItem, needValues, headEntity, DETAILS, handleOpenAll } from 'tables'
@@ -59,18 +59,7 @@ class ListPlain extends Component {
     const { [table]: { item, entities } } = tables
     const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
     const activeItems = compileActive(tables, table)
-    let masterTable = null
-    if (linkField != null) {
-      const {
-        [table]: {
-          fieldSpecs: {
-            [linkField]: {
-              valType: { relTable } = emptyO,
-            } = emptyO },
-        },
-      } = tables
-      masterTable = relTable
-    }
+    const masterTable = getMasterTable(tables, table, linkField)
     const startMode = masterTable == null
     ? 0
     : editMode(tables, table, 'detail', masterTable)
@@ -80,8 +69,11 @@ class ListPlain extends Component {
           !(filtered && select === DETAILS)
           ? <div>
               <EditInsert
+                table={table}
                 perm={perm}
                 select={select}
+                masterTable={masterTable}
+                nItems={listIds.length}
                 fixed={fixed}
                 item={item}
                 button={'button-medium'}

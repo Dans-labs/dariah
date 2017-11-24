@@ -13,11 +13,13 @@
     color: var(--action-fore);
     cursor: pointer;
     font-weight: bold;
-    color: var(--invert-fore);
-    background-color: var(--invert-back);
+    color: var(--action-invert-fore);
+    background-color: var(--action-invert-back);
     border-color: var(--action-border);
     white-space: nowrap;
     padding: 0.5rem;
+    margin: 0.5rem 1rem;
+    display: inline-block;
 }
 .button-large, .button-large.invert {
     --size: medium;

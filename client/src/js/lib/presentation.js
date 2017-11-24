@@ -14,6 +14,7 @@ import {
   mainTemplates, mainEditTemplates, mainActionTemplates,
   detailTemplates, detailEditTemplates, detailActionTemplates,
   relatedTemplates,
+  insertTemplates,
   consolidatedTemplates,
 } from 'Templates'
 
@@ -50,6 +51,14 @@ const makeL = memoize((tables, table) => field => {
   return label
 }, emptyO)
 
+
+export const applyInsertTemplate = (table, masterTable, nItems, onInsert) => {
+  if (masterTable == null) {return null}
+  const { [table]: theseTemplates = emptyO } = insertTemplates
+  const template = masterTable ? theseTemplates[masterTable] : theseTemplates
+  if (template == null || template == emptyO) {return null}
+  return template({ n: nItems, onInsert })
+}
 
 // NB: [''] == '' and this is what we intend here
 

@@ -4,6 +4,9 @@
     --action-back:                     hsla(210, 100%,  90%, 1  );
     --action-border:                   hsla(210, 100%,  50%, 0.5);
     --action-disabled-back:            hsla(210,   0%,  90%, 1  );
+    --action-invert-fore:              hsla(  0, 100%, 100%, 1  );
+    --action-invert-back:              hsla(  0,   0%,   0%, 1  );
+    --action-invert-border:            hsla(240, 100%,  50%, 0.8);
     --action-link-fore:                hsla(210, 100%,  20%, 1  );
     --action-link-back:                hsla(210, 100%,  90%, 1  );
     --action-active-fore:              hsla(210, 100%,  40%, 1  );
@@ -61,8 +64,8 @@
     --info-back:                       hsla(120,   0%,  80%, 0.5);
 
     --invert-fore:                     hsla(  0, 100%, 100%, 1  );
-    --invert-back:                     hsla(  0,   0%,   0%, 0.8);
-    --invert-border:                   hsla(  0,   0%,   0%, 0.5);
+    --invert-back:                     hsla(  0,   0%,  50%, 0.8);
+    --invert-border:                   hsla(  0,   0%,  70%, 0.5);
 
     --msg-box-back:                    hsla(  0,   0%,  90%, 0.8);
     --msg-box-border:                  hsla(  0,   0%,  50%, 0.5);

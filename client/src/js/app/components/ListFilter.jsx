@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import { emptyS, emptyO } from 'utils'
 import { handle } from 'handle'
+import { getMasterTable } from 'fields'
 
 import { initFiltering, computeFiltering } from 'filters'
 import { insertItem, DETAILS } from 'tables'
@@ -63,14 +64,18 @@ class ListFilter extends Component {
     const { [table]: { item } } = tables
     const things = item[1]
     const alterSection = `list-${table}-${select}`
+    const masterTable = getMasterTable(tables, table, linkField)
     return (
       <div className={`list-filter ${compactClass}`}>
         {
           select === DETAILS
           ? <div>
               <EditInsert
+                table={table}
                 perm={perm}
                 select={select}
+                masterTable={masterTable}
+                nItems={listIds.length}
                 fixed={fixed}
                 item={item}
                 button={'button-medium'}

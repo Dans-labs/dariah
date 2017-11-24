@@ -5,7 +5,6 @@ import { itemReadField, itemEditField } from 'fields'
 import { assessmentScore } from 'workflow'
 
 import Expand, { ExpandHead, ExpandBody } from 'Expand'
-import Insert from 'Insert'
 import Tooltip from 'Tooltip'
 
 const rField = (field, l, f, key) => itemReadField(field, l(field), f(field), key)
@@ -41,7 +40,7 @@ export const mainEditTemplates = {
 }
 
 export const mainActionTemplates = {
-  contrib({ v, w }) {
+  contrib({ w }) {
     return (
       <div>
         {
@@ -50,16 +49,6 @@ export const mainActionTemplates = {
               {`This contribution is locked because it is ${w('lockedReason')}.`}
             </div>
           : null
-        }
-        {
-          w('nAss')
-          ? null
-          : <Insert
-              table={'assessment'}
-              thing={'assessment'}
-              masterId={v('_id')}
-              linkField={'contrib'}
-            />
         }
       </div>
     )
@@ -343,6 +332,50 @@ export const relatedTemplates = {
           <div>{f('typeContribution')}</div>
         </div>
       )
+    },
+  },
+}
+
+export const insertTemplates = {
+  assessment: {
+    contrib({ n, onInsert }) {
+      return n == 0
+      ? <span
+          className={`button-large invert`}
+          onClick={onInsert}
+        >{`Write a self-assessment`}</span>
+      : <Tooltip
+          tip={
+            <div>
+              <p>{'Normally a contribution needs just one self-assessment.'}</p>
+              <p>{'Only add an other one in the following cases'}</p>
+              <ul>
+                <li>{'The previous self-assessment has become obsolete'}</li>
+                <li>
+                  {`The previous self-assessment is based on a contribution type,
+                      but the contribution in question has been assigned another type.`
+                  }
+                </li>
+              </ul>
+              <p>
+                <b>
+                  {`In the last case, it is recommended to copy and paste the relevant parts
+                    of the old assessment into the new one and delete the old one.`
+                  }
+                </b>
+              </p>
+            </div>
+          }
+          at={'top'}
+        >
+          <span
+            className={`button-large invert`}
+            onClick={onInsert}
+          >
+            {`Add another self-assessment`}
+            <span className={'fa fa-exclamation'} />
+          </span>
+        </Tooltip>
     },
   },
 }

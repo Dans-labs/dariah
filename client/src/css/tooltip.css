@@ -5,7 +5,8 @@
     background-color: var(--action-back);
 }
 .tooltip {
-    width: max-content;
+    width: fit-content;
+    max-width: 40vh;
     position: absolute;
     top: 0;
     left: 0;

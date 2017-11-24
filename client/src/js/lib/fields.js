@@ -271,6 +271,22 @@ export const makeDetails = ({ tables, table, eId }) => {
   .filter(x => x != null)
 }
 
+export const getMasterTable = (tables, table, linkField) => {
+  let masterTable = null
+  if (linkField != null) {
+    const {
+      [table]: {
+        fieldSpecs: {
+          [linkField]: {
+            valType: { relTable } = emptyO,
+          } = emptyO },
+      },
+    } = tables
+    masterTable = relTable
+    return masterTable
+  }
+}
+
 export const makeKeepInfo = detailFragments => {
   const keep = {}
   for (const detailFragment of detailFragments) {

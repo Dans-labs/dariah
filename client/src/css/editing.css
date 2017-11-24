@@ -193,10 +193,7 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
     max-width: calc(100% - 1rem);
 }
 div.detail-control {
-    flex: 0 0 1rem;
-}
-div.detail-body {
-    flex: 1 0 90%;
+    flex: 1 1 1rem;
 }
 .label-col {
     text-align: right;
