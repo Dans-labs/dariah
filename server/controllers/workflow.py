@@ -1,43 +1,22 @@
 from controllers.utils import now
+
+from models.data import DataModel as DM
 from models.names import *
 
-timing = {
-    N_assessment: {
-        N_submitted: {
-            True: N_dateSubmitted,
-            False: N_dateWithdrawn,
-        },
-    },
-}
-
-def readWorkflow(basicList, table, eIds):
+def readWorkflow(basicList, table, myDocs):
     result = {}
-    if table == N_contrib:
-        details = basicList(
-            N_assessment,
-            {table: {'$in': eIds}},
-            {N__id: False, table: True, N_submitted: True},
-        )
-        for detail in details:
-            if detail.get(N_submitted, None):
-                # detail[table] is the contrib Id, must be one of the eIds
-                result[detail[table]] = {
-                    N_locked: True,
-                    N_lockedReason: 'being assessed',
-                }
+    for w in DM[N_workflow].get(table, {}).get(N_read, []):
+        _computeWorkflow(basicList, myDocs, w, result) 
     return result
 
 def adjustWorkflow(basicList, table, document, adjustedValues):
-    result = []
-    if table == N_assessment:
-        if document.get(N_submitted, None) != adjustedValues.get(N_submitted, None) \
-        or document.get(N_contrib, None) != adjustedValues.get(N_contrib, None) \
-        :
-            contribIds = [doc[N_contrib] for doc in (document, adjustedValues) if N_contrib in doc]
-            workflow = readWorkflow(basicList, N_contrib, contribIds)
-            for contribId in contribIds:
-                result.append([N_contrib, contribId, workflow.get(contribId, {})])
-    return result
+    return _applyAdjustWorkflow(basicList,
+        _combineAffected(
+            _getAffected(
+                basicList, document, adjustedValues, w,
+            ) for w in DM[N_workflow].get(table, {}).get(N_adjust, []),
+        ),
+    )
 
 def detailInsert(
     basicList,
@@ -88,6 +67,141 @@ def detailInsert(
             N_insertValues: insertValues,
         }
     return (good, message, data)
+
+# BASIC RULE COMPUTATION METHODS THAT CAN BE CONFIGURED IN A WORKFLOW
+
+def _otherHasValue(master, linkField, myDocs, myField, otherDocs, otherField, value, emptyFields):
+    workflowIds = set()
+    if master:
+        for otherDoc in otherDocs:
+            if otherDoc.get(otherField, None) == value:
+                myId = otherDoc.get(linkField, None)
+                if myId != None:
+                    workflowIds.add(myId)
+    else:
+        otherIndex = dict((doc[N__id], doc.get(otherField, None)) for doc in otherDocs)
+        for myDoc in myDocs:
+            otherId = myDoc.get(linkField, None)
+            otherValue = otherIndex.get(otherId, None)
+            if otherValue == value:
+                workflowIds.add(myDoc[N__id])
+    return workflowIds
+
+def _otherHasIncomplete(master, linkField, myDocs, myField, otherDocs, otherField, value, emptyFields):
+    workflowIds = set()
+    if master:
+        for otherDoc in otherDocs:
+            if any(_isEmpty(otherDoc.get(emptyField, None)) for emptyField in emptyFields):
+                myId = otherDoc.get(linkField, None)
+                if myId != None:
+                    workflowIds.add(myId)
+    else:
+        otherIndex = dict((doc[N__id], [doc.get(emptyField, None) for emptyField in emptyFields]) for doc in otherDocs)
+        for myDoc in myDocs:
+            otherId = myDoc.get(linkField, None)
+            otherValues = otherIndex.get(otherId, None)
+            if any(_isEmpty(otherValue) for otherValue in otherValues):
+                workflowIds.add(myDoc[N__id])
+    return workflowIds
+
+def _otherHasDifferent(master, linkField, myDocs, myField, otherDocs, otherField, value, emptyFields):
+    workflowIds = set()
+    if master:
+        myIndex = dict((doc[N__id], doc.get(myField, None)) for doc in myDocs)
+        for otherDoc in otherDocs:
+            myId = otherDoc.get(linkField, None)
+            if myId == None: continue
+            myValue = myIndex.get(myId, None)
+            otherValue = otherDoc.get(otherField, None)
+            if myValue != otherValue:
+                workflowIds.add(myId)
+    else:
+        otherIndex = dict((doc[N__id], doc.get(otherField, None)) for doc in otherDocs)
+        for myDoc in myDocs:
+            otherId = myDoc.get(linkField, None)
+            if otherId == None: continue
+            otherValue = otherIndex.get(otherId, None)
+            myValue = myDoc.get(myField, None)
+            if myValue != otherValue:
+                workflowIds.add(myDoc[N__id])
+    return workflowIds
+
+methods = {
+    'hasValue': _otherHasValue,
+    'hasDifferent': _otherHasDifferent,
+    'hasIncomplete': _otherHasIncomplete,
+}
+
+# HELPERS READ WORKFLOW
+
+def _isEmpty(val):
+    return not val or (type(val) is list and len([v for v in val if v]) == 0)
+
+def _applyReadWorkflow(workflowIds, workflow, result):
+    for myWorkflowId in workflowIds:
+        if myWorkflowId not in result: result[myWorkflowId] = {}
+        result[myWorkflowId].update(workflow)
+
+def _computeWorkflow(basicList, myDocs, w, result):
+    myDocIds = {doc[N__id] for doc in myDocs}
+
+    method = w['method']
+    master = w['master']
+    linkField = w[N_linkField]
+    myField = w['myField']
+    otherTable = w['otherTable']
+    otherField = w['otherField']
+    value = w['value']
+    emptyFields = w['emptyFields']
+    workflow = w[N_workflow]
+
+    if master:
+        otherDocs = basicList(otherTable, {linkField: {'$in': list(myDocIds)}}, True) 
+    else:
+        otherIds = {doc[linkField] for doc in myDocs}
+        otherDocs = basicList(otherTable, {N__id: {'$in': list(otherIds)}}, True)
+
+    myWorkflowIds = methods[method](master, linkField, myDocs, myField, otherDocs, otherField, value, emptyFields)
+    _applyReadWorkflow(myWorkflowIds, workflow, result)
+
+def _getAffected(basicList, document, adjustedValues, w):
+    otherTable = w['otherTable']
+    master = w['master']
+    linkField = w[N_linkField]
+    triggerFields = w['triggerFields']
+
+    triggers = set(triggerFields)
+    if not master: triggers.add(linkField)
+    if any((document.get(triggerField, None) != adjustedValues.get(triggerField, None)) for triggerField in triggers):
+        myDocs = [doc for doc in (document, adjustedValues) if N__id in doc]
+        myDocIds = {doc[N__id] for doc in myDocs}
+
+        if master:
+            otherDocs = basicList(otherTable, {linkField: {'$in': list(myDocIds)}}, True) 
+        else:
+            otherIds = {doc[linkField] for doc in myDocs}
+            otherDocs = basicList(otherTable, {N__id: {'$in': list(otherIds)}}, True)
+        return (otherTable, otherDocs)
+    return (None, [])
+
+def _combineAffected(affecteds):
+    allAffected = {}
+    for (table, docs) in affecteds:
+        for doc in docs:
+            allAffected.setdefault(table, {})[doc[N__id]] = doc
+    return allAffected
+
+def _applyAdjustWorkflow(basicList, allAffected):
+    workflowEntries = []
+    for (table, docMap) in allAffected.items():
+        docIds = docMap.keys()
+        docs = docMap.values()
+        workflow = readWorkflow(basicList, table, docs)
+        for docId in docIds:
+            workflowEntries.append([table, docId, workflow.get(docId, {})])
+    return workflowEntries
+
+# HELPERS ADJUST WORKFLOW
 
 def _getActiveItems(basicList):
     present = now()

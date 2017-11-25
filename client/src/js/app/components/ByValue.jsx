@@ -51,7 +51,7 @@ const ByValue = ({
         }
         {' '}
         <span
-          className={`button-small fa fa-angle-${alt === 0 ? collapse : expand}`}
+          className={`button small fa fa-angle-${alt === 0 ? collapse : expand}`}
           onClick={nextAlt}
         />
       </div>

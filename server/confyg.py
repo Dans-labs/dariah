@@ -15,7 +15,7 @@ def getNames(val, doString=True):
     elif type(val) is dict: 
         names = set()
         for (k, v) in val.items():
-            if isName(k): names.add(k)
+            if type(k) is str and isName(k): names.add(k)
             names |= getNames(v, doString=False)
         return names
     return set()

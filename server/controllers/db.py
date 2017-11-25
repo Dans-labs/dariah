@@ -5,7 +5,7 @@ from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
 
 from controllers.utils import oid, now, dtm, json_string, fillInSelect
-from controllers.workflow import detailInsert, readWorkflow, adjustWorkflow, timing
+from controllers.workflow import detailInsert, readWorkflow, adjustWorkflow
 from models.data import DataModel as DM
 from models.names import *
 
@@ -106,7 +106,7 @@ class DbAccess(object):
             self._updateItem(controller, table, newData, rowFilter, fieldFilter, records, msgs, workflow)
 
         return self.stop({
-            N_data: {'records': records, 'workflow': workflow},
+            N_data: {'records': records, N_workflow: workflow},
             N_msgs: msgs,
         })
 
@@ -428,6 +428,15 @@ class DbAccess(object):
         if not mayDelete:
             msgs.append({N_kind: N_error, N_text: 'Not allowed to delete item {} from {}'.format(ident, table)})
             return False
+
+        # check current workflow conditions
+        myWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {}) 
+        if myWorkflow.get(N_locked):
+            msgs.append({N_kind: N_error, N_text: 'This item in table {} is locked because: {}'.format(
+                table, myWorkflow.get(N_lockedReason, None),
+            )})
+            return
+
         # first cascade delete detail records that are marked for it
         # if there are remaining detail records, prevent delete!
         tableInfo = DM[N_tables].get(table, {})
@@ -456,8 +465,8 @@ class DbAccess(object):
                 if not good:
                     msgs.append({N_kind: N_error, N_text: result or 'Cannot delete details in table {}'.format(detailTable)})
                     continue
-                (rowFilter, fieldFilter) = result
-                detailsToRemove.append((detailDocuments, rowFilter))
+                (detailRowFilter, fieldFilter) = result
+                detailsToRemove.append((detailDocuments, detailRowFilter))
             else:
                 # in this case: check whether there is nothing to delete
                 n = detailsToKeep.setdefault(detailTable, 0)
@@ -476,9 +485,9 @@ class DbAccess(object):
             return False
         
         # only here we start removing details, but we stop if something goes wrong
-        for (detailDocuments, rowFilter) in detailsToRemove:
+        for (detailDocuments, detailRowFilter) in detailsToRemove:
             for detailDoc in detailDocuments:
-                good = self._deleteItem(controller, detailTable, {N__id: detailDoc[N__id]}, rowFilter, records, msgs, workflow)
+                good = self._deleteItem(controller, detailTable, {N__id: detailDoc[N__id]}, detailRowFilter, records, msgs, workflow)
                 if not good:
                     return False
 
@@ -543,7 +552,7 @@ class DbAccess(object):
         for (field, newVal) in updateValues.items():
             if document.get(field, None) == newVal: continue
             if fieldSpecs[field][N_multiple]: continue
-            timingField = timing.get(table, {}).get(field, {}).get(newVal, None)
+            timingField = DM[N_timing].get(table, {}).get(field, {}).get(newVal, None)
             if timingField != None:
                 updateSaveValues[timingField] = now()
 
@@ -554,15 +563,36 @@ class DbAccess(object):
         updateSaveValues.setdefault(N_modified, []).append('{} on {}'.format(modBy, modDate))
         if N_isPristine in updateSaveValues: del updateSaveValues[N_isPristine]
 
+        # check current workflow conditions
+        myWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {}) 
+        if myWorkflow.get(N_stalled):
+            msgs.append({N_kind: N_error, N_text: 'Operation on {} is not permitted because: {}'.format(
+                table, myWorkflow.get(N_stalledReason, None),
+            )})
+            return
+        if myWorkflow.get(N_incomplete):
+            msgs.append({N_kind: N_error, N_text: 'Operation on {} is not permitted because: {}'.format(
+                table, myWorkflow.get(N_incompleteReason, None),
+            )})
+            return
+        if myWorkflow.get(N_locked):
+            msgs.append({N_kind: N_error, N_text: 'This item in table {} is locked because: {}'.format(
+                table, myWorkflow.get(N_lockedReason, None),
+            )})
+            return
+
         # here system values are updated in the database
         _DBM[table].update_one(
             rowFilter,
             {'$set': updateSaveValues, '$unset': {N_isPristine: ''}},
         )
 
-        ownWorkflow = readWorkflow(self.basicList, table, [document[N__id]]) 
+        ownWorkflow = readWorkflow(self.basicList, table, [document]) 
+        newDocument = {}
+        newDocument.update(document)
+        newDocument.update(updateValues)
         # check for updates in the workflow information
-        workflow.extend(adjustWorkflow(self.basicList, table, document, updateValues)) 
+        workflow.extend(adjustWorkflow(self.basicList, table, document, newDocument)) 
         records.append({
             N_values: updateSaveValues,
             N_newValues: newValues,
@@ -578,7 +608,7 @@ class DbAccess(object):
         ldoc = len(documents)
         if ldoc == 0:
             return self.stop({N_data: failData, N_text: failText})
-        workflow = readWorkflow(self.basicList, table, [doc[N__id] for doc in documents]) 
+        workflow = readWorkflow(self.basicList, table, documents) 
         if multiple:
             data = []
             for document in documents:
@@ -622,7 +652,7 @@ class DbAccess(object):
             (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
             (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
             perm = {N_update: uFields, N_delete: mayDelete}
-            ownWorkflow = readWorkflow(self.basicList, table, [document[N__id]]) 
+            ownWorkflow = readWorkflow(self.basicList, table, [document]) 
             tables.append({
                 N_table: table,
                 N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),

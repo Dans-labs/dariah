@@ -64,7 +64,7 @@ const ItemForm = props => {
               perm={perm}
               keep={keep}
               fixed={fixed}
-              button={'button-medium'}
+              button={'button medium'}
               onClick={handle(dispatch, delItem, table, eId, head)}
             />
             <ItemEdit
@@ -89,7 +89,7 @@ const ItemForm = props => {
                   at={'right'}
                 >
                   <span
-                    className={`button-medium fa fa-pencil`}
+                    className={`button medium fa fa-pencil`}
                     onClick={nextAlt}
                   />
                 </Tooltip>
@@ -99,7 +99,7 @@ const ItemForm = props => {
               perm={perm}
               keep={keep}
               fixed={fixed}
-              button={'button-medium'}
+              button={'button medium'}
               onClick={handle(dispatch, delItem, table, eId, head)}
             />
             <ItemRead

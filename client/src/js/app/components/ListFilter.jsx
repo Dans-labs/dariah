@@ -78,14 +78,14 @@ class ListFilter extends Component {
                 nItems={listIds.length}
                 fixed={fixed}
                 item={item}
-                button={'button-medium'}
+                button={'button medium'}
                 onInsert={handle(dispatch, insertItem, table, select, masterId, linkField)}
               />
               <OpenCloseAll
                  table={table}
                  listIds={listIds}
                  item={item}
-                 button={'button-medium'}
+                 button={'button medium'}
                  alterSection={alterSection}
                  nAlts={nAlts}
                  initial={initial}

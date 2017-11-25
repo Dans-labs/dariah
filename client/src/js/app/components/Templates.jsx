@@ -45,7 +45,7 @@ export const mainActionTemplates = {
       <div>
         {
           w('locked')
-          ? <div className={'workflow-large invert'} >
+          ? <div className={'label large workflow info'} >
               {`This contribution is locked because it is ${w('lockedReason')}.`}
             </div>
           : null
@@ -53,7 +53,7 @@ export const mainActionTemplates = {
       </div>
     )
   },
-  assessment({ tables, l, e, v, fe, fs, m }) {
+  assessment({ tables, l, e, v, w, fe, fs, m }) {
     const { overall, relevantScore, relevantMax, allMax, relevantN, allN } = assessmentScore(tables, v('_id'))
     const irrelevantN = allN - relevantN
     const isWithdrawn = !e('dateWithdrawn')
@@ -112,12 +112,14 @@ export const mainActionTemplates = {
                 {!isSubmitted && isWithdrawn ? `${l('dateWithdrawn')}: ${v('dateWithdrawn')}` : null}
                 {isSubmitted ? `${l('dateSubmitted')}: ${v('dateSubmitted')}` : null}
                 {
-                  fs('submitted', e('submitted'), h =>
-                    <span
-                      className={'button-large invert'}
-                      onClick={h}
-                    >{`${e('submitted') ? 'Submit for' : 'Withdraw from'} review`}</span>
-                  )
+                  (w('incomplete') || w('stalled'))
+                  ? null
+                  : fs('submitted', e('submitted'), h =>
+                      <span
+                        className={`button large workflow ${e('submitted') ? 'info' : 'warning'}`}
+                        onClick={h}
+                      >{`${e('submitted') ? 'Submit for' : 'Withdraw from'} review`}</span>
+                    )
                 }
               </span>,
               m('submitted'),
@@ -126,6 +128,28 @@ export const mainActionTemplates = {
           {e('submitted') ? null : eField('reviewerE', l, fe, m)}
           {e('submitted') ? null : eField('reviewerF', l, fe, m)}
         </div>
+        {
+          w('stalled')
+          ? <div className={'label large workflow error'} >
+            {`This contribution is cannot be submitted because: ${w('stalledReason')}.
+              Either change the type of the contribution to the type of this assessment,
+              or start a new assessment, copy over the relevant material form this
+              assessment (by hand), and remove this assessment.
+            `}
+            </div>
+          : null
+        }
+        {
+          w('incomplete')
+          ? <div className={'label large workflow warning'} >
+            {`This contribution cannot yet be submitted because: ${w('incompleteReason')}.
+            `}
+            </div>
+          : <div className={'label large workflow good'} >
+            {`All criteria assessed: this contribution can be submitted.
+            `}
+            </div>
+        }
       </div>
     )
   },
@@ -341,7 +365,7 @@ export const insertTemplates = {
     contrib({ n, onInsert }) {
       return n == 0
       ? <span
-          className={`button-large invert`}
+          className={`button large workflow info`}
           onClick={onInsert}
         >{`Write a self-assessment`}</span>
       : <Tooltip
@@ -369,7 +393,7 @@ export const insertTemplates = {
           at={'top'}
         >
           <span
-            className={`button-large invert`}
+            className={`button large workflow warning`}
             onClick={onInsert}
           >
             {`Add another self-assessment`}

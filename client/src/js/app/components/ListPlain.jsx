@@ -76,14 +76,14 @@ class ListPlain extends Component {
                 nItems={listIds.length}
                 fixed={fixed}
                 item={item}
-                button={'button-medium'}
+                button={'button medium'}
                 onInsert={this.handleInsert}
               />
               <OpenCloseAll
                 table={table}
                 listIds={listIds}
                 item={item}
-                button={'button-medium'}
+                button={'button medium'}
                 alterSection={alterSection}
                 nAlts={nAlts}
                 initial={initial}
@@ -115,7 +115,7 @@ class ListPlain extends Component {
                       {
                         !expand
                         ? <span className={'link head'} onClick={this.showHide(table, select, eId, false, nextAlt)} >
-                            <span className={`button-small fa fa-angle-up`} />
+                            <span className={`button small fa fa-angle-up`} />
                           </span>
                         : null
                       }
@@ -145,7 +145,7 @@ class ListPlain extends Component {
                           </span>
                       }
                       <span className={'link head'} onClick={this.showHide(table, select, eId, true, nextAlt)} >
-                        <span className={`button-small fa fa-angle-down`} />
+                        <span className={`button small fa fa-angle-down`} />
                         {' '}{head}
                       </span>
                     </span>

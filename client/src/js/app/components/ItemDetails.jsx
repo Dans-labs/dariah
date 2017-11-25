@@ -41,7 +41,7 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
                       className={'link'}
                       onClick={nextAlt}
                     >
-                      <span className={`button-small fa fa-angle-${alt === 0 ? 'down' : 'up'}`} />
+                      <span className={`button small fa fa-angle-${alt === 0 ? 'down' : 'up'}`} />
                       {
                         alt === 0
                         ? `${nDetails} ${nDetails === 1 ? detailThing : detailThings}`

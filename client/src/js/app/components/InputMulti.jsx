@@ -38,7 +38,7 @@ export default ({
             at={'left'}
           >
             <div
-              className={'button-medium'}
+              className={'button medium'}
               onClick={fieldRemove(fields, i, submitTime)}
             >{'×'}</div>
           </Tooltip>
@@ -64,7 +64,7 @@ export default ({
           at={'left'}
         >
           <div
-            className={'button-medium'}
+            className={'button medium'}
             onClick={fieldPush(fields, submitTime)}
           >{'+'}</div>
         </Tooltip>

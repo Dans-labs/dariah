@@ -19,7 +19,7 @@ export const editControl = canSubmit => ({
           at={'right'}
         >
           <span
-            className={'button-medium fa fa-eye'}
+            className={'button medium fa fa-eye'}
             onClick={nextAlt}
           />
         </Tooltip>
@@ -33,7 +33,7 @@ export const editControl = canSubmit => ({
             at={'right'}
           >
             <span
-              className={'button-medium edit-action fa fa-save'}
+              className={'button medium edit-action fa fa-save'}
               onClick={handleSubmit}
             />
           </Tooltip>

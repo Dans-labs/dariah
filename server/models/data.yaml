@@ -84,6 +84,10 @@ generic:
   workflow:
     - locked
     - lockedReason
+    - stalled
+    - stalledReason
+    - incomplete
+    - incompleteReason
 
 custom:
   - type
@@ -91,6 +95,74 @@ custom:
   - criteriaIds
   - criteriaEntities
   - typeCriteria
+
+timing:
+  assessment:
+    submitted:
+      true: dateSubmitted
+      false: dateWithdrawn
+
+workflow:
+  contrib:
+    read:
+      - master: true
+        linkField: contrib
+        otherTable: assessment
+        otherField: submitted
+        myField: null
+        value: true
+        emptyFields: []
+        method: hasValue
+        workflow:
+          locked: true
+          lockedReason: being assessed
+    adjust:
+      - master: true
+        linkField: contrib
+        otherTable: assessment
+        triggerFields:
+          - typeContribution
+  assessment:
+    read:
+      - master: false
+        linkField: contrib
+        otherTable: contrib
+        otherField: typeContribution
+        myField: assessmentType
+        value: null
+        emptyFields: []
+        method: hasDifferent
+        workflow:
+          stalled: true
+          stalledReason: assessment type is different from contribution type
+      - master: true
+        linkField: assessment
+        otherTable: criteriaEntry
+        otherField: null
+        myField: null
+        value: null
+        emptyFields:
+          - score
+          - evidence
+        method: hasIncomplete
+        workflow:
+          incomplete: true
+          incompleteReason: not all criteria have a score with evidence
+    adjust:
+      - master: false
+        linkField: contrib
+        otherTable: contrib
+        triggerFields:
+          - assessmentType
+          - submitted
+  criteriaEntry:
+    adjust:
+      - master: false
+        linkField: assessment
+        otherTable: assessment
+        triggerFields:
+          - score
+          - evidence
 
 tables:
   permissionGroup:

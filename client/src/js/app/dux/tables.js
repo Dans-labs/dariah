@@ -156,7 +156,7 @@ const flows = {
       const fieldUpdates = {}
       Object.entries(values).forEach(([key, value]) => {fieldUpdates[key] = { $set: value }})
       newState = updateAuto(newState, [table, 'entities', _id, 'values'], fieldUpdates)
-      newState = updateAuto(newState, [table, 'entities', _id, 'workflow'], ownWorkflow)
+      newState = updateAuto(newState, [table, 'entities', _id, 'workflow'], { $set: ownWorkflow })
       if (newValues != null) {
         for (const { _id, rep, repName, relTable, field } of newValues) {
           newState = update(newState, { [table]: { valueLists: { [field]: { $push: [_id] } } } })

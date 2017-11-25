@@ -31,7 +31,7 @@ const MarkdownArea = ({
         at={'right'}
       >
         <div
-          className={`button-medium field-control fa fa-${alt === 0 ? 'pencil' : 'hand-o-down'}`}
+          className={`button medium field-control fa fa-${alt === 0 ? 'pencil' : 'hand-o-down'}`}
           onClick={nextAlt}
         />
       </Tooltip>

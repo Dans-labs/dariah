@@ -56,7 +56,7 @@ const fieldsButton = memoize((nextAlt, table, eId, mayUpdate, on) => (
         at={'left'}
     >
       <span
-        className={`button-small fa fa-angle-${on ? 'down' : 'up'}`}
+        className={`button small fa fa-angle-${on ? 'down' : 'up'}`}
         onClick={nextAlt}
       />
     </Tooltip>

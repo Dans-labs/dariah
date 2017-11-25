@@ -30,7 +30,7 @@ class Insert extends Component {
     const { props: { thing } } = this
     return (
       <span
-        className={`button-large invert`}
+        className={`button large workflow info`}
         onClick={this.handleInsert}
       >{`New ${thing}`}</span>
     )

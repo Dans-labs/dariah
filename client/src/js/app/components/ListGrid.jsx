@@ -103,14 +103,14 @@ const ListGrid = ({
               nItems={listIds.length}
               fixed={fixed}
               item={item}
-              button={'button-medium'}
+              button={'button medium'}
               onInsert={handle(dispatch, insertItem, table, select, masterId, linkField)}
             />
             <OpenCloseAll
               table={table}
               listIds={listIds}
               item={item}
-              button={'button-medium'}
+              button={'button medium'}
               alterSection={alterSection}
               nAlts={nAlts}
               initial={initial}
@@ -136,7 +136,7 @@ const ListGrid = ({
               at={'right'}
             >
               <span
-                className={'fa fa-close button-small'}
+                className={'fa fa-close button small'}
                 onClick={handle(dispatch, resetSort, gridTag)}
               />{' '}
             </Tooltip>
@@ -164,7 +164,7 @@ const ListGrid = ({
                         at={'top'}
                       >
                         <span
-                          className={'sorted button-small'}
+                          className={'sorted button small'}
                           onClick={handle(dispatch, delColumn, gridTag, field)}
                         >{field}</span>
                       </Tooltip>
@@ -173,7 +173,7 @@ const ListGrid = ({
                         at={'top'}
                       >
                         <span
-                          className={'unsorted button-small'}
+                          className={'unsorted button small'}
                           onClick={handle(dispatch, addColumn, gridTag, field, 1)}
                         >{field}</span>
                       </Tooltip>
@@ -185,7 +185,7 @@ const ListGrid = ({
                         at={'top'}
                       >
                         <span
-                          className={`sorted button-small fa fa-arrow-${direction === 1 ? 'up' : 'down'}`}
+                          className={`sorted button small fa fa-arrow-${direction === 1 ? 'up' : 'down'}`}
                           onClick={handle(dispatch, turnColumn, gridTag, field)}
                         />
                       </Tooltip>
