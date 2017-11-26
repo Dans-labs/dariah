@@ -10,6 +10,8 @@ Whereas the database consists of neutral things (fields, records, lists),
 the workflow engine weaves additional attributes around it,
 that indicate additional constraints.
 
+![diag](design/design.011.png)
+
 These additional *workflow* attributes are computed by the server on the fly,
 without storing them in the database.
 From then on the following happens with the workflow attributes:
