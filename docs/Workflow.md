@@ -32,7 +32,7 @@ Realization
 =============================================================================
 Workflow is realized at the server and at the client.
 To a large extent, its rules are specified in the
-[data model configuration file]({{site.serverbase}}/models/data.yaml),
+[data model configuration file]({{site.serverBase}}/models/data.yaml),
 under the key `workflow`.
 
 Client
@@ -56,7 +56,7 @@ The principal functions exported are discussed here.
 Given a document in some table, this function compiles
 the workflow attributes and gives them a proper value.
 The determination of these attributes is dictated by the
-[data model configuration file]({{site.serverbase}}/models/data.yaml),
+[data model configuration file]({{site.serverBase}}/models/data.yaml),
 under the key `workflow/tables`*table*`/read`.
 
 There you find a sequence of instructions by which the system
@@ -146,7 +146,7 @@ workflow attributes after a change in a given record. whether it
 be an insert. update or delete.
 
 The determination of these attributes is dictated by the
-[data model configuration file]({{site.serverbase}}/models/data.yaml),
+[data model configuration file]({{site.serverBase}}/models/data.yaml),
 under the key `workflow/tables`*table*`/adjust`.
 
 Typically, when a record gets workflow attributes based on master or
@@ -184,7 +184,7 @@ workflow rule, which we have not mentioned here as an example.
 Finally, the server has to know the consequences of the workflow attributes for
 behaviour.
 This is dictated in
-[data model configuration file]({{site.serverbase}}/models/data.yaml),
+[data model configuration file]({{site.serverBase}}/models/data.yaml),
 under the key `workflow/prevent`*attribute*
 where `attribute` is a name such as `locked` or `incomplete`.
 
