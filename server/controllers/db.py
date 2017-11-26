@@ -5,7 +5,7 @@ from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
 
 from controllers.utils import oid, now, dtm, json_string, fillInSelect
-from controllers.workflow import detailInsert, readWorkflow, adjustWorkflow
+from controllers.workflow import detailInsert, readWorkflow, adjustWorkflow, enforceWorkflow
 from models.data import DataModel as DM
 from models.names import *
 
@@ -393,6 +393,11 @@ class DbAccess(object):
         if extraData and N_insertValues in extraData:
             insertValues.update(extraData[N_insertValues])
 
+        # enforce the workflow
+        ownWorkflow = readWorkflow(self.basicList, table, insertValues).get(None, {}) 
+        if not enforceWorkflow(ownWorkflow, {}, insertValues, N_insert, msgs):
+            return False
+
         result = _DBM[table].insert_one(insertValues)
         ident = result.inserted_id
         records.append((table, ident, readFieldFilter))
@@ -429,13 +434,10 @@ class DbAccess(object):
             msgs.append({N_kind: N_error, N_text: 'Not allowed to delete item {} from {}'.format(ident, table)})
             return False
 
-        # check current workflow conditions
-        myWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {}) 
-        if myWorkflow.get(N_locked):
-            msgs.append({N_kind: N_error, N_text: 'This item in table {} is locked because: {}'.format(
-                table, myWorkflow.get(N_lockedReason, None),
-            )})
-            return
+        # enforce the workflow
+        ownWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {}) 
+        if not enforceWorkflow(ownWorkflow, document, {}, N_delete, msgs):
+            return False
 
         # first cascade delete detail records that are marked for it
         # if there are remaining detail records, prevent delete!
@@ -563,23 +565,14 @@ class DbAccess(object):
         updateSaveValues.setdefault(N_modified, []).append('{} on {}'.format(modBy, modDate))
         if N_isPristine in updateSaveValues: del updateSaveValues[N_isPristine]
 
-        # check current workflow conditions
-        myWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {}) 
-        if myWorkflow.get(N_stalled):
-            msgs.append({N_kind: N_error, N_text: 'Operation on {} is not permitted because: {}'.format(
-                table, myWorkflow.get(N_stalledReason, None),
-            )})
-            return
-        if myWorkflow.get(N_incomplete):
-            msgs.append({N_kind: N_error, N_text: 'Operation on {} is not permitted because: {}'.format(
-                table, myWorkflow.get(N_incompleteReason, None),
-            )})
-            return
-        if myWorkflow.get(N_locked):
-            msgs.append({N_kind: N_error, N_text: 'This item in table {} is locked because: {}'.format(
-                table, myWorkflow.get(N_lockedReason, None),
-            )})
-            return
+        newDocument = {}
+        newDocument.update(document)
+        newDocument.update(updateValues)
+
+        # enforce the workflow
+        ownWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {})
+        if not enforceWorkflow(ownWorkflow, document, newDocument, N_update, msgs):
+            return False
 
         # here system values are updated in the database
         _DBM[table].update_one(
@@ -587,17 +580,14 @@ class DbAccess(object):
             {'$set': updateSaveValues, '$unset': {N_isPristine: ''}},
         )
 
-        ownWorkflow = readWorkflow(self.basicList, table, [document]) 
-        newDocument = {}
-        newDocument.update(document)
-        newDocument.update(updateValues)
         # check for updates in the workflow information
+        ownWorkflow = readWorkflow(self.basicList, table, [newDocument]).get(document[N__id], {})
         workflow.extend(adjustWorkflow(self.basicList, table, document, newDocument)) 
         records.append({
             N_values: updateSaveValues,
             N_newValues: newValues,
             N_diags: validationDiags,
-            N_workflow: ownWorkflow.get(document[N__id], {}),
+            N_workflow: ownWorkflow,
         })
 
     def _findDoc(self, table, rowFilter, fieldFilter, failData, failText, multiple=False):
@@ -652,13 +642,13 @@ class DbAccess(object):
             (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
             (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
             perm = {N_update: uFields, N_delete: mayDelete}
-            ownWorkflow = readWorkflow(self.basicList, table, [document]) 
+            ownWorkflow = readWorkflow(self.basicList, table, [document].get(document[N__id], {})) 
             tables.append({
                 N_table: table,
                 N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
                 N_perm: perm,
                 N_fields: fieldFilter,
-                N_workflow: ownWorkflow.get(document[N__id], {})
+                N_workflow: ownWorkflow
             })
         records.clear()
         records.extend(tables)

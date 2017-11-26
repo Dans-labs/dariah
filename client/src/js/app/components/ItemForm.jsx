@@ -62,6 +62,7 @@ const ItemForm = props => {
         ? <div>
             <EditDelete
               perm={perm}
+              workflow={workflow}
               keep={keep}
               fixed={fixed}
               button={'button medium'}
@@ -97,6 +98,7 @@ const ItemForm = props => {
             }
             <EditDelete
               perm={perm}
+              workflow={workflow}
               keep={keep}
               fixed={fixed}
               button={'button medium'}

@@ -15,10 +15,21 @@ and a technical part: architecture, technology, software design.
 
 # Overview of this documentation
 
-## [Workflow](Workflow)
-This app is designed to handle a self-assessment and review workflow of
-`contribution` descriptions.
-This is a fairly sophisticated workflow. Read more by clicking on the heading of this section.
+## Two layers
+There are two layers in this app: a lower level layer that sees the world as
+collections of records with fields, which it can read, insert, update, and delete.
+This layer has a user interface which can expose all lists and items of this world.
+
+There is also a higher level layer, in which we can express things as:
+
+* if an assessment is submitted for review, lock the assessment and the contribution;
+* if the criteria entries for an assessment are not complete, do not allow to submit it for review.
+
+This higher level layer is called the [workflow engine](Workflow)
+and here we see the [business logic](Business) of the tool being expressed.
+
+On the user interface, the business items are shown as heavy buttons and big
+squares with messages. 
 
 ## The technology
 The contribution is an [SPA](https://en.wikipedia.org/wiki/Single-page_application)

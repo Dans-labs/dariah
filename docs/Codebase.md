@@ -104,29 +104,41 @@ but when it comes to database access, the module
 [db]({{site.serverBase}}/controllers/db.py) does the heavy lifting and tends
 to become uglier and uglier.
 
-[SASS](http://sass-lang.com)
+[CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
 -----------------------------------------------------------------------------------------
-
-This is syntactic sugar on top of [CSS](#css).
 Styling the app has nightmarish overtones, because the concerns of style often cut
 right across the concerns of the components.
 There are several ways to control the resulting mess, and one of the best is to use
 the modern features of CSS.
-
-Another way is to embed pieces of styling in your [JSX](#JSX) components.
-
-And finally, you can extract common colour and size properties in handy functions that compute
-them from parameters.
-For this we use SASS, but we do it half-heartedly.
-
-[CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
------------------------------------------------------------------------------------------
 
 Cascading style sheets are the ultimate way to paint the final look and feel of the website.
 By using [flex boxes](http://sass-lang.com) instead of tables we can make
 the app respond gracefully to changes in the size of the display without
 resorting to the bureaucracy of overdefining style properties.
 Note that our app does not use the HTML `<table>` element any more for aligning pieces of content.
+
+We use a lot of the CSS3 features, including
+[variables](https://developer.mozilla.org/en-US/docs/Web/CSS/var), and
+[calc()](https://developer.mozilla.org/en-US/docs/Web/CSS/calc).
+
+This lessens our need for a stylesheet preprocessor such as
+[SASS](http://sass-lang.com) to 0%.
+
+Note especially how colour management has become easy:
+
+1. all colour definitions are in variables
+2. all colour definitions are in [hsla](),
+   which allows a very consistent definition of families of colours.
+   Quote from [Mozilla](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value):
+
+   > One advantage of HSL over RGB is that it is more intuitive:
+   you can guess at the color you want, and tweak it from there.
+   It is also easier to create a set of matching colors
+   (e.g., by keeping the hue the same,
+   while varying the lightness/darkness and saturation).
+
+   This is exactly what we do. 
+   See [vars.css]({{site.cssBase}}/vars.css).
 
 [Shell](https://www.gnu.org/software/bash/)
 -----------------------------------------------------------------------------------------

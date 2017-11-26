@@ -116,7 +116,7 @@ export const mainActionTemplates = {
                   ? null
                   : fs('submitted', e('submitted'), h =>
                       <span
-                        className={`button large workflow ${e('submitted') ? 'info' : 'warning'}`}
+                        className={`button large workflow ${e('submitted') ? 'info' : 'error'}`}
                         onClick={h}
                       >{`${e('submitted') ? 'Submit for' : 'Withdraw from'} review`}</span>
                     )
@@ -145,10 +145,19 @@ export const mainActionTemplates = {
             {`This contribution cannot yet be submitted because: ${w('incompleteReason')}.
             `}
             </div>
-          : <div className={'label large workflow good'} >
-            {`All criteria assessed: this contribution can be submitted.
-            `}
+          : e('submitted')
+            ? <div className={'label large workflow good'} >
+              {`All criteria assessed: this contribution can be submitted.
+              `}
+              </div>
+            : null
+        }
+        {
+          w('locked')
+          ? <div className={'label large workflow info'} >
+              {`This assessment is locked because it is ${w('lockedReason')}.`}
             </div>
+          : null
         }
       </div>
     )

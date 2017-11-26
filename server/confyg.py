@@ -11,7 +11,13 @@ def isName(val): return val.replace('_','').isalnum()
 
 def getNames(val, doString=True):
     if type(val) is str: return {val} if doString and isName(val) else set()
-    elif type(val) is list: return {v for v in val if type(v) is str and isName(v)}
+    elif type(val) is list:
+        names = set()
+        for v in val:
+            if type(v) is str and isName(v): names.add(v)
+            elif type(v) is dict:
+                names |= getNames(v, doString=False)
+        return names
     elif type(val) is dict: 
         names = set()
         for (k, v) in val.items():
@@ -59,14 +65,14 @@ def checkNames(controllers, names):
                 if matches:
                     for match in matches:
                         nfound += 1
-                        serverprint('WARNING: {:<10}: line {:>3}: string  name {}'.format(fName, i, match))
+                        serverprint('WARNING: {:<10}: line {:>3}: string  name {}'.format(fName, i + 1, match))
                 matches = NamesRe.findall(line)
                 if matches:
                     for match in matches:
                         occs += 1
                         if match[2:] not in names:
                             Nfound += 1
-                            serverprint('WARNING: {:<10}: line {:>3}: unknown name {}'.format(fName, i, match))
+                            serverprint('WARNING: {:<10}: line {:>3}: unknown name {}'.format(fName, i + 1, match))
     serverprint('INFO   : {:>3} N_ names in {:>4} occurrences'.format(len(names), occs)) 
     if nfound:
         serverprint('WARNING: {:>3} string  name{} in controllers'.format(nfound, '' if nfound == 1 else 's'))

@@ -60,7 +60,7 @@
     --info-fore:                       hsla(120,   0%,  50%, 1  );
     --info-back:                       hsla(120,   0%,  80%, 0.5);
 
-    --msg-box-back:                    hsla(  0,   0%,  90%, 0.8);
+    --msg-box-back:                    hsla(  0,   0%,  90%, 1  );
     --msg-box-border:                  hsla(  0,   0%,  50%, 0.5);
 
     --record-back:                     hsla(  0,   0%,  90%, 0.8);
@@ -160,11 +160,11 @@
     --workflow-action-good-border:     hsla(120, 100%,  90%, 0.7);
 
     --workflow-action-warning-fore:    hsla( 30, 100%, 100%, 1  );
-    --workflow-action-warning-back:    hsla( 30, 100%,  30%, 1  );
+    --workflow-action-warning-back:    hsla( 30, 100%,  40%, 1  );
     --workflow-action-warning-border:  hsla( 30, 100%,  90%, 0.7);
 
     --workflow-action-error-fore:      hsla(  0, 100%, 100%, 1  );
-    --workflow-action-error-back:      hsla(  0, 100%,  30%, 1  );
+    --workflow-action-error-back:      hsla(  0, 100%,  40%, 1  );
     --workflow-action-error-border:    hsla(  0, 100%,  90%, 0.7);
 
     --workflow-info-fore:              hsla(240,   0%,   0%, 1  );

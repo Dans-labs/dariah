@@ -1,20 +1,23 @@
 import React from 'react'
 
-import { emptyO } from 'utils'
+import { emptyO, emptyS } from 'utils'
 
 import Tooltip from 'Tooltip'
 
-export default ({ perm, keep, fixed, button, onClick }) => {
+export default ({ perm, workflow, keep, fixed, button, onClick }) => {
   const doKeep = Object.keys(keep).length > 0
   const keepInfo = Object.keys(keep).sort().map(table => keep[table]).join(', ')
-  const tipInfo = doKeep
-  ? `This item cannot deleted because related items exist: ${keepInfo}`
+  const locked = workflow && workflow.locked
+  const lockedReason = locked ? workflow.lockedReason : emptyS
+  const tipInfo = doKeep || locked
+  ? (doKeep ? `This item cannot deleted because related items exist: ${keepInfo}` : emptyS)
+    + (locked ? `This item is locked because: ${lockedReason}` : emptyS)
   : 'delete this record'
   const icon = doKeep ? 'puzzle-piece' : 'trash'
   const disabled = doKeep ? 'disabled' : 'error-o'
   const activate = doKeep ? emptyO : { onClick }
   return (
-    !fixed && perm.delete
+    !fixed && perm.delete && !locked
     ? <Tooltip
         tip={tipInfo}
         at={'left'}

@@ -1,175 +1,247 @@
 ---
-title: Workflow
+title: Workflow Engine
 ---
 
-A  contribution is a piece of work in Digital Humanities, delivered by a person or institute,
-and potentially relevant to the European DARIAH research infrastructure.
-The national members of DARIAH may add such a contribution to their agreed budget of in-kind
-contributions to DARIAH as a whole. This makes it necessary to assess contributions against
-a set of well-defined criteria.
+Description
+===============================================================================
+The workflow engine of this app is a system to handle business logic.
 
-# Assessment model
-Contributions may represent diverse efforts such as
-consultancy, workshops, software development, and hosting services.
-This asks for a diversification of contribution types and associated criteria.
-Moreover, types and criteria may change over time,
-but during an assessment and review cycle they should be fixed.
-The assessor of a contribution (from now on called *applicant*)
-needs to state how that contribution scores for each relevant criterion,
-and for each score, evidence must be given.
+Whereas the database consists of neutral things (fields, records, lists),
+the workflow engine weaves additional attributes around it,
+that indicate additional constraints.
 
-**typeContribution** is the table with the set of contribution types.
+These additional *workflow* attributes are computed by the server on the fly,
+without storing them in the database.
+From then on the following happens with the workflow attributes:
 
-**criteria** is the table with the individual criteria, where each criteria can be associated 
-with one or more types.  
+* they are sent to client, together with the *permission* information for each record
+* the client uses the workflow info to show or hide workflow related controls, and
+  to suppress controls that lead to actions that violate the business logic
+* the server uses the workflow info to enforce the business logic;
+* the server updates the workflow attributes after any insert/update/delete action.
 
-**package** is the table of fixed constellations of types and criteria.
-At any point in time there are one or more active packages, usually just one.
-A package defines a set of contribution types, and a set of criteria.
-Every criterion is linked to a number of contribution types,
-meaning that the criterion is relevant to contributions of those types and no others.
-Every criterion is associated with exactly one package,
-hence the package ultimately determines the
-mapping between types and criteria.
+No matter how good a job the client does in supporting the business logic and
+prohibiting actions that violate the business logic,
+the server always has the last word. 
+Every access to bits and pieces in the database is first subjected to the
+permissions (a lower layer) and then to the additional workflow constraints.
 
-A package has a validity interval, i.e. a start date and an end date.
-A package is *active* at a point in time, if that point in time is inside the validity interval.
-The types of an active package are the active types, and its criteria are the active criteria.
-Technically, more than one package can be valid at the same time. 
-In that case, the sets of active types and criteria are the union of the sets of types
-and criteria for each active package. 
-But the intention is that there is always exactly one active package.
+Realization
+=============================================================================
+Workflow is realized at the server and at the client.
+To a large extent, its rules are specified in the
+[data model configuration file]({{site.serverbase}}/models/data.yaml),
+under the key `workflow`.
 
-Other components may call workflow functions in order to determine what the
-active packages, types and criteria are, so they can render inactive and active ones in
-different ways.
+Client
+---------------------------------------------------------------------
+Workflow logic is found in [workflow.js](Dux#workflow),
+but also in the component [Templates](Components#templates), 
+where several templates include workflow buttons and info panels.
+The templates themselves are applied by functions in [presentation.js](Lib#presentation).
+These functions are given workflow attributes that they pass on to the templates.
 
-## Assessing
-Applicants with write access to a contribution can add a self-assessment to a contribution.
-A self assessment is a record in the **assessment** table, and consists of a few metadata fields.
+Server
+----------------------------------------------------------------------
+The heart of the workflow code is at the server, in
+[workflow.py]({{site.serverBase}}/controllers/workflow.py).
+It's functions are called from [db.py]({{site.serverBase}}/controllers/db.py)
+in many places.
 
-When an assessment record is created, additional *detail records* will be created as well.
-These are **criteriaEntry** records.
-For each assessment, there is a fixed set of criteriaEntry records.
-This set is determined by the currently active set of criteria:
-one criteriaEntry record will be created per active criterion.
+The principal functions exported are discussed here.
 
-A criteriaEntry record has a field for choosing a **score** and a text field for entering the evidence.
-Scores are defined in yet another type of record.
+### readWorkflow
+Given a document in some table, this function compiles
+the workflow attributes and gives them a proper value.
+The determination of these attributes is dictated by the
+[data model configuration file]({{site.serverbase}}/models/data.yaml),
+under the key `workflow/tables`*table*`/read`.
 
-## Scoring
-The scores for a criterion are entered in with the help of **score** records,
-which are detail records of criteria.
-Scores have a number, typically `0`, `2`, `4`, and a short description, typically
-`None`, `Partial`, `Full`, but the number and nature of scores may vary freely between criteria.
+There you find a sequence of instructions by which the system
+can compute workflow attributes for each record in a table.
+Let us look at an example:
 
-The score of an assessment as a whole s the sum of the individual scores
-expressed as percentage of the total amount of points that can be assigned.
-A temporary overall score is obtained by treating unfilled scores as having value `0`.
+```yaml
+  tables:
+    contrib:
+      read:
+        - inspect: details
+          method: hasValue
+          linkField: contrib
+          otherTable: assessment
+          otherField: submitted
+          myField: null
+          value: true
+          workflow:
+            locked: true
+            lockedReason: being assessed
+```
+Basically, this instructs the system to look at various other
+tables and records and fields, and if certain conditions are met
+the attributes `locked` and `lockedReason` are added to the
+workflow attributes.
 
-However, some criteria may allow scores with a value `-1` (non-applicable).
-If an assessment assigns that score to a criterion,
-0 points are added, but points missed from this criterion will be subtracted from the total score.
-the criterion will not be counted in the average.
+Line by line:
 
-*Example*:
-Suppose there are four criteria, A, B, C, D.
+    - inspect: details
 
-A, B, and C have scores `0`, `2`, and `4`.
+This is an instruction to look into the detail record(s) of the current
+record. Other possible values are: `master` and `self`, with the
+obvious meanings.
 
-D has scores `-1`, `0`, `2`, `4`.
+    method: hasValue
 
-Now there are two contributions U and V, with scores as follows:
+The name of the method by which the inspected value is taken and
+turned in either `True` or `False`.
+There is a fixed, limited supply of methods, which are hard-coded
+in the program, see
+[`hasValue`, `hasDifferent`, `hasIncomplete`]({{site.serverBase}}/controllers/workflow.py).
 
-criterion |contrib U | contrib V
----|---|---
- A   | 4  | 4
- B   | 4  | 4
- C   | 4  | 4
- D   |-1  | 0
-sum  |12  |12
-total|12  |16
-score|100%|75% 
+Not all of the following parameters need to be present for all methods,
+and there are more possible parameters, e.g.
 
-See how U does better than V although they have an equal number of points.
-But for U criterion D does not count, while for V it counts, bit the score is 0.
+    emptyFields:
+        - score
+        - evidence
 
-**N.B.** Not all criteria will allow `-1` values!
+a list of fields in the other table that will be checked for
+emptiness.
 
-# Review model
-After a contributor has filled out an assessment, (s)he can ask for a review.
-Two reviewers will be selected, and they will get access to the self assessment.
+    linkField: contrib
 
-Upon asking for review, the assessment and the contribution will be made immutable, temporarily.
+This is the name of the field by which detail records point to their master.
 
-The two reviewers have distinct roles:
-* **reviewer (expert)** inspects the assessment closely and proposes a decision;
-* **reviewer (final say)** take the decision.
+    - otherTable: assessment
 
-Both reviewers can enter comments in a comment stream, which are detail records of the assessment.
+This is the name of the other table (which can be the master table,
+the details table, or the own table, depending on the value of
+`inspect`).
 
-At a certain point, the reviewer with the final say can take a three fold decision:
+    otherField: submitted
 
-* **approve**
-* **reject**
-* **modifications needed**
+The name of the field in the other table to look at.
 
-In all cases, a *consolidated* version of the assessment will be made.
-This is a record, where all links to related records have been replaced by concrete values present at that time.
-consolidated records do not contain fields that point to other records. 
+    myField: null
 
-## Approve
-Consolidated assessments will be stored in a collection called `assessmentConsolidated`.
-They contain the `_id` of the *live* assessment, and a time stamp of the moment of consolidating.
+The name of the field in the own table to look at.
 
-The *live* assessment will remain immutable, but the *live* contribution becomes mutable again.
-Note that an assessment has a link to its contribution, and when we consolidate an assessment, it will
-contain a consolidated contribution.
+    value: true
 
-So the consolidated assessment contains all information upon which the outcome of the assessment is based.
+A reference value to compare the inspected value with.
 
-The reason why contributions will not be permanently immutable is this:
-contributions are likely to continue to evolve after assessment;
-their metadata (among which URLs and email addresses) may change, and the contributor may wish 
-to keep the data for his/her contribution up to data,
-especially in view of data exchange between the contribution tool
-and the Market Place.
+Summarizing: you just saw just one instruction to inspect
+related values and to deliver or not deliver a specific
+set of workflow attributes.
+More precisely, this is the rule that states that
+a contribution record becomes locked if it has an assessment
+that has been submitted.
 
-## Reject
-The *live* assessment will remain immutable, but the *live* contribution becomes mutable again.
-The applicant may enter an objection.
-In that case the back office will ask a second opinion and take appropriate action.
+### adjustWorkflow
+Whereas `readWorkflow` computes all relevant workflow for a 
+given record in a given table, `adjustWorkflow` delivers
+a list of *other* records in other tables, that need new
+workflow attributes after a change in a given record. whether it
+be an insert. update or delete.
 
-* If the second opinion is still *reject*, a new consolidated version of the assessment is saved.
-  This version contains the objection and the final decision.
-* If the second opinion is *approve*, a new consolidated version of the assessment is saved,
-  and the final verdict will be changed to *accept*
-* If the second opinion is *re-assess*, the applicant is invited to create a new self assessment and offer it for
-  review. Two different reviewers will be chosen.
+The determination of these attributes is dictated by the
+[data model configuration file]({{site.serverbase}}/models/data.yaml),
+under the key `workflow/tables`*table*`/adjust`.
 
-## Modifications needed
-The *live* assessment and *live* contribution will become mutable again,
-and the applicant can modify both in response to comments by the reviewers.
-When (s)he is finished, the applicant can submit the modified version.
+Typically, when a record gets workflow attributes based on master or
+detail records, these attributes must be updated on any change in the master
+or in one of the details.
+The system is not clever enough to generate these adjust rules itself.
+We have to do that.
 
-# Trails
-After an assessment and review process, the system contains a trail of all that has gone on in the following form:
+Let us look at the same example, but now at its `adjust` rule:
 
-* **live contribution**
-  The contribution record is still in place, mutable, and contains only the actual situation
-* **live assessment**
-  The assessment record is still in place, but immutable.
-* **live comments trail**
-  * by reviewers: comments and suggestions for modification
-  * by the applicant: to state an objection
-* **consolidated versions of assessments**
-  There are snapshots of the assessment at pivotal points in time:
-  * when the assessment has been offered for review
-  * when reviewers have made decisions
-  * when second opinions have been asked and given
-  These snapshots contain snapshots of all detail records, including
-  * the contribution in question
-  * the then active criteria
-  * the then active scores
-  * the filled out criteriaEntry records
-  * the comment trail at that point in time
+```yaml
+assessment:
+    adjust:
+    - inspect: master
+      linkField: contrib
+      otherTable: contrib
+      triggerFields:
+        - assessmentType
+        - submitted
+```
+
+it says that if an assessment record is changed, some other
+records are affected, namely its master record in the contrib table.
+But not all changes in the assessment trigger adjustments,
+only changes in one of the `triggerFields`, in this case obviously the
+field `submitted`.
+The system add the `linkField` silently to the `triggerField`,
+because if we, for whatever reason, reassigned this assessment to a different
+contribution, then that contribution has to know!
+
+The other trigger field, `assessmentType` is mentioned because of an other
+workflow rule, which we have not mentioned here as an example. 
+
+### enforceWorkflow
+Finally, the server has to know the consequences of the workflow attributes for
+behaviour.
+This is dictated in
+[data model configuration file]({{site.serverbase}}/models/data.yaml),
+under the key `workflow/prevent`*attribute*
+where `attribute` is a name such as `locked` or `incomplete`.
+
+For each attribute there are optional constraints for the `update` and `delete`
+actions.
+
+  prevent:
+    locked:
+        delete: true
+
+means that it is forbidden to delete a record that carries the `locked` attribute. 
+
+Likewise,
+
+        update: true
+
+means that any update whatsoever is forbidden to such a record.
+
+However, we can relax update constraints:
+
+        update:
+            submitted: true
+
+means that any update that changes the value of the field `submitted` is forbidden.
+
+We can relax this even further, and here we take a real example, under attribute
+`stalled` instead of `locked`:
+
+    stalled:
+      update:
+        submitted:
+          after: true
+
+This means that any update that leads to field `submitted` having value `true` is forbidden.
+
+Here we say that a stalled assessment cannot be submitted.
+For the sake of clarity, here is the rule that says when an assessment is `stalled`:
+
+    assessment:
+      read:
+        - inspect: master
+          method: hasDifferent
+          linkField: contrib
+          otherTable: contrib
+          otherField: typeContribution
+          myField: assessmentType
+          value: null
+          workflow:
+            stalled: true
+            stalledReason: assessment type is different from contribution type
+
+In words: if an assessment has an `assessmentType` field with a different value
+that the `contributionType` field of its master contribution, then the assessment
+counts as stalled.
+
+This can happen when the type of a contribution is changed after creation of the assessment.
+In that case, the criteria of the assessment are not the criteria by which the
+contribution should be assessed.
+So the system stalls this assessment. It is doomed, it can never be submitted.
+Unless you decide to change back the type of the contribution.
+If that is not an option, the best thing to do is to copy the worthwhile
+material from this assessment into a fresh assessment.
