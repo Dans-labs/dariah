@@ -127,7 +127,7 @@ This lessens our need for a stylesheet preprocessor such as
 Note especially how colour management has become easy:
 
 1. all colour definitions are in variables
-2. all colour definitions are in [hsla](),
+2. all colour definitions are in [hsla](https://en.wikipedia.org/wiki/HSL_and_HSV),
    which allows a very consistent definition of families of colours.
    Quote from [Mozilla](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value):
 

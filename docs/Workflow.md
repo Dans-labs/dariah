@@ -47,7 +47,7 @@ Server
 ----------------------------------------------------------------------
 The heart of the workflow code is at the server, in
 [workflow.py]({{site.serverBase}}/controllers/workflow.py).
-It's functions are called from [db.py]({{site.serverBase}}/controllers/db.py)
+Its functions are called from [db.py]({{site.serverBase}}/controllers/db.py)
 in many places.
 
 The principal functions exported are discussed here.
