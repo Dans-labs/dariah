@@ -1,11 +1,11 @@
 from controllers.utils import now
 
-from models.data import DataModel as DM
+from models.workflow import WorkflowModel as WM
 from models.names import *
 
 def readWorkflow(basicList, table, myDocs):
     result = {}
-    for w in DM[N_workflow][N_tables].get(table, {}).get(N_read, []):
+    for w in WM[N_tables].get(table, {}).get(N_read, []):
         _computeWorkflow(basicList, myDocs, w, result) 
     return result
 
@@ -14,13 +14,13 @@ def adjustWorkflow(basicList, table, document, adjustedValues):
         _combineAffected(
             _getAffected(
                 basicList, document, adjustedValues, w,
-            ) for w in DM[N_workflow][N_tables].get(table, {}).get(N_adjust, []),
+            ) for w in WM[N_tables].get(table, {}).get(N_adjust, []),
         ),
     )
 
 def enforceWorkflow(workflow, currentDoc, newDoc, action, msgs):
     allow = True
-    for (condition, preventions) in DM[N_workflow][N_prevent].items():
+    for (condition, preventions) in WM[N_prevent].items():
         workflowCondition = workflow.get(condition, None)
         if workflowCondition:
             thesePreventions = preventions.get(action, None)
@@ -239,10 +239,16 @@ methods = {
 def _isEmpty(val):
     return not val or (type(val) is list and len([v for v in val if v]) == 0)
 
-def _applyReadWorkflow(workflowIds, workflow, result):
-    for myWorkflowId in workflowIds:
-        if myWorkflowId not in result: result[myWorkflowId] = {}
-        result[myWorkflowId].update(workflow)
+def _applyReadWorkflow(workflowItems, workflow, result):
+    if type(workflowItems) is set:
+        for myWorkflowId in workflowItems:
+            if myWorkflowId not in result: result[myWorkflowId] = {}
+            result[myWorkflowId].update(workflow)
+    elif type(workflowItems) is dict:
+        for (myWorkflowId, myWorkflowData) in workflowItems.items():
+            if myWorkflowId not in result: result[myWorkflowId] = {}
+            result[myWorkflowId].update(workflow)
+            result[myWorkflowId].update(myWorkflowData)
 
 def _computeWorkflow(basicList, myDocs, w, result):
     myDocIds = {doc.get(N__id, None) for doc in myDocs}

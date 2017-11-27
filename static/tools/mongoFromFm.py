@@ -394,6 +394,10 @@ class FMConvert(object):
                 rep=('string', 1),
             )
 
+    def decisionTable(self):
+        mt = 'decision'
+        self.allData[mt] = [dict(_id=self.mongo.newId(mt), rep=decision) for decision in self.decisions]
+
     def yearTable(self):
         mt = 'year'
         existingYears = dict((int(row['rep']), row) for row in self.allData[mt])
@@ -757,6 +761,7 @@ INSR = documents to be inserted, avoiding overwriting
         self.userTable()
         self.relTables()
         self.yearTable()
+        self.decisionTable()
         if isDevel: self.testTweaks()
         self.backoffice()
         self.provenance()

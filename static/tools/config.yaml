@@ -299,6 +299,10 @@ testOwner:
       ? 3DHOP
       ? AAI
 
+decisions:
+  - accept
+  - reject
+
 MAIN_TABLES:
 - contrib
 - country

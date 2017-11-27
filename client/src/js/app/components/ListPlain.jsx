@@ -4,7 +4,8 @@ import { browserHistory } from 'react-router'
 
 import { memoize } from 'memo'
 import { combineSelectors, withParams, getUrlParts, emptyS, emptyO } from 'utils'
-import { someEditable, getMasterTable } from 'fields'
+import { someEditable } from 'fields'
+import { getMasterTable } from 'details'
 import { editMode } from 'presentation'
 
 import { insertItem, needValues, headEntity, DETAILS, handleOpenAll } from 'tables'

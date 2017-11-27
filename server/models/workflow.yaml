@@ -1,0 +1,93 @@
+generic:
+  workflow:
+    inspect:
+      - master
+      - details
+      - self
+    prevent:
+      - after
+      - before
+      - except
+
+prevent:
+  locked:
+    delete: true
+    update: except
+  stalled:
+    update:
+      submitted:
+        after: true
+  incomplete:
+    update:
+      submitted:
+        after: true
+
+tables:
+  contrib:
+    read:
+      - inspect: details
+        method: hasValue
+        linkField: contrib
+        otherTable: assessment
+        otherField: submitted
+        myField: null
+        value: true
+        workflow:
+          locked: true
+          lockedReason: being assessed
+    adjust:
+      - inspect: details
+        linkField: contrib
+        otherTable: assessment
+        triggerFields:
+          - typeContribution
+  assessment:
+    read:
+      - inspect: master
+        method: hasDifferent
+        linkField: contrib
+        otherTable: contrib
+        otherField: typeContribution
+        myField: assessmentType
+        value: null
+        workflow:
+          stalled: true
+          stalledReason: assessment type is different from contribution type
+      - inspect: self
+        method: hasValue
+        otherField: submitted
+        value: true
+        workflow:
+          locked:
+            except:
+              - submitted
+          lockedReason: being reviewed
+      - inspect: details
+        method: hasIncomplete
+        linkField: assessment
+        otherTable: criteriaEntry
+        otherField: null
+        myField: null
+        value: null
+        emptyFields:
+          - score
+          - evidence
+        workflow:
+          incomplete: true
+          incompleteReason: not all criteria have a score with evidence
+    adjust:
+      - inspect: master
+        linkField: contrib
+        otherTable: contrib
+        triggerFields:
+          - assessmentType
+          - submitted
+  criteriaEntry:
+    adjust:
+      - inspect: master
+        linkField: assessment
+        otherTable: assessment
+        triggerFields:
+          - score
+          - evidence
+

@@ -4,7 +4,8 @@ import { connect } from 'react-redux'
 import { combineSelectors, emptyS } from 'utils'
 
 import { handle } from 'handle'
-import { makeFields, makeDetails, someEditable, makeKeepInfo } from 'fields'
+import { makeFields, someEditable } from 'fields'
+import { makeDetails, makeKeepInfo } from 'details'
 
 import { delItem, headEntity, DETAILS } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'

@@ -32,8 +32,7 @@ Realization
 =============================================================================
 Workflow is realized at the server and at the client.
 To a large extent, its rules are specified in the
-[data model configuration file]({{site.serverBase}}/models/data.yaml),
-under the key `workflow`.
+[workflow model configuration file]({{site.serverBase}}/models/workflow.yaml).
 
 Client
 ---------------------------------------------------------------------
@@ -57,7 +56,8 @@ Given a document in some table, this function compiles
 the workflow attributes and gives them a proper value.
 The determination of these attributes is dictated by the
 [data model configuration file]({{site.serverBase}}/models/data.yaml),
-under the key `workflow/tables`*table*`/read`.
+[workflow model configuration file]({{site.serverBase}}/models/workflow.yaml).
+under the key `tables/`*table*`/read`.
 
 There you find a sequence of instructions by which the system
 can compute workflow attributes for each record in a table.
@@ -146,8 +146,8 @@ workflow attributes after a change in a given record. whether it
 be an insert. update or delete.
 
 The determination of these attributes is dictated by the
-[data model configuration file]({{site.serverBase}}/models/data.yaml),
-under the key `workflow/tables`*table*`/adjust`.
+[workflow model configuration file]({{site.serverBase}}/models/workflow.yaml).
+under the key `tables/`*table*`/adjust`.
 
 Typically, when a record gets workflow attributes based on master or
 detail records, these attributes must be updated on any change in the master
@@ -184,8 +184,8 @@ workflow rule, which we have not mentioned here as an example.
 Finally, the server has to know the consequences of the workflow attributes for
 behaviour.
 This is dictated in
-[data model configuration file]({{site.serverBase}}/models/data.yaml),
-under the key `workflow/prevent`*attribute*
+[workflow model configuration file]({{site.serverBase}}/models/workflow.yaml).
+under the key `prevent/`*attribute*
 where `attribute` is a name such as `locked` or `incomplete`.
 
 For each attribute there are optional constraints for the `update` and `delete`

@@ -1,7 +1,7 @@
 import { memoize } from 'memo'
 import { emptyS, emptyA, emptyO, max, sum } from 'utils'
 
-import { getDateTime, sortTimeInterval, sortStringTemplate } from 'fields'
+import { getDateTime, sortTimeInterval, sortStringTemplate } from 'datatypes'
 
 /* DEFINITIONS */
 

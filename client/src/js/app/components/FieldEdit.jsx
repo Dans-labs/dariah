@@ -3,7 +3,8 @@ import { connect } from 'react-redux'
 import { Field, FieldArray } from 'redux-form'
 
 import { compileActive } from 'workflow'
-import { validation, normalization, getValType } from 'fields'
+import { validation, normalization } from 'datatypes'
+import { getValType } from 'values'
 
 import InputMulti from 'InputMulti'
 import RelSelect from 'RelSelect'

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { emptyS, emptyO } from 'utils'
 import { handle } from 'handle'
-import { getMasterTable } from 'fields'
+import { getMasterTable } from 'details'
 
 import { initFiltering, computeFiltering } from 'filters'
 import { insertItem, DETAILS } from 'tables'

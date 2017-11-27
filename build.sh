@@ -4,7 +4,7 @@ root=`pwd`
 
 function codestats {
     cd $root
-    xd="__pycache__,node_modules,.tmp"
+    xd="__pycache__,node_modules,.tmp,.git,_temp,.ipynb_checkpoints,images,fonts,favicons,.sass_cache,_site,_sass"
     xf="cloc_exclude.lst"
     rf="docs/Stats.md"
     client/node_modules/cloc/lib/cloc --exclude_dir=$xd --exclude-list-file=$xf --report-file=$rf --md .

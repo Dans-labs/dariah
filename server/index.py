@@ -6,8 +6,6 @@ from controllers.file import FileApi
 from controllers.controller import Controller
 from controllers.auth import AuthApi
 from controllers.perm import PermApi
-from models.data import DataModel
-from models.permission import PermissionModel
 
 File = FileApi()
 DB = DbAccess()

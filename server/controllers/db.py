@@ -243,10 +243,11 @@ class DbAccess(object):
         (good, result) = Perm.getPerm(controller, table, N_list)
         if not good:
             if result == None:
-                msgs.append({N_kind: N_warning, N_text: '{} list is empty'.format(table)})
+                msgs.append({N_kind: N_info, N_text: '{} list is empty'.format(table)})
+                good = True
             else:
                 msgs.append({N_kind: N_error, N_text: result or 'Cannot list {}'.format(table)})
-            return
+                return
         (rowFilter, fieldFilter) = result
         details = tableInfo.get(N_details, {})
         detailOrder = tableInfo.get(N_detailOrder, [])
@@ -335,7 +336,6 @@ class DbAccess(object):
         Perm = self.Perm
         tableInfo = DM[N_tables].get(table, {})
         details = tableInfo.get(N_details, {})
-        msgs = []
         for (name, detailProps) in details.items():
             t = detailProps[N_table]
             self._getList(N_list, t, data, msgs, titleOnly=False)
@@ -642,7 +642,7 @@ class DbAccess(object):
             (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
             (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
             perm = {N_update: uFields, N_delete: mayDelete}
-            ownWorkflow = readWorkflow(self.basicList, table, [document].get(document[N__id], {})) 
+            ownWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {})
             tables.append({
                 N_table: table,
                 N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),

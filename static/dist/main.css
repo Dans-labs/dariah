@@ -735,6 +735,9 @@ input.invalid, input.invalid:focus, .input invalid, textarea.invalid, textarea.i
 div.detail-control {
     flex: 1 1 1rem;
 }
+div.detail-body {
+    flex: 1 1 calc(100% - 1rem);
+}
 .label-col {
     text-align: right;
     padding: 0.2rem 0.2rem 0.2rem 0.1rem;
@@ -1246,6 +1249,7 @@ div.fulltext .search {
     border: 0.2rem solid var(--record-border);
     border-radius: 0.5rem;
     background-color: var(--record-back);
+    width: 100%;
 }
 .itemRecord.edit {
     border: 0.2rem solid var(--record-edit-border);

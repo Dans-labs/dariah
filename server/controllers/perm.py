@@ -20,8 +20,16 @@ class PermApi(object):
         tables = PM[N_tables]
         fields = PM[N_fields]
         actions = PM[N_actions]
-        if controller not in methods or table not in tables or table not in fields or action not in actions or action not in tables[table]:
-            return (False, 'error in executing method: {}'.format(controller))
+        if controller not in methods:
+            return (False, 'error in executing method {}'.format(controller))
+        if action not in actions:
+            return (False, 'Unknown action {} when calling controller {}'.format(action, controller))
+        if table not in tables:
+            return (False, 'Unknown table {} when calling controller {}'.format(table, controller))
+        if action not in tables[table]:
+            return (False, 'Inappropriate action {} for table {} when calling controller {}'.format(action, table, controller))
+        if table not in fields:
+            return (False, 'Missing field specs for table {} when calling controller {}'.format(table, controller))
         level = self._highestLevel((methods[controller][N_call], tables[table][action]))
         rowFilter = self._rowSet(table, level) if action != N_insert else True
         fieldFilter = self._fieldProjection(table, action) if action not in {N_insert, N_delete} else True

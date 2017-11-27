@@ -10,7 +10,8 @@ import { getGrid, compileSortedData, resetSort, addColumn, turnColumn, delColumn
 import { insertItem, DETAILS } from 'tables'
 import { compileActive } from 'workflow'
 
-import { dealWithProvenance, getMasterTable } from 'fields'
+import { dealWithProvenance } from 'fields'
+import { getMasterTable } from 'details'
 
 import ItemRow from 'ItemRow'
 import EditInsert from 'EditInsert'

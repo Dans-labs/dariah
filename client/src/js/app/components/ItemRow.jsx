@@ -3,7 +3,8 @@ import { connect } from 'react-redux'
 
 import { memoize } from 'memo'
 import { emptyS } from 'utils'
-import { makeFields, makeDetails } from 'fields'
+import { makeFields } from 'fields'
+import { makeDetails } from 'details'
 
 import { getForms } from 'forms'
 

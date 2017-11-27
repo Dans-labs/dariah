@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { emptyO } from 'utils'
 import { compileActive } from 'workflow'
-import { wrappedRepr } from 'fields'
+import { wrappedRepr } from 'values'
 
 import { getSettings } from 'settings'
 

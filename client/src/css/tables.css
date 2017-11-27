@@ -2,6 +2,7 @@
     border: 0.2rem solid var(--record-border);
     border-radius: 0.5rem;
     background-color: var(--record-back);
+    width: 100%;
 }
 .itemRecord.edit {
     border: 0.2rem solid var(--record-edit-border);
