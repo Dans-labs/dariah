@@ -1,5 +1,4 @@
 import assert from 'assert'
-import padEnd from 'lodash/padend'
 import padStart from 'lodash/padstart'
 import { jString } from 'utils'
 

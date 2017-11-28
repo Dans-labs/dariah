@@ -72,7 +72,7 @@ module.exports = {
         use: extractCSS.extract([
           {
             loader: 'css-loader',
-            options: { minimize: false },
+            options: { minimize: isProd },
           },
           {
             loader: 'postcss-loader',

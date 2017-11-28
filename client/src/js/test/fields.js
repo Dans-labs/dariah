@@ -1,6 +1,4 @@
 import assert from 'assert'
-import padStart from 'lodash/padstart'
-import padEnd from 'lodash/padend'
 import { sortTimeInterval, getDateTime } from 'datatypes'
 
 const testSortInterval = () => {

@@ -42,7 +42,7 @@ elif [[ "$1" == "docs" ]]; then
 elif [[ "$1" == "dev" ]]; then
     cd client
     export NODE_ENV="development"
-    webpack
+    webpack --config webpack.dev.js
 elif [[ "$1" == "model" ]]; then
 	cd server
     python3 compile.py
@@ -53,7 +53,7 @@ elif [[ "$1" == "serve" ]]; then
 elif [[ "$1" == "hot" ]]; then
     cd client
     export NODE_ENV="development"
-    webpack-dev-server
+    webpack-dev-server --config webpack.dev.js
 elif [[ "$1" == "data" ]]; then
     cd static/tools
     python3 mongoFromFm.py development
@@ -63,7 +63,7 @@ elif [[ "$1" == "root" ]]; then
 elif [[ "$1" == "prod" ]]; then
     pushd client
     export NODE_ENV="production"
-    webpack
+    webpack --config webpack.prod.js
     popd
 elif [[ "$1" == "shipdocs" ]]; then
     codestats
@@ -82,7 +82,7 @@ elif [[ "$1" == "shipcode" ]]; then
     bundle exec jekyll build
     popd
     export NODE_ENV="production"
-    webpack
+    webpack --config webpack.prod.js
     popd
     git add --all .
     git commit -m "ship: $2"
@@ -112,7 +112,7 @@ else
     echo "hot         : development - start client app server with hot module reload"
     echo "data        : development - convert legacy FileMaker data and import it into MongoDB"
     echo "root        : development - assign role root to user indicated in config file"
-    echo "prod        : production - build client app and docs"
+    echo "prod        : production - build client app"
     echo "shipdocs \$  : production - build docs, commit and push to github. \$=commit message"
     echo "shipcode \$1 : production - build client app and docs, commit and push to github. \$=commit message!"
     echo "shipdata    : production - transfer Filemaker legacy data to production server" 
