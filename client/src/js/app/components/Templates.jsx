@@ -44,9 +44,9 @@ export const mainActionTemplates = {
     return (
       <div>
         {
-          w('locked')
+          w('locked').on
           ? <div className={'label large workflow info'} >
-              {`This contribution is locked because it is ${w('lockedReason')}.`}
+              {`This contribution is locked because it is ${w('locked').desc}.`}
             </div>
           : null
         }
@@ -112,7 +112,7 @@ export const mainActionTemplates = {
                 {!isSubmitted && isWithdrawn ? `${l('dateWithdrawn')}: ${v('dateWithdrawn')}` : null}
                 {isSubmitted ? `${l('dateSubmitted')}: ${v('dateSubmitted')}` : null}
                 {
-                  (w('incomplete') || w('stalled'))
+                  (w('incomplete').on || w('stalled').on)
                   ? null
                   : fs('submitted', e('submitted'), h =>
                       <span
@@ -129,9 +129,9 @@ export const mainActionTemplates = {
           {e('submitted') ? null : eField('reviewerF', l, fe, m)}
         </div>
         {
-          w('stalled')
+          w('stalled').on
           ? <div className={'label large workflow error'} >
-            {`This contribution is cannot be submitted because: ${w('stalledReason')}.
+            {`This contribution is cannot be submitted because: ${w('stalled').desc}.
               Either change the type of the contribution to the type of this assessment,
               or start a new assessment, copy over the relevant material form this
               assessment (by hand), and remove this assessment.
@@ -140,9 +140,9 @@ export const mainActionTemplates = {
           : null
         }
         {
-          w('incomplete')
+          w('incomplete').on
           ? <div className={'label large workflow warning'} >
-            {`This contribution cannot yet be submitted because: ${w('incompleteReason')}.
+            {`This contribution cannot yet be submitted because: ${w('incomplete').desc}.
             `}
             </div>
           : e('submitted')
@@ -153,9 +153,9 @@ export const mainActionTemplates = {
             : null
         }
         {
-          w('locked')
+          w('locked').on
           ? <div className={'label large workflow info'} >
-              {`This assessment is locked because it is ${w('lockedReason')}.`}
+              {`This assessment is locked because it is ${w('locked').desc}.`}
             </div>
           : null
         }

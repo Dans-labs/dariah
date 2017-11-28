@@ -91,7 +91,7 @@ export const applyTemplate = (settings, tables, table, kind, otherTable, values,
   }
   const v = isConsolidated ? vConsolidated : vLive
 
-  const w = field => workflow[field]
+  const w = field => workflow[field] || emptyO
 
   const l = makeL(tables, table)
 
@@ -140,7 +140,7 @@ export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId
         entities: {
           [eId]: {
             workflow: {
-              [field]: info,
+              [field]: info = emptyO,
             } = emptyO,
           },
         },

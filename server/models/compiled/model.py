@@ -204,42 +204,36 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                           'otherTable': 'contrib',
                                                           'triggerFields': [ 'assessmentType',
                                                                              'submitted']}],
-                                            'read': [ { 'inspect': 'master',
+                                            'read': [ { 'attribute': { 'desc': 'assessment type is '
+                                                                               'different from '
+                                                                               'contribution type',
+                                                                       'name': 'stalled'},
+                                                        'inspect': 'master',
                                                         'linkField': 'contrib',
                                                         'method': 'hasDifferent',
                                                         'myField': 'assessmentType',
                                                         'otherField': 'typeContribution',
                                                         'otherTable': 'contrib',
-                                                        'value': None,
-                                                        'workflow': { 'stalled': True,
-                                                                      'stalledReason': 'assessment '
-                                                                                       'type is '
-                                                                                       'different '
-                                                                                       'from '
-                                                                                       'contribution '
-                                                                                       'type'}},
-                                                      { 'inspect': 'self',
+                                                        'value': None},
+                                                      { 'attribute': { 'desc': 'being reviewed',
+                                                                       'except': ['submitted'],
+                                                                       'name': 'locked'},
+                                                        'inspect': 'self',
                                                         'method': 'hasValue',
                                                         'otherField': 'submitted',
-                                                        'value': True,
-                                                        'workflow': { 'locked': { 'except': [ 'submitted']},
-                                                                      'lockedReason': 'being '
-                                                                                      'reviewed'}},
-                                                      { 'emptyFields': ['score', 'evidence'],
+                                                        'value': True},
+                                                      { 'attribute': { 'desc': 'some criteria lack '
+                                                                               'a score or '
+                                                                               'evidence ({n}x)',
+                                                                       'name': 'incomplete'},
+                                                        'emptyFields': ['score', 'evidence'],
                                                         'inspect': 'details',
                                                         'linkField': 'assessment',
                                                         'method': 'hasIncomplete',
                                                         'myField': None,
                                                         'otherField': None,
                                                         'otherTable': 'criteriaEntry',
-                                                        'value': None,
-                                                        'workflow': { 'incomplete': True,
-                                                                      'incompleteReason': 'not all '
-                                                                                          'criteria '
-                                                                                          'have a '
-                                                                                          'score '
-                                                                                          'with '
-                                                                                          'evidence'}}]}},
+                                                        'value': None}]}},
               'contrib': { 'detailOrder': ['assessment'],
                            'details': { 'assessment': { 'filtered': False,
                                                         'linkField': 'contrib',
@@ -485,16 +479,15 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                        'linkField': 'contrib',
                                                        'otherTable': 'assessment',
                                                        'triggerFields': ['typeContribution']}],
-                                         'read': [ { 'inspect': 'details',
+                                         'read': [ { 'attribute': { 'desc': 'being assessed',
+                                                                    'name': 'locked'},
+                                                     'inspect': 'details',
                                                      'linkField': 'contrib',
                                                      'method': 'hasValue',
                                                      'myField': None,
                                                      'otherField': 'submitted',
                                                      'otherTable': 'assessment',
-                                                     'value': True,
-                                                     'workflow': { 'locked': True,
-                                                                   'lockedReason': 'being '
-                                                                                   'assessed'}}]}},
+                                                     'value': True}]}},
               'country': { 'fieldOrder': [ 'iso',
                                            'name',
                                            'isMember',

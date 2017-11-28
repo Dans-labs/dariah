@@ -23,78 +23,73 @@ def adjustWorkflow(basicList, table, document, adjustedValues):
 
 def enforceWorkflow(workflow, currentDoc, newDoc, action, msgs):
     allow = True
-    for (condition, preventions) in WM[N_prevent].items():
-        workflowCondition = workflow.get(condition, None)
-        if workflowCondition:
-            thesePreventions = preventions.get(action, None)
-            if thesePreventions == True:
+    for (attribute, actionPreventions) in WM[N_prevent].items():
+        attributeData = workflow.get(attribute, {})
+        if attributeData.get(N_on, False):
+            actionPrevention = actionPreventions.get(action, None)
+            if actionPrevention == True:
                 allow = False
                 msgs.append({
                     N_kind: N_error,
                     N_text: 'Cannot {} because {}'.format(
                         action,
-                        workflow.get('{}Reason'.format(condition), condition),
+                        attributeData.get(N_desc),
                     ),
                 })
-            elif thesePreventions == N_except:
-                exceptFields = set(workflowCondition.get(N_except, []))
+            else:
                 thisAllow = True
-                for field in set(currentDoc) | set(newDoc):
-                    if field in exceptFields: continue
-                    if currentDoc.get(field, None) != newDoc.get(field, None):
-                        thisAllow = False
-                        msgs.append({
-                            N_kind: N_error,
-                            N_text: 'Cannot {} field {} from {} to {}'.format(
-                                action,
-                                field,
-                                currentDoc.get(field, None),
-                                newDoc.get(field, None),
-                                workflow.get('{}Reason'.format(condition), condition),
-                            ),
-                        })
+                if actionPrevention == N_except:
+                    exceptFields = set(attributeData.get(N_except, []))
+                    for field in set(currentDoc) | set(newDoc):
+                        if field in exceptFields: continue
+                        if currentDoc.get(field, None) != newDoc.get(field, None):
+                            thisAllow = False
+                            msgs.append({
+                                N_kind: N_error,
+                                N_text: 'Cannot {} field {} from {} to {}'.format(
+                                    action,
+                                    field,
+                                    currentDoc.get(field, None),
+                                    newDoc.get(field, None),
+                                ),
+                            })
+                elif actionPrevention:
+                    for (field, fieldPreventions) in actionPrevention.items():
+                        if fieldPreventions == True:
+                            if currentDoc.get(field, None) != newDoc.get(field, None):
+                                thisAllow = False
+                                msgs.append({
+                                    N_kind: N_error,
+                                    N_text: 'Cannot {} field {}}'.format(
+                                        action,
+                                        field,
+                                    ),
+                                })
+                        elif fieldPreventions:
+                            for when in (N_before, N_after):
+                                if when in fieldPreventions:
+                                    testValue = fieldPreventions[when]
+                                    useSource = currentDoc if when == N_before else newDoc
+                                    useValue = useSource.get(field, None)
+                                    if testValue == useValue:
+                                        thisAllow = False
+                                        msgs.append({
+                                            N_kind: N_error,
+                                            N_text: ('Cannot {} {} from {}' if when == N_before else 'Cannot change {} to{}').format(
+                                                action,
+                                                field,
+                                                useValue,
+                                            ),
+                                        })
                 if not thisAllow:
                     allow = False
                     msgs.append({
                         N_kind: N_error,
                         N_text: 'Cannot {} because {}'.format(
                             action,
-                            workflow.get('{}Reason'.format(condition), condition),
+                            attributeData.get(N_desc),
                         ),
                     })
-            elif thesePreventions:
-                for (field, fieldPreventions) in thesePreventions.items():
-                    if fieldPreventions == True:
-                        if currentDoc.get(field, None) != newDoc.get(field, None):
-                            allow = False
-                            msgs.append({
-                                N_kind: N_error,
-                                N_text: 'Cannot {} field {} because {}'.format(
-                                    action,
-                                    field,
-                                    workflow.get('{}Reason'.format(condition), condition),
-                                )
-                            })
-                    elif fieldPreventions:
-                        for when in (N_before, N_after):
-                            if when in fieldPreventions:
-                                testValue = fieldPreventions[when]
-                                useSource = currentDoc if when == N_before else newDoc
-                                useValue = useSource.get(field, None)
-                                if testValue == useValue:
-                                    allow = False
-                                    thisReason = ('Cannot {} {} from {}' if when == N_before else 'Cannot change {} to{}').format(
-                                        action,
-                                        field,
-                                        useValue,
-                                    )
-                                    msgs.append({
-                                        N_kind: N_error,
-                                        N_text: '{} because {}'.format(
-                                            thisReason,
-                                            workflow.get('{}Reason'.format(condition), condition),
-                                        )
-                                    })
     return allow
 
 def detailInsert(
@@ -149,68 +144,71 @@ def detailInsert(
 
 # BASIC RULE COMPUTATION METHODS THAT CAN BE CONFIGURED IN A WORKFLOW
 
-def _otherHasValue(myDocs, otherDocs, w):
+def _compute_hasValue(myDocs, otherDocs, w):
     inspect = w.get(N_inspect, None)
     linkField = w.get(N_linkField, None)
     otherField = w.get(N_otherField, None)
     value = w.get(N_value, None)
 
-    workflowIds = set()
+    workflowResults = {}
     if inspect == N_self:
         for myDoc in myDocs:
             if myDoc.get(otherField, None) == value:
-                workflowIds.add(myDoc.get(N__id, None))
+                workflowResults[myDoc.get(N__id, None)] = {N_on: True}
     elif inspect == N_details:
         for otherDoc in otherDocs:
             if otherDoc.get(otherField, None) == value:
                 myId = otherDoc.get(linkField, None)
                 if myId != None:
-                    workflowIds.add(myId)
+                    workflowResults[myId] = {N_on: True}
     else:
         otherIndex = dict((doc.get(N__id, None), doc.get(otherField, None)) for doc in otherDocs)
         for myDoc in myDocs:
             otherId = myDoc.get(linkField, None)
             otherValue = otherIndex.get(otherId, None)
             if otherValue == value:
-                workflowIds.add(myDoc.get(N__id, None))
-    return workflowIds
+                workflowResults[myDoc.get(N__id, None)] = {N_on: True}
+    return workflowResults
 
-def _otherHasIncomplete(myDocs, otherDocs, w):
+def _compute_hasIncomplete(myDocs, otherDocs, w):
     inspect = w.get(N_inspect, None)
     linkField = w.get(N_linkField, None)
     emptyFields = w.get(N_emptyFields, None)
 
-    workflowIds = set()
+    workflowResults = {}
     if inspect == N_self:
         for myDoc in myDocs:
             if any(_isEmpty(myDoc.get(emptyField, None)) for emptyField in emptyFields):
-                workflowIds.add(myDoc.get(N__id, None))
+                workflowResults[myDoc.get(N__id, None)] = {N_on: True, 'n': 1}
     elif inspect == N_details:
         for otherDoc in otherDocs:
             if any(_isEmpty(otherDoc.get(emptyField, None)) for emptyField in emptyFields):
                 myId = otherDoc.get(linkField, None)
                 if myId != None:
-                    workflowIds.add(myId)
+                    n = workflowResults.setdefault(myId, {N_on: True, 'n': 0})['n']
+                    workflowResults[myId]['n'] = n + 1
     else:
         otherIndex = dict((doc.get(N__id, None), [doc.get(emptyField, None) for emptyField in emptyFields]) for doc in otherDocs)
         for myDoc in myDocs:
             otherId = myDoc.get(linkField, None)
             otherValues = otherIndex.get(otherId, None)
             if any(_isEmpty(otherValue) for otherValue in otherValues):
-                workflowIds.add(myDoc.get(N__id, None))
-    return workflowIds
+                myId = myDoc.get(N__id, None)
+                n = workflowResults.setdefault(myId, {N_on: True, 'n': 0})['n']
+                workflowResults[myId]['n'] = n + 1
+    return workflowResults
 
-def _otherHasDifferent(myDocs, otherDocs, w):
+def _compute_hasDifferent(myDocs, otherDocs, w):
     inspect = w.get(N_inspect, None)
     linkField = w.get(N_linkField, None)
     myField = w.get(N_myField, None)
     otherField = w.get(N_otherField, None)
 
-    workflowIds = set()
+    workflowResults = {}
     if inspect == N_self:
         for myDoc in myDocs:
             if myDoc.get(myField, None) != myDoc.get(otherField, None):
-                workflowIds.add(myDoc.get(N__id, None))
+                workflowResults[myDoc.get(N__id, None)] = {N_on: True}
     elif inspect == N_details:
         myIndex = dict((doc.get(N__id, None), doc.get(myField, None)) for doc in myDocs)
         for otherDoc in otherDocs:
@@ -219,7 +217,7 @@ def _otherHasDifferent(myDocs, otherDocs, w):
             myValue = myIndex.get(myId, None)
             otherValue = otherDoc.get(otherField, None)
             if myValue != otherValue:
-                workflowIds.add(myId)
+                workflowResults[myId] = {N_on: True}
     else:
         otherIndex = dict((doc.get(N__id, None), doc.get(otherField, None)) for doc in otherDocs)
         for myDoc in myDocs:
@@ -228,30 +226,20 @@ def _otherHasDifferent(myDocs, otherDocs, w):
             otherValue = otherIndex.get(otherId, None)
             myValue = myDoc.get(myField, None)
             if myValue != otherValue:
-                workflowIds.add(myDoc.get(N__id, None))
-    return workflowIds
-
-methods = {
-    'hasValue': _otherHasValue,
-    'hasDifferent': _otherHasDifferent,
-    'hasIncomplete': _otherHasIncomplete,
-}
+                workflowResults[myDoc.get(N__id, None)] = {N_on: True}
+    return workflowResults
 
 # HELPERS READ WORKFLOW
 
 def _isEmpty(val):
     return not val or (type(val) is list and len([v for v in val if v]) == 0)
 
-def _applyReadWorkflow(workflowItems, workflow, result):
-    if type(workflowItems) is set:
-        for myWorkflowId in workflowItems:
-            if myWorkflowId not in result: result[myWorkflowId] = {}
-            result[myWorkflowId].update(workflow)
-    elif type(workflowItems) is dict:
-        for (myWorkflowId, myWorkflowData) in workflowItems.items():
-            if myWorkflowId not in result: result[myWorkflowId] = {}
-            result[myWorkflowId].update(workflow)
-            result[myWorkflowId].update(myWorkflowData)
+def _applyReadWorkflow(workflowResults, attribute, result):
+    for (myWorkflowId, myWorkflowData) in workflowResults.items():
+        for (k, v) in attribute.items():
+            if k != N_name:
+                myWorkflowData[k] = v.format(**myWorkflowData) if k == N_desc else v
+        result.setdefault(myWorkflowId, {})[attribute[N_name]] = myWorkflowData
 
 def _computeWorkflow(basicList, myDocs, w, result):
     myDocIds = {doc.get(N__id, None) for doc in myDocs}
@@ -260,7 +248,7 @@ def _computeWorkflow(basicList, myDocs, w, result):
     inspect = w.get(N_inspect, None)
     linkField = w.get(N_linkField, None)
     otherTable = w.get(N_otherTable, None)
-    workflow = w.get(N_workflow, None)
+    attribute = w.get(N_attribute, None)
 
     if inspect == N_self:
         otherDocs = myDocs
@@ -270,8 +258,8 @@ def _computeWorkflow(basicList, myDocs, w, result):
         otherIds = {doc[linkField] for doc in myDocs}
         otherDocs = basicList(otherTable, {N__id: {'$in': list(otherIds)}}, True)
 
-    myWorkflowIds = methods[method](myDocs, otherDocs, w)
-    _applyReadWorkflow(myWorkflowIds, workflow, result)
+    myWorkflowResults = globals()['_compute_{}'.format(method)](myDocs, otherDocs, w)
+    _applyReadWorkflow(myWorkflowResults, attribute, result)
 
 # HELPERS ADJUST WORKFLOW
 

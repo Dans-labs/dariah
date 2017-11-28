@@ -14,9 +14,9 @@ workflow:
       otherField: submitted
       myField: null
       value: true
-      workflow:
-        locked: true
-        lockedReason: being assessed
+      attribute:
+        name: locked
+        desc: being assessed
   adjust:
     - inspect: details
       linkField: contrib

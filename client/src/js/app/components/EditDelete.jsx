@@ -7,11 +7,11 @@ import Tooltip from 'Tooltip'
 export default ({ perm, workflow, keep, fixed, button, onClick }) => {
   const doKeep = Object.keys(keep).length > 0
   const keepInfo = Object.keys(keep).sort().map(table => keep[table]).join(', ')
-  const locked = workflow && workflow.locked
-  const lockedReason = locked ? workflow.lockedReason : emptyS
+  const locked = workflow && workflow.locked && workflow.locked.on
+  const lockedDesc = (workflow && workflow.locked && workflow.locked.desc) || emptyS
   const tipInfo = doKeep || locked
   ? (doKeep ? `This item cannot deleted because related items exist: ${keepInfo}` : emptyS)
-    + (locked ? `This item is locked because: ${lockedReason}` : emptyS)
+    + (locked ? `This item is locked because: ${lockedDesc}` : emptyS)
   : 'delete this record'
   const icon = doKeep ? 'puzzle-piece' : 'trash'
   const disabled = doKeep ? 'disabled' : 'error-o'

@@ -14,18 +14,18 @@ workflow:
       otherField: typeContribution
       myField: assessmentType
       value: null
-      workflow:
-        stalled: true
-        stalledReason: assessment type is different from contribution type
+      attribute:
+        name: stalled
+        desc: assessment type is different from contribution type
     - inspect: self
       method: hasValue
       otherField: submitted
       value: true
-      workflow:
-        locked:
-          except:
-            - submitted
-        lockedReason: being reviewed
+      attribute:
+        name: locked
+        except:
+          - submitted
+        desc: being reviewed
     - inspect: details
       method: hasIncomplete
       linkField: assessment
@@ -36,9 +36,9 @@ workflow:
       emptyFields:
         - score
         - evidence
-      workflow:
-        incomplete: true
-        incompleteReason: not all criteria have a score with evidence
+      attribute:
+        name: incomplete
+        desc: 'some criteria lack a score or evidence ({n}x)'
   adjust:
     - inspect: master
       linkField: contrib
