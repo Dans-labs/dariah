@@ -1,0 +1,89 @@
+perm:
+  list:   public
+  read:   public
+  update: office
+  insert: office
+  delete: office
+
+title: name
+
+item:
+  - country
+  - countries
+
+sort:
+  - [name, 1]
+
+fieldOrder:
+  - iso
+  - name
+  - isMember
+  - latitude
+  - longitude
+
+fieldSpecs:
+  iso:
+    perm:
+      list:   public
+      read:   public
+      update: office
+    label: ISO(2)
+    valType: text
+    valid: isoCountry
+    multiple: false
+    grid:
+      width: 2em
+      grow: 0
+  name:
+    perm:
+      list:   public
+      read:   public
+      update: office
+    label: Name
+    valType: text
+    multiple: false
+    grid:
+      width: 10em
+      grow: 1
+  isMember:
+    perm:
+      list:   public
+      read:   public
+      update: office
+    label: Is DARIAH member
+    valType: bool
+    multiple: false
+    grid:
+      width: 4em
+      grow: 0
+  latitude:
+    perm:
+      list:   public
+      read:   public
+      update: office
+    label: Latitude
+    valType: number
+    multiple: false
+    grid:
+      width: 4em
+      grow: 0.5
+      shrink: 0
+  longitude:
+    perm:
+      list:   public
+      read:   public
+      update: office
+    label: Longitude
+    valType: number
+    multiple: false
+    grid:
+      width: 4em
+      grow: 0.5
+      shrink: 0
+
+filters:
+  - field: isMember
+    label: member of DARIAH
+    type: ByValue
+    maxCols: 1
+    expanded: true

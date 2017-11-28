@@ -1,0 +1,189 @@
+perm:
+  list:   auth
+  read:   auth
+  update: edit
+  insert: auth
+  delete: own
+
+workflow:
+  read:
+    - inspect: master
+      method: hasDifferent
+      linkField: contrib
+      otherTable: contrib
+      otherField: typeContribution
+      myField: assessmentType
+      value: null
+      workflow:
+        stalled: true
+        stalledReason: assessment type is different from contribution type
+    - inspect: self
+      method: hasValue
+      otherField: submitted
+      value: true
+      workflow:
+        locked:
+          except:
+            - submitted
+        lockedReason: being reviewed
+    - inspect: details
+      method: hasIncomplete
+      linkField: assessment
+      otherTable: criteriaEntry
+      otherField: null
+      myField: null
+      value: null
+      emptyFields:
+        - score
+        - evidence
+      workflow:
+        incomplete: true
+        incompleteReason: not all criteria have a score with evidence
+  adjust:
+    - inspect: master
+      linkField: contrib
+      otherTable: contrib
+      triggerFields:
+        - assessmentType
+        - submitted
+
+title: title
+
+item:
+  - assessment
+  - assessments
+
+sort:
+  - [contrib, 1]
+  - [title, 1]
+  - [dateCreated, -1]
+
+fieldOrder: 
+  - title
+  - assessmentType
+  - contrib
+  - remarks
+  - submitted
+  - dateSubmitted
+  - dateWithdrawn
+  - reviewerE
+  - reviewerF
+
+fieldSpecs: 
+  title:
+    perm:
+      list:   auth
+      read:   auth
+      update: edit
+    label: Title
+    valType: text
+    multiple: false
+  contrib:
+    perm:
+      list:   auth
+      read:   auth
+      update: nobody
+    label: Contribution
+    valType:
+      relTable: contrib
+      allowNew: false
+    multiple: false
+  assessmentType:
+    perm:
+      list:   auth
+      read:   auth
+      update: nobody
+    label: Assessment type
+    valType:
+      relTable: typeContribution
+      allowNew: false
+      fixed: true
+      inactive:
+        attributes:
+          className: inactive
+          data-rh: this value does not belong to the current package
+        disabled: true
+    multiple: false
+  remarks:
+    perm:
+      list:   auth
+      read:   auth
+      update: edit
+    label: Remarks
+    valType: textarea
+    multiple: true
+  submitted:
+    perm:
+      list:   auth
+      read:   auth
+      update: edit
+    label: Submitted for review
+    valType: bool
+    multiple: false
+  dateSubmitted:
+    perm:
+      list: auth
+      read: auth
+      update: nobody
+    label: Submitted on
+    valType: datetime
+    multiple: false
+  dateWithdrawn:
+    perm:
+      list: auth
+      read: auth
+      update: nobody
+    label: Withdrawn on
+    valType: datetime
+    multiple: false
+  reviewerE:
+    perm:
+      list: auth
+      read: auth
+      update: office
+    label: Reviewer (expert)
+    valType:
+      select:
+        authority:
+          $ne: legacy
+      relTable: user
+      allowNew: email
+    multiple: false
+  reviewerF:
+    perm:
+      list: auth
+      read: auth
+      update: office
+    label: Reviewer (final say)
+    valType:
+      select:
+        authority:
+          $ne: legacy
+      relTable: user
+      allowNew: email
+    multiple: false
+
+detailOrder:
+  - review
+  - criteriaEntry
+
+details:
+  review:
+    table: review
+    linkField: assessment
+    mode: list
+    filtered: false
+  criteriaEntry:
+    table: criteriaEntry
+    linkField: assessment
+    expand: true
+    mode: list
+    border: {
+      read: false,
+      edit: false,
+    }
+    filtered: true
+    cascade: true
+    fixed: true
+
+needMaster: true

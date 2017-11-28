@@ -1,6 +1,8 @@
 from datetime import datetime
-from models.permission import PermissionModel as PM
-from models.names import *
+from models.compiled.model import model as M
+from models.compiled.names import *
+
+PM = M[N_permissions]
 
 class UserApi(object):
     def __init__(self, DB):

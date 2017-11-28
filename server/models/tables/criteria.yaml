@@ -1,0 +1,86 @@
+perm:
+  list:   public
+  read:   public
+  update: office
+  insert: office
+  delete: office
+
+title: criterion
+
+item:
+  - assessment criterion
+  - assessment criteria
+
+sort:
+  - [package, 1]
+  - [criterion, 1]
+
+fieldOrder:
+  - criterion
+  - remarks
+  - typeContribution
+  - package
+
+fieldSpecs:
+  package:
+    perm:
+      list: public
+      read: public
+      update: office
+    label: Package
+    valType:
+      relTable: package
+      allowNew: true
+      fixed: true
+    multiple: false
+  typeContribution:
+    perm:
+      list: public
+      read: public
+      update: office
+    label: Type
+    valType:
+      relTable: typeContribution
+      allowNew: true
+      inactive:
+        attributes:
+          className: inactive
+          data-rh: this value does not belong to the current package
+        disabled: true
+    multiple: true
+  criterion:
+    perm:
+      list: public
+      read: public
+      update: office
+    label: Criterion
+    valType: text
+    multiple: false
+  remarks:
+    perm:
+      list: public
+      read: public
+      update: office
+    label: Remarks
+    valType: textarea
+    multiple: true
+
+detailOrder:
+  - score
+
+details:
+  score:
+    table: score
+    linkField: criteria
+    mode: list
+    filtered: true
+    cascade: true
+
+needMaster: true
+
+filters:
+  - field: typeContribution
+    label: type
+    type: ByValue
+    maxCols: 1
+    expanded: true

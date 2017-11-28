@@ -4,10 +4,10 @@ root=`pwd`
 
 function codestats {
     cd $root
-    xd="__pycache__,node_modules,.tmp,.git,_temp,.ipynb_checkpoints,images,fonts,favicons,.sass_cache,_site,_sass"
+    xd="__pycache__,node_modules,.tmp,.git,_temp,.ipynb_checkpoints,images,fonts,favicons,.sass_cache,_site,_sass,compiled"
     xf="cloc_exclude.lst"
     rf="docs/Stats.md"
-    client/node_modules/cloc/lib/cloc --exclude_dir=$xd --exclude-list-file=$xf --report-file=$rf --md .
+    client/node_modules/cloc/lib/cloc --exclude_dir=$xd --exclude-list-file=$xf --report-file=$rf --md . ../dariah.wiki
     cat $rf
 }
 
@@ -43,9 +43,12 @@ elif [[ "$1" == "dev" ]]; then
     cd client
     export NODE_ENV="development"
     webpack
+elif [[ "$1" == "model" ]]; then
+	cd server
+    python3 compile.py
 elif [[ "$1" == "serve" ]]; then
 	cd server
-    python3 confyg.py models controllers
+    python3 compile.py
     export REGIME=devel; python3 -m bottle --debug --reload --bind localhost:8001 index:app
 elif [[ "$1" == "hot" ]]; then
     cd client
@@ -102,6 +105,7 @@ else
     echo "stats       : reporting - collect codebase statistics"
     echo "test        : testing - run all tests"
     echo "test \$1     : testing - run specific test \$1"
+    echo "model       : development - compile data model"
     echo "serve       : development - start webserver"
     echo "docs        : development - build and serve github pages documentation"
     echo "dev         : development - build client app (js and sass)"

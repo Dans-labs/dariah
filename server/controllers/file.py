@@ -2,7 +2,7 @@ import os
 
 from bottle import static_file
 
-from models.names import *
+from models.compiled.names import *
 
 STATIC_ROOT = '../static/'
 

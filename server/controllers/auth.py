@@ -3,8 +3,10 @@ import bottle
 from beaker.middleware import SessionMiddleware
 from controllers.user import UserApi
 from controllers.utils import utf8FromLatin1, serverprint
-from models.permission import PermissionModel as PM
-from models.names import *
+from models.compiled.model import model as M
+from models.compiled.names import *
+
+PM = M[N_permissions]
 
 class AuthApi(UserApi):
     def __init__(self, DB, secret_file):

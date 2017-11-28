@@ -1,0 +1,85 @@
+perm:
+  list:   auth
+  read:   auth
+  update: edit
+  insert: auth
+  delete: own
+
+title: criteria
+
+item:
+  - review entry
+  - review entries
+
+sort:
+  - [seq, 1]
+
+fieldOrder:
+  - seq
+  - criteria
+  - criteriaEntry
+  - comments
+  - review
+
+fieldSpecs:
+  seq:
+    perm:
+      list:   auth
+      read:   edit
+      update: nobody
+    label: Number
+    valType: number
+    multiple: false
+  criteria:
+    perm:
+      list:   auth
+      read:   edit
+      update: nobody
+    label: criterion
+    valType:
+      relTable: criteria
+      allowNew: false
+      fixed: true
+    multiple: false
+  criteriaEntry:
+    perm:
+      list:   auth
+      read:   edit
+      update: nobody
+    label: Assessor entry
+    valType:
+      relTable: criteriaEntry
+      allowNew: false
+      fixed: true
+    multiple: false
+  review:
+    perm:
+      list:   auth
+      read:   edit
+      update: nobody
+    label: review
+    valType:
+      relTable: review
+      allowNew: false
+      fixed: true
+    multiple: false
+  comments:
+    perm:
+      list:   auth
+      read:   edit
+      update: edit
+    label: Comments
+    valType: textarea
+    multiple: true
+
+needMaster: true
+
+filters:
+  - field: score
+    relField: score
+    label: score
+    type: ByValue
+    maxCols: 1
+    expanded: true
+
+needMaster: true

@@ -1,0 +1,37 @@
+perm:
+  list:   public
+  read:   public
+  update: nobody
+  insert: nobody
+  delete: nobody
+
+title: rep
+
+item:
+  - permission group
+  - permission groups
+
+sort:
+  - [rep, 1]
+
+fieldOrder:
+  - rep
+  - description
+
+fieldSpecs:
+  rep:
+    perm:
+      list:   public
+      read:   public
+      update: nobody
+    label: Permission group
+    valType: text
+    multiple: false
+  description:
+    perm:
+      list:   public
+      read:   public
+      update: nobody
+    label: Description
+    valType: text
+    multiple: false

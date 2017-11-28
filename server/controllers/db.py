@@ -6,8 +6,12 @@ from pymongo import MongoClient
 
 from controllers.utils import oid, now, dtm, json_string, fillInSelect
 from controllers.workflow import detailInsert, readWorkflow, adjustWorkflow, enforceWorkflow
-from models.data import DataModel as DM
-from models.names import *
+from models.compiled.model import model as M
+from models.compiled.names import *
+
+DM = M[N_tables]
+DMG = M[N_generic]
+WM = M[N_workflow]
 
 # We store the mongo db connection here as a module global variable
 # No other module is supposed to import the connection
@@ -71,7 +75,6 @@ class DbAccess(object):
         (good, result) = Perm.getPerm(controller, table, N_read)
         if not good:
             return self.stop({N_text: result or 'Cannot read {}'.format(table)})
-        tableInfo = DM[N_tables].get(table, {})
         (rowFilter, fieldFilter) = result
         (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, fieldFilter)
 
@@ -151,7 +154,6 @@ class DbAccess(object):
     # IMPLEMENTATION METHODS
 
     def _validate(self, table, itemValues, uFields):
-        tableInfo = DM[N_tables].get(table, {})
         (fieldOrder, fieldSpecs, allFields) = self._theseFields(table, True)
         valItemValues = {}
         newValues = []
@@ -203,7 +205,7 @@ class DbAccess(object):
                                 valid = False
                                 diags.append('Unknown value "{}"'.format(v))
                             else:
-                                repName = DM[N_tables].get(relTable, {}).get(N_title, DM[N_generic][N_title]) if allowNew == True else allowNew 
+                                repName = DM.get(relTable, {})[N_title] if allowNew == True else allowNew 
                                 existing = list(_DBM[relTable].find({repName: v}))
                                 if existing and len(existing) > 1:
                                     _id = existing[0][N__id]
@@ -232,10 +234,10 @@ class DbAccess(object):
         ):
         if table in data: return
         Perm = self.Perm
-        tableInfo = DM[N_tables].get(table, {})
-        title = tableInfo.get(N_title, DM[N_generic][N_title])
-        item = tableInfo.get(N_item, DM[N_generic][N_item])
-        sort =  tableInfo.get(N_sort, None)
+        tableInfo = DM.get(table, {})
+        title = tableInfo[N_title]
+        item = tableInfo[N_item]
+        sort =  tableInfo[N_sort]
         (mayInsert, iFields, warnings) = Perm.may(table, N_insert)
         perm = {N_insert: mayInsert, N_needMaster: tableInfo.get(N_needMaster, False)}
         orderKey = N_myIds if my else N_allIds 
@@ -302,12 +304,11 @@ class DbAccess(object):
         Perm = self.Perm
         (good, result) = Perm.getPerm(N_list, table, N_list)
         if not good: return {}
-        tableInfo = DM[N_tables].get(table, {})
+        tableInfo = DM.get(table, {})
         valueLists = {}
         (rowFilter, fieldFilter) = result
+        (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, fieldFilter)
         getFields = set(fieldFilter)
-        fieldOrder = [x for x in tableInfo.get(N_fieldSpecs, DM[N_generic][N_fieldSpecs]) if x in fieldFilter]
-        fieldSpecs = dict(x for x in tableInfo.get(N_fieldSpecs, DM[N_generic][N_fieldSpecs]).items() if x[0] in fieldOrder)
 
         relFields = [
             f for (f, fSpec) in fieldSpecs.items()\
@@ -324,17 +325,17 @@ class DbAccess(object):
         for f in relFields:
             fSpec = fieldSpecs[f][N_valType]
             t = fSpec[N_relTable]
-            thisTableInfo = DM[N_tables].get(t, {})
+            thisTableInfo = DM.get(t, {})
             select = deepcopy(fSpec.get(N_select, {}))
             fillInSelect(select)
-            valueOrder = thisTableInfo.get(N_sort, DM[N_generic][N_sort])
+            valueOrder = thisTableInfo[N_sort]
             rows = [str(row[N__id]) for row in _DBM[t].find(select, {N__id: True}).sort(valueOrder)]
             valueLists[f] = rows
         return valueLists
 
     def _getDetails(self, table, data, msgs):
         Perm = self.Perm
-        tableInfo = DM[N_tables].get(table, {})
+        tableInfo = DM.get(table, {})
         details = tableInfo.get(N_details, {})
         for (name, detailProps) in details.items():
             t = detailProps[N_table]
@@ -343,11 +344,11 @@ class DbAccess(object):
     def _insertItem(self, controller, table, newData, records, msgs, workflow):
         masterId = newData.get(N_masterId, None)
         linkField = newData.get(N_linkField, None)
-        tableInfo = DM[N_tables].get(table, {})
-        title = tableInfo.get(N_title, DM[N_generic][N_title])
-        noTitle = tableInfo.get(N_noTitle, DM[N_generic][N_noTitle])
-        item = tableInfo.get(N_item)[0]
-        sort = tableInfo.get(N_title, DM[N_generic][N_sort])
+        tableInfo = DM.get(table, {})
+        title = tableInfo[N_title]
+        noTitle = tableInfo.get(N_noTitle, DMG[N_noTitle])
+        item = tableInfo[N_item][0]
+        sort = tableInfo[N_sort]
         (readGood, readResult) = self.Perm.getPerm(controller, table, N_read)
         if not readGood:
             msgs.append({N_kind: N_error, N_text: readResult or 'Cannot read table {}'.format(table)})
@@ -369,8 +370,8 @@ class DbAccess(object):
             linkFieldSpecs = fieldSpecs[linkField]
             masterTable = linkFieldSpecs[N_valType][N_relTable]
             masterDocument = list(_DBM[masterTable].find({N__id: oMasterId}))[0]
-            masterTableInfo = DM[N_tables].get(masterTable, {})
-            masterTitle = masterTableInfo.get(N_title, DM[N_generic][N_title])
+            masterTableInfo = DM.get(masterTable, {})
+            masterTitle = masterTableInfo[N_title]
         for (field, value) in newData.items():
             if field != N_linkField and field != N_masterId:
                 insertValues[field] = value
@@ -394,8 +395,8 @@ class DbAccess(object):
             insertValues.update(extraData[N_insertValues])
 
         # enforce the workflow
-        ownWorkflow = readWorkflow(self.basicList, table, insertValues).get(None, {}) 
-        if not enforceWorkflow(ownWorkflow, {}, insertValues, N_insert, msgs):
+        myWorkflow = readWorkflow(self.basicList, table, insertValues).get(None, {}) 
+        if not enforceWorkflow(myWorkflow, {}, insertValues, N_insert, msgs):
             return False
 
         result = _DBM[table].insert_one(insertValues)
@@ -435,13 +436,13 @@ class DbAccess(object):
             return False
 
         # enforce the workflow
-        ownWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {}) 
-        if not enforceWorkflow(ownWorkflow, document, {}, N_delete, msgs):
+        myWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {}) 
+        if not enforceWorkflow(myWorkflow, document, {}, N_delete, msgs):
             return False
 
         # first cascade delete detail records that are marked for it
         # if there are remaining detail records, prevent delete!
-        tableInfo = DM[N_tables].get(table, {})
+        tableInfo = DM.get(table, {})
         details = tableInfo.get(N_details, {})
         detailsToKeep = {}
         detailsToRemove = []
@@ -554,11 +555,11 @@ class DbAccess(object):
         for (field, newVal) in updateValues.items():
             if document.get(field, None) == newVal: continue
             if fieldSpecs[field][N_multiple]: continue
-            timingField = DM[N_timing].get(table, {}).get(field, {}).get(newVal, None)
+            timingField = WM.get(N_timing).get(table, {}).get(field, {}).get(newVal, None)
             if timingField != None:
                 updateSaveValues[timingField] = now()
 
-        for sysField in DM[N_generic][N_systemFields]:
+        for sysField in DMG[N_systemFields]:
             if (sysField not in updateValues or updateValues[sysField] == None) and sysField in document:
                     updateSaveValues[sysField] = document[sysField] # add the system field
 
@@ -570,8 +571,8 @@ class DbAccess(object):
         newDocument.update(updateValues)
 
         # enforce the workflow
-        ownWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {})
-        if not enforceWorkflow(ownWorkflow, document, newDocument, N_update, msgs):
+        myWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {})
+        if not enforceWorkflow(myWorkflow, document, newDocument, N_update, msgs):
             return False
 
         # here system values are updated in the database
@@ -581,13 +582,13 @@ class DbAccess(object):
         )
 
         # check for updates in the workflow information
-        ownWorkflow = readWorkflow(self.basicList, table, [newDocument]).get(document[N__id], {})
+        myWorkflow = readWorkflow(self.basicList, table, [newDocument]).get(document[N__id], {})
         workflow.extend(adjustWorkflow(self.basicList, table, document, newDocument)) 
         records.append({
             N_values: updateSaveValues,
             N_newValues: newValues,
             N_diags: validationDiags,
-            N_workflow: ownWorkflow,
+            N_workflow: myWorkflow,
         })
 
     def _findDoc(self, table, rowFilter, fieldFilter, failData, failText, multiple=False):
@@ -642,25 +643,26 @@ class DbAccess(object):
             (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
             (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
             perm = {N_update: uFields, N_delete: mayDelete}
-            ownWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {})
+            myWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {})
             tables.append({
                 N_table: table,
                 N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
                 N_perm: perm,
                 N_fields: fieldFilter,
-                N_workflow: ownWorkflow
+                N_workflow: myWorkflow
             })
         records.clear()
         records.extend(tables)
 
-    def _consolidateDocs(self, table, documents, level=0, withDetails=False):
-        tableInfo = DM[N_tables].get(table, {})
-        fieldOrder = [x for x in tableInfo.get(N_fieldOrder, DM[N_generic][N_fieldOrder])]
-        fieldSpecs = dict(x for x in tableInfo.get(N_fieldSpecs, DM[N_generic][N_fieldSpecs]).items() if x[0] in fieldOrder)
+    def _consolidateDocs(self, controller, table, documents, level=0, withDetails=False):
+        (good, result) = Perm.getPerm(controller, table, N_read)
+        (rowFilter, fieldFilter) = result
+        tableInfo = DM.get(table, {})
+        (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, fieldFilter)
         detailOrder = tableInfo.get(N_detailOrder, None)
         details = tableInfo.get(N_details, None)
-        title = tableInfo.get(N_title, DM[N_generic][N_title])
-        item = tableInfo.get(N_item, DM[N_generic][N_item])
+        title = tableInfo[N_title]
+        item = tableInfo[N_item]
         consolidatedDocs = []
         docs = documents if type(documents) is list else [documents]
         nDocs = len(docs)
@@ -706,8 +708,8 @@ class DbAccess(object):
         methodName = '_head_{}'.format(table)
         if hasattr(self, methodName):
             return getattr(self, methodName)(doc)
-        tableInfo = DM[N_tables].get(table, {})
-        title = tableInfo.get(N_title, DM[N_generic][N_title])
+        tableInfo = DM.get(table, {})
+        title = tableInfo[N_title]
         return str(doc.get(title, 'no {}'.format(title))).rstrip('\n')
 
     def _head_user(self, doc):
@@ -754,14 +756,11 @@ class DbAccess(object):
         return '{} - {}'.format(score, level) if score or level else description
 
     def _theseFields(self, table, fieldFilter):
-        tableInfo = DM[N_tables].get(table, {})
-        fieldOrder = [x for x in tableInfo.get(N_fieldOrder, DM[N_generic][N_fieldOrder]) if fieldFilter == True or x in fieldFilter]
-        fieldSpecs = dict(
-            x for x in tableInfo.get(N_fieldSpecs, DM[N_generic][N_fieldSpecs]).items() if x[0] in fieldOrder
-        )
-        fieldFilterPost = dict(
-            (f, True) for f in fieldOrder
-        )
+        tableInfo = DM.get(table, {})
+        allFieldSpecs = tableInfo[N_fieldSpecs]
+        fieldOrder = [x for x in tableInfo[N_fieldOrder] if fieldFilter == True or x in fieldFilter]
+        fieldSpecs = dict((x, allFieldSpecs.get(x, {})) for x in fieldOrder)
+        fieldFilterPost = dict((f, True) for f in fieldOrder)
         return (fieldOrder, fieldSpecs, fieldFilterPost)
 
 def _simpleVal(valType, val):

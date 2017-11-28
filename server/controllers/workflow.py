@@ -1,11 +1,14 @@
 from controllers.utils import now
 
-from models.workflow import WorkflowModel as WM
-from models.names import *
+from models.compiled.model import model as M
+from models.compiled.names import *
+
+DM = M[N_tables]
+WM = M[N_workflow]
 
 def readWorkflow(basicList, table, myDocs):
     result = {}
-    for w in WM[N_tables].get(table, {}).get(N_read, []):
+    for w in DM.get(table, {}).get(N_workflow, {}).get(N_read, []):
         _computeWorkflow(basicList, myDocs, w, result) 
     return result
 
@@ -14,7 +17,7 @@ def adjustWorkflow(basicList, table, document, adjustedValues):
         _combineAffected(
             _getAffected(
                 basicList, document, adjustedValues, w,
-            ) for w in WM[N_tables].get(table, {}).get(N_adjust, []),
+            ) for w in DM.get(table, {}).get(N_workflow, {}).get(N_adjust, []),
         ),
     )
 

@@ -1,0 +1,245 @@
+defaults:
+  title: rep
+  item:
+    - item
+    - items
+  sort:
+    - [rep, 1]
+  fieldOrder:
+    - rep
+  fieldSpecs:
+    rep:
+      perm:
+        list:   public
+        read:   public
+        update: office
+      label: representation
+      valType: text
+      multiple: false
+
+provenanceOrder:
+  - editors
+  - creator
+  - dateCreated
+  - modified
+
+provenanceSpecs:
+  editors:
+    perm:
+      list: own
+      read: own
+      update: own
+    label: editors
+    valType:
+      relTable: user
+      allowNew: false
+    multiple: true
+  creator:
+    perm:
+      list: office
+      read: office
+      update: nobody
+    label: creator
+    valType:
+      relTable: user
+      allowNew: false
+    multiple: false
+  dateCreated:
+    perm:
+      list: office
+      read: office
+      update: nobody
+    label: created on
+    valType: datetime
+    multiple: false
+  modified:
+    perm:
+      list: office
+      read: office
+      update: nobody
+    label: modified
+    valType: text
+    multiple: true
+
+generic:
+  systemFields:
+    - dateCreated
+    - creator
+    - modified
+  noTitle: no title
+
+permissions:
+  unauth: public
+  auth:   auth
+
+  groups:
+    public: user, not logged in
+    auth:   authenticated user
+    edit:   authenticated user and editor of records in question
+    own:    authenticated user and creator of records in question
+    office: back office user
+    system: system administrator
+    root: full control
+    nobody: nobody
+
+  levels:
+    - public
+    - auth
+    - edit
+    - EDIT
+    - own
+    - OWN
+    - office
+    - system
+    - root
+    - nobody
+
+  authorize:
+    public: 
+      public: 1
+    auth:
+      public: 1
+      auth:   1
+      edit:  -2
+      EDIT:  -2
+      own:   -1
+      OWN:   -1
+      ownLT: -10
+    office:
+      public: 1
+      auth:   1
+      edit:   2
+      EDIT:  -2
+      own:    1
+      OWN:   -1
+      ownLT: -10
+      office: 1
+    system:
+      public: 1
+      auth:   1
+      edit:   2
+      EDIT:  -2
+      own:    1
+      OWN:   -1
+      ownLT: -10
+      office: 1
+      system: 1
+    root:
+      public: 1
+      auth:   1
+      edit:   2
+      EDIT:  -2
+      own:    1
+      OWN:   -1
+      ownLT:  1
+      office: 1
+      system: 1
+
+  actions:
+    insert: create item
+    list:   read item title
+    read:   read item
+    update: update item
+    delete: delete item
+
+  methods:
+    mylist:
+      desc: list my items
+      call: EDIT
+    list:
+      desc: list all items
+      call: public
+    view:
+      desc: details of an item
+      call: public
+    mod:
+      desc: modify (insert/update/delete) an item
+      call: edit
+
+  owners:
+    user:     _id
+
+  editors:
+    - editors
+
+workflow:
+  prevent:
+    locked:
+      delete: true
+      update: except
+    stalled:
+      update:
+        submitted:
+          after: true
+    incomplete:
+      update:
+        submitted:
+          after: true
+  timing:
+    assessment:
+      submitted:
+        true: dateSubmitted
+        false: dateWithdrawn
+
+# Finally a section of 
+# string constants
+# used in the program
+
+names:
+  - diags
+  - 'No'
+  - 'true'
+  - 'Yes'
+  - _error
+  - _id
+  - action
+  - affiliation
+  - allIds
+  - Approved
+  - before
+  - bool
+  - cn
+  - complete
+  - criteriaEntities
+  - criteriaIds
+  - DARIAH
+  - data
+  - datetime
+  - detailData
+  - devel
+  - entities
+  - error
+  - fields
+  - filterList
+  - givenName
+  - good
+  - groupDesc
+  - groupRep
+  - id
+  - info
+  - insertValues
+  - isMemberOf
+  - isPristine
+  - kind
+  - local
+  - mail
+  - master
+  - masterId
+  - message
+  - msgs
+  - myIds
+  - newValues
+  - number
+  - o
+  - REGIME
+  - Rejected
+  - repName
+  - self
+  - sn
+  - text
+  - typeCriteria
+  - typeInfo
+  - url
+  - valueLists
+  - values
+  - warning

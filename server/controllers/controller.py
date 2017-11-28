@@ -1,7 +1,7 @@
 import traceback
 from bottle import request
 from controllers.utils import serverprint
-from models.names import *
+from models.compiled.names import *
 
 getq = lambda name: request.query[name][0:64]
 

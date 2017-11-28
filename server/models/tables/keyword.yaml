@@ -1,0 +1,6 @@
+perm:
+  list:   public
+  read:   public
+  update: office
+  insert: public
+  delete: office

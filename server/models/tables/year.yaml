@@ -1,0 +1,31 @@
+perm:
+  list:   public
+  read:   public
+  update: office
+  insert: public
+  delete: office
+
+title: rep
+
+item:
+  - year
+  - years
+
+sort:
+  - [rep, 1]
+
+fieldOrder:
+  - rep
+
+fieldSpecs:
+  rep:
+    perm:
+      list:   public
+      read:   public
+      update: office
+    label: Year
+    valType: number
+    multiple: false
+    grid:
+      width: 3em
+      grow: 0

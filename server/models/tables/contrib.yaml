@@ -1,0 +1,292 @@
+perm:
+  list:   public
+  read:   public
+  update: edit
+  insert: auth
+  delete: own
+
+workflow:
+  read:
+    - inspect: details
+      method: hasValue
+      linkField: contrib
+      otherTable: assessment
+      otherField: submitted
+      myField: null
+      value: true
+      workflow:
+        locked: true
+        lockedReason: being assessed
+  adjust:
+    - inspect: details
+      linkField: contrib
+      otherTable: assessment
+      triggerFields:
+        - typeContribution
+
+title: title
+
+item:
+  - contribution
+  - contributions
+
+sort:
+  - [title, 1]
+  - [dateCreated, -1]
+
+fieldOrder: 
+  - title
+  - year
+  - country
+  - vcc
+  - typeContribution
+  - description
+  - costTotal
+  - costDescription
+  - contactPersonName
+  - contactPersonEmail
+  - urlContribution
+  - urlAcademic
+  - tadirahObject
+  - tadirahActivity
+  - tadirahTechnique
+  - discipline
+  - keyword
+
+fieldSpecs: 
+  title:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Title
+    valType: text
+    multiple: false
+  contactPersonName:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: contact person
+    valType: text
+    multiple: false
+  contactPersonEmail:
+    perm:
+      list:   auth
+      read:   auth
+      update: edit
+    label: contact email
+    valType: email
+    multiple: true
+  urlContribution:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Contribution url
+    valType: url
+    multiple: true
+  urlAcademic:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Academic url
+    valType: url
+    multiple: true
+  description:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Description
+    valType: textarea
+    multiple: false
+  costTotal:
+    perm:
+      list:   auth
+      read:   auth
+      update: edit
+    label: cost (total)
+    valType: number
+    multiple: false
+  costDescription:
+    perm:
+      list:   office
+      read:   office
+      update: edit
+    label: cost (description)
+    valType: textarea
+    multiple: false
+  country:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Country
+    valType:
+      relTable: country
+      select:
+        isMember: true
+      allowNew: false
+    multiple: false
+  year:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Year
+    valType:
+      relTable: year
+      select:
+        rep:
+          $lte: $curYear
+      allowNew: false
+    multiple: false
+  vcc:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: VCC
+    valType:
+      relTable: vcc
+      allowNew: false
+    multiple: true
+  discipline:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Disciplines
+    valType:
+      relTable: discipline
+      allowNew: true
+    multiple: true
+  keyword:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Keywords
+    valType:
+      relTable: keyword
+      allowNew: true
+    multiple: true
+  typeContribution:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Type
+    valType:
+      relTable: typeContribution
+      allowNew: false
+      inactive:
+        attributes:
+          className: inactive
+          data-rh: this value does not belong to the current package
+        disabled: true
+    multiple: false
+  typeContributionOther:
+    perm:
+      list:   office
+      read:   office
+      update: nobody
+    label: Type
+    valType:
+      relTable: typeContribution
+      allowNew: true
+    multiple: true
+  tadirahObject:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Object(s)
+    valType:
+      relTable: tadirahObject
+      allowNew: false
+    multiple: true
+  tadirahActivity:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Activity(ies)
+    valType:
+      relTable: tadirahActivity
+      allowNew: false
+    multiple: true
+  tadirahTechnique:
+    perm:
+      list:   public
+      read:   public
+      update: edit
+    label: Technique(s)
+    valType:
+      relTable: tadirahTechnique
+      allowNew: false
+    multiple: true
+
+detailOrder:
+  - assessment
+
+details:
+  assessment:
+    table: assessment
+    linkField: contrib
+    mode: list
+    filtered: false
+
+filters:
+  - field: title
+    label: title
+    type: Fulltext
+    maxCols: null
+    expanded: null
+  - field: country
+    label: country
+    type: EUMap
+    maxCols: 2
+    expanded: true
+  - field: vcc
+    label: vcc
+    type: ByValue
+    maxCols: 2
+    expanded: true
+  - field: year
+    label: year
+    type: ByValue
+    maxCols: 3
+    expanded: false
+  - field: typeContribution
+    label: type
+    type: ByValue
+    maxCols: 2
+    expanded: true
+  - field: tadirahActivity
+    label: research activity
+    type: ByValue
+    maxCols: 2
+    expanded: false
+  - field: tadirahObject
+    label: research object
+    type: ByValue
+    maxCols: 2
+    expanded: false
+  - field: tadirahTechnique
+    label: research technique
+    type: ByValue
+    maxCols: 1
+    expanded: false
+  - field: discipline
+    label: discipline
+    type: ByValue
+    maxCols: 2
+    expanded: false
+  - field: keyword
+    label: keyword
+    type: ByValue
+    maxCols: 1
+    expanded: false

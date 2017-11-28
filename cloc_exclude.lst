@@ -12,8 +12,3 @@ static/tools/country_compose/countries.html
 static/tools/from_filemaker.html
 docs/design
 docs/Stats.md
-server/models/names.py
-server/models/data.py
-server/models/permission.py
-server/models/workflow.py
-

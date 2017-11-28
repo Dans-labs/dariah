@@ -1,0 +1,107 @@
+perm:
+  list:   auth
+  read:   auth
+  update: edit
+  insert: auth
+  delete: own
+
+title: title
+
+item:
+  - review
+  - reviews
+
+sort:
+  - [assessment, 1]
+  - [title, 1]
+  - [dateCreated, -1]
+
+fieldOrder: 
+  - title
+  - reviewType
+  - assessment
+  - remarks
+  - decision
+  - dateDecided
+
+fieldSpecs: 
+  title:
+    perm:
+      list:   auth
+      read:   auth
+      update: edit
+    label: Title
+    valType: text
+    multiple: false
+  assessment:
+    perm:
+      list:   auth
+      read:   auth
+      update: nobody
+    label: Assessment
+    valType:
+      relTable: assessment
+      allowNew: false
+      fixed: true
+    multiple: false
+  reviewType:
+    perm:
+      list:   auth
+      read:   auth
+      update: nobody
+    label: Review type
+    valType:
+      relTable: typeContribution
+      allowNew: false
+      fixed: true
+      inactive:
+        attributes:
+          className: inactive
+          data-rh: this value does not belong to the current package
+        disabled: true
+    multiple: false
+  remarks:
+    perm:
+      list:   auth
+      read:   auth
+      update: edit
+    label: Remarks
+    valType: textarea
+    multiple: true
+  decision:
+    perm:
+      list:   auth
+      read:   auth
+      update: edit
+    label: Decision
+    valType:
+      relTable: decision
+      allowNew: false
+    multiple: false
+  dateDecided:
+    perm:
+      list: auth
+      read: auth
+      update: nobody
+    label: Decided on
+    valType: datetime
+    multiple: false
+
+detailOrder:
+  - reviewEntry
+
+details:
+  reviewEntry:
+    table: reviewEntry
+    linkField: review
+    expand: true
+    mode: list
+    border: {
+      read: false,
+      edit: false,
+    }
+    filtered: true
+    cascade: true
+    fixed: true
+
+needMaster: true

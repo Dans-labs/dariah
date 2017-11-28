@@ -147,7 +147,7 @@ export const mainActionTemplates = {
             </div>
           : e('submitted')
             ? <div className={'label large workflow good'} >
-              {`All criteria assessed: this contribution can be submitted.
+              {`All criteria filled: this contribution can be submitted.
               `}
               </div>
             : null

@@ -1,0 +1,93 @@
+perm:
+  list:   auth
+  read:   auth
+  update: edit
+  insert: auth
+  delete: own
+
+workflow:
+  adjust:
+    - inspect: master
+      linkField: assessment
+      otherTable: assessment
+      triggerFields:
+        - score
+        - evidence
+
+title: criteria
+
+item:
+  - criterion entry
+  - criterion entries
+
+sort:
+  - [seq, 1]
+
+fieldOrder:
+  - seq
+  - criteria
+  - score
+  - evidence
+  - assessment
+
+fieldSpecs:
+  seq:
+    perm:
+      list:   auth
+      read:   edit
+      update: nobody
+    label: Number
+    valType: number
+    multiple: false
+  criteria:
+    perm:
+      list:   auth
+      read:   edit
+      update: nobody
+    label: criterion
+    valType:
+      relTable: criteria
+      allowNew: false
+      fixed: true
+    multiple: false
+  score:
+    perm:
+      list:   auth
+      read:   edit
+      update: edit
+    label: score
+    valType:
+      relTable: score
+      link: criteria
+      allowNew: false
+      popUpIfEmpty: true
+    multiple: false
+  assessment:
+    perm:
+      list:   auth
+      read:   edit
+      update: nobody
+    label: assessment
+    valType:
+      relTable: assessment
+      allowNew: false
+      fixed: true
+    multiple: false
+  evidence:
+    perm:
+      list:   auth
+      read:   edit
+      update: edit
+    label: Evidence
+    valType: textarea
+    multiple: true
+
+needMaster: true
+
+filters:
+  - field: score
+    relField: score
+    label: score
+    type: ByValue
+    maxCols: 1
+    expanded: true
