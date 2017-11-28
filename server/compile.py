@@ -19,7 +19,10 @@ def combine(topData, tableData):
         for (df, dfInfo) in defaults.items():
             if df not in tableInfo:
                 tableInfo[df] = dfInfo
-        tableInfo['fieldOrder'] = [*tableInfo['fieldOrder'], *provenanceOrder]
+        fieldOrder = []
+        fieldOrder.extend(tableInfo['fieldOrder'])
+        fieldOrder.extend(provenanceOrder)
+        tableInfo['fieldOrder'] = fieldOrder
         for (p, pInfo) in provenanceSpecs.items():
             if p not in tableInfo['fieldSpecs']:
                 tableInfo['fieldSpecs'][p] = pInfo
