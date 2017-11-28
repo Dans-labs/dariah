@@ -26,8 +26,8 @@ provenanceOrder:
 provenanceSpecs:
   editors:
     perm:
-      list: own
-      read: own
+      list: edit
+      read: edit
       update: own
     label: editors
     valType:
