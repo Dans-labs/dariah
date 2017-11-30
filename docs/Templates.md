@@ -1,5 +1,5 @@
 ---
-Templates
+title: Templates
 ---
 
 Introduction
