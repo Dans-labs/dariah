@@ -246,10 +246,9 @@ class DbAccess(object):
         if not good:
             if result == None:
                 msgs.append({N_kind: N_info, N_text: '{} list is empty'.format(table)})
-                good = True
             else:
                 msgs.append({N_kind: N_error, N_text: result or 'Cannot list {}'.format(table)})
-                return
+            return
         (rowFilter, fieldFilter) = result
         details = tableInfo.get(N_details, {})
         detailOrder = tableInfo.get(N_detailOrder, [])
