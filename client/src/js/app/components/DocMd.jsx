@@ -22,7 +22,7 @@ class DocMd extends Component {
   render() {
     const { props: { alter, alterSection, text, docName, dispatch } } = this
 
-    if (needDoc({ text })) {return <div>{`No document ${docName}`}</div>}
+    if (needDoc({ text })) {return `No document ${docName}`}
 
     const { getAlt, nextAlt } = compileAlternatives(alterSection, 2, 0, dispatch)('format')
     const alt = getAlt(alter)
@@ -44,15 +44,11 @@ class DocMd extends Component {
           </p>
           {
             alt === 0
-            ? <div>
-                <Markdown
-                  source={text}
-                  renderers={renderers}
-                />
-              </div>
-            : <div>
-                <pre className={'md-source'} >{text}</pre>
-              </div>
+            ? <Markdown
+                source={text}
+                renderers={renderers}
+              />
+            : <pre className={'md-source'} >{text}</pre>
           }
         </div>
       </ErrorBoundary>

@@ -38,35 +38,35 @@ export const updateAuto = (state, path, data, asArray = false) => path.length ==
   ? update(state, data)
   : path.length === 1
     ? update(
-        state, {
-          [path[0]]: {
-            $apply: v => {
-              const newV = update(v || (asArray ? emptyA : emptyO), data)
-              return jString(v) === jString(newV)
-              ? v
-              : newV
-            },
+      state, {
+        [path[0]]: {
+          $apply: v => {
+            const newV = update(v || (asArray ? emptyA : emptyO), data)
+            return jString(v) === jString(newV)
+            ? v
+            : newV
           },
         },
-      )
+      },
+    )
     : update(
-        state, {
-          [path[0]]: {
-            $apply: v => updateAuto(v || emptyO, path.slice(1), data, asArray),
-          },
+      state, {
+        [path[0]]: {
+          $apply: v => updateAuto(v || emptyO, path.slice(1), data, asArray),
         },
-      )
+      },
+    )
 
 export const jString = (o, indent) => JSON.stringify(
   o,
   (k, v) => (v !== null && typeof v === 'object' && !Array.isArray(v))
     ? Object.keys(v).sort().reduce(
-        (r, kv) => {
-          r[kv] = v[kv]
-          return r
-        },
-        {},
-      )
+      (r, kv) => {
+        r[kv] = v[kv]
+        return r
+      },
+      {},
+    )
     : v,
   indent,
 )

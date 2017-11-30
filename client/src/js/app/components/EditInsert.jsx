@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { applyInsertTemplate } from 'presentation'
+import { applyInsertTemplate } from 'templates'
 
 import { DETAILS } from 'tables'
 

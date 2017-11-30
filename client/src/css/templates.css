@@ -1,25 +1,25 @@
-div.criteriaEntryRead, div.criteraEntryEdit {
+div.entryRead, div.entryEdit {
     border-radius: 0.5rem;
     margin: 2px;
 }
-div.criteriaEntryRead.complete {
+div.entryRead.complete {
     border: 2px solid var(--entry-complete-border);
     background-color: var(--entry-complete-back);
 }
-div.criteriaEntryRead.incomplete {
+div.entryRead.incomplete {
     border: 2px dotted var(--entry-incomplete-border);
     background-color: var(--entry-incomplete-back);
 }
-div.criteriaEntryEdit.complete {
+div.entryEdit.complete {
     border: 2px solid var(--entry-edit-complete-border);
     background-color: var(--entry-edit-complete-back);
 }
-div.criteriaEntryEdit.incomplete {
+div.entryEdit.incomplete {
     border: 2px dotted var(--entry-edit-incomplete-border);
     background-color: var(--entry-edit-incomplete-back);
 }
 
-div.criteriaEntry {
+div.entry {
     display: flex;
     flex-flow: row  nowrap;
     justify-content: flex-start;
@@ -34,16 +34,30 @@ div.slim {
 div.xSlim {
     flex: 0 1 2rem;
 }
-div.criteriaRemarks {
+div.comments {
+    margin-left: 2rem;
+    margin-right: 3.5rem;
+}
+div.comments.criteria {
     font-size: small;
     margin-left: 0;
     margin-right: 3.5rem;
 }
 
-div.evidence {
-    margin-left: 2rem;
-    margin-right: 3.5rem;
+div.comments.assessment {
+    color: var(--assessment-quoted-fore);
+    background-color: var(--assessment-quoted-back);
+    border: 2px solid var(--assessment-quoted-border);
+    border-radius: 0.2rem;
+    padding: 0.2rem;
 }
+
+div.assessment .tag {
+    color: var(--workflow-info-fore);
+    background-color: var(--workflow-info-back);
+    border-color: var(--workflow-info-border);
+}
+
 .vtop {
     vertical-align: top;
 }

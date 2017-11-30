@@ -110,7 +110,7 @@ const updateEntities = (stateEntities, entities) => {
   return update(stateEntities, { $merge: newEntities })
 }
 
-const updateWorkflow = (state, workflow) => {
+const updateWorkflow = (state, workflow = emptyA) => {
   let newState = state
   for (const [relTable, relId, wf] of workflow) {
     newState = updateAuto(newState, [relTable, 'entities', relId, 'workflow'], { $set: wf })
@@ -149,7 +149,7 @@ const flows = {
   },
   modItem(state, { data, table }) {
     if (data == null) {return state}
-    const { records, workflow } = data
+    const { records = emptyA, workflow } = data
     let newState = state
     for (const record of records) {
       const { values, values: { _id }, newValues, workflow: ownWorkflow } = record
@@ -169,7 +169,7 @@ const flows = {
   },
   insertItem(state, { data, table, select }) {
     if (data == null) {return state}
-    const { records, workflow } = data
+    const { records = emptyA, workflow } = data
     let newState = state
     for (const record of records) {
       const { table: thisTable, ...dataRest } = record
@@ -192,7 +192,7 @@ const flows = {
   },
   delItem(state, { data }) {
     if (data == null) {return state}
-    const { records, workflow } = data
+    const { records = emptyA, workflow } = data
     let newState = state
     for (const record of records) {
       const [thisTable, _id] = record

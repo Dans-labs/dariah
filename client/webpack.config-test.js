@@ -1,4 +1,3 @@
-const webpack = require('webpack')
 const nodeExternals = require('webpack-node-externals')
  
 module.exports = {
@@ -10,18 +9,36 @@ module.exports = {
     modules: [
       __dirname + '/src/js/app/dux',
       __dirname + '/src/js/app/components',
+      __dirname + '/src/js/app/tables',
       __dirname + '/src/js/lib',
       __dirname + '/src/js/test',
       'node_modules',
     ],
   },
+  //devtool: "inline-cheap-module-source-map",
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         use: [
-          'babel-loader',
+          {
+            loader: 'babel-loader',
+            options: {
+              plugins: [
+                'babel-plugin-transform-object-rest-spread',
+                'babel-plugin-transform-class-properties',
+                '@babel/plugin-transform-react-jsx',
+              ],
+              presets: [
+                '@babel/preset-react',
+                '@babel/preset-env',
+              ],
+              "minified": true,
+              "comments": false,
+            },
+          },
         ],
       },
     ]

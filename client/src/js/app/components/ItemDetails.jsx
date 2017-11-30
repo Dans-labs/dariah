@@ -103,7 +103,7 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
                             linkField={linkField}
                             fixed={fixed}
                           />
-                        : <span>{`unknown display mode "${mode}" for ${detailThings}`}</span>
+                        : `unknown display mode "${mode}" for ${detailThings}`
                   : null
                 }
               </div>

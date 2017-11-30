@@ -10,6 +10,10 @@
     --action-active-back:              hsla(060,  80%,  90%, 0.8);
     --action-active-border:            hsla(060, 100%,  50%, 0.5);
 
+    --assessment-quoted-fore:          hsla( 60, 100%,  10%, 1  );
+    --assessment-quoted-back:          hsla( 60, 100%,  90%, 1  );
+    --assessment-quoted-border:        hsla( 60, 100%,  35%, 0.5);
+
     --entry-complete-back:             hsla(120, 100%, 100%, 1  );
     --entry-complete-border:           hsla(120, 100%,  50%, 0.5);
     --entry-incomplete-back:           hsla(  0, 100%, 100%, 1  );

@@ -65,6 +65,8 @@
     height: 100;
     position: fixed;
     top: 40;
+    bottom: auto;
+    left: auto;
     right: 10;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -86,6 +88,8 @@
     cursor: pointer;
     position: fixed;
     top: 0.05rem;
+    bottom: auto;
+    left: auto;
     right: 1rem;
     text-align: right;
     padding-left: 0;
@@ -97,11 +101,15 @@
 .msg-spinner-tip {
     position: fixed;
     top: 0.3rem;
+    bottom: auto;
+    left: auto;
     right: 2.2rem;
 }
 .msg-spinner-arrow {
     position: fixed;
+    bottom: auto;
     top: 1.2rem;
+    left: auto;
     right: 2rem;
 }
 .msg-dot {

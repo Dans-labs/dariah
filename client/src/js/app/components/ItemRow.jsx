@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
 
 import { memoize } from 'memo'
@@ -86,17 +86,15 @@ const ItemRow = ({
     <div className={isactive ? 'isactive' : emptyS}>
       {
         alt === 0
-        ? <div>
-            <div className={'grid-row'}>
-              <div className={'grid-status-cell'} >
-                {fieldsButton(nextAlt, table, eId, update, true)}
-                {hasForm ? <EditStatus form={`${table}-${eId}`} active={false} /> : null}
-              </div>
-              {putFieldFragments(tables, fieldFragments, widthStyles)}
-              {putDetailFragments(table, eId, detailFragments, widthStyles, nFields)}
+        ? <div className={'grid-row'}>
+            <div className={'grid-status-cell'} >
+              {fieldsButton(nextAlt, table, eId, update, true)}
+              {hasForm ? <EditStatus form={`${table}-${eId}`} active={false} /> : null}
             </div>
+            {putFieldFragments(tables, fieldFragments, widthStyles)}
+            {putDetailFragments(table, eId, detailFragments, widthStyles, nFields)}
           </div>
-        : <div>
+        : <Fragment>
             <div className={'grid-status-cell'} >
               {fieldsButton(nextAlt, table, eId, update, false)}
             </div>
@@ -118,7 +116,7 @@ const ItemRow = ({
               detailFragments={detailFragments}
               fixed={fixed}
             />
-          </div>
+          </Fragment>
       }
     </div>
   )

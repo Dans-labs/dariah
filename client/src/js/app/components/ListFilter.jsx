@@ -149,7 +149,7 @@ class ListFilter extends Component {
                   linkField={linkField}
                   fixed={fixed}
                 />
-              : <span>{`unknown display mode "${mode}" for ${things}`}</span>
+              : `unknown display mode "${mode}" for ${things}`
           }
         </div>
       </div>

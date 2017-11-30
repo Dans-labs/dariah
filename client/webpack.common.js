@@ -18,12 +18,49 @@ module.exports = {
     modules: [
       __dirname + '/src/js/app/dux',
       __dirname + '/src/js/app/components',
+      __dirname + '/src/js/app/tables',
       __dirname + '/src/js/lib',
       'node_modules',
     ],
   },
   module: {
     rules: [
+      {
+        test: /\.jsx?$/,
+        enforce: 'pre',
+        use: [
+          {
+            loader: 'eslint-loader',
+            options: {
+              configFile: 'eslint.yaml',
+            },
+          }
+        ],
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+              plugins: [
+                '@babel/plugin-transform-react-jsx',
+                'babel-plugin-transform-object-rest-spread',
+                'babel-plugin-transform-class-properties',
+              ],
+              presets: [
+                '@babel/preset-env',
+                '@babel/preset-react',
+              ],
+              minified: true,
+              comments: false,
+            },
+          },
+        ],
+      },
       {
         test: /\.gif?$/,
         loader: 'url-loader',
@@ -44,20 +81,6 @@ module.exports = {
         options: {
           name: '[name].[ext]',
         },
-      },
-      {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        use: [
-          'babel-loader',
-          {
-            loader: 'eslint-loader',
-            options: {
-              configFile: 'eslint.yaml',
-              failOnError: false,
-            },
-          },
-        ],
       },
     ]
   },

@@ -4,7 +4,7 @@ from copy import deepcopy
 from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
 
-from controllers.utils import oid, now, dtm, json_string, fillInSelect
+from controllers.utils import oid, now, dtm, json_string, fillInSelect, filterModified
 from controllers.workflow import detailInsert, readWorkflow, adjustWorkflow, enforceWorkflow
 from models.compiled.model import model as M
 from models.compiled.names import *
@@ -380,14 +380,14 @@ class DbAccess(object):
             insertValues[title] = '{} of {}'.format(item, masterDocument[masterTitle]) if masterDocument else noTitle
 
         # hook for workflow-specific actions: extra fields, extra details
-        (extraGood, extraText, extraData) = detailInsert(
+        (extraGood, extraData) = detailInsert(
             self.basicList,
+            msgs,
             self._head,
             table=table,
             masterDocument=masterDocument,
         )
         if not extraGood:
-            msgs.append({N_kind: N_error, N_text: extraText})
             return False
 
         # use the extra fields, if any
@@ -395,7 +395,9 @@ class DbAccess(object):
             insertValues.update(extraData[N_insertValues])
 
         # enforce the workflow
-        myWorkflow = readWorkflow(self.basicList, table, insertValues).get(None, {}) 
+        myWorkflow = readWorkflow(
+            self.basicList, table, {None: insertValues},
+        ).get(None, {}) 
         if not enforceWorkflow(myWorkflow, {}, insertValues, N_insert, msgs):
             return False
 
@@ -424,8 +426,10 @@ class DbAccess(object):
         if ident == None:
             msgs.append({N_kind: N_error, N_text: 'Not specified which item to delete from table {}'.format(table)})
             return False
-        rowFilter.update({N__id: oid(ident)})
-        documents = list(_DBM[table].find(rowFilter))
+        theRowFilter = {}
+        theRowFilter.update(rowFilter)
+        theRowFilter.update({N__id: oid(ident)})
+        documents = list(_DBM[table].find(theRowFilter))
         if len(documents) != 1:
             msgs.append({N_kind: N_error, N_text: 'Unidentified item to delete'})
             return False
@@ -436,7 +440,9 @@ class DbAccess(object):
             return False
 
         # enforce the workflow
-        myWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {}) 
+        myWorkflow = readWorkflow(
+            self.basicList, table, {document[N__id]: document},
+        ).get(document[N__id], {}) 
         if not enforceWorkflow(myWorkflow, document, {}, N_delete, msgs):
             return False
 
@@ -458,8 +464,10 @@ class DbAccess(object):
             else:
                 msgs.append({N_kind: N_error, N_text: result or 'Cannot read details in table {}'.format(detailTable)})
                 continue
-            detailRowFilter.update({linkField: oid(ident)})
-            detailDocuments = list(_DBM[detailTable].find(detailRowFilter, {N__id: True}))
+            theDetailRowFilter = {}
+            theDetailRowFilter.update(detailRowFilter)
+            theDetailRowFilter.update({linkField: oid(ident)})
+            detailDocuments = list(_DBM[detailTable].find(theDetailRowFilter, {N__id: True}))
             nDetails = len(detailDocuments)
             if nDetails == 0: continue
             if cascade:
@@ -469,7 +477,7 @@ class DbAccess(object):
                     msgs.append({N_kind: N_error, N_text: result or 'Cannot delete details in table {}'.format(detailTable)})
                     continue
                 (detailRowFilter, fieldFilter) = result
-                detailsToRemove.append((detailDocuments, detailRowFilter))
+                detailsToRemove.append((detailTable, detailDocuments, theDetailRowFilter))
             else:
                 # in this case: check whether there is nothing to delete
                 n = detailsToKeep.setdefault(detailTable, 0)
@@ -488,7 +496,7 @@ class DbAccess(object):
             return False
         
         # only here we start removing details, but we stop if something goes wrong
-        for (detailDocuments, detailRowFilter) in detailsToRemove:
+        for (detailTable, detailDocuments, detailRowFilter) in detailsToRemove:
             for detailDoc in detailDocuments:
                 good = self._deleteItem(controller, detailTable, {N__id: detailDoc[N__id]}, detailRowFilter, records, msgs, workflow)
                 if not good:
@@ -497,7 +505,7 @@ class DbAccess(object):
         # only if all details have been deleted, we proceed with deleting the main record
         if not self._hasErrors(msgs):
             # finally delete the main record
-            _DBM[table].delete_one(rowFilter)
+            _DBM[table].delete_one(theRowFilter)
             workflow.extend(adjustWorkflow(self.basicList, table, document, {}))
             records.append((table, str(ident)))
 
@@ -561,9 +569,11 @@ class DbAccess(object):
 
         for sysField in DMG[N_systemFields]:
             if (sysField not in updateValues or updateValues[sysField] == None) and sysField in document:
-                    updateSaveValues[sysField] = document[sysField] # add the system field
+                updateSaveValues[sysField] = document[sysField] # add the system field
 
-        updateSaveValues.setdefault(N_modified, []).append('{} on {}'.format(modBy, modDate))
+        modified = filterModified(updateSaveValues.get(N_modified, []))
+        modified.append('{} on {}'.format(modBy, modDate))
+        updateSaveValues[N_modified] = modified
         if N_isPristine in updateSaveValues: del updateSaveValues[N_isPristine]
 
         newDocument = {}
@@ -571,7 +581,9 @@ class DbAccess(object):
         newDocument.update(updateValues)
 
         # enforce the workflow
-        myWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {})
+        myWorkflow = readWorkflow(
+            self.basicList, table, {document[N__id]: document},
+        ).get(document[N__id], {})
         if not enforceWorkflow(myWorkflow, document, newDocument, N_update, msgs):
             return False
 
@@ -582,7 +594,9 @@ class DbAccess(object):
         )
 
         # check for updates in the workflow information
-        myWorkflow = readWorkflow(self.basicList, table, [newDocument]).get(document[N__id], {})
+        myWorkflow = readWorkflow(
+            self.basicList, table, {newDocument[N__id]: newDocument}
+        ).get(document[N__id], {})
         workflow.extend(adjustWorkflow(self.basicList, table, document, newDocument)) 
         records.append({
             N_values: updateSaveValues,
@@ -599,7 +613,9 @@ class DbAccess(object):
         ldoc = len(documents)
         if ldoc == 0:
             return self.stop({N_data: failData, N_text: failText})
-        workflow = readWorkflow(self.basicList, table, documents) 
+        workflow = readWorkflow(
+            self.basicList, table, dict((doc[N__id], doc) for doc in documents),
+        ) 
         if multiple:
             data = []
             for document in documents:
@@ -643,7 +659,9 @@ class DbAccess(object):
             (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
             (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
             perm = {N_update: uFields, N_delete: mayDelete}
-            myWorkflow = readWorkflow(self.basicList, table, [document]).get(document[N__id], {})
+            myWorkflow = readWorkflow(
+                self.basicList, table, {document[N__id]: document},
+            ).get(document[N__id], {})
             tables.append({
                 N_table: table,
                 N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),

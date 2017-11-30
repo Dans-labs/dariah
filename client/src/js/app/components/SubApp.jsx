@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
 
 import { withParams, emptyA } from 'utils'
@@ -140,18 +140,18 @@ const SubApp = ({ me, table, routes, children }) => (
       <ErrorBoundary>
         {
           routes[1].path === 'data' && routes.length === 1
-          ? <div>{'All tables'}</div>
+          ? 'All tables'
           : routes[1].path === 'data' && routes.length === 2
-            ? <div>
+            ? <Fragment>
                 <h3>{'Registry'}</h3>
                 <p>{'Use the side bar to navigate to a section'}</p>
-              </div>
+              </Fragment>
               : routes[1].path === 'data' && routes.length === 3
-                ? <div>
+                ? <Fragment>
                     <h3>{'Registry'}</h3>
                     <h4>{`Table ${table}`}</h4>
                     <p>{'Use the side bar to navigate to a particular view on this table'}</p>
-                  </div>
+                  </Fragment>
                 : null
         }
       </ErrorBoundary>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
 
 import { combineSelectors, emptyA } from 'utils'
@@ -92,7 +92,7 @@ const ListGrid = ({
     )
   }
   return (
-    <div>
+    <Fragment>
       {
         !(filtered && select === DETAILS)
         ? <div>
@@ -122,12 +122,12 @@ const ListGrid = ({
       }
       {
         sortSpec.length !== 0
-        ? <p className={'sortspecs'} >
+        ? <div className={'sortspecs'} >
             {'Sorted: '}
             {
               sortSpec.map(([column, direction]) => (
                 <span className={'sortcol'} key={column} >
-                  <span>{column}</span>
+                  {column}
                   <span className={`fa fa-arrow${direction === -1 ? 'down' : 'up'}`} />
                 </span>
               ))
@@ -141,7 +141,7 @@ const ListGrid = ({
                 onClick={handle(dispatch, resetSort, gridTag)}
               />{' '}
             </Tooltip>
-          </p>
+          </div>
         : null
       }
       <div className={'grid'} >
@@ -212,7 +212,7 @@ const ListGrid = ({
         </div>
         {rows}
       </div>
-    </div>
+    </Fragment>
   )
 }
 

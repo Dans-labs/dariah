@@ -37,9 +37,9 @@ To a large extent, its rules are specified in the
 Client
 ---------------------------------------------------------------------
 Workflow logic is found in [workflow.js](Dux#workflow),
-but also in the component [Templates](Components#templates), 
-where several templates include workflow buttons and info panels.
-The templates themselves are applied by functions in [presentation.js](Lib#presentation).
+but also in the [templates](Templates), 
+which may include workflow buttons and info panels.
+The templates themselves are applied by functions in [templates.js]({{site.libBase}}/templates.js).
 These functions are given workflow attributes that they pass on to the templates.
 
 Server

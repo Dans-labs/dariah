@@ -27,7 +27,7 @@ fieldSpecs:
       list:   auth
       read:   edit
       update: nobody
-    label: Number
+    label: Criterion number
     valType: number
     multiple: false
   criteria:
@@ -68,7 +68,7 @@ fieldSpecs:
       list:   auth
       read:   edit
       update: edit
-    label: Comments
+    label: Reviewer comments
     valType: textarea
     multiple: true
 
@@ -81,5 +81,3 @@ filters:
     type: ByValue
     maxCols: 1
     expanded: true
-
-needMaster: true

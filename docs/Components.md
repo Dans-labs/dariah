@@ -642,7 +642,7 @@ the form submission machinery.
 See [ItemEdit](#itemedit).
 
 ### Task
-Manages the display of a single record, but only as far as an [ActionTemplate](#templates)
+Manages the display of a single record, but only as far as an [ActionTemplate](Templates)
 has been provided for that table.
 The action template may contain controls that modify fields and save them to the database,
 exactly as [ItemEdit](#itemedit).
@@ -657,7 +657,7 @@ and in edit-view.
 This component uses
 [applyEditTemplate](Lib#applyedittemplate)
 to see whether there is an action template defined in
-[Templates](#templates).
+[Templates](Templates).
 If yes, that template will be applied, if no, nothing will be rendered.
 
 [ItemContainer]({{site.appBase}}/components/ItemContainer.jsx)
@@ -795,9 +795,9 @@ and a read-only field by a
 
 ### Using templates
 Before setting up the fields of an item,
-[applyEditTemplate](presentation#applyedittemplate)
+[applyEditTemplate](Lib#applyedittemplate)
 is called.
-If it finds a suitable template in [Templates](#templates)
+If it finds a suitable template in [Templates](Templates)
 it will be applied.
 If not, all fields will be displayed in a generic presentation.
 
@@ -836,9 +836,9 @@ You might wonder why `table` is missing in the props.
 The `fieldFragment`s prop contains that information.
 
 Before setting up the fields of an item,
-[applyTemplate](presentation#applytemplate)
+[applyTemplate](Lib#applytemplate)
 is called.
-If it finds a suitable template in [Templates](#templates)
+If it finds a suitable template in [Templates](Templates)
 it will be applied.
 If not, all fields will be displayed in a generic presentation.
 
@@ -1160,201 +1160,6 @@ This is one of the components just below [App](#app).
 It contains a set of panes and navigation links to main subcomponents to
 display in those panes.
 Most of those subcomponents are linked to a main table, which is passed in the `table` prop.
-
-[Templates]({{site.appBase}}/components/Templates.jsx)
-=============================================================================================
-presents __none__
-
-For some parts of the application the generic ways of presenting records and fields
-is just not good enough, e.g. for the display of assessments.
-We need a deeper customization there, where the criteriaEntry detail records should
-appear in one big form.
-
-The challenge is to use as much of the generic machinery when we define custom presentations.
-Our solution here is by using *templates*.
-
-Looking up a field value might seem a very innocent operation: you retrieve the
-appropriate document from the database, look up the field in question, and read out the value 
-that you find there.
-Alas, there are several complicating factors:
-* That value might be a MongoDB object identifier pointing to a related record.
-  We do not want to display that identifier, but the corresponding record, but not
-  the whole record. Only an informative heading. For that we have to look up additional
-  fields in the related table, and possibly apply logic depending on what we encounter.
-* We should not show fields that the current user is not entitled to view.
-  We should not put in edit controls for fields that the current user is not allowed to 
-  edit.
-
-These concerns are built into the generic logic, in the components
-* [ItemRead](#itemread)
-* [ItemEdit](#itemedit)
-* [FieldRead](#fieldread)
-* [FieldEdit](#fieldedit)
-and we do not want to reimplement this logic when we do templates.
-
-Our solution is that templates are not static strings into which 
-field values are merged dynamically.
-
-Instead, our templates are *functions* that take a properties object as arguments.
-The properties are functions that can furnish representations for fields.
-These functions use the general machinery to
-* compute string values for fields;
-* compute read-only values for fields including looking up headings of related records,
-  for fields pointing to them, and wrap them in
-  [FieldRead](#fieldread) components;
-* present appropriate edit controls for fields whenever the user may change their values
-  and wrap them in
-  [FieldEdit](#fieldedit) components.
-* present custom controls for fields upon click events
-  and wrap them in
-  [FieldSet](#fieldset) components.
-
-Applying a template means feeding a higher order React component with
-a properties object of field rendering functions, which results in 
-a concrete React component.
-
-The templates will be applied by
-[ItemRead](#itemread),
-[ItemEdit](#itemedit),
-and
-[ItemAction](#itemaction),
-.
-using the functions
-[applyTemplate](presentation#applytemplate)
-and
-[applyEditTemplate](presentation#applyedittemplate)
-
-### Task
-There are several situations that ask for templates:
-* related records (read only)
-* detail records (read only)
-* detail records (editable)
-* consolidated records
-
-In all those cases the templates are organized in objects, that are first keyed
-by the name of a main table.
-For each main table there is an object of functions, the template functions, named
-after the related/detail table they are for.
-
-#### Explanation
-**Related records** are records pointed to by a field in a main record.
-For example, a `assessment` record has a field `contribution`, containing the
-identifier of the contribution record that the assessment is targeting.
-Here the assessment record wants to display a contribution record as read-only information.
-A template for this can be defined as follows:  
-
-```jsx
-const relatedTemplates = {
-  contrib: {
-    assessment({ v, e, f, linkMe }) {
-      const cTitle = v('title')
-      return (
-        <div>
-        presentation of fields, using v, e, f
-        </div>
-      )
-    },
-    ...
-  },
-  ...
-```
-
-**Detail records** are records that point to another record.
-For an example, an `assessment` record is accompanied by a series of 
-`criteriaEntry` records. The `assessment` record has no pointers to the `criteriaEntry`
-records. Rather each `criteriaEntry` record points to an assessment record.
-
-If record A points to record B, you could say that record B is as master record and A is a detail of it.
-But in our application, this is not automatically so.
-
-For example, a contribution points to a `year` record, to indicate the year of the contribution.
-Yet we do not consider a contribution to be a detail of a year.
-
-If you want related records to be treated as detail records, you have to say so in the
-[data model](Model).
-
-**Readonly** versus **Edit** versus **Action**
-For main and detail records, we have several sets of templates;
-* **Read** for presentation of records in read-only mode,
-* **Edit** for presenting records as forms with editable fields,
-* **Action** for presenting actions upon records.
-
-The idea is that the form can switch between **Read** and **Edit** by means of a standard
-control, and that the **Action** part is independent of that switch: it is always displayed.
-
-In the **Read** part, you cannot have edit controls, but in the **Edit** and **Action** parts
-you can have them.
-However, in the **Action** part, you do not have `save` and `reset` buttons.
-This part is meant for action buttons, which change a field to a predefined value and save
-them immediately.
-
-**Consolidated records** are records for which all related values and relevant details have been 
-collected and represented as strings. 
-A consolidated record is a frozen snapshot of the logical content of a record.
-It will not change if related records and detail records are modified.
-We use consolidated records for storing contribution metadata in assessment records when
-the assessment has finished, and other cases where we have to preserve a record of activities.
-
-### Applying templates
-A template is a function that can be passed a `props` object containing functions that deliver
-field value information:
-* `v = field => ` *read-only string value for* `field`
-* `f = field => <FieldRead> ` *react component for reading* `field`
-* `fe = field => <FieldEdit> ` *react component for editing* `field`
-* `fs = field => <FieldSet> ` *customizable react component for setting* `field`
-  to a predefined value
-* `e = field => ` *whether that field has an empty value*
-* `m = field => ` *whether that field is editable by the current user*
-
-### mainTemplates
-Object, keyed by the names of tables.
-The values are *read* templates for records in those (main) tables.
-
-These templates are not passed the `fe` function.
-
-### mainActionTemplates
-Like *mainTemplates*, but now the values are *action* templates.
-
-These template functions are passed the `fe` function.
-
-### mainEditTemplates
-Like *mainTemplates*, but now the values are *edit* templates.
-
-These template functions are passed the `fe` function.
-There is an extra parameter `editButton`, which is a React component that 
-holds the [edit/save button](EditCOntrol) for this record.
-
-### detailTemplates
-Object, keyed by the names of the detail tables and then by the names of master tables.
-The values are *read* templates for records in those detail tables, when they
-are presented as details of a record in the master table.
-
-These templates are not passed the `fe` function.
-
-### detailActionTemplates
-Like *detailTemplates*, but now the values are *action* templates.
-
-These template functions are passed the `fe` function.
-
-### detailEditTemplates
-Like *detailTemplates*, but now the values are *edit* templates.
-
-These template functions are passed the `fe` function.
-There is an extra parameter `editButton`, which is a React component that 
-holds the edit/save button for this record.
-
-### relatedTemplates
-Object, keyed by the names of the related tables.
-For each related table it contains an object of functions,
-named by the table name of the main records.
-
-These template functions are not passed the `fe` function,
-but they get an extra parameter: `linkMe`, a hyperlink to the main record: `linkMe`.
-
-### consolidatedTemplates
-Object is keyed by the names of the related tables.
-For each related table it contains an object of functions,
-named by the table name of the main records.
 
 [Tooltip]({{site.appBase}}/components/Tooltip.jsx)
 =============================================================================================

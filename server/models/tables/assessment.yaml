@@ -46,6 +46,11 @@ workflow:
       triggerFields:
         - assessmentType
         - submitted
+    - inspect: details
+      linkField: assessment
+      otherTable: criteriaEntry
+      triggerFields:
+        - submitted
 
 title: title
 
@@ -101,7 +106,7 @@ fieldSpecs:
       inactive:
         attributes:
           className: inactive
-          data-rh: this value does not belong to the current package
+          title: this value does not belong to the current package
         disabled: true
     multiple: false
   remarks:

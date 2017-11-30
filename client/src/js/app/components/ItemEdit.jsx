@@ -4,7 +4,7 @@ import { reduxForm } from 'redux-form'
 
 import { emptyO } from 'utils'
 
-import { applyEditTemplate } from 'presentation'
+import { applyEditTemplate } from 'templates'
 import { onSubmitSuccess, itemEditField } from 'fields'
 import { toDb, headEntity } from 'tables'
 
@@ -41,9 +41,8 @@ const ItemEdit = ({
   } = tables
   const kind = masterTable ? 'detail' : 'main'
   return (
-    applyEditTemplate(settings, tables, table, `${kind}Edit`, masterTable, eId, fieldFragments, editButton, submitValues)
-    || <div>
-        <form>
+    applyEditTemplate(settings, tables, table, `${kind}Edit`, masterTable, eId, fieldFragments, editButton, submitValues, reset)
+    || <form>
           {editButton}
           <div className={'grid fragments'}>{
             fieldFragments.map(({
@@ -83,7 +82,6 @@ const ItemEdit = ({
           }
           </div>
         </form>
-      </div>
   )
 }
 

@@ -64,7 +64,7 @@ class ListContainer extends Component {
                   perm={perm}
                   gridTag={table}
                 />
-              : <span>{`unknown display mode "${mode}" for ${things}`}</span>
+              : `unknown display mode "${mode}" for ${things}`
         }
       </ErrorBoundary>
     )

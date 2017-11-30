@@ -50,7 +50,7 @@ const Expand = ({
       {
         alt == 0
         ? null
-        : <div>{full}</div>
+        : full
       }
     </div>
   )
@@ -102,9 +102,7 @@ const ExpandBodyPure = ({
     alt == 0
     ? null
     : <div className={className}>
-        {
-          <div>{full}</div>
-        }
+        {full}
       </div>
   )
 }

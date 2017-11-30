@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
 
 import { combineSelectors, emptyS } from 'utils'
@@ -60,7 +60,7 @@ const ItemForm = props => {
     <div className={`itemRecord ${borderSwitch} ${editSwitch} ${isactive ? 'isactive' : emptyS}`} >
       {
         hasEditable && alt === 1
-        ? <div>
+        ? <Fragment>
             <EditDelete
               perm={perm}
               workflow={workflow}
@@ -82,8 +82,8 @@ const ItemForm = props => {
               linkField={linkField}
               fieldFragments={fieldFragments}
             />
-          </div>
-        : <div>
+          </Fragment>
+        : <Fragment>
             {
               hasEditable
               ? <Tooltip
@@ -114,7 +114,7 @@ const ItemForm = props => {
               linkField={linkField}
               fieldFragments={fieldFragments}
             />
-          </div>
+          </Fragment>
       }
       <ItemAction
           settings={settings}

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { emptyO } from 'utils'
 
-import { applyTemplate } from 'presentation'
+import { applyTemplate } from 'templates'
 import { toFieldInfo, itemReadField } from 'fields'
 
 import FieldRead from 'FieldRead'
@@ -28,27 +28,25 @@ export default ({
   const kind = masterTable ? 'detail' : 'main'
   return (
     applyTemplate(settings, tables, table, kind, masterTable, toFieldInfo(eId, fieldFragments), workflow)
-    || <div>
-        <div className={'grid fragments'}>{
-          fieldFragments.map(({
-            field, label,
-            fragment: { table: relTable, myValues },
-          }) => (
-            itemReadField(
-              field,
-              label,
-              <FieldRead
-                field={field}
-                tables={tables}
-                table={relTable}
-                eId={eId}
-                myValues={myValues}
-              />,
-              field,
-            )
-          ))
-        }
-        </div>
+    || <div className={'grid fragments'}>{
+        fieldFragments.map(({
+          field, label,
+          fragment: { table: relTable, myValues },
+        }) => (
+          itemReadField(
+            field,
+            label,
+            <FieldRead
+              field={field}
+              tables={tables}
+              table={relTable}
+              eId={eId}
+              myValues={myValues}
+            />,
+            field,
+          )
+        ))
+      }
       </div>
   )
 }

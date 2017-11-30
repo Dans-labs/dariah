@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
 import { emptyS } from 'utils'
 
@@ -11,7 +11,7 @@ export const editControl = canSubmit => ({
     dirty, invalid, submitting, error, handleSubmit,
     nextAlt,
 }) => (
-  <span>
+  <Fragment>
     {
       (canSubmit && !dirty && !submitting)
       ? <Tooltip
@@ -99,6 +99,6 @@ export const editControl = canSubmit => ({
     {
       error && canSubmit && <span className={'invalid diag'}>{error}</span>
     }
-  </span>
+  </Fragment>
 )
 

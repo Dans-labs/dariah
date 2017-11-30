@@ -16,14 +16,16 @@ if [[ "$1" == "module" ]]; then
     if [[ "$2" == "" ]]; then
         npm install
     else
-        npm install --save-dev $2
+        shift
+        npm install --save-dev "$@"
     fi
 elif [[ "$1" == "xmodule" ]]; then
     cd client
     if [[ "$2" == "" ]]; then
         echo "pass module to remove as argument"
     else
-        npm remove --save-dev $2
+        shift
+        npm remove --save-dev "$@"
     fi
 elif [[ "$1" == "stats" ]]; then
     codestats
@@ -33,7 +35,7 @@ elif [[ "$1" == "test" ]]; then
     if [[ "$2" == "" ]]; then
         npm test  'src/js/test/**/*.js'
     else
-        npm test src/js/test/$2.js
+        npm test "src/js/test/$2.js"
     fi
 elif [[ "$1" == "docs" ]]; then
     codestats
@@ -66,6 +68,7 @@ elif [[ "$1" == "prod" ]]; then
     webpack --config webpack.prod.js
     popd
 elif [[ "$1" == "shipdocs" ]]; then
+    shift
     codestats
     pushd client
     pushd ../docs
@@ -73,9 +76,10 @@ elif [[ "$1" == "shipdocs" ]]; then
     popd
     popd
     git add --all .
-    git commit -m "docs: $2"
+    git commit -m "docs: $*"
     git push origin master
 elif [[ "$1" == "shipcode" ]]; then
+    shift
     codestats
     pushd client
     pushd ../docs
@@ -85,7 +89,7 @@ elif [[ "$1" == "shipcode" ]]; then
     webpack --config webpack.prod.js
     popd
     git add --all .
-    git commit -m "ship: $2"
+    git commit -m "ship: $*"
     git push origin master
 elif [[ "$1" == "shipdata" ]]; then
     git add --all .

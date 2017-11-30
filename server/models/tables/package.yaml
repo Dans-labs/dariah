@@ -59,7 +59,7 @@ fieldSpecs:
       inactive:
         attributes:
           className: inactive
-          data-rh: this value does not belong to the current package
+          title: this value does not belong to the current package
         disabled: false
     multiple: true
   remarks:

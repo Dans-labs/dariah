@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 
 import { emptyS } from 'utils'
@@ -28,16 +28,13 @@ class Notification extends Component {
     dispatch(clear())
   }
 
-    /*
-    */
-
   render() {
     const { props: { messages, lastNote, lastKind, busy, show } } = this
 
     const highlight = lastNote > -1
     const busyBlocks = new Array(busy < 0 ? 0 : busy).fill(1)
     return (
-      <div>
+      <Fragment>
         <Tooltip
           tip={'click circle to show/hide notifications and progress messages'}
           at={'left'}
@@ -45,7 +42,7 @@ class Notification extends Component {
           classTip={'msg-spinner-tip'}
           classArrow={'msg-spinner-arrow'}
         >
-          <p className={'msg-spinner'} >
+          <div className={'msg-spinner'} >
             <span
               className={highlight ? `spin-${lastKind}` : 'spin-ok'}
             >
@@ -55,7 +52,7 @@ class Notification extends Component {
                 onClick={this.handleBox}
               />
             </span>
-          </p>
+          </div>
         </Tooltip>
         {
           show
@@ -65,29 +62,29 @@ class Notification extends Component {
               onClick={this.handleHide}
             >{
               messages.map((msg, i) => (
-                <p
+                <div
                   key={i}
                   ref={this.refDom(`m${i}`)}
                   className={`msg-line ${[msg.kind]}-o ${msg.kind !== 'info' ? 'msg-high' : emptyS}`}
-                >{msg.text}</p>
+                >{msg.text}</div>
               ))
             }
-              <p className={'msg-dismiss'} >{'(click panel to hide)'}</p>
+              <div className={'msg-dismiss'} >{'(click panel to hide)'}</div>
               {
                 messages.length > 1
-                ? <p className={'msg-trash'} >
+                ? <div className={'msg-trash'} >
                     <a
                       href={'#'}
                       className={'control'}
                       onClick={this.handleClear}
                     ><span className={'control fa fa-trash'} />{' clear messages'}</a>
-                  </p>
+                  </div>
                 : null
               }
             </div>
           : null
         }
-      </div>
+      </Fragment>
     )
   }
   componentDidMount() {this.setView()}

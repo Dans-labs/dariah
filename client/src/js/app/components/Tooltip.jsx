@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 
 import { emptyS } from 'utils'
@@ -84,27 +84,24 @@ class Tooltip extends Component {
       },
     } = this
     return showTooltips
-    ? [
-      <span
-        key={'target'}
-        ref={this.storeTarget}
-        className={`${className} tooltipped focus ${focusOnly ? emptyS : 'hover'}`}
-        onMouseOver={this.handlePositioning}
-        onFocus={this.handlePositioning}
-      >{children}</span>,
-      <span
-        key={'tip'}
-      >
+    ? <Fragment>
         <span
-          ref={this.storeTip}
-          className={`tooltip ${classTip}`}
-        >{tip}</span>
-        <span
-          ref={this.storeArrow}
-          className={`toolarrow toolarrow-${at} ${classArrow}`}
-        />
-      </span>,
-    ]
+          ref={this.storeTarget}
+          className={`${className} tooltipped focus ${focusOnly ? emptyS : 'hover'}`}
+          onMouseOver={this.handlePositioning}
+          onFocus={this.handlePositioning}
+        >{children}</span>
+        <span>
+          <span
+            ref={this.storeTip}
+            className={`tooltip ${classTip}`}
+          >{tip}</span>
+          <span
+            ref={this.storeArrow}
+            className={`toolarrow toolarrow-${at} ${classArrow}`}
+          />
+        </span>
+      </Fragment>
     : children
   }
   storeTarget = domElem => {this.target = domElem}

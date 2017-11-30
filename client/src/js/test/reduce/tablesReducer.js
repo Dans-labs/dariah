@@ -173,13 +173,13 @@ const actionTests = [
     // ACTION DATA and PROPS
     props: { table: 'person', select: MYIDS },
 
-    data: [
-      { 
+    data: { 
+      records: [{
         table: 'person',
         values: { _id: 2, name: 'no Name' },
         fields: { name: true, surName: true, keyword: true, email: true, gender: true },
-      },
-    ],
+      }],
+    },
 
     // NEW STATE
     predictedState: {
@@ -237,23 +237,25 @@ const actionTests = [
     // ACTION DATA and PROPS
     props: { table: 'person', select: MYIDS },
 
-    data: [
-      { 
-        table: 'person',
-        values: { _id: 2, name: 'no Name' },
-        fields: { name: true, surName: true, keyword: true, email: true, gender: true },
-      },
-      { 
-        table: 'address',
-        values: { _id: 3, street: 'Main street', number: '43', city: 'Zwolle' },
-        fields: { street: true, number: true, city: true },
-      },
-      { 
-        table: 'address',
-        values: { _id: 4, street: 'High street', number: '44', city: 'Kampen' },
-        fields: { street: true, number: true, city: true },
-      },
-    ],
+    data: {
+      records: [
+        { 
+          table: 'person',
+          values: { _id: 2, name: 'no Name' },
+          fields: { name: true, surName: true, keyword: true, email: true, gender: true },
+        },
+        { 
+          table: 'address',
+          values: { _id: 3, street: 'Main street', number: '43', city: 'Zwolle' },
+          fields: { street: true, number: true, city: true },
+        },
+        { 
+          table: 'address',
+          values: { _id: 4, street: 'High street', number: '44', city: 'Kampen' },
+          fields: { street: true, number: true, city: true },
+        },
+      ],
+    },
 
     // NEW STATE
     predictedState: {
@@ -326,8 +328,13 @@ const actionTests = [
     props: { table: 'person' },
 
     data: {
-      values: { _id: 2, name: 'Marie', surName: 'Blacque', keyword: ['a', 'd'], email: 'marie@blacque.com', gender: 'x', age: 66, member: false },
-      fields: { name: true, surName: true, keyword: true, email: true, gender: true, age: true, member: true },
+      records: [
+        {
+          table: 'person',
+          values: { _id: 2, name: 'Marie', surName: 'Blacque', keyword: ['a', 'd'], email: 'marie@blacque.com', gender: 'x', age: 66, member: false },
+          fields: { name: true, surName: true, keyword: true, email: true, gender: true, age: true, member: true },
+        },
+      ],
     },
 
     // NEW STATE
@@ -376,7 +383,12 @@ const actionTests = [
     props: { table: 'person' },
 
     data: {
-      values: { _id: 2, surName: 'Blacque', email: 'marie@blacque.com' },
+      records: [
+        {
+          table: 'person',
+          values: { _id: 2, surName: 'Blacque', email: 'marie@blacque.com' },
+        },
+      ],
     },
 
     // NEW STATE
@@ -437,12 +449,17 @@ const actionTests = [
     props: { table: 'person' },
 
     data: {
-      values: { _id: 2, name: 'Marie', surName: 'Blacque', keyword: ['x', 'y'], email: 'marie@blacque.com', gender: 'x' },
-      fields: { name: true, surName: true, keyword: true, email: true, gender: true },
-      newValues: [
-        { _id: 'x', rep: 'kwx', relTable: 'keyword', field: 'keyword' },
-        { _id: 'y', rep: 'kwy', relTable: 'keyword', field: 'keyword' },
-      ]
+      records: [
+        {
+          table: 'person',
+          values: { _id: 2, name: 'Marie', surName: 'Blacque', keyword: ['x', 'y'], email: 'marie@blacque.com', gender: 'x' },
+          fields: { name: true, surName: true, keyword: true, email: true, gender: true },
+          newValues: [
+            { _id: 'x', rep: 'kwx', relTable: 'keyword', repName: 'rep', field: 'keyword' },
+            { _id: 'y', rep: 'kwy', relTable: 'keyword', repName: 'rep', field: 'keyword' },
+          ],
+        },
+      ],
     },
 
     // NEW STATE
@@ -503,7 +520,7 @@ const actionTests = [
     // ACTION DATA and PROPS
     props: { table: 'person' },
 
-    data: [['person', 2]],
+    data: { records: [['person', 2]] },
 
     // NEW STATE
     predictedState: {
@@ -555,7 +572,7 @@ const actionTests = [
     // ACTION DATA and PROPS
     props: { table: 'person' },
 
-    data: [['address', 2], ['address', 3], ['person', 2]],
+    data: { records: [['address', 2], ['address', 3], ['person', 2]] },
 
     // NEW STATE
     predictedState: {
@@ -605,7 +622,7 @@ const actionTests = [
     // ACTION DATA and PROPS
     props: { table: 'person' },
 
-    data: [['person', 2]],
+    data: { records: [['person', 2]] },
 
     // NEW STATE
     predictedState: {
@@ -735,9 +752,9 @@ const actionTests = [
       [ALLIDS,              x => x.person[ALLIDS],      true],
     ],
   },
-  /* note that we do not expect that the merged entities end up unchanged.
-   * It would be too costly to enforce this
-   */
+  // note that we do not expect that the merged entities end up unchanged.
+  // It would be too costly to enforce this
+  //
   {
     // FETCHTABLE
 

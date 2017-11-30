@@ -6,7 +6,7 @@ import { memoize } from 'memo'
 import { combineSelectors, withParams, getUrlParts, emptyS, emptyO } from 'utils'
 import { someEditable } from 'fields'
 import { getMasterTable } from 'details'
-import { editMode } from 'presentation'
+import { editMode } from 'templates'
 
 import { insertItem, needValues, headEntity, DETAILS, handleOpenAll } from 'tables'
 import { getAltSection, compileAlternatives } from 'alter'
@@ -63,7 +63,7 @@ class ListPlain extends Component {
     const masterTable = getMasterTable(tables, table, linkField)
     const startMode = masterTable == null
     ? 0
-    : editMode(tables, table, 'detail', masterTable)
+    : editMode(tables, table, masterTable)
     return (
       <div className={'list-plain'} >
         {
@@ -140,10 +140,7 @@ class ListPlain extends Component {
                       {
                         showStatus
                         ? <EditStatus form={formTag} active={active} />
-                        : <span>
-                            <span className={'fa'} />
-                            {' '}
-                          </span>
+                        : <span className={'fa'} />
                       }
                       <span className={'link head'} onClick={this.showHide(table, select, eId, true, nextAlt)} >
                         <span className={`button small fa fa-angle-down`} />

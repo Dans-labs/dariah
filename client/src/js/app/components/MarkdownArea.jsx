@@ -39,10 +39,9 @@ const MarkdownArea = ({
         alt === 0
         ? <Markdown
             className={`${editClass(dirty, invalid)} field-content`}
-            key={'fmt'}
             source={value}
           />
-        : <div key={'src'} className={'field-content'}>
+        : <div className={'field-content'}>
             <Tooltip
               tip={
                 <EditHelp

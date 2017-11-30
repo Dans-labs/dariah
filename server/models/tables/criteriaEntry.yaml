@@ -6,6 +6,18 @@ perm:
   delete: own
 
 workflow:
+  read:
+    - inspect: master
+      method: hasValue
+      linkField: assessment
+      otherTable: assessment
+      otherField: submitted
+      value: true
+      attribute:
+        name: locked
+        except:
+          - submitted
+        desc: being reviewed
   adjust:
     - inspect: master
       linkField: assessment

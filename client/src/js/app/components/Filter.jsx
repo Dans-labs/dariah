@@ -24,9 +24,7 @@ const Filter = ({
   const { [filterTag]: filterSettings = emptyO } = filterData
   return (
     filterList == null
-    ? <div>
-        {'No filters for this list'}
-      </div>
+    ? 'No filters for this list'
       : <ErrorBoundary>
           <div className={`filterSequence ${compact ? 'compact' : emptyS}`} >
             {filterList.filter(x => fields[x.field]).map((filter, filterId) => {

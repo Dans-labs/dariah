@@ -4,13 +4,14 @@ parserOptions:
   ecmaFeatures:
     jsx: true
   sourceType: module
+  failOnError: true
 
 plugins:
   - react
 
 settings:
   react:
-    version: 15.4.2
+    version: 16.2.0
 
 env:
   browser: true
@@ -95,9 +96,6 @@ rules:
     - warn
     - callbacksLast: true
       noSortAlphabetically: true
-  react/jsx-space-before-closing:
-    - warn
-    - always
   react/jsx-tag-spacing:
     - warn
     - closingSlash: never
@@ -147,7 +145,7 @@ rules:
   computed-property-spacing:
     - warn
     - never
-  indent:
+  indent-legacy:
     - warn
     - 2
     - SwitchCase: 1
@@ -232,5 +230,6 @@ rules:
   operator-linebreak:
     - warn
     - before
+  no-unreachable: warn
 
 extends: "eslint:recommended"

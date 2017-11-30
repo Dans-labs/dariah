@@ -3,7 +3,7 @@ import Markdown from 'react-markdown'
 
 import { memoize } from 'memo'
 import { emptyS, emptyA, emptyO } from 'utils'
-import { applyTemplate } from 'presentation'
+import { applyTemplate } from 'templates'
 
 import { repr } from 'tables'
 

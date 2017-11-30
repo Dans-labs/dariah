@@ -1,12 +1,13 @@
-import { makeSubmitTime } from 'fields'
+import { makeSubmitTime, makeChangeSaveVal } from 'fields'
 
 export default ({
   widget,
-  setValue,
   input: { onChange },
+  setValue,
   submitValues,
 }) => {
   const submitTime = makeSubmitTime(submitValues)
-  const onChangeSave = () => {onChange(setValue); submitTime()}
+  //const onChangeSave = () => {onChange(setValue); submitTime()}
+  const onChangeSave = makeChangeSaveVal(onChange, submitTime, setValue)
   return widget(onChangeSave)
 }

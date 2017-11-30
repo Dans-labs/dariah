@@ -8,7 +8,7 @@ Table of Contents
 * [fields](#fields)
 * [handle](#handle)
 * [memo](#memo)
-* [presentation](#presentation)
+* [templates](#templates)
 * [utils](#utils)
 
 [edit]({{site.libBase}}/edit.js)
@@ -402,10 +402,10 @@ slice of the state. As a consequence, opening a contribution record within the l
 all contributions, took a full 3 seconds. It took me long to pinpoint the memoizer
 as the root cause of this particular slowness.
 
-[presentation]({{site.libBase}}/presentation.js)
+[templates]({{site.libBase}}/templates.js)
 =============================================================================================
 This library contains templates that customize the presentation of records and fields.
-See [Templates](Components#templates) for how the template system is structured.
+See [Templates](Templates) for how the template system is structured.
 This library contains the functions to *apply* templates.
 
 ### applyTemplate
@@ -427,7 +427,7 @@ as well as with [FieldEdit](Components#fieldedit) components.
 [ItemEdit](Components#itemedit)
 
 See also
-[Templates](Components#templates).
+[Templates](Templates).
 
 ### editMode
 This function computes a test function for a record, and the test
@@ -446,8 +446,8 @@ the `startMode` function, which computes for each record a choice between
 alternatives (edit mode or read-only mode), called `thisStartMode`.
 
 When ListPlain is called to display the `criteriaEntry` detail records of
-an `assessment` record, there a test function is invoked, defined in
-[detailEdit]({{site.libBase}}/presentation.js)
+an `assessment` record, a test function is invoked, defined in
+[criteriaEntry]({{site.appBase}}/tables/criteriaEntry.js)
 telling to return `1` if the `score` is empty or if the `evidence` is empty.
 Alternative `1` corresponds to edit mode.
 

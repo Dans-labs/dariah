@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { memoize } from 'memo'
 import { combineSelectors, emptyS, emptyO } from 'utils'
 import { handle, handlEV } from 'handle'
-import { checkDisabled, makeSubmitTime } from 'fields'
+import { checkDisabled, makeSubmitTime, makeChangeSave } from 'fields'
 import { composeAttributes } from 'values'
 
 import { getSettings } from 'settings'
@@ -136,7 +136,7 @@ const Tags = ({
                         onClick={removeVal(value, onChange, val)}
                       >{'×'}</span>{' '}
                     </Tooltip>
-                    <span>{lab}</span>
+                    {lab}
                   </span>
                 )
               }
@@ -164,7 +164,7 @@ const Typing = ({ selectTag, search, dispatch, placeHolder }) => (
             onClick={handle(dispatch, setSearch, selectTag, emptyS)}
           >{'×'}</span>
         </Tooltip>
-      : <span>{'\xa0'}</span>
+      : '\xa0'
     }
     {'\xa0'}
     <Tooltip
@@ -259,6 +259,7 @@ const Options = ({
   )
 }
 
+
 const RelSelect = ({
   settings,
   tables, table, eId,
@@ -271,7 +272,7 @@ const RelSelect = ({
   submitValues,
 }) => {
   const submitTime = makeSubmitTime(submitValues)
-  const onChangeSave = val => {onChange(val); submitTime()}
+  const onChangeSave = makeChangeSave(onChange, submitTime)
   const { [selectTag]: { search, popUp } = emptyO } = select
   const { options, optionLookup } = compileOptions(tables, table, allowed, field, settings)
   const realPopUp = popUp

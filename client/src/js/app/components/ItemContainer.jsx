@@ -47,7 +47,6 @@ class ItemContainer extends Component {
           alterSection={alterSection}
           isactive={isactive}
           startMode={startMode}
-          key={`${table}-${eId}`}
           initialValues={initialValues}
           perm={perm}
           workflow={workflow}

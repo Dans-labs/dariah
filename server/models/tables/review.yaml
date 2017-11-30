@@ -5,6 +5,21 @@ perm:
   insert: auth
   delete: own
 
+workflow:
+  read:
+    - inspect: siblings
+      method: getValues
+      linkField: assessment
+      otherField: _id
+      attribute:
+        name: others
+        desc: other reviews of the same assessment
+  adjust:
+    - inspect: siblings
+      linkField: assessment
+      triggerFields:
+        - _id
+
 title: title
 
 item:
@@ -43,22 +58,6 @@ fieldSpecs:
       relTable: assessment
       allowNew: false
       fixed: true
-    multiple: false
-  reviewType:
-    perm:
-      list:   auth
-      read:   auth
-      update: nobody
-    label: Review type
-    valType:
-      relTable: typeContribution
-      allowNew: false
-      fixed: true
-      inactive:
-        attributes:
-          className: inactive
-          data-rh: this value does not belong to the current package
-        disabled: true
     multiple: false
   remarks:
     perm:

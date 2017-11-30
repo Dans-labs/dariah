@@ -61,12 +61,12 @@ in such a way that we are protected agains typos?
 Well, we convert the `.yaml` model files to Python modules that expose
 the same model, but now as Python data structure.
 This is done by means of the
-[confyg.py]({{site.serverBase}}/confyg.py}})
+[compile.py]({{site.serverBase}}/compile.py)
 script, just before starting the server.
 That enables us to collect the names and generate some code.
 Every part of the `.yaml` files that may act as a name, is collected.
 We generate a module
-[names.py]({{site.serverBase}}/models/names.py}})
+[names.py]({{site.serverBase}}/models/names.py)
 that contains a line
 
 `N_`*name* `= '`*name*`'`
@@ -78,7 +78,7 @@ By consequently using `N_`*names* instead of plain strings, we guard ourselves a
 typos, because the Python parser will complain about undefined variables.
 
 Moreover, the same 
-[confyg.py]({{site.serverBase}}/confyg.py}})
+[compile.py]({{site.serverBase}}/compile.py)
 module also checks all the code in the controllers directory for names:
 * whether every `N_`*name* is defined in the `names.py` and
 * if there are occurrences of plain strings for which an `N_`*name* is defined.
@@ -175,7 +175,7 @@ A field spec value may contain the following bits of information:
   `shrink` (*optional: default:* `0`) the degree by which the column width is allowed to decrease.
 * `valid`: the name of a client-side validation function by which new and modified values for this
   field are validated.
-  The validators are exposed in [fields.js]({{site.libBase}}/fields.js}}) as member functions
+  The validators are exposed in [fields.js]({{site.libBase}}/fields.js) as member functions
   of a `validation` object.
 
   **N.B:** the server carries out extensive, non-customizable validation as well, in order
@@ -257,9 +257,6 @@ By some definition, certain records can be marked as
   put on the element that renders the item.
   Any set of valid attributes will do,
   there are no additional constraints.
-  For example, since we are using [React-Hint](https://react-hint.js.org)
-  for tooltips, we use the attribute `data-rh` instead of `title` to produce
-  tooltips.
 
 **Example:** 
 The `typeContribution` field of a `contrib` record may be obsolete, because it is not
@@ -270,7 +267,6 @@ In the `valType` for this field we see the following specification:
 inactive:
     attributes:
       className: inactive
-      data-rh: this value does not belong to the current package
     disabled: true
 ```
 
@@ -279,12 +275,9 @@ This is the rendered HTML for this value:
 ```html
 <a
     href="/data/typeContribution/list/item/00000000cca4bbd9fe00000b"
-    data-rh="this value does not belong to the current package"
     class="tag disabled inactive"
 >Tools and Software</a>
 ```
-
-Note the `data-rh` attribute (the tooltip) and the `class`, which contains the word `inactive`.
 
 #### Listing related records
 When we need to show a related record as a single value, we use its title field, as

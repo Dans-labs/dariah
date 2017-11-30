@@ -100,15 +100,15 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                                   'valType': { 'allowNew': False,
                                                                                'fixed': True,
                                                                                'inactive': { 'attributes': { 'className': 'inactive',
-                                                                                                             'data-rh': 'this '
-                                                                                                                        'value '
-                                                                                                                        'does '
-                                                                                                                        'not '
-                                                                                                                        'belong '
-                                                                                                                        'to '
-                                                                                                                        'the '
-                                                                                                                        'current '
-                                                                                                                        'package'},
+                                                                                                             'title': 'this '
+                                                                                                                      'value '
+                                                                                                                      'does '
+                                                                                                                      'not '
+                                                                                                                      'belong '
+                                                                                                                      'to '
+                                                                                                                      'the '
+                                                                                                                      'current '
+                                                                                                                      'package'},
                                                                                              'disabled': True},
                                                                                'relTable': 'typeContribution'}},
                                               'contrib': { 'label': 'Contribution',
@@ -203,7 +203,11 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                           'linkField': 'contrib',
                                                           'otherTable': 'contrib',
                                                           'triggerFields': [ 'assessmentType',
-                                                                             'submitted']}],
+                                                                             'submitted']},
+                                                        { 'inspect': 'details',
+                                                          'linkField': 'assessment',
+                                                          'otherTable': 'criteriaEntry',
+                                                          'triggerFields': ['submitted']}],
                                             'read': [ { 'attribute': { 'desc': 'assessment type is '
                                                                                'different from '
                                                                                'contribution type',
@@ -372,15 +376,15 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                                            'update': 'edit'},
                                                                  'valType': { 'allowNew': False,
                                                                               'inactive': { 'attributes': { 'className': 'inactive',
-                                                                                                            'data-rh': 'this '
-                                                                                                                       'value '
-                                                                                                                       'does '
-                                                                                                                       'not '
-                                                                                                                       'belong '
-                                                                                                                       'to '
-                                                                                                                       'the '
-                                                                                                                       'current '
-                                                                                                                       'package'},
+                                                                                                            'title': 'this '
+                                                                                                                     'value '
+                                                                                                                     'does '
+                                                                                                                     'not '
+                                                                                                                     'belong '
+                                                                                                                     'to '
+                                                                                                                     'the '
+                                                                                                                     'current '
+                                                                                                                     'package'},
                                                                                             'disabled': True},
                                                                               'relTable': 'typeContribution'}},
                                            'typeContributionOther': { 'label': 'Type',
@@ -643,15 +647,15 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                                             'update': 'office'},
                                                                   'valType': { 'allowNew': True,
                                                                                'inactive': { 'attributes': { 'className': 'inactive',
-                                                                                                             'data-rh': 'this '
-                                                                                                                        'value '
-                                                                                                                        'does '
-                                                                                                                        'not '
-                                                                                                                        'belong '
-                                                                                                                        'to '
-                                                                                                                        'the '
-                                                                                                                        'current '
-                                                                                                                        'package'},
+                                                                                                             'title': 'this '
+                                                                                                                      'value '
+                                                                                                                      'does '
+                                                                                                                      'not '
+                                                                                                                      'belong '
+                                                                                                                      'to '
+                                                                                                                      'the '
+                                                                                                                      'current '
+                                                                                                                      'package'},
                                                                                              'disabled': True},
                                                                                'relTable': 'typeContribution'}}},
                             'filters': [ { 'expanded': True,
@@ -759,7 +763,16 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                              'linkField': 'assessment',
                                                              'otherTable': 'assessment',
                                                              'triggerFields': [ 'score',
-                                                                                'evidence']}]}},
+                                                                                'evidence']}],
+                                               'read': [ { 'attribute': { 'desc': 'being reviewed',
+                                                                          'except': ['submitted'],
+                                                                          'name': 'locked'},
+                                                           'inspect': 'master',
+                                                           'linkField': 'assessment',
+                                                           'method': 'hasValue',
+                                                           'otherField': 'submitted',
+                                                           'otherTable': 'assessment',
+                                                           'value': True}]}},
               'decision': { 'fieldOrder': ['rep', 'editors', 'creator', 'dateCreated', 'modified'],
                             'fieldSpecs': { 'creator': { 'label': 'creator',
                                                          'multiple': False,
@@ -958,15 +971,15 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                                            'update': 'office'},
                                                                  'valType': { 'allowNew': True,
                                                                               'inactive': { 'attributes': { 'className': 'inactive',
-                                                                                                            'data-rh': 'this '
-                                                                                                                       'value '
-                                                                                                                       'does '
-                                                                                                                       'not '
-                                                                                                                       'belong '
-                                                                                                                       'to '
-                                                                                                                       'the '
-                                                                                                                       'current '
-                                                                                                                       'package'},
+                                                                                                            'title': 'this '
+                                                                                                                     'value '
+                                                                                                                     'does '
+                                                                                                                     'not '
+                                                                                                                     'belong '
+                                                                                                                     'to '
+                                                                                                                     'the '
+                                                                                                                     'current '
+                                                                                                                     'package'},
                                                                                             'disabled': False},
                                                                               'relTable': 'typeContribution'}}},
                            'item': ['package', 'packages'],
@@ -1101,25 +1114,6 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                                  'read': 'auth',
                                                                  'update': 'edit'},
                                                        'valType': 'textarea'},
-                                          'reviewType': { 'label': 'Review type',
-                                                          'multiple': False,
-                                                          'perm': { 'list': 'auth',
-                                                                    'read': 'auth',
-                                                                    'update': 'nobody'},
-                                                          'valType': { 'allowNew': False,
-                                                                       'fixed': True,
-                                                                       'inactive': { 'attributes': { 'className': 'inactive',
-                                                                                                     'data-rh': 'this '
-                                                                                                                'value '
-                                                                                                                'does '
-                                                                                                                'not '
-                                                                                                                'belong '
-                                                                                                                'to '
-                                                                                                                'the '
-                                                                                                                'current '
-                                                                                                                'package'},
-                                                                                     'disabled': True},
-                                                                       'relTable': 'typeContribution'}},
                                           'title': { 'label': 'Title',
                                                      'multiple': False,
                                                      'perm': { 'list': 'auth',
@@ -1134,7 +1128,17 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                     'read': 'auth',
                                     'update': 'edit'},
                           'sort': [['assessment', 1], ['title', 1], ['dateCreated', -1]],
-                          'title': 'title'},
+                          'title': 'title',
+                          'workflow': { 'adjust': [ { 'inspect': 'siblings',
+                                                      'linkField': 'assessment',
+                                                      'triggerFields': ['_id']}],
+                                        'read': [ { 'attribute': { 'desc': 'other reviews of the '
+                                                                           'same assessment',
+                                                                   'name': 'others'},
+                                                    'inspect': 'siblings',
+                                                    'linkField': 'assessment',
+                                                    'method': 'getValues',
+                                                    'otherField': '_id'}]}},
               'reviewEntry': { 'fieldOrder': [ 'seq',
                                                'criteria',
                                                'criteriaEntry',
@@ -1144,7 +1148,7 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                'creator',
                                                'dateCreated',
                                                'modified'],
-                               'fieldSpecs': { 'comments': { 'label': 'Comments',
+                               'fieldSpecs': { 'comments': { 'label': 'Reviewer comments',
                                                              'multiple': True,
                                                              'perm': { 'list': 'auth',
                                                                        'read': 'edit',
@@ -1200,7 +1204,7 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                            'valType': { 'allowNew': False,
                                                                         'fixed': True,
                                                                         'relTable': 'review'}},
-                                               'seq': { 'label': 'Number',
+                                               'seq': { 'label': 'Criterion number',
                                                         'multiple': False,
                                                         'perm': { 'list': 'auth',
                                                                   'read': 'edit',
