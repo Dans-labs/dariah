@@ -146,6 +146,7 @@ def detailInsert(
                 N_criteriaEntry,
                 {N_assessment: masterDocument.get(N__id, None)},
                 {N__id: True, N_seq: True, N_criteria: True},
+                sort=((N_seq, 1),),
             )
             for criteriaEntryDoc in criteriaEntryDocs:
                 detailData.append({
