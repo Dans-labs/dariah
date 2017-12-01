@@ -7,6 +7,7 @@ import { emptyO } from 'utils'
 import { applyEditTemplate } from 'templates'
 import { onSubmitSuccess, itemEditField } from 'fields'
 import { toDb, headEntity } from 'tables'
+import { getMe } from 'me'
 
 import ErrorBoundary from 'ErrorBoundary'
 import FieldRead from 'FieldRead'
@@ -14,7 +15,7 @@ import FieldEdit from 'FieldEdit'
 import EditControl from 'EditControl'
 
 const ItemEdit = ({
-  settings,
+  settings, me,
   tables, table, eId,
   linkField,
   dirty, invalid, submitting, reset, error,
@@ -35,13 +36,20 @@ const ItemEdit = ({
     [table]: {
       fieldSpecs: {
         [linkField]: {
-          valType: { relTable: masterTable } = emptyO,
+          valType: { relTable } = emptyO,
         } = emptyO },
     },
   } = tables
-  const kind = masterTable ? 'detail' : 'main'
+  const kind = relTable ? 'detail' : 'main'
   return (
-    applyEditTemplate(settings, tables, table, `${kind}Edit`, masterTable, eId, fieldFragments, editButton, submitValues, reset)
+    applyEditTemplate({
+      settings, me,
+      tables, table, eId,
+      kind: `${kind}Edit`,
+      relTable,
+      fieldFragments,
+      editButton, submitValues, reset,
+    })
     || <form>
           {editButton}
           <div className={'grid fragments'}>{
@@ -85,7 +93,7 @@ const ItemEdit = ({
   )
 }
 
-export default connect()(reduxForm({
+export default connect(getMe)(reduxForm({
   destroyOnUnmount: false,
   enableReinitialize: true,
   keepDirtyOnReinitialize: false,

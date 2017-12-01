@@ -220,6 +220,20 @@ export const getTables = ({ tables }) => ({ tables })
 
 export const toDb = memoize((table, eId, head, dispatch) => values => dispatch(modItem(table, eId, head, values)))
 
+export const isOwner = (tables, table, eId, me) => {
+  if (me._id) {
+    const {
+      [table]: {
+        entities: {
+          [eId]: { values: { creator, editors } = emptyO } = emptyO,
+        },
+      },
+    } = tables
+    return me._id == creator || (editors || emptyA).some(i => i == me._id)
+  }
+  else {return false}
+}
+
 const hasTableKey = (tables, table, key, value = null) => {
   if (tables == null) {return false}
   const { [table]: tableData } = tables

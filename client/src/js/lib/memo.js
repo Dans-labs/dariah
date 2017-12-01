@@ -108,7 +108,7 @@ export const memoize = (f, levels, config) => {
      * Trick: maintain a WeakMap (called objMap) that maps objects to unique integers. Use that integer
      * in the cache key. WeakMaps do not accept non-objects as keys.
      * So we build an array of key parts as follows: non-object arguments are added as they are,
-     * object arguments add their unique integer, as hold in the WeakMap.
+     * object arguments add their unique integer, as held in the WeakMap.
      * The resulting array is JSON stringified.
      * For a bit more pecision: a non-object arg is translated to [false, arg],
      * and an object arg is translated to [true, objMap.get(arg)].

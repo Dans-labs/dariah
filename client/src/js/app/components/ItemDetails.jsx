@@ -1,10 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { emptyS } from 'utils'
+import { combineSelectors, emptyS } from 'utils'
 
-import { DETAILS } from 'tables'
+import { DETAILS, isOwner } from 'tables'
 import { makeTag } from 'filters'
+import { getMe } from 'me'
 import { getAltSection, compileAlternatives } from 'alter'
 
 import ListGrid from 'ListGrid'
@@ -12,7 +13,7 @@ import ListPlain from 'ListPlain'
 import ListFilter from 'ListFilter'
 import Tooltip from 'Tooltip'
 
-const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailFragments, dispatch }) => {
+const ItemDetails = ({ me, alter, alterSection, filters, tables, table, eId, detailFragments, dispatch }) => {
   if (detailFragments.length == 0) {return null}
   const makeAlternatives = compileAlternatives(alterSection, 2, 1, dispatch)
   return (
@@ -24,10 +25,13 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
           const nDetails = detailListIds.length
           const { getAlt, nextAlt } = makeAlternatives(name)
           const alt = getAlt(alter)
-          const { mode, expand, border, filtered, fixed } = detailSpecs
+          const { mode, expand: expandSpec, border, filtered, fixed } = detailSpecs
           const [detailThing, detailThings] = detailItem
           const filterTag = makeTag(DETAILS, eId, linkField)
           const gridTag = `${table}-${name}-${eId}`
+          const expand = expandSpec === 'own'
+          ? isOwner(tables, table, eId, me)
+          : expandSpec
           return (
             <div key={name} className={'grid-row'} >
               {
@@ -115,5 +119,7 @@ const ItemDetails = ({ alter, alterSection, filters, tables, table, eId, detailF
   )
 }
 
-export default connect(getAltSection)(ItemDetails)
+const getInfo = combineSelectors(getMe, getAltSection)
+
+export default connect(getInfo)(ItemDetails)
 

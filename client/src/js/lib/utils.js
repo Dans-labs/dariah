@@ -5,6 +5,7 @@ import update from 'immutability-helper'
 export const emptyS = Object.freeze('')
 export const emptyA = Object.freeze([])
 export const emptyO = Object.freeze({})
+export const emptySet = Object.freeze(new Set())
 export const emptyF = Object.freeze(() => null)
 
 export const propsChanged = (newProps, need, oldProps, keyPropNames) => {

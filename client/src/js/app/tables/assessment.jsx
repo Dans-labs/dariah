@@ -32,7 +32,7 @@ const templates = {
       </Fragment>
     )
   },
-  mainAction({ tables, l, e, v, w, fe, fs, m }) {
+  mainAction({ tables, l, e, v, w, s, fe, fs, m }) {
     const { overall, relevantScore, relevantMax, allMax, relevantN, allN } = assessmentScore(tables, v('_id'))
     const irrelevantN = allN - relevantN
     const isWithdrawn = !e('dateWithdrawn')
@@ -49,7 +49,7 @@ const templates = {
             >{`${overall} %`}</span>
           </Tooltip>
           <Expand
-            alterSection={`assessment{v('_id')}`}
+            alterSection={`assessment${v('_id')}`}
             alterTag={'score'}
             iconOpen={'calculator'}
             iconClose={'minus-circle'}
@@ -88,8 +88,8 @@ const templates = {
               'submitted',
               'Submission',
               <Fragment>
-                {!isSubmitted && isWithdrawn ? `${l('dateWithdrawn')}: ${v('dateWithdrawn')}` : null}
-                {isSubmitted ? `${l('dateSubmitted')}: ${v('dateSubmitted')}` : null}
+                {!isSubmitted && isWithdrawn ? `${l('dateWithdrawn')}: ${s('dateWithdrawn')}` : null}
+                {isSubmitted ? `${l('dateSubmitted')}: ${s('dateSubmitted')}` : null}
                 {
                   (w('incomplete').on || w('stalled').on)
                   ? null
@@ -141,6 +141,75 @@ const templates = {
       </Fragment>
     )
   },
+  insert: {
+    contrib({ at, v, n, o, onInsert }) {
+      return at.has(v('typeContribution'))
+      ? o
+        ? n == 0
+          ? <span
+              className={`button large workflow info`}
+              onClick={onInsert}
+            >
+              {`Write a self-assessment`}
+            </span>
+          : <Tooltip
+              tip={
+                <Fragment>
+                  <p>{'Normally a contribution needs just one self-assessment.'}</p>
+                  <p>{'Only add an other one in the following cases'}</p>
+                  <ul>
+                    <li>{'The previous self-assessment has become obsolete'}</li>
+                    <li>
+                      {`The previous self-assessment is based on a contribution type,
+                          but the contribution in question has been assigned another type.`
+                      }
+                    </li>
+                  </ul>
+                  <p>
+                    <b>
+                      {`In the last case, it is recommended to copy and paste the relevant parts
+                        of the old assessment into the new one and delete the old one.`
+                      }
+                    </b>
+                  </p>
+                </Fragment>
+              }
+              at={'top'}
+            >
+              <span
+                className={`button large workflow warning`}
+                onClick={onInsert}
+              >
+                {`Add another self-assessment`}
+                <span className={'fa fa-exclamation'} />
+              </span>
+            </Tooltip>
+        : <span
+            className={`label large workflow info`}
+          >
+            {`Only owners and editors can self-assess a contribution`}
+          </span>
+      : <span
+          className={`label large workflow error`}
+        >
+          {`Contributions with a legacy type cannot be assessed`}
+        </span>
+    },
+  },
+  consolidated: {
+    trail({ s }) { // consolidated assessment within a trail record
+      return (
+        <Fragment>
+          <div>{s('title')}</div>
+          <div>
+            {s('vcc', ', ')}
+            {' '}
+            {s.year}
+          </div>
+        </Fragment>
+      )
+    },
+  },
 }
 
 Object.assign(templates, {
@@ -152,61 +221,6 @@ Object.assign(templates, {
   },
   detailAction: {
     contrib: templates.mainAction,
-  },
-  insert: {
-    contrib({ n, onInsert }) {
-      return n == 0
-      ? <span
-          className={`button large workflow info`}
-          onClick={onInsert}
-        >{`Write a self-assessment`}</span>
-      : <Tooltip
-          tip={
-            <Fragment>
-              <p>{'Normally a contribution needs just one self-assessment.'}</p>
-              <p>{'Only add an other one in the following cases'}</p>
-              <ul>
-                <li>{'The previous self-assessment has become obsolete'}</li>
-                <li>
-                  {`The previous self-assessment is based on a contribution type,
-                      but the contribution in question has been assigned another type.`
-                  }
-                </li>
-              </ul>
-              <p>
-                <b>
-                  {`In the last case, it is recommended to copy and paste the relevant parts
-                    of the old assessment into the new one and delete the old one.`
-                  }
-                </b>
-              </p>
-            </Fragment>
-          }
-          at={'top'}
-        >
-          <span
-            className={`button large workflow warning`}
-            onClick={onInsert}
-          >
-            {`Add another self-assessment`}
-            <span className={'fa fa-exclamation'} />
-          </span>
-        </Tooltip>
-    },
-  },
-  consolidated: {
-    trail({ v }) { // consolidated assessment within a trail record
-      return (
-        <Fragment>
-          <div>{v('title')}</div>
-          <div>
-            {v('vcc', ', ')}
-            {' '}
-            {v.year}
-          </div>
-        </Fragment>
-      )
-    },
   },
 })
 

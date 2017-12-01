@@ -93,7 +93,7 @@ details:
   reviewEntry:
     table: reviewEntry
     linkField: review
-    expand: true
+    expand: own
     mode: list
     border: {
       read: false,

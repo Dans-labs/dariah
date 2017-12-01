@@ -1,5 +1,5 @@
 import { memoize } from 'memo'
-import { emptyS, emptyA, emptyO, max, sum } from 'utils'
+import { emptyS, emptyA, emptyO, emptySet, max, sum } from 'utils'
 
 import { getDateTime, sortTimeInterval, sortStringTemplate } from 'datatypes'
 
@@ -30,7 +30,7 @@ export const loadExtra = {
 
 const compileActiveItems = memoize((entitiesPkg, entitiesTyp, entitiesCri, field = null) => {
   if ([entitiesPkg, entitiesTyp, entitiesCri].some(x => x == null)) {
-    return field ? null : emptyO
+    return field ? emptySet : emptyO
   }
   const resultSetPkg = new Set()
   const resultSetTyp = new Set()
@@ -80,7 +80,7 @@ const compileActiveItems = memoize((entitiesPkg, entitiesTyp, entitiesCri, field
 
 export const compileActive = (tables, field) => {
   if ([PACKAGE_TABLE, CRITERIA_TABLE, TYPE_TABLE].some(x => tables[x] == null)) {
-    return field ? null : emptyO
+    return field ? emptySet : emptyO
   }
   const {
     [PACKAGE_TABLE]: { entities: entitiesPkg },

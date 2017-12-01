@@ -97,10 +97,12 @@ const ListGrid = ({
         !(filtered && select === DETAILS)
         ? <div>
             <EditInsert
+              tables={tables}
               table={table}
               perm={tablePerm}
               select={select}
               masterTable={masterTable}
+              masterId={masterId}
               nItems={listIds.length}
               fixed={fixed}
               item={item}

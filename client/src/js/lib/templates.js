@@ -2,9 +2,10 @@ import React from 'react'
 import { Field } from 'redux-form'
 
 import { memoize } from 'memo'
-import { emptyO } from 'utils'
+import { emptyO, emptyA } from 'utils'
 
 import { repr } from 'tables'
+import { compileActive } from 'workflow'
 
 import FieldRead from 'FieldRead'
 import FieldEdit from 'FieldEdit'
@@ -31,31 +32,129 @@ const findTemplate = (table, kind, subKind) => {
 
 const isEmpty = (value, multiple) => !value || (multiple && value.every(v => !v))
 
+const isOwner = (me, v) =>
+  me._id == v('creator') || (v('editors') || emptyA).some(i => i == me._id)
+
+/* RECORD INFO FACTORY FUNCTIONS
+ *
+ * The following functions create field retrieval functions to be used by templates
+ * in the places where they need the values of the fields.
+ *
+ * When we apply a template to a record,
+ * we collect some information from the record as a whole,
+ * and based on this info we create functions that yield that info in a field
+ * dependent manner.
+ *
+ * E.g. in a template we use s('title') to retrieve the value of the title field.
+ * We construct the function s by means of makeS(tables, table, eId)
+ *
+ * We can then define a template as follows, just a tiny example.
+ *
+ * template = ({ s }) => <div><h1>{s('title')}</h1></div>
+ *
+ * So for each record, we construct the function v, and we call template({ v }).
+ * The templates are defined for tables, the v-like functions for records.
+ * There are more functions like v:
+ * - e: is the field empty
+ * - m: is the field editable
+ * - f: give a react component for the field, read-only mode
+ * - fe: give a react component for the field, edit mode
+ * etc., and, very importantly:
+ * - w: yield the workflow information for a key.
+ *
+ * The server adds workflow information to some records in the form of key values
+ * and templates have access to them by means of w.
+ * In this way, we can make the presentation of items very sensitive
+ * to the role they play in the workflow as a whole.
+ *
+ * We pass all these functions together in a single object to the templates.
+ *
+ * OK, here are the factory functions, they all start with make.
+ */
+
+const makeM = memoize(fieldInfo => field => {
+  const {
+    [field]: {
+      valType,
+      fragment: { editable },
+    },
+  } = fieldInfo
+  return editable && (typeof valType != 'object' || !valType.fixed)
+}, emptyO)
+
 const makeL = memoize((tables, table) => field => {
-  const { [table]: { fieldSpecs: { [field]: { label } = emptyO } = emptyO } } = tables
+  const {
+    [table]: {
+      fieldSpecs: {
+        [field]: { label } = emptyO,
+      } = emptyO,
+    },
+  } = tables
   return label
 }, emptyO)
 
-
-export const applyInsertTemplate = (table, masterTable, nItems, onInsert) => {
-  const template = findTemplate(table, 'insert', masterTable)
-  if (!template) {return null}
-  return template({ n: nItems, onInsert })
-}
-
-export const applyTemplate = (settings, tables, table, kind, otherTable, values, workflow, linkMe) => {
-  const template = findTemplate(table, kind, otherTable)
-  if (!template) {return null}
-
-  const isConsolidated = kind === 'consolidated'
+const makeE = memoize((tables, table, values) => {
   const { [table]: { fieldSpecs } } = tables
-
-  const e = field => {
-    const { [field]: value } = values
+  return field => {
     const { [field]: { multiple } } = fieldSpecs
+    const { [field]: value } = values
     return isEmpty(value, multiple)
   }
-  const vConsolidated = (field, sep) => {
+}, emptyO)
+
+const makeEditE = memoize((tables, table, fieldInfo) => {
+  const { [table]: { fieldSpecs } } = tables
+  return field => {
+    const { [field]: { fragment: { myValues } } } = fieldInfo
+    const { [field]: { multiple } } = fieldSpecs
+    return isEmpty(myValues, multiple)
+  }
+}, emptyO)
+
+const makeV = memoize((tables, table, eId) => {
+  const {
+    [table]: {
+      entities: { [eId]: { values } = emptyO },
+      fieldSpecs,
+    },
+  } = tables
+  return (field, relField) => {
+    const { [field]: value } = values
+    if (relField) {
+      const { [field]: { valType } = emptyO } = fieldSpecs
+      const relTable = typeof valType == 'object' && valType.relTable
+      if (relTable) {
+        const {
+          [relTable]: {
+            entities: { [value]: { values: { [relField]: relValue } = emptyO } = emptyO },
+          },
+        } = tables
+        return relValue
+      }
+      else {return null}
+    }
+    else {return value}
+  }
+}, emptyO)
+
+const makeInsertS = memoize((settings, tables, table, eId) => {
+  const {
+    [table]: {
+      entities: { [eId]: { values } = emptyO },
+      fieldSpecs,
+    },
+  } = tables
+  return (field, relField, sep, relSep) => {
+    const { [field]: { value } } = values
+    const { [field]: { valType, multiple } = emptyO } = fieldSpecs
+    return repr(tables, table, field, valType, multiple, relField, value, settings, sep, relSep)
+  }
+}, emptyO)
+
+const makeS = memoize((settings, tables, table, values, kind) => {
+  const { [table]: { fieldSpecs } } = tables
+  return kind === 'consolidated'
+  ? (field, sep) => {
     const { [field]: value } = values
     const { [field]: { multiple } } = fieldSpecs
     const useSep = sep == null ? ' ' : sep
@@ -63,100 +162,97 @@ export const applyTemplate = (settings, tables, table, kind, otherTable, values,
     ? value.join(useSep)
     : value
   }
-  const vLive = (field, relField, sep, relSep) => {
+  : (field, relField, sep, relSep) => {
     const { [field]: value } = values
     const { [field]: { valType, multiple } = emptyO } = fieldSpecs
     return repr(tables, table, field, valType, multiple, relField, value, settings, sep, relSep)
   }
-  const v = isConsolidated ? vConsolidated : vLive
+}, emptyO)
 
-  const w = field => workflow[field] || emptyO
-
-  const l = makeL(tables, table)
-
-  const f = isConsolidated
-  ? null
-  : (field, relField) =>
-    <FieldRead
-      settings={settings}
-      tables={tables}
-      table={table}
-      field={field}
-      relField={relField}
-      myValues={values[field]}
-    />
-
-  return template({ settings, tables, l, v, w, e, f, linkMe })
-}
-
-export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId, fieldFragments, editButton, submitValues, reset) => {
-  const template = findTemplate(table, kind, otherTable)
-  if (!template) {return null}
-
-  const fieldInfo = {}
-  for (const { field, ...fieldProps } of fieldFragments) {
-    fieldInfo[field] = fieldProps
-  }
-  fieldInfo['_id'] = { multiple: false, fragment: { editable: false, myValues: eId } }
-
+const makeEditS = memoize((settings, tables, table, fieldInfo) => {
   const { [table]: { fieldSpecs } } = tables
-
-  const e = field => {
-    const { [field]: { fragment: { myValues } } } = fieldInfo
-    const { [field]: { multiple } } = fieldSpecs
-    return isEmpty(myValues, multiple)
-  }
-  const v = (field, relField, sep, relSep) => {
+  return (field, relField, sep, relSep) => {
     const { [field]: { fragment: { myValues } } } = fieldInfo
     const { [field]: { valType, multiple } = emptyO } = fieldSpecs
     return repr(tables, table, field, valType, multiple, relField, myValues, settings, sep, relSep)
   }
-  const w = field => {
-    const {
-      [table]: {
-        entities: {
-          [eId]: {
-            workflow: {
-              [field]: info = emptyO,
-            } = emptyO,
-          },
+}, emptyO)
+
+const makeW = memoize((tables, table, eId) => field => {
+  const {
+    [table]: {
+      entities: {
+        [eId]: {
+          workflow: {
+            [field]: info = emptyO,
+          } = emptyO,
         },
       },
-    } = tables
-    return info
+    },
+  } = tables
+  return info
+}, emptyO)
+
+const makeInsertF = memoize((settings, tables, table, eId) => {
+  const {
+    [table]: {
+      entities: { [eId]: { values } = emptyO },
+    },
+  } = tables
+  return (field, relField) => {
+    const { [field]: value } = values
+    return (
+      <FieldRead
+        settings={settings}
+        tables={tables}
+        table={table}
+        eId={eId}
+        field={field}
+        relField={relField}
+        myValues={value}
+      />
+    )
   }
+}, emptyO)
 
-  const l = makeL(tables, table)
+const makeF = memoize((settings, tables, table, eId, values, kind) =>
+  kind === 'consolidated'
+  ? null
+  : (field, relField) =>
+      <FieldRead
+        settings={settings}
+        tables={tables}
+        table={table}
+        eId={eId}
+        field={field}
+        relField={relField}
+        myValues={values[field]}
+      />,
+  emptyO,
+)
 
-  const f = (field, relField) => {
+const makeEditF = memoize((settings, tables, table, eId, fieldInfo) =>
+  (field, relField) => {
     const { [field]: { fragment: { myValues } } } = fieldInfo
     return (
       <FieldRead
         settings={settings}
         tables={tables}
         table={table}
+        eId={eId}
         field={field}
         relField={relField}
         myValues={myValues}
       />
     )
-  }
+  },
+  emptyO,
+)
 
-  const m = field => {
+const makeEditFE = memoize((settings, tables, table, eId, fieldInfo, m, submitValues, reset) =>
+  (field, editOptions) => {
     const {
-      [field]: {
-        valType,
-        fragment: { editable },
-      },
-    } = fieldInfo
-    return editable && (typeof valType != 'object' || !valType.fixed)
-  }
-
-  const fe = (field, editOptions) => {
-    const {
-      [field]: {
-        fragment: { myValues, ...fieldProps },
-      },
+      [field]: { fragment: { myValues, ...fieldProps } },
     } = fieldInfo
     const editable = m(field)
     return editable
@@ -171,15 +267,19 @@ export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId
         reset={reset}
       />
     : <FieldRead
-        field={field}
+        settings={settings}
         tables={tables}
         table={table}
         eId={eId}
+        field={field}
         myValues={myValues}
       />
-  }
+  },
+  emptyO,
+)
 
-  const fs = (field, setValue, widget) => {
+const makeEditFS = memoize((tables, table, eId, m, submitValues) =>
+  (field, setValue, widget) => {
     const editable = m(field)
     return editable
     ? <Field
@@ -193,21 +293,105 @@ export const applyEditTemplate = (settings, tables, table, kind, otherTable, eId
         submitValues={submitValues}
       />
     : null
-  }
+  },
+  emptyO,
+)
 
-  return template({ settings, tables, l, v, w, e, f, fe, fs, m, editButton })
+/* TEMPLATE APPLICATION FUNCTIONS
+ *
+ * Applying templates is a breeze now.
+ * We need to look up the appropriate template, if any,
+ * call the factory functions,
+ * and then call the template with the resulting record info functions.
+ */
+
+export const applyInsertTemplate = ({
+  settings, me,
+  tables, table, relTable, relId,
+  nItems, onInsert,
+}) => {
+  const template = findTemplate(table, 'insert', relTable)
+  if (!template) {return null}
+
+  /*
+   * Here v looks up fields in the related record (i.e. the master)
+   * This template is called in the context of a list of detail records
+   * of a master record.
+   */
+  const at = compileActive(tables, 'typeContribution')
+  const v = makeV(tables, relTable, relId)
+  const s = makeInsertS(settings, tables, relTable, relId)
+  const f = makeInsertF(settings, tables, relTable, relId)
+  const o = isOwner(me, v)
+
+  return template({ at, v, s, f, o, n: nItems, me, onInsert })
 }
 
-export const editMode = (tables, table, otherTable) => values => {
-  const test = findTemplate(table, 'editMode', otherTable)
-  if (!test) {return 0}
+export const applyTemplate = ({
+  settings, me,
+  tables, table, eId,
+  kind,
+  relTable,
+  values,
+  linkMe,
+}) => {
+  const template = findTemplate(table, kind, relTable)
+  if (!template) {return null}
 
-  const { [table]: { fieldSpecs } } = tables
+  const at = compileActive(tables, 'typeContribution')
+  const l = makeL(tables, table)
+  const e = makeE(tables, table, values)
+  const v = makeV(tables, table, eId)
+  const w = makeW(tables, table, eId)
+  const s = makeS(settings, tables, table, values, kind)
+  const f = makeF(settings, tables, table, eId, values, kind)
+  const o = isOwner(me, v)
 
-  const e = field => {
-    const { [field]: value } = values
-    const { [field]: { multiple } } = fieldSpecs
-    return isEmpty(value, multiple)
+  return template({ settings, tables, at, l, e, v, w, s, f, o, me, linkMe })
+}
+
+export const applyEditTemplate = ({
+  settings, me,
+  tables, table, eId,
+  kind,
+  relTable,
+  fieldFragments,
+  editButton, submitValues, reset,
+}) => {
+  const template = findTemplate(table, kind, relTable)
+  if (!template) {return null}
+
+  const fieldInfo = {}
+  for (const { field, ...fieldProps } of fieldFragments) {
+    fieldInfo[field] = fieldProps
   }
-  return test(e)
+  fieldInfo['_id'] = { multiple: false, fragment: { editable: false, myValues: eId } }
+
+  const m = makeM(fieldInfo)
+
+  const at = compileActive(tables, 'typeContribution')
+  const l = makeL(tables, table)
+  const e = makeEditE(tables, table, fieldInfo)
+  const v = makeV(tables, table, eId)
+  const w = makeW(tables, table, eId)
+  const s = makeEditS(settings, tables, table, fieldInfo)
+  const f = makeEditF(settings, tables, table, eId, fieldInfo)
+  const fe = makeEditFE(settings, tables, table, eId, fieldInfo, m, submitValues, reset)
+  const fs = makeEditFS(tables, table, eId, m, submitValues)
+  const o = isOwner(me, v)
+
+  return template({ settings, tables, at, l, e, v, w, s, f, fe, fs, m, o, me, editButton })
+}
+
+export const editMode = ({
+  me,
+  tables, table,
+  relTable,
+}) => values => {
+  const template = findTemplate(table, 'editMode', relTable)
+  if (!template) {return 0}
+
+  const e = makeE(tables, table, values)
+
+  return template({ e, me })
 }

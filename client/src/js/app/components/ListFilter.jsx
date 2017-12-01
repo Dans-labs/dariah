@@ -71,10 +71,12 @@ class ListFilter extends Component {
           select === DETAILS
           ? <div>
               <EditInsert
+                tables={tables}
                 table={table}
                 perm={perm}
                 select={select}
                 masterTable={masterTable}
+                masterId={masterId}
                 nItems={listIds.length}
                 fixed={fixed}
                 item={item}

@@ -12,6 +12,7 @@ import { insertItem, needValues, headEntity, DETAILS, handleOpenAll } from 'tabl
 import { getAltSection, compileAlternatives } from 'alter'
 import { compileActive } from 'workflow'
 import { getSettings } from 'settings'
+import { getMe } from 'me'
 
 import ErrorBoundary from 'ErrorBoundary'
 import ItemContainer from 'ItemContainer'
@@ -48,7 +49,8 @@ class ListPlain extends Component {
   render() {
     const {
       props: {
-        settings, alter, alterSection,
+        settings, me,
+        alter, alterSection,
         filtered, filters,
         tables, table, select,
         masterId, linkField,
@@ -63,17 +65,19 @@ class ListPlain extends Component {
     const masterTable = getMasterTable(tables, table, linkField)
     const startMode = masterTable == null
     ? 0
-    : editMode(tables, table, masterTable)
+    : editMode({ me, tables, table, relTable: masterTable })
     return (
       <div className={'list-plain'} >
         {
           !(filtered && select === DETAILS)
           ? <div>
               <EditInsert
+                tables={tables}
                 table={table}
                 perm={perm}
                 select={select}
                 masterTable={masterTable}
+                masterId={masterId}
                 nItems={listIds.length}
                 fixed={fixed}
                 item={item}
@@ -214,6 +218,6 @@ class ListPlain extends Component {
   }
 }
 
-const getInfo = combineSelectors(getSettings, getAltSection)
+const getInfo = combineSelectors(getSettings, getMe, getAltSection)
 
 export default connect(getInfo)(withParams(ListPlain))

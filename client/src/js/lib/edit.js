@@ -74,7 +74,7 @@ export const editControl = canSubmit => ({
     {
       (!dirty && !invalid && !submitting && !canSubmit)
       ? <Tooltip
-          tip={'you have not changed this record'}
+          tip={'you have visited this record'}
           at={'right'}
         >
           <span

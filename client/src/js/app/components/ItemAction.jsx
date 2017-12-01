@@ -8,9 +8,10 @@ import { emptyO } from 'utils'
 import { applyEditTemplate } from 'templates'
 import { onSubmitSuccess } from 'fields'
 import { toDb, headEntity } from 'tables'
+import { getMe } from 'me'
 
 const ItemAction = ({
-  settings,
+  settings, me,
   tables, table, eId,
   linkField,
   fieldFragments,
@@ -23,27 +24,28 @@ const ItemAction = ({
     [table]: {
       fieldSpecs: {
         [linkField]: {
-          valType: { relTable: masterTable } = emptyO,
+          valType: { relTable } = emptyO,
         } = emptyO },
     },
   } = tables
-  const kind = masterTable ? 'detail' : 'main'
+  const kind = relTable ? 'detail' : 'main'
   return (
     <div className={'item-workflow'}>
       {
-        applyEditTemplate(
-          settings, tables, table,
-          `${kind}Action`,
-          masterTable, eId,
-          fieldFragments, null,
+        applyEditTemplate({
+          settings, me,
+          tables, table, eId,
+          kind: `${kind}Action`,
+          relTable,
+          fieldFragments,
           submitValues,
-        )
+        })
       }
     </div>
   )
 }
 
-export default connect()(reduxForm({
+export default connect(getMe)(reduxForm({
   destroyOnUnmount: false,
   enableReinitialize: true,
   keepDirtyOnReinitialize: false,

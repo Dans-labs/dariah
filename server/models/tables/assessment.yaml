@@ -181,7 +181,7 @@ details:
   criteriaEntry:
     table: criteriaEntry
     linkField: assessment
-    expand: true
+    expand: own
     mode: list
     border: {
       read: false,

@@ -13,41 +13,41 @@ const templates = {
     : null
   },
   related: {
-    assessment({ v, e, f, linkMe }) {
-      const cTitle = v('title')
+    assessment({ v, e, s, f, linkMe }) {
+      const cTitle = s('title')
       return (
         <Fragment>
           <div>
             {
               e('urlContribution')
               ? cTitle
-              : <a href={v('urlContribution')}>{cTitle}</a>
+              : <a href={s('urlContribution')}>{cTitle}</a>
             }
           </div>
           <div>
-            {v('vcc', null, ', ')}
+            {s('vcc', null, ', ')}
             {' '}
-            {v('country')}
+            {s('country')}
             {' '}
-            {v('year')}
+            {s('year')}
             {' '}
-            <a href={`mailto:${v('contactPersonEmail')}`}>
-              {v('contactPersonName')}
+            <a href={`mailto:${s('contactPersonEmail')}`}>
+              {s('contactPersonName')}
             </a>
           </div>
           <Expand
-            alterSection={`contribution_in_assessment{v('_id')}`}
+            alterSection={`contribution_in_assessment${v('_id')}`}
             alterTag={'cost'}
             iconOpen={'info-circle'}
             iconClose={'minus-circle'}
             titleOpen={'Show contribution cost description'}
             titleClose={'Hide contribution cost description'}
-            headActive={`Cost: ${e('costTotal') ? 'Not given' : v('costTotal')}`}
+            headActive={`Cost: ${e('costTotal') ? 'Not given' : s('costTotal')}`}
             headLine={emptyS}
             full={<Fragment>{f('costDescription')}</Fragment>}
           />
           <Expand
-            alterSection={`contribution_in_assessment{v('_id')}`}
+            alterSection={`contribution_in_assessment${v('_id')}`}
             alterTag={'description'}
             iconOpen={'info-circle'}
             iconClose={'minus-circle'}
@@ -56,7 +56,7 @@ const templates = {
             headActive={'Description fields'}
             headLine={
               e('urlAcademic')
-              ? <a href={v('urlAcademic')}>{v('urlAcademic')}</a>
+              ? <a href={s('urlAcademic')}>{s('urlAcademic')}</a>
               : emptyS
             }
             full={
@@ -74,7 +74,7 @@ const templates = {
             }
           />
           <Expand
-            alterSection={`contribution_in_assessment{v('_id')}`}
+            alterSection={`contribution_in_assessment${v('_id')}`}
             alterTag={'provenance'}
             iconOpen={'info-circle'}
             iconClose={'minus-circle'}
@@ -88,12 +88,12 @@ const templates = {
                   {'Created '}
                   {f('dateCreated')}
                   {' by '}
-                  {v('creator')}
+                  {s('creator')}
                 </div>
                 <div>
                   <div><b>{'Modification history'}</b></div>
                   {
-                    v('modified').map((mod, i) =>
+                    s('modified').map((mod, i) =>
                       <div key={i}>{mod}</div>
                     )
                   }

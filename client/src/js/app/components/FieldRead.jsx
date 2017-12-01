@@ -1,18 +1,33 @@
 //import React from 'react'
 import { connect } from 'react-redux'
 
-import { emptyO } from 'utils'
+import { combineSelectors, emptyO } from 'utils'
 import { compileActive } from 'workflow'
 import { wrappedRepr } from 'values'
 
 import { getSettings } from 'settings'
+import { getMe } from 'me'
 
-const FieldRead = ({ settings, tables, table, field, relField, myValues }) => {
+const FieldRead = ({
+  settings, me,
+  tables, table, eId,
+  field, relField,
+  myValues,
+}) => {
   const { [table]: { fieldSpecs } } = tables
   const { [field]: { valType, multiple } } = fieldSpecs
   const { inactive = null } = typeof valType === 'object' ? valType : emptyO
   const activeItems = inactive ? compileActive(tables, field) : null
-  return wrappedRepr(tables, table, field, valType, multiple, relField, activeItems, inactive, myValues, settings)
+  return wrappedRepr({
+    settings, me,
+    tables, table, eId,
+    field, valType, multiple,
+    relField,
+    activeItems, inactive,
+    values: myValues,
+  })
 }
 
-export default connect(getSettings)(FieldRead)
+const getInfo = combineSelectors(getMe, getSettings)
+
+export default connect(getInfo)(FieldRead)

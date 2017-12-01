@@ -7,17 +7,17 @@ import Tooltip from 'Tooltip'
 
 const templates = {
   editMode: {
-    review(e) {
+    review({ e }) {
       return e('comments') ? 1 : 0
     },
   },
   detail: {
-    review({ l, v, e, f }) {
+    review({ l, v, e, s, f }) {
       const statusClass = e('comments') ? 'incomplete' : 'complete'
       return (
         <div className={`review entryRead ${statusClass}`}>
           <div className={'review entry'}>
-            <div>{v('seq')}</div>
+            <div>{s('seq')}</div>
             <Expand
               alterSection={`criteriaEntry${v('_id')}`}
               alterTag={l('remarks')}
@@ -41,13 +41,13 @@ const templates = {
     },
   },
   detailEdit: {
-    review({ l, v, e, f, fe, editButton }) {
+    review({ l, e, s, f, fe, editButton }) {
       const statusClass = e('comments') ? 'incomplete' : 'complete'
       return (
         <div className={`review entryEdit ${statusClass}`}>
           <div className={'review entry'}>
             {editButton}
-            {v('seq')}
+            {s('seq')}
             <div className={'fat'}>
               <div className={'fat'}>{f('criteria')}</div>
               <div className={'criteria comments'}>{f('criteria', 'remarks')}</div>

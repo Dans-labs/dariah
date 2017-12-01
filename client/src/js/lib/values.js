@@ -26,7 +26,12 @@ export const getValType = valType => {
   return typing
 }
 
-const valuePrepare = memoize((settings, tables, table, valType, relField, activeItems, inactive) => (value, rep) => {
+const valuePrepare = memoize(({
+  settings, me,
+  tables, table, eId,
+  valType, relField,
+  activeItems, inactive,
+}) => (value, rep) => {
   if (valType === 'textarea') {return [rep, { source: rep }, 'Markdown']}
   if (valType === 'url') {return [rep, { href: rep, target: '_blank' }, 'a']}
   if (valType === 'email') {
@@ -45,7 +50,14 @@ const valuePrepare = memoize((settings, tables, table, valType, relField, active
     const relRecord = tables[relTable].entities[value]
     const linkMe = `/data/${relTable}/list/item/${value}`
     if (value != null) {
-      const templateApplied = applyTemplate(settings, tables, relTable, 'related', table, relRecord.values, null, linkMe)
+      const templateApplied = applyTemplate({
+        settings, me,
+        tables, table: relTable, eId: value,
+        kind: 'related',
+        relTable: table,
+        values: relRecord.values,
+        linkMe,
+      })
       if (templateApplied) {return [templateApplied]}
     }
     if (relField == null) {
@@ -58,7 +70,12 @@ const valuePrepare = memoize((settings, tables, table, valType, relField, active
         valType: relValType,
         multiple: relMultiple,
       } } } } = tables
-      const relPrepare = valuePrepare(settings, tables, relTable, relValType, null, activeItems, inactive)
+      const relPrepare = valuePrepare({
+        settings, me,
+        tables, table: relTable, eId,
+        valType: relValType,
+        activeItems, inactive,
+      })
       const relValues = relRecord.values[relField]
       const xReps = relMultiple
       ? (relValues || emptyA).map((relValue, i) => relPrepare(relValue, rep[i])).filter(x => x != null)
@@ -84,7 +101,7 @@ const valuePrepare = memoize((settings, tables, table, valType, relField, active
     { ...link, ...(classNames.length ? mergeClassnames(classNames, attributes) : attributes) },
     elem,
   ]
-}, emptyO)
+}, { 0: 1})
 
 const putElem = ([rep, attributes, elem], i) => {
   const r = rep || emptyS
@@ -103,8 +120,20 @@ const putElem = ([rep, attributes, elem], i) => {
  * Depending on settings and active items it might be wrapped into elements with attributes.
  */
 export const wrappedRepr = memoize(
-  (tables, table, field, valType, multiple, relField, activeItems, inactive, values, settings) => {
-    const prepare = valuePrepare(settings, tables, table, valType, relField, activeItems, inactive)
+  ({
+    settings, me,
+    tables, table, eId,
+    field, valType, multiple,
+    relField,
+    activeItems, inactive,
+    values,
+  }) => {
+    const prepare = valuePrepare({
+      settings, me,
+      tables, table, eId,
+      valType, relField,
+      activeItems, inactive,
+    })
     const reps = repr(tables, table, field, valType, multiple, relField, values, settings)
     const xReps = multiple
     ? (values || emptyA).map((value, i) => prepare(value, reps[i])).filter(x => x != null)
@@ -113,7 +142,7 @@ export const wrappedRepr = memoize(
     ? <div>{xReps.map((rep, i) => putElem(rep, i))}</div>
     : putElem(xReps)
   },
-  emptyO,
+  { 0: 1 },
 )
 
 const mergeClassnames = (classNames, attributes) => {
