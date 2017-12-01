@@ -15,4 +15,5 @@ sessions/*
 uploads/*
 errors/*
 cache/*
-_temp/
+.cache/*
+_temp/*
