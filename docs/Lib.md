@@ -3,6 +3,8 @@ title: Library
 ---
 
 Table of Contents
+* [datatypes](#datatypes)
+* [details](#details)
 * [edit](#edit)
 * [europe.geo](#europe-geo)
 * [fields](#fields)
@@ -10,9 +12,88 @@ Table of Contents
 * [memo](#memo)
 * [templates](#templates)
 * [utils](#utils)
+* [values](#values)
+
+[datatypes]({{site.libBase}}/datatypes.js)
+=============================================================================================
+Elementary operations on data that comes in basic types, such as strings, numbers and dates.
+This file contains also the functions that normalize and validate values.
+
+### getDateTime
+Convert a datetime object or string into a numerical value, so you can make comparisons.
+If absent, yield negative infinity for start dates and positive infinity for end dates.
+Used in [workflow](Dux#workflow).
+
+### normalization
+An object with normalization functions, named after the types of the values they normalize.
+All functions take a value, and return a normalized value.
+
+### sortStringTemplate
+Compare function for sorting. Wraps the values to be compared in a template before actually
+comparing them.
+
+Used in [workflow](Dux#workflow).
+
+### sortTimeInterval
+
+Sort by time interval.
+Sorting by time intervals should works as follows:
+
+* if both intervals are fully specified, the interval with the earlier start date comes first;
+* if the start dates are equal, the one with the LATER end date comes first,
+  in this way, containing intervals come before contained intervals;
+* if the start date is missing, the start date is assumed to be in the infinite past;
+* if the end date is missing, the end date is assumed to be in the infinite future.
+
+Used in [workflow](Dux#workflow).
+
+### validation
+An object with validation functions, named after the types of the values they validate.
+All functions take a value, and return undefined if the value passes validation or is itself undefined.
+If a value does not pass validation, a simple string expressing the reason is returned.
+
+[details]({{site.libBase}}/detail.js)
+=============================================================================================
+These functions help by setting up lists of detail records for master records.
+The carry out what has been specified in the [data model](Model) config files under
+the keys `detail` and `detailOrder`.
+
+### getMasterTable
+Given a table and the name of a field that links to an other, related, table,
+if finds the name of that related table.
+If that other table list this table as a details table, and marks this field
+as the link field, then the related table is indeed the master table.
+But this function is indifferent to that.
+It merely consults the `fieldSpec` of `field` in `table`. 
+
+### makeDetails
+Prepare lists of details for an item of a table.
+Collect the specs and put all information in an array of objects,
+each corresponding to a details list,
+from which components can easily
+construct a widget for handling lists of details
+
+### makeKeepInfo
+Collects information on the basis of which it can be decided whether a record may be deleted
+or not. 
+A record may be deleted if it has no detail records, except those that will be deleted as well.
+Those are the details which are marked as `cascade` in the [data model](Model).
+This function returns a list of all non-cascade detail tables that have records linking to
+the record in question.
+
+**Example**: [ItemForm](Components#itemform)
 
 [edit]({{site.libBase}}/edit.js)
 =============================================================================================
+Helpers for presenting edit controls, such as a save button.
+
+### editClass
+Returns the proper CSS class for styling content that is being edited,
+depending on the state it may be in:
+
+* `dirty`: a changed value that has not been saved to the database yet, and/or
+* `invalid`: a value that does not pass validation.
+
 ### editControl
 
 This is nearly a React component, except it needs a boolean parameter `canSubmit`,
@@ -22,7 +103,7 @@ The basic function of this component is to give an indication of the edit status
 Whether values have changed (`dirty`), values are `invalid`, or values are being `submitted`.
 
 If this component is put inside a `<form>` element under the control of 
-[redux-form](http://redux-form.com), it is also capable to trigger a submit and save action.
+[redux-form]({{site.reduxFormBase}}), it is also capable to trigger a submit and save action.
 
 #### `canSubmit = true`
 The component [EditControl](Components#editcontrol) calls this function with submit capacity.
@@ -40,6 +121,45 @@ The typical form properties are now obtained by enhancing this very component wi
 However, because this component is not assumed to be within a `<form>` context,
 it cannot perform a submit.
 
+### makeChangeSave
+Produces a function, that when triggered by a value, will submit that value (after a short delay).
+See `makeSubmitTime`.
+This is used when an input field fires an event with a value entered by the user.
+
+### makeChangeSaveVal
+Produces a function, with a value baked in.
+When called, this function will submit that value (after a short delay).
+This is used when the user clicks a button, like `submit review` in which case
+a specific field has to be set to a specific value, in this example: `submitted = true`.
+
+### makeReset
+Composes an attribute that sets up an `onKeyUp` handler for an input field.
+It will react to the `Esc` key, and reset the input field to its pristine value,
+i.e. the value it had before the user started interacting with it.
+
+### makeSubmit
+Produces a submit action or a null-returning function, depending on parameters.
+The parameters tell whether some record is dirty, valid and not currently submitting.
+In that case, the result is a submit function (which is also passed as parameter).
+
+This function is used in those cases where an input field looses focus.
+It then generates a submit action if all is well.
+
+### makeSubmitTime
+Given a (submit)-function, transforms it into the same function that will
+be invoked with a small delay.
+
+This can be used after events that change a form, without a blur event.
+The event should trigger a submit and save, but first the triggering action
+should have done its work.
+
+**Example**: [Input](Components#input)
+
+### onSubmitSuccess
+Needed in a workaround for an
+[issue in redux-form](https://github.com/erikras/redux-form/issues/2841).
+See [ItemEdit](Components#itemedit)
+
 [europe.geo]({{site.libBase}}/europe.geo.js)
 =============================================================================================
 ### countryBorders
@@ -48,7 +168,7 @@ Object that contains the borders of the European countries plus a bit of additio
 [geojson](http://geojson.org)
 format.
 
-See this [Jupyter notebook](https://github.com/Dans-labs/dariah/blob/master/static/tools/country_compose/countries.ipynb)
+See this [Jupyter notebook]({{site.staticBase}}/tools/country_compose/countries.ipynb)
 to see where this data comes from and how it has been tweaked for this website.
 
 [fields]({{site.libBase}}/fields.js)
@@ -59,27 +179,10 @@ Checks whether a certain value is inactive and should be disabled.
 See [workflow logic](Dux#workflow).
 Used in component [RelSelect](Components#relselect).
 
-### composeAttributes
-When composing a Field component for an item, compute attributes telling whether
-the item is active or not, and merge them into the other attributes.
-Used in component [RelSelect](Components#relselect).
-
 ### dealWithProvenance
 Remove provenance fields if current settings require that.
 See [settings](Dux#settings).
 Used in component [ItemContainer](Components#itemcontainer) and others.
-
-### editClass
-Returns the proper CSS class for styling content that is being edited,
-depending on the state it may be in:
-
-* `dirty`: a changed value that has not been saved to the database yet, and/or
-* `invalid`: a value that does not pass validation.
-
-### getDateTime
-Convert a datetime object or string into a numerical value, so you can make comparisons.
-If absent, yield negative infinity for start dates and positive infinity for end dates.
-Used in [workflow](Dux#workflow).
 
 ### itemEditField
 Render an edit field in standard presentation, like [ItemEdit](Components#itemedit) does it.
@@ -101,77 +204,17 @@ standard way.
 
 ### makeFields
 Prepare field components for an item of a table.
-Collect the specs and put all information in an array objects,
+Collect the specs from the `fieldOrder` and `fieldSpecs` fields
+of the [data model](Model) and put all information in an array objects,
 each corresponding to a field, from which components can easily
 construct a widget for showing or editing that field.
 
 **Example**: [ItemForm](Components#itemform)
 
-### makeDetails
-Prepare lists of details for an item of a table.
-Collect the specs and put all information in an array of objects,
-each corresponding to a details list,
-from which components can easily
-construct a widget for handling lists of details
-
-**Example**: [ItemForm](Components#itemform)
-
-### makeSubmit
-Produces a submit action or a null-returning function, depending on parameters.
-The parameters tell whether some record is dirty, valid and not currently submitting.
-In that case, the result is a submit function (which is also passed as parameter).
-
-This function is used in those cases where an input field looses focus.
-It then generates a submit action if all is well.
-
-### makeSubmitTime
-Given a (submit)-function, transforms it into the same function that will
-be invoked with a small delay.
-
-This can be used after events that change a form, without a blur event.
-The event should trigger a submit and save, but first the triggering action
-should have done its work.
-
-**Example**: [Input](Components#input)
-
-### normalization
-An object with normalization functions, named after the types of the values they normalize.
-All functions take a value, and return a normalized value.
-
-### onSubmitSuccess
-Needed in a workaround for an
-[issue in redux-form](https://github.com/erikras/redux-form/issues/2841).
-See [ItemEdit](Components#itemedit)
-
-### getValType(valType)
-For a given value type, such as `text`, `URL`, `number`, return a component and subtype
-for handling the input of such values, e.g. `<input type="URL" />`.
-
-**Example**: [FieldEdit](Components#fieldedit)
-
 ### someEditable
 Checks whether a list of fields contains at least one that the current user may edit.
 
 **Example**: [ItemForm](Components#itemform)
-
-### sortStringTemplate
-Compare function for sorting. Wraps the values to be compared in a template before actually
-comparing them.
-
-Used in [workflow](Dux#workflow).
-
-### sortTimeInterval
-
-Sort by time interval.
-Sorting by time intervals should works as follows:
-
-* if both intervals are fully specified, the interval with the earlier start date comes first;
-* if the start dates are equal, the one with the LATER end date comes first,
-  in this way, containing intervals come before contained intervals;
-* if the start date is missing, the start date is assumed to be in the infinite past;
-* if the end date is missing, the end date is assumed to be in the infinite future.
-
-Used in [workflow](Dux#workflow).
 
 ### toFieldInfo
 Reduces the information in the fragments produced by [makeFields](#makefields)
@@ -179,18 +222,6 @@ to a simple object with only the value(s) of that field.
 
 Used in [ItemRead](Components#itemread) to pass an argument to 
 [applyTemplate](#applytemplate).
-
-### validation
-An object with validation functions, named after the types of the values they validate.
-All functions take a value, and return undefined if the value passes validation or is itself undefined.
-If a value does not pass validation, a simple string expressing the reason is returned.
-
-### wrappedRepr
-Produces a representation for a field value, complete with
-surrounding elements and attributes.
-Values of link fields will be wrapped in `<a href="...">` elements, 
-
-Used in [FieldRead](Components#fieldread).
 
 [handle]({{site.libBase}}/handle.js)
 =============================================================================================
@@ -408,15 +439,20 @@ This library contains templates that customize the presentation of records and f
 See [Templates](Templates) for how the template system is structured.
 This library contains the functions to *apply* templates.
 
+### applyInsertTemplate
+Applies a template for the *insert record* button for a list.
+This template cannot have field values, because it is for a whole list of records.
+However, it is invoked by lists that are detail lists, and hence there is a master
+record.
+This template has access to the fields of that master record.
+It is invoked in [EditInsert](Components#editinsert) components.
+
 ### applyTemplate
-Applies a template by preparing field information in such a way
-that it can be easily called for from within a template.
+Applies a read only template.
 You can merge a template with [FieldRead](Components#fieldread) components.
-This is for read-only templates.
 
 ### applyEditTemplate
-Applies an edit template by preparing field information in such a way
-that it can be easily called for from within a template.
+Applies an edit template.
 There is a bit of extra data here compared to read-only templates,
 namely whether fields are editable or not.
 You can merge a template with [FieldRead](Components#fieldread) components,
@@ -484,6 +520,7 @@ Therefore we declare a few *empty* concepts:
 * emptyA (array), 
 * emptyO (object),
 * emptyF (function).
+* emptySet (set).
 
 We also
 [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze)
@@ -579,4 +616,27 @@ In the first case, it receives some properties as `params`.
 
 When we write our components, we do not want to care about this, hence
 we wrap them as `withParams(Component)`.
+
+[values]({{site.libBase}}/values.js)
+=============================================================================================
+This is a library of functions that produce formatted representations of values
+from the database.
+
+### composeAttributes
+When composing a Field component for an item, compute attributes telling whether
+the item is active or not, and merge them into the other attributes.
+Used in component [RelSelect](Components#relselect).
+
+### getValType(valType)
+For a given value type, such as `text`, `URL`, `number`, return a component and subtype
+for handling the input of such values, e.g. `<input type="URL" />`.
+
+**Example**: [FieldEdit](Components#fieldedit)
+
+### wrappedRepr
+Produces a representation for a field value, complete with
+surrounding elements and attributes.
+Values of link fields will be wrapped in `<a href="...">` elements, 
+
+Used in [FieldRead](Components#fieldread).
 

@@ -12,7 +12,7 @@ All information regarding the workflow of assessing contributions, is in so-call
 *packages*, *criteria*, *types*, etc.
 These have been compiled under guidance of the HaS project by Lisa de Leeuw, and I have entered them
 into a big
-[back office configuration file](https://github.com/Dans-labs/dariah/blob/master/static/tools/back office.yaml)
+[back office configuration file]({{site.staticBase}}/tools/backoffice.yaml)
 which will be read by an import script and transported into the MongoDB database.
 
 # Legacy contributions
@@ -33,7 +33,7 @@ We do the following:
 * import a moderately denormalized version of the data into MongoDB.
 
 The machinery for this is programmed in the script, and the configuration details
-are spelled out in a [config](https://github.com/Dans-labs/dariah/blob/master/static/tools/config.yaml).
+are spelled out in a [config]({{site.staticBase}}/tools/config.yaml).
 
 # Importing and reimporting
 The source data model is complex, the [target data model](Model) is complex, and the
@@ -47,7 +47,7 @@ But there comes a time, and it has arrived now, that people want to experiment w
 But the app is not finished yet, and maybe there are more design jumps to make.
 
 So we need an import script that can reimport the initial data without disturbing the new data.
-We have written [mongoFromFm](https://github.com/Dans-labs/dariah/blob/master/static/tools/mongoFromFm.py)
+We have written [mongoFromFm.py]({{site.staticBase}}/tools/mongoFromFm.py)
 that does exactly this.
 
 ## From transfer to import

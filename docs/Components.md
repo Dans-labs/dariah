@@ -288,7 +288,7 @@ We only do that when we detect an iOS browser.
 =============================================================================================
 A component that shows the current edit status of a record.
 It is presented as a button that can be clicked to submit and save a form.
-It can only be used as descendant of a [redux-form](https://redux-form.com)-enabled `<form>`-carrying
+It can only be used as descendant of a [redux-form]({{site.reduxFormBase}})-enabled `<form>`-carrying
 component. See also [EditStatus](#editstatus).
 
 Uses the library function [editControl]({{site.libBase}}/edit.js).
@@ -315,7 +315,7 @@ will perform the insert action.
 A component that shows the current edit status of a record.
 It is presented as a `<span>` that looks exactly as an
 [EditControl](#editcontrol), but it cannot be clicked to submit and save values.
-It can be used everywhere, and it is itself enhanced by [redux-form](https://redux-form.com).
+It can be used everywhere, and it is itself enhanced by [redux-form]({{site.reduxFormBase}}).
 Because it is outside a `<form>` context, submitting will not work.
 
 Uses the library function [editControl]({{site.libBase}}/edit.js).
@@ -393,7 +393,7 @@ choice field.
 ###### `...props` any
 There are many more props that get passed to `FieldEdit`. 
 They have been injected by the wrapper
-[redux-form()](http://redux-form.com/{{site.reduxFormV}}/docs/api/ReduxForm.md/) into
+[redux-form()]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/ReduxForm.md/) into
 [ItemForm](#itemform), the parent of this component, and they will be passed
 on to *Field* and *FieldArray*, so that they can do their magic.
 
@@ -402,10 +402,10 @@ Edit control for an editable field.
 Depending on the type of the field and the multiplicity, it presents
 the right control.
 Basically, this component produces one or more 
-[Field](http://redux-form.com/{{site.reduxFormV}}/docs/api/Field.md/) 
+[Field]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/Field.md/) 
 or
-[FieldArray](http://redux-form.com/{{site.reduxFormV}}/docs/api/FieldArray.md/)
-components (which are provided by [redux-form](https://redux-form.com). 
+[FieldArray]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/FieldArray.md/)
+components (which are provided by [redux-form]({{site.reduxFormBase}}). 
 
 Note that we do not pass the actual values to these components.
 They know how to get the current values from the state, and what actions
@@ -455,7 +455,7 @@ Both turned out to be related to Redux-Form.
   on to the component function by redux-form.
 
   This is actually documented in the redux-form docs. You need 
-  [this](http://redux-form.com/{{site.reduxFormV}}/docs/api/Field.md/),
+  [this]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/Field.md/),
   section **2. A stateless function**
 
   > You must define the stateless function outside of your render() method,
@@ -467,7 +467,7 @@ Both turned out to be related to Redux-Form.
 
   and
   
-  [this](http://redux-form.com/{{site.reduxFormV}}/docs/api/Field.md/#props):
+  [this]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/Field.md/#props):
 
   > Any custom props passed to Field will be merged into the props object
   on the same level as the input and meta objects.
@@ -510,7 +510,7 @@ The value that will be passed to the handler of `widget`, when it receives a cli
 
 ### Task
 This is a form input component meant to be passed to a 
-[Field](http://redux-form.com/{{site.reduxFormV}}/docs/api/Field.md/) component,
+[Field]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/Field.md/) component,
 like [Input](#input).
 But unlike an `Input`, it only handles a click event, upon which it will change
 the value in the field to `setValue`, and save the form to the database.
@@ -604,16 +604,16 @@ invalid, and of so, for what reason?
 ###### `...props` any
 There are many more props that must be passed to `Field`. 
 They have been injected by the wrapper
-[reduxForm()](http://redux-form.com/{{site.reduxFormV}}/docs/api/ReduxForm.md/) into
+[reduxForm()]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/ReduxForm.md/) into
 [ItemForm](#itemform), the uncle (`InputMulti` is passed as attribute to `Field` which is
 a child of [FieldEdit](#fieldedit)) of this component, and they are just passed
 on to *Field* and *FieldArray*, so that they can do their magic.
 
 ### Task
 Renders a sequence of
-[Field](http://redux-form.com/{{site.reduxFormV}}/docs/api/Field.md/) 
+[Field]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/Field.md/) 
 components on behalf of a
-[FieldArray](http://redux-form.com/{{site.reduxFormV}}/docs/api/FieldArray.md/)
+[FieldArray]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/FieldArray.md/)
 component.
 There are controls to remove values, and to add fresh, empty values.
 
@@ -637,7 +637,7 @@ on to other components.
 
 ###### `handleSubmit` function
 A function that is invoked when the form is submitted.
-This function is passed from [redux-form](https://redux-form.com) and handles all
+This function is passed from [redux-form]({{site.reduxFormBase}}) and handles all
 the form submission machinery.
 See [ItemEdit](#itemedit).
 
@@ -723,7 +723,7 @@ Resetting means: changing all edited values back to the initialValues.
 
 ###### `handleSubmit` function
 A function that is invoked when the form is submitted.
-This function is passed from [redux-form](https://redux-form.com) and handles all
+This function is passed from [redux-form]({{site.reduxFormBase}}) and handles all
 the form submission machinery.
 It also calls a function that you can pass to it as first argument.
 We pass it our `toDb(table, eId, mod)` function.
@@ -745,7 +745,7 @@ In read-only view, markdown fields are rendered as formatted text, and tags in s
 do not open the choice when you click on it. 
 Instead such a click takes to an item view of that value in its own table.
 
-We use [redux-form](http://redux-form.com) for displaying forms,
+We use [redux-form]({{site.reduxFormBase}}) for displaying forms,
 filling them out, submitting them, sending the values to the database,
 validating and normalizing
 values.
@@ -753,14 +753,14 @@ values.
 Although *redux-form* has an awesome functionality, it is far from trivial to get it integrated.
 
 The work horses are the
-[Field](http://redux-form.com/{{site.reduxFormV}}/docs/api/Field.md/) 
+[Field]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/Field.md/) 
 and
-[FieldArray](http://redux-form.com/{{site.reduxFormV}}/docs/api/FieldArray.md/)
+[FieldArray]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/FieldArray.md/)
 components.
 
 These elements can be put in an arbitrary component, under a `<form/>` element.
 The resulting component is enhanced by the
-[reduxForm()](http://redux-form.com/{{site.reduxFormV}}/docs/api/ReduxForm.md/) function.
+[reduxForm()]({site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/ReduxForm.md/) function.
 
 The basic flow is this:
 
@@ -1107,7 +1107,7 @@ The capabilities of this widget are:
 * options can be filtered by a full text filter;
 * only one copy of an option can be chosen;
 * selected options are removed from the list of selectable options;
-* plays well with [Redux-Form](https://redux-form.com);
+* plays well with [Redux-Form]({{site.reduxFormBase}});
 * facilitates disabling some options and presenting options in custom ways
 
 [Root]({{site.appBase}}/components/Root.jsx)

@@ -4,11 +4,11 @@ title: Deployment
 
 # Basic information
 
-**source code** GitHub repository [Dans-labs/dariah](https://github.com/Dans-labs/dariah)
+**source code** GitHub repository [{{site.repo}}]({{site.repo}})
 
-**tech doc** GitHub Pages [dans-labs.github.io/dariah](https://dans-labs.github.io/dariah/)
+**tech doc** GitHub Pages [{{site.docSite}}]({{site.docSite}})
 
-**server** [dariah-beta.dans.knaw.nl](https://dariah-beta.dans.knaw.nl)
+**server** [{{site.liveBase}}]({{site.liveBase}})
 
 **database** MongoDB via pymongo (no connection information needed). Version 3.4.10 or higher.
 On the Mac: installing: 
@@ -35,14 +35,14 @@ a Python3 micro framework to route URLs to functions that perform requests and r
 It contains a development web server.
 
 The list of Python dependencies to be installed is in
-[requirements.txt](https://github.com/Dans-labs/dariah/blob/master/server/config/requirements.txt).
+[requirements.txt]({{site.serverBase}}/config/requirements.txt).
 
 The production web server is **httpd (Apache)**. Bottle connects to it through
 [mod_wsgi](https://modwsgi.readthedocs.io/en/develop/index.html)
 (take care to use a version that speaks Python3).
 This connection is defined in the default config file
 See
-[default_example.conf](https://github.com/Dans-labs/dariah/blob/master/server/config/default_example.conf).
+[default_example.conf]({{site.serverBase}}/config/default_example.conf).
 
 - `/etc/httpd/config.d/`
   - `default.conf` (config for this site)
@@ -50,9 +50,9 @@ See
   - ...
 
 The *client* code is done in 
-[React](https://facebook.github.io/react/)
+[React]({{site.reactDocs}})
 using the
-[JSX](https://facebook.github.io/react/docs/introducing-jsx.html)
+[JSX]({{site.reactDocs}}/introducing-jsx.html)
 idiom.
 We have added
 [Redux](http://redux.js.org)
@@ -92,8 +92,9 @@ The absolute location is not important. Here we assume everything resides in `/o
           - `perm.py` permission control
         - `models` yaml files defining the [data model](Model)
           (these files have been converted to python files):
-          - `data.yaml` the data model
-          - `permission.yaml` the permissions model
+          - `model.yaml` (generic settings)
+          - `tables`
+            - *table*`.yaml` per *table* modeling
         - `views` html templates
           - `index.tpl` the html template of the single page
         - `serve.py` wsgi entry-point for apache

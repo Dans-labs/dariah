@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react'
 
-import { emptyS } from 'utils'
+import { memoize } from 'memo'
+import { emptyS, emptyO } from 'utils'
 
 import Tooltip from 'Tooltip'
 
@@ -101,4 +102,24 @@ export const editControl = canSubmit => ({
     }
   </Fragment>
 )
+
+export const makeSubmit = memoize((dirty, invalid, submitting, submit) =>
+  dirty && !invalid && !submitting
+  ? submit
+  : () => null
+)
+
+export const makeSubmitTime = memoize(submit => () => setTimeout(submit, 10))
+
+export const makeChangeSave = memoize((onChange, submit) => val => {onChange(val); submit()})
+
+export const makeChangeSaveVal = memoize((onChange, submit, val) => () => {onChange(val); submit()})
+
+export const makeReset = memoize((type, reset) =>
+  type == 'checkbox'
+  ? emptyO
+  : { onKeyUp: e => {if (e.keyCode == 27) {e.preventDefault(); reset()}} }
+)
+
+export const onSubmitSuccess = (result, dispatch, { reset }) => reset()
 

@@ -265,7 +265,7 @@ Used to steer the *collective* checkbox that governs all facets.
 =============================================================================================
 
 The `forms` slice of the state is under control of the
-[Redux-Form](https://redux-form.com) module.
+[Redux-Form]({{site.reduxFormBase}}) module.
 It contains all current form data of components where the user is interacting with forms.
 
 Some other components might want to know whether a component is engaged in data entry or not,

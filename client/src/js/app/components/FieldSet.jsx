@@ -1,4 +1,4 @@
-import { makeSubmitTime, makeChangeSaveVal } from 'fields'
+import { makeSubmitTime, makeChangeSaveVal } from 'edit'
 
 export default ({
   widget,

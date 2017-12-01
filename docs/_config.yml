@@ -39,9 +39,15 @@ exclude:
 liveBase: https://dariah-beta.dans.knaw.nl
 serverBase: https://github.com/Dans-labs/dariah/blob/master/server
 clientBase: https://github.com/Dans-labs/dariah/blob/master/client
+staticBase: https://github.com/Dans-labs/dariah/blob/master/static
 cssBase: https://github.com/Dans-labs/dariah/blob/master/client/src/css
 appBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/app
 libBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/lib
 testBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/test
 repBase: https://github.com/Dans-labs/dariah/blob/master
+repo: https://github.com/Dans-labs/dariah
+docSite: https://dans-labs.github.io/dariah/
+
+reactDocs: https://facebook.github.io/react/docs
+reduxFormBase: https://redux-form.com
 reduxFormV: 7.1.2

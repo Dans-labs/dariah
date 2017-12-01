@@ -16,20 +16,25 @@ Looking up a field value might seem a very innocent operation: you retrieve the
 appropriate document from the database, look up the field in question, and read out the value 
 that you find there.
 Alas, there are several complicating factors:
-* That value might be a MongoDB object identifier pointing to a related record.
-  We do not want to display that identifier, but the corresponding record, but not
-  the whole record. Only an informative heading. For that we have to look up additional
-  fields in the related table, and possibly apply logic depending on what we encounter.
-* We should not show fields that the current user is not entitled to view.
-  We should not put in edit controls for fields that the current user is not allowed to 
-  edit.
+1. That value might be a MongoDB object identifier pointing to a related record.
+   We do not want to display that identifier, but the corresponding record, but not
+   the whole record. Only an informative heading. For that we have to look up additional
+   fields in the related table, and possibly apply logic depending on what we encounter.
+1. We should not show fields that the current user is not entitled to view.
+   We should not put in edit controls for fields that the current user is not allowed to 
+   edit.
+1. We should present values that are in some way *legacy* different from
+   values that are *current*, where the current-ness of values is determined
+   by certain other fields in the database (see [business model](Business).
 
-These concerns are built into the generic logic, in the components
+The first two concerns are built into the generic logic, in the components
+* [EditInsert](#editinsert)
 * [ItemRead](#itemread)
 * [ItemEdit](#itemedit)
 * [FieldRead](#fieldread)
 * [FieldEdit](#fieldedit)
-and we do not want to reimplement this logic when we do templates.
+and we do not want to reimplement this logic when we want to cater
+for the third concern by means of templates.
 
 Our solution is that templates are not static strings into which 
 field values are merged dynamically.
@@ -38,23 +43,36 @@ Instead, our templates are *functions* that take a properties object as argument
 
 The properties are functions that can furnish representations for fields.
 These functions use the general machinery to
-* compute string values for fields;
-* compute read-only values for fields including looking up headings of related records,
-  for fields pointing to them, and wrap them in
+* `l(field)` fetch labels for fields;
+* `e(field)` check whether fields have empty values;
+* `v(field)` fetch the raw values for fields;
+* `w(key)` fetch additional [workflow](Workflow) attributes for records;
+* `s(field)` fetch the plain string values for fields, replacing identifiers into
+  related tables by headings of related records;
+  by entity titles;
+* `f(field)` fetch values for fields (with related lookup), and wrap them in
   [FieldRead](#fieldread) components;
-* present appropriate edit controls for fields whenever the user may change their values
-  and wrap them in
-  [FieldEdit](#fieldedit) components.
-* present custom controls for fields upon click events
-  and wrap them in
-  [FieldSet](#fieldset) components
-* retrieve [workflow](Workflow) information.
+* `f(field)` fetch values for fields, and wrap them in
+  [FieldEdit](#fieldedit) components, which are controls to let the user edit the value;
+* `fs(field)` present custom controls for fields
+  and wrap them in [FieldSet](#fieldset) components, which react to click events:
+  upon a click, a baked in value will be saved for this field to the database;
+* `n` (only for insert templates): the number of detail records in the list
+* `at` a set of the *active* contribution types
+* `o` check whether the current record is owned by the user or whether the user is
+  in the list of editors;
+* `me` all attributes of the logged in user (empty if the user is not logged in);
+* `linkMe` a direct hyperlink to a the value as part of its list;
+* `editButton` a ready-made control for switching edit/read-only mode and saving the values.
+* `onInsert` a ready-made handler for triggering an insert action. To be associated
+  to the element that receives the user trigger to create a new record.
 
 Applying a template means feeding a higher order React component with
 a properties object of field rendering functions, which results in 
 a concrete React component.
 
 The templates will be applied by
+[EditInsert](#editinsert),
 [ItemRead](#itemread),
 [ItemEdit](#itemedit),
 and
@@ -65,11 +83,12 @@ using the functions
 [applyEditTemplate](templates#applyedittemplate),
 [applyInsertTemplate](templates#applyinserttemplate),
 and
-[editMode](templates#editmode),
+[editMode](templates#editmode).
 
 Template organization
 =================================================
 There are several purposes for which we invoke the template mechanism:
+
 * The presentation of:
   * main records
   * related records
@@ -101,6 +120,14 @@ you can have them.
 However, in the **Action** part, you do not have `save` and `reset` buttons.
 This part is meant for action buttons, which change a field to a predefined value and save
 them immediately.
+
+Insert
+-------
+For lists of detail records we have templates that format
+the insert button. 
+These templates can also choose not to show the insert button,
+depending on conditions determined by the master record and the number of
+items in the detail list.
 
 Main, related, detail, consolidated
 -------------------------------------------
@@ -248,5 +275,4 @@ In some situation you want to open some records in edit mode and others in read 
 A typical situation is where you want to open incomplete records in edit mode, and others not.
 The template functions of this kind do not deliver templates, but a boolean, 
 which will be used whenever a table is presented to the user as a list.
-
 

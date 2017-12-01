@@ -3,8 +3,7 @@ import { connect } from 'react-redux'
 import Markdown from 'react-markdown'
 
 import { emptyO } from 'utils'
-import { editClass } from 'edit'
-import { makeSubmit, makeReset } from 'fields'
+import { makeSubmit, makeReset, editClass } from 'edit'
 
 import { getAltSection, compileAlternatives } from 'alter'
 

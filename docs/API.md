@@ -6,7 +6,7 @@ title: API
 
 All API calls are structured like this:
 
-`https://dariah-beta.dans.knaw.nl/api/db/`**verb**`?`**parameters**
+`{{site.liveBase}}`**verb**`?`**parameters**
 
 Below there is a partial specification of the verbs and their parameters.
 
@@ -45,7 +45,7 @@ Per entity, the fields can be found under the key `values`.
 
 #### Example
 
-[view a collection](https://dariah-beta.dans.knaw.nl/api/db/list?table=contrib&complete=true)
+[view a collection]({{site.liveBase}}/api/db/list?table=contrib&complete=true)
 
 ### view
 
@@ -57,4 +57,4 @@ having all fields you are entitled to read.
 
 #### Example
 
-[view an item](https://dariah-beta.dans.knaw.nl/api/db/view?table=contrib&id=595426cf2179c0309da90f0e)
+[view an item]({{site.liveBase}}/api/db/view?table=contrib&id=595426cf2179c0309da90f0e)

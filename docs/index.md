@@ -36,7 +36,7 @@ The contribution is an [SPA](https://en.wikipedia.org/wiki/Single-page_applicati
 (Single Page Application) and hence the focus is on the client side, aka front-end of the app.
 
 We have implemented the front-end with the help of
-[React](https://facebook.github.io/react/) and [Redux](http://redux.js.org)
+[React]({{site.reactDocs}}) and [Redux](http://redux.js.org)
 and followed the most recent and idiomatic practices to achieve our ends.
 
 Here is a crash course in modern [JavaScript, ES6](ES6) and [React+Redux](React).

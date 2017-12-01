@@ -52,9 +52,9 @@ in such a way that no data is sent from server to client that the current user i
 
 The code in `db` is generic, it does not contain explicit reference to particular tables and fields.
 All specifics are derived form the
-[data model config file]({{site.serverBase}}/models/data.YAML)
-and
-[the permissions config file]({{site.serverBase}}/models/permission.YAML).
+[model config file]({{site.serverBase}}/models/model.yaml)
+and the table specific files in
+[tables]({{site.serverBase}}/models/tables).
 
 There are also *hooks*, where specific behaviour for certain tables can be specified.
 That behaviour is coded in the [workflow module](#workflow).

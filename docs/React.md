@@ -3,7 +3,7 @@ title: React
 ---
 
 # React Components
-[React Components](https://facebook.github.io/react/docs/react-component.html)
+[React Components]({{site.reactDocs}}/react-component.html)
 represent pieces of the web page and their functionality.
 Components are organized hierarchically.
 Components can be parametrized by *properties*, which parents pass to children.
@@ -86,7 +86,7 @@ fast JavaScript currently is.
 This is one of the reasons that a niche for React exists, with its [MiniDOM](#minidom).
 
 ### Fragment
-A [fragment](https://facebook.github.io/react/docs/rendering-elements.html)
+A [fragment]({{site.reactDocs}}/rendering-elements.html)
 is such a mixture of properly nested React elements and components.
 It is part of the React's toolkit to manage DOM manipulations efficiently.
 
@@ -94,7 +94,7 @@ See [Reconciliation](#reconciliation).
 
 ## Property management
 ### PropTypes
-[PropTypes](https://facebook.github.io/react/docs/typechecking-with-proptypes.html)
+[PropTypes]({{site.reactDocs}}/typechecking-with-proptypes.html)
 are a means to do type checking for React Components is done by *PropTypes*.
 
 PropType checking in react only happens in development mode.
@@ -119,7 +119,7 @@ const { props: { foo, bar} } = this
 ```
 
 ### Context
-[Context](https://facebook.github.io/react/docs/context.html)
+[Context]({{site.reactDocs}}/context.html)
 is a React mechanism to pass data directly  from ancestors to deep descendants.
 The React documentation
 considers context as a brittle part of itself, and warns
@@ -135,16 +135,16 @@ The main function of a
 is to act as a template to be [rendered](#render).
 But if there is additional work to be done, this can be hooked up at various
 stages in the component's
-[life cycle](https://facebook.github.io/react/docs/react-component.html#the-component-life cycle).
+[life cycle]({{site.reactDocs}}/react-component.html#the-component-life cycle).
 Most stages occur during (re)rendering, and there is a stage of construction and unmounting.
 
 ### Constructor
 When a
 [component](#react-components)
 is being
-[rendered](https://facebook.github.io/react/docs/react-component.html#render)
+[rendered]({{site.reactDocs}}/react-component.html#render)
 the
-[constructor](https://facebook.github.io/react/docs/react-component.html#constructor)
+[constructor]({{site.reactDocs}}/react-component.html#constructor)
 is the method to construct the corresponding React class.
 It will set up the
 [state](#state).
@@ -154,7 +154,7 @@ When a
 [component](#react-components)
 has been added to the DOM
 its method
-[componentDidMount](https://facebook.github.io/react/docs/react-component.html#componentdidmount)
+[componentDidMount]({{site.reactDocs}}/react-component.html#componentdidmount)
 will be called just after.
 This is the recommended time to fetch data for this component, if needed.
 
@@ -163,7 +163,7 @@ When a
 [component](#react-components)
 has been updated due to receiving new properties,
 its method
-[componentDidUpdate](https://facebook.github.io/react/docs/react-component.html#componentdidupdate)
+[componentDidUpdate]({{site.reactDocs}}/react-component.html#componentdidupdate)
 will be called just after.
 If DOM manipulations are needed to complete the rendering, this is the place to do it.
 
@@ -176,7 +176,7 @@ When a
 [component](#react-components)
 will be added to the DOM,
 its method
-[componentWillMount](https://facebook.github.io/react/docs/react-component.html#componentwillmount)
+[componentWillMount]({{site.reactDocs}}/react-component.html#componentwillmount)
 will be called just before.
 This is the first thing that happens after [constructor()](#constructor).
 
@@ -185,7 +185,7 @@ When a
 [component](#react-components)
 is about to receive new props (as part of the update process),
 its method
-[componentWillReceiveProps](https://facebook.github.io/react/docs/react-component.html#componentwillreceiveprops)
+[componentWillReceiveProps]({{site.reactDocs}}/react-component.html#componentwillreceiveprops)
 will be called just before.
 The new props are passed with it, so that it is possible to execute
 actions dependent on whether pros have changed.
@@ -195,7 +195,7 @@ When a
 [component](#react-components)
 will be removed from the DOM,
 its method
-[componentWillUnmount](https://facebook.github.io/react/docs/react-component.html#componentwillunmount)
+[componentWillUnmount]({{site.reactDocs}}/react-component.html#componentwillunmount)
 will be called just before.
 If we want to save state, we can hook it up here.
 
@@ -204,7 +204,7 @@ The main function of a
 [component](#react-components)
 is to act as a template to be rendered.
 Its method
-[render](https://facebook.github.io/react/docs/react-component.html#render)
+[render]({{site.reactDocs}}/react-component.html#render)
 constructs the template to be rendered.
 During rendering the template will be used as a set of instructions to build a real DOM
 somewhere on the actual web page.
@@ -213,7 +213,7 @@ somewhere on the actual web page.
 For elements that can receive user input (forms, inputs, etc.) there is the option
 to handle input in a way controlled by React, and not by the default HTML behaviour.
 We say that those elements are used as
-[controlled Components](https://facebook.github.io/react/docs/forms.html).
+[controlled Components]({{site.reactDocs}}/forms.html).
 
 So when a user clicks a checkbox, the check is not managed by the browser,
 but a callback is called, a parent component executes it, state gets updated, state changes
@@ -222,7 +222,7 @@ to be checked (or unchecked).
 
 ## State
 There are two main reasons for a component to maintain
-[state](https://facebook.github.io/react/docs/state-and-life cycle.html):
+[state]({{site.reactDocs}}/state-and-life cycle.html):
 
 * getting external data,
 * reacting to user events.
@@ -239,7 +239,7 @@ whose properties are dependent on this state, are re-rendered automatically
 ### Local State
 The vanilla React way is that [components](#react-components)
 have their own state, which only they can modify through
-[setState](https://facebook.github.io/react/docs/react-component.html#setstate).
+[setState]({{site.reactDocs}}/react-component.html#setstate).
 
 But even in React, state is not completely local, because in many
 cases several components need to have access to the state.

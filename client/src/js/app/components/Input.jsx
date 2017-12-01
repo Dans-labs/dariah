@@ -1,8 +1,7 @@
 import React from 'react'
 
 import { emptyO } from 'utils'
-import { editClass } from 'edit'
-import { makeSubmit, makeSubmitTime, makeReset } from 'fields'
+import { makeSubmit, makeSubmitTime, makeReset, editClass } from 'edit'
 
 import EditHelp from 'EditHelp'
 import Tooltip from 'Tooltip'

@@ -4,7 +4,7 @@ title: Codebase
 
 # Statistics
 
-[cloc tool](https://GitHub.com/AlDanial/cloc)
+[cloc tool](https://github.com/AlDanial/cloc)
 {% include_relative Stats.md %}
 
 # Legend
@@ -20,17 +20,17 @@ What [Markdown](#markdown) is to text, YAML is to XML-JSON.
 In this app we use YAML for configuration details.
 
 * the conversion of legacy contribution data into MongoDB is steered by a 
-  [config.yaml]({{site.repBase}}/static/tools/config.yaml).
+  [config.yaml]({{site.staticBase}}/tools/config.yaml).
 * the [data model](Model) lists all the tables
   and fields, including how they hang together and how we want to represent them on screen.
   It also defines access control.
   If you, as developer, need to add new tables and fields, you can do so by modifying these
   files:
-  [data model]({{site.serverBase}}/models/data.yaml)
-  [permissions]({{site.serverBase}}/models/permission.yaml).
+  * [model]({{site.serverBase}}/models/model.yaml)
+  * [per table]({{site.serverBase}}/models/tables).
   No extra coding is needed.
 
-[Markdown](https://guides.GitHub.com/features/mastering-markdown/)
+[Markdown](https://guides.github.com/features/mastering-markdown/)
 -----------------------------------------------------------------------------------------
 
 A simple plain-text way to write formatted text.
@@ -66,12 +66,12 @@ We use it as a work horse which takes care of a copy of data from the database.
 It reacts to changes by integrating new bits of data into the existing state,
 a process that is called [reducing](React#redux).
 
-[JSX](https://facebook.GitHub.io/react/docs/introducing-JSX.html)
+[JSX]({{site.reactDocs}}/introducing-JSX.html)
 -----------------------------------------------------------------------------------------
 
 This is also JavaScript, but with a thin layer of syntactic sugar, by which you
-can present your code as a collection of [React](https://facebook.GitHub.io/react/)
-[components](https://facebook.GitHub.io/react/docs/react-component.html).
+can present your code as a collection of [React]({{site.reactDocs}})
+[components]({{site.reactDocs}}/react-component.html).
 
 In this app we have dozens of JSX files, each containing exactly one component
 (with a few exceptions).

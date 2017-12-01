@@ -32,7 +32,7 @@ Realization
 =============================================================================
 Workflow is realized at the server and at the client.
 To a large extent, its rules are specified in the
-[workflow model configuration file]({{site.serverBase}}/models/workflow.yaml).
+[data model](Model).
 
 Client
 ---------------------------------------------------------------------
@@ -55,28 +55,27 @@ The principal functions exported are discussed here.
 Given a document in some table, this function compiles
 the workflow attributes and gives them a proper value.
 The determination of these attributes is dictated by the
-[data model configuration file]({{site.serverBase}}/models/data.yaml),
-[workflow model configuration file]({{site.serverBase}}/models/workflow.yaml).
-under the key `tables/`*table*`/read`.
+[model]({{site.serverBase}}/models/model.yaml),
+[tables]({{site.serverBase}}/models/tables),
+under the key `workflow`.
 
 There you find a sequence of instructions by which the system
 can compute workflow attributes for each record in a table.
 Let us look at an example:
 
 ```yaml
-  tables:
-    contrib:
-      read:
-        - inspect: details
-          method: hasValue
-          linkField: contrib
-          otherTable: assessment
-          otherField: submitted
-          myField: null
-          value: true
-          workflow:
-            locked: true
-            lockedReason: being assessed
+workflow:
+  read:
+    - inspect: details
+      method: hasValue
+      linkField: contrib
+      otherTable: assessment
+      otherField: submitted
+      myField: null
+      value: true
+      attribute:
+        name: locked
+        desc: being assessed
 ```
 Basically, this instructs the system to look at various other
 tables and records and fields, and if certain conditions are met
@@ -146,8 +145,8 @@ workflow attributes after a change in a given record. whether it
 be an insert. update or delete.
 
 The determination of these attributes is dictated by the
-[workflow model configuration file]({{site.serverBase}}/models/workflow.yaml).
-under the key `tables/`*table*`/adjust`.
+[data model](Model).
+under the key `workflow`.
 
 Typically, when a record gets workflow attributes based on master or
 detail records, these attributes must be updated on any change in the master
@@ -183,9 +182,9 @@ workflow rule, which we have not mentioned here as an example.
 ### enforceWorkflow
 Finally, the server has to know the consequences of the workflow attributes for
 behaviour.
-This is dictated in
-[workflow model configuration file]({{site.serverBase}}/models/workflow.yaml).
-under the key `prevent/`*attribute*
+This is dictated in the
+[model](Model).
+under the key `workflow/prevent/`*attribute*
 where `attribute` is a name such as `locked` or `incomplete`.
 
 For each attribute there are optional constraints for the `update` and `delete`

@@ -25,10 +25,10 @@ we only store references to related records inside the main records.
 
 Configuration
 ==============================================================================
-Both the
-[data model]({{site.serverbase}}/models/data.yaml)
-and the
-[permission model]({{site.serverbase}}/models/permission.yaml)
+The
+[model]({{site.serverbase}}/models/model.yaml)
+and the files in 
+[table]({{site.serverbase}}/models/tables)
 are YAML configuration files, and by tweaking them you can achieve a lot of customization.
 
 Name handling

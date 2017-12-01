@@ -13,17 +13,6 @@ import { emptyS, emptyO } from 'utils'
  *
  * Still needed in 6.7.0
  */
-export const onSubmitSuccess = (result, dispatch, { reset }) => reset()
-
-export const makeSubmit = memoize((dirty, invalid, submitting, submit) =>
-  dirty && !invalid && !submitting
-  ? submit
-  : () => null
-)
-
-export const makeSubmitTime = memoize(submit => () => setTimeout(submit, 10))
-export const makeChangeSave = memoize((onChange, submit) => val => {onChange(val); submit()})
-export const makeChangeSaveVal = memoize((onChange, submit, val) => () => {onChange(val); submit()})
 
 export const itemReadField = (field, label, fvalue, key) => (
   <div
@@ -35,12 +24,6 @@ export const itemReadField = (field, label, fvalue, key) => (
       {fvalue}
     </div>
   </div>
-)
-
-export const makeReset = memoize((type, reset) =>
-  type == 'checkbox'
-  ? emptyO
-  : { onKeyUp: e => {if (e.keyCode == 27) {e.preventDefault(); reset()}} }
 )
 
 export const itemEditField = (field, label, fevalue, editable, key) => (

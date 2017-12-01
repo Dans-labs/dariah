@@ -1,8 +1,7 @@
 import React from 'react'
 import { Field } from 'redux-form'
 
-import { editClass } from 'edit'
-import { makeSubmit, makeSubmitTime } from 'fields'
+import { makeSubmit, makeSubmitTime, editClass } from 'edit'
 
 import Tooltip from 'Tooltip'
 

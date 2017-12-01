@@ -86,7 +86,7 @@ Currently, these are the dux of this app:
 * [docs](Dux#docs): fetch documents, especially markdown ones, and show them in two representations: source and formatted;
 * [filters](Dux#filters): the machinery of faceted and full text filtering of entities from tables;
 * [forms](Dux#forms): the state of all data entry forms in the app;
-  managed by [redux-form](http://redux-form.com); but other parts of the app need to inspect the `form` slice of the state as well;
+  managed by [redux-form]({{site.reduxFormBase}}); but other parts of the app need to inspect the `form` slice of the state as well;
 * [grid](Dux#grid): the display state of all lists in grid layout: the sort columns and the directions
   of sorting;
 * [me](Dux#me): data about the currently logged-in user;

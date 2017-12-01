@@ -111,8 +111,12 @@ Examples:
 
 A consequence is, that if there is no `root` in the system, nobody can be made `root` from within the system.
 
-When importing data into the system by means of [load.sh](https://github.com/Dans-labs/dariah/blob/master/static/tools/load.sh) you can specify to make a specific user `root`.
-Which user that is, is specified in [config.yaml](https://github.com/Dans-labs/dariah/blob/master/static/tools/config.yaml), see `rootUser`.
+When importing data into the system by means of
+[load.sh]({{site.staticBase}}/tools/load.sh)
+you can specify to make a specific user `root`.
+Which user that is, is specified in
+[config.yaml]({{site.staticBase}}/tools/config.yaml),
+see `rootUser`.
 
 Once the root user is in place, (s)he can assign system admins and back office people.
 Once those are in place, the daily governance of the system can take place.
