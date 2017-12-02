@@ -17,6 +17,7 @@ const templates = {
         {rField('title', l, f)}
         {rField('assessmentType', l, f)}
         {rField('contrib', l, f)}
+        {rField('remarks', l, f)}
       </div>
     )
   },
@@ -28,6 +29,7 @@ const templates = {
           {eField('title', l, fe, m)}
           {eField('assessmentType', l, fe, m)}
           {eField('contrib', l, fe, m)}
+          {eField('remarks', l, fe, m)}
         </div>
       </Fragment>
     )

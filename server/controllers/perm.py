@@ -18,7 +18,7 @@ class PermApi(object):
     def getUid(self): return self.uid
     def getEppn(self): return self.eppn
 
-    def getPerm(self, controller, table, action):
+    def getPerm(self, controller, table, action, extraMy=None):
         methods = PM[N_methods]
         call = methods.get(controller, {}).get(N_call, None)
         if call == None:
@@ -37,6 +37,12 @@ class PermApi(object):
         level = self._highestLevel((call, perm))
         rowFilter = self._rowSet(table, level) if action != N_insert else True
         fieldFilter = self._fieldProjection(table, action) if action not in {N_insert, N_delete} else True
+        if rowFilter != False:
+            if extraMy:
+                if self.uid:
+                    rowFilter['$or'] = [{field: self.uid} for field in extraMy]
+                else:
+                    rowFilter = False
         if rowFilter == False or not fieldFilter:
             return (False, None) # this is not an error: the set of permitted rows/fields is just empty
         return (True, (rowFilter, fieldFilter))

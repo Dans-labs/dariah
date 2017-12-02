@@ -25,6 +25,8 @@ workflow:
         name: locked
         except:
           - submitted
+          - reviewerE
+          - reviewerF
         desc: being reviewed
     - inspect: details
       method: hasIncomplete
@@ -39,6 +41,14 @@ workflow:
       attribute:
         name: incomplete
         desc: 'some criteria lack a score or evidence ({n}x)'
+    - inspect: details
+      method: getValues
+      linkField: assessment
+      otherTable: review
+      otherField: creator
+      attribute:
+        name: reviews
+        desc: reviews of this same assessment
   adjust:
     - inspect: master
       linkField: contrib
@@ -51,6 +61,9 @@ workflow:
       otherTable: criteriaEntry
       triggerFields:
         - submitted
+  assign:
+    - reviewerE
+    - reviewerF
 
 title: title
 
@@ -114,7 +127,7 @@ fieldSpecs:
       list:   auth
       read:   auth
       update: edit
-    label: Remarks
+    label: General remarks
     valType: textarea
     multiple: true
   submitted:
@@ -176,6 +189,7 @@ details:
   review:
     table: review
     linkField: assessment
+    expand: own
     mode: list
     filtered: false
   criteriaEntry:

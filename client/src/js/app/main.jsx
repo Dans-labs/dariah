@@ -31,6 +31,7 @@ render(
           <Route path={'data'} component={SubApp} >
             <Route path={':table'} >
               <Route path={'mylist(/item/:eId)'} component={ListContainer} select={MYIDS} mode={'list'} />
+              <Route path={'myassign(/item/:eId)'} component={ListContainer} select={MYIDS} extra={true} mode={'list'} />
               <Route path={'list(/item/:eId)'} component={ListContainer} select={ALLIDS} mode={'list'} />
               <Route path={'grid(/item/:eId)'} component={ListContainer} select={ALLIDS} mode={'grid'} />
               <Route path={'filter(/item/:eId)'} component={ListContainer} select={ALLIDS} mode={'list'} filtered={true} />

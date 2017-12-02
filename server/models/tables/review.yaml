@@ -19,6 +19,11 @@ workflow:
       linkField: assessment
       triggerFields:
         - _id
+    - inspect: master
+      linkField: assessment
+      otherTable: assessment
+      triggerFields:
+        - creator
 
 title: title
 
@@ -48,6 +53,22 @@ fieldSpecs:
     label: Title
     valType: text
     multiple: false
+  reviewType:
+    perm:
+      list:   auth
+      read:   auth
+      update: nobody
+    label: Review type
+    valType:
+      relTable: typeContribution
+      allowNew: false
+      fixed: true
+      inactive:
+        attributes:
+          className: inactive
+          title: this value does not belong to the current package
+        disabled: true
+    multiple: false
   assessment:
     perm:
       list:   auth
@@ -64,7 +85,7 @@ fieldSpecs:
       list:   auth
       read:   auth
       update: edit
-    label: Remarks
+    label: General remarks
     valType: textarea
     multiple: true
   decision:

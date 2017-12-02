@@ -25,7 +25,7 @@ const tableLinks = (me, { path, name, forWhom, details }) => forMe(me.groupRep, 
       <div className={'subsection'} >
         {
           (details || emptyA).filter(({ forWhom: subFor }) => forMe(me.groupRep, subFor)).map(
-            ({ component, path: subPath, name: subName, hint }) =>
+            ({ component, path: subPath, name: subName, hint, ppath }) =>
               component == null
               ? <Tooltip
                   key={subPath}
@@ -33,7 +33,7 @@ const tableLinks = (me, { path, name, forWhom, details }) => forMe(me.groupRep, 
                   at={'right'}
                 >
                   <NavLink
-                    to={`${path}/${subPath}`}
+                    to={`${ppath || path}/${subPath}`}
                   >{subName}</NavLink>
                 </Tooltip>
               : component
@@ -71,6 +71,16 @@ const navBarItems = [
     details: [
       { path: 'filter', name: 'All items', forWhom: 'auth', hint: 'overview of all assessments' },
       { path: 'mylist', name: 'My items', forWhom: 'auth', hint: 'Look here to see the status of your assessments' },
+    ],
+  },
+  {
+    path: '/data/review',
+    name: 'Reviews',
+    forWhom: 'auth',
+    details: [
+      { path: 'filter', name: 'All items', forWhom: 'office', hint: 'overview of all reviews' },
+      { path: 'myassign', name: 'My assignments', forWhom: 'auth', hint: 'my review assignments', ppath: '/data/assessment' },
+      { path: 'mylist', name: 'My reviews', forWhom: 'auth', hint: 'my reviews' },
     ],
   },
   {

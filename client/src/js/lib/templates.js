@@ -14,12 +14,14 @@ import FieldSet from 'FieldSet'
 import contrib from 'contrib'
 import assessment from 'assessment'
 import criteriaEntry from 'criteriaEntry'
+import review from 'review'
 import reviewEntry from 'reviewEntry'
 
 const templateTables = {
   contrib,
   assessment,
   criteriaEntry,
+  review,
   reviewEntry,
 }
 
@@ -77,7 +79,7 @@ const makeM = memoize(fieldInfo => field => {
     [field]: {
       valType,
       fragment: { editable },
-    },
+    } = emptyO,
   } = fieldInfo
   return editable && (typeof valType != 'object' || !valType.fixed)
 }, emptyO)
@@ -88,25 +90,25 @@ const makeL = memoize((tables, table) => field => {
       fieldSpecs: {
         [field]: { label } = emptyO,
       } = emptyO,
-    },
+    } = emptyO,
   } = tables
   return label
 }, emptyO)
 
-const makeE = memoize((tables, table, values) => {
-  const { [table]: { fieldSpecs } } = tables
+const makeE = memoize((tables, table, values = emptyO) => {
+  const { [table]: { fieldSpecs } = emptyO } = tables
   return field => {
-    const { [field]: { multiple } } = fieldSpecs
+    const { [field]: { multiple } = emptyO } = fieldSpecs
     const { [field]: value } = values
     return isEmpty(value, multiple)
   }
 }, emptyO)
 
-const makeEditE = memoize((tables, table, fieldInfo) => {
-  const { [table]: { fieldSpecs } } = tables
+const makeEditE = memoize((tables, table, fieldInfo = emptyO) => {
+  const { [table]: { fieldSpecs } = emptyO } = tables
   return field => {
-    const { [field]: { fragment: { myValues } } } = fieldInfo
-    const { [field]: { multiple } } = fieldSpecs
+    const { [field]: { fragment: { myValues } = emptyO } = emptyO } = fieldInfo
+    const { [field]: { multiple } = emptyO } = fieldSpecs
     return isEmpty(myValues, multiple)
   }
 }, emptyO)
@@ -114,9 +116,9 @@ const makeEditE = memoize((tables, table, fieldInfo) => {
 const makeV = memoize((tables, table, eId) => {
   const {
     [table]: {
-      entities: { [eId]: { values } = emptyO },
-      fieldSpecs,
-    },
+      entities: { [eId]: { values = emptyO } = emptyO },
+      fieldSpecs = emptyO,
+    } = emptyO,
   } = tables
   return (field, relField) => {
     const { [field]: value } = values
@@ -126,8 +128,13 @@ const makeV = memoize((tables, table, eId) => {
       if (relTable) {
         const {
           [relTable]: {
-            entities: { [value]: { values: { [relField]: relValue } = emptyO } = emptyO },
-          },
+            entities: {
+              [value]: {
+                values: {
+                  [relField]: relValue } = emptyO,
+              } = emptyO,
+            } = emptyO,
+          } = emptyO,
         } = tables
         return relValue
       }
@@ -140,23 +147,23 @@ const makeV = memoize((tables, table, eId) => {
 const makeInsertS = memoize((settings, tables, table, eId) => {
   const {
     [table]: {
-      entities: { [eId]: { values } = emptyO },
-      fieldSpecs,
-    },
+      entities: { [eId]: { values = emptyO } = emptyO },
+      fieldSpecs = emptyO,
+    } = emptyO,
   } = tables
   return (field, relField, sep, relSep) => {
-    const { [field]: { value } } = values
+    const { [field]: value } = values
     const { [field]: { valType, multiple } = emptyO } = fieldSpecs
     return repr(tables, table, field, valType, multiple, relField, value, settings, sep, relSep)
   }
 }, emptyO)
 
-const makeS = memoize((settings, tables, table, values, kind) => {
+const makeS = memoize((settings, tables, table, values = emptyO, kind) => {
   const { [table]: { fieldSpecs } } = tables
   return kind === 'consolidated'
   ? (field, sep) => {
     const { [field]: value } = values
-    const { [field]: { multiple } } = fieldSpecs
+    const { [field]: { multiple } = emptyO } = fieldSpecs
     const useSep = sep == null ? ' ' : sep
     return multiple
     ? value.join(useSep)
@@ -169,26 +176,26 @@ const makeS = memoize((settings, tables, table, values, kind) => {
   }
 }, emptyO)
 
-const makeEditS = memoize((settings, tables, table, fieldInfo) => {
-  const { [table]: { fieldSpecs } } = tables
+const makeEditS = memoize((settings, tables, table, fieldInfo = emptyO) => {
+  const { [table]: { fieldSpecs } = emptyO } = tables
   return (field, relField, sep, relSep) => {
-    const { [field]: { fragment: { myValues } } } = fieldInfo
+    const { [field]: { fragment: { myValues = emptyO } = emptyO } = emptyO } = fieldInfo
     const { [field]: { valType, multiple } = emptyO } = fieldSpecs
     return repr(tables, table, field, valType, multiple, relField, myValues, settings, sep, relSep)
   }
 }, emptyO)
 
-const makeW = memoize((tables, table, eId) => field => {
+const makeW = memoize((tables, table, eId) => key => {
   const {
     [table]: {
       entities: {
         [eId]: {
           workflow: {
-            [field]: info = emptyO,
+            [key]: info = emptyO,
           } = emptyO,
-        },
-      },
-    },
+        } = emptyO,
+      } = emptyO,
+    } = emptyO,
   } = tables
   return info
 }, emptyO)
@@ -196,8 +203,8 @@ const makeW = memoize((tables, table, eId) => field => {
 const makeInsertF = memoize((settings, tables, table, eId) => {
   const {
     [table]: {
-      entities: { [eId]: { values } = emptyO },
-    },
+      entities: { [eId]: { values = emptyO } = emptyO },
+    } = emptyO,
   } = tables
   return (field, relField) => {
     const { [field]: value } = values
@@ -215,7 +222,7 @@ const makeInsertF = memoize((settings, tables, table, eId) => {
   }
 }, emptyO)
 
-const makeF = memoize((settings, tables, table, eId, values, kind) =>
+const makeF = memoize((settings, tables, table, eId, values = emptyO, kind) =>
   kind === 'consolidated'
   ? null
   : (field, relField) =>
@@ -231,9 +238,9 @@ const makeF = memoize((settings, tables, table, eId, values, kind) =>
   emptyO,
 )
 
-const makeEditF = memoize((settings, tables, table, eId, fieldInfo) =>
+const makeEditF = memoize((settings, tables, table, eId, fieldInfo = emptyO) =>
   (field, relField) => {
-    const { [field]: { fragment: { myValues } } } = fieldInfo
+    const { [field]: { fragment: { myValues = emptyO } = emptyO } = emptyO } = fieldInfo
     return (
       <FieldRead
         settings={settings}
@@ -249,10 +256,10 @@ const makeEditF = memoize((settings, tables, table, eId, fieldInfo) =>
   emptyO,
 )
 
-const makeEditFE = memoize((settings, tables, table, eId, fieldInfo, m, submitValues, reset) =>
+const makeEditFE = memoize((settings, tables, table, eId, fieldInfo = emptyO, m, submitValues, reset) =>
   (field, editOptions) => {
     const {
-      [field]: { fragment: { myValues, ...fieldProps } },
+      [field]: { fragment: { myValues = emptyO, ...fieldProps } = emptyO },
     } = fieldInfo
     const editable = m(field)
     return editable
@@ -320,11 +327,12 @@ export const applyInsertTemplate = ({
    */
   const at = compileActive(tables, 'typeContribution')
   const v = makeV(tables, relTable, relId)
+  const w = makeW(tables, relTable, relId)
   const s = makeInsertS(settings, tables, relTable, relId)
   const f = makeInsertF(settings, tables, relTable, relId)
   const o = isOwner(me, v)
 
-  return template({ at, v, s, f, o, n: nItems, me, onInsert })
+  return template({ at, v, w, s, f, o, n: nItems, me, onInsert })
 }
 
 export const applyTemplate = ({

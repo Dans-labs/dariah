@@ -1,7 +1,10 @@
 import traceback
 from bottle import request
 from controllers.utils import serverprint
+from models.compiled.model import model as M
 from models.compiled.names import *
+
+DM = M[N_tables]
 
 getq = lambda name: request.query[name][0:64]
 
@@ -21,6 +24,12 @@ class Controller(object):
         table = getq(N_table)
         complete = getq(N_complete)==N_true
         return self.DB.getList(name, table, titleOnly=not complete, my=True)
+
+    def myassign(self, name):
+        table = getq(N_table)
+        complete = getq(N_complete)==N_true
+        my = DM.get(table, {}).get(N_workflow, {}).get(N_assign, True)
+        return self.DB.getList(name, table, titleOnly=not complete, my=my)
 
     def view(self, name):
         table = getq(N_table)
@@ -56,4 +65,5 @@ class Controller(object):
             serverprint('\n')
             result = self.DB.stop({N_data: data, N_text: 'server error: {}'.format(message)})
         return result
+
 

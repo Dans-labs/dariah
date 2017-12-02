@@ -70,14 +70,14 @@ class ListContainer extends Component {
     )
   }
   componentDidMount() {
-    const { props: { tables, table, select, mode, dispatch } } = this
+    const { props: { tables, table, select, extra, mode, dispatch } } = this
     const complete = mode === 'grid'
-    fetchTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA), dispatch)
+    fetchTables(tables, [[table, select, extra, complete]].concat(loadExtra[table] || emptyA), dispatch)
   }
   componentDidUpdate() {
-    const { props: { tables, table, select, mode, dispatch } } = this
+    const { props: { tables, table, select, extra, mode, dispatch } } = this
     const complete = mode === 'grid'
-    fetchTables(tables, [[table, select, complete]].concat(loadExtra[table] || emptyA), dispatch)
+    fetchTables(tables, [[table, select, extra, complete]].concat(loadExtra[table] || emptyA), dispatch)
   }
 }
 

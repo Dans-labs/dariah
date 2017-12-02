@@ -19,17 +19,17 @@ export const MYIDS = 'myIds'
  * Most actions call accessData, which will dispatch the ultimate fetch action.
  */
 
-export const fetchTable = (table, select = ALLIDS, complete) => accessData({
+export const fetchTable = (table, select = ALLIDS, extra, complete) => accessData({
   type: 'fetchTable',
   contentType: 'db',
-  path: `/${select === MYIDS ? 'my' : emptyS}list?table=${table}&complete=${complete}`,
+  path: `/${select === MYIDS ? 'my' : emptyS}${extra && select === MYIDS ? 'assign' : 'list'}?table=${table}&complete=${complete}`,
   desc: `${table} table`,
   table,
 })
 
 export const fetchTables = (tables, tableList, dispatch) => {
-  tableList.forEach(([table, select = ALLIDS, complete = true]) => {
-    if (needTable(tables, table, select, complete)) {dispatch(fetchTable(table, select, complete))}
+  tableList.forEach(([table, select = ALLIDS, extra, complete = true]) => {
+    if (needTable(tables, table, select, complete)) {dispatch(fetchTable(table, select, extra, complete))}
   })
 }
 

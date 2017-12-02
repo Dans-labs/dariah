@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 
-import { emptyS } from 'utils'
+import { emptyS, emptyA } from 'utils'
 
 import Expand from 'Expand'
 
@@ -93,7 +93,7 @@ const templates = {
                 <div>
                   <div><b>{'Modification history'}</b></div>
                   {
-                    s('modified').map((mod, i) =>
+                    (v('modified') || emptyA).map((mod, i) =>
                       <div key={i}>{mod}</div>
                     )
                   }

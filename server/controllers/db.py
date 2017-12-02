@@ -242,7 +242,8 @@ class DbAccess(object):
         perm = {N_insert: mayInsert, N_needMaster: tableInfo.get(N_needMaster, False)}
         orderKey = N_myIds if my else N_allIds 
         none = {table: {orderKey: [], N_entities: {}, N_fields: {}, N_perm: {}}}
-        (good, result) = Perm.getPerm(controller, table, N_list)
+        extraMy = my if type(my) is list else None
+        (good, result) = Perm.getPerm(controller, table, N_list, extraMy=extraMy)
         if not good:
             if result == None:
                 msgs.append({N_kind: N_info, N_text: '{} list is empty'.format(table)})

@@ -36,8 +36,8 @@ provenanceSpecs:
     multiple: true
   creator:
     perm:
-      list: office
-      read: office
+      list: edit
+      read: edit
       update: nobody
     label: creator
     valType:
@@ -46,16 +46,16 @@ provenanceSpecs:
     multiple: false
   dateCreated:
     perm:
-      list: office
-      read: office
+      list: edit
+      read: edit
       update: nobody
     label: created on
     valType: datetime
     multiple: false
   modified:
     perm:
-      list: office
-      read: office
+      list: edit
+      read: edit
       update: nobody
     label: modified
     valType: text
@@ -155,6 +155,9 @@ permissions:
     mod:
       desc: modify (insert/update/delete) an item
       call: edit
+    myassign:
+      desc: list my assignments
+      call: auth
 
   owners:
     user:     _id
