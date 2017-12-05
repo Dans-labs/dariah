@@ -6,17 +6,17 @@ from models.compiled.names import *
 DM = M[N_tables]
 WM = M[N_workflow]
 
-def readWorkflow(basicList, table, myDocMap):
+def readWorkflow(basicList, msgs, table, myDocMap):
     result = {}
     for w in DM.get(table, {}).get(N_workflow, {}).get(N_read, []):
-        _computeWorkflow(basicList, table, myDocMap, w, result) 
+        _computeWorkflow(basicList, msgs, table, myDocMap, w, result) 
     return result
 
-def adjustWorkflow(basicList, table, document, adjustedValues):
-    return _applyAdjustWorkflow(basicList,
+def adjustWorkflow(basicList, msgs, table, document, adjustedValues):
+    return _applyAdjustWorkflow(basicList, msgs,
         _combineAffected(
             _getAffected(
-                basicList, table, document, adjustedValues, w,
+                basicList, msgs, table, document, adjustedValues, w,
             ) for w in DM.get(table, {}).get(N_workflow, {}).get(N_adjust, []),
         ),
     )
@@ -105,7 +105,7 @@ def detailInsert(
         detailData = []
         insertValues = {}
         if masterDocument != None:
-            activeItems = _getActiveItems(basicList)
+            activeItems = _getActiveItems(basicList, msgs)
             criteriaIds = activeItems[N_criteriaIds]
             criteriaEntities = activeItems[N_criteriaEntities]
             typeCriteria = activeItems[N_typeCriteria]
@@ -115,16 +115,25 @@ def detailInsert(
             insertValues[N_assessmentType] = masterType
             if masterType == None:
                 good = False
-                msgs.append({N_kind: N_error, N_text: 'Contribution has no type'})
+                msgs.append({
+                    N_kind: N_error,
+                    N_text: 'Contribution has no type',
+                })
             else:
                 typeDoc = typeInfo[masterType]
                 typeHead = head(N_typeContribution, typeDoc)
                 if masterType not in typeIds:
                     good = False
-                    msgs.append({N_kind: N_error, N_text: 'Contribution type {} is a legacy type'.format(typeHead)})
+                    msgs.append({
+                        N_kind: N_error,
+                        N_text: 'Contribution type {} is a legacy type'.format(typeHead),
+                    })
                 elif masterType not in typeCriteria:
                     good = False
-                    msgs.append({N_kind: N_error, N_text: 'No criteria defined for contribution type {}'.format(typeHead)})
+                    msgs.append({
+                        N_kind: N_error,
+                        N_text: 'No criteria defined for contribution type {}'.format(typeHead),
+                    })
                 else:
                     criteria = typeCriteria[masterType]
                     theseCriteriaIds = [c for c in criteriaIds if c in criteria]
@@ -145,7 +154,8 @@ def detailInsert(
             criteriaEntryDocs = basicList(
                 N_criteriaEntry,
                 {N_assessment: masterDocument.get(N__id, None)},
-                {N__id: True, N_seq: True, N_criteria: True},
+                {N_seq, N_criteria},
+                msgs,
                 sort=((N_seq, 1),),
             )
             for criteriaEntryDoc in criteriaEntryDocs:
@@ -218,15 +228,28 @@ def _compute_getValues(myDocMap, otherDocMap, w):
  
 # SELECTOR FUNCTIONS
 
-def _selectDocsRead(basicList, table, myDocMap, w):
+def _selectDocsRead(basicList, msgs, table, myDocMap, w):
     inspect = w.get(N_inspect, None)
     linkField = w.get(N_linkField, None)
+    masterTable = w.get(N_masterTable, None)
     otherTable = w.get(N_otherTable, None)
+    permFields = w.get(N_permFields, None)
 
     if inspect == N_self:
         otherDocMap = dict((id, [doc]) for (id, doc) in myDocMap.items())
     elif inspect == N_details:
-        details = basicList(otherTable, {linkField: {'$in': list(myDocMap.keys())}}, True) 
+        permIds = None
+        if permFields:
+            permIds = set()
+            for doc in myDocMap.values():
+                permIds |= {doc[permField] for permField in permFields if permField in doc}
+        details = basicList(
+            otherTable,
+            {linkField: {'$in': list(myDocMap.keys())}},
+            True,
+            msgs,
+            permIds=permIds,
+        ) 
         otherDocMap = {}
         for detail in details:
             masterId = detail.get(linkField, None)
@@ -236,9 +259,14 @@ def _selectDocsRead(basicList, table, myDocMap, w):
             (detailId, detailDoc.get(linkField, None)) \
             for (detailId, detailDoc) in myDocMap.items()
         )
-
         detailIdsFromMasterId = _makeInverse(masterIdFromDetailId)
-        masters = basicList(otherTable, {N__id: {'$in': list(masterIdFromDetailId.values())}}, True)
+        masters = basicList(
+            otherTable,
+            {N__id: {'$in': list(masterIdFromDetailId.values())}},
+            True,
+            msgs,
+            permFields=permFields,
+        )
         otherDocMap = {}
         for master in masters:
             masterId = master.get(N__id, None)
@@ -252,7 +280,25 @@ def _selectDocsRead(basicList, table, myDocMap, w):
             for (detailId, detailDoc) in myDocMap.items()
         )
         detailIdsFromMasterId = _makeInverse(masterIdFromDetailId)
-        siblings = basicList(table, {linkField: {'$in': list(masterIdFromDetailId.values())}}, True) 
+        permIds = None
+        if permFields:
+            masters = basicList(
+                otherTable,
+                {N__id: {'$in': list(masterIdFromDetailId.values())}},
+                True,
+                msgs,
+                permFields=permFields,
+            )
+            permIds = set()
+            for doc in masters:
+                permIds |= {doc[permField] for permField in permFields if permField in doc}
+        siblings = basicList(
+            otherTable,
+            {linkField: {'$in': list(masterIdFromDetailId.values())}},
+            True,
+            msgs,
+            permIds=permIds,
+        ) 
         otherDocMap = {}
         for sibling in siblings:
             masterId = sibling.get(linkField, None)
@@ -266,7 +312,7 @@ def _selectDocsRead(basicList, table, myDocMap, w):
 
     return otherDocMap
 
-def _selectDocsAdjust(basicList, table, myDocs, w):
+def _selectDocsAdjust(basicList, msgs, table, myDocs, w):
     inspect = w.get(N_inspect, None)
     linkField = w.get(N_linkField, None)
     otherTable = w.get(N_otherTable, None)
@@ -281,10 +327,16 @@ def _selectDocsAdjust(basicList, table, myDocs, w):
             otherTable,
             {linkField: {'$in': [doc.get(N__id, None) for doc in myDocs]}},
             True,
+            msgs,
         ) 
     elif inspect == N_master:
         otherIds = {doc.get(linkField, None) for doc in myDocs}
-        otherDocs = basicList(otherTable, {N__id: {'$in': list(otherIds)}}, True)
+        otherDocs = basicList(
+            otherTable,
+            {N__id: {'$in': list(otherIds)}},
+            True,
+            msgs,
+        )
     elif inspect == N_siblings:
         masterIds = {doc.get(linkField, None) for doc in myDocs}
         otherDocs = basicList(
@@ -294,6 +346,7 @@ def _selectDocsAdjust(basicList, table, myDocs, w):
                 {N__id: {'$nin': [doc.get(N__id, None) for doc in myDocs]}},
             ]},
             True,
+            msgs,
         ) 
         otherTable = table
     else:
@@ -319,21 +372,21 @@ def _applyReadWorkflow(workflowResults, attribute, result):
                 myWorkflowMap[k] = v.format(**myWorkflowMap) if k == N_desc else v
         result.setdefault(myWorkflowId, {})[attribute[N_name]] = myWorkflowMap
 
-def _computeWorkflow(basicList, table, myDocs, w, result):
+def _computeWorkflow(basicList, msgs, table, myDocs, w, result):
     method = w.get(N_method, None)
     inspect = w.get(N_inspect, None)
     linkField = w.get(N_linkField, None)
     otherTable = w.get(N_otherTable, None)
     attribute = w.get(N_attribute, None)
 
-    otherDocMap = _selectDocsRead(basicList, table, myDocs, w)
+    otherDocMap = _selectDocsRead(basicList, msgs, table, myDocs, w)
 
     myWorkflowResults = globals()['_compute_{}'.format(method)](myDocs, otherDocMap, w)
     _applyReadWorkflow(myWorkflowResults, attribute, result)
 
 # HELPERS ADJUST WORKFLOW
 
-def _getAffected(basicList, table, document, adjustedValues, w):
+def _getAffected(basicList, msgs, table, document, adjustedValues, w):
     inspect = w.get(N_inspect, None)
     linkField = w.get(N_linkField, None)
     triggerFields = w.get(N_triggerFields, None)
@@ -345,7 +398,7 @@ def _getAffected(basicList, table, document, adjustedValues, w):
         for triggerField in triggers
     ):
         myDocs = [doc for doc in (document, adjustedValues)]
-        return _selectDocsAdjust(basicList, table, myDocs, w)
+        return _selectDocsAdjust(basicList, msgs, table, myDocs, w)
     return (None, [])
 
 def _combineAffected(affecteds):
@@ -355,29 +408,31 @@ def _combineAffected(affecteds):
             allAffected.setdefault(table, {})[doc.get(N__id, None)] = doc
     return allAffected
 
-def _applyAdjustWorkflow(basicList, allAffected):
+def _applyAdjustWorkflow(basicList, msgs, allAffected):
     workflowEntries = []
     for (table, docMap) in allAffected.items():
-        workflow = readWorkflow(basicList, table, docMap)
+        workflow = readWorkflow(basicList, msgs, table, docMap)
         for docId in docMap:
             workflowEntries.append([table, docId, workflow.get(docId, {})])
     return workflowEntries
 
 # MISCELLANEOUS FUNCTIONS
 
-def _getActiveItems(basicList):
+def _getActiveItems(basicList, msgs):
     present = now()
     types = basicList(
         N_typeContribution,
         {},
-        {N__id: True, N_mainType: True, N_subType: True},
+        {N_mainType, N_subType},
+        msgs,
     )
     typeInfo = dict((doc[N__id], doc) for doc in types)
 
     packages = basicList(
         N_package,
         {N_startDate: {'$lte': present}, N_endDate: {'$gte': present}},
-        {N__id: True, N_typeContribution: True},
+        {N_typeContribution},
+        msgs,
     )
     packageIds = [doc[N__id] for doc in packages]  
     activeFilter = {N_package: {'$in': packageIds}}
@@ -385,6 +440,7 @@ def _getActiveItems(basicList):
         N_criteria,
         activeFilter,
         True,
+        msgs,
         sort=((N_criterion, 1),),
     )
     typeCriteria = {}

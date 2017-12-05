@@ -49,7 +49,9 @@ class Controller(object):
         if callable(method):
             result = method(controller)
         else:
-            result = self.DB.stop({N_text: 'wrong method: {}'.format(controller)})
+            result = self.DB.stop({
+                N_msgs: [{N_kind: N_error, N_text: 'wrong method: {}'.format(controller)}],
+            })
         return result
 
     def _errorWrap(self, action, controller, addData):
@@ -63,7 +65,10 @@ class Controller(object):
             traceback.print_exc()
             serverprint('END                 {}'.format(controller))
             serverprint('\n')
-            result = self.DB.stop({N_data: data, N_text: 'server error: {}'.format(message)})
+            result = self.DB.stop({
+                N_data: data,
+                N_msgs: [{N_kind: N_error, N_text: 'server error: {}'.format(message)}],
+            })
         return result
 
 

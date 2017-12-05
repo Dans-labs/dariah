@@ -11,36 +11,44 @@ const initSelect = { search: emptyS, popUp: false }
 
 /* ACTIONS */
 
-export const setSearch = (selectTag, search) => ({ type: 'setSearch', selectTag, search })
-export const setPopUp = (selectTag, onOff) => ({ type: 'setPopUp', selectTag, onOff })
+export const setSearch = (selectTag, search) => ({
+	type: 'setSearch',
+	selectTag,
+	search,
+})
+export const setPopUp = (selectTag, onOff) => ({
+	type: 'setPopUp',
+	selectTag,
+	onOff,
+})
 export const togglePopUp = selectTag => ({ type: 'togglePopUp', selectTag })
 
 /* REDUCER */
 
 const flows = {
-  setSearch(state, { selectTag, search }) {
-    return update(state, {
-      [selectTag]: {
-        $apply: st => update(st || initSelect, { search: { $set: search } }),
-      },
-    })
-  },
-  setPopUp(state, { selectTag, onOff }) {
-    return update(state, {
-      [selectTag]: {
-        $apply: st => update(st || initSelect, { popUp: { $set: onOff } }),
-      },
-    })
-  },
-  togglePopUp(state, { selectTag }) {
-    const { [selectTag]: myState } = state
-    const newOnOff = myState == null ? true : !myState.popUp
-    return update(state, {
-      [selectTag]: {
-        $apply: st => update(st || initSelect, { popUp: { $set: newOnOff } }),
-      },
-    })
-  },
+	setSearch(state, { selectTag, search }) {
+		return update(state, {
+			[selectTag]: {
+				$apply: st => update(st || initSelect, { search: { $set: search } }),
+			},
+		})
+	},
+	setPopUp(state, { selectTag, onOff }) {
+		return update(state, {
+			[selectTag]: {
+				$apply: st => update(st || initSelect, { popUp: { $set: onOff } }),
+			},
+		})
+	},
+	togglePopUp(state, { selectTag }) {
+		const { [selectTag]: myState } = state
+		const newOnOff = myState == null ? true : !myState.popUp
+		return update(state, {
+			[selectTag]: {
+				$apply: st => update(st || initSelect, { popUp: { $set: newOnOff } }),
+			},
+		})
+	},
 }
 
 export default makeReducer(flows, emptyO)
@@ -51,18 +59,39 @@ export const getSelect = ({ select }) => ({ select })
 
 /* HELPERS */
 
-export const compileOptions = memoize((tables, table, allowed, field, settings) => {
-  const { [table]: { valueLists, fieldSpecs } } = tables
-  const { [field]: valueList } = (valueLists || emptyO)
-  if (valueList == null) {return { options: emptyA, optionLookup: emptyO }}
+export const compileOptions = memoize(
+	(tables, table, allowed, field, settings) => {
+		const { [table]: { valueLists, fieldSpecs } } = tables
+		const { [field]: valueList } = valueLists || emptyO
+		if (valueList == null) {
+			return { options: emptyA, optionLookup: emptyO }
+		}
 
-  const { [field]: { valType } } = fieldSpecs
-  const allowedOptions = allowed == null ? valueList : valueList.filter(_id => allowed.includes(_id))
-  const options = allowedOptions.map(val => ({
-    value: val, label: repr(tables, table, field, valType, false, null, val, settings, ', '),
-  }))
-  const optionLookup = {}
-  options.forEach(({ value: val, label: lab }) => {optionLookup[val] = lab})
-  return { options, optionLookup }
-}, emptyO, { debug: 'compileOptions' })
-
+		const { [field]: { valType } } = fieldSpecs
+		const allowedOptions =
+			allowed == null
+				? valueList
+				: valueList.filter(_id => allowed.includes(_id))
+		const options = allowedOptions.map(val => ({
+			value: val,
+			label: repr(
+				tables,
+				table,
+				field,
+				valType,
+				false,
+				null,
+				val,
+				settings,
+				', ',
+			),
+		}))
+		const optionLookup = {}
+		options.forEach(({ value: val, label: lab }) => {
+			optionLookup[val] = lab
+		})
+		return { options, optionLookup }
+	},
+	emptyO,
+	{ debug: 'compileOptions' },
+)

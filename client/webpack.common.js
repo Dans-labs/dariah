@@ -27,19 +27,6 @@ module.exports = {
     rules: [
       {
         test: /\.jsx?$/,
-        enforce: 'pre',
-        use: [
-          {
-            loader: 'eslint-loader',
-            options: {
-              configFile: 'eslint.yaml',
-            },
-          }
-        ],
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.jsx?$/,
         exclude: /node_modules/,
         use: [
           {

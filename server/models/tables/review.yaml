@@ -10,13 +10,31 @@ workflow:
     - inspect: siblings
       method: getValues
       linkField: assessment
+      masterTable: assessment
+      otherTable: review
+      permFields:
+        - reviewerE
+        - reviewerF
       otherField: _id
       attribute:
         name: others
         desc: other reviews of the same assessment
+    - inspect: siblings
+      method: getValues
+      linkField: assessment
+      masterTable: assessment
+      otherTable: criteriaEntry
+      permFields:
+        - creator
+      otherField: _id
+      attribute:
+        name: assess
+        desc: criteria entries of the assessment
   adjust:
     - inspect: siblings
       linkField: assessment
+      masterTable: assessment
+      otherTable: review
       triggerFields:
         - _id
     - inspect: master

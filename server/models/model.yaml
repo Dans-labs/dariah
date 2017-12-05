@@ -36,8 +36,8 @@ provenanceSpecs:
     multiple: true
   creator:
     perm:
-      list: edit
-      read: edit
+      list: auth
+      read: auth
       update: nobody
     label: creator
     valType:
@@ -108,7 +108,7 @@ permissions:
     office:
       public: 1
       auth:   1
-      edit:   2
+      edit:   1
       EDIT:  -2
       own:    1
       OWN:   -1
@@ -117,7 +117,7 @@ permissions:
     system:
       public: 1
       auth:   1
-      edit:   2
+      edit:   1
       EDIT:  -2
       own:    1
       OWN:   -1
@@ -127,7 +127,7 @@ permissions:
     root:
       public: 1
       auth:   1
-      edit:   2
+      edit:   1
       EDIT:  -2
       own:    1
       OWN:   -1

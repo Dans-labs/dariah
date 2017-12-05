@@ -1,142 +1,142 @@
 .grid {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-content: flex-start;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
 }
 
 .grid-head {
-    display: inline-flex;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-    align-items: baseline;
-    align-content: flex-start;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: baseline;
+	align-content: flex-start;
 }
 
 .grid-row {
-    width: 100%;
-    display: inline-flex;
-    margin-bottom: 0.1rem;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-    align-items: stretch;
-    align-content: flex-start;
+	width: 100%;
+	display: inline-flex;
+	margin-bottom: 0.1rem;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: flex-start;
 }
 .grid-row.form {
-    display: inline-flex;
-    margin-bottom: 0.1rem;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-    align-items: stretch;
-    align-content: flex-start;
+	display: inline-flex;
+	margin-bottom: 0.1rem;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: flex-start;
 }
 .grid-cell {
 }
 .grid-head-cell {
-    font-weight: bold;
+	font-weight: bold;
 }
 .grid-status-cell {
-    flex: 0 0 3rem;
+	flex: 0 0 3rem;
 }
 .list-plain {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-content: flex-start;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
 }
 .sortspecs {
-    font-size: small;
-    color: var(--sort-specs-fore);
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: flex-start;
-    align-content: flex-start;
+	font-size: small;
+	color: var(--sort-specs-fore);
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-content: flex-start;
 }
 .sortcol {
-    margin: 0 1rem 0 1rem;
-    background-color: var(--sort-col-back);
-    border-radius: 0.3rem;
+	margin: 0 1rem 0 1rem;
+	background-color: var(--sort-col-back);
+	border-radius: 0.3rem;
 }
 .sorted {
-    background-color: var(--sort-back);
+	background-color: var(--sort-back);
 }
 .unsorted {
 }
 div.list-filter {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    align-content: flex-start;
-    align-items: flex-start;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	align-content: flex-start;
+	align-items: flex-start;
 }
 div.filters {
-    max-width: 40%;
-    flex: 1 1 45%;
-    padding-right: 0.5rem;
+	max-width: 40%;
+	flex: 1 1 45%;
+	padding-right: 0.5rem;
 }
 div.filters.outer {
-    max-height: 100%;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+	max-height: 100%;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
 }
 div.filters.compact {
-    width: calc(100% - 1rem);
-    max-width: calc(100% - 1rem);
-    flex: 1 1 auto;
+	width: calc(100% - 1rem);
+	max-width: calc(100% - 1rem);
+	flex: 1 1 auto;
 }
 div.list {
-    flex: 1 1 45%;
-    padding-left: 0.5rem;
+	flex: 1 1 45%;
+	padding-left: 0.5rem;
 }
 div.list.outer {
-    max-height: 100%;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+	max-height: 100%;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
 }
 div.list.compact {
-    width: calc(100% - 1rem);
-    flex: 1 1 auto;
+	width: calc(100% - 1rem);
+	flex: 1 1 auto;
 }
 div.list-filter.compact {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-content: flex-start;
-    align-items: flex-start;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+	align-items: flex-start;
 }
 div.filterSequence.compact {
-    width: 100%;
-    max-width: 100%;
-    display: inline-flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    align-content: flex-start;
-    align-items: baseline;
+	width: 100%;
+	max-width: 100%;
+	display: inline-flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	align-content: flex-start;
+	align-items: baseline;
 }
 div.fulltext {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    align-content: flex-start;
-    align-items: baseline;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	align-content: flex-start;
+	align-items: baseline;
 }
 div.fulltext .search {
-    flex: 1 0.3 5rem;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+	flex: 1 0.3 5rem;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
 }
 .fulltext-stat {
-    flex: 0.5 0.2 5rem;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    text-align: right;
-    color: var(--dim-fore);
-    background-color: var(--dim-back);
+	flex: 0.5 0.2 5rem;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	text-align: right;
+	color: var(--dim-fore);
+	background-color: var(--dim-back);
 }
 .item-head {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-    align-content: flex-start;
-    align-items: baseline;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+	align-items: baseline;
 }

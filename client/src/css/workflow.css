@@ -1,62 +1,62 @@
-.button.workflow, .label.workflow {
-    font-weight: bold;
-    padding: 0.5rem;
-    margin: 0.5rem 1rem;
-    display: inline-block;
+.button.workflow,
+.label.workflow {
+	font-weight: bold;
+	padding: 0.5rem;
+	margin: 0.5rem 1rem;
+	display: inline-block;
 }
 .button.workflow {
-    border-width: 0.3rem;
-    border-style: outset;
+	border-width: 0.3rem;
+	border-style: outset;
 }
 .label.workflow {
-    border-radius: 0;
+	border-radius: 0;
 }
 .label.workflow.info {
-    font-weight: bold;
-    color: var(--workflow-info-fore);
-    background-color: var(--workflow-info-back);
-    border-color: var(--workflow-info-border);
+	font-weight: bold;
+	color: var(--workflow-info-fore);
+	background-color: var(--workflow-info-back);
+	border-color: var(--workflow-info-border);
 }
 .label.workflow.good {
-    font-weight: bold;
-    color: var(--workflow-good-fore);
-    background-color: var(--workflow-good-back);
-    border-color: var(--workflow-good-border);
+	font-weight: bold;
+	color: var(--workflow-good-fore);
+	background-color: var(--workflow-good-back);
+	border-color: var(--workflow-good-border);
 }
 .label.workflow.warning {
-    font-weight: bold;
-    color: var(--workflow-warning-fore);
-    background-color: var(--workflow-warning-back);
-    border-color: var(--workflow-warning-border);
+	font-weight: bold;
+	color: var(--workflow-warning-fore);
+	background-color: var(--workflow-warning-back);
+	border-color: var(--workflow-warning-border);
 }
 .label.workflow.error {
-    font-weight: bold;
-    color: var(--workflow-error-fore);
-    background-color: var(--workflow-error-back);
-    border-color: var(--workflow-error-border);
+	font-weight: bold;
+	color: var(--workflow-error-fore);
+	background-color: var(--workflow-error-back);
+	border-color: var(--workflow-error-border);
 }
 .button.workflow.info {
-    font-weight: bold;
-    color: var(--workflow-action-info-fore);
-    background-color: var(--workflow-action-info-back);
-    border-color: var(--workflow-action-info-border);
+	font-weight: bold;
+	color: var(--workflow-action-info-fore);
+	background-color: var(--workflow-action-info-back);
+	border-color: var(--workflow-action-info-border);
 }
 .button.workflow.good {
-    font-weight: bold;
-    color: var(--workflow-action-good-fore);
-    background-color: var(--workflow-action-good-back);
-    border-color: var(--workflow-action-good-border);
+	font-weight: bold;
+	color: var(--workflow-action-good-fore);
+	background-color: var(--workflow-action-good-back);
+	border-color: var(--workflow-action-good-border);
 }
 .button.workflow.warning {
-    font-weight: bold;
-    color: var(--workflow-action-warning-fore);
-    background-color: var(--workflow-action-warning-back);
-    border-color: var(--workflow-action-warning-border);
+	font-weight: bold;
+	color: var(--workflow-action-warning-fore);
+	background-color: var(--workflow-action-warning-back);
+	border-color: var(--workflow-action-warning-border);
 }
 .button.workflow.error {
-    font-weight: bold;
-    color: var(--workflow-action-error-fore);
-    background-color: var(--workflow-action-error-back);
-    border-color: var(--workflow-action-error-border);
+	font-weight: bold;
+	color: var(--workflow-action-error-fore);
+	background-color: var(--workflow-action-error-back);
+	border-color: var(--workflow-action-error-border);
 }
-

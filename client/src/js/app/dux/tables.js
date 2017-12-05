@@ -4,7 +4,14 @@ import { browserHistory } from 'react-router'
 
 import { accessData } from 'server'
 import { memoize } from 'memo'
-import { makeReducer, updateAuto, getUrlParts, emptyS, emptyA, emptyO } from 'utils'
+import {
+	makeReducer,
+	updateAuto,
+	getUrlParts,
+	emptyS,
+	emptyA,
+	emptyO,
+} from 'utils'
 
 import { compileAlternatives, setItems } from 'alter'
 
@@ -19,195 +26,266 @@ export const MYIDS = 'myIds'
  * Most actions call accessData, which will dispatch the ultimate fetch action.
  */
 
-export const fetchTable = (table, select = ALLIDS, extra, complete) => accessData({
-  type: 'fetchTable',
-  contentType: 'db',
-  path: `/${select === MYIDS ? 'my' : emptyS}${extra && select === MYIDS ? 'assign' : 'list'}?table=${table}&complete=${complete}`,
-  desc: `${table} table`,
-  table,
-})
+export const fetchTable = (table, select = ALLIDS, extra, complete) =>
+	accessData({
+		type: 'fetchTable',
+		contentType: 'db',
+		path: `/${select === MYIDS ? 'my' : emptyS}${
+			extra && select === MYIDS ? 'assign' : 'list'
+		}?table=${table}&complete=${complete}`,
+		desc: `${table} table`,
+		table,
+	})
 
 export const fetchTables = (tables, tableList, dispatch) => {
-  tableList.forEach(([table, select = ALLIDS, extra, complete = true]) => {
-    if (needTable(tables, table, select, complete)) {dispatch(fetchTable(table, select, extra, complete))}
-  })
+	tableList.forEach(([table, select = ALLIDS, extra, complete = true]) => {
+		if (needTable(tables, table, select, complete)) {
+			dispatch(fetchTable(table, select, extra, complete))
+		}
+	})
 }
 
-export const fetchItem = (table, eId, head) => accessData({
-  type: 'fetchItem',
-  contentType: 'db',
-  path: `/view?table=${table}&id=${eId}`,
-  desc: `${table} record ${head}`,
-  table,
-})
+export const fetchItem = (table, eId, head) =>
+	accessData({
+		type: 'fetchItem',
+		contentType: 'db',
+		path: `/view?table=${table}&id=${eId}`,
+		desc: `${table} record ${head}`,
+		table,
+	})
 
-export const fetchItems = (table, eIds, alterSection, alt) => accessData({
-  type: 'fetchItems',
-  contentType: 'db',
-  path: `/view?table=${table}`,
-  desc: `${table} records ${eIds.length}`,
-  sendData: eIds,
-  table,
-  eIds, alterSection, alt,
-})
+export const fetchItems = (table, eIds, alterSection, alt) =>
+	accessData({
+		type: 'fetchItems',
+		contentType: 'db',
+		path: `/view?table=${table}`,
+		desc: `${table} records ${eIds.length}`,
+		sendData: eIds,
+		table,
+		eIds,
+		alterSection,
+		alt,
+	})
 
-export const modItem = (table, eId, head, values) => accessData({
-  type: 'modItem',
-  contentType: 'db',
-  path: `/mod?table=${table}&action=update`,
-  desc: `${table} update record ${head}`,
-  sendData: { _id: eId, values },
-  table,
-})
+export const modItem = (table, eId, head, values) =>
+	accessData({
+		type: 'modItem',
+		contentType: 'db',
+		path: `/mod?table=${table}&action=update`,
+		desc: `${table} update record ${head}`,
+		sendData: { _id: eId, values },
+		table,
+	})
 
-export const insertItem = (table, select = ALLIDS, masterId = null, linkField = null) => accessData({
-  type: 'insertItem',
-  contentType: 'db',
-  path: `/mod?table=${table}&action=insert`,
-  desc: `${table} insert new record`,
-  sendData: { masterId, linkField },
-  table,
-  select,
-})
+export const insertItem = (
+	table,
+	select = ALLIDS,
+	masterId = null,
+	linkField = null,
+) =>
+	accessData({
+		type: 'insertItem',
+		contentType: 'db',
+		path: `/mod?table=${table}&action=insert`,
+		desc: `${table} insert new record`,
+		sendData: { masterId, linkField },
+		table,
+		select,
+	})
 
-export const delItem = (table, eId, head) => accessData({
-  type: 'delItem',
-  contentType: 'db',
-  path: `/mod?table=${table}&action=delete`,
-  desc: `${table} delete record ${head}`,
-  sendData: { _id: eId },
-  table,
-})
+export const delItem = (table, eId, head) =>
+	accessData({
+		type: 'delItem',
+		contentType: 'db',
+		path: `/mod?table=${table}&action=delete`,
+		desc: `${table} delete record ${head}`,
+		sendData: { _id: eId },
+		table,
+	})
 
 /* REDUCER */
 
 const updateItemWithFields = (state, table, _id, fields, values) => {
-  const newVals = {}
-  fields.forEach(field => {newVals[field] = values[field]})
-  return updateAuto(
-    state,
-    [table, 'entities', _id, 'values'],
-    { $merge: newVals },
-  )
+	const newVals = {}
+	fields.forEach(field => {
+		newVals[field] = values[field]
+	})
+	return updateAuto(state, [table, 'entities', _id, 'values'], {
+		$merge: newVals,
+	})
 }
 
 const updateEntities = (stateEntities, entities) => {
-  let newEntities = entities
-  Object.entries(stateEntities).forEach(([_id, stateEntity]) => {
-    const newEntity = newEntities[_id]
-    if (newEntity != null && stateEntity.fields != null && newEntity.fields == null) {
-      const theseValues = update(stateEntity.values, { $merge: newEntity.values })
-      newEntities = update(
-        newEntities, {
-          [_id]: {
-            fields: { $set: stateEntity.fields },
-            values: { $merge: theseValues },
-          },
-        },
-      )
-    }
-  })
-  return update(stateEntities, { $merge: newEntities })
+	let newEntities = entities
+	Object.entries(stateEntities).forEach(([_id, stateEntity]) => {
+		const newEntity = newEntities[_id]
+		if (
+			newEntity != null &&
+			stateEntity.fields != null &&
+			newEntity.fields == null
+		) {
+			const theseValues = update(stateEntity.values, {
+				$merge: newEntity.values,
+			})
+			newEntities = update(newEntities, {
+				[_id]: {
+					fields: { $set: stateEntity.fields },
+					values: { $merge: theseValues },
+				},
+			})
+		}
+	})
+	return update(stateEntities, { $merge: newEntities })
 }
 
 const updateWorkflow = (state, workflow = emptyA) => {
-  let newState = state
-  for (const [relTable, relId, wf] of workflow) {
-    newState = updateAuto(newState, [relTable, 'entities', relId, 'workflow'], { $set: wf })
-  }
-  return newState
+	let newState = state
+	for (const [relTable, relId, wf] of workflow) {
+		newState = updateAuto(newState, [relTable, 'entities', relId, 'workflow'], {
+			$set: wf,
+		})
+	}
+	return newState
 }
 
 const flows = {
-  fetchTable(state, { data }) {
-    if (data == null) {return state}
-    let newState = state
-    Object.entries(data).forEach(([table, tableData]) => {
-      const { [table]: stateTableData = emptyO } = state
-      const { entities: stateEntities = emptyO } = stateTableData
-      const { entities } = tableData
+	fetchTable(state, { data }) {
+		if (data == null) {
+			return state
+		}
+		let newState = state
+		Object.entries(data).forEach(([table, tableData]) => {
+			const { [table]: stateTableData = emptyO } = state
+			const { entities: stateEntities = emptyO } = stateTableData
+			const { entities } = tableData
 
-      const newEntities = updateEntities(stateEntities, entities)
-      const newTableData = update(tableData, { entities: { $set: newEntities } })
-      newState = updateAuto(newState, [table], { $merge: newTableData })
-    })
-    return newState
-  },
-  fetchItem(state, { data, table }) {
-    if (data == null) {return state}
-    const { values: { _id } } = data
-    return updateAuto(state, [table, 'entities', _id], { $set: data })
-  },
-  fetchItems(state, { data, table }) {
-    if (data == null || data.length == 0) {return state}
-    let newState = state
-    for (const record of data) {
-      const { values: { _id } } = record
-      newState = updateAuto(newState, [table, 'entities', _id], { $set: record })
-    }
-    return newState
-  },
-  modItem(state, { data, table }) {
-    if (data == null) {return state}
-    const { records = emptyA, workflow } = data
-    let newState = state
-    for (const record of records) {
-      const { values, values: { _id }, newValues, workflow: ownWorkflow } = record
-      const fieldUpdates = {}
-      Object.entries(values).forEach(([key, value]) => {fieldUpdates[key] = { $set: value }})
-      newState = updateAuto(newState, [table, 'entities', _id, 'values'], fieldUpdates)
-      newState = updateAuto(newState, [table, 'entities', _id, 'workflow'], { $set: ownWorkflow })
-      if (newValues != null) {
-        for (const { _id, rep, repName, relTable, field } of newValues) {
-          newState = update(newState, { [table]: { valueLists: { [field]: { $push: [_id] } } } })
-          newState = updateItemWithFields(newState, relTable, _id, ['_id', repName], { _id, [repName]: rep })
-        }
-      }
-    }
-    newState = updateWorkflow(newState, workflow)
-    return newState
-  },
-  insertItem(state, { data, table, select }) {
-    if (data == null) {return state}
-    const { records = emptyA, workflow } = data
-    let newState = state
-    for (const record of records) {
-      const { table: thisTable, ...dataRest } = record
-      const { values: { _id } } = dataRest
-      newState = updateAuto(newState, [thisTable, 'entities', _id], { $set: dataRest })
-      if (newState[thisTable][ALLIDS] != null) {
-        newState = updateAuto(newState, [thisTable, ALLIDS], { $push: [_id] }, true)
-      }
-      if (select === MYIDS && table === thisTable) {
-        newState = updateAuto(newState, [table, MYIDS], { $push: [_id] }, true)
-      }
-      newState = update(newState, {
-        [thisTable]: {
-          lastInserted: { $set: _id },
-        },
-      })
-    }
-    newState = updateWorkflow(newState, workflow)
-    return newState
-  },
-  delItem(state, { data }) {
-    if (data == null) {return state}
-    const { records = emptyA, workflow } = data
-    let newState = state
-    for (const record of records) {
-      const [thisTable, _id] = record
-      newState = update(newState, { [thisTable]: { entities: { $unset: [_id] } } })
-      const { [thisTable]: { myIds, allIds } } = newState
-      for (const [name, list] of Object.entries({ myIds, allIds})) {
-        if (list != null) {
-          const otherIds = list.filter(x => x !== _id)
-          newState = update(newState, { [thisTable]: { [name]: { $set: otherIds } } })
-        }
-      }
-    }
-    newState = updateWorkflow(newState, workflow)
-    return newState
-  },
+			const newEntities = updateEntities(stateEntities, entities)
+			const newTableData = update(tableData, {
+				entities: { $set: newEntities },
+			})
+			newState = updateAuto(newState, [table], { $merge: newTableData })
+		})
+		return newState
+	},
+	fetchItem(state, { data, table }) {
+		if (data == null) {
+			return state
+		}
+		const { values: { _id } } = data
+		return updateAuto(state, [table, 'entities', _id], { $set: data })
+	},
+	fetchItems(state, { data, table }) {
+		if (data == null || data.length == 0) {
+			return state
+		}
+		let newState = state
+		for (const record of data) {
+			const { values: { _id } } = record
+			newState = updateAuto(newState, [table, 'entities', _id], {
+				$set: record,
+			})
+		}
+		return newState
+	},
+	modItem(state, { data, table }) {
+		if (data == null) {
+			return state
+		}
+		const { records = emptyA, workflow } = data
+		let newState = state
+		for (const record of records) {
+			const {
+				values,
+				values: { _id },
+				newValues,
+				workflow: ownWorkflow,
+			} = record
+			const fieldUpdates = {}
+			Object.entries(values).forEach(([key, value]) => {
+				fieldUpdates[key] = { $set: value }
+			})
+			newState = updateAuto(
+				newState,
+				[table, 'entities', _id, 'values'],
+				fieldUpdates,
+			)
+			newState = updateAuto(newState, [table, 'entities', _id, 'workflow'], {
+				$set: ownWorkflow,
+			})
+			if (newValues != null) {
+				for (const { _id, rep, repName, relTable, field } of newValues) {
+					newState = update(newState, {
+						[table]: { valueLists: { [field]: { $push: [_id] } } },
+					})
+					newState = updateItemWithFields(
+						newState,
+						relTable,
+						_id,
+						['_id', repName],
+						{ _id, [repName]: rep },
+					)
+				}
+			}
+		}
+		newState = updateWorkflow(newState, workflow)
+		return newState
+	},
+	insertItem(state, { data, table, select }) {
+		if (data == null) {
+			return state
+		}
+		const { records = emptyA, workflow } = data
+		let newState = state
+		for (const record of records) {
+			const { table: thisTable, ...dataRest } = record
+			const { values: { _id } } = dataRest
+			newState = updateAuto(newState, [thisTable, 'entities', _id], {
+				$set: dataRest,
+			})
+			if (newState[thisTable][ALLIDS] != null) {
+				newState = updateAuto(
+					newState,
+					[thisTable, ALLIDS],
+					{ $push: [_id] },
+					true,
+				)
+			}
+			if (select === MYIDS && table === thisTable) {
+				newState = updateAuto(newState, [table, MYIDS], { $push: [_id] }, true)
+			}
+			newState = update(newState, {
+				[thisTable]: {
+					lastInserted: { $set: _id },
+				},
+			})
+		}
+		newState = updateWorkflow(newState, workflow)
+		return newState
+	},
+	delItem(state, { data }) {
+		if (data == null) {
+			return state
+		}
+		const { records = emptyA, workflow } = data
+		let newState = state
+		for (const record of records) {
+			const [thisTable, _id] = record
+			newState = update(newState, {
+				[thisTable]: { entities: { $unset: [_id] } },
+			})
+			const { [thisTable]: { myIds, allIds } } = newState
+			for (const [name, list] of Object.entries({ myIds, allIds })) {
+				if (list != null) {
+					const otherIds = list.filter(x => x !== _id)
+					newState = update(newState, {
+						[thisTable]: { [name]: { $set: otherIds } },
+					})
+				}
+			}
+		}
+		newState = updateWorkflow(newState, workflow)
+		return newState
+	},
 }
 
 export default makeReducer(flows)
@@ -218,65 +296,81 @@ export const getTables = ({ tables }) => ({ tables })
 
 /* HELPERS */
 
-export const toDb = memoize((table, eId, head, dispatch) => values => dispatch(modItem(table, eId, head, values)))
+export const toDb = memoize((table, eId, head, dispatch) => values =>
+	dispatch(modItem(table, eId, head, values)),
+)
 
 export const isOwner = (tables, table, eId, me) => {
-  if (me._id) {
-    const {
-      [table]: {
-        entities: {
-          [eId]: { values: { creator, editors } = emptyO } = emptyO,
-        },
-      },
-    } = tables
-    return me._id == creator || (editors || emptyA).some(i => i == me._id)
-  }
-  else {return false}
+	if (me._id) {
+		const {
+			[table]: {
+				entities: { [eId]: { values: { creator, editors } = emptyO } = emptyO },
+			},
+		} = tables
+		return me._id == creator || (editors || emptyA).some(i => i == me._id)
+	} else {
+		return false
+	}
 }
 
 const hasTableKey = (tables, table, key, value = null) => {
-  if (tables == null) {return false}
-  const { [table]: tableData } = tables
-  if (tableData == null) {return false}
-  return tableData[key] != null && (value == null || tableData[key] === value)
+	if (tables == null) {
+		return false
+	}
+	const { [table]: tableData } = tables
+	if (tableData == null) {
+		return false
+	}
+	return tableData[key] != null && (value == null || tableData[key] === value)
 }
 
 export const needTable = (tables, table, select = ALLIDS, complete) => {
-  if (!hasTableKey(tables, table, select)) {return true}
-  if (complete && !hasTableKey(tables, table, 'complete', true)) {return true}
-  const { [table]: { fieldSpecs } } = tables
-  const relTables = Array.from(
-    new Set(
-      Object.entries(fieldSpecs).
-      filter(entry => ((typeof entry[1].valType) === 'object') && entry[1].valType.relTable != null).
-      map(entry => entry[1].valType.relTable)
-    )
-  )
-  if (relTables.some(relTable => !hasTableKey(tables, relTable, ALLIDS))) {return true}
-  return false
+	if (!hasTableKey(tables, table, select)) {
+		return true
+	}
+	if (complete && !hasTableKey(tables, table, 'complete', true)) {
+		return true
+	}
+	const { [table]: { fieldSpecs } } = tables
+	const relTables = Array.from(
+		new Set(
+			Object.entries(fieldSpecs)
+				.filter(
+					entry =>
+						typeof entry[1].valType === 'object' &&
+						entry[1].valType.relTable != null,
+				)
+				.map(entry => entry[1].valType.relTable),
+		),
+	)
+	if (relTables.some(relTable => !hasTableKey(tables, relTable, ALLIDS))) {
+		return true
+	}
+	return false
 }
 
 export const needTables = (tables, tableList) =>
-  tableList.some(([table, select = ALLIDS, complete = true]) =>
-    needTable(tables, table, select, complete)
-  )
+	tableList.some(([table, select = ALLIDS, complete = true]) =>
+		needTable(tables, table, select, complete),
+	)
 
-export const needValues = (entities, eId) => (
-  entities == null
-  || entities[eId] == null
-  || entities[eId].fields == null
-  || entities[eId].perm == null
+export const needValues = (entities, eId) =>
+	entities == null ||
+	entities[eId] == null ||
+	entities[eId].fields == null ||
+	entities[eId].perm == null
+
+export const listValues = memoize(
+	({ tables, table, eId, field }) =>
+		tables == null
+			? emptyA
+			: tables[table] == null
+				? emptyA
+				: tables[table].entities[eId] == null
+					? emptyA
+					: new Set(tables[table].entities[eId][field]),
+	emptyO,
 )
-
-export const listValues = memoize(({ tables, table, eId, field }) => (
-  tables == null
-  ? emptyA
-  : tables[table] == null
-    ? emptyA
-    : tables[table].entities[eId] == null
-      ? emptyA
-      : new Set(tables[table].entities[eId][field])
-), emptyO)
 
 /* Record and Field value representation
  *
@@ -339,93 +433,108 @@ export const listValues = memoize(({ tables, table, eId, field }) => (
  */
 
 const headUser = memoize((tables, valId) => {
-  const { user: { entities: { [valId]: entity } } } = tables
-  if (entity) {
-    const { values } = entity
-    return presentUser(values)
-  }
-  else {return 'UNKNOWN'}
+	const { user: { entities: { [valId]: entity } } } = tables
+	if (entity) {
+		const { values } = entity
+		return presentUser(values)
+	} else {
+		return 'UNKNOWN'
+	}
 }, emptyO)
 
 export const presentUser = userInfo => {
-  const { name, firstName, lastName, email, eppn, authority, org } = userInfo
-  const orgRep = org ? ` (${org})` : emptyS
-  if (name) {return `${name}${orgRep}`}
-  if (firstName || lastName) {
-    return `${firstName || emptyS}${(firstName && lastName) ? ' ' : emptyS}${lastName || emptyS}`
-  }
-  if (email) {return `${email}${orgRep}`}
-  const authorityRep = authority ? ` - ${authority}` : emptyS
-  if (eppn) {return `${eppn}${authorityRep}${orgRep}`}
-  return '!unidentified user!'
+	const { name, firstName, lastName, email, eppn, authority, org } = userInfo
+	const orgRep = org ? ` (${org})` : emptyS
+	if (name) {
+		return `${name}${orgRep}`
+	}
+	if (firstName || lastName) {
+		return `${firstName || emptyS}${
+			firstName && lastName ? ' ' : emptyS
+		}${lastName || emptyS}`
+	}
+	if (email) {
+		return `${email}${orgRep}`
+	}
+	const authorityRep = authority ? ` - ${authority}` : emptyS
+	if (eppn) {
+		return `${eppn}${authorityRep}${orgRep}`
+	}
+	return '!unidentified user!'
 }
 
 const headCountry = memoize((tables, valId) => {
-  const { country: { entities: { [valId]: entity } } } = tables
-  if (entity) {
-    const { values: { name, iso } } = entity
-    return `${iso}: ${name}`
-  }
-  else {return 'UNKNOWN'}
+	const { country: { entities: { [valId]: entity } } } = tables
+	if (entity) {
+		const { values: { name, iso } } = entity
+		return `${iso}: ${name}`
+	} else {
+		return 'UNKNOWN'
+	}
 }, emptyO)
 
 const headType = memoize((tables, valId) => {
-  const { typeContribution: { entities: { [valId]: entity } } } = tables
-  if (entity) {
-    const { values: { mainType, subType } } = entity
-    const sep = (mainType && subType) ? ' / ' : emptyS
-    return `${mainType}${sep}${subType}`
-  }
-  else {return 'UNKNOWN'}
+	const { typeContribution: { entities: { [valId]: entity } } } = tables
+	if (entity) {
+		const { values: { mainType, subType } } = entity
+		const sep = mainType && subType ? ' / ' : emptyS
+		return `${mainType}${sep}${subType}`
+	} else {
+		return 'UNKNOWN'
+	}
 }, emptyO)
 
 const headScore = memoize((tables, valId) => {
-  let valRep
-  const { score: { entities: { [valId]: entity } } } = tables
-  if (entity) {
-    const { values: { score = 'N/A', level = 'N/A', description = emptyS } } = entity
-    valRep = (score || level)
-    ? `${score} - ${level}`
-    : description
-  }
-  else {valRep = 'UNKNOWN'}
-  return valRep
+	let valRep
+	const { score: { entities: { [valId]: entity } } } = tables
+	if (entity) {
+		const {
+			values: { score = 'N/A', level = 'N/A', description = emptyS },
+		} = entity
+		valRep = score || level ? `${score} - ${level}` : description
+	} else {
+		valRep = 'UNKNOWN'
+	}
+	return valRep
 }, emptyO)
 
 const headRelated = relTable =>
-  memoize((tables, valId, settings) => {
-    const { [relTable]: { title = 'rep', entities: { [valId]: entity }, fieldSpecs } } = tables
-    if (entity) {
-      const { values: { [title]: rep } } = entity
-      const { [title]: { valType } } = fieldSpecs
-      return repr1Head(tables, relTable, title, valType, rep, settings)
-    }
-    else {return 'UNKNOWN'}
-  }, emptyO)
+	memoize((tables, valId, settings) => {
+		const {
+			[relTable]: { title = 'rep', entities: { [valId]: entity }, fieldSpecs },
+		} = tables
+		if (entity) {
+			const { values: { [title]: rep } } = entity
+			const { [title]: { valType } } = fieldSpecs
+			return repr1Head(tables, relTable, title, valType, rep, settings)
+		} else {
+			return 'UNKNOWN'
+		}
+	}, emptyO)
 
 /* The head switch function
  */
 
 const headSwitch = {
-  user: headUser,
-  country: headCountry,
-  typeContribution: headType,
-  score: headScore,
-  default: headRelated,
+	user: headUser,
+	country: headCountry,
+	typeContribution: headType,
+	score: headScore,
+	default: headRelated,
 }
 
 /* The generic head function is exported
  */
 
 export const headEntity = (tables, table, valId, settings) =>
-  (headSwitch[table] || headSwitch.default(table))(tables, valId, settings)
+	(headSwitch[table] || headSwitch.default(table))(tables, valId, settings)
 
 const trimDate = (text, table, field, settings) =>
-  text == null
-  ? emptyS
-  : !(settings.longDates[table] && settings.longDates[table][field])
-    ? text.replace(/T.*$/, emptyS)
-    : text.replace(/\.[0-9]+/, emptyS)
+	text == null
+		? emptyS
+		: !(settings.longDates[table] && settings.longDates[table][field])
+			? text.replace(/T.*$/, emptyS)
+			: text.replace(/\.[0-9]+/, emptyS)
 
 /*
  * The repr functions
@@ -449,29 +558,40 @@ const trimDate = (text, table, field, settings) =>
  *
  */
 const repr1Head = (tables, table, field, valType, value, settings) => {
-  if (value == null) {return emptyS}
-  if (valType == null || typeof valType === 'string') {
-    switch (valType) {
-      case 'datetime': return trimDate(value, table, field, settings)
-      case 'bool': return value ? 'Yes' : 'No'
-      default: return value
-    }
-  }
-  else {
-    const { relTable } = valType
-    return relTable == null
-    ? emptyS
-    : headEntity(tables, relTable, value)
-  }
+	if (value == null) {
+		return emptyS
+	}
+	if (valType == null || typeof valType === 'string') {
+		switch (valType) {
+			case 'datetime':
+				return trimDate(value, table, field, settings)
+			case 'bool':
+				return value ? 'Yes' : 'No'
+			default:
+				return value
+		}
+	} else {
+		const { relTable } = valType
+		return relTable == null ? emptyS : headEntity(tables, relTable, value)
+	}
 }
 
-const reprHead = (tables, table, field, valType, multiple, value, settings, sep) => {
-  const rep = multiple
-  ? (value || emptyA).map(val => repr1Head(tables, table, field, valType, val, settings))
-  : repr1Head(tables, table, field, valType, value, settings)
-  return multiple && sep != null
-  ? rep.join(sep)
-  : rep
+const reprHead = (
+	tables,
+	table,
+	field,
+	valType,
+	multiple,
+	value,
+	settings,
+	sep,
+) => {
+	const rep = multiple
+		? (value || emptyA).map(val =>
+				repr1Head(tables, table, field, valType, val, settings),
+			)
+		: repr1Head(tables, table, field, valType, value, settings)
+	return multiple && sep != null ? rep.join(sep) : rep
 }
 
 /*
@@ -483,71 +603,127 @@ const reprHead = (tables, table, field, valType, multiple, value, settings, sep)
  * If not, we take a single space as default.
  */
 export const repr = memoize(
-  (tables, table, field, valType, multiple, relField, value, settings, sep, relSep) => {
-    if (relField == null) {
-      return reprHead(tables, table, field, valType, multiple, value, settings, sep)
-    }
+	(
+		tables,
+		table,
+		field,
+		valType,
+		multiple,
+		relField,
+		value,
+		settings,
+		sep,
+		relSep,
+	) => {
+		if (relField == null) {
+			return reprHead(
+				tables,
+				table,
+				field,
+				valType,
+				multiple,
+				value,
+				settings,
+				sep,
+			)
+		}
 
-    const { relTable } = valType
-    if (relTable == null) {return emptyS}
-    const {
-      [relTable]: {
-        fieldSpecs: { [relField]: { multiple: relMultiple, valType: relValType } },
-      },
-    } = tables
-    const relValues = multiple
-    ? value.map(val => tables[relTable].entities[val].values[relField])
-    : tables[relTable].entities[value].values[relField]
+		const { relTable } = valType
+		if (relTable == null) {
+			return emptyS
+		}
+		const {
+			[relTable]: {
+				fieldSpecs: {
+					[relField]: { multiple: relMultiple, valType: relValType },
+				},
+			},
+		} = tables
+		const relValues = multiple
+			? value.map(val => tables[relTable].entities[val].values[relField])
+			: tables[relTable].entities[value].values[relField]
 
-    const theRelSep = multiple && relMultiple && sep != null && relSep == null
-    ? ' '
-    : relSep
-    const rep = multiple
-    ? relValues.map(relValue => reprHead(tables, relTable, relField, relValType, relMultiple, relValue, settings, theRelSep))
-    : reprHead(tables, relTable, relField, relValType, relMultiple, relValues, settings, relSep)
+		const theRelSep =
+			multiple && relMultiple && sep != null && relSep == null ? ' ' : relSep
+		const rep = multiple
+			? relValues.map(relValue =>
+					reprHead(
+						tables,
+						relTable,
+						relField,
+						relValType,
+						relMultiple,
+						relValue,
+						settings,
+						theRelSep,
+					),
+				)
+			: reprHead(
+					tables,
+					relTable,
+					relField,
+					relValType,
+					relMultiple,
+					relValues,
+					settings,
+					relSep,
+				)
 
-    return multiple && sep != null
-    ? rep.join(sep)
-    : rep
-  },
-  emptyO,
+		return multiple && sep != null ? rep.join(sep) : rep
+	},
+	emptyO,
 )
 
-export const handleOpenAll = memoize((alter, alterSection, nAlts, initial, table, items, dispatch) => {
-  const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
-  const theAlt = (initial + 1) % nAlts
-  return () => {
-    const alts = []
-    items.forEach(eId => {
-      const { getAlt } = makeAlternatives(eId)
-      const alt = getAlt(alter)
-      if (alt !== theAlt) {
-        alts.push(eId)
-      }
-    })
-    if (alts.length) {
-      dispatch(fetchItems(table, alts, alterSection, theAlt))
-    }
-  }
-}, emptyO)
+export const handleOpenAll = memoize(
+	(alter, alterSection, nAlts, initial, table, items, dispatch) => {
+		const makeAlternatives = compileAlternatives(
+			alterSection,
+			nAlts,
+			initial,
+			dispatch,
+		)
+		const theAlt = (initial + 1) % nAlts
+		return () => {
+			const alts = []
+			items.forEach(eId => {
+				const { getAlt } = makeAlternatives(eId)
+				const alt = getAlt(alter)
+				if (alt !== theAlt) {
+					alts.push(eId)
+				}
+			})
+			if (alts.length) {
+				dispatch(fetchItems(table, alts, alterSection, theAlt))
+			}
+		}
+	},
+	emptyO,
+)
 
-export const handleCloseAll = memoize((alter, alterSection, nAlts, initial, items, dispatch) => {
-  const makeAlternatives = compileAlternatives(alterSection, nAlts, initial, dispatch)
-  const { base, table, controller } = getUrlParts(browserHistory)
-  const xBase = `${base}/${table}/${controller}`
-  return () => {
-    browserHistory.push(`${xBase}/`)
-    const alts = []
-    items.forEach(eId => {
-      const { getAlt } = makeAlternatives(eId)
-      const alt = getAlt(alter)
-      if (alt !== initial) {
-        alts.push(eId)
-      }
-    })
-    if (alts.length) {
-      dispatch(setItems(alts, alterSection, initial))
-    }
-  }
-}, emptyO)
-
+export const handleCloseAll = memoize(
+	(alter, alterSection, nAlts, initial, items, dispatch) => {
+		const makeAlternatives = compileAlternatives(
+			alterSection,
+			nAlts,
+			initial,
+			dispatch,
+		)
+		const { base, table, controller } = getUrlParts(browserHistory)
+		const xBase = `${base}/${table}/${controller}`
+		return () => {
+			browserHistory.push(`${xBase}/`)
+			const alts = []
+			items.forEach(eId => {
+				const { getAlt } = makeAlternatives(eId)
+				const alt = getAlt(alter)
+				if (alt !== initial) {
+					alts.push(eId)
+				}
+			})
+			if (alts.length) {
+				dispatch(setItems(alts, alterSection, initial))
+			}
+		}
+	},
+	emptyO,
+)

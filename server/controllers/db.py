@@ -13,6 +13,8 @@ DM = M[N_tables]
 DMG = M[N_generic]
 WM = M[N_workflow]
 
+# N_info
+
 # We store the mongo db connection here as a module global variable
 # No other module is supposed to import the connection
 # Only the DbAccess methods are supposed to eaccess the db.
@@ -24,6 +26,38 @@ WM = M[N_workflow]
 _DBM = None 
 
 NA = 'N/A'
+
+def _mongoFields(fieldSet): return dict((field, True) for field in fieldSet)
+
+def _mongoRows(rowFilter): return {} if rowFilter == True else rowFilter
+
+def _andFields(fieldSet1, fieldSet2): return _mongoFields(fieldSet1 & fieldSet2)
+
+def _theseFields(table, fieldSet):
+    tableInfo = DM.get(table, {})
+    fieldOrder = tableInfo[N_fieldOrder]
+    fieldSpecs = tableInfo[N_fieldSpecs]
+    return (
+        [f for f in fieldOrder if f in fieldSet],
+        dict(x for x in fieldSpecs.items() if x[0] in fieldSet),
+        _mongoFields(fieldSet),
+    )
+
+def _allFields(table):
+    tableInfo = DM.get(table, {})
+    return set(tableInfo[N_fieldSpecs])
+
+def _andRows(rowFilter1, rowFilter2):
+    free1 = rowFilter1 == True or rowFilter1 == None
+    free2 = rowFilter2 == True or rowFilter2 == None
+    if free1 and free2 == True: return {}
+    if free1: return _mongoRows(rowFilter2)
+    if free2: return _mongoRows(rowFilter1)
+    if rowFilter1 == False or rowFilter2 == False: return False
+    rowFilter = {}
+    rowFilter.update(rowFilter1)
+    rowFilter.update(rowFilter2)
+    return rowFilter
 
 class DbAccess(object):
     def __init__(self):
@@ -38,14 +72,36 @@ class DbAccess(object):
         # All db access is here, through _DBM, and all _DBM access is guarded by permission calculation.
         # Other modules can safely call basicList, it will never return results that are not permitted.
 
-        def basicList(table, rowFilter, fieldFilter, sort=None):
+        # We need some relaxations of permissions, for example, reviewers may read the
+        # criteria entries of assessors and the review entries of co-reviewers of the same
+        # assessment. 
+        # These permissions cannot be detemined on the basis of generic groups, such as auth, edit, own.
+        # What we do is: we subject assessments and reviews and criteriaEntries and criteria
+        # to strict permissions: only owners and editors have access, even read access.
+        # Where we need extra permissions, we grant them very precisely.
+        # You can pass a set of identifiers to basiclist. These are "as if" user identities.
+        # It instructs basicList to retrieve records as if the user id is one of these identities.
+        # You can also pass a set of fields to basicList. 
+        # It instructs basicList to retrieve records as if the user is among the values these fields take
+        # on the records retrieved
+
+        # basicList will never complain and always return a list.
+        # If permissions are not sufficient, the list may be empty, or the records may have only _id fields.
+
+        def basicList(table, rowFilter, fieldSet, msgs, permFields=None, permIds=None, sort=None):
             Perm = self.Perm
-            (mayRead, readFields, warnings) = Perm.may(table, N_read)
-            theFieldFilter = readFields if fieldFilter == True else dict(x for x in fieldFilter.items() if x[0] in readFields)
+            (mayRead, mayRowFilter, mayFieldSet) = Perm.allow(
+                table, N_read, msgs,
+                verbose=False,
+            )
+            if not mayRead: return []
+            theRowFilter = _mongoRows(rowFilter)
+            if fieldSet == True: fieldSet = _allFields(table)
+            theFieldFilter = _andFields(fieldSet, mayFieldSet)
             if sort == None:
-                result = list(_DBM[table].find(rowFilter, theFieldFilter))
+                result = list(_DBM[table].find(theRowFilter, theFieldFilter))
             else:
-                result = list(_DBM[table].find(rowFilter, theFieldFilter).sort(sort))
+                result = list(_DBM[table].find(theRowFilter, theFieldFilter).sort(sort))
             return result
 
         self.basicList = basicList
@@ -54,7 +110,7 @@ class DbAccess(object):
 
     def getList(
             self, controller, table,
-            rFilter=None, titleOnly=False,
+            titleOnly=False,
             withValueLists=True, withDetails=True,
             my=False,
         ):
@@ -64,7 +120,7 @@ class DbAccess(object):
             controller, table,
             data,
             msgs,
-            rFilter=rFilter, titleOnly=titleOnly,
+            titleOnly=titleOnly,
             withValueLists=withValueLists, withDetails=withDetails,
             my=my,
         )
@@ -72,31 +128,59 @@ class DbAccess(object):
 
     def getItem(self, controller, table, ident):
         Perm = self.Perm
-        (good, result) = Perm.getPerm(controller, table, N_read)
+        msgs = []
+
+        (good, rowFilter, fieldSet) = Perm.allow(
+            table, N_read, msgs,
+            controller=controller,
+        )
         if not good:
-            return self.stop({N_text: result or 'Cannot read {}'.format(table)})
-        (rowFilter, fieldFilter) = result
-        (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, fieldFilter)
+            return self.stop({N_msgs: msgs})
 
         if ident == None:
-            rowFilter.update({N__id: {'$in': [oid(i) for i in request.json]}})
-            return self._findDoc(table, rowFilter, fieldFilter, {}, '{} cannot find items'.format(table), multiple=True)
+            thisRowFilter = _andRows(
+                rowFilter,
+                {N__id: {'$in': [oid(i) for i in request.json]}},
+            )
+            data = self._findDoc(
+                table,
+                thisRowFilter,
+                fieldSet,
+                {},
+                '{} cannot find items'.format(table),
+                msgs,
+                multiple=True,
+            )
+            return self.stop({N_data: data, N_msgs: msgs})
         else:
-            rowFilter.update({N__id: oid(ident)})
-            return self._findDoc(table, rowFilter, fieldFilter, {}, '{} item does not exist'.format(table))
+            thisRowFilter = _andRows(
+                rowFilter,
+                {N__id: oid(ident)},
+            )
+            data = self._findDoc(
+                table,
+                thisRowFilter,
+                fieldSet,
+                {},
+                '{} item does not exist'.format(table),
+                msgs,
+            )
+            return self.stop({N_data: data, N_msgs: msgs})
 
     def modList(self, controller, table, action):
         Perm = self.Perm
-        (good, result) = Perm.getPerm(controller, table, action)
+        msgs = []
+
+        (good, rowFilter, fieldSet) = Perm.allow(
+            table, action, msgs,
+            controller=controller,
+        )
         none = '' if action == N_insert else {}
         if not good:
-            return self.stop({N_data: none, N_text: result or 'Cannot do {} in table {}'.format(table, action)})
-
-        (rowFilter, fieldFilter) = result
+            return self.stop({N_data: none, N_msgs: msgs})
 
         newData = request.json
         records = []
-        msgs = []
         workflow = []
 
         if action == N_insert:
@@ -106,7 +190,7 @@ class DbAccess(object):
         elif action == N_delete:
             self._deleteItem(controller, table, newData, rowFilter, records, msgs, workflow)
         elif action == N_update:
-            self._updateItem(controller, table, newData, rowFilter, fieldFilter, records, msgs, workflow)
+            self._updateItem(controller, table, newData, rowFilter, fieldSet, records, msgs, workflow)
 
         return self.stop({
             N_data: {'records': records, N_workflow: workflow},
@@ -143,18 +227,31 @@ class DbAccess(object):
 
     def stop(self, info):
         data = info.get(N_data, None)
-        text = info.get(N_text, None)
         msgs = info.get(N_msgs, None)
-        good = text == None and (msgs == None or all(msg[N_kind] != N_error for msg in msgs))
-        msgs = [{N_kind: N_error, N_text: text}] if msgs == None and text != None else msgs
+        good = (msgs == None or all(msg[N_kind] != N_error for msg in msgs))
         return {N_data: data, N_msgs: msgs, N_good: good}
 
     def _hasErrors(self, msgs): return any(msg[N_kind] == N_error for msg in msgs)
 
     # IMPLEMENTATION METHODS
 
+    def _getPerm(self, table, doc, msgs):
+        Perm = self.Perm
+        (mayDelete, dummyRD, dummyRD) = Perm.allow(
+            table, N_delete, msgs,
+            document=doc,
+            verbose=False,
+        )
+        (mayUpdate, dummyRU, fieldSetU) = Perm.allow(
+            table, N_update, msgs,
+            document=doc,
+            verbose=False,
+        )
+        uFields = _mongoFields(fieldSetU) if mayUpdate else {}
+        return {N_update: uFields, N_delete: mayDelete}
+
     def _validate(self, table, itemValues, uFields):
-        (fieldOrder, fieldSpecs, allFields) = self._theseFields(table, True)
+        (fieldOrder, fieldSpecs, allFields) = _theseFields(table, True)
         valItemValues = {}
         newValues = []
         for (f, values) in itemValues.items():
@@ -228,60 +325,57 @@ class DbAccess(object):
     def _getList(
             self, controller, table,
             data, msgs,
-            rFilter=None, titleOnly=False,
+            titleOnly=False,
             withValueLists=True, withDetails=True,
             my=False,
+            verbose=True,
         ):
         if table in data: return
+
         Perm = self.Perm
+        extraMy = my if type(my) is list else None
+
+        (good, rowFilter, fieldSet) = Perm.allow(
+            table, N_list,
+            msgs,
+            controller=controller,
+            extraMy=extraMy,
+            verbose=verbose,
+        )
+
+        if not good:
+            return
+
+        (fieldOrder, fieldSpecs, fieldFilter) = _theseFields(table, fieldSet)
+
         tableInfo = DM.get(table, {})
         title = tableInfo[N_title]
         item = tableInfo[N_item]
         sort =  tableInfo[N_sort]
-        (mayInsert, iFields, warnings) = Perm.may(table, N_insert)
+        mayInsert = Perm.allow(
+            table, N_insert, msgs,
+            verbose=False,
+        )[0]
         perm = {N_insert: mayInsert, N_needMaster: tableInfo.get(N_needMaster, False)}
         orderKey = N_myIds if my else N_allIds 
         none = {table: {orderKey: [], N_entities: {}, N_fields: {}, N_perm: {}}}
-        extraMy = my if type(my) is list else None
-        (good, result) = Perm.getPerm(controller, table, N_list, extraMy=extraMy)
-        if not good:
-            if result == None:
-                msgs.append({N_kind: N_info, N_text: '{} list is empty'.format(table)})
-            else:
-                msgs.append({N_kind: N_error, N_text: result or 'Cannot list {}'.format(table)})
-            return
-        (rowFilter, fieldFilter) = result
+        theRowFilter = _mongoRows(rowFilter)
+        if sort == None:
+            documents = list(_DBM[table].find(theRowFilter, fieldFilter))
+        else:
+            documents = list(_DBM[table].find(theRowFilter, fieldFilter).sort(sort))
+        allIds=[doc[N__id] for doc in documents]
+        entities=dict((str(doc[N__id]), {N_values: doc}) for doc in documents)
+        if not titleOnly:
+            for doc in documents:
+                entities[str(doc[N__id])][N_perm] = self._getPerm(table, doc, msgs)
+
         details = tableInfo.get(N_details, {})
         detailOrder = tableInfo.get(N_detailOrder, [])
-        (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, fieldFilter)
-        coreFields = {N__id: True}
-        getFields = set(fieldFilter)
-        for f in getFields:
-            coreFields[f] = True
-
-        theFieldFilter = coreFields if titleOnly else fieldFilter 
-        theFieldFilter[N_creator] = True
-        if rFilter != None:
-            rowFilter.update(rFilter)
-        if sort == None:
-            documents = list(_DBM[table].find(rowFilter, theFieldFilter))
-        else:
-            documents = list(_DBM[table].find(rowFilter, theFieldFilter).sort(sort))
-        allIds=[d[N__id] for d in documents]
-        entities=dict((str(d[N__id]), {N_values: dict((f, d[f]) for f in d if (
-                (not titleOnly or f in coreFields) and
-                (f != N_creator or f in fieldFilter)
-            ))}) for d in documents)
-        if not titleOnly:
-            for d in documents:
-                (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=d)
-                (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=d)
-                thisPerm = {N_update: uFields, N_delete: mayDelete}
-                entities[str(d[N__id])][N_perm] = thisPerm
 
         result = {
             N_entities: entities,
-            N_fields: theFieldFilter,
+            N_fields: fieldFilter,
             N_title: title,
             N_item: item,
             N_perm: perm,
@@ -302,17 +396,20 @@ class DbAccess(object):
 
     def _getValueLists(self, table, data, msgs, noTables=False):
         Perm = self.Perm
-        (good, result) = Perm.getPerm(N_list, table, N_list)
+        (good, rowFilter, fieldSet) = Perm.allow(
+            table, N_list, msgs,
+            controller=N_list,
+            verbose=False,
+        )
         if not good: return {}
+
         tableInfo = DM.get(table, {})
         valueLists = {}
-        (rowFilter, fieldFilter) = result
-        (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, fieldFilter)
-        getFields = set(fieldFilter)
+        (fieldOrder, fieldSpecs, fieldFilter) = _theseFields(table, fieldSet)
 
         relFields = [
             f for (f, fSpec) in fieldSpecs.items()\
-                if f in getFields and\
+                if f in fieldSet and\
                 type(fSpec[N_valType]) is dict and\
                 N_relTable in fSpec[N_valType]
         ]  
@@ -334,12 +431,11 @@ class DbAccess(object):
         return valueLists
 
     def _getDetails(self, table, data, msgs):
-        Perm = self.Perm
         tableInfo = DM.get(table, {})
         details = tableInfo.get(N_details, {})
         for (name, detailProps) in details.items():
             t = detailProps[N_table]
-            self._getList(N_list, t, data, msgs, titleOnly=False)
+            self._getList(N_list, t, data, msgs, titleOnly=False, verbose=False)
 
     def _insertItem(self, controller, table, newData, records, msgs, workflow):
         masterId = newData.get(N_masterId, None)
@@ -349,11 +445,13 @@ class DbAccess(object):
         noTitle = tableInfo.get(N_noTitle, DMG[N_noTitle])
         item = tableInfo[N_item][0]
         sort = tableInfo[N_sort]
-        (readGood, readResult) = self.Perm.getPerm(controller, table, N_read)
+        (readGood, readRowFilter, readFieldSet) = self.Perm.allow(
+            table, N_read, msgs,
+            controller=controller,
+        )
         if not readGood:
-            msgs.append({N_kind: N_error, N_text: readResult or 'Cannot read table {}'.format(table)})
             return False
-        (readRowFilter, readFieldFilter) = readResult
+
         modDate = now()
         modBy = self.eppn
         insertValues = {
@@ -364,7 +462,7 @@ class DbAccess(object):
         masterDocument = None
         masterTitle = None
         if masterId != None and linkField != None:
-            (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, readFieldFilter)
+            (dummyO, fieldSpecs, readFieldFilter) = _theseFields(table, readFieldSet)
             oMasterId = oid(masterId)
             insertValues[linkField] = oMasterId
             linkFieldSpecs = fieldSpecs[linkField]
@@ -396,7 +494,7 @@ class DbAccess(object):
 
         # enforce the workflow
         myWorkflow = readWorkflow(
-            self.basicList, table, {None: insertValues},
+            self.basicList, msgs, table, {None: insertValues},
         ).get(None, {}) 
         if not enforceWorkflow(myWorkflow, {}, insertValues, N_insert, msgs):
             return False
@@ -412,11 +510,14 @@ class DbAccess(object):
                     detailRecord[N_masterId] = ident
                     good = self._insertItem(controller, detailTable, detailRecord, records, msgs, workflow)
                     if not good:
-                        msgs.append({N_kind: N_error, N_text: result})
+                        msgs.append({
+                            N_kind: N_error,
+                            N_text: result},
+                        )
                         return False
 
         # check for updates in the workflow information
-        workflow.extend(adjustWorkflow(self.basicList, table, {}, insertValues))
+        workflow.extend(adjustWorkflow(self.basicList, msgs, table, {}, insertValues))
 
         return not self._hasErrors(msgs)
 
@@ -424,24 +525,31 @@ class DbAccess(object):
         Perm = self.Perm
         ident = newData.get(N__id, None)
         if ident == None:
-            msgs.append({N_kind: N_error, N_text: 'Not specified which item to delete from table {}'.format(table)})
+            msgs.append({
+                N_kind: N_error,
+                N_text: 'Not specified which item to delete from table {}'.format(table)},
+            )
             return False
-        theRowFilter = {}
-        theRowFilter.update(rowFilter)
-        theRowFilter.update({N__id: oid(ident)})
+        theRowFilter = _andRows(rowFilter, {N__id: oid(ident)})
         documents = list(_DBM[table].find(theRowFilter))
         if len(documents) != 1:
-            msgs.append({N_kind: N_error, N_text: 'Unidentified item to delete'})
+            msgs.append({
+                N_kind: N_error,
+                N_text: 'Unidentified item to delete'},
+            )
             return False
         document = documents[0]
-        (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
+        (mayDelete, dummyR, dummyF) = Perm.allow(
+            table, N_delete, msgs,
+            controller=controller,
+            document=document,
+        )
         if not mayDelete:
-            msgs.append({N_kind: N_error, N_text: 'Not allowed to delete item {} from {}'.format(ident, table)})
             return False
 
         # enforce the workflow
         myWorkflow = readWorkflow(
-            self.basicList, table, {document[N__id]: document},
+            self.basicList, msgs, table, {document[N__id]: document},
         ).get(document[N__id], {}) 
         if not enforceWorkflow(myWorkflow, document, {}, N_delete, msgs):
             return False
@@ -458,25 +566,24 @@ class DbAccess(object):
             cascade = detail.get(N_cascade, False)
             detailTable = detail[N_table]
             linkField = detail[N_linkField]
-            (good, result) = Perm.getPerm(controller, detailTable, N_read)
-            if good:
-                (detailRowFilter, fieldFilter) = result
-            else:
-                msgs.append({N_kind: N_error, N_text: result or 'Cannot read details in table {}'.format(detailTable)})
+            (good, detailRowFilter, dummyF) = Perm.allow(
+                detailTable, N_read, msgs,
+                controller=controller,
+            )
+            if not good:
                 continue
-            theDetailRowFilter = {}
-            theDetailRowFilter.update(detailRowFilter)
-            theDetailRowFilter.update({linkField: oid(ident)})
+            theDetailRowFilter = _andRows(detailRowFilter, {linkField: oid(ident)})
             detailDocuments = list(_DBM[detailTable].find(theDetailRowFilter, {N__id: True}))
             nDetails = len(detailDocuments)
             if nDetails == 0: continue
             if cascade:
                 # in this case: check whether we have permission to delete
-                (good, result) = Perm.getPerm(controller, detailTable, N_delete)
+                (good, dummyR, dummyF) = Perm.allow(
+                    detailTable, N_delete, msgs,
+                    controller=controller,
+                )
                 if not good:
-                    msgs.append({N_kind: N_error, N_text: result or 'Cannot delete details in table {}'.format(detailTable)})
                     continue
-                (detailRowFilter, fieldFilter) = result
                 detailsToRemove.append((detailTable, detailDocuments, theDetailRowFilter))
             else:
                 # in this case: check whether there is nothing to delete
@@ -490,8 +597,14 @@ class DbAccess(object):
         if detailsToKeep:
             eText = ', '.join('{}({}x)'.format(*x) for x in sorted(detailsToKeep.items())) 
             msgs.extend([
-                {N_kind: N_warning, N_text: 'Cannot delete record with dependent details:'},
-                {N_kind: N_warning, N_text: eText},
+                {
+                    N_kind: N_warning,
+                    N_text: 'Cannot delete record with dependent details:',
+                },
+                {
+                    N_kind: N_warning,
+                    N_text: eText,
+                },
             ])
             return False
         
@@ -506,35 +619,43 @@ class DbAccess(object):
         if not self._hasErrors(msgs):
             # finally delete the main record
             _DBM[table].delete_one(theRowFilter)
-            workflow.extend(adjustWorkflow(self.basicList, table, document, {}))
+            workflow.extend(adjustWorkflow(self.basicList, msgs, table, document, {}))
             records.append((table, str(ident)))
 
         return not self._hasErrors(msgs)
 
-    def _updateItem(self, controller, table, newData, rowFilter, fieldFilter, records, msgs, workflow):
+    def _updateItem(self, controller, table, newData, rowFilter, fieldSet, records, msgs, workflow):
         Perm = self.Perm
         ident = newData.get(N__id, None)
         if ident == None:
-            msgs.append({N_kind: N_error, N_text: 'Not specified which item to update in table {}'.format(table)})
+            msgs.append({
+                N_kind: N_error,
+                N_text: 'Not specified which item to update in table {}'.format(table),
+            })
             return
-        rowFilter.update({N__id: oid(ident)})
-        documents = list(_DBM[table].find(rowFilter))
+        theRowFilter = _andRows(rowFilter, {N__id: oid(ident)})
+        documents = list(_DBM[table].find(theRowFilter))
         if len(documents) != 1:
-            msgs.append({N_kind: N_error, N_text: 'Unidentified item to update'})
+            msgs.append({
+                N_kind: N_error,
+                N_text: 'Unidentified item to update'},
+            )
             return
         document = documents[0]
-        (mayUpdate, updFields, warnings) = Perm.may(table, N_update, document=document, newValues=newData.get(N_values, {}))
-        msgs.extend([{N_kind: N_warning, N_text: warning} for warning in warnings])
-        (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, fieldFilter)
+        (mayUpdate, dummyR, fieldSetU) = Perm.allow(
+            table, N_update, msgs,
+            document=document,
+            newValues=newData.get(N_values, {}),
+        )
+        if not mayUpdate:
+            return
+
+        fieldSpecs = _theseFields(table, fieldSet)
         uFields = set()
-        for uField in updFields:
+        for uField in fieldSetU:
             valType = fieldSpecs[uField][N_valType]
             if type(valType) is not dict or not valType.get(N_fixed, False):
                 uFields.add(uField)
-        if not mayUpdate:
-            if len(warnings == 0):
-                msgs.append({N_kind: N_error, N_text: 'Not allowed to update this item'})
-            return
         newValues = dict(x for x in newData.get(N_values, {}).items())
         (valItemValues, newValues) = self._validate(table, newValues, uFields)
         validationDiags = {}
@@ -545,12 +666,17 @@ class DbAccess(object):
                 updateValues[f] = vals
             else:
                 hasInvalid = True
-                msgs.extend(valMsgs)
+                msgs.extend(
+                    valMsgs,
+                )
                 validationDiags[f] = diags
         if hasInvalid:
             invalidFields = ', '.join(sorted(validationDiags))
             validationDiags[N__error] = 'invalid values in fields {}'.format(invalidFields)
-            msgs.append({N_kind: N_warning, N_text: 'table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)})
+            msgs.append({
+                N_kind: N_warning,
+                N_text: 'table {}, item {}: invalid values in {}'.format(table, ident, invalidFields)},
+            )
 
         modDate = now()
         modBy = self.eppn
@@ -582,7 +708,7 @@ class DbAccess(object):
 
         # enforce the workflow
         myWorkflow = readWorkflow(
-            self.basicList, table, {document[N__id]: document},
+            self.basicList, msgs, table, {document[N__id]: document},
         ).get(document[N__id], {})
         if not enforceWorkflow(myWorkflow, document, newDocument, N_update, msgs):
             return False
@@ -595,9 +721,9 @@ class DbAccess(object):
 
         # check for updates in the workflow information
         myWorkflow = readWorkflow(
-            self.basicList, table, {newDocument[N__id]: newDocument}
+            self.basicList, msgs, table, {newDocument[N__id]: newDocument}
         ).get(document[N__id], {})
-        workflow.extend(adjustWorkflow(self.basicList, table, document, newDocument)) 
+        workflow.extend(adjustWorkflow(self.basicList, msgs, table, document, newDocument)) 
         records.append({
             N_values: updateSaveValues,
             N_newValues: newValues,
@@ -605,62 +731,59 @@ class DbAccess(object):
             N_workflow: myWorkflow,
         })
 
-    def _findDoc(self, table, rowFilter, fieldFilter, failData, failText, multiple=False):
-        Perm = self.Perm
-        theFieldFilter = dict(x for x in fieldFilter.items())
-        theFieldFilter[N_creator] = True
-        documents = list(_DBM[table].find(rowFilter, theFieldFilter))
+    def _findDoc(self, table, rowFilter, fieldSet, failData, failText, msgs, multiple=False):
+        fieldFilter = _mongoFields(fieldSet)
+        theRowFilter = _mongoRows(rowFilter)
+        documents = list(_DBM[table].find(theRowFilter, fieldFilter))
         ldoc = len(documents)
         if ldoc == 0:
-            return self.stop({N_data: failData, N_text: failText})
+            msgs.append({
+                N_kind: N_error,
+                N_text: failText},
+            )
+            return failData
         workflow = readWorkflow(
-            self.basicList, table, dict((doc[N__id], doc) for doc in documents),
+            self.basicList, msgs, table, dict((doc[N__id], doc) for doc in documents),
         ) 
         if multiple:
             data = []
             for document in documents:
-                (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
-                (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
-                perm = {N_update: uFields, N_delete: mayDelete}
+                perm = self._getPerm(table, document, msgs)
                 data.append({
                     N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
                     N_perm: perm,
                     N_fields: fieldFilter,
                     N_workflow: workflow.get(document[N__id], {})
                 })
-            return self.stop({N_data: data})
+            return data
         else:
             document = documents[0]
-            (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
-            (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
-            perm = {N_update: uFields, N_delete: mayDelete}
-            return self.stop({
-                N_data: {
-                    N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
-                    N_perm: perm,
-                    N_fields: fieldFilter,
-                    N_workflow: workflow.get(document[N__id], {})
-                },
-            })
+            perm = self._getPerm(table, document, msgs)
+            return {
+                N_values: dict((f,v) for (f,v) in document.items() if f != N_creator or f in fieldFilter),
+                N_perm: perm,
+                N_fields: fieldFilter,
+                N_workflow: workflow.get(document[N__id], {})
+            }
 
     def _findDocs(self, records, msgs, workflow):
-        Perm = self.Perm
         tables = []
         for (table, ident, fieldFilter) in records:
-            rowFilter = {N__id: ident}
+            theRowFilter = {N__id: ident}
             theFieldFilter = dict(x for x in fieldFilter.items())
             theFieldFilter[N_creator] = True
-            documents = list(_DBM[table].find(rowFilter, theFieldFilter))
+            documents = list(_DBM[table].find(theRowFilter, theFieldFilter))
             ldoc = len(documents)
             if ldoc == 0:
-                msgs.append({N_kind: N_error, N_text: 'Could not find back record {} in table {}'.format(ident, table)})
+                msgs.append({
+                    N_kind: N_error,
+                    N_text: 'Could not find back record {} in table {}'.format(ident, table),
+                })
                 continue
             document = documents[0]
-            (mayDelete, dFields, warnings) = Perm.may(table, N_delete, document=document)
-            (mayUpdate, uFields, warnings) = Perm.may(table, N_update, document=document)
-            perm = {N_update: uFields, N_delete: mayDelete}
+            perm.self._getPerm(table, document, msgs)
             myWorkflow = readWorkflow(
-                self.basicList, table, {document[N__id]: document},
+                self.basicList, msgs, table, {document[N__id]: document},
             ).get(document[N__id], {})
             tables.append({
                 N_table: table,
@@ -672,16 +795,21 @@ class DbAccess(object):
         records.clear()
         records.extend(tables)
 
-    def _consolidateDocs(self, controller, table, documents, level=0, withDetails=False):
-        (good, result) = Perm.getPerm(controller, table, N_read)
-        (rowFilter, fieldFilter) = result
+    def _consolidateDocs(self, controller, table, documents, msgs, consolidatedDocs, level=0, withDetails=False):
+        (good, rowFilter, fieldSet) = Perm.allow(
+            table, N_read, msgs,
+            controller=controller,
+        )
+
+        if not good:
+            return
+
         tableInfo = DM.get(table, {})
-        (fieldOrder, fieldSpecs, fieldFilter) = self._theseFields(table, fieldFilter)
+        (fieldOrder, fieldSpecs, fieldFilter) = _theseFields(table, fieldSet)
         detailOrder = tableInfo.get(N_detailOrder, None)
         details = tableInfo.get(N_details, None)
         title = tableInfo[N_title]
         item = tableInfo[N_item]
-        consolidatedDocs = []
         docs = documents if type(documents) is list else [documents]
         nDocs = len(docs)
         for document in docs:
@@ -716,11 +844,11 @@ class DbAccess(object):
                     detailDocs = list(_DBM[detailTable].find({linkField: document[N__id]}))
                     consDoc.setdefault(N_details, []).append((detail, self._consolidateDocs(
                         detailTable, detailDocs,
+                        msgs,
                         level=level+1,
                         withDetails=False,
                     )))
             consolidatedDocs.append(consDoc)
-        return consolidatedDocs if type(documents) is list else consolidatedDocs[0]
 
     def _head(self, table, doc):
         methodName = '_head_{}'.format(table)
@@ -772,14 +900,6 @@ class DbAccess(object):
         level = doc.get(N_level, NA)
         description = doc.get(N_description, '')
         return '{} - {}'.format(score, level) if score or level else description
-
-    def _theseFields(self, table, fieldFilter):
-        tableInfo = DM.get(table, {})
-        allFieldSpecs = tableInfo[N_fieldSpecs]
-        fieldOrder = [x for x in tableInfo[N_fieldOrder] if fieldFilter == True or x in fieldFilter]
-        fieldSpecs = dict((x, allFieldSpecs.get(x, {})) for x in fieldOrder)
-        fieldFilterPost = dict((f, True) for f in fieldOrder)
-        return (fieldOrder, fieldSpecs, fieldFilterPost)
 
 def _simpleVal(valType, val):
     result = \

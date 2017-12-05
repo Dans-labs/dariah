@@ -146,7 +146,7 @@ rules:
     - warn
     - never
   indent-legacy:
-    - warn
+    - off
     - 2
     - SwitchCase: 1
   jsx-quotes:
@@ -228,8 +228,9 @@ rules:
       - error
   no-constant-condition: warn
   operator-linebreak:
-    - warn
+    - off
     - before
   no-unreachable: warn
 
-extends: "eslint:recommended"
+extends:
+  - eslint:recommended

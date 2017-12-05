@@ -1,70 +1,70 @@
-div.entryRead, div.entryEdit {
-    border-radius: 0.5rem;
-    margin: 2px;
+div.entryRead,
+div.entryEdit {
+	border-radius: 0.5rem;
+	margin: 2px;
 }
 div.entryRead.complete {
-    border: 2px solid var(--entry-complete-border);
-    background-color: var(--entry-complete-back);
+	border: 2px solid var(--entry-complete-border);
+	background-color: var(--entry-complete-back);
 }
 div.entryRead.incomplete {
-    border: 2px dotted var(--entry-incomplete-border);
-    background-color: var(--entry-incomplete-back);
+	border: 2px dotted var(--entry-incomplete-border);
+	background-color: var(--entry-incomplete-back);
 }
 div.entryEdit.complete {
-    border: 2px solid var(--entry-edit-complete-border);
-    background-color: var(--entry-edit-complete-back);
+	border: 2px solid var(--entry-edit-complete-border);
+	background-color: var(--entry-edit-complete-back);
 }
 div.entryEdit.incomplete {
-    border: 2px dotted var(--entry-edit-incomplete-border);
-    background-color: var(--entry-edit-incomplete-back);
+	border: 2px dotted var(--entry-edit-incomplete-border);
+	background-color: var(--entry-edit-incomplete-back);
 }
 
 div.entry {
-    display: flex;
-    flex-flow: row  nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: flex-start;
 }
 div.fat {
-    flex: 0 1 80%;
+	flex: 0 1 80%;
 }
 div.slim {
-    flex: 0 1 10rem;
+	flex: 0 1 10rem;
 }
 div.xSlim {
-    flex: 0 1 2rem;
+	flex: 0 1 2rem;
 }
 div.comments {
-    margin-left: 2rem;
-    margin-right: 3.5rem;
+	margin-left: 2rem;
+	margin-right: 3.5rem;
 }
 div.comments.criteria {
-    font-size: small;
-    margin-left: 0;
-    margin-right: 3.5rem;
+	font-size: small;
+	margin-left: 0;
+	margin-right: 3.5rem;
 }
 
 div.comments.assessment {
-    color: var(--assessment-quoted-fore);
-    background-color: var(--assessment-quoted-back);
-    border: 2px solid var(--assessment-quoted-border);
-    border-radius: 0.2rem;
-    padding: 0.2rem;
+	color: var(--assessment-quoted-fore);
+	background-color: var(--assessment-quoted-back);
+	border: 2px solid var(--assessment-quoted-border);
+	border-radius: 0.2rem;
+	padding: 0.2rem;
 }
 
 div.assessment .tag {
-    color: var(--workflow-info-fore);
-    background-color: var(--workflow-info-back);
-    border-color: var(--workflow-info-border);
+	color: var(--workflow-info-fore);
+	background-color: var(--workflow-info-back);
+	border-color: var(--workflow-info-border);
 }
 
 .vtop {
-    vertical-align: top;
+	vertical-align: top;
 }
 .tError {
-    color: var(--template-error);
+	color: var(--template-error);
 }
 .tGood {
-    color: var(--template-good);
+	color: var(--template-good);
 }
-

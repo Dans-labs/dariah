@@ -1,126 +1,133 @@
 /* PAGE LAYOUT */
 
-*, *:before, *:after {
-  box-sizing: border-box;
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
 }
 
 html {
-    height: 100vh;
+	height: 100vh;
 }
 body {
-    height: 100%;
-    margin: 0;
+	height: 100%;
+	margin: 0;
 }
-#body,body,p,div,td,li {
-    font-family: sans-serif;
+#body,
+body,
+p,
+div,
+td,
+li {
+	font-family: sans-serif;
 }
 
 .topnavbar {
-    height: var(--topbar-height);
-    background-color: var(--topbar-back);
-    padding: 0 8rem 0 0;
-    overflow: visible;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
+	height: var(--topbar-height);
+	background-color: var(--topbar-back);
+	padding: 0 8rem 0 0;
+	overflow: visible;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-items: center;
 }
 .topnavbar img {
-    height: var(--logo-height);
-    margin-top: 0 0 var(--topbar-bottom) 0;
-    display: inline-block;
-    vertical-align: top;
+	height: var(--logo-height);
+	margin-top: 0 0 var(--topbar-bottom) 0;
+	display: inline-block;
+	vertical-align: top;
 }
 .topnavbar a {
-    padding: 0.2rem 1rem;
+	padding: 0.2rem 1rem;
 }
 
 div.sub-app {
-    height: var(--subapp-height);
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-content: flex-start;
-    align-items: flex-start;
-    margin-top: var(--subapp-top);
-    padding: 0;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+	height: var(--subapp-height);
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-content: flex-start;
+	align-items: flex-start;
+	margin-top: var(--subapp-top);
+	padding: 0;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
 }
 div.subnavbar {
-    max-height: var(--subapp-height);
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    background-color: var(--subbar-back);
-    padding: 0;
-    display: flex;
-    flex: 0 0 content;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-content: flex-start;
+	max-height: var(--subapp-height);
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	background-color: var(--subbar-back);
+	padding: 0;
+	display: flex;
+	flex: 0 0 content;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
 }
 .subnavbar .section {
-    flex: 0 0 content;
-    display: inline-flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-content: flex-start;
-    padding: 0.2rem;
+	flex: 0 0 content;
+	display: inline-flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+	padding: 0.2rem;
 }
 .subnavbar .subsection {
-    flex-basis: content;
-    flex-grow: 0;
-    flex-shrink: 0;
-    display: inline-flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-content: start-end;
-    margin-left: 1rem;
-    font-size: small;
-    padding: 0.2rem;
+	flex-basis: content;
+	flex-grow: 0;
+	flex-shrink: 0;
+	display: inline-flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: start-end;
+	margin-left: 1rem;
+	font-size: small;
+	padding: 0.2rem;
 }
 div.submaterial {
-    max-height: var(--subapp-height);
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    flex: 1 1 70%;
-    padding: 0 0 0 0.5rem;
+	max-height: var(--subapp-height);
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	flex: 1 1 70%;
+	padding: 0 0 0 0.5rem;
 }
 div.item-workflow {
-    margin: 0.2rem 0 0.2rem 0;
-    padding: 1rem 0 1rem 0;
-    background-color: var(--workflow-item-back);
+	margin: 0.2rem 0 0.2rem 0;
+	padding: 1rem 0 1rem 0;
+	background-color: var(--workflow-item-back);
 }
 span.login {
-    float: right;
-    color: var(--widget-fixed-fore);
-    font-size: medium;
+	float: right;
+	color: var(--widget-fixed-fore);
+	font-size: medium;
 }
 .small {
-    font-size: small;
+	font-size: small;
 }
 
 div.sized {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
 .inlineL {
-    float: left;
+	float: left;
 }
 .inlineR {
-    float: right;
+	float: right;
 }
 div.error-boundary {
-    font-size: medium;
-    font-weight: normal;
-    background-color: var(--errorboundary-back);
-    color: var(--errorboundary-fore);
-    border: 2px dotted var(--errorboundary-border);
-    border-radius: 0.8rem;
-    padding: 0.3rem;
+	font-size: medium;
+	font-weight: normal;
+	background-color: var(--errorboundary-back);
+	color: var(--errorboundary-fore);
+	border: 2px dotted var(--errorboundary-border);
+	border-radius: 0.8rem;
+	padding: 0.3rem;
 }
 
 td {
-    vertical-align: top;
+	vertical-align: top;
 }

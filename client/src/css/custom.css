@@ -1,34 +1,38 @@
-.tag.option.inactive, .tag.inactive, .inactive {
-    color: var(--tag-inactive-fore);
-    background-color: var(--tag-inactive-back);
-    border: 1px solid var(--tag-inactive-border);
+.tag.option.inactive,
+.tag.inactive,
+.inactive {
+	color: var(--tag-inactive-fore);
+	background-color: var(--tag-inactive-back);
+	border: 1px solid var(--tag-inactive-border);
 }
-.tag.option.inactive.disabled, .tag.inactive.disabled, .inactive.disabled {
-    color: var(--tag-disabled-fore);
-    background-color: var(--tag-disabled-back);
-    border: 1px solid var(--tag-disabled-border);
+.tag.option.inactive.disabled,
+.tag.inactive.disabled,
+.inactive.disabled {
+	color: var(--tag-disabled-fore);
+	background-color: var(--tag-disabled-back);
+	border: 1px solid var(--tag-disabled-border);
 }
 
 .isactive {
-    background-color: var(--workflow-active);
+	background-color: var(--workflow-active);
 }
 
 .ass-score-box {
-    background-color: var(--score-back);
-    padding: 0.3rem;
-    margin-bottom: 0.3rem;
-    border: 3px solid var(--score-border);
-    border-radius: 0.5rem;
-    display: inline-flex;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
+	background-color: var(--score-back);
+	padding: 0.3rem;
+	margin-bottom: 0.3rem;
+	border: 3px solid var(--score-border);
+	border-radius: 0.5rem;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: flex-start;
 }
 .ass-score {
-    color: var(--score-fore);
-    font-size: xx-large;
+	color: var(--score-fore);
+	font-size: xx-large;
 }
 .ass-score-deriv {
-    color: var(--score-fore);
-    font-size: medium;
+	color: var(--score-fore);
+	font-size: medium;
 }

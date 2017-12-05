@@ -1,55 +1,58 @@
-.button  {
-    color: var(--action-fore);
-    cursor: pointer;
-    background-color: var(--action-back);
-    border-color: var(--action-border);
-    white-space: nowrap;
+.button {
+	color: var(--action-fore);
+	cursor: pointer;
+	background-color: var(--action-back);
+	border-color: var(--action-border);
+	white-space: nowrap;
 }
 .button.disabled {
-    cursor: default;
-    background-color: var(--action-disabled-back);
+	cursor: default;
+	background-color: var(--action-disabled-back);
 }
-.button.large, .label.large {
-    --size: medium;
-    --radius: 0.5rem;
-    --border: 2px;
-    font-size: var(--size);
-    border-radius: var(--radius);
-    border-style: solid;
-    border-width: var(--border);
-    padding-top: calc(var(--radius) * 0.4);
-    padding-bottom: calc(var(--radius) * 0.4);
-    padding-left: calc(var(--radius) * 1.2);
-    padding-right: calc(var(--radius) * 1.2);
+.button.large,
+.label.large {
+	--size: medium;
+	--radius: 0.5rem;
+	--border: 2px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
 }
-.button.medium, .label.medium {
-    --size: medium;
-    --radius: 0.4rem;
-    --border: 1px;
-    font-size: var(--size);
-    border-radius: var(--radius);
-    border-style: solid;
-    border-width: var(--border);
-    padding-top: calc(var(--radius) * 0.4);
-    padding-bottom: calc(var(--radius) * 0.4);
-    padding-left: calc(var(--radius) * 1.2);
-    padding-right: calc(var(--radius) * 1.2);
+.button.medium,
+.label.medium {
+	--size: medium;
+	--radius: 0.4rem;
+	--border: 1px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
 }
-.button.small, .label.small {
-    --size: small;
-    --radius: 0.3rem;
-    --border: 0;
-    font-size: var(--size);
-    border-radius: var(--radius);
-    border-style: solid;
-    border-width: var(--border);
-    padding-top: calc(var(--radius) * 0.4);
-    padding-bottom: calc(var(--radius) * 0.4);
-    padding-left: calc(var(--radius) * 1.2);
-    padding-right: calc(var(--radius) * 1.2);
+.button.small,
+.label.small {
+	--size: small;
+	--radius: 0.3rem;
+	--border: 0;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
 }
 
 .link {
-    color: var(--action-fore);
-    cursor: pointer;
+	color: var(--action-fore);
+	cursor: pointer;
 }

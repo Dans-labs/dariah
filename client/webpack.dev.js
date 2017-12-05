@@ -19,6 +19,19 @@ module.exports = merge(common, {
   module: {
     rules: [
       {
+        test: /\.jsx?$/,
+        enforce: 'pre',
+        use: [
+          {
+            loader: 'eslint-loader',
+            options: {
+              //configFile: 'eslint.yaml',
+            },
+          }
+        ],
+        exclude: /node_modules/,
+      },
+      {
         test: /\.css$/,
         use: extractCSS.extract([
           {

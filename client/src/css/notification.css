@@ -1,125 +1,122 @@
-
 .error {
-    color: var(--error-fore);
-    background-color: var(--error-back);
+	color: var(--error-fore);
+	background-color: var(--error-back);
 }
 .error-o {
-    color: var(--error-fore-o);
+	color: var(--error-fore-o);
 }
 .warning {
-    color: var(--warning-fore);
-    background-color: var(--warning-back);
+	color: var(--warning-fore);
+	background-color: var(--warning-back);
 }
 .warning-o {
-    color: var(--warning-fore-o);
+	color: var(--warning-fore-o);
 }
 .good {
-    color: var(--good-fore);
-    background-color: var(--good-back);
+	color: var(--good-fore);
+	background-color: var(--good-back);
 }
 .good-o {
-    color: var(--good-fore-o);
+	color: var(--good-fore-o);
 }
 .info {
-    color: var(--info-fore);
-    background-color: var(--info-back);
+	color: var(--info-fore);
+	background-color: var(--info-back);
 }
 .info-o {
-    color: var(--info-fore-o);
+	color: var(--info-fore-o);
 }
 .special {
-    color: var(--special-fore);
-    background-color: var(--special-back);
+	color: var(--special-fore);
+	background-color: var(--special-back);
 }
 .special-o {
-    color: var(--special-fore-o);
+	color: var(--special-fore-o);
 }
 .msg-high {
-    font-weight: bold;
+	font-weight: bold;
 }
 .msg-line {
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-top: 0;
-    margin-bottom: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 .msg-trash {
-    padding-top: 2;
-    padding-bottom: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    font-size: medium;
-    float: left;
+	padding-top: 2;
+	padding-bottom: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-size: medium;
+	float: left;
 }
 .msg-dismiss {
-    padding-top: 2;
-    padding-bottom: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    font-style: italic;
-    font-size: small;
-    float: right;
+	padding-top: 2;
+	padding-bottom: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-style: italic;
+	font-size: small;
+	float: right;
 }
 .msg-box {
-    width: 50%;
-    height: 100;
-    position: fixed;
-    top: 40;
-    bottom: auto;
-    left: auto;
-    right: 10;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-left: 10;
-    padding-right: 10;
-    z-index: 2000;
-    opacity: 0.9;
-    vertical-align: middle;
-    cursor: pointer;
-    background-color: var(--msg-box-back);
-    border: 2px solid var(--msg-box-border);
-    border-radius: 0.8rem;
-    font-size: small;
+	width: 50%;
+	height: 100;
+	position: fixed;
+	top: 40;
+	bottom: auto;
+	left: auto;
+	right: 10;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	padding-left: 10;
+	padding-right: 10;
+	z-index: 2000;
+	opacity: 0.9;
+	vertical-align: middle;
+	cursor: pointer;
+	background-color: var(--msg-box-back);
+	border: 2px solid var(--msg-box-border);
+	border-radius: 0.8rem;
+	font-size: small;
 }
 .msg-spinner {
-    width: 5rem;
-    height: 2rem;
-    color: var(--action-fore);
-    cursor: pointer;
-    position: fixed;
-    top: 0.05rem;
-    bottom: auto;
-    left: auto;
-    right: 1rem;
-    text-align: right;
-    padding-left: 0;
-    padding-right: 0;
-    z-index: 2000;
-    opacity: 0.9;
-    vertical-align: middle;
+	width: 5rem;
+	height: 2rem;
+	color: var(--action-fore);
+	cursor: pointer;
+	position: fixed;
+	top: 0.05rem;
+	bottom: auto;
+	left: auto;
+	right: 1rem;
+	text-align: right;
+	padding-left: 0;
+	padding-right: 0;
+	z-index: 2000;
+	opacity: 0.9;
+	vertical-align: middle;
 }
 .msg-spinner-tip {
-    position: fixed;
-    top: 0.3rem;
-    bottom: auto;
-    left: auto;
-    right: 2.2rem;
+	position: fixed;
+	top: 0.3rem;
+	bottom: auto;
+	left: auto;
+	right: 2.2rem;
 }
 .msg-spinner-arrow {
-    position: fixed;
-    bottom: auto;
-    top: 1.2rem;
-    left: auto;
-    right: 2rem;
+	position: fixed;
+	bottom: auto;
+	top: 1.2rem;
+	left: auto;
+	right: 2rem;
 }
 .msg-dot {
-    font-size: small;
+	font-size: small;
 }
 
 .progress {
-    display: inline-block;
-    text-align: center;
-    vertical-align: top;
+	display: inline-block;
+	text-align: center;
+	vertical-align: top;
 }
-
-

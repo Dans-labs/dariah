@@ -46,6 +46,9 @@ workflow:
       linkField: assessment
       otherTable: review
       otherField: creator
+      permFields:
+        - reviewerE
+        - reviewerF
       attribute:
         name: reviews
         desc: reviews of this same assessment

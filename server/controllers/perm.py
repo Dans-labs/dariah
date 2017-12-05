@@ -18,58 +18,166 @@ class PermApi(object):
     def getUid(self): return self.uid
     def getEppn(self): return self.eppn
 
-    def getPerm(self, controller, table, action, extraMy=None):
-        methods = PM[N_methods]
-        call = methods.get(controller, {}).get(N_call, None)
-        if call == None:
-            return (False, 'Not allowed to execute controller {}'.format(controller))
+    def allow(self, table, action, msgs, controller=None, document=None, newValues=None, extraMy=None, verbose=True):
+        '''
+        allow is the function that will determine whether something is allowed.
+        It will be called for an action on a table and/or document.
+        It may or may not be called in the context of a controller.
+        The result is a tuple:
+        - good: a boolean telling whether the action is allowed in that setting
+        - rowFilter: a mongodb criterion constraining the set of records to which the action may be applied
+        - fieldSet: the set of fields to which the action may be applied
 
+        If not good, rowFilter and fieldSet will be None.
+        
+        rowFilter:
+        - dict() (mongodb criteria for allowed rows),
+        - False (no rows)
+        - True (all rows)
+        - None (irrelevant)
+
+        fieldSet:
+        - set() (allowed field names),
+        - empty set (no fields)
+        - None (irrelevant)
+
+        If a document is passed, permissions will be calculated for that document,
+        and the rowFilter will be None, because it is not needed.
+        If no document is given, a rowFilter will be computed.
+        
+        If the operation is not permitted on any row, rowFilter = False is returned.
+        The reaction to this outcome should be to not perform a database lookup at all.
+
+        But this is not a permission error, in this case the list of records for which
+        the operation is allowed is empty.
+        This is different from good == False and rowFilter == None.
+
+        If the operation is permitted on a selection of rows, a mongodb selection dict is returned.
+        If the operation is permitted on all rows, rowFilter=True is returned.
+
+        If no fields are permitted, fieldSet = set() is returned.
+        This will still deliver the _id fields, because _id fields are always permitted.
+        If all or part of the fields are permitted, a set of permitted fields is returned.
+
+        '''
+        # sanity checks
+        # does the action exist?
         actions = PM[N_actions]
         if action not in actions:
-            return (False, 'Unknown action {} when calling controller {}'.format(action, controller))
+            if verbose:
+                msgs.append({
+                    N_kind: N_error,
+                    N_text: 'Unknown action {}'.format(action),
+                })
+            return (False, None, None)
 
-        perm = DM.get(table, {}).get(N_perm, {}).get(action, None)
-        if perm == None:
-            return (False, 'Action {} not allowed for table {} when calling controller {}'.format(
-                action, table, controller,
-        ))
+        # determine the access level that is required for this action
+        # level on the basis of the table and the action
+        permT = DM.get(table, {}).get(N_perm, {}).get(action, None)
+        if permT == None:
+            if verbose:
+                msgs.append({
+                    N_kind: N_error,
+                    N_text: 'Action {} not allowed for table {} '.format(action, table),
+                })
+            return (False, None, None)
 
-        level = self._highestLevel((call, perm))
-        rowFilter = self._rowSet(table, level) if action != N_insert else True
-        fieldFilter = self._fieldProjection(table, action) if action not in {N_insert, N_delete} else True
-        if rowFilter != False:
-            if extraMy:
-                if self.uid:
-                    rowFilter['$or'] = [{field: self.uid} for field in extraMy]
-                else:
-                    rowFilter = False
-        if rowFilter == False or not fieldFilter:
-            return (False, None) # this is not an error: the set of permitted rows/fields is just empty
-        return (True, (rowFilter, fieldFilter))
+        # level on the basis of the controller
+        if controller == None:
+            perm = permT
+        else:
+            methods = PM[N_methods]
+            permC = methods.get(controller, {}).get(N_call, None)
+            if permC == None:
+                if verbose:
+                    msgs.append({
+                        N_kind: N_error,
+                        N_text: 'Not allowed to execute controller {}'.format(controller),
+                    })
+                return (False, None, None)
+            # take the strictest access level that the controller and the table require
+            perm = self._highestLevel((permC, permT))
 
-    def may(self, table, action, document=None, newValues=None):
-        actions = PM[N_actions]
-        if action not in actions:
-            return (False, {}, [])
-
-        perm = DM.get(table, {}).get(N_perm, {}).get(action, None)
-        if perm == None:
-            return (False, {}, [])
-
-
+        # determine whether the action is allowed
         if document == None:
-            authorized = self._authorize(perm)
-            fieldSet = self._fieldProjection(table, action)
-            warnings = []
+            allowed = self._authorize(perm)
         else:
             isOwn = self._isOwn(table, document)
             isEditor = self._isEditor(table, document)
-            authorized = self._authorize(perm, isOwn=isOwn, isEditor=isEditor)
-            (warnings, fieldSet) = self._fieldSet(
-                table, document, action, isOwn, isEditor, newValues=newValues,
-            )
-        if not authorized: return (False, {}, [])
-        return (True, fieldSet, warnings)
+            allowed = self._authorize(perm, isOwn=isOwn, isEditor=isEditor)
+
+        if not allowed:
+            if verbose:
+                msgs.append({
+                    N_kind: N_error,
+                    N_text: 'You are not allowed to perform {} on table {}{}'.format(
+                        action, table, 
+                        '' if document == None else ' on this particular document',
+                    ),
+                })
+            return (False, None, None)
+
+        # compute the rowFilter
+        if action == N_insert: rowFilter = None
+        elif document == None:
+            if allowed == 1: rowFilter = True
+            elif allowed == -10: rowFilter = True
+            else:
+                owners = PM[N_owners]
+                ownField = owners.get(table, N_creator)
+                if allowed == -1: rowFilter = {ownField: self.uid}
+                elif allowed == -2: rowFilter = {'$or': [{ownField: self.uid}, {N_editors: self.uid}]}
+        else:
+            rowFilter = None
+
+        # compute the fieldSet
+        fieldSet = set()
+        fields = DM.get(table, {}).get(N_fieldSpecs, {})
+
+        for field in fields:
+            permF = fields[field].get(N_perm, {}).get(action, None)
+            if permF == None: continue
+            if document == None:
+                if self._authorize(permF): fieldSet.add(field)
+            else:
+                if permF == N_ownLT:
+                    oldValueId = document.get(field, None) 
+                    oldValue = None if oldValueId == None else self.groupFromId[oid(oldValueId)]
+                    newValueId = None if newValues == None else newValues.get(field, None) 
+                    newValue = None if newValueId == None else self.groupFromId[oid(newValueId)]
+                    if newValue == None: continue
+                    if newValue in {N_own, N_nobody}:
+                        if verbose:
+                            msgs.append({
+                                N_kind: N_error,
+                                N_text: 'Cannot change permission role: {} is not an assignable role'.format(newValue),
+                            })
+                        continue
+                    elif newValue not in self.rank:
+                        if verbose:
+                            msgs.append({
+                                N_kind: N_error,
+                                N_text: 'Cannot change permission role: the power of role {} is unknown'.format(newValue),
+                            })
+                        continue
+                    elif self.rank[newValue] > self.rank[group]:
+                        if verbose:
+                            msgs.append({
+                                N_kind: N_error,
+                                N_text: 'Cannot change permission role: the role {} has more power than you have as {}'.format(newValue, self.group),
+                            })
+                        continue
+                    if oldValue != None:
+                        uid = document[N__id]
+                        if uid != self.uid and self.rank[oldValue] >= self.rank[group]:
+                            if verbose:
+                                msgs.append({
+                                    N_kind: N_error,
+                                    N_text: 'Cannot change permission role: the other user is a {} with at least as much power as you have as {}'.format(oldValue, self.group),
+                                })
+                            continue
+                if self._authorize(permF): fieldSet.add(field)
+        return (True, rowFilter, fieldSet)
 
     def _isOwn(self, table, document):
         uid = self.uid
@@ -84,71 +192,18 @@ class PermApi(object):
         if N_editors not in document: return False
         return self.uid in set(document[N_editors])
 
-    def _authorize(self, level, asInt=False, isOwn=None, isEditor=None, uid=None, oldValue=None, newValue=None, warnings=[]):
+    def _authorize(self, perm, isOwn=None, isEditor=None):
         group = self.group
         authorize = PM[N_authorize]
-        may = authorize.get(group, {}).get(level, 0)
+        may = authorize.get(group, {}).get(perm, 0)
         if may == -1 and isOwn == False: may = 0
         if may == -2 and isOwn == False and isEditor == False: may = 0
-        if may == -10:
-            if newValue != None:
-                if newValue in {N_own, N_nobody}:
-                    may = 0
-                    warnings.append('Cannot change permission role: {} is not an assignable role'.format(newValue))
-                elif newValue not in self.rank:
-                    warnings.append('Cannot change permission role: the power of role {} is unknown'.format(newValue))
-                    may = 0
-                elif self.rank[newValue] > self.rank[group]:
-                    warnings.append('Cannot change permission role: the role {} has more power than you have as {}'.format(newValue, self.group))
-                    may = 0
-                if oldValue != None:
-                    if uid != self.uid and self.rank[oldValue] >= self.rank[group]:
-                        warnings.append('Cannot change permission role: the other user is a {} with at least as much power as you have as {}'.format(oldValue, self.group))
-                        may = 0
-        return may if asInt else (may != 0)
+        return may
 
     def _orderLevels(self, levs):
         rank = self.rank
         return sorted(levs, key=lambda lv: rank[lv]) 
 
     def _highestLevel(self, levs): return self._orderLevels(levs)[-1]
-    def _lowestLevel(self, levs): return self._orderLevels(levs)[0]
 
-    def _rowSet(self, table, level):
-        owners = PM[N_owners]
-        ownField = owners.get(table, N_creator)
-        authorized = self._authorize(level, asInt=True)
-        if authorized == 1: return {}
-        if authorized == 2: return {}
-        if authorized == 0: return False
-        if authorized == -1:
-            return {ownField: self.uid}
-        if authorized == -2:
-            return {'$or': [{ownField: self.uid}, {N_editors: self.uid}]}
 
-    def _fieldProjection(self, table, action):
-        fields = DM.get(table, {}).get(N_fieldSpecs, {})
-        projection = {}
-        for field in fields:
-            level = fields[field].get(N_perm, {}).get(action, None)
-            if level != None and self._authorize(level):
-                projection[field] = True
-        return projection
-
-    def _fieldSet(self, table, document, action, isOwn, isEditor, newValues=None):
-        fields = DM.get(table, {}).get(N_fieldSpecs, {})
-        projection = {}
-        warnings = []
-        for field in fields:
-            level = fields[field].get(N_perm, {}).get(action, None)
-            if level == None: continue
-            newValue = None
-            oldValue = None
-            if level == N_ownLT:
-                oldValueId = document.get(field, None) 
-                oldValue = None if oldValueId == None else self.groupFromId[oid(oldValueId)]
-                newValueId = None if newValues == None else newValues.get(field, None) 
-                newValue = None if newValueId == None else self.groupFromId[oid(newValueId)]
-            if self._authorize(level, isOwn=isOwn, isEditor=isEditor, uid=document[N__id], oldValue=oldValue, newValue=newValue, warnings=warnings):
-                projection[field] = True
-        return (warnings, projection)

@@ -1,29 +1,29 @@
 .tooltips-on {
-    background-color: var(--tooltip-back);
+	background-color: var(--tooltip-back);
 }
 .tooltips-off {
-    background-color: var(--action-back);
+	background-color: var(--action-back);
 }
 .tooltip {
-    width: fit-content;
-    max-width: 40vh;
-    position: absolute;
-    top: 0;
-    left: 0;
-    color: var(--tooltip-fore);
-    background-color: var(--tooltip-back);
-    border-radius: 1rem;
-    padding: 0.6rem 0.5rem;
-    text-transform: none;
-    font-size: 1rem;
+	width: fit-content;
+	max-width: 40vh;
+	position: absolute;
+	top: 0;
+	left: 0;
+	color: var(--tooltip-fore);
+	background-color: var(--tooltip-back);
+	border-radius: 1rem;
+	padding: 0.6rem 0.5rem;
+	text-transform: none;
+	font-size: 1rem;
 }
 
 .toolarrow {
 	width: 0;
 	height: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
 	content: '';
 	margin: auto;
 	display: block;
@@ -52,15 +52,14 @@
 
 .tooltip,
 .toolarrow {
-    opacity: 0;
-    pointer-events: none;
+	opacity: 0;
+	pointer-events: none;
 }
 
 .tooltipped.focus:focus-within + span > .tooltip,
 .tooltipped.focus:focus-within + span > .toolarrow,
 .tooltipped.hover:hover + span > .tooltip,
 .tooltipped.hover:hover + span > .toolarrow {
-    opacity: 0.95;
-    transition: opacity 1s 0.5s ease, top 1s ease, left 1s ease;
+	opacity: 0.95;
+	transition: opacity 1s 0.5s ease, top 1s ease, left 1s ease;
 }
-
