@@ -17,16 +17,16 @@ appropriate document from the database, look up the field in question, and read
 out the value that you find there. Alas, there are several complicating factors:
 
 1. That value might be a MongoDB object identifier pointing to a related record.
-	We do not want to display that identifier, but the corresponding record, but
-	not the whole record. Only an informative heading. For that we have to look
-	up additional fields in the related table, and possibly apply logic depending
-	on what we encounter.
+  We do not want to display that identifier, but the corresponding record, but
+  not the whole record. Only an informative heading. For that we have to look
+  up additional fields in the related table, and possibly apply logic depending
+  on what we encounter.
 1. We should not show fields that the current user is not entitled to view. We
-	should not put in edit controls for fields that the current user is not
-	allowed to edit.
+  should not put in edit controls for fields that the current user is not
+  allowed to edit.
 1. We should present values that are in some way _legacy_ different from values
-	that are _current_, where the current-ness of values is determined by certain
-	other fields in the database (see [business model](Business).
+  that are _current_, where the current-ness of values is determined by certain
+  other fields in the database (see [business model](Business).
 
 The first two concerns are built into the generic logic, in the components
 
@@ -35,7 +35,7 @@ The first two concerns are built into the generic logic, in the components
 * [ItemEdit](#itemedit)
 * [FieldRead](#fieldread)
 * [FieldEdit](#fieldedit) and we do not want to reimplement this logic when we
-	want to cater for the third concern by means of templates.
+  want to cater for the third concern by means of templates.
 
 Our solution is that templates are not static strings into which field values
 are merged dynamically.
@@ -51,26 +51,26 @@ functions use the general machinery to
 * `v(field)` fetch the raw values for fields;
 * `w(key)` fetch additional [workflow](Workflow) attributes for records;
 * `s(field)` fetch the plain string values for fields, replacing identifiers
-	into related tables by headings of related records; by entity titles;
+  into related tables by headings of related records; by entity titles;
 * `f(field)` fetch values for fields (with related lookup), and wrap them in
-	[FieldRead](#fieldread) components;
+  [FieldRead](#fieldread) components;
 * `f(field)` fetch values for fields, and wrap them in [FieldEdit](#fieldedit)
-	components, which are controls to let the user edit the value;
+  components, which are controls to let the user edit the value;
 * `fs(field)` present custom controls for fields and wrap them in
-	[FieldSet](#fieldset) components, which react to click events: upon a click, a
-	baked in value will be saved for this field to the database;
+  [FieldSet](#fieldset) components, which react to click events: upon a click, a
+  baked in value will be saved for this field to the database;
 * `n` (only for insert templates): the number of detail records in the list
 * `at` a set of the _active_ contribution types
 * `o` check whether the current record is owned by the user or whether the user
-	is in the list of editors;
+  is in the list of editors;
 * `me` all attributes of the logged in user (empty if the user is not logged
-	in);
+  in);
 * `linkMe` a direct hyperlink to a the value as part of its list;
 * `editButton` a ready-made control for switching edit/read-only mode and saving
-	the values.
+  the values.
 * `onInsert` a ready-made handler for triggering an insert action. To be
-	associated to the element that receives the user trigger to create a new
-	record.
+  associated to the element that receives the user trigger to create a new
+  record.
 
 Applying a template means feeding a higher order React component with a
 properties object of field rendering functions, which results in a concrete
@@ -88,13 +88,13 @@ using the functions [applyTemplate](Templates#applytemplate),
 There are several purposes for which we invoke the template mechanism:
 
 * The presentation of:
-	* main records
-	* related records
-	* detail records
-	* insert buttons
-	* consolidated records
+  * main records
+  * related records
+  * detail records
+  * insert buttons
+  * consolidated records
 * the determination of:
-	* edit modes.
+  * edit modes.
 
 All templates can be found in files named after the tables for which they are
 defined. You can find them in the [tables]({{site.appBase}}/tables) directory.
@@ -181,7 +181,7 @@ functions that deliver field value information or workflow information:
 * `f = field => <FieldRead>` _react component for reading_ `field`
 * `fe = field => <FieldEdit>` _react component for editing_ `field`
 * `fs = field => <FieldSet>` _customizable react component for setting_ `field`
-	to a predefined value
+  to a predefined value
 * `e = field =>` _whether that field has an empty value_
 * `m = field =>` _whether that field is editable by the current user_
 * `w = kind =>` workflow information, see [workflow](Workflow).

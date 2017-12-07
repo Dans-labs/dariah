@@ -35,7 +35,7 @@ better stability: unchanged parts will not be replaced by new copies of values.
 
 # [genericReducer]({{site.testBase}}/genericReducer.js)
 
-### runActionTest
+## runActionTest
 
 Given an action and the description of a few state transitions, and a list of
 inspection instructions, with expected outcomes, this function will execute
@@ -52,7 +52,7 @@ strictly equal.
 
 ## [filtersReducer]({{site.testBase}}/reduce/filtersReducer.js)
 
-_There no tests here yet._
+... _There areno tests here yet_
 
 ## [tablesReducer]({{site.testBase}}/reduce/tablesReducer.js)
 
@@ -65,7 +65,7 @@ After each state transition, there are two basic things to assess:
 
 * the new state has the right value (the semantics is good)
 * the unchanged parts of the new state are still the same objects as those part
-	in the old state (the pragmatics is good).
+  in the old state (the pragmatics is good).
 
 If the semantics turns out to be wrong, the app will appear to act
 stupidly/sloppily. This is the first order error.

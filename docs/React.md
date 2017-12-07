@@ -259,7 +259,7 @@ idea that [state](#state) is centralized and all components have to subscribe to
 a state [Provider]({{site.reactRedux}}/docs/api.md#provider-store), the store.
 
 * If a component needs to update the state, it dispatches an action to the
-	store.
+  store.
 * So-called _reducers_ translate the action into a state update.
 * And then the component can re-render.
 
@@ -284,13 +284,13 @@ For every such task, we make a _duct_ and put it into the _dux_ directory. Every
 duct manages a slice of the state has four sections:
 
 * Actions: functions that create the actions whose dispatch will trigger a state
-	update
+  update
 * Reducer: a single function that translates all relevant actions into updates
-	of its slice of the state
+  of its slice of the state
 * Selectors: functions that grab data from the state in order to offer it to
-	[connected](#connect) components
+  [connected](#connect) components
 * Helpers: functions that contain additional logic, especially for selectors.
-	See for an example [filters](Dux#filters).
+  See for an example [filters](Dux#filters).
 
 ## Merge
 
@@ -298,7 +298,7 @@ When a reducer transforms a state, it must happen in such a way that
 
 * unaffected parts of the state do not change,
 * all intermediate objects between the top-level state and a changed leaf are
-	fresh objects.
+  fresh objects.
 
 The handiest way to achieve this is to use
 [lodash merge]({{site.lodash}}/#merge) and
@@ -363,12 +363,12 @@ Xc = connect(selectors, dispatchers)(X)
 The new component Xc has extra props:
 
 * data properties provided by the selector function `selectors`, which is a
-	function that reads the global state and returns information of it as a props
-	object.
+  function that reads the global state and returns information of it as a props
+  object.
 * callback properties, provided by the function `dispatchers`. This returns a
-	props object of action creator functions. Xc can use these where a callback is
-	needed. When such a function is called, the action will be created and
-	dispatched, which in turn will lead to a state change.
+  props object of action creator functions. Xc can use these where a callback is
+  needed. When such a function is called, the action will be created and
+  dispatched, which in turn will lead to a state change.
 
 See also [Architecture](Architecture#overview).
 

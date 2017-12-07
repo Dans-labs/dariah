@@ -12,24 +12,21 @@ workflow:
       linkField: assessment
       masterTable: assessment
       otherTable: review
-      permFields:
-        - reviewerE
-        - reviewerF
-      otherField: _id
+      otherFields:
+        - _id
       attribute:
         name: others
         desc: other reviews of the same assessment
-    - inspect: siblings
+    - inspect: master
       method: getValues
       linkField: assessment
-      masterTable: assessment
-      otherTable: criteriaEntry
-      permFields:
-        - creator
-      otherField: _id
+      otherTable: assessment
+      otherFields:
+        - reviewerE
+        - reviewerF
       attribute:
-        name: assess
-        desc: criteria entries of the assessment
+        name: reviewers
+        desc: all reviewers of this assessment
   adjust:
     - inspect: siblings
       linkField: assessment

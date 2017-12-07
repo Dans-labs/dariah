@@ -21,40 +21,40 @@ Elementary operations on data that comes in basic types, such as strings,
 numbers and dates. This file contains also the functions that normalize and
 validate values.
 
-### getDateTime
+## getDateTime
 
 Convert a datetime object or string into a numerical value, so you can make
 comparisons. If absent, yield negative infinity for start dates and positive
 infinity for end dates. Used in [workflow](Dux#workflow).
 
-### normalization
+## normalization
 
 An object with normalization functions, named after the types of the values they
 normalize. All functions take a value, and return a normalized value.
 
-### sortStringTemplate
+## sortStringTemplate
 
 Compare function for sorting. Wraps the values to be compared in a template
 before actually comparing them.
 
 Used in [workflow](Dux#workflow).
 
-### sortTimeInterval
+## sortTimeInterval
 
 Sort by time interval. Sorting by time intervals should works as follows:
 
 * if both intervals are fully specified, the interval with the earlier start
-	date comes first;
+  date comes first;
 * if the start dates are equal, the one with the LATER end date comes first, in
-	this way, containing intervals come before contained intervals;
+  this way, containing intervals come before contained intervals;
 * if the start date is missing, the start date is assumed to be in the infinite
-	past;
+  past;
 * if the end date is missing, the end date is assumed to be in the infinite
-	future.
+  future.
 
 Used in [workflow](Dux#workflow).
 
-### validation
+## validation
 
 An object with validation functions, named after the types of the values they
 validate. All functions take a value, and return undefined if the value passes
@@ -67,7 +67,7 @@ These functions help by setting up lists of detail records for master records.
 The carry out what has been specified in the [data model](Model) config files
 under the keys `detail` and `detailOrder`.
 
-### getMasterTable
+## getMasterTable
 
 Given a table and the name of a field that links to an other, related, table, if
 finds the name of that related table. If that other table list this table as a
@@ -75,13 +75,13 @@ details table, and marks this field as the link field, then the related table is
 indeed the master table. But this function is indifferent to that. It merely
 consults the `fieldSpec` of `field` in `table`.
 
-### makeDetails
+## makeDetails
 
 Prepare lists of details for an item of a table. Collect the specs and put all
 information in an array of objects, each corresponding to a details list, from
 which components can easily construct a widget for handling lists of details
 
-### makeKeepInfo
+## makeKeepInfo
 
 Collects information on the basis of which it can be decided whether a record
 may be deleted or not. A record may be deleted if it has no detail records,
@@ -96,7 +96,7 @@ question.
 
 Helpers for presenting edit controls, such as a save button.
 
-### editClass
+## editClass
 
 Returns the proper CSS class for styling content that is being edited, depending
 on the state it may be in:
@@ -104,7 +104,7 @@ on the state it may be in:
 * `dirty`: a changed value that has not been saved to the database yet, and/or
 * `invalid`: a value that does not pass validation.
 
-### editControl
+## editControl
 
 This is nearly a React component, except it needs a boolean parameter
 `canSubmit`, to direct it into one behaviour or another.
@@ -117,7 +117,7 @@ If this component is put inside a `<form>` element under the control of
 [redux-form]({{site.reduxFormBase}}), it is also capable to trigger a submit and
 save action.
 
-#### `canSubmit = true`
+### `canSubmit = true`
 
 The component [EditControl](Components#editcontrol) calls this function with
 submit capacity. It also has to provide the resulting component with typical
@@ -128,33 +128,33 @@ enhanced with `reduxForm`, namely [ItemEdit](Components#itemedit), these
 properties have been injected higher up in the component tree and can be passed
 down as props.
 
-#### `canSubmit = false`
+### `canSubmit = false`
 
 The the component [EditStatus](Components#editstatus) calls this function
 without submit capacity. The typical form properties are now obtained by
 enhancing this very component with `reduxForm`. However, because this component
 is not assumed to be within a `<form>` context, it cannot perform a submit.
 
-### makeChangeSave
+## makeChangeSave
 
 Produces a function, that when triggered by a value, will submit that value
 (after a short delay). See `makeSubmitTime`. This is used when an input field
 fires an event with a value entered by the user.
 
-### makeChangeSaveVal
+## makeChangeSaveVal
 
 Produces a function, with a value baked in. When called, this function will
 submit that value (after a short delay). This is used when the user clicks a
 button, like `submit review` in which case a specific field has to be set to a
 specific value, in this example: `submitted = true`.
 
-### makeReset
+## makeReset
 
 Composes an attribute that sets up an `onKeyUp` handler for an input field. It
 will react to the `Esc` key, and reset the input field to its pristine value,
 i.e. the value it had before the user started interacting with it.
 
-### makeSubmit
+## makeSubmit
 
 Produces a submit action or a null-returning function, depending on parameters.
 The parameters tell whether some record is dirty, valid and not currently
@@ -164,7 +164,7 @@ as parameter).
 This function is used in those cases where an input field looses focus. It then
 generates a submit action if all is well.
 
-### makeSubmitTime
+## makeSubmitTime
 
 Given a (submit)-function, transforms it into the same function that will be
 invoked with a small delay.
@@ -175,7 +175,7 @@ have done its work.
 
 **Example**: [Input](Components#input)
 
-### onSubmitSuccess
+## onSubmitSuccess
 
 Needed in a workaround for an
 [issue in redux-form]({{site.reduxFormIssues}}/2841). See
@@ -183,7 +183,7 @@ Needed in a workaround for an
 
 # [europe.geo]({{site.libBase}}/europe.geo.js)
 
-### countryBorders
+## countryBorders
 
 Object that contains the borders of the European countries plus a bit of
 additional information in [geojson]({{site.geojson}}) format.
@@ -194,19 +194,19 @@ see where this data comes from and how it has been tweaked for this website.
 
 # [fields]({{site.libBase}}/fields.js)
 
-### checkDisabled
+## checkDisabled
 
 Checks whether a certain value is inactive and should be disabled. See
 [workflow logic](Dux#workflow). Used in component
 [RelSelect](Components#relselect).
 
-### dealWithProvenance
+## dealWithProvenance
 
 Remove provenance fields if current settings require that. See
 [settings](Dux#settings). Used in component
 [ItemContainer](Components#itemcontainer) and others.
 
-### itemEditField
+## itemEditField
 
 Render an edit field in standard presentation, like
 [ItemEdit](Components#itemedit) does it. In fact, ItemEdit uses this very
@@ -217,7 +217,7 @@ in the standard way.
 
 **Example**: [Templates](Components#templates)
 
-### itemReadField
+## itemReadField
 
 Render an read-only field in standard presentation, like
 [ItemRead](Components#itemread) does it. In fact, ItemRead uses this very
@@ -228,7 +228,7 @@ in the standard way.
 
 **Example**: [Templates](Components#templates)
 
-### makeFields
+## makeFields
 
 Prepare field components for an item of a table. Collect the specs from the
 `fieldOrder` and `fieldSpecs` fields of the [data model](Model) and put all
@@ -237,14 +237,14 @@ components can easily construct a widget for showing or editing that field.
 
 **Example**: [ItemForm](Components#itemform)
 
-### someEditable
+## someEditable
 
 Checks whether a list of fields contains at least one that the current user may
 edit.
 
 **Example**: [ItemForm](Components#itemform)
 
-### toFieldInfo
+## toFieldInfo
 
 Reduces the information in the fragments produced by [makeFields](#makefields)
 to a simple object with only the value(s) of that field.
@@ -296,7 +296,7 @@ The solution is to use a [memoized](#memo) version of `handleItem`.
 
 The following functions are conveniences for doing exactly that.
 
-### handle(dispatch, actionCreator, actionArgs)
+## handle(dispatch, actionCreator, actionArgs)
 
 This is a memoized action _creator_ wrapper. It return a function, that can be
 called with an event. After receiving the event, the passed `actionCreator` will
@@ -308,19 +308,19 @@ This particular function `handle` will not use the information in the event. It
 takes trouble to neutralize the event instead. If there is relevant information
 in the event, use one of the following functions.
 
-### handlE
+## handlE
 
 Like `handle`, and the information in the event is not used, but the default
 behaviour of the event and its propagation are not suppressed.
 
-### handlEV
+## handlEV
 
 Like `handle`, but now the `event.target.value` is passed the actionCreator as
 final argument.
 
 # [memo]({{site.libBase}}/memo.js)
 
-### makeSet
+## makeSet
 
 We use plain objects, including `Array`s for all things on the state. But what
 if your component prefers the data as a
@@ -330,7 +330,7 @@ get two copies of the same set, which is a waste. Here memoization is a
 solution. `makeSet` is a memoized function that takes an array and returns its
 values as a `Set`.
 
-### memoize
+## memoize
 
 Turns the function `f` into a memoized function `memF` that yields the same
 results for the same parameters. It stores computed results under a key
@@ -405,7 +405,7 @@ WeakMaps do not cling to the objects that act as their keys. They somehow store
 the identity of their key objects, without claiming the continued existence of
 them.
 
-### Usage
+## Usage
 
 ```javascript
 const baseFunction = (x, y, z) => expensiveResult
@@ -416,7 +416,7 @@ memBaseFunction(a, b, c) // computes baseFunction(a, b, c)
 memBaseFunction(a, b, c) // retrieves baseFunction(a, b, c) from cache instead of computing it
 ```
 
-#### Level
+### Level
 
 If the `level` paramter is `null` or `undefined`, all arguments will be
 stringified in one go.
@@ -433,25 +433,25 @@ to the memo key in the following way:
 * level _-1_: JSON stringify it
 * level _0_: use the object identity of it as key in a `WeakMap`
 * level _i+i_: JSON stringify the top _i_ levels of it; everything from level
-	_i+1_ onwards is treated by object identity.
+  _i+1_ onwards is treated by object identity.
 
 N.B: _Function arguments_ can not be stringified, they always go by way of
 object identitiy.
 
 For exmaples, see the [test suite]({{site.repBase}}/client/src/test/memo.js).
 
-#### Config
+### Config
 
 The `config` parameter takes the following keys:
 
 * `clearCache`: time in seconds that a key is being retained in the memCache
 * `debug`: `string`: when the memoized function computes a result, retrieves it
-	from cache, or cleares it from cache, the debug string will be output through
-	`console.warn`. Only in development mode! It is also possible to add extra
-	bits of debugging information, by adapting the `debugStyle` object in the
-	[source code]({{site.libBase}}/memo.js).
+  from cache, or cleares it from cache, the debug string will be output through
+  `console.warn`. Only in development mode! It is also possible to add extra
+  bits of debugging information, by adapting the `debugStyle` object in the
+  [source code]({{site.libBase}}/memo.js).
 
-#### Caution
+### Caution
 
 If you memoize a function that takes big objects as parameters, and you forget
 to specify that those arguments must be treated by object identity, you may hit
@@ -468,7 +468,7 @@ This library contains templates that customize the presentation of records and
 fields. See [Templates](Templates) for how the template system is structured.
 This library contains the functions to _apply_ templates.
 
-### applyInsertTemplate
+## applyInsertTemplate
 
 Applies a template for the _insert record_ button for a list. This template
 cannot have field values, because it is for a whole list of records. However, it
@@ -476,12 +476,12 @@ is invoked by lists that are detail lists, and hence there is a master record.
 This template has access to the fields of that master record. It is invoked in
 [EditInsert](Components#editinsert) components.
 
-### applyTemplate
+## applyTemplate
 
 Applies a read only template. You can merge a template with
 [FieldRead](Components#fieldread) components.
 
-### applyEditTemplate
+## applyEditTemplate
 
 Applies an edit template. There is a bit of extra data here compared to
 read-only templates, namely whether fields are editable or not. You can merge a
@@ -492,7 +492,7 @@ template with [FieldRead](Components#fieldread) components, as well as with
 
 See also [Templates](Templates).
 
-### editMode
+## editMode
 
 This function computes a test function for a record, and the test function is
 customized per table, in the same way as templates are customized per table.
@@ -518,7 +518,7 @@ in edit mode. If it is possibly complete, it will be opened in read-only mode.
 
 # [utils]({{site.libBase}}/utils.js)
 
-### combineSelectors(...selectors)
+## combineSelectors(...selectors)
 
 Given a list of _selector_ functions, creates a combined selector that returns
 an object containing the results of the individual selectors. This function uses
@@ -526,7 +526,7 @@ the _reselect's_
 [createSelector]({{site.reactReselect}}#createselectorinputselectors--inputselectors-resultfunc).
 We use it quite often when components need multiple sections of the state.
 
-### emptyX (S A O F)
+## emptyX (S A O F)
 
 Many objects get created during rendering and re-rendering. If we render a list
 of thousand entries, and we pass each item component a property with a value
@@ -560,7 +560,7 @@ The contract with ourselves is: do not ever use one of
 if you need an empty value, but use an `empty`_X_ (_X_ in `S`, `A`, `O`, `F`)
 instead.
 
-### getUrlParts
+## getUrlParts
 
 Analyse URLs in order to extract a part `/item/`_itemID_ from it (if present).
 
@@ -569,7 +569,7 @@ that.
 
 See [ListPlain](Components#listplain) for an example.
 
-### jString
+## jString
 
 When we need the value of an object as a key, for example when we
 [memoize](Lib#memo) functions, the most straightforward way is to
@@ -585,7 +585,7 @@ we fail to detect the equality of objects, which results in spurious
 re-rendering of components. If that happens too often, the cost adds up or even
 multiplies quickly.
 
-### makeReducer(flows, init)
+## makeReducer(flows, init)
 
 Given an object of _flows_ and an initial state, returns a _reducer_ function.
 The _flows_ is an object with functions, named after _actions_. These functions
@@ -594,28 +594,28 @@ define how a new state must be produced when an action has been _dispatched_.
 This function helps to write down complex reducer function as small components
 with a clean syntax.
 
-### max
+## max
 
 Returns the maximum of an array of numbers. If the array is empty, return
 negative infinity.
 
-### min
+## min
 
 Returns the minimum of an array of numbers. If the array is empty, return
 positive infinity.
 
-### propsChanged(newProps, need, oldProps, keyPropNames)
+## propsChanged(newProps, need, oldProps, keyPropNames)
 
 Determines whether `newProps` differ significantly from `oldProps`, based on the
 props with `keyPropNames` only. If the props are sufficiently changed, it uses
 the `need` function to finally determine whether the change should result in an
 action.
 
-### sum
+## sum
 
 Returns the sum of an array of numbers. If the array is empty, return `0`.
 
-### updateAuto
+## updateAuto
 
 The `update()` function of the
 [Immutability-Helper module]({{site.immutability}}) is great. But one thing is a
@@ -626,7 +626,7 @@ the code for that becomes tedious quickly.
 The idea, however, is right, and this function is a variant of the `update()`
 function with auto vivification.
 
-### withParams(Component)
+## withParams(Component)
 
 Higher order function that turns a Component (which is a function) into another
 component.
@@ -654,20 +654,20 @@ them as `withParams(Component)`.
 This is a library of functions that produce formatted representations of values
 from the database.
 
-### composeAttributes
+## composeAttributes
 
 When composing a Field component for an item, compute attributes telling whether
 the item is active or not, and merge them into the other attributes. Used in
 component [RelSelect](Components#relselect).
 
-### getValType(valType)
+## getValType(valType)
 
 For a given value type, such as `text`, `URL`, `number`, return a component and
 subtype for handling the input of such values, e.g. `<input type="URL" />`.
 
 **Example**: [FieldEdit](Components#fieldedit)
 
-### wrappedRepr
+## wrappedRepr
 
 Produces a representation for a field value, complete with surrounding elements
 and attributes. Values of link fields will be wrapped in `<a href="...">`

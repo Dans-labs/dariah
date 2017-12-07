@@ -8,7 +8,7 @@ background.
 
 Click on the names in the titles to view their source code on GitHub.
 
-### Standard props
+# Standard props
 
 Components get _properties_ as input (we call them _props_). For each component
 we mention the props they expect and what type of data they represent.
@@ -19,119 +19,119 @@ Here is a list of those props and their types. When we mention these props later
 on, we omit the types.
 
 * `alter` **object**; a slice of the state from
-	[getAltSection](Dux#getaltsection); Group of settings for components with
-	alternative renderings: these settings tell which alternative has been chosen
-	for each of those components;
+  [getAltSection](Dux#getaltsection); Group of settings for components with
+  alternative renderings: these settings tell which alternative has been chosen
+  for each of those components;
 * `alterSection` **string**; name of a section of the `alter` state; such a
-	section contains the choice of alternative for a bunch of components that are
-	relevant to the present component; each component that requests data from
-	`alter` only gets data for a single section; in this way components will not
-	be dependent on too big a part of the state; those dependencies may cause
-	spurious re-renderings;
+  section contains the choice of alternative for a bunch of components that are
+  relevant to the present component; each component that requests data from
+  `alter` only gets data for a single section; in this way components will not
+  be dependent on too big a part of the state; those dependencies may cause
+  spurious re-renderings;
 * `amounts` **object**; for a faceted filter: contains the amount of items that
-	match each facet; see [computeFiltering](Dux#computefiltering);
+  match each facet; see [computeFiltering](Dux#computefiltering);
 * `children` **components**; a special prop defined by React itself; it contains
-	the material that has been put in the component; you find it in the `render`
-	function of the component; it is everything between `<Component>` and
-	`</Component>`;
+  the material that has been put in the component; you find it in the `render`
+  function of the component; it is everything between `<Component>` and
+  `</Component>`;
 * `className` **string**; a class name to be put in the top level element of the
-	rendered component;
+  rendered component;
 * `compact` **bool**; whether the component should minimize the real estate on
-	the screen that it uses;
+  the screen that it uses;
 * `detailFragments` **array of object**; the information on the basis of which
-	the detail records of an item can be rendered; every entry in the array
-	corresponds to a detail table that may contain detail records of the master
-	record that is being dealt with; ultimately computed by
-	[makeDetails](Lib#makedetails) and then passed to child components;
+  the detail records of an item can be rendered; every entry in the array
+  corresponds to a detail table that may contain detail records of the master
+  record that is being dealt with; ultimately computed by
+  [makeDetails](Lib#makedetails) and then passed to child components;
 * `dispatch` **function**; this function belongs to the store that holds the
-	state; it is generally injected into the props of a component by
-	[connect]({{site.reactRedux}}/docs/api.md#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options)ing
-	a component to the store; this only happens if `connect()` is called with zero
-	or one argument (the `MapDispatchToProps` argument should be undefined); the
-	`dispatch` function enables the component to trigger an action that changes
-	the state; where you would call `setState()` in vanilla-React you put
-	`dispatch(action)` if your app uses Redux;
+  state; it is generally injected into the props of a component by
+  [connect]({{site.reactRedux}}/docs/api.md#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options)ing
+  a component to the store; this only happens if `connect()` is called with zero
+  or one argument (the `MapDispatchToProps` argument should be undefined); the
+  `dispatch` function enables the component to trigger an action that changes
+  the state; where you would call `setState()` in vanilla-React you put
+  `dispatch(action)` if your app uses Redux;
 * `eId` **string**; the MongoDB id of an entity that is being dealt with;
 * `field` **string**; the name of a field that is being dealt with;
 * `fieldFragments` **array** an array with instructions per field how to render
-	it; ultimately computed by [makeFields](Lib#makefields) and then passed to
-	child components;
+  it; ultimately computed by [makeFields](Lib#makefields) and then passed to
+  child components;
 * `filtered` **bool**; whether the list should be accompanied by filters; the
-	specification of the filters themselves is in the [data model](Model);
+  specification of the filters themselves is in the [data model](Model);
 * `fields` **objects**; defines a subset of all fields: these are the fields
-	that the component has to deal with;
+  that the component has to deal with;
 * `filteredAmount` **number**; the number of items that pass all filters; see
-	[computeFiltering](Dux#computefiltering);
+  [computeFiltering](Dux#computefiltering);
 * `filteredAmountOthers` **object**; for each filter, the amount of items that
-	passes all filters except that one filter; see
-	[computeFiltering](Dux#computefiltering);
+  passes all filters except that one filter; see
+  [computeFiltering](Dux#computefiltering);
 * `filterField` **string**; the name of the field that the current filter is
-	acting upon; (as in the [data model](Model);
+  acting upon; (as in the [data model](Model);
 * `filterRelField` **string**; the name of the related field that the current
-	filter is acting upon; this is relevant for fields that point to a related
-	table: you can filter on the values of a specific field in the related table;
-	(as in the [data model](Model);
+  filter is acting upon; this is relevant for fields that point to a related
+  table: you can filter on the values of a specific field in the related table;
+  (as in the [data model](Model);
 * `filterId` **number**; the sequence number of a specific filter which
-	identifies it among all filters for the same table;
+  identifies it among all filters for the same table;
 * `filterLabel` **string**; the user-facing name of the filter;
 * `filters` **object**; a slice of the state from [getFilters](Dux#getfilters);
-	contains the actual filter settings, i.e. what the user has entered in search
-	boxes and which facets the user has clicked; organized by table and then by
-	`filterTag` and then by `filterId`;
+  contains the actual filter settings, i.e. what the user has entered in search
+  boxes and which facets the user has clicked; organized by table and then by
+  `filterTag` and then by `filterId`;
 * `filterSettings` **object**; a slice of the state, sub-slice of `filters`,
-	corresponding to the filters of a single `filterTag` of a single `table`;
+  corresponding to the filters of a single `filterTag` of a single `table`;
 * `filterSetting` **object** or **string**; a slice of the state, sub-slice of
-	`filterSetting`, corresponding to a single filter, identified by `filterId`;
-	whether this is an object or a string, depends on the nature of the filter:
-	for a [Fulltext](#fulltext) filter it is a string (the search text), for a
-	[ByValue](#byvalue) filter it is an object, containing the status (boolean) of
-	all its facet checkboxes;
+  `filterSetting`, corresponding to a single filter, identified by `filterId`;
+  whether this is an object or a string, depends on the nature of the filter:
+  for a [Fulltext](#fulltext) filter it is a string (the search text), for a
+  [ByValue](#byvalue) filter it is an object, containing the status (boolean) of
+  all its facet checkboxes;
 * `filterTag` **string**; identifies a group of filters for a single table;
-	tables may have multiple incarnations; a table can be a main table, but also a
-	detail table for a specific record; the filters for a table when it displays
-	details may be distinct from the filters of the same table when it is
-	displayed as the main table; we separate those cases by means of a `filterTag`
-	prop;
+  tables may have multiple incarnations; a table can be a main table, but also a
+  detail table for a specific record; the filters for a table when it displays
+  details may be distinct from the filters of the same table when it is
+  displayed as the main table; we separate those cases by means of a `filterTag`
+  prop;
 * `linkField` **string**; when rendering a list of records that are details of
-	some master record, this is the field of the detail records that holds the
-	`masterId`; in this way the detail record links to its master record; when the
-	component creates a new detail record, it will pre-fill this field with the
-	current `masterId`;
+  some master record, this is the field of the detail records that holds the
+  `masterId`; in this way the detail record links to its master record; when the
+  component creates a new detail record, it will pre-fill this field with the
+  current `masterId`;
 * `listIds` **array of string**; a sequence of strings which are essentially
-	MongoDB identifiers of entities in a table; components that display lists use
-	this prop to determine which entities must be actually appear on the screen
-	and in what order; see also the prop `filteredIds`;
+  MongoDB identifiers of entities in a table; components that display lists use
+  this prop to determine which entities must be actually appear on the screen
+  and in what order; see also the prop `filteredIds`;
 * `masterId` **string**; when rendering a list of records that are details of
-	some master record, this holds the MongoDB id of the master record;
+  some master record, this holds the MongoDB id of the master record;
 * `me` **object**; a slice of the state from [getMe](Dux#getme); the information
-	about the currently logged-in user, fetched from the server;
+  about the currently logged-in user, fetched from the server;
 * `mode` **string**; either `list` or `grid`; whether the list of items should
-	render as a list of expandable headings, or as a grid with full field
-	information;
+  render as a list of expandable headings, or as a grid with full field
+  information;
 * `perm` **object**; Holds permissions for a record: whether deleting is
-	allowed, and per field whether updating is allowed;
+  allowed, and per field whether updating is allowed;
 * `myValues` **object**; ultimately extracted from the `tables` slice of the
-	state; it contains the values of the fields of the entity that is being dealt
-	with;
+  state; it contains the values of the fields of the entity that is being dealt
+  with;
 * `select` **string**; sometimes a list is fetched as a whole, sometimes only
-	_my own_ records are displayed and yet other times only records that are the
-	details of some master record must be shown; this property indicates which is
-	which;
+  _my own_ records are displayed and yet other times only records that are the
+  details of some master record must be shown; this property indicates which is
+  which;
 * `settings` **object**; a slice of the state from
-	[getSettings](Dux#getsettings); settings are pieces of custom information that
-	are relevant to many components of the app;
+  [getSettings](Dux#getsettings); settings are pieces of custom information that
+  are relevant to many components of the app;
 * `table` **string**; name of the table that the component must deal with;
 * `submitValues` **function**; a callback that is used to save form values to
-	the database; used for components that supply edit controls for form values:
-	they can call `submitValues` after a change or upon loss of focus; it is
-	basically the `handleSubmit` from Redux-From, with a specific first argument
-	passed (`toDb`) that saves values to the database;
+  the database; used for components that supply edit controls for form values:
+  they can call `submitValues` after a change or upon loss of focus; it is
+  basically the `handleSubmit` from Redux-From, with a specific first argument
+  passed (`toDb`) that saves values to the database;
 * `tables` **object**; a slice of the state from [getTables](Dux#gettables); all
-	data that comes from database tables; organized by `table` name; for each
-	table there is spec information and actual entity data;
+  data that comes from database tables; organized by `table` name; for each
+  table there is spec information and actual entity data;
 * `win` **{**`width` **number**`, height` **number**`}`; a slice of the state
-	from [getWinDim](Dux#getwindim); contains the physical dimensions of the
-	window at any time.
+  from [getWinDim](Dux#getwindim); contains the physical dimensions of the
+  window at any time.
 
 # [main]({{site.appBase}}/main.jsx)
 
@@ -463,43 +463,43 @@ In order to get everything working correctly, two problems had to be solved.
 Both turned out to be related to Redux-Form.
 
 * The component that you pass to the `component` prop of `Field` and
-	`FieldArray` must not be dynamically composed in the `render()` function that
-	produces `Field(Array)`. Because in that case, the `Field(Array)` is
-	re-rendered too often, and effect for the user is that he loses focus after
-	entering the first character, which is _very_ annoying.
+  `FieldArray` must not be dynamically composed in the `render()` function that
+  produces `Field(Array)`. Because in that case, the `Field(Array)` is
+  re-rendered too often, and effect for the user is that he loses focus after
+  entering the first character, which is _very_ annoying.
 
-	So, the value for `component` must be a static function. But what if this
-	function needs dynamically determined arguments? How can they be passed to it?
-	The solution is simple: pass them as props to `Field(Array)`, and they will be
-	passed on to the component function by redux-form.
+  So, the value for `component` must be a static function. But what if this
+  function needs dynamically determined arguments? How can they be passed to it?
+  The solution is simple: pass them as props to `Field(Array)`, and they will be
+  passed on to the component function by redux-form.
 
-	This is actually documented in the redux-form docs. You need
-	[this]({{site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/Field.md/), section
-	**2. A stateless function**
+  This is actually documented in the redux-form docs. You need
+  [this]({{site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/Field.md/), section
+  **2. A stateless function**
 
-	> You must define the stateless function outside of your render() method, or
-		else it will be recreated on every render and will force the Field to
-		re-render because its component prop will be different. If you are defining
-		your stateless function inside of render(), it will not only be slower, but
-		your input will lose focus whenever the entire form component re-renders.
+  > You must define the stateless function outside of your render() method, or
+  else it will be recreated on every render and will force the Field to
+  re-render because its component prop will be different. If you are defining
+  your stateless function inside of render(), it will not only be slower, but
+  your input will lose focus whenever the entire form component re-renders.
 
-	and
+  and
 
-	[this]({{site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/Field.md/#props):
+  [this]({{site.reduxFormBase}}/{{site.reduxFormV}}/docs/api/Field.md/#props):
 
-	> Any custom props passed to Field will be merged into the props object on the
-		same level as the input and meta objects.
+  > Any custom props passed to Field will be merged into the props object on the
+  same level as the input and meta objects.
 
 * When navigating between forms for several records, the `onChange` callback,
-	that should be bound to the proper form, becomes bound to the wrong form. As
-	far as I can see, all other things work as expected, so it was difficult to
-	see why this occurred. The explanation is in a
-	[GitHub issue]({{site.reduxFormIssues}}/2886). Summarized: the construction of
-	the `onChange` function is effectively memoized. It is determined upon
-	mounting of the component, but not on updating it. The workaround is easy: add
-	an extra key property to the form. Another cause for the same problem I
-	encountered in [InputMulti](#inputmulti), where I had memoized the callbacks
-	for adding and removing values to/from a sequence.
+  that should be bound to the proper form, becomes bound to the wrong form. As
+  far as I can see, all other things work as expected, so it was difficult to
+  see why this occurred. The explanation is in a
+  [GitHub issue]({{site.reduxFormIssues}}/2886). Summarized: the construction of
+  the `onChange` function is effectively memoized. It is determined upon
+  mounting of the component, but not on updating it. The workaround is easy: add
+  an extra key property to the form. Another cause for the same problem I
+  encountered in [InputMulti](#inputmulti), where I had memoized the callbacks
+  for adding and removing values to/from a sequence.
 
 # [FieldRead]({{site.appBase}}/components/FieldRead.jsx)
 
@@ -559,11 +559,11 @@ A control to filter a list of items. The following types of filters are
 implemented.
 
 * [Fulltext](#fulltext): Search in a textual field for a pattern. The pattern is
-	entered by the user, the search is incremental, after each keystroke the
-	results are updated.
+  entered by the user, the search is incremental, after each keystroke the
+  results are updated.
 * [ByValue](#byvalue): Faceted search for values of a specific field.
-	* [EUMap](#eumap): Faceted search on country, together with a map
-		visualization
+  * [EUMap](#eumap): Faceted search on country, together with a map
+    visualization
 
 The list of the available filter types and their characteristics are not
 configured on the client, but come from the server.
@@ -769,10 +769,10 @@ Whether the form contains invalid, values in any of its fields. The form uses
 two kinds of validation:
 
 * synchronous: on every keystroke, the current value will be subjected to a
-	validation function
+  validation function
 * on submit: the submitted values will be validated on the server, and if that
-	fails, the reasons for failure will be reported in exactly the same way as for
-	synchronous validation.
+  fails, the reasons for failure will be reported in exactly the same way as for
+  synchronous validation.
 
 ###### `error` object
 
@@ -833,25 +833,25 @@ function.
 The basic flow is this:
 
 * we read the values of a record from the state and pass them to the redux-form
-	component as _initial values_;
+  component as _initial values_;
 * _redux-form_ manages its own slice of the state (`form`) and has its own set
-	of actions to respond to user interactions;
+  of actions to respond to user interactions;
 * when the user interacts with the form, the work ends up in the `form` slice of
-	the state;
+  the state;
 * when the form is _submitted_:
-	* the current values are sent to the database, and the updated record is read
-		back from the database;
-	* the updated values are passed to the form as new initial values
-	* the form re-initializes itself, and the user can start again;
+  * the current values are sent to the database, and the updated record is read
+    back from the database;
+  * the updated values are passed to the form as new initial values
+  * the form re-initializes itself, and the user can start again;
 * when the user interrupts editing the form, and switches to another component,
-	nothing is lost:
-	* the edits are saved in the state;
-	* when the form is mounted again, not only the initial values are fetched
-		back, but also the edit state is restored;
+  nothing is lost:
+  * the edits are saved in the state;
+  * when the form is mounted again, not only the initial values are fetched
+    back, but also the edit state is restored;
 * submitting happens with _auto save_: whenever an input field looses focus, the
-	form is submitted; submitting happens also for those fields in which you can
-	not have a cursor: whenever a field value is changed by a click, the form is
-	submitted.
+  form is submitted; submitting happens also for those fields in which you can
+  not have a cursor: whenever a field value is changed by a click, the form is
+  submitted.
 
 Hence it is easy to edit two forms at the same time, which can be handy if (s)he
 edits two contributions that need to have a consistent wording. It is also
@@ -863,7 +863,7 @@ refer to the same underlying state.
 The construction of the actual fields is done by a function `makeFields()`, that
 generates an array of fragments, one for each field. An editable field will be
 handled by a [`<FieldEdit />](#fieldedit) component, and a read-only field by a
-[`<FieldRead />](#fieldread) component.
+[`\<FieldRead />](#fieldread) component.
 
 ### Using templates
 
@@ -1245,7 +1245,7 @@ The capabilities of this widget are:
 
 * single select or multi-select, depending on the property `multiple`;
 * fixed list of values or the possibility to create new values on the fly,
-	depending on the prop `allowNew`;
+  depending on the prop `allowNew`;
 * options can be filtered by a full text filter;
 * only one copy of an option can be chosen;
 * selected options are removed from the list of selectable options;

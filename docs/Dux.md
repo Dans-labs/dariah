@@ -11,8 +11,8 @@ We have organized dux as follows:
 
 * one file that contains its _actions_, _reducer_, _selectors_ and _helpers_.
 * the reducer is programmed as an object of _flows_. For each action, there is a
-	flow with the same name, which is a function that produces a new state on the
-	basis of that action.
+  flow with the same name, which is a function that produces a new state on the
+  basis of that action.
 * a number of React components that make use of these by importing them.
 
 This app contains the following dux:
@@ -182,7 +182,7 @@ Lists and filters form a complex system of components, involving
 * fetching the metadata that is used by the filtering
 * handling the user interactions with the filters
 * supporting special effects such as a map of European countries with markers
-	having a radius indicative of the number of filtered items by that country.
+  having a radius indicative of the number of filtered items by that country.
 
 This duct not only needs data from the `filters` slice, but also from the
 `tables` slice!
@@ -523,10 +523,10 @@ before and is still pending. In that case, the _request counter_ will be
 increased, and no new request will be made.
 
 * request counters that are non-zero correspond to requests that are either
-	pending, or have ended in failure;
+  pending, or have ended in failure;
 * pending requests have positive request counters, the number represents the
-	number of requests the app has tried to make so far (only 1 request will be
-	issued effectively);
+  number of requests the app has tried to make so far (only 1 request will be
+  issued effectively);
 * successful request have their request counter set to 0 again.
 
 ## Actions
@@ -836,7 +836,7 @@ will be exactly one package.
 From the active package derive a number of other active concepts:
 
 * the contribution types listed in the `typeContribution` field of the active
-	package are the _active types_
+  package are the _active types_
 * the criteria that are details of the active package are _active criteria_.
 
 The generic List and Item components can be made sensitive to this notion of
@@ -869,11 +869,11 @@ client.
 The data returned is an object containing:
 
 * `overall`: the overall score as percentage of points scored with respect to
-	total of scorable points
+  total of scorable points
 * `relevantScore`: the sum of the scores for all criteria that have not been
-	scored as `-1` (non-applicable)
+  scored as `-1` (non-applicable)
 * `relevantMax`: the total of the maximum scores for all criteria that have not
-	been scored as `-1`
+  been scored as `-1`
 * `allMax`: the total of the maximum scores for all criteria
 * `relevantN`: the number of criteria that have not been scored as `-1`
 * `allN`: the number of criteria.

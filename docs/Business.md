@@ -1,5 +1,5 @@
---medium- title: Business Logic
-
+---
+title: Business Logic
 ---
 
 A contribution is a piece of work in Digital Humanities, delivered by a person
@@ -152,13 +152,13 @@ mutable again. The applicant may enter an objection. In that case the back
 office will ask a second opinion and take appropriate action.
 
 * If the second opinion is still _reject_, a new consolidated version of the
-	assessment is saved. This version contains the objection and the final
-	decision.
+  assessment is saved. This version contains the objection and the final
+  decision.
 * If the second opinion is _approve_, a new consolidated version of the
-	assessment is saved, and the final verdict will be changed to _accept_
+  assessment is saved, and the final verdict will be changed to _accept_
 * If the second opinion is _re-assess_, the applicant is invited to create a new
-	self assessment and offer it for review. Two different reviewers will be
-	chosen.
+  self assessment and offer it for review. Two different reviewers will be
+  chosen.
 
 ## Modifications needed
 
@@ -172,13 +172,21 @@ After an assessment and review process, the system contains a trail of all that
 has gone on in the following form:
 
 * **live contribution** The contribution record is still in place, mutable, and
-	contains only the actual situation
+  contains only the actual situation
 * **live assessment** The assessment record is still in place, but immutable.
-* **live comments trail** _ by reviewers: comments and suggestions for
-	modification _ by the applicant: to state an objection
+* **live comments trail**
+  * by reviewers: comments and suggestions for
+    modification
+  * by the applicant: to state an objection
 * **consolidated versions of assessments** There are snapshots of the assessment
-	at pivotal points in time: _ when the assessment has been offered for review _
-	when reviewers have made decisions _ when second opinions have been asked and
-	given These snapshots contain snapshots of all detail records, including _ the
-	contribution in question _ the then active criteria _ the then active scores _
-	the filled out criteriaEntry records _ the comment trail at that point in time
+  at pivotal points in time:
+  * when the assessment has been offered for review
+  * when reviewers have made decisions
+  * when second opinions have been asked and given
+
+  These snapshots contain snapshots of all detail records, including
+  * the contribution in question
+  * the then active criteria
+  * the then active scores
+  * the filled out criteriaEntry records
+  * the comment trail at that point in time.

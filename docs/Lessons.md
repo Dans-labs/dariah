@@ -43,7 +43,7 @@ would have had several disadvantages:
 * an extra dependency on a Silicon-Valley service
 * the struggle to customize the service
 * the need to instruct the users to use the system according to the intended
-	workflow.
+  workflow.
 
 ## This approach: from the ground up
 
@@ -87,7 +87,7 @@ I had to choose between Angular and React, and I choose React because:
 * combined better with the other parts of the app,
 * was more popular among developers,
 * and was a natural continuation of the work I had already done in my self-made
-	framework.
+  framework.
 
 Angular had just moved to version 2, the learning curve had steepened, and I
 heard developers say that at first it worked like a charm, but that it was very
@@ -135,7 +135,7 @@ generic system. So the app has two layers of abstraction:
 
 * level 1 for CRUD,
 * level 2 for additional workflow. It is level 2 that your users will interact
-	with most.
+  with most.
 
 ## Lesson 8: Hooks and config for workflow
 
@@ -158,11 +158,11 @@ niceties it had to offer.
 The result:
 
 * for production I can ship very compact code, in such a way that the client web
-	browsers load it very fast;
+  browsers load it very fast;
 * for development, I have a very easy and short feedback loop: when I save my
-	code, it is automatically rebuilt, and in a fraction of a second the updated
-	modules reload in the browser, and when there are errors, I get pointed to the
-	exact line in the code where it went wrong.
+  code, it is automatically rebuilt, and in a fraction of a second the updated
+  modules reload in the browser, and when there are errors, I get pointed to the
+  exact line in the code where it went wrong.
 
 ## Lesson 10: Trust React
 

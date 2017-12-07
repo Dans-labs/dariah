@@ -5,6 +5,38 @@ perm:
   insert: auth
   delete: own
 
+workflow:
+  read:
+    - inspect: siblings
+      method: getValues
+      linkField: assessment
+      masterTable: assessment
+      otherTable: reviewEntry
+      otherFields:
+        - creator
+        - comments
+      equalField: criteriaEntry
+      attribute:
+        name: others
+        desc: entries by other reviewers
+    - inspect: master
+      method: getValues
+      linkField: assessment
+      otherTable: assessment
+      otherFields:
+        - reviewerE
+        - reviewerF
+      attribute:
+        name: reviewers
+        desc: all reviewers of this assessment
+  adjust:
+    - inspect: siblings
+      linkField: assessment
+      masterTable: assessment
+      otherTable: reviewEntry
+      triggerFields:
+        - comments
+
 title: criteria
 
 item:
@@ -20,6 +52,7 @@ fieldOrder:
   - criteriaEntry
   - comments
   - review
+  - assessment
 
 fieldSpecs:
   seq:
@@ -60,6 +93,17 @@ fieldSpecs:
     label: review
     valType:
       relTable: review
+      allowNew: false
+      fixed: true
+    multiple: false
+  assessment:
+    perm:
+      list:   auth
+      read:   edit
+      update: nobody
+    label: assessment
+    valType:
+      relTable: assessment
       allowNew: false
       fixed: true
     multiple: false

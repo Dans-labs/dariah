@@ -44,14 +44,14 @@ affectionately: _duck_), where a duct is one file of [ES6](ES6) code that
 exports
 
 * _action_ creator functions (one or more as named exports); their names
-	typically start with `handle`, `change`, `fetch`; `fetch` as in
-	"asynchronously fetch data from the server".
+  typically start with `handle`, `change`, `fetch`; `fetch` as in
+  "asynchronously fetch data from the server".
 * a single _reducer_ function (as the default export);
 * _selector_ functions (one or more as named exports); their names always start
-	with `get`; `get` as in: "get a fragment of the whole state".
+  with `get`; `get` as in: "get a fragment of the whole state".
 * _helper_ functions (some of which do not have to be exported); quite often
-	their names start with `compile` as in "compile the state data into something
-	that may component can readily consume".
+  their names start with `compile` as in "compile the state data into something
+  that may component can readily consume".
 
 Such a _duct_ ties in very well with the way that React components can be
 connected to the state. The idiomatic approach is to write your component as a
@@ -91,42 +91,42 @@ closely so it really makes sense to have all four things in one file.
 Currently, these are the dux of this app:
 
 * [alter](Dux#alter): show/hide, cycle through _n_ alternative representations
-	of a piece of user interface; example: widgets that can be expanded and
-	collapsed by the user;
+  of a piece of user interface; example: widgets that can be expanded and
+  collapsed by the user;
 * [workflow](Dux#workflow): specialized logic for the assessment and review
-	workflow e.g. to determine what are the active contribution types and
-	assessment criteria at a given point in time;
+  workflow e.g. to determine what are the active contribution types and
+  assessment criteria at a given point in time;
 * [docs](Dux#docs): fetch documents, especially markdown ones, and show them in
-	two representations: source and formatted;
+  two representations: source and formatted;
 * [filters](Dux#filters): the machinery of faceted and full text filtering of
-	entities from tables;
+  entities from tables;
 * [forms](Dux#forms): the state of all data entry forms in the app; managed by
-	[redux-form]({{site.reduxFormBase}}); but other parts of the app need to
-	inspect the `form` slice of the state as well;
+  [redux-form]({{site.reduxFormBase}}); but other parts of the app need to
+  inspect the `form` slice of the state as well;
 * [grid](Dux#grid): the display state of all lists in grid layout: the sort
-	columns and the directions of sorting;
+  columns and the directions of sorting;
 * [me](Dux#me): data about the currently logged-in user;
 * [notes](Dux#notes): the notification system; this is what displays progress
-	and error messages; it can be accessed by the user by clicking the unobtrusive
-	open circle in the upper right corner of the browser window;
+  and error messages; it can be accessed by the user by clicking the unobtrusive
+  open circle in the upper right corner of the browser window;
 * [roots](Dux#roots): combining all the other dux;
 * [select](Dux#select): the state of all multi-select widgets in the app;
 * [server](Dux#server): handling asynchronous actions and reporting about
-	success, failure and pending requests; it also prevents subsequent requests of
-	data between the first request and the arrival of the data;
+  success, failure and pending requests; it also prevents subsequent requests of
+  data between the first request and the arrival of the data;
 * [settings](Dux#settings): cross-cutting operational parameters, such as
-	whether to show or hide the provenance fields (creator, created data, sequence
-	of modified-by records);
+  whether to show or hide the provenance fields (creator, created data, sequence
+  of modified-by records);
 * [tables](Dux#tables): manage all database data that has been fetched from the
-	server; in fact, we construct a normalized copy of all tables that contain
-	information that is application needs; when more data is needed, the
-	application fetches it from the server and merges it in `tables` slice of the
-	state; this slice not only holds the data of the tables, but also the specs of
-	them, such as the fields, their types, the relations between tables, the
-	master-detail structure, etc.;
+  server; in fact, we construct a normalized copy of all tables that contain
+  information that is application needs; when more data is needed, the
+  application fetches it from the server and merges it in `tables` slice of the
+  state; this slice not only holds the data of the tables, but also the specs of
+  them, such as the fields, their types, the relations between tables, the
+  master-detail structure, etc.;
 * [win](Dux#win): react to the resizing of the browser window; earlier stages of
-	the application used this to resize certain areas in the application window;
-	however, by using new CSS features such as [flexbox]({{site.flexbox}}) we do
-	not have any real need to make the window size known to the app; this might
-	change when the app acquires new functionality, so for the moment we retain
-	this mechanism.
+  the application used this to resize certain areas in the application window;
+  however, by using new CSS features such as [flexbox]({{site.flexbox}}) we do
+  not have any real need to make the window size known to the app; this might
+  change when the app acquires new functionality, so for the moment we retain
+  this mechanism.

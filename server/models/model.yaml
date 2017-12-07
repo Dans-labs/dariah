@@ -104,7 +104,7 @@ permissions:
       EDIT:  -2
       own:   -1
       OWN:   -1
-      ownLT: -10
+      ownLT: -1
     office:
       public: 1
       auth:   1
@@ -112,7 +112,7 @@ permissions:
       EDIT:  -2
       own:    1
       OWN:   -1
-      ownLT: -10
+      ownLT:  1
       office: 1
     system:
       public: 1
@@ -121,7 +121,7 @@ permissions:
       EDIT:  -2
       own:    1
       OWN:   -1
-      ownLT: -10
+      ownLT:  1
       office: 1
       system: 1
     root:
@@ -217,6 +217,7 @@ names:
   - good
   - groupDesc
   - groupRep
+  - groupValues
   - id
   - info
   - insertValues

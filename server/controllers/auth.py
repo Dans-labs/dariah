@@ -4,18 +4,17 @@ from beaker.middleware import SessionMiddleware
 from controllers.user import UserApi
 from controllers.utils import utf8FromLatin1, serverprint
 from models.compiled.model import model as M
-from models.compiled.names import *
+from models.compiled.names import N
 
-PM = M[N_permissions]
+PM = M[N.permissions]
+
 
 class AuthApi(UserApi):
     def __init__(self, DB, secret_file):
         super().__init__(DB)
 
         # determine production or devel
-        self.isDevel = os.environ.get(N_REGIME, None) == N_devel
-
-        if self.isDevel: self.testUsers = self.getTestUsers()
+        self.isDevel = os.environ.get(N.REGIME, None) == N.devel
 
         # read secret from the system
         self.secret = ''
@@ -37,87 +36,101 @@ class AuthApi(UserApi):
             'session.secure': not self.isDevel,
         }
         self._session_key = 'dariah.session'
-        self.app = SessionMiddleware(self.app, session_opts, environ_key=self._session_key)
-        DB.getGroups(self)
+        self.app = SessionMiddleware(
+            self.app, session_opts, environ_key=self._session_key
+        )
 
-    def required(self, f): # decorator
-        unauth = PM[N_unauth]
-        unauthId = self.idFromGroup[unauth]
+    def required(self, f):  # decorator
+        unauth = PM[N.unauth]
+        unauthId = self.DB.idFromGroup[unauth]
+
         def g(*args, **kwargs):
             self.authenticate()
-            if self.userInfo.get(N_group, unauthId) == unauthId:
-                return {N_data: [], N_msgs: [{N_kind: N_warning, N_text: 'You need to be logged in to get this data'}], N_good: True}
+            if self.userInfo.get(N.group, unauthId) == unauthId:
+                return {
+                    N.data: [],
+                    N.msgs: [{
+                        N.kind: N.warning,
+                        N.text: 'You need to be logged in to get this data'
+                    }],
+                    N.good:
+                        True
+                }
             return f(*args, **kwargs)
+
         return g
 
     def authenticate(self, login=False):
-        unauth = PM[N_unauth]
-        unauthId = self.idFromGroup[unauth]
-        auth = PM[N_auth]
-        authId = self.idFromGroup[auth]
-        env = bottle.request.environ
+        unauth = PM[N.unauth]
+        unauthId = self.DB.idFromGroup[unauth]
+        auth = PM[N.auth]
+        authId = self.DB.idFromGroup[auth]
         self.userInfo = None
         eppn = self._get_session()
-        if eppn != None:
+        if eppn is not None:
             userInfo = self.getUser(eppn)
-            if userInfo != None:
+            if userInfo is not None:
                 self.userInfo = userInfo
-        if self.userInfo == None:
+        if self.userInfo is None:
             self._checkLogin(force=login)
-            if self.userInfo != None:
+            if self.userInfo is not None:
                 self.userInfo = self.storeUpdate(self.userInfo)
-                if self.userInfo != None:
-                    if self.userInfo.get(N_mayLogin, False):
+                if self.userInfo is not None:
+                    if self.userInfo.get(N.mayLogin, False):
                         self._create_session()
                     else:
                         self.userInfo = None
-        if self.userInfo == None:
+        if self.userInfo is None:
             self._delete_session
 
-        if self.userInfo == None:
-            self.userInfo = {N_group: unauthId, N_groupRep: unauth}
+        if self.userInfo is None:
+            self.userInfo = {N.group: unauthId, N.groupRep: unauth}
         else:
-            eppn = self.userInfo.get(N_eppn, None)
-            if eppn == None:
-                self.userInfo[N_group] = unauthId
-                self.userInfo[N_groupRep] = unauth
+            eppn = self.userInfo.get(N.eppn, None)
+            if eppn is None:
+                self.userInfo[N.group] = unauthId
+                self.userInfo[N.groupRep] = unauth
             else:
-                if N_group not in self.userInfo:
-                    self.userInfo[N_group] = authId
-                self.userInfo[N_groupRep] = self.groupFromId[self.userInfo[N_group]]
+                if N.group not in self.userInfo:
+                    self.userInfo[N.group] = authId
+                self.userInfo[N.groupRep
+                              ] = self.DB.groupFromId[self.userInfo[N.group]]
 
     def deauthenticate(self):
-        unauth = PM[N_unauth]
-        unauthId = self.idFromGroup[unauth]
-        self.userInfo = {N_group: unauthId, N_groupRep: unauth};
+        unauth = PM[N.unauth]
+        unauthId = self.DB.idFromGroup[unauth]
+        self.userInfo = {N.group: unauthId, N.groupRep: unauth}
         self._delete_session()
 
     def _create_session(self):
-        env = bottle.request.environ
         session = bottle.request.environ.get(self._session_key)
-        session[N_eppn] = self.userInfo[N_eppn]
+        session[N.eppn] = self.userInfo[N.eppn]
         session.save()
 
     def _delete_session(self):
         env = bottle.request.environ
         session = env.get(self._session_key, None)
-        if session: session.delete()
+        if session:
+            session.delete()
 
     def _get_session(self):
-        env = bottle.request.environ
         session = bottle.request.environ.get(self._session_key)
-        return session.get(N_eppn, None)
+        return session.get(N.eppn, None)
 
     def _checkLogin(self, force=False):
         env = bottle.request.environ
         if force and self.isDevel:
+            testUsers = self.getTestUsers()
+
             MAX_ITER = 3
             i = 0
             stop = False
             while not stop and i < MAX_ITER:
                 try:
-                    eppn = input('{}|email address: '.format('|'.join(self.testUsers)))
-                    if eppn != None:
+                    eppn = input(
+                        '{}|email address: '.format('|'.join(testUsers))
+                    )
+                    if eppn is not None:
                         eppn = eppn.split('\n', 1)[0]
                         stop = True
                 except Exception as err:
@@ -127,8 +140,8 @@ class AuthApi(UserApi):
                     else:
                         serverprint('Try again')
 
-            if eppn in self.testUsers:
-                self.userInfo = self.testUsers[eppn]
+            if eppn in testUsers:
+                self.userInfo = testUsers[eppn]
             else:
                 parts = eppn.split('@', 1)
                 if len(parts) == 1:
@@ -136,28 +149,34 @@ class AuthApi(UserApi):
                 else:
                     (name, domain) = parts
                     self.userInfo = {
-                        N_eppn: '{}@local.host'.format(name),
-                        N_email: eppn,
-                        N_authority: N_local,
+                        N.eppn: '{}@local.host'.format(name),
+                        N.email: eppn,
+                        N.authority: N.local,
                     }
         else:
             sKey = 'Shib-Session-ID'
-            authenticated =  sKey in env and env[sKey] 
+            authenticated = sKey in env and env[sKey]
             if authenticated:
                 self.userInfo = {
-                    N_eppn: utf8FromLatin1(env[N_eppn]),
-                    N_email: utf8FromLatin1(env[N_mail]),
-                    N_authority: N_DARIAH,
+                    N.eppn: utf8FromLatin1(env[N.eppn]),
+                    N.email: utf8FromLatin1(env[N.mail]),
+                    N.authority: N.DARIAH,
                 }
                 attributes = {}
-                if N_o in env: attributes[N_org] = utf8FromLatin1(env[N_o])
-                if N_cn in env: attributes[N_name] = utf8FromLatin1(env[N_cn])
-                if N_givenName in env: attributes[N_firstName] = utf8FromLatin1(env[N_givenName])
-                if N_sn in env: attributes[N_lastName] = utf8FromLatin1(env[N_sn])
-                if N_isMemberOf in env: attributes[N_membership] = utf8FromLatin1(env[N_isMemberOf])
-                if N_affiliation in env: attributes[N_rel] = utf8FromLatin1(env[N_affiliation])
+                if N.o in env:
+                    attributes[N.org] = utf8FromLatin1(env[N.o])
+                if N.cn in env:
+                    attributes[N.name] = utf8FromLatin1(env[N.cn])
+                if N.givenName in env:
+                    attributes[N.firstName] = utf8FromLatin1(env[N.givenName])
+                if N.sn in env:
+                    attributes[N.lastName] = utf8FromLatin1(env[N.sn])
+                if N.isMemberOf in env:
+                    attributes[N.membership] = utf8FromLatin1(
+                        env[N.isMemberOf]
+                    )
+                if N.affiliation in env:
+                    attributes[N.rel] = utf8FromLatin1(env[N.affiliation])
                 self.userInfo.update(attributes)
             else:
                 self.userInfo = None
-
-

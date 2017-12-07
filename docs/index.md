@@ -24,9 +24,9 @@ this world.
 There is also a higher level layer, in which we can express things as:
 
 * if an assessment is submitted for review, lock the assessment and the
-	contribution;
+  contribution;
 * if the criteria entries for an assessment are not complete, do not allow to
-	submit it for review.
+  submit it for review.
 
 This higher level layer is called the [workflow engine](Workflow) and here we
 see the [business logic](Business) of the tool being expressed.

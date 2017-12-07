@@ -29,9 +29,9 @@ current web user. The result has three parts:
 
 * a boolean which tells: yes, allowed, or no: forbidden;
 * a rowFilter, which specifies, in case of a yes, to which rows the action may
-	be applied;
+  be applied;
 * a fieldFilter, which specifies, in case of yes, which fields in those rows may
-	be acted upon.
+  be acted upon.
 
 ## may( table, action, document=None)
 
@@ -46,7 +46,7 @@ The result has two parts:
 
 * a boolean which tells: yes, allowed, or no: forbidden;
 * a fieldFilter, which specifies, in case of yes, which fields in those rows may
-	be acted upon.
+  be acted upon.
 
 # [db]({{site.serverBase}}/controllers/db.py)
 

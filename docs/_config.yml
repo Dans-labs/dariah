@@ -83,6 +83,7 @@ mocha: https://mochajs.org
 mongodb: https://docs.mongodb.com
 node: https://nodejs.org
 npm: https://www.npmjs.com
+prettier: https://prettier.io
 python: https://docs.python.org/3/
 reactDocs: https://facebook.github.io/react/docs
 reactReselect: https://github.com/reactjs/reselect

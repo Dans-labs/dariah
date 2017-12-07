@@ -16,13 +16,15 @@ A simple plain-text way to convey structured data. What [Markdown](#markdown) is
 to text, YAML is to XML-JSON. In this app we use YAML for configuration details.
 
 * the conversion of legacy contribution data into MongoDB is steered by a
-	[config.yaml]({{site.staticBase}}/tools/config.yaml).
+  [config.yaml]({{site.staticBase}}/tools/config.yaml).
 * the [data model](Model) lists all the tables and fields, including how they
-	hang together and how we want to represent them on screen. It also defines
-	access control. If you, as developer, need to add new tables and fields, you
-	can do so by modifying these files: _
-	[model]({{site.serverBase}}/models/model.yaml) _
-	[per table]({{site.serverBase}}/models/tables). No extra coding is needed.
+  hang together and how we want to represent them on screen. It also defines
+  access control. If you, as developer, need to add new tables and fields, you
+  can do so by modifying these files:
+
+  * [model]({{site.serverBase}}/models/model.yaml)
+  * [per table]({{site.serverBase}}/models/tables).
+    No extra coding is needed.
 
 ## [Markdown]({{site.markdownDoc}})
 
@@ -112,17 +114,17 @@ This lessens our need for a stylesheet preprocessor such as
 Note especially how colour management has become easy:
 
 1. all colour definitions are in variables
-2. all colour definitions are in [hsla]({{site.hsl}}), which allows a very
-	consistent definition of families of colours. Quote from
-	[Mozilla]({{site.css}}/color_value):
+1. all colour definitions are in [hsla]({{site.hsl}}), which allows a very
+  consistent definition of families of colours. Quote from
+  [Mozilla]({{site.css}}/color_value):
 
-	> One advantage of HSL over RGB is that it is more intuitive: you can guess
+  > One advantage of HSL over RGB is that it is more intuitive: you can guess
 
-	    at the color you want, and tweak it from there. It is also easier to create
-		a set of matching colors (e.g., by keeping the hue the same, while varying
-		the lightness/darkness and saturation).
+      at the color you want, and tweak it from there. It is also easier to create
+    a set of matching colors (e.g., by keeping the hue the same, while varying
+    the lightness/darkness and saturation).
 
-	This is exactly what we do. See [vars.css]({{site.cssBase}}/vars.css).
+  This is exactly what we do. See [vars.css]({{site.cssBase}}/vars.css).
 
 ## [Shell]({{site.bash}})
 
@@ -162,5 +164,5 @@ In our app, we use JSON:
 
 * to send data from server to client
 * [configure]({{site.clientBase}}/webpack.config.js) the main development tools,
-	such as [Webpack]({{site.webpack}}) for building and [Mocha]({{site.mocha}})
-	for testing.
+  such as [Webpack]({{site.webpack}}) for building and [Mocha]({{site.mocha}})
+  for testing.

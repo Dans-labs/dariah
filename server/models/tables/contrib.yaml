@@ -112,8 +112,8 @@ fieldSpecs:
     multiple: false
   costDescription:
     perm:
-      list:   office
-      read:   office
+      list:   edit
+      read:   edit
       update: edit
     label: cost (description)
     valType: textarea

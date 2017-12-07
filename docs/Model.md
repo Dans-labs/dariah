@@ -97,7 +97,7 @@ Especially the replacement of
 
 ```javascript
 {
-	name
+  name
 }
 ```
 
@@ -174,22 +174,22 @@ contain the following bits of information:
 
 * `label`: a user-friendly display name of the field.
 * `multiple`: whether there is only one value allowed for this field, or a list
-	of values.
+  of values.
 * `valType`: the type of the field and its other behavioural characteristics:
-	see the section **valType** below.
+  see the section **valType** below.
 * `grid`: this is a branch of settings relevant for laying out the table in a
-	grid. They are the CSS [flex]({{site.flexBox}}) attributes. `width`: the
-	intended width of the column in which this field is presented; `grow`
-	(_optional: default:_ `0`) the degree by which the column width is allowed to
-	increase `shrink` (_optional: default:_ `0`) the degree by which the column
-	width is allowed to decrease.
+  grid. They are the CSS [flex]({{site.flexBox}}) attributes. `width`: the
+  intended width of the column in which this field is presented; `grow`
+  (_optional: default:_ `0`) the degree by which the column width is allowed to
+  increase `shrink` (_optional: default:_ `0`) the degree by which the column
+  width is allowed to decrease.
 * `valid`: the name of a client-side validation function by which new and
-	modified values for this field are validated. The validators are exposed in
-	[fields.js]({{site.libBase}}/fields.js) as member functions of a `validation`
-	object.
+  modified values for this field are validated. The validators are exposed in
+  [fields.js]({{site.libBase}}/fields.js) as member functions of a `validation`
+  object.
 
-	**N.B:** the server carries out extensive, non-customizable validation as
-	well, in order to protect the integrity of the database.
+  **N.B:** the server carries out extensive, non-customizable validation as
+  well, in order to protect the integrity of the database.
 
 ##### `valType`
 
@@ -202,33 +202,33 @@ Possible types are:
 
 * `bool`: `true` or `false`.
 * `datetime`: a date time, mostly represented in its
-	[ISO 8601]({{site.iso8601}}) format.
+  [ISO 8601]({{site.iso8601}}) format.
 * `number`: an integer or real number.
 * `text`: a string of characters, usually just a one-liner.
 * `url`: a syntactically valid URL: i.e. a string of text that can be
-	interpreted as a URL. A validation routine will check this.
+  interpreted as a URL. A validation routine will check this.
 * `email`: a syntactically valid email address. A validation routine will check
-	this.
+  this.
 * `textarea`: a string of characters, which may extend to several pages. It is
-	assumed that this is Markdown text, and its formatted version will be shown on
-	the interface, see [MarkdownArea](Components#markdownarea).
+  assumed that this is Markdown text, and its formatted version will be shown on
+  the interface, see [MarkdownArea](Components#markdownarea).
 
 When a field refers to other records, there is much more to specify. In this
 case `valType` is a branch with the following information.
 
 * `relTable`: the table that contains the related records;
 * `allowNew`: whether the user is allowed to enter new records in the related
-	table;
+  table;
 * `popUpIfEmpty`: (_optional: default:_ `false`) if an edit view on a record
-	having an empty value for this field is shown, a widget to choose a value will
-	pop up immediately. Otherwise there will be just a control button, inviting
-	you to enter a value.
+  having an empty value for this field is shown, a widget to choose a value will
+  pop up immediately. Otherwise there will be just a control button, inviting
+  you to enter a value.
 * `select`: a criterion on records in the related table, see section **select**
-	below;
+  below;
 * `fixed` (_optional, default:_ `false`) whether the value of this field is
-	fixed after it has been assigned initially; see section **fixed** below.
+  fixed after it has been assigned initially; see section **fixed** below.
 * `inactive`: (_optional_) this field relates to custom presentations, defined
-	in [Workflow](Workflow); see section **inactive** below.
+  in [Workflow](Workflow); see section **inactive** below.
 
 ###### `select`
 
@@ -273,10 +273,10 @@ By some definition, certain records can be marked as _inactive_. `inactive` is a
 branch with settings how to present inactive items:
 
 * `disabled`: if true, do not present inactive items in choice widgets: so if
-	you modify the value, you cannot choose inactive values.
+  you modify the value, you cannot choose inactive values.
 * `attributes`: e.g. a CSS `className` and a `title` attribute (tooltip) that
-	will be put on the element that renders the item. Any set of valid attributes
-	will do, there are no additional constraints.
+  will be put on the element that renders the item. Any set of valid attributes
+  will do, there are no additional constraints.
 
 **Example:** The `typeContribution` field of a `contrib` record may be obsolete,
 because it is not specified in the current package (see [Workflow](Workflow). In
@@ -334,21 +334,21 @@ Each filter is a dictionary with the following information.
 
 * `field` The name of the field to be filtered.
 * `relField` (_optional_) If `field` is an identifier pointing to a related
-	table, the `relField` specifies which field in the related table should be
-	filtered. For example, if you want to filter `criteriaEntry` records on there
-	`score`, you are faced with the fact that scores live in a separate table, and
-	the actual score is contained in the field `score` of that table. The
-	`criteriaEntry` records contain just an `_id` into the table `score`. Hence,
-	if we want to filter on actual scores, we say `field: score` and `relField:
-	score`.
+  table, the `relField` specifies which field in the related table should be
+  filtered. For example, if you want to filter `criteriaEntry` records on there
+  `score`, you are faced with the fact that scores live in a separate table, and
+  the actual score is contained in the field `score` of that table. The
+  `criteriaEntry` records contain just an `_id` into the table `score`. Hence,
+  if we want to filter on actual scores, we say `field: score` and `relField:
+  score`.
 * `label` A user friendly name for the filter, usually the label of the field to
-	be filtered.
+  be filtered.
 * `type` The type of filter: `ByValue`: faceted, `EUMap`: faceted, plus a
-	visualisation on the map of Europe, `Fulltext`: full text search in the field.
+  visualisation on the map of Europe, `Fulltext`: full text search in the field.
 * `maxCols`: (_not needed for `Fulltext` filters_) facets are displayed in a
-	table with at most this amount of columns.
+  table with at most this amount of columns.
 * `expanded`: (_not needed for `Fulltext` filters_) whether the table of facets
-	is initially expanded or collapsed.
+  is initially expanded or collapsed.
 
 ### `details` and `detailOrder`
 
@@ -373,41 +373,41 @@ For each originating kind there is the following information:
 
 * `table` The name of the originating table;
 * `linkField` The name of the field in the originating table that links to the
-	master record;
+  master record;
 * `mode` The display mode of the detal records: as grid or list;
 * `filtered` whether the detais of this kind should have filter controls. If
-	yes, the filters are taken from the specification of the originating table.
+  yes, the filters are taken from the specification of the originating table.
 * `expand` (_optional, default:_ `false`) If this is true, the all detail
-	records of this kind will be immediately expanded. Normally, detail records
-	are presented as head lines initially.
+  records of this kind will be immediately expanded. Normally, detail records
+  are presented as head lines initially.
 * `border` (_optional, default:_ `read: true, edit: true`) whether to put a
-	border around each individual detail record of this kind. This feature must be
-	specified for the read-only presentation and the editable presentation
-	separately, by means of the keys `read` and `edit`.
+  border around each individual detail record of this kind. This feature must be
+  specified for the read-only presentation and the editable presentation
+  separately, by means of the keys `read` and `edit`.
 * `cascade` (_optional, default:_ `false`) when the master record is deleted,
-	its details have a dangling reference to a non-existing master record. In some
-	cases it is desirable to delete the detail records as well. If `cascade:
-	true`, the detail records of this kind will be deleted together with the
-	master record.
+  its details have a dangling reference to a non-existing master record. In some
+  cases it is desirable to delete the detail records as well. If `cascade:
+  true`, the detail records of this kind will be deleted together with the
+  master record.
 
-	**Example 1:** the `criteriaEntry` detail records are deleted with their
-	master `assessment` record.
+  **Example 1:** the `criteriaEntry` detail records are deleted with their
+  master `assessment` record.
 
-	**Example 2:** the `criteria` detail records are _not_ deleted with their
-	master `package` record.
+  **Example 2:** the `criteria` detail records are _not_ deleted with their
+  master `package` record.
 
 * `fixed` (_optional, default:_ `false`) whether the list of details of this
-	kind is fixed. Details of a kind are fixed, if, after having been created, no
-	details may be added or removed. Individual details may still be modified.
+  kind is fixed. Details of a kind are fixed, if, after having been created, no
+  details may be added or removed. Individual details may still be modified.
 
-	**Example:** once an `assessment` record for a contribution has been created,
-	a special [workflow](Workflow) takes care to lookup the list of criteria that
-	apply to this contribution, based on its `typeContribution` field. (This
-	mapping is read from the `criteria` detail records of the currently active
-	`package` records). For each criterion a `criteriaEntry` detail record is
-	added to the master `assessment` record. After that, the list of
-	`criteriaEntries` for this `assessment` record may not change anymore. But the
-	user is still be able to fill out the `criteriaEntry` records.
+  **Example:** once an `assessment` record for a contribution has been created,
+  a special [workflow](Workflow) takes care to lookup the list of criteria that
+  apply to this contribution, based on its `typeContribution` field. (This
+  mapping is read from the `criteria` detail records of the currently active
+  `package` records). For each criterion a `criteriaEntry` detail record is
+  added to the master `assessment` record. After that, the list of
+  `criteriaEntries` for this `assessment` record may not change anymore. But the
+  user is still be able to fill out the `criteriaEntry` records.
 
 ### `needMaster`
 
@@ -475,7 +475,7 @@ powerful:
 * `system`
 * `root`
 * `nobody`: omnipotent access (however: nobody can be member of this group, so
-	this effectively means: nobody is allowed to do this)
+  this effectively means: nobody is allowed to do this)
 
 The difference between _own_ and _OWN_ is subtle and only relevant for groups
 more powerful than _own_. If a thing requires level _own_, but the user is in a
@@ -507,9 +507,9 @@ Otherwise the value is either 1, -1, or -2, meaning:
 * `1` : access is to be granted.
 * `-1` : access is only to be granted if the thing has been created by the user.
 * `-2` : access is only to be granted if the relative group levels work out:
-	* like _ownLT_ above: users cannot modify the power of more powerful users
-	* and users cannot assign more power (to themselves or others) than they
-		themselves have.
+  * like _ownLT_ above: users cannot modify the power of more powerful users
+  * and users cannot assign more power (to themselves or others) than they
+    themselves have.
 
 ### Methods
 
@@ -551,12 +551,12 @@ The authorization logic on tables then works like this:
 
 1. the access level for invoking the method is checked;
 1. if allowed, the actions and tables that the method is going to perform are
-	considered;
+  considered;
 1. for every (table-action) combination a row filter and a field filter is
-	constructed, restricting the action to only those rows and fields that are
-	permitted to the user; this might be an empty set;
+  constructed, restricting the action to only those rows and fields that are
+  permitted to the user; this might be an empty set;
 1. if the set is not empty, the action is executed on those rows and those
-	fields that pass the filters.
+  fields that pass the filters.
 
 The permissions model has a configuration section for tables as a whole, which
 will be checked first. This will give rise to the row filter.

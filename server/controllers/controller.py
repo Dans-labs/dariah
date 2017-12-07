@@ -2,43 +2,47 @@ import traceback
 from bottle import request
 from controllers.utils import serverprint
 from models.compiled.model import model as M
-from models.compiled.names import *
+from models.compiled.names import N
 
-DM = M[N_tables]
+DM = M[N.tables]
 
-getq = lambda name: request.query[name][0:64]
+
+def getq(name):
+    return request.query[name][0:64]
+
 
 class Controller(object):
     def __init__(self, DB):
         self.DB = DB
 
     def data(self, controller, Perm):
-        return self._errorWrap(lambda: self._data(controller, Perm), controller, controller==N_mod)
+        return self._errorWrap(lambda: self._data(controller, Perm),
+                               controller, controller == N.mod)
 
     def list(self, name):
-        table = getq(N_table)
-        complete = getq(N_complete)==N_true
+        table = getq(N.table)
+        complete = getq(N.complete) == N.true
         return self.DB.getList(name, table, titleOnly=not complete, my=False)
 
     def mylist(self, name):
-        table = getq(N_table)
-        complete = getq(N_complete)==N_true
+        table = getq(N.table)
+        complete = getq(N.complete) == N.true
         return self.DB.getList(name, table, titleOnly=not complete, my=True)
 
     def myassign(self, name):
-        table = getq(N_table)
-        complete = getq(N_complete)==N_true
-        my = DM.get(table, {}).get(N_workflow, {}).get(N_assign, True)
+        table = getq(N.table)
+        complete = getq(N.complete) == N.true
+        my = DM.get(table, {}).get(N.workflow, {}).get(N.assign, True)
         return self.DB.getList(name, table, titleOnly=not complete, my=my)
 
     def view(self, name):
-        table = getq(N_table)
-        ident = getq(N_id) if N_id in request.query else None
+        table = getq(N.table)
+        ident = getq(N.id) if N.id in request.query else None
         return self.DB.getItem(name, table, ident)
 
     def mod(self, name):
-        table = getq(N_table)
-        action = getq(N_action)
+        table = getq(N.table)
+        action = getq(N.action)
         return self.DB.modList(name, table, action)
 
     def _data(self, controller, Perm):
@@ -50,7 +54,10 @@ class Controller(object):
             result = method(controller)
         else:
             result = self.DB.stop({
-                N_msgs: [{N_kind: N_error, N_text: 'wrong method: {}'.format(controller)}],
+                N.msgs: [{
+                    N.kind: N.error,
+                    N.text: 'wrong method: {}'.format(controller)
+                }],
             })
         return result
 
@@ -58,17 +65,19 @@ class Controller(object):
         try:
             result = action()
         except Exception as err:
-            message = getattr(err, N_message, repr(err))
-            data = {N__error: message} if addData else None
+            message = getattr(err, N.message, repr(err))
+            data = {N._error: message} if addData else None
             serverprint('\n')
             serverprint('ERROR IN CONTROLLER {}'.format(controller))
             traceback.print_exc()
             serverprint('END                 {}'.format(controller))
             serverprint('\n')
             result = self.DB.stop({
-                N_data: data,
-                N_msgs: [{N_kind: N_error, N_text: 'server error: {}'.format(message)}],
+                N.data:
+                data,
+                N.msgs: [{
+                    N.kind: N.error,
+                    N.text: 'server error: {}'.format(message)
+                }],
             })
         return result
-
-

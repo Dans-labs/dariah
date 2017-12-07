@@ -13,9 +13,11 @@ major browsers understand. The compilation from source code to what the browser
 eventually gets is way more complicated. It is taken care of by the build tool
 of our choice: [Webpack]({{site.webpack}})
 
-Our source code conforms to a number of style guides, which are enforced by
+Our source code conforms to a number of style guides, which are checked by
 [eslint]({{site.eslint}}). There are many options and choices, ours are
 [here]({{site.clientBase}}/eslint.yaml).
+Not all of these are relevant, because we also enforce style by means of
+[prettier]().
 
 The evolution of JavaScript to ES6 and beyond has transformed JavaScript from a
 "horrible language" into a performant language with a beautiful syntax on one of
@@ -106,7 +108,11 @@ const handleEvent = id => event => dispatch({ id, value: event.target.value })
 
 There is more to this, notably, for arrow functions the `this` is lexical.
 
-# Object Notations [shorthand]({{site.javascript}}/Operators/Object_initializer), [destructuring]({{site.babel}}/learn-es2015/#ecmascript-2015-features-destructuring), [rest spread]({{site.babel}}/learn-es2015/#ecmascript-2015-features-destructuring)
+# Object Notations
+
+[shorthand]({{site.javascript}}/Operators/Object_initializer),
+[destructuring]({{site.babel}}/learn-es2015/#ecmascript-2015-features-destructuring),
+[rest spread]({{site.babel}}/learn-es2015/#ecmascript-2015-features-destructuring).
 
 Objects are central to JavaScript. ES6 contains new syntax, that makes working
 with objects very pleasant indeed. In our app we have activated linters that

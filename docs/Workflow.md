@@ -17,12 +17,12 @@ without storing them in the database. From then on the following happens with
 the workflow attributes:
 
 * they are sent to client, together with the _permission_ information for each
-	record
+  record
 * the client uses the workflow info to show or hide workflow related controls,
-	and to suppress controls that lead to actions that violate the business logic
+  and to suppress controls that lead to actions that violate the business logic
 * the server uses the workflow info to enforce the business logic;
 * the server updates the workflow attributes after any insert/update/delete
-	action.
+  action.
 
 No matter how good a job the client does in supporting the business logic and
 prohibiting actions that violate the business logic, the server always has the
@@ -97,8 +97,8 @@ Not all of the following parameters need to be present for all methods, and
 there are more possible parameters, e.g.
 
     emptyFields:
-	    - score
-	    - evidence
+      - score
+      - evidence
 
 a list of fields in the other table that will be checked for emptiness.
 
@@ -190,7 +190,7 @@ means that any update whatsoever is forbidden to such a record.
 However, we can relax update constraints:
 
         update:
-	        submitted: true
+          submitted: true
 
 means that any update that changes the value of the field `submitted` is
 forbidden.
@@ -199,9 +199,9 @@ We can relax this even further, and here we take a real example, under attribute
 `stalled` instead of `locked`:
 
     stalled:
-	  update:
-	    submitted:
-	      after: true
+    update:
+      submitted:
+        after: true
 
 This means that any update that leads to field `submitted` having value `true`
 is forbidden.
@@ -210,17 +210,17 @@ Here we say that a stalled assessment cannot be submitted. For the sake of
 clarity, here is the rule that says when an assessment is `stalled`:
 
     assessment:
-	  read:
-	    - inspect: master
-	      method: hasDifferent
-	      linkField: contrib
-	      otherTable: contrib
-	      otherField: typeContribution
-	      myField: assessmentType
-	      value: null
-	      workflow:
-	        stalled: true
-	        stalledReason: assessment type is different from contribution type
+    read:
+      - inspect: master
+        method: hasDifferent
+        linkField: contrib
+        otherTable: contrib
+        otherField: typeContribution
+        myField: assessmentType
+        value: null
+        workflow:
+          stalled: true
+          stalledReason: assessment type is different from contribution type
 
 In words: if an assessment has an `assessmentType` field with a different value
 that the `contributionType` field of its master contribution, then the
