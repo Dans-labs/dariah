@@ -166,3 +166,104 @@ In our app, we use JSON:
 * [configure]({{site.clientBase}}/webpack.config.js) the main development tools,
   such as [Webpack]({{site.webpack}}) for building and [Mocha]({{site.mocha}})
   for testing.
+
+# Keeping the code tidy
+
+There are three progressive levels of caring for your code.
+
+**Level 1** is adopting a style guide and meticulously keeping to it.
+It is hard, especially if you work in two syntactically and culturally diverse
+languages such as Javascript and Python. Add CSS, Markdown and YAML to the mix,
+and you can feel the need for a next step.
+
+Yet this is the fundamental step, it cannot be skipped.
+
+**Level 2** is using *linters*.
+They are little programs that observe your code and check it for correctness
+and style, as far as that is possible without actually running the code.
+Usually, your editing environment runs them sneakily while you type or
+when you save, and give you unobtrusive but conspicuous feedback.
+It saves you a lot of roundtrips of compiling/building/running/staring at errors.
+Moreover, it gives you the feedback right where you are typing, so you do not have to
+lookup files and line numbers.
+
+Sometimes linters give you so much feedback that your heart sinks at the
+thought of going through all those cases and fix them all,
+even if you have a splendid IDE.
+
+That is where the next step comes in.
+
+**Level 3** is using *formatters*.
+They have a lot in common with linters, but they fix the problems.
+Sometimes they parse your program with the parser of the language and
+then format the abstract syntax three they've got.
+That is the end of all style inconsistencies.
+
+## Tools
+
+ForJavascript we use [eslint]({{site.eslint}}) as linter,
+and [prettier]({{site.prettier}}) as formatter.
+
+For Python we use [flake8]({{site.flake8}}) as linter,
+and [yapf]({{site.yapf}}) as formatter.
+
+Formatters are not perfect, sometimes they produce
+code at which the linter balks, especially *yapf* is doing that.
+Luckily, you can selectively suppress certain kinds of transformations.
+
+## Editor or IDE?
+
+For projects like these, you need a good editing environment.
+IDEs can give you that, but the good old ones like Eclipse
+are not really suited to the Javascript and Python environments.
+There are interesting modern ones such as 
+GitHub's [Atom]({{site.atom}})
+modernized ones such as
+Microsoft's [Visual Studio Code]({{site.vsc}})
+and commercial ones such as [Webstorm]({{site.webstorm}}).
+
+You can also choose to work with a text editor,
+such as the free [Vim]({{site.vim}})
+or the commercial [Sublime Text]({{site.sublimeText}}).
+
+My choice has been Vim, since I use it from its start in 1991.
+These are the key reasons for which Vim stands out:
+* it has a compositional command set, like Unix itself.
+  By this you get all your (massive) editing chores done.
+* it has a rich ecosystem of plugins.
+  By this you can turn Vim into an IDE.
+* It is rock solid. 
+  You can edit many small files and then some big ones, at the same time.
+  You do not loose data.
+
+Just for the record, here is a piece of my `.vimrc` file (the
+configuration file, which draws in plugins, and customises the interface).
+
+You can find out more about the plugins by visiting 
+[github]({{site.githubBase}}) and append the full plugin
+reference to the url, since they are all GitHub repos.
+
+```vim
+  call plug#begin()
+  Plug 'bennyyip/vim-yapf'
+  Plug 'jelera/vim-javascript-syntax'
+  Plug 'pangloss/vim-javascript'
+  Plug 'mxw/vim-jsx'
+  Plug 'hail2u/vim-css3-syntax'
+  Plug 'kien/ctrlp.vim'
+  Plug 'nathanaelkane/vim-indent-guides'
+  Plug 'othree/yajs.vim'
+  Plug 'othree/javascript-libraries-syntax.vim'
+  Plug 'prettier/vim-prettier', {
+    \ 'do': 'npm install',
+    \ 'for': ['javascript', 'css', 'json' ] }
+  Plug 'scrooloose/nerdtree'
+  Plug 'w0rp/ale'
+  call plug#end()
+```
+
+An honourable mention for the [ALE]({{site.ale}}) plugin.
+This is an arch plugin that invokes linters for your files while you edit.
+The beauty is, that if you have installed the linters first outside Vim,
+ALE is smart enough to detect them and run them for you,
+asynchronously, and with zero configuration.

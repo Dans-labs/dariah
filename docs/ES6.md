@@ -17,7 +17,7 @@ Our source code conforms to a number of style guides, which are checked by
 [eslint]({{site.eslint}}). There are many options and choices, ours are
 [here]({{site.clientBase}}/eslint.yaml).
 Not all of these are relevant, because we also enforce style by means of
-[prettier]().
+[prettier]({{site.prettier}}).
 
 The evolution of JavaScript to ES6 and beyond has transformed JavaScript from a
 "horrible language" into a performant language with a beautiful syntax on one of

@@ -110,6 +110,7 @@ of this.
 
 To get an impression of the kind of work behind this app, we reveal how many
 lines of code have been written in which languages.
+See also how we managed to keep the code in all those languages tidy.
 
 ## [Lessons learned](Lessons)
 
