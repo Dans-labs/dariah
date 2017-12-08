@@ -2,30 +2,35 @@
 title: Routing
 ---
 
-# Client
+Client
+======
 
-## Entry point
+Entry point
+-----------
 
 At the client side, the app starts in [main](Components#main).
 
 The first priority is to create a Redux [Provider](React#redux) component, which
 will be ancestor to all other components.
 
-## Routing
+Routing
+-------
 
 The second priority is to set up the routes configuration, i.e. the way URLs
 give rise to activating certain components. ![diag](design/design.006.png)
 
-We are still talking about _client_ side routing.
+We are still talking about *client* side routing.
 
-# Server
+Server
+======
 
-At the _server_ there are other rules that link URLs to behaviour.
+At the *server* there are other rules that link URLs to behaviour.
 
 Here are a few rules that capture how routing works in a Single Page App (SPA)
 like this, and the diagram visualizes the same logic.
 
-## Fall-back behaviour
+Fall-back behaviour
+-------------------
 
 The server responds to any URL with sending the
 [index]({{site.serverBase}}/views/index.tpl) page, which also causes the bundled
@@ -39,17 +44,18 @@ the browser's refresh button. At that moment, the current URL might be a deep
 path, and we cannot expect the server to know those paths. The best the server
 can do is to send the whole app again.
 
-## Special behaviour
+Special behaviour
+-----------------
 
 There are a few exceptions, though:
 
-### Static
+### Static ###
 
 If the URL points to a static file, i.e. a file under `/static/`, the server
 will respond with the file contents. Otherwise there was no way to serve the
 static JavaScript app in the first place.
 
-### Api
+### Api ###
 
 If the URL points to `/api/`, the server will respond in a variety of ways,
 depending on the rest of the URL. By means of these `/api/` URLs the client can

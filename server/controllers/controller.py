@@ -16,8 +16,10 @@ class Controller(object):
         self.DB = DB
 
     def data(self, controller, Perm):
-        return self._errorWrap(lambda: self._data(controller, Perm),
-                               controller, controller == N.mod)
+        return self._errorWrap(
+            lambda: self._data(controller, Perm), controller,
+            controller == N.mod
+        )
 
     def list(self, name):
         table = getq(N.table)
@@ -74,7 +76,7 @@ class Controller(object):
             serverprint('\n')
             result = self.DB.stop({
                 N.data:
-                data,
+                    data,
                 N.msgs: [{
                     N.kind: N.error,
                     N.text: 'server error: {}'.format(message)

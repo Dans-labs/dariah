@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getWinDim } from 'win'
+import { getWinDim } from  'win'
 
 import ErrorBoundary from 'ErrorBoundary'
 import Login from 'Login'

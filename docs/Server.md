@@ -16,24 +16,27 @@ YAML files.
 These modules are then imported by all controllers, so that all data access
 happens in conformance with the data model and its permissions.
 
-# [perm]({{site.serverBase}}/controllers/perm.py)
+[perm]({{site.serverBase}}/controllers/perm.py)
+===============================================
 
 Contains the methods to compute permissions for controllers, tables and fields.
 Here are the main methods.
 
-## getPerm(controller, table, action)
+getPerm(controller, table, action)
+----------------------------------
 
 Given a controller, a table and an action (such as `read`, `update`), this
 method computes whether that controller may perform that action on behalf of the
 current web user. The result has three parts:
 
-* a boolean which tells: yes, allowed, or no: forbidden;
-* a rowFilter, which specifies, in case of a yes, to which rows the action may
-  be applied;
-* a fieldFilter, which specifies, in case of yes, which fields in those rows may
-  be acted upon.
+*   a boolean which tells: yes, allowed, or no: forbidden;
+*   a rowFilter, which specifies, in case of a yes, to which rows the action may
+    be applied;
+*   a fieldFilter, which specifies, in case of yes, which fields in those rows may
+    be acted upon.
 
-## may( table, action, document=None)
+may( table, action, document=None)
+----------------------------------
 
 Given table and an action (such as `read`, `update`), this method computes
 whether that action may be performed on behalf of the current web user. If a
@@ -44,11 +47,12 @@ calculated as if the user does not own any document in the table.
 
 The result has two parts:
 
-* a boolean which tells: yes, allowed, or no: forbidden;
-* a fieldFilter, which specifies, in case of yes, which fields in those rows may
-  be acted upon.
+*   a boolean which tells: yes, allowed, or no: forbidden;
+*   a fieldFilter, which specifies, in case of yes, which fields in those rows may
+    be acted upon.
 
-# [db]({{site.serverBase}}/controllers/db.py)
+[db]({{site.serverBase}}/controllers/db.py)
+===========================================
 
 This is the data access module. It uses the [data model](Model) to serve any
 data to any user in such a way that no data is sent from server to client that
@@ -59,12 +63,13 @@ particular tables and fields. All specifics are derived form the
 [model config file]({{site.serverBase}}/models/model.yaml) and the table
 specific files in [tables]({{site.serverBase}}/models/tables).
 
-There are also _hooks_, where specific behaviour for certain tables can be
+There are also *hooks*, where specific behaviour for certain tables can be
 specified. That behaviour is coded in the [workflow module](#workflow).
 
 We describe the main methods here.
 
-## validate(table, itemValues, updateFields)
+validate(table, itemValues, updateFields)
+-----------------------------------------
 
 Server validation of the values of a record. `itemValues` is a dictionary of all
 field values of the item, and `updateFields` is the set of fields to be updated.
@@ -74,7 +79,8 @@ dictionary of diagnostic information if there are validation errors, a list of
 error messages if the validation process itself failed, and a list of new values
 created in related tables.
 
-## getList(controller, table, rowFilter, titleOnly, withValueLists, withFilters, my)
+getList(controller, table, rowFilter, titleOnly, withValueLists, withFilters, my)
+---------------------------------------------------------------------------------
 
 A true workhorse, that retrieves the contents of a table, in various
 circumstances.
@@ -98,7 +104,8 @@ returned.
 
 `my`: only fetches rows that have been created by the current user.
 
-## getItem(controller, table, ident)
+getItem(controller, table, ident)
+---------------------------------
 
 Fetches a single item.
 
@@ -117,7 +124,8 @@ items (title only) first, and then fetches an individual item. The client
 application needs to know for each item how much of its field have actually been
 fetched.
 
-## modList(controller, table, action)
+modList(controller, table, action)
+----------------------------------
 
 An other workhorse. This function can insert, update and delete a single item.
 New items are inserted as rows with blank fields. The information to update
@@ -128,35 +136,41 @@ The `controller` is the name of the top-level method that called this function.
 
 `table` is the name of the table in question.
 
-# [user]({{site.serverBase}}/controllers/user.py)
+[user]({{site.serverBase}}/controllers/user.py)
+===============================================
 
 Contains the logic needed to maintain the user table. When new users log in
 through the DARIAH infrastructure, it collects their `eppn`, i.e. the names by
 which they are identified by the authentication systems. It also retrieves to
 what permission groups users belong.
 
-# [auth]({{site.serverBase}}/controllers/auth.py)
+[auth]({{site.serverBase}}/controllers/auth.py)
+===============================================
 
 Contains the methods to authenticate users. Here all the logic about user
 sessions and session cookies is written down. It builds on the bottle web
 framework.
 
-# [file]({{site.serverBase}}/controllers/file.py)
+[file]({{site.serverBase}}/controllers/file.py)
+===============================================
 
 Contains the methods to get file data from the server. There is a method to
 serve static files by calling the web framework bottle. And there is a method to
 read a file and deliver its content as JSON.
 
-# [utils]({{site.serverBase}}/controllers/utils.py)
+[utils]({{site.serverBase}}/controllers/utils.py)
+=================================================
 
 Low level stuff.
 
-# [workflow]({{site.serverBase}}/controllers/workflow.py)
+[workflow]({{site.serverBase}}/controllers/workflow.py)
+=======================================================
 
 Contains workflow specific behaviour, i.e. the specifics of the assessment and
 review process.
 
-## getActiveItems(basicList)
+getActiveItems(basicList)
+-------------------------
 
 Calculates the active package, and from there the active types and criteria,
 given the current time. This is the backdrop for any assessment and review
@@ -167,7 +181,8 @@ database, in such a way that the access restrictions are respected. It is
 defined in [db](#db) and will be passed from there. So this module does not do
 its own data access, all data access is still coded in [db](#db).
 
-## detailInsert(basicList, table=None, masterDocument=None)
+detailInsert(basicList, table=None, masterDocument=None)
+--------------------------------------------------------
 
 Method invoked by [db](#db), just before an item is inserted. This method has
 the opportunity to generate extra fields for that record, and to generate extra

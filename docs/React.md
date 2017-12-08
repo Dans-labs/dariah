@@ -2,25 +2,28 @@
 title: React
 ---
 
-# React Components
+React Components
+================
 
 [React Components]({{site.reactDocs}}/react-component.html) represent pieces of
 the web page and their functionality. Components are organized hierarchically.
-Components can be parametrized by _properties_, which parents pass to children.
+Components can be parametrized by *properties*, which parents pass to children.
 A component acts as a template instruction to build a piece of DOM.
 
 Components can be programmed as classes or as functions.
 
-In this app we distinguish between three _capability levels_ of components.
+In this app we distinguish between three *capability levels* of components.
 
-## Pure components
+Pure components
+---------------
 
 If a component knows how to build the DOM, purely on the basis of its properties
 and a static template, it can be (and will be) coded as a pure function.
 
 [Example: Stat]({{site.appBase}}/components/Stat.jsx).
 
-## Simple Stateful components
+Simple Stateful components
+--------------------------
 
 If a component needs to store the effects of the outside world (incoming server
 data or user interaction), it is stateful. If the component does not need
@@ -30,7 +33,8 @@ will be connected to the Redux state by means of a simple binding:
 
 [Example: Facet]({{site.appBase}}/components/Facet.jsx).
 
-## Complex components
+Complex components
+------------------
 
 If a component has to handle the DOM after it has been constructed, e.g. apply
 some hiding and showing, fill a DIV with a third party component, or get data
@@ -39,42 +43,39 @@ a class with so-called [life cycle methods](#life-cycle).
 
 [Example: ListContainer]({{site.appBase}}/components/ListContainer.jsx).
 
-## React Processing Concepts
+React Processing Concepts
+-------------------------
 
 React renders updates to [components](#react-components) very efficiently. The
 [render()](#render) function is a template for a [element fragment](#fragment),
 not the real [DOM](#dom). So, after an update, it is not costly to recompute the
 fragment for that component completely, because the DOM is not touched.
 
-### Reconciliation
+### Reconciliation ###
 
 Once the new fragment has been constructed, a clever, React-internal process
 called **reconciliation** is carried out, which computes the minimum number of
 update actions that have to be applied to the previous, real DOM incarnation of
 the component, to change it to match the new fragment.
 
-### MiniDOM
+### MiniDOM ###
 
 A compact internal representation of the [DOM](#dom), made from React
-_elements_.
+*elements*.
 
 A React element is an instance of the React Element class. In **jsx** you can
 refer to a React element just by saying
 
-```
-  <p>foo</p>
-```
+      <p>foo</p>
 
 React elements reflect HTML elements, but you can mingle them with React
 components, which look nearly the same in **jsx**:
 
-```
- <p>
-   <NavLink to="/data" >bar</NavLink>
- </p>
-```
+     <p>
+       <NavLink to="/data" >bar</NavLink>
+     </p>
 
-### DOM
+### DOM ###
 
 DOM is an abbreviation for [Document Object Model]({{site.webApi}}). The DOM is
 what the browser gets in memory once it has loaded an HTML document. One of the
@@ -86,7 +87,7 @@ matter how fast JavaScript currently is.
 This is one of the reasons that a niche for React exists, with its
 [MiniDOM](#minidom).
 
-### Fragment
+### Fragment ###
 
 A [fragment]({{site.reactDocs}}/rendering-elements.html) is such a mixture of
 properly nested React elements and components. It is part of the React's toolkit
@@ -94,12 +95,13 @@ to manage DOM manipulations efficiently.
 
 See [Reconciliation](#reconciliation).
 
-## Property management
+Property management
+-------------------
 
-### PropTypes
+### PropTypes ###
 
 [PropTypes]({{site.reactDocs}}/typechecking-with-proptypes.html) are a means to
-do type checking for React Components is done by _PropTypes_.
+do type checking for React Components is done by *PropTypes*.
 
 PropType checking in react only happens in development mode. React checks
 whether the named props that are passed to a component correspond to the props
@@ -110,20 +112,16 @@ I find the `PropType` verbose, and no match for the otherwise clean and pleasant
 syntax of JSX. Additionally, most of the mistakes I make, do not reveal
 themselves as value type mistakes. On top it this all: declaring `PropTypes`
 forces you to repeat all the names of your PropTypes, so is against the
-principle of _do't repeat yourself_. In this application, the property names are
+principle of *do't repeat yourself*. In this application, the property names are
 always clear in the code, either as
 
-```
-const MyComponent = ({ foo, bar )} => ...
-```
+    const MyComponent = ({ foo, bar )} => ...
 
 or as
 
-```
-const { props: { foo, bar} } = this
-```
+    const { props: { foo, bar} } = this
 
-### Context
+### Context ###
 
 [Context]({{site.reactDocs}}/context.html) is a React mechanism to pass data
 directly from ancestors to deep descendants. The React documentation considers
@@ -131,32 +129,33 @@ context as a brittle part of itself, and warns against over-use. At the same
 time, [Redux](#redux) depends critically on it, so I consider it safe to use.
 But our code will not use it explicitly, only through Redux.
 
-## Component management
+Component management
+--------------------
 
-### Life Cycle
+### Life Cycle ###
 
 The main function of a [component](#react-components) is to act as a template to
 be [rendered](#render). But if there is additional work to be done, this can be
 hooked up at various stages in the component's [life
-cycle]({{site.reactDocs}}/react-component.html#the-component-life cycle). Most
+cycle]\({{site.reactDocs}}/react-component.html#the-component-life cycle). Most
 stages occur during (re)rendering, and there is a stage of construction and
 unmounting.
 
-### Constructor
+### Constructor ###
 
 When a [component](#react-components) is being
 [rendered]({{site.reactDocs}}/react-component.html#render) the
 [constructor]({{site.reactDocs}}/react-component.html#constructor) is the method
 to construct the corresponding React class. It will set up the [state](#state).
 
-### componentDidMount
+### componentDidMount ###
 
 When a [component](#react-components) has been added to the DOM its method
 [componentDidMount]({{site.reactDocs}}/react-component.html#componentdidmount)
 will be called just after. This is the recommended time to fetch data for this
 component, if needed.
 
-### componentDidUpdate
+### componentDidUpdate ###
 
 When a [component](#react-components) has been updated due to receiving new
 properties, its method
@@ -168,14 +167,14 @@ rendering, this is the place to do it.
 is also needed initially, it is handy to write a function for it and call it in
 this method and in [componentDidMount()](#componentdidmount).
 
-### componentWillMount
+### componentWillMount ###
 
 When a [component](#react-components) will be added to the DOM, its method
 [componentWillMount]({{site.reactDocs}}/react-component.html#componentwillmount)
 will be called just before. This is the first thing that happens after
 [constructor()](#constructor).
 
-### componentWillReceiveProps
+### componentWillReceiveProps ###
 
 When a [component](#react-components) is about to receive new props (as part of
 the update process), its method
@@ -183,13 +182,13 @@ the update process), its method
 will be called just before. The new props are passed with it, so that it is
 possible to execute actions dependent on whether pros have changed.
 
-### componentWillUnMount
+### componentWillUnMount ###
 
 When a [component](#react-components) will be removed from the DOM, its method
 [componentWillUnmount]({{site.reactDocs}}/react-component.html#componentwillunmount)
 will be called just before. If we want to save state, we can hook it up here.
 
-### render
+### render ###
 
 The main function of a [component](#react-components) is to act as a template to
 be rendered. Its method [render]({{site.reactDocs}}/react-component.html#render)
@@ -197,7 +196,8 @@ constructs the template to be rendered. During rendering the template will be
 used as a set of instructions to build a real DOM somewhere on the actual web
 page.
 
-## Controlled Component
+Controlled Component
+--------------------
 
 For elements that can receive user input (forms, inputs, etc.) there is the
 option to handle input in a way controlled by React, and not by the default HTML
@@ -209,13 +209,14 @@ callback is called, a parent component executes it, state gets updated, state
 changes trickle down as property updates to child elements, and the checkbox in
 question is told to be checked (or unchecked).
 
-## State
+State
+-----
 
 There are two main reasons for a component to maintain
-[state]({{site.reactDocs}}/state-and-life cycle.html):
+[state]\({{site.reactDocs}}/state-and-life cycle.html):
 
-* getting external data,
-* reacting to user events.
+*   getting external data,
+*   reacting to user events.
 
 In both cases, something happens in the outside world that must be remembered.
 Components remember these things in their [state](#state), which only they can
@@ -224,7 +225,7 @@ properties to their children. State updates trigger these computations
 automatically, and children whose properties are dependent on this state, are
 re-rendered automatically (and economically).
 
-### Local State
+### Local State ###
 
 The vanilla React way is that [components](#react-components) have their own
 state, which only they can modify through
@@ -245,60 +246,62 @@ Setting up ad-hoc communication between such components leads to an asynchronous
 dependency hell, which can be avoided by a central state as a single source of
 truth.
 
-So in this app, we have left the path of local state, and embraced _central
-state_.
+So in this app, we have left the path of local state, and embraced *central
+state*.
 
-### Central State
+### Central State ###
 
-A widely used approach to _central_ state is [Redux](#redux).
+A widely used approach to *central* state is [Redux](#redux).
 
-# Redux
+Redux
+=====
 
 [Redux]({{site.redux}}/docs/api/index.html) is a popular implementation of the
 idea that [state](#state) is centralized and all components have to subscribe to
 a state [Provider]({{site.reactRedux}}/docs/api.md#provider-store), the store.
 
-* If a component needs to update the state, it dispatches an action to the
-  store.
-* So-called _reducers_ translate the action into a state update.
-* And then the component can re-render.
+*   If a component needs to update the state, it dispatches an action to the
+    store.
+*   So-called *reducers* translate the action into a state update.
+*   And then the component can re-render.
 
 Using Redux requires a lot of extra code in actions and reducers, which get
 separated from the components for which it is used.
 
-However, there is a way to do it nicely. There is a way of writing _idiomatic_
+However, there is a way to do it nicely. There is a way of writing *idiomatic*
 redux, beautifully advocated by its creator, Dan Abramov, in
 [30 videos]({{site.reduxVideos}}), and that is by means of
-[ducks]({{site.ducks}}). (we call them _dux_).
+[ducks]({{site.ducks}}). (we call them *dux*).
 
 We divide the state into segments that are responsible for well-described tasks,
 such as
 
-* tables of data from the server
-* notification
-* faceted browsing
-* alternative presentations to the user
-* window resizing
+*   tables of data from the server
+*   notification
+*   faceted browsing
+*   alternative presentations to the user
+*   window resizing
 
-For every such task, we make a _duct_ and put it into the _dux_ directory. Every
+For every such task, we make a *duct* and put it into the *dux* directory. Every
 duct manages a slice of the state has four sections:
 
-* Actions: functions that create the actions whose dispatch will trigger a state
-  update
-* Reducer: a single function that translates all relevant actions into updates
-  of its slice of the state
-* Selectors: functions that grab data from the state in order to offer it to
-  [connected](#connect) components
-* Helpers: functions that contain additional logic, especially for selectors.
-  See for an example [filters](Dux#filters).
+*   Actions: functions that create the actions whose dispatch will trigger a state
+    update
+*   Reducer: a single function that translates all relevant actions into updates
+    of its slice of the state
+*   Selectors: functions that grab data from the state in order to offer it to
+    [connected](#connect) components
+*   Helpers: functions that contain additional logic, especially for selectors.
+    See for an example [filters](Dux#filters).
 
-## Merge
+Merge
+-----
 
 When a reducer transforms a state, it must happen in such a way that
 
-* unaffected parts of the state do not change,
-* all intermediate objects between the top-level state and a changed leaf are
-  fresh objects.
+*   unaffected parts of the state do not change,
+*   all intermediate objects between the top-level state and a changed leaf are
+    fresh objects.
 
 The handiest way to achieve this is to use
 [lodash merge]({{site.lodash}}/#merge) and
@@ -314,13 +317,14 @@ the old state has an array of items, and we need to append some items, we create
 a new array, consisting of the items of the original array, with the new items
 concatenated after them.
 
-## Select
+Select
+------
 
 The opposite of merging data into the state is selecting data from the state.
 Our components need bits and pieces of the state in order to know what they
-should render. To this end, we write _selector_ functions, that return suitable
+should render. To this end, we write *selector* functions, that return suitable
 slices of the state. In some cases, selecting the data requires quite a bit of
-computation, especially when the data in the state is _normalized_ and the
+computation, especially when the data in the state is *normalized* and the
 component needs denormalized data. Or, in the case of faceted browsing, the
 items to show must be computed from the list of items in the table slice of the
 state, combined with the current filter settings from the filter slice of the
@@ -347,45 +351,43 @@ However, we will also encounter cases where we need more complete memoization,
 so that functions have a cache for their results given multiple sets of
 parameters. See [memo](Lib#memo).
 
-## Connect
+Connect
+-------
 
 Redux and the dux streamline very much how components deal with the centralized
 store. The central function is Redux
 [connect]({{site.reactRedux}}/docs/api#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options).
 
-If a component X needs state, we can create a _connected_ component Xc from X.
+If a component X needs state, we can create a *connected* component Xc from X.
 Connected means: connected to the state.
 
-```
-Xc = connect(selectors, dispatchers)(X)
-```
+    Xc = connect(selectors, dispatchers)(X)
 
 The new component Xc has extra props:
 
-* data properties provided by the selector function `selectors`, which is a
-  function that reads the global state and returns information of it as a props
-  object.
-* callback properties, provided by the function `dispatchers`. This returns a
-  props object of action creator functions. Xc can use these where a callback is
-  needed. When such a function is called, the action will be created and
-  dispatched, which in turn will lead to a state change.
+*   data properties provided by the selector function `selectors`, which is a
+    function that reads the global state and returns information of it as a props
+    object.
+*   callback properties, provided by the function `dispatchers`. This returns a
+    props object of action creator functions. Xc can use these where a callback is
+    needed. When such a function is called, the action will be created and
+    dispatched, which in turn will lead to a state change.
 
 See also [Architecture](Architecture#overview).
 
-# Routing
+Routing
+=======
 
 [React-router]({{site.reactRouter}}) is a convenient library to manage the
 connection between the URL and the part of your app that should be active in
 response to it.
 
-```
-<Router history={browserHistory} >
-  <Route path="/" component={App} >
-    <Route path="about" component={About} />
-    <Route path="table" component={ListPlain} />
-  </Route>
-</Router>
-```
+    <Router history={browserHistory} >
+      <Route path="/" component={App} >
+        <Route path="about" component={About} />
+        <Route path="table" component={ListPlain} />
+      </Route>
+    </Router>
 
 The router and its routes are basically React [components](#react-components).
 But they come loaded with some extra behaviour. Basically, when a route is

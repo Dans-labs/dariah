@@ -2,7 +2,8 @@
 title: Workflow Engine
 ---
 
-# Description
+Description
+===========
 
 The workflow engine of this app is a system to handle business logic.
 
@@ -12,29 +13,31 @@ constraints.
 
 ![diag](design/design.011.png)
 
-These additional _workflow_ attributes are computed by the server on the fly,
+These additional *workflow* attributes are computed by the server on the fly,
 without storing them in the database. From then on the following happens with
 the workflow attributes:
 
-* they are sent to client, together with the _permission_ information for each
-  record
-* the client uses the workflow info to show or hide workflow related controls,
-  and to suppress controls that lead to actions that violate the business logic
-* the server uses the workflow info to enforce the business logic;
-* the server updates the workflow attributes after any insert/update/delete
-  action.
+*   they are sent to client, together with the *permission* information for each
+    record
+*   the client uses the workflow info to show or hide workflow related controls,
+    and to suppress controls that lead to actions that violate the business logic
+*   the server uses the workflow info to enforce the business logic;
+*   the server updates the workflow attributes after any insert/update/delete
+    action.
 
 No matter how good a job the client does in supporting the business logic and
 prohibiting actions that violate the business logic, the server always has the
 last word. Every access to bits and pieces in the database is first subjected to
 the permissions (a lower layer) and then to the additional workflow constraints.
 
-# Realization
+Realization
+===========
 
 Workflow is realized at the server and at the client. To a large extent, its
 rules are specified in the [data model](Model).
 
-## Client
+Client
+------
 
 Workflow logic is found in [workflow.js](Dux#workflow), but also in the
 [templates](Templates), which may include workflow buttons and info panels. The
@@ -42,7 +45,8 @@ templates themselves are applied by functions in
 [templates.js]({{site.libBase}}/templates.js). These functions are given
 workflow attributes that they pass on to the templates.
 
-## Server
+Server
+------
 
 The heart of the workflow code is at the server, in
 [workflow.py]({{site.serverBase}}/controllers/workflow.py). Its functions are
@@ -50,7 +54,7 @@ called from [db.py]({{site.serverBase}}/controllers/db.py) in many places.
 
 The principal functions exported are discussed here.
 
-### readWorkflow
+### readWorkflow ###
 
 Given a document in some table, this function compiles the workflow attributes
 and gives them a proper value. The determination of these attributes is dictated
@@ -128,10 +132,10 @@ deliver or not deliver a specific set of workflow attributes. More precisely,
 this is the rule that states that a contribution record becomes locked if it has
 an assessment that has been submitted.
 
-### adjustWorkflow
+### adjustWorkflow ###
 
 Whereas `readWorkflow` computes all relevant workflow for a given record in a
-given table, `adjustWorkflow` delivers a list of _other_ records in other
+given table, `adjustWorkflow` delivers a list of *other* records in other
 tables, that need new workflow attributes after a change in a given record.
 whether it be an insert. update or delete.
 
@@ -166,11 +170,11 @@ this assessment to a different contribution, then that contribution has to know!
 The other trigger field, `assessmentType` is mentioned because of an other
 workflow rule, which we have not mentioned here as an example.
 
-### enforceWorkflow
+### enforceWorkflow ###
 
 Finally, the server has to know the consequences of the workflow attributes for
 behaviour. This is dictated in the [model](Model). under the key
-`workflow/prevent/`_attribute_ where `attribute` is a name such as `locked` or
+`workflow/prevent/`*attribute* where `attribute` is a name such as `locked` or
 `incomplete`.
 
 For each attribute there are optional constraints for the `update` and `delete`
