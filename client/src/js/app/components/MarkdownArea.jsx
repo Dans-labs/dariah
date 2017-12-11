@@ -34,7 +34,7 @@ const MarkdownArea = ({
 				tip={`${alt === 0 ? 'edit text' : 'preview formatted text'}`}
 				at={'right'}
 			>
-				<div
+				<span
 					className={`button medium field-control fa fa-${
 						alt === 0 ? 'pencil' : 'hand-o-down'
 					}`}

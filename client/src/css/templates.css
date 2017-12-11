@@ -26,6 +26,23 @@ div.entry {
 	justify-content: flex-start;
 	align-items: flex-start;
 }
+div.review.allcomments {
+    display: flex;
+    flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+div.review.reviewer {
+    flex: 0 0 50%;
+}
+div.review.reviewer.my {
+    background-color: var(--review-my-back);
+    border: 2px solid var(--review-my-border);
+}
+div.review.reviewer.other {
+    background-color: var(--review-other-back);
+    border: 2px solid var(--review-other-border);
+}
 div.fat {
 	flex: 0 1 80%;
 }
@@ -51,6 +68,14 @@ div.comments.assessment {
 	border: 2px solid var(--assessment-quoted-border);
 	border-radius: 0.2rem;
 	padding: 0.2rem;
+}
+
+div.comments.review {
+	font-size: medium;
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
+	margin-left: 0.25rem;
+	margin-right: 0.25rem;
 }
 
 div.assessment .tag {

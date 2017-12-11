@@ -275,8 +275,11 @@ class WorkflowApi(object):
             }
         elif table == N.review:
             detailData = []
+            insertValues = {}
             if masterDocument is not None:
                 assessmentId = masterDocument.get(N._id, None)
+                masterType = masterDocument.get(N.assessmentType, None)
+                insertValues[N.reviewType] = masterType
                 criteriaEntryDocs = self.workflowLookup(
                     N.criteriaEntry,
                     {N.assessment: assessmentId},
@@ -297,6 +300,7 @@ class WorkflowApi(object):
                 N.detailData: {
                     N.reviewEntry: detailData
                 },
+                N.insertValues: insertValues,
             }
         return (good, data)
 

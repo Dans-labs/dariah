@@ -194,8 +194,10 @@ textarea.invalid:focus {
 	-webkit-overflow-scrolling: touch;
 }
 .field-control {
+    /*
 	overflow: auto;
 	-webkit-overflow-scrolling: touch;
+    */
 }
 .fragments {
 	width: calc(100% - 1rem);
