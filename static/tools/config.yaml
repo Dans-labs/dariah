@@ -3,7 +3,7 @@ locations:
   BASE_DIR_PROD: /home/dirkr/dariah_data
   FM_DIR: >-
     {b}/fm
-  EXPORT_DIR: ~/github/Dans-labs/_temp
+  EXPORT_DIR: ~/github/Dans-labs/dariah/_temp
   EXPORT_ORIG: >-
     {e}/contribFromFileMaker.xlsx
   EXPORT_MONGO: >-

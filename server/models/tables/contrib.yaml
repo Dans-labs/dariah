@@ -245,6 +245,11 @@ filters:
     type: Fulltext
     maxCols: null
     expanded: null
+  - field: submitted
+    detail: assessment
+    type: ByValue
+    maxcols: 1
+    expanded: true 
   - field: country
     label: country
     type: EUMap

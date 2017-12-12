@@ -8,6 +8,7 @@ import { getTables, needTables, fetchTables, MYIDS } from 'tables'
 import { getFilters, makeTag } from 'filters'
 
 import ErrorBoundary from 'ErrorBoundary'
+import ListStats from 'ListStats'
 import ListGrid from 'ListGrid'
 import ListPlain from 'ListPlain'
 import ListFilter from 'ListFilter'
@@ -71,6 +72,11 @@ class ListContainer extends Component {
 						select={select}
 						perm={perm}
 						gridTag={table}
+					/>
+				) : mode === 'stats' ? (
+					<ListStats
+						tables={tables}
+						table={table}
 					/>
 				) : (
 					`unknown display mode "${mode}" for ${things}`

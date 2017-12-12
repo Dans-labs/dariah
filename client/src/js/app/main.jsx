@@ -69,6 +69,13 @@ render(
 								mode={'list'}
 								filtered={true}
 							/>
+							<Route
+								path={'stats'}
+								component={ListContainer}
+								select={ALLIDS}
+								mode={'stats'}
+								filtered={false}
+							/>
 						</Route>
 					</Route>
 				</Route>

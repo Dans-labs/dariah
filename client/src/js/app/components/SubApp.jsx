@@ -51,6 +51,12 @@ const navBarItems = [
 		forWhom: 'public',
 		details: [
 			{
+				path: 'stats',
+				name: 'Statistics',
+				forWhom: 'public',
+				hint: 'Various statistics of contributions',
+			},
+			{
 				path: 'filter',
 				name: 'All items',
 				forWhom: 'public',

@@ -1,0 +1,28 @@
+.head {
+    font-weight: bold;
+}
+.stats-section {
+    display: flex;
+    flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: flex-start;
+}
+.stats-title {
+    font-size: large;
+    padding: 0.5rem 0 0.3rem 0;
+    width: 100%;
+}
+.stats-line {
+	display: inline-flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: baseline;
+	align-content: flex-start;
+}
+.stats-item {
+    flex: 0 0 10rem;
+    text-align: right;
+    padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+    border: 2px solid var(--stats-border);
+}

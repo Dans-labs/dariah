@@ -9,6 +9,7 @@
 # In this case the role 'root' will be assigned to the user configured as root user.
 
 import os,sys,re,collections,json,yaml
+import xlsxwriter
 from os.path import splitext, basename
 from functools import reduce
 from glob import glob
@@ -713,6 +714,7 @@ INSR = documents to be inserted, avoiding overwriting
                     val = '|'.join(val)
                     worksheet.write(r+1, f, val)
         workbook.close()
+        return
 
         workbook = xlsxwriter.Workbook(self.EXPORT_MONGO, {'strings_to_urls': False})
         getName = lambda i: self.mongo.getName(i)
@@ -769,7 +771,7 @@ INSR = documents to be inserted, avoiding overwriting
         self.importMongo()
         #self.showData()
         #self.showMoney()
-        #if isDevel: self.exportXlsx()
+        if isDevel: self.exportXlsx()
 
 if makeRoot:
     makeUserRoot()

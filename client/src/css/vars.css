@@ -117,6 +117,8 @@
     --sort--col-back:                  hsla(120,   0%,  95%, 1  );
     --sort--specs-fore:                hsla(120,   0%,  40%, 1  );
 
+    --stats-border:                    hsla(  0,   0%,  50%, 0.5);
+
     --subbar-back:                     hsla( 30,  30%,  80%, 0.4);
 
     --special-fore-o:                  hsla(120,  00%,  30%, 1  );
