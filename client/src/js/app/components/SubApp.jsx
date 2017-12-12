@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
 
-import { withParams, emptyA } from 'utils'
+import { withParams, emptyA, emptyS } from 'utils'
 import { getMe } from 'me'
 
 import ErrorBoundary from 'ErrorBoundary'
@@ -29,10 +29,10 @@ const tableLinks = (me, { path, name, forWhom, details }) =>
 				{(details || emptyA)
 					.filter(({ forWhom: subFor }) => forMe(me.groupRep, subFor))
 					.map(
-						({ component, path: subPath, name: subName, hint, ppath }) =>
+						({ button, component, path: subPath, name: subName, hint, ppath }) =>
 							component == null ? (
 								<Tooltip key={subPath} tip={hint} at={'right'}>
-									<NavLink to={`${ppath || path}/${subPath}`}>
+									<NavLink to={`${ppath || path}/${subPath}`} className={button ? 'button large workflow' : emptyS}>
 										{subName}
 									</NavLink>
 								</Tooltip>
@@ -55,6 +55,7 @@ const navBarItems = [
 				name: 'Statistics',
 				forWhom: 'public',
 				hint: 'Various statistics of contributions',
+        button: true,
 			},
 			{
 				path: 'filter',

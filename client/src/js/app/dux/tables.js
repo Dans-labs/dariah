@@ -557,7 +557,7 @@ const trimDate = (text, table, field, settings) =>
  * The result is a string, except when the field is multiple and sep is null.
  *
  */
-const repr1Head = (tables, table, field, valType, value, settings) => {
+export const repr1Head = (tables, table, field, valType, value, settings) => {
 	if (value == null) {
 		return emptyS
 	}
