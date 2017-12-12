@@ -18,6 +18,7 @@ const getSumCost = (entities, ids) =>
   )
 
 const breakDownBy = (settings, tables, table, field, theIds) => {
+  console.warn(`begin BD ${field}`)
   const {
     [table]: {
       fieldSpecs: {
@@ -56,6 +57,7 @@ const breakDownBy = (settings, tables, table, field, theIds) => {
       results = updateAuto(results, [repValue, key], { $set: [number, cost] })
     })
   })
+  console.warn(`end BD ${field}`)
   return [label, results]
 }
 
@@ -69,15 +71,19 @@ const ListStats = ({ settings, tables, table }) => {
   } = tables
 
   const allContribIds = new Set(allIds)
+  console.warn('A')
   const assessedContribIds = new Set(
     Object.values(aEntities).map(e => e.values.contrib),
   )
+  console.warn('B')
   const reviewedAssessmentIds = new Set(
     Object.values(rEntities).map(e => e.values.assessment),
   )
+  console.warn('C')
   const reviewedContribIds = new Set(
     Array.from(reviewedAssessmentIds).map(eId => aEntities[eId].values.contrib),
   )
+  console.warn('D')
 
   const theIds = {
     all: allContribIds,
