@@ -59,7 +59,13 @@ const navBarItems = [
 			},
 			{
 				path: 'filter',
-				name: 'All items',
+				name: 'All items (filtered)',
+				forWhom: 'public',
+				hint: 'Overview of all contributions',
+			},
+			{
+				path: 'list',
+				name: 'All items (list)',
 				forWhom: 'public',
 				hint: 'Overview of all contributions',
 			},

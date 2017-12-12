@@ -1,4 +1,4 @@
-.head {
+.stats-section.head, .stats-line.head, .stats-item.head {
     font-weight: bold;
 }
 .stats-section {
