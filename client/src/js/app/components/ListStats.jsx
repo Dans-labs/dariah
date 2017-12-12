@@ -14,11 +14,10 @@ const statKeys = {
 
 const getSumCost = (entities, ids) =>
   Math.round(
-    sum(Array.from(ids).map(eId => entities[eId].values.costTotal || 0)),
+    sum(Array.from(ids).map(eId => (entities[eId] && entities[eId].values.costTotal) || 0)),
   )
 
 const breakDownBy = (settings, tables, table, field, theIds) => {
-  console.warn(`begin BD ${field}`)
   const {
     [table]: {
       fieldSpecs: {
@@ -57,7 +56,6 @@ const breakDownBy = (settings, tables, table, field, theIds) => {
       results = updateAuto(results, [repValue, key], { $set: [number, cost] })
     })
   })
-  console.warn(`end BD ${field}`)
   return [label, results]
 }
 
@@ -71,19 +69,15 @@ const ListStats = ({ settings, tables, table }) => {
   } = tables
 
   const allContribIds = new Set(allIds)
-  console.warn('A')
   const assessedContribIds = new Set(
     Object.values(aEntities).map(e => e.values.contrib),
   )
-  console.warn('B')
   const reviewedAssessmentIds = new Set(
     Object.values(rEntities).map(e => e.values.assessment),
   )
-  console.warn('C')
   const reviewedContribIds = new Set(
     Array.from(reviewedAssessmentIds).map(eId => aEntities[eId].values.contrib),
   )
-  console.warn('D')
 
   const theIds = {
     all: allContribIds,
@@ -92,22 +86,18 @@ const ListStats = ({ settings, tables, table }) => {
   }
   let allResults = {}
   Object.entries(theIds).forEach(([key, ids]) => {
-    allResults = updateAuto(allResults, ['-', key], {
+    allResults = updateAuto(allResults, [' ', key], {
       $set: [theIds[key].size, getSumCost(entities, ids)],
     })
   })
 
-  console.warn('E')
-
   const results = [
     ['Total', allResults],
-    //breakDownBy(settings, tables, table, 'year', theIds),
-    //breakDownBy(settings, tables, table, 'country', theIds),
-    //breakDownBy(settings, tables, table, 'typeContribution', theIds),
-    //breakDownBy(settings, tables, table, 'discipline', theIds),
+    breakDownBy(settings, tables, table, 'year', theIds),
+    breakDownBy(settings, tables, table, 'country', theIds),
+    breakDownBy(settings, tables, table, 'typeContribution', theIds),
+    breakDownBy(settings, tables, table, 'discipline', theIds),
   ]
-
-  console.warn('F')
 
   return (
     <Fragment>
@@ -116,14 +106,12 @@ const ListStats = ({ settings, tables, table }) => {
           <div className={'stats-item value head'}>{'value'}</div>
           {statKeyOrder.map(statKey => (
             <Fragment key={statKey}>
-              <div className={'stats-item ncost head'}>{
-                statKeys[statKey]
-              }</div>
+              <div className={'stats-item ncost head'}>{statKeys[statKey]}</div>
             </Fragment>
           ))}
         </div>
         <div className={'stats-line head'}>
-          <div className={'stats-item value head'}>{' '}</div>
+          <div className={'stats-item value head'}>{` `}</div>
           {statKeyOrder.map(statKey => (
             <Fragment key={statKey}>
               <div className={'stats-item n head'}>{'#'}</div>
@@ -135,20 +123,22 @@ const ListStats = ({ settings, tables, table }) => {
       {results.map(([name, values]) => (
         <div key={name} className={'stats-section'}>
           <div className={'stats-title head'}>{name}</div>
-          {Object.entries(values).sort().map(([value, keys]) => (
-            <div key={value} className={'stats-line'}>
-              <div className={'stats-item value'}>{value}</div>
-              {statKeyOrder.map(statKey => {
-                const thisData = keys[statKey] || noData
-                return (
-                  <Fragment key={statKey}>
-                    <div className={'stats-item n'}>{thisData[0]}</div>
-                    <div className={'stats-item cost'}>{thisData[1]}</div>
-                  </Fragment>
-                )
-              })}
-            </div>
-          ))}
+          {Object.entries(values)
+            .sort()
+            .map(([value, keys]) => (
+              <div key={value} className={'stats-line'}>
+                <div className={'stats-item value'}>{value}</div>
+                {statKeyOrder.map(statKey => {
+                  const thisData = keys[statKey] || noData
+                  return (
+                    <Fragment key={statKey}>
+                      <div className={'stats-item n'}>{thisData[0]}</div>
+                      <div className={'stats-item cost'}>{thisData[1]}</div>
+                    </Fragment>
+                  )
+                })}
+              </div>
+            ))}
         </div>
       ))}
     </Fragment>
