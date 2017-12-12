@@ -97,6 +97,8 @@ const ListStats = ({ settings, tables, table }) => {
     })
   })
 
+  console.warn('E')
+
   const results = [
     ['Total', allResults],
     breakDownBy(settings, tables, table, 'year', theIds),
@@ -104,6 +106,8 @@ const ListStats = ({ settings, tables, table }) => {
     breakDownBy(settings, tables, table, 'typeContribution', theIds),
     breakDownBy(settings, tables, table, 'discipline', theIds),
   ]
+
+  console.warn('F')
 
   return (
     <Fragment>
