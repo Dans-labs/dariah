@@ -32,7 +32,7 @@ const tableLinks = (me, { path, name, forWhom, details }) =>
 						({ button, component, path: subPath, name: subName, hint, ppath }) =>
 							component == null ? (
 								<Tooltip key={subPath} tip={hint} at={'right'}>
-									<NavLink to={`${ppath || path}/${subPath}`} className={button ? 'button large workflow' : emptyS}>
+									<NavLink to={`${ppath || path}/${subPath}`} className={button ? 'button large workflow info' : emptyS}>
 										{subName}
 									</NavLink>
 								</Tooltip>
