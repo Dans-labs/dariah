@@ -118,6 +118,15 @@
     --sort--specs-fore:                hsla(120,   0%,  40%, 1  );
 
     --stats-border:                    hsla(  0,   0%,  50%, 0.5);
+    --stats-cost-fore:                 hsla(120,  20%,  10%, 1  );
+    --stats-cost-back:                 hsla(120,  20%,  98%, 1  );
+    --stats-n-fore:                    hsla(120,  20%,  10%, 1  );
+    --stats-n-back:                    hsla(120,  20%,  94%, 1  );
+    --stats-title-fore:                hsla(  0,   0%, 100%, 1  );
+    --stats-title-back:                hsla(  0,   0%,  10%, 1  );
+    --stats-title-border:              hsla(  0,   0%,  95%, 0.8);
+    --stats-value-fore:                hsla(  0,   0%,   0%, 1  );
+    --stats-value-back:                hsla(  0,   0%,  90%, 1  );
 
     --subbar-back:                     hsla( 30,  30%,  80%, 0.4);
 

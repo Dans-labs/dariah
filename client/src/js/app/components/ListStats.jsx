@@ -14,7 +14,11 @@ const statKeys = {
 
 const getSumCost = (entities, ids) =>
   Math.round(
-    sum(Array.from(ids).map(eId => (entities[eId] && entities[eId].values.costTotal) || 0)),
+    sum(
+      Array.from(ids).map(
+        eId => (entities[eId] && entities[eId].values.costTotal) || 0,
+      ),
+    ),
   )
 
 const breakDownBy = (settings, tables, table, field, theIds) => {
@@ -86,13 +90,13 @@ const ListStats = ({ settings, tables, table }) => {
   }
   let allResults = {}
   Object.entries(theIds).forEach(([key, ids]) => {
-    allResults = updateAuto(allResults, [' ', key], {
+    allResults = updateAuto(allResults, ['All', key], {
       $set: [theIds[key].size, getSumCost(entities, ids)],
     })
   })
 
   const results = [
-    ['Total', allResults],
+    ['', allResults],
     breakDownBy(settings, tables, table, 'year', theIds),
     breakDownBy(settings, tables, table, 'country', theIds),
     breakDownBy(settings, tables, table, 'typeContribution', theIds),
@@ -122,7 +126,7 @@ const ListStats = ({ settings, tables, table }) => {
       </div>
       {results.map(([name, values]) => (
         <div key={name} className={'stats-section'}>
-          <div className={'stats-title head'}>{name}</div>
+          {name ? <div className={'stats-title head'}>{name}</div> : null}
           {Object.entries(values)
             .sort()
             .map(([value, keys]) => (
