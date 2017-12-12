@@ -101,10 +101,10 @@ const ListStats = ({ settings, tables, table }) => {
 
   const results = [
     ['Total', allResults],
-    breakDownBy(settings, tables, table, 'year', theIds),
-    breakDownBy(settings, tables, table, 'country', theIds),
-    breakDownBy(settings, tables, table, 'typeContribution', theIds),
-    breakDownBy(settings, tables, table, 'discipline', theIds),
+    //breakDownBy(settings, tables, table, 'year', theIds),
+    //breakDownBy(settings, tables, table, 'country', theIds),
+    //breakDownBy(settings, tables, table, 'typeContribution', theIds),
+    //breakDownBy(settings, tables, table, 'discipline', theIds),
   ]
 
   console.warn('F')
