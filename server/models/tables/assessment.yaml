@@ -5,6 +5,11 @@ perm:
   insert: auth
   delete: own
 
+timing:
+  submitted:
+    true: dateSubmitted
+    false: dateWithdrawn
+
 workflow:
   read:
     - inspect: master
@@ -32,9 +37,6 @@ workflow:
       method: hasIncomplete
       linkField: assessment
       otherTable: criteriaEntry
-      otherField: null
-      myField: null
-      value: null
       emptyFields:
         - score
         - evidence
@@ -47,6 +49,7 @@ workflow:
       otherTable: review
       otherFields:
         - creator
+        - decision
       attribute:
         name: reviews
         desc: reviews of this same assessment
@@ -57,6 +60,7 @@ workflow:
       triggerFields:
         - assessmentType
         - submitted
+        - reviewerF
     - inspect: details
       linkField: assessment
       otherTable: criteriaEntry

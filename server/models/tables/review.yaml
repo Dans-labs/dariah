@@ -5,6 +5,9 @@ perm:
   insert: auth
   delete: own
 
+timing:
+  decision: dateDecided
+
 workflow:
   read:
     - inspect: siblings
@@ -14,6 +17,8 @@ workflow:
       otherTable: review
       otherFields:
         - _id
+        - decision
+        - dateDecided
       attribute:
         name: others
         desc: other reviews of the same assessment
@@ -27,6 +32,15 @@ workflow:
       attribute:
         name: reviewers
         desc: all reviewers of this assessment
+    - inspect: details
+      method: hasIncomplete
+      linkField: review
+      otherTable: reviewEntry
+      emptyFields:
+        - comments
+      attribute:
+        name: incomplete
+        desc: "some criteria lack reviewer's comments ({n}x)"
   adjust:
     - inspect: siblings
       linkField: assessment
@@ -34,11 +48,19 @@ workflow:
       otherTable: review
       triggerFields:
         - _id
+        - decision
     - inspect: master
       linkField: assessment
       otherTable: assessment
       triggerFields:
         - creator
+        - decision
+    - inspect: master
+      linkField: contrib
+      otherTable: contrib
+      triggerFields:
+        - creator
+        - decision
 
 title: title
 
@@ -54,6 +76,7 @@ sort:
 fieldOrder: 
   - title
   - reviewType
+  - contrib
   - assessment
   - remarks
   - decision
@@ -83,6 +106,17 @@ fieldSpecs:
           className: inactive
           title: this value does not belong to the current package
         disabled: true
+    multiple: false
+  contrib:
+    perm:
+      list:   public
+      read:   public
+      update: nobody
+    label: Contribution
+    valType:
+      relTable: contrib
+      allowNew: false
+      fixed: true
     multiple: false
   assessment:
     perm:

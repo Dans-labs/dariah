@@ -1,4 +1,5 @@
 - alter
+  - Expand
 - docs:
   - DocMd
   - Doc
@@ -7,8 +8,6 @@
 - filters:
   - CheckboxI
   - EUMap
-  - ListContainer
-  - ListFilter
   - ByValue
   - Facet
   - Filter
@@ -39,40 +38,41 @@
   - FieldRead
   - ListGrid
   - RelSelect
+  - TooltipSwitch
 - tables:
-  - ItemContainer
-  - ListContainer
-  - ListFilter
-  - ListPlain
-  - Overview
   - EditControl
   - EditDelete
-  - EditInsert
   - EditHelp
+  - EditInsert
   - EditStatus
   - FieldEdit
   - FieldRead
   - FieldSet
+  - Input
+  - InputMulti
+  - Insert
   - ItemAction
+  - ItemContainer
   - ItemDetails
   - ItemEdit
   - ItemForm
   - ItemRow
+  - ItemRead
+  - ListContainer
+  - ListFilter
+  - ListPlain
   - ListGrid
   - MarkdownArea
   - OpenCloseAll
   - RelSelect
-  - Input
-  - InputMulti
-  - ItemRead
 - win:
-  - Window
   - App
   - SubApp
+  - Window
 - __none__:
-  - Static
+  - ErrorBoundary
   - NavLink
   - NotFound
+  - Static
   - Tooltip
 - workflow:
-  - Overview

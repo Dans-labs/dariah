@@ -197,7 +197,7 @@ const makeEditS = memoize((settings, tables, table, fieldInfo = emptyO) => {
 	const { [table]: { fieldSpecs } = emptyO } = tables
 	return (field, relField, sep, relSep) => {
 		const {
-			[field]: { fragment: { myValues = emptyO } = emptyO } = emptyO,
+			[field]: { fragment: { myValues } = emptyO } = emptyO,
 		} = fieldInfo
 		const { [field]: { valType, multiple } = emptyO } = fieldSpecs
 		return repr(

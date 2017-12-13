@@ -60,3 +60,11 @@
 	background-color: var(--workflow-action-error-back);
 	border-color: var(--workflow-action-error-border);
 }
+.button.workflow.info.active,
+.button.workflow.good.active,
+.button.workflow.warning.active,
+.button.workflow.error.active {
+	color: var(--workflow-action-active-fore);
+	background-color: var(--workflow-action-active-back);
+	border-color: var(--workflow-action-active-border);
+}

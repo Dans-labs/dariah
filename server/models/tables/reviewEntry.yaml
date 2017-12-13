@@ -36,6 +36,11 @@ workflow:
       otherTable: reviewEntry
       triggerFields:
         - comments
+    - inspect: master
+      linkField: review
+      otherTable: review
+      triggerFields:
+        - comments
 
 title: criteria
 

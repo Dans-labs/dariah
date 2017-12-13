@@ -16,7 +16,26 @@ workflow:
       value: true
       attribute:
         name: locked
-        desc: being assessed
+        desc: being reviewed
+    - inspect: details
+      method: getValues
+      linkField: contrib
+      otherTable: review
+      otherFields:
+        - creator
+        - decision
+      attribute:
+        name: reviews
+        desc: reviews of this contribution
+    - inspect: details
+      method: getValues
+      linkField: contrib
+      otherTable: assessment
+      otherFields:
+        - reviewerF
+      attribute:
+        name: reviewers
+        desc: final reviewers of this contribution
   adjust:
     - inspect: details
       linkField: contrib
@@ -236,6 +255,12 @@ details:
   assessment:
     table: assessment
     linkField: contrib
+    mode: list
+    filtered: false
+  review:
+    table: review
+    linkField: contrib
+    expand: own
     mode: list
     filtered: false
 

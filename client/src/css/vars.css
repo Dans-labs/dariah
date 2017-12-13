@@ -189,6 +189,10 @@
     --workflow-action-error-back:      hsla(  0, 100%,  40%, 1  );
     --workflow-action-error-border:    hsla(  0, 100%,  90%, 0.7);
 
+    --workflow-action-active-fore:     hsla(210, 100%,  40%, 1  );
+    --workflow-action-active-back:     hsla(060,  80%,  90%, 0.8);
+    --workflow-action-active-border:   hsla(060, 100%,  50%, 0.5);
+
     --workflow-info-fore:              hsla(240,   0%,   0%, 1  );
     --workflow-info-back:              hsla(240, 100%,  95%, 1  );
     --workflow-info-border:            hsla(240, 100%,  95%, 1  );

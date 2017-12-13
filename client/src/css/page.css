@@ -60,25 +60,20 @@ div.subnavbar {
 	-webkit-overflow-scrolling: touch;
 	background-color: var(--subbar-back);
 	padding: 0;
-	display: flex;
-	flex: 0 0 content;
-	flex-flow: column nowrap;
-	justify-content: flex-start;
-	align-content: flex-start;
 }
 .subnavbar .section {
-	flex: 0 0 content;
-	display: inline-flex;
-	flex-flow: column nowrap;
-	justify-content: flex-start;
-	align-content: flex-start;
 	padding: 0.2rem;
 }
+.subnavbar .section .head {
+	font-weight: bold;
+}
 .subnavbar .subsection {
+    /*
 	flex-basis: content;
 	flex-grow: 0;
 	flex-shrink: 0;
-	display: inline-flex;
+	display: inline-flex;*/
+    display: flex;
 	flex-flow: column nowrap;
 	justify-content: flex-start;
 	align-content: start-end;

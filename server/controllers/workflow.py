@@ -278,8 +278,10 @@ class WorkflowApi(object):
             insertValues = {}
             if masterDocument is not None:
                 assessmentId = masterDocument.get(N._id, None)
+                contribId = masterDocument.get(N.contrib, None)
                 masterType = masterDocument.get(N.assessmentType, None)
                 insertValues[N.reviewType] = masterType
+                insertValues[N.contrib] = contribId
                 criteriaEntryDocs = self.workflowLookup(
                     N.criteriaEntry,
                     {N.assessment: assessmentId},

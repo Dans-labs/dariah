@@ -13,14 +13,24 @@ const flows = {
 	},
 }
 
+/* trim dates:
+ *
+ * true: trim time always
+ * 1:    trim time is longer than 1 day ago
+ * false or absent: trim milliseconds only
+ */
+
 const initSettings = () => ({
 	provenanceFields: new Set(['creator', 'dateCreated', 'modified']),
 	hideProvenance: true,
 	longDates: {
 		assessment: {
-			dateSubmitted: true,
-			dateWithdrawn: true,
+			dateSubmitted: 1,
+			dateWithdrawn: 1,
 		},
+    review: {
+      dateDecided: 1,
+    },
 	},
 	showTooltips: true,
 })

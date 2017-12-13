@@ -14,7 +14,6 @@ from models.compiled.names import N
 DM = M[N.tables]
 DMG = M[N.generic]
 PM = M[N.permissions]
-WM = M[N.workflow]
 
 # N.info
 
@@ -527,9 +526,9 @@ class DbAccess(object):
         }
         masterDocument = None
         masterTitle = None
+        (dummyO, fieldSpecs,
+         readFieldFilter) = _theseFields(table, readFieldSet)
         if masterId is not None and linkField is not None:
-            (dummyO, fieldSpecs,
-             readFieldFilter) = _theseFields(table, readFieldSet)
             oMasterId = oid(masterId)
             insertValues[linkField] = oMasterId
             linkFieldSpecs = fieldSpecs[linkField]
@@ -819,11 +818,15 @@ class DbAccess(object):
                 continue
             if fieldSpecs[field][N.multiple]:
                 continue
-            timingField = WM.get(N.timing).get(table,
-                                               {}).get(field,
-                                                       {}).get(newVal, None)
+            timingField = DM.get(table, {}).get(N.timing,
+                                                {}).get(field, None)
             if timingField is not None:
-                updateSaveValues[timingField] = now()
+                if type(timingField) is str:
+                    thisTimingField = timingField
+                else:
+                    thisTimingField = timingField.get(newVal, None)
+                if thisTimingField is not None:
+                    updateSaveValues[thisTimingField] = now()
 
         for sysField in DMG[N.systemFields]:
             if (

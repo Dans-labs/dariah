@@ -20,18 +20,20 @@ const templates = {
 				{rField('assessmentType', l, f)}
 				{rField('contrib', l, f)}
 				{rField('remarks', l, f)}
+				{rField('editors', l, f)}
 			</div>
 		)
 	},
-	mainEdit({ l, fe, m, editButton }) {
+	mainEdit({ l, f, fe, m, editButton }) {
 		return (
 			<Fragment>
 				{editButton}
 				<div className={'grid fragments'}>
 					{eField('title', l, fe, m)}
-					{eField('assessmentType', l, fe, m)}
-					{eField('contrib', l, fe, m)}
+					{rField('assessmentType', l, f)}
+					{rField('contrib', l, f)}
 					{eField('remarks', l, fe, m)}
+					{eField('editors', l, fe, m)}
 				</div>
 			</Fragment>
 		)

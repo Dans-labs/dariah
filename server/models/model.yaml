@@ -16,6 +16,12 @@ defaults:
       label: representation
       valType: text
       multiple: false
+  filters:
+    - field: rep
+      label: value representation
+      type: Fulltext
+      maxCols: null
+      expanded: null
 
 provenanceOrder:
   - editors
@@ -178,11 +184,6 @@ workflow:
       update:
         submitted:
           after: true
-  timing:
-    assessment:
-      submitted:
-        true: dateSubmitted
-        false: dateWithdrawn
 
 # Finally a section of 
 # string constants

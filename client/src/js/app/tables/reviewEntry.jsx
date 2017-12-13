@@ -17,8 +17,8 @@ const templates = {
   detail: {
     review({ tables, settings, l, v, w, me, e, s, f }) {
       const statusClass = e('comments') ? 'incomplete' : 'complete'
-      const { reviewerE, reviewerF } = getItem(w('reviewers'))
-      const thisReviewer = { E: reviewerE, F: reviewerF }
+      const thisReviewer = getItem(w('reviewers'))
+      const { reviewerE, reviewerF } = thisReviewer
       const myType = isReviewerType(me, reviewerE, reviewerF)
       return (
         <div className={`review entryRead ${statusClass}`}>
@@ -56,8 +56,8 @@ const templates = {
   detailEdit: {
     review({ tables, settings, l, e, w, me, s, f, fe, editButton }) {
       const statusClass = e('comments') ? 'incomplete' : 'complete'
-      const { reviewerE, reviewerF } = getItem(w('reviewers'))
-      const thisReviewer = { E: reviewerE, F: reviewerF }
+      const thisReviewer = getItem(w('reviewers'))
+      const { reviewerE, reviewerF } = thisReviewer
       const myType = isReviewerType(me, reviewerE, reviewerF)
       return (
         <div className={`review entryEdit ${statusClass}`}>
@@ -104,7 +104,7 @@ const putReviewAll = (
             className={`review reviewer ${reviewType} ${isMy ? 'my' : 'other'}`}
           >
             <div
-              className={`label large workflow ${isMy ? 'special' : 'info'}`}
+              className={`label large workflow ${isMy ? 'good' : 'info'}`}
             >
               {`${
                 isMy
@@ -112,7 +112,7 @@ const putReviewAll = (
                   : headEntity(
                       tables,
                       'user',
-                      thisReviewer[reviewType],
+                      thisReviewer[`reviewer${reviewType}`],
                       settings,
                     )
               } (${reviewerRole[reviewType]})`}
@@ -145,7 +145,7 @@ const putReviewReviewer = (
     )
   } else {
     const otherEntries = getItem(w('others'), true).filter(
-      ({ creator }) => creator === thisReviewer[reviewType],
+      ({ creator }) => creator === thisReviewer[`reviewer${reviewType}`],
     )
     return otherEntries.map(({ comments }, i) => (
       <Markdown
