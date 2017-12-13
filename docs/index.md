@@ -67,10 +67,11 @@ structured around a handful of slices of the *state*, the single source of truth
 for the whole app when it lives in the browser.
 
 [Model](Model)
-----------------------------
-The whole app is centered around data: contributions, assessments, reviews and more.
-Read how we have organized and specified the data,
-and how this is communicated to the rest of the app.
+--------------
+
+The whole app is centered around data: contributions, assessments, reviews and
+more. Read how we have organized and specified the data, and how this is
+communicated to the rest of the app.
 
 [Components](Components)
 ------------------------
@@ -140,7 +141,6 @@ the start. For an account, read the [lessons](Lessons).
 Author
 ======
 
-Dirk Roorda [DANS]({{site.dans}})
-<mailto:dirk.roorda@dans.knaw.nl>
+Dirk Roorda [DANS]({{site.dans}}) <mailto:dirk.roorda@dans.knaw.nl>
 
 2017-12-04
