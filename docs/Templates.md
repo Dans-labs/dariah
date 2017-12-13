@@ -13,6 +13,10 @@ in one big form.
 The challenge is to use as much of the generic machinery when we define custom
 presentations. Our solution here is by using *templates*.
 
+The particulars of our templates are documented in [Tables](Tables), but you
+might need to continue reading here first about the power and organization of
+themt.
+
 Looking up a field value might seem a very innocent operation: you retrieve the
 appropriate document from the database, look up the field in question, and read
 out the value that you find there. Alas, there are several complicating factors:

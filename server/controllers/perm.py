@@ -33,55 +33,6 @@ class PermApi(object):
         extraMy=None,
         verbose=True,
     ):
-        '''
-        allow is the function that will determine whether something is allowed.
-        It will be called for an action on a table and/or document.
-        It may or may not be called in the context of a controller.
-        The result is a tuple:
-        - good: a boolean telling whether the action is allowed in that setting
-        - rowFilter: a mongodb criterion constraining the set of records
-          to which the action may be applied
-        - fieldSet: the set of fields to which the action may be applied
-
-        If not good, rowFilter and fieldSet will be None.
-
-        rowFilter:
-        - {} (mongodb criteria for allowed rows),
-        - False (no rows)
-        - True (all rows)
-        - None (irrelevant)
-
-        fieldSet:
-        - set() (allowed field names),
-        - empty set (no fields)
-        - None (irrelevant)
-
-        If a document is passed, permissions will be calculated
-        for that document,
-        and the rowFilter will be None, because it is not needed.
-        If no document is given, a rowFilter will be computed.
-
-        If the operation is not permitted on any row,
-        rowFilter = False is returned.
-        The reaction to this outcome should be
-        to not perform a database lookup at all.
-
-        But this is not a permission error, in this case the
-        list of records for which
-        the operation is allowed is empty.
-        This is different from good is False and rowFilter is None.
-
-        If the operation is permitted on a selection of rows,
-        a mongodb selection dict is returned.
-        If the operation is permitted on all rows, rowFilter=True is returned.
-
-        If no fields are permitted, fieldSet = set() is returned.
-        This will still deliver the _id fields,
-        because _id fields are always permitted.
-        If all or part of the fields are permitted,
-        a set of permitted fields is returned.
-
-        '''
         # sanity checks
         # does the action exist?
         actions = PM[N.actions]

@@ -18,7 +18,6 @@ We have organized dux as follows:
 This app contains the following dux:
 
 *   [alter](#alter)
-*   [workflow](#workflow)
 *   [docs](#docs)
 *   [filters](#filters)
 *   [forms](#forms)
@@ -31,6 +30,7 @@ This app contains the following dux:
 *   [settings](#settings)
 *   [tables](#tables)
 *   [win](#win)
+*   [workflow](#workflow)
 
 However, life is complicated, and the interplay between dux and components is no
 exception. Sometimes actions will be fired that affect more than one slice of

@@ -144,7 +144,7 @@ const putReviewReviewer = (
       </Tooltip>
     )
   } else {
-    const otherEntries = getItem(w('others'), true).filter(
+    const otherEntries = getItem(w('reviews'), true).filter(
       ({ creator }) => creator === thisReviewer[`reviewer${reviewType}`],
     )
     return otherEntries.map(({ comments }, i) => (

@@ -1262,7 +1262,7 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                       'triggerFields': ['creator', 'decision']}],
                                         'read': [ { 'attribute': { 'desc': 'other reviews of the '
                                                                            'same assessment',
-                                                                   'name': 'others'},
+                                                                   'name': 'reviews'},
                                                     'inspect': 'siblings',
                                                     'linkField': 'assessment',
                                                     'masterTable': 'assessment',
@@ -1394,7 +1394,7 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                            'triggerFields': ['comments']}],
                                              'read': [ { 'attribute': { 'desc': 'entries by other '
                                                                                 'reviewers',
-                                                                        'name': 'others'},
+                                                                        'name': 'reviews'},
                                                          'equalField': 'criteriaEntry',
                                                          'inspect': 'siblings',
                                                          'linkField': 'assessment',

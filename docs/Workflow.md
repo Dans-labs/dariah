@@ -39,9 +39,11 @@ rules are specified in the [data model](Model).
 Client
 ------
 
-Workflow logic is found in [workflow.js](Dux#workflow), but also in the
-[templates](Templates), which may include workflow buttons and info panels. The
-templates themselves are applied by functions in
+Workflow logic is predominantly found in the [templates](Templates), which may
+include workflow buttons and info panels. but also in
+[workflow.js](Dux#workflow), which computes special items to present to the
+user, and for some of them workflow information is used. The templates
+themselves are applied by functions in
 [templates.js]({{site.libBase}}/templates.js). These functions are given
 workflow attributes that they pass on to the templates.
 
@@ -58,8 +60,8 @@ The principal functions exported are discussed here.
 
 Given a document in some table, this function compiles the workflow attributes
 and gives them a proper value. The determination of these attributes is dictated
-by the [model]({{site.serverBase}}/models/model.yaml),
-[tables]({{site.serverBase}}/models/tables), under the key `workflow`.
+by the [data model](Model), in the individual
+[tables]({{site.serverBase}}/models/tables), under the key `workflow/read`.
 
 There you find a sequence of instructions by which the system can compute
 workflow attributes for each record in a table. Let us look at an example:
@@ -139,8 +141,9 @@ given table, `adjustWorkflow` delivers a list of *other* records in other
 tables, that need new workflow attributes after a change in a given record.
 whether it be an insert. update or delete.
 
-The determination of these attributes is dictated by the [data model](Model).
-under the key `workflow`.
+The determination of these attributes is dictated by the [data model](Model). in
+the individual [tables]({{site.serverBase}}/models/tables), under the key
+`workflow/adjust`.
 
 Typically, when a record gets workflow attributes based on master or detail
 records, these attributes must be updated on any change in the master or in one
@@ -173,28 +176,40 @@ workflow rule, which we have not mentioned here as an example.
 ### enforceWorkflow ###
 
 Finally, the server has to know the consequences of the workflow attributes for
-behaviour. This is dictated in the [model](Model). under the key
+behaviour. This is dictated in the generic [data model](Model), under the key
 `workflow/prevent/`*attribute* where `attribute` is a name such as `locked` or
 `incomplete`.
 
 For each attribute there are optional constraints for the `update` and `delete`
 actions.
 
-prevent: locked: delete: true
+```yaml
+prevent:
+  locked:
+    delete: true
+```
 
 means that it is forbidden to delete a record that carries the `locked`
 attribute.
 
 Likewise,
 
-        update: true
+```yaml
+prevent:
+  locked:
+    update: true
+```
 
 means that any update whatsoever is forbidden to such a record.
 
 However, we can relax update constraints:
 
-        update:
-          submitted: true
+```yaml
+prevent:
+  locked:
+    update:
+      submitted: true
+```
 
 means that any update that changes the value of the field `submitted` is
 forbidden.
@@ -202,10 +217,13 @@ forbidden.
 We can relax this even further, and here we take a real example, under attribute
 `stalled` instead of `locked`:
 
-    stalled:
+```yaml
+prevent:
+  stalled:
     update:
       submitted:
         after: true
+```
 
 This means that any update that leads to field `submitted` having value `true`
 is forbidden.
@@ -213,7 +231,8 @@ is forbidden.
 Here we say that a stalled assessment cannot be submitted. For the sake of
 clarity, here is the rule that says when an assessment is `stalled`:
 
-    assessment:
+```yaml
+  workflow:
     read:
       - inspect: master
         method: hasDifferent
@@ -225,6 +244,7 @@ clarity, here is the rule that says when an assessment is `stalled`:
         workflow:
           stalled: true
           stalledReason: assessment type is different from contribution type
+```
 
 In words: if an assessment has an `assessmentType` field with a different value
 that the `contributionType` field of its master contribution, then the
@@ -236,3 +256,38 @@ which the contribution should be assessed. So the system stalls this assessment.
 It is doomed, it can never be submitted. Unless you decide to change back the
 type of the contribution. If that is not an option, the best thing to do is to
 copy the worthwhile material from this assessment into a fresh assessment.
+
+Wiring
+======
+
+Let us finish with an example, to show the intricate wiring of data that is
+going on in the workflow system.
+
+![diag](design/design.012.png)
+
+Above we see a good deal of the workflow rules that govern contributions and
+their assessments and reviews, each with their detail records of criteria
+entries (in the self-assessment) and review entries (in the reviews).
+
+The colored squares are particular records in the contribution, assessment,
+review, etc. collections. We only mention the fields that play a role in the
+workflow.
+
+The rounded labels indicate the workflow attributes that are computed for those
+records. The arrows show which fields are used for which workflow attributes.
+
+In fact, the arrows correspond exactly with the `workflow/read` and
+`workflow/adjust` instructions given in the [data model](Model). The reading of
+an arrow is like this:
+
+1.  **read workflow**: whenever a record needs to be sent to the client, compute
+    the indicated workflow labels, based on the information in the fields
+    indicated by following the arrows in the opposite direction;
+2.  **adjust workflow**: whenever a record is inserted, deleted, or updated,
+    follow any arrow from any of its fields, and for every record at the opposite
+    end, trigger a recomputation of its workflow, and send that to the client as
+    part of the result op the modification action.
+
+In this way, whenever the user changes a record, not only the affected records
+are reported back, but also the records with updated workflow information. This
+will ultimately update the user interface in all relevant parts.

@@ -17,7 +17,7 @@ workflow:
         - comments
       equalField: criteriaEntry
       attribute:
-        name: others
+        name: reviews
         desc: entries by other reviewers
     - inspect: master
       method: getValues

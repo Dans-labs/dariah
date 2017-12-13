@@ -64,7 +64,7 @@ const templates = {
         theseDecisions[reviewType] = v('decision')
         theseDecisionDates[reviewType] = s('dateDecided')
       } else {
-        const { items: otherReviews = emptyA } = w('others') || emptyO
+        const { items: otherReviews = emptyA } = w('reviews') || emptyO
         for (const { decision, dateDecided } of otherReviews) {
           if (decision) {
             theseDecisions[reviewType] = decision

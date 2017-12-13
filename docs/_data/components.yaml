@@ -76,3 +76,8 @@
   - Static
   - Tooltip
 - workflow:
+  - assessment
+  - contrib
+  - criteriaEntry
+  - review
+  - reviewEntry

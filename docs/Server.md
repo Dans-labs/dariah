@@ -22,20 +22,7 @@ happens in conformance with the data model and its permissions.
 Contains the methods to compute permissions for controllers, tables and fields.
 Here are the main methods.
 
-getPerm(controller, table, action)
-----------------------------------
-
-Given a controller, a table and an action (such as `read`, `update`), this
-method computes whether that controller may perform that action on behalf of the
-current web user. The result has three parts:
-
-*   a boolean which tells: yes, allowed, or no: forbidden;
-*   a rowFilter, which specifies, in case of a yes, to which rows the action may
-    be applied;
-*   a fieldFilter, which specifies, in case of yes, which fields in those rows may
-    be acted upon.
-
-may( table, action, document=None)
+allow( table, action, msgs, controller=None, document=None, newValues=None, extraMy=None, verbose=True)
 ----------------------------------
 
 Given table and an action (such as `read`, `update`), this method computes
@@ -45,11 +32,39 @@ determine whether the document is owned by the user, and in that case the
 permissions tend to be more liberal. Without a document, permissions are
 calculated as if the user does not own any document in the table.
 
-The result has two parts:
+The result has three parts:
 
-*   a boolean which tells: yes, allowed, or no: forbidden;
-*   a fieldFilter, which specifies, in case of yes, which fields in those rows may
-    be acted upon.
+*   **good**: a boolean which tells: yes, allowed, or no: forbidden;
+*   **rowFilter**, which specifies, in case of a yes, to which rows the action may
+    be applied; it has the shape of a MongoDB selection criterion, but it can
+    also be `False` (no rows) or `True` (all rows) or `None` (irrelevant). 
+*   **fieldSet**, which specifies, in case of yes, which fields in those rows may
+    be acted upon; it is a `Set`.
+
+If not good, *rowFilter* and *fieldSet* will be `None`.
+
+If a document is passed *rowFilter* will be `None`, because it is not needed.
+Only if no document is given, a *rowFilter* will be computed.
+If the operation is not permitted on any row,
+*rowFilter* becomes `False`.
+The reaction to this outcome should be
+to not perform a database lookup at all.
+
+But this is not a permission error, because in this case the
+list of records for which
+the operation is allowed is empty.
+This is different from *good* is `False` and *rowFilter* is `None`.
+
+If the operation is permitted on a selection of rows,
+*rowFilter* is returned as a mongodb selection dict is returned.
+If the operation is permitted on all rows, *rowFilter* is returned as `True`.
+
+If no fields are permitted, *fieldSet* is returned as `set()`.
+This will still deliver the `_id` fields,
+because `_id` fields are always permitted.
+If all or part of the fields are permitted,
+the set of permitted fields is returned.
+
 
 [db]({{site.serverBase}}/controllers/db.py)
 ===========================================

@@ -20,7 +20,7 @@ workflow:
         - decision
         - dateDecided
       attribute:
-        name: others
+        name: reviews
         desc: other reviews of the same assessment
     - inspect: master
       method: getValues
