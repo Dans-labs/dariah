@@ -11,7 +11,7 @@ works.
 [assessment]({{site.appBase}}/tables/assessment.jsx)
 ====================================================
 
-[data model]({{site.serverbase}}/models/tables/assessment.yaml)
+[data model]({{site.serverBase}}/models/tables/assessment.yaml)
 
 main, mainEdit
 --------------
@@ -51,19 +51,19 @@ review.
 [contrib]({{site.appBase}}/tables/contrib.jsx)
 ==============================================
 
-[data model]({{site.serverbase}}/models/tables/contrib.yaml)
+[data model]({{site.serverBase}}/models/tables/contrib.yaml)
 
 [criteriaEntry]({{site.appBase}}/tables/contrib.jsx)
 ====================================================
 
-[data model]({{site.serverbase}}/models/tables/criteriaEntry.yaml)
+[data model]({{site.serverBase}}/models/tables/criteriaEntry.yaml)
 
 [review]({{site.appBase}}/tables/contrib.jsx)
 =============================================
 
-[data model]({{site.serverbase}}/models/tables/review.yaml)
+[data model]({{site.serverBase}}/models/tables/review.yaml)
 
 [review]({{site.appBase}}/tables/reviewEntry.jsx)
 =================================================
 
-[data model]({{site.serverbase}}/models/tables/reviewEntry.yaml)
+[data model]({{site.serverBase}}/models/tables/reviewEntry.yaml)

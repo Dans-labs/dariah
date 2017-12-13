@@ -35,7 +35,7 @@ This higher level layer is called the [workflow engine](Workflow) and here we
 see the [business logic](Business) of the tool being expressed.
 
 On the user interface, the business items are shown as heavy buttons and big
-squares with messages.
+squares with messages. We get them there by using [templates](Templates).
 
 The technology
 --------------
@@ -65,6 +65,12 @@ about how the tool reacts to URLs.
 Read about division of labour, and how the dozens of React components are
 structured around a handful of slices of the *state*, the single source of truth
 for the whole app when it lives in the browser.
+
+[Model](Model)
+----------------------------
+The whole app is centered around data: contributions, assessments, reviews and more.
+Read how we have organized and specified the data,
+and how this is communicated to the rest of the app.
 
 [Components](Components)
 ------------------------
