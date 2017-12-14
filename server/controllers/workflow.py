@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from controllers.utils import now, mongoFields, mongoRows
 from models.compiled.model import model as M
 from models.compiled.names import N
@@ -207,6 +208,24 @@ class WorkflowApi(object):
                                 ),
                         })
         return allow
+
+    def weed(self, workflow, records, action):
+        weeded = OrderedDict()
+        deleted = set()
+        weedDeleted = action == N.delete
+        if weedDeleted:
+            for (table, eId) in records:
+                deleted.add((table, eId))
+        for (table, eId, attributes) in workflow:
+            if weedDeleted and (table, str(eId)) in deleted:
+                continue
+            weeded.setdefault(table,
+                              OrderedDict()).setdefault(eId,
+                                                        {}).update(attributes)
+        workflow.clear()
+        for (table, tableData) in weeded.items():
+            for (eId, attributes) in tableData.items():
+                workflow.append((table, eId, attributes))
 
     def detailInsert(
         self,

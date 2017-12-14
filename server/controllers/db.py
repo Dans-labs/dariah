@@ -4,8 +4,16 @@ from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
 
 from controllers.utils import (
-    oid, now, dtm, json_string, fillInSelect, filterModified, mongoFields,
-    mongoRows, andRows
+    oid,
+    now,
+    dtm,
+    json_string,
+    fillInSelect,
+    filterModified,
+    mongoFields,
+    mongoRows,
+    andRows,
+    pp,
 )
 from controllers.workflow import WorkflowApi
 from models.compiled.model import model as M
@@ -138,6 +146,7 @@ class DbAccess(object):
 
     def modList(self, controller, table, action):
         Perm = self.Perm
+        WF = self.WF
         msgs = []
 
         (good, rowFilter, fieldSet) = Perm.allow(
@@ -170,10 +179,11 @@ class DbAccess(object):
                 workflow
             )
 
+        WF.weed(workflow, records, action)
         return self.stop({
             N.data: {
                 'records': records,
-                N.workflow: workflow
+                N.workflow: workflow,
             },
             N.msgs: msgs,
         })
@@ -818,8 +828,7 @@ class DbAccess(object):
                 continue
             if fieldSpecs[field][N.multiple]:
                 continue
-            timingField = DM.get(table, {}).get(N.timing,
-                                                {}).get(field, None)
+            timingField = DM.get(table, {}).get(N.timing, {}).get(field, None)
             if timingField is not None:
                 if type(timingField) is str:
                     thisTimingField = timingField

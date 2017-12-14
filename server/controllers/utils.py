@@ -1,9 +1,12 @@
 import sys
+import pprint
 from datetime import datetime as dt
 from bson.objectid import ObjectId
 
 ISO_DTP = '%Y-%m-%dT%H:%M:%S.%f'
 ISO_DT = '%Y-%m-%dT%H:%M:%S'
+
+pp = pprint.PrettyPrinter(indent=2, width=100, compact=False)
 
 
 def oid(oidstr):
@@ -40,7 +43,6 @@ def utf8FromLatin1(s):
 
 def serverprint(msg):
     sys.stdout.write('o-o-o {}\n'.format(msg))
-
 
 def fillInSelect(select):
     params = {
