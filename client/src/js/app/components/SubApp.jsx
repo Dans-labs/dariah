@@ -103,6 +103,13 @@ const navBarItems = [
         hint: 'Look here to see the status of your self-assessments',
         button: true,
       },
+      {
+        path: '/data/assessment/list',
+        name: 'Assign reviewers',
+        forWhom: 'office',
+        hint: 'Assign reviewers to self-assessments',
+        button: true,
+      },
     ],
   },
   {

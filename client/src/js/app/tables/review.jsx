@@ -239,7 +239,7 @@ Object.assign(templates, {
     assessment: templates.main,
   },
   detailEdit: {
-    contrib: templates.mainEdit,
+    assessment: templates.mainEdit,
   },
   detailAction: {
     assessment: templates.mainAction,
