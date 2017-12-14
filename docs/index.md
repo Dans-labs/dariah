@@ -5,7 +5,7 @@ title: Home
 ![logo](images/inkind_logo.png)
 
 [DARIAH contribution tool]({{site.liveBase}})
-=============================================
+---------------------------------------------
 
 This is the documentation for the DARIAH contribution tool, an instrument to
 register and assess community contributions to the [DARIAH]({{site.dariah}}).
@@ -13,95 +13,140 @@ register and assess community contributions to the [DARIAH]({{site.dariah}}).
 The documentation contains a functional part, the *workflow* of assessment and
 reviewing, and a technical part: architecture, technology, software design.
 
-Overview of this documentation
-==============================
+About
+-----
 
-Two layers
-----------
+### [Code base](Codebase) ###
 
-There are two layers in this app: a lower level layer that sees the world as
-collections of records with fields, which it can read, insert, update, and
-delete. This layer has a user interface which can expose all lists and items of
-this world.
+To get an impression of the kind of work behind this app, we reveal how many
+lines of code have been written in which languages. See also how we managed to
+keep the code in all those languages tidy.
 
-There is also a higher level layer, in which we can express things as:
+### [Lessons learned](Lessons) ###
 
-*   if an assessment is submitted for review, lock the assessment and the
-    contribution;
-*   if the criteria entries for an assessment are not complete, do not allow to
-    submit it for review.
+It has taken a lot of time to develop this app. Lots more than I expected from
+the start.
 
-This higher level layer is called the [workflow engine](Workflow) and here we
-see the [business logic](Business) of the tool being expressed.
+### [News](News) ###
 
-On the user interface, the business items are shown as heavy buttons and big
-squares with messages. We get them there by using [templates](Templates).
+Every now and then I resume what has happened during development. It is not
+regular and not comprehensive!
 
-The technology
---------------
+Functionality
+-------------
 
-The contribution is an [SPA]({{site.spa}}) (Single Page Application) and hence
-the focus is on the client side, aka front-end of the app.
+For a vivid impression of the intended functions of this app, see these
+[slides](Functions.pptx) which I made near the end of the project (2017-12-14).
 
-We have implemented the front-end with the help of [React]({{site.reactDocs}})
-and [Redux]({{site.redux}}) and followed the most recent and idiomatic practices
-to achieve our ends.
+### [Business logic](Business) ###
 
-Here is a crash course in modern [JavaScript, ES6](ES6) and
-[React+Redux](React).
+The actual handling of contributions, assessments and reviews is the business
+logic of this app.
 
-For an overview of all technology we have made use of, see the
-[alphabetical tech references](Tech)
+### [Workflow](Workflow) ###
 
-[API](API) and [Routing](Routing)
----------------------------------
+At the highest level of abstraction a workflow engine implements the business
+logic.
 
-The data of the tool is accessible through an API. The routing page tells more
-about how the tool reacts to URLs.
+### [Tables](Tables) ###
 
-[Architecture](Architecture)
-----------------------------
+Several tables work together with the workflow engine.
 
-Read about division of labour, and how the dozens of React components are
-structured around a handful of slices of the *state*, the single source of truth
-for the whole app when it lives in the browser.
+[Templates](Templates)
 
-[Model](Model)
---------------
+Those tables receive custom formatting through a very dynamic templating system.
+
+Legacy
+------
+
+### [Content](Content) ###
+
+This app inherits 800 contributions that have been entered in 2015-2017 into a
+FileMaker database. We have migrated those to a MongoDB model.
+
+Concepts
+--------
+
+### [Model](Model) ###
 
 The whole app is centered around data: contributions, assessments, reviews and
-more. Read how we have organized and specified the data, and how this is
-communicated to the rest of the app.
+more. We have to organize and specify that data.
 
-[Components](Components)
-------------------------
+### [Architecture](Architecture) ###
 
-The user interface is realized by many React components. In this section they
-are all documented, alphabetically.
+This is a complex app. We need a lot of structure to get every bit of data there
+where it is needed. On time.
 
-But components hang together, work together, share data. To see that picture,
-start with looking at the side bar, where the components have been grouped by
-... **duct** ... !
+### [Routing](Routing) ###
 
-[Dux](Dux)
+This is a *web* app. We need to divide labour between client and server, and
+define a routing scheme that steers the app by URLs.
+
+Server
+------
+
+### [Server](Server) ###
+
+The part of the app that guards the data sits at the server. From there it sends
+it to the web browsers (clients) of the users.
+
+### [Authentication](Authentication) ###
+
+Users are authenticated at the server, and every bit of data that they
+subsequently receive, has passed a customs control.
+
+Client
+------
+
+### [Components](Components) ###
+
+The client (web browser) is where the app speaks to the user. The user interface
+is built up from dozens of components, that mediate between the user and the
+server.
+
+### [Dux](Dux) ###
+
+The client collects the actions of the user and the data from the server into an
+internal state, from which it flows back to the components.
+
+### [Auxiliaries](Lib) ###
+
+We have developed quite a bit of library functions to assist our components.
+
+Technology
 ----------
 
-There are ducts of information connecting the pieces of work that the individual
-components do. I follow a [proposal by Erik Rasmussen]({{site.ducks}}) to call a
-modular Redux package a duck, but with a twist: I call it a *duct*. But in the
-plural I call them **dux**, honouring the good work of Redux.
+### [ES6](ES6) ###
 
-[Server](Server)
-----------------
+We have implemented the client application in ES6, i.e. modern Javascript. That
+is our glue language.
 
-At the server side we store the data in a [MongoDB]({{site.mongodb}}). This data
-is served by a [Python-Bottle]({{site.bottle}}) web framework. The
-authentication of users is outsourced to the DARIAH infrastructure, see
-[here](Dux#me). The authorization is defined by the [data model](Model) which
-governs all data access.
+### [React](React) ###
 
-[Tests](Tests)
---------------
+Our components are written in React, a framework that defines a syntactic sugar
+right within ES6.
+
+### [Tech index](Tech) ###
+
+We have listed most of the technology that we have made use of.
+
+Integration
+-----------
+
+### [API](API) ###
+
+The data of the tool is accessible through an API. In fact, this app itself uses
+that API, whenever the client needs data from the server.
+
+Maintenance
+-----------
+
+### [Deploy](Deploy) ###
+
+Here are the bits and pieces you have to do in order to get a working system out
+of this.
+
+### [Tests](Tests) ###
 
 Testing becomes a life saver when your app is growing in complexity. When you
 add new behaviours you run the risk that existing behaviours break. The remedy
@@ -109,38 +154,9 @@ is to write tests for all aspects of the behaviours, and run them rigorously
 after each change and refactoring. That way, you proactively discover your bugs
 before your users do.
 
-[Initial Content](Content)
---------------------------
-
-There are already 800 contributions in the system. They have been collected in a
-FileMaker database in the past. We convert this content and use it for an
-initial filling of the contribution tool. The legacy import is automated and
-repeatable, even into a database that has been used in production for a while.
-Click on the title of this section to read more about how difficult that is, and
-how we partly solved it.
-
-[Deploy](Deploy)
-----------------
-
-Here are the bits and pieces you have to do in order to get a working system out
-of this.
-
-[Code base](Codebase)
----------------------
-
-To get an impression of the kind of work behind this app, we reveal how many
-lines of code have been written in which languages. See also how we managed to
-keep the code in all those languages tidy.
-
-[Lessons learned](Lessons)
---------------------------
-
-It has taken a lot of time to develop this app. Lots more than I expected from
-the start. For an account, read the [lessons](Lessons).
-
 Author
-======
+------
 
 Dirk Roorda [DANS]({{site.dans}}) <mailto:dirk.roorda@dans.knaw.nl>
 
-2017-12-04
+2017-12-14

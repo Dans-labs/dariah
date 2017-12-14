@@ -69,15 +69,16 @@
   - App
   - SubApp
   - Window
-- __none__:
-  - ErrorBoundary
-  - NavLink
-  - NotFound
-  - Static
-  - Tooltip
 - workflow:
   - assessment
   - contrib
   - criteriaEntry
   - review
   - reviewEntry
+  - ScoreBox
+- __none__:
+  - ErrorBoundary
+  - NavLink
+  - NotFound
+  - Static
+  - Tooltip

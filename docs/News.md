@@ -2,7 +2,26 @@
 title: News
 ---
 
-### 2017-09022 ###
+### 2017-12-14 ###
+
+The workflow functions have developed into a serious engine,
+that can be configured from within the data model.
+Templates are the prime consumers of this information.
+
+The review workflow is implemented.
+Not yet in all fullness, but the basics such as advice by the first reviewer,
+decision by the second reviewer work, as well as marking
+a successfully reviewed contribution as DARIAH approved.
+
+For Python, Javascript and Markdown I have started using code formatters.
+So the exact formatting of all these sources are not my doing,
+but the work of carefully configured software tools.
+That brings a bit more consistency in the sources. 
+
+I have done a lot of documentation updates.
+
+
+### 2017-09-22 ###
 
 There is now a templating mechanism in place by which I can design the display
 of detail records and related records within the display of another record. I
@@ -16,7 +35,7 @@ The server documentation has been updated.
 
 Bugs have been fixed, and probably more have been introduced.
 
-### 2017-09021 ###
+### 2017-09-21 ###
 
 The presentation of assessment is developing to much more useful layouts. Lots
 of issues of an information-logistic nature had to be solved.

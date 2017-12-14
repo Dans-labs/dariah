@@ -931,21 +931,3 @@ Computes the active packages, types and criteria and deliver them in an object,
 keyed by kind of item and containing an array of active item MongoDB ids for
 that kind.
 
-### assessmentScore ###
-
-Computes the overall score of an assessment, based on information that is on the
-client.
-
-The data returned is an object containing:
-
-*   `overall`: the overall score as percentage of points scored with respect to
-    total of scorable points
-*   `relevantScore`: the sum of the scores for all criteria that have not been
-    scored as `-1` (non-applicable)
-*   `relevantMax`: the total of the maximum scores for all criteria that have not
-    been scored as `-1`
-*   `allMax`: the total of the maximum scores for all criteria
-*   `relevantN`: the number of criteria that have not been scored as `-1`
-*   `allN`: the number of criteria.
-
-See more about the computation in [Workflow](Workflow#scoring).

@@ -250,12 +250,84 @@ In words: if an assessment has an `assessmentType` field with a different value
 that the `contributionType` field of its master contribution, then the
 assessment counts as stalled.
 
-This can happen when the type of a contribution is changed after creation of the
-assessment. In that case, the criteria of the assessment are not the criteria by
-which the contribution should be assessed. So the system stalls this assessment.
-It is doomed, it can never be submitted. Unless you decide to change back the
-type of the contribution. If that is not an option, the best thing to do is to
-copy the worthwhile material from this assessment into a fresh assessment.
+### Inspecting other documents ###
+
+Both `readWorkflow` and `adjustWorkflow` have instructions to look up related
+documents and then apply a computing method to all those documents.
+
+The target documents can be specified with these instructions:
+
+*   **self** don't look further, look at yourself. The information from which
+    workflow attributes are to be derived, is already present in the document
+    itself.
+*   **master** look at your master document. A document can have multiple masters,
+    so you have to specify the field in yourself that points to the master, and
+    also what table that is.
+*   **details** look at your details. A document can have multiple kinds of
+    details, so you have to specify the table that holds the details, and the
+    field in the details that points to you.
+*   **siblings** look at records with the same master. You have to specify your
+    field that points to the master, the field in your siblings that points to the
+    master, and the table that holds your siblings.
+
+### Computing attributes ###
+
+When the other documents have been found, it is time to extract information from
+them, in order to put it into workflow attributes. There is a limited set of
+functions you can call, they are all listed in
+[worklow.py]({{site.serverBase}}/controllers/workflow.py) and their names start
+with `_compute_`. Below we name them without this prefix.
+
+#### hasValue ####
+
+Returns `{'on': True }` if one of the other docs has a field with a given value.
+
+#### hasIncomplete ####
+
+Returns `{'on': True, 'n': n }` if one of the other docs has an empty field
+among a given list of fields. If so, `n` is the number of such docs.
+
+#### hasDifferent ####
+
+Returns `{'on': True }` if one of the other docs has a different value than you
+for a given field.
+
+#### getValues ####
+
+Returns
+
+```python
+{'items': [
+  {'field1': value1a, 'field2': value2a},
+  {'field1': value1b, 'field2': value2b},
+  ...
+  ]
+}
+```
+
+where `field1` and `field2` are given fields, and `value1a` and `value2a` are
+values for those fields found in the other docs, and likewise for all such
+values `value1b` and `value2b` that can be found in all other docs.
+
+#### assessmentScore ####
+
+Computes the overall score of an assessment, based on its detail criteriaEntry
+records.
+
+The data returned is a dictionary containing:
+
+*   `overall`: the overall score as percentage of points scored with respect to
+    total of scorable points
+*   `relevantScore`: the sum of the scores for all criteria that have not been
+    scored as `-1` (non-applicable)
+*   `relevantMax`: the total of the maximum scores for all criteria that have not
+    been scored as `-1`
+*   `allMax`: the total of the maximum scores for all criteria
+*   `relevantN`: the number of criteria that have not been scored as `-1`
+*   `allN`: the number of criteria.
+*   `aId`: the id of the assessment in question.
+
+See more about the computation in the [business logic](Business#scoring).
 
 Wiring
 ======

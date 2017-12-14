@@ -48,6 +48,13 @@ If the contribution has received an other *type* since the creation of this
 assessment, this assessment will count as *stalled*, and cannot be used for
 review.
 
+In this case, the criteria of the assessment are not the criteria by
+which the contribution should be assessed. So the system stalls this assessment.
+It is doomed, it can never be submitted. Unless you decide to change back the
+type of the contribution. If that is not an option, the best thing to do is to
+copy the worthwhile material from this assessment into a fresh assessment.
+
+
 [contrib]({{site.appBase}}/tables/contrib.jsx)
 ==============================================
 

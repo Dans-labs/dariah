@@ -1313,6 +1313,30 @@ it to the special [Provider](React#redux) component of Redux.
 Then it wraps the whole remaining app in a [Window](#window) component for
 detecting some global UI events.
 
+[ScoreBox]({{site.appBase}}/components/ScoreBox.jsx)
+====================================================
+
+presents [workflow](Dux#workflow)
+
+#### Props ####
+
+###### score ######
+
+This is an object, containing several score quantities, relevant to the scoring
+of assessments.
+
+### Task ###
+
+The server computes the scores, and delivers it as workflow attributes with
+contribution and assessment records.
+
+Displays the score of an assessment, and can be expanded to show a derivation of
+that score.
+
+It should be used in templates that have access to workflow attributes. See the
+`mainAction` templates of [contrib]({{site.appBase}}/tables/contrib.jsx) and
+[assessment]({{site.appBase}}/tables/assessment.jsx).
+
 [Stat]({{site.appBase}}/components/Stat.jsx)
 ============================================
 

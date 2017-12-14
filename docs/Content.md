@@ -2,10 +2,10 @@
 title: Initial Content
 ---
 
-There are two types of initial content to be loaded in the contribution tool:
-
-*   legacy database of contributions;
-*   the contents of the assessment workflow.
+There are already 800 contributions in the system. They have been collected in a
+FileMaker database in the past. We convert this content and use it for an
+initial filling of the contribution tool. The legacy import is automated and
+repeatable, even into a database that has been used in production for a while.
 
 The workflow information
 ========================
