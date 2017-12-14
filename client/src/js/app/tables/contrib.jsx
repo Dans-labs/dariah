@@ -3,6 +3,7 @@ import React, { Fragment } from 'react'
 import { emptyS, emptyA, emptyO } from 'utils'
 
 import Expand from 'Expand'
+import ScoreBox from 'ScoreBox'
 
 const templates = {
   mainAction({ tables, w, m }) {
@@ -25,11 +26,22 @@ const templates = {
         }
       })
     }
+    let result
+    if (approved) {
+      const scoreItems = (w('score') || emptyO).items || emptyA
+      const score = scoreItems.length ? scoreItems[0] : emptyO
+      result = (
+        <Fragment>
+          <ScoreBox score={score} />
+          <div className={'label large workflow good'}>
+            {`This contribution has been approved by DARIAH.`}
+          </div>
+        </Fragment>
+      )
+    }
     return approved ? (
-      <div className={'label large workflow good'}>
-        {`This contribution has been approved by DARIAH.`}
-      </div>
-    ) : (m('title') && w('locked').on) ? (
+      result
+    ) : m('title') && w('locked').on ? (
       <div className={'label large workflow info'}>
         {`This contribution is locked because it is ${w('locked').desc}.`}
       </div>

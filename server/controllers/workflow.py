@@ -9,7 +9,7 @@ WM = M[N.workflow]
 # BASIC RULE COMPUTATION METHODS THAT CAN BE CONFIGURED IN A WORKFLOW
 
 
-def _compute_hasValue(myDocMap, otherDocMap, w):
+def _compute_hasValue(wf, myDocMap, otherDocMap, w):
     otherField = w.get(N.otherField, None)
     value = w.get(N.value, None)
 
@@ -24,7 +24,7 @@ def _compute_hasValue(myDocMap, otherDocMap, w):
     }
 
 
-def _compute_hasIncomplete(myDocMap, otherDocMap, w):
+def _compute_hasIncomplete(wf, myDocMap, otherDocMap, w):
     emptyFields = w.get(N.emptyFields, None)
 
     incompleteMap = {
@@ -46,7 +46,7 @@ def _compute_hasIncomplete(myDocMap, otherDocMap, w):
     }
 
 
-def _compute_hasDifferent(myDocMap, otherDocMap, w):
+def _compute_hasDifferent(wf, myDocMap, otherDocMap, w):
     myField = w.get(N.myField, None)
     otherField = w.get(N.otherField, None)
 
@@ -62,7 +62,7 @@ def _compute_hasDifferent(myDocMap, otherDocMap, w):
     }
 
 
-def _compute_getValues(myDocMap, otherDocMap, w):
+def _compute_getValues(wf, myDocMap, otherDocMap, w):
     otherFields = w.get(N.otherFields, [])
 
     return {
@@ -74,6 +74,74 @@ def _compute_getValues(myDocMap, otherDocMap, w):
         }
         for (myDocId, otherDocs) in otherDocMap.items()
     }
+
+
+def _compute_assessmentScore(wf, myDocMap, otherDocMap, w):
+    MONGO = wf.MONGO
+    if not myDocMap:
+        return {}
+    result = {}
+    scoreData = list(
+        MONGO[N.score].find({}, {
+            N._id: True,
+            N.criteria: True,
+            N.score: True
+        })
+    )
+    scoreMapping = {s[N._id]: s[N.score] for s in scoreData}
+    maxScoreByCrit = {}
+    for s in scoreData:
+        crit = s[N.criteria]
+        score = s[N.score]
+        prevMax = maxScoreByCrit.setdefault(crit, None)
+        if prevMax is None or score > prevMax:
+            maxScoreByCrit[crit] = score
+
+    for (myDocId, otherDocs) in otherDocMap.items():
+        resultItems = []
+        for otherDoc in otherDocs:
+            aId = otherDoc.get(N._id, None)
+            if not aId:
+                continue
+            myCriteriaData = list(
+                MONGO[N.criteriaEntry].find({
+                    N.assessment: aId
+                }, {
+                    N._id: True,
+                    N.criteria: True,
+                    N.score: True
+                })
+            )
+            myCriteriaEntries = [(
+                cd[N.criteria], scoreMapping.get(cd.get(N.score, None), 0),
+                maxScoreByCrit[cd[N.criteria]]
+            ) for cd in myCriteriaData]
+
+            allMax = sum(x[2] for x in myCriteriaEntries)
+            allN = len(myCriteriaEntries)
+
+            relevantCriteriaEntries = [
+                x for x in myCriteriaEntries if x[1] >= 0
+            ]
+            relevantMax = sum(x[2] for x in relevantCriteriaEntries)
+            relevantScore = sum(x[1] for x in relevantCriteriaEntries)
+            relevantN = len(relevantCriteriaEntries)
+            overall = 0 if relevantMax == 0 else (
+                round(relevantScore * 100 / relevantMax)
+            )
+            resultItems.append(
+                dict(
+                    overall=overall,
+                    relevantScore=relevantScore,
+                    relevantMax=relevantMax,
+                    allMax=allMax,
+                    relevantN=relevantN,
+                    allN=allN,
+                    aId=aId,
+                )
+            )
+        result[myDocId] = {N.items: resultItems}
+    return result
 
 
 class WorkflowApi(object):
@@ -482,7 +550,7 @@ class WorkflowApi(object):
         otherDocMap = self._selectDocsRead(msgs, table, myDocs, w)
 
         myWorkflowResults = globals()['_compute_{}'.format(method)](
-            myDocs, otherDocMap, w
+            self, myDocs, otherDocMap, w
         )
         self._applyReadWorkflow(myWorkflowResults, attribute, result)
 

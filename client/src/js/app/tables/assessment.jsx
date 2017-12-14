@@ -1,11 +1,10 @@
 import React, { Fragment } from 'react'
 
-import { emptyS } from 'utils'
+import { emptyA, emptyO } from 'utils'
 import { itemReadField, itemEditField } from 'fields'
-import { assessmentScore } from 'workflow'
 
-import Expand from 'Expand'
 import Tooltip from 'Tooltip'
+import ScoreBox from 'ScoreBox'
 
 const rField = (field, l, f, key) =>
 	itemReadField(field, l(field), f(field), key)
@@ -38,63 +37,14 @@ const templates = {
 			</Fragment>
 		)
 	},
-	mainAction({ tables, l, e, v, w, s, fe, fs, m }) {
-		const {
-			overall,
-			relevantScore,
-			relevantMax,
-			allMax,
-			relevantN,
-			allN,
-		} = assessmentScore(tables, v('_id'))
-		const irrelevantN = allN - relevantN
+	mainAction({ l, e, w, s, fe, fs, m }) {
+    const scoreItems = (w('score') || emptyO).items || emptyA
+    const score = scoreItems.length ? scoreItems[0] : emptyO
 		const isWithdrawn = !e('dateWithdrawn')
 		const isSubmitted = !e('submitted')
 		return (
 			<Fragment>
-				<div className={'ass-score-box'}>
-					<Tooltip tip={'overall-score of this assessment'} at={'right'}>
-						<span className={'ass-score'}>{`${overall} %`}</span>
-					</Tooltip>
-					<Expand
-						alterSection={`assessment${v('_id')}`}
-						alterTag={'score'}
-						iconOpen={'calculator'}
-						iconClose={'minus-circle'}
-						titleOpen={'Show derivation'}
-						titleClose={'Hide derivation'}
-						headActive={emptyS}
-						headLine={emptyS}
-						full={
-							<div className={'ass-score-deriv'}>
-								<p>{`This contribution scores ${relevantScore} points.`}</p>
-								<p>{`For this type of contribution there is a total of ${
-									allMax
-								} points,
-                    divided over ${allN} criteria.`}</p>
-								{irrelevantN ? (
-									<p>
-										{`However,
-                        ${irrelevantN} rule${irrelevantN == 1 ? ' is' : 's are'}
-                        not applicable to this contribution,
-                        which leaves the total amount to
-                        ${relevantMax} points,
-                        divided over ${relevantN} criteria.`}
-									</p>
-								) : (
-									emptyS
-								)}
-								<p>
-									{`The total score is expressed as a percentage:
-                    the fraction of ${
-											relevantScore
-										} scored points with respect to 
-                    ${relevantMax} scorable points.`}
-								</p>
-							</div>
-						}
-					/>
-				</div>
+        <ScoreBox score={score} />
 				<div className={'grid fragments'}>
 					{m('submitted') ? null : eField('submitted', l, fe, m)}
 					{itemEditField(

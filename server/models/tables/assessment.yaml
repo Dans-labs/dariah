@@ -23,6 +23,11 @@ workflow:
         name: stalled
         desc: assessment type is different from contribution type
     - inspect: self
+      method: assessmentScore
+      attribute:
+        name: score
+        desc: assessment score
+    - inspect: self
       method: hasValue
       otherField: submitted
       value: true

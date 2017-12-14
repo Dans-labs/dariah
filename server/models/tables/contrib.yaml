@@ -28,6 +28,13 @@ workflow:
         name: reviews
         desc: reviews of this contribution
     - inspect: details
+      method: assessmentScore
+      linkField: contrib
+      otherTable: assessment
+      attribute:
+        name: score
+        desc: assessment score
+    - inspect: details
       method: getValues
       linkField: contrib
       otherTable: assessment
