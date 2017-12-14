@@ -5,7 +5,7 @@ import { emptyS, emptyA, emptyO } from 'utils'
 import Expand from 'Expand'
 
 const templates = {
-  mainAction({ tables, w }) {
+  mainAction({ tables, w, m }) {
     let approved = false
     const { items: reviewers = emptyA } = w('reviewers') || emptyO
     const { items: reviews = emptyA } = w('reviews') || emptyO
@@ -29,7 +29,7 @@ const templates = {
       <div className={'label large workflow good'}>
         {`This contribution has been approved by DARIAH.`}
       </div>
-    ) : w('locked').on ? (
+    ) : (m('title') && w('locked').on) ? (
       <div className={'label large workflow info'}>
         {`This contribution is locked because it is ${w('locked').desc}.`}
       </div>

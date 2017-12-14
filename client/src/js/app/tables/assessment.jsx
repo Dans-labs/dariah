@@ -147,7 +147,7 @@ const templates = {
               `}
 					</div>
 				) : null}
-				{w('locked').on ? (
+				{(m('title') && w('locked')).on ? (
 					<div className={'label large workflow info'}>
 						{`This assessment is locked because it is ${w('locked').desc}.`}
 					</div>

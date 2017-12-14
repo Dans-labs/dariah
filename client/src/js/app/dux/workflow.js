@@ -13,7 +13,7 @@ export const TYPE_FIELD = 'typeContribution'
 /* CONFIGURATION */
 
 export const loadExtra = {
-  contrib: [['package'], ['criteria'], ['typeContribution']],
+  contrib: [['package'], ['criteria'], ['typeContribution'], ['decision']],
 }
 
 /* ACTIONS */
