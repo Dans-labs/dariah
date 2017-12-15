@@ -19,7 +19,7 @@ const templates = {
       const statusClass = e('comments') ? 'incomplete' : 'complete'
       const thisReviewer = getItem(w('reviewers'))
       const { reviewerE, reviewerF } = thisReviewer
-      const myType = isReviewerType(me, reviewerE, reviewerF)
+      const myType = isReviewerType(me._id, reviewerE, reviewerF)
       return (
         <div className={`review entryRead ${statusClass}`}>
           <div className={'criteria entry'}>
@@ -58,7 +58,7 @@ const templates = {
       const statusClass = e('comments') ? 'incomplete' : 'complete'
       const thisReviewer = getItem(w('reviewers'))
       const { reviewerE, reviewerF } = thisReviewer
-      const myType = isReviewerType(me, reviewerE, reviewerF)
+      const myType = isReviewerType(me._id, reviewerE, reviewerF)
       return (
         <div className={`review entryEdit ${statusClass}`}>
           <div className={'criteria entry'}>

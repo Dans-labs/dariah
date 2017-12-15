@@ -8,12 +8,13 @@ DM = M[N.tables]
 
 
 def getq(name):
-    return request.query[name][0:64]
+    return request.query.get(name, '')[0:64]
 
 
 class Controller(object):
     def __init__(self, DB):
         self.DB = DB
+        self.WF = DB.WF
 
     def data(self, controller, Perm):
         return self._errorWrap(
@@ -46,6 +47,10 @@ class Controller(object):
         table = getq(N.table)
         action = getq(N.action)
         return self.DB.modList(name, table, action)
+
+    def wf(self, name):
+        reset = getq(N.reset)
+        return self.WF.manageWorkflow(reset=reset == N.true)
 
     def _data(self, controller, Perm):
         self.DB.Perm = Perm

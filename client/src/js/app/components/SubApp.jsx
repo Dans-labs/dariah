@@ -283,11 +283,18 @@ const navBarItems = [
         hint: 'User permission groups',
         button: true,
       },
+      {
+        path: '/data/workflow',
+        name: 'Workflow management',
+        forWhom: 'system',
+        hint: 'Manage the workflow information for all tables',
+        button: true,
+      },
     ],
   },
 ]
 
-const SubApp = ({ me, table, routes, children }) => (
+const SubApp = ({ me, routes, children }) => (
   <div className={'sub-app'}>
     <div className={'subnavbar'}>
       <ErrorBoundary>
@@ -296,22 +303,13 @@ const SubApp = ({ me, table, routes, children }) => (
     </div>
     <div className={'submaterial'}>
       <ErrorBoundary>
-        {routes[1].path === 'data' && routes.length === 1 ? (
+        {routes.length === 0 || routes.length == 1 ||
+        routes[1].path !== 'data' ? null : routes.length === 2 ? (
           'All tables'
-        ) : routes[1].path === 'data' && routes.length === 2 ? (
+        ) : routes[2].path === 'workflow' ? null : routes.length === 3 ? (
           <Fragment>
             <h3>{'Registry'}</h3>
             <p>{'Use the side bar to navigate to a section'}</p>
-          </Fragment>
-        ) : routes[1].path === 'data' && routes.length === 3 ? (
-          <Fragment>
-            <h3>{'Registry'}</h3>
-            <h4>{`Table ${table}`}</h4>
-            <p>
-              {
-                'Use the side bar to navigate to a particular view on this table'
-              }
-            </p>
           </Fragment>
         ) : null}
       </ErrorBoundary>

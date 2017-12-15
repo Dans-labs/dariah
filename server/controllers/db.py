@@ -382,6 +382,7 @@ class DbAccess(object):
             return
 
         MONGO = self.MONGO
+        WF = self.WF
         Perm = self.Perm
         extraMy = my if type(my) is list else None
 
@@ -420,8 +421,21 @@ class DbAccess(object):
             documents = list(
                 MONGO[table].find(theRowFilter, fieldFilter).sort(sort)
             )
+        workflow = {}
+        if my:
+            workflow = WF.loadWorkflow(
+                table, {doc.get(N._id): doc
+                        for doc in documents}
+            )
+
         allIds = [doc[N._id] for doc in documents]
-        entities = {str(doc[N._id]): {N.values: doc} for doc in documents}
+        entities = {}
+        for doc in documents:
+            eId = doc[N._id]
+            record = {N.values: doc}
+            if my and eId in workflow:
+                record[N.workflow] = workflow[eId]
+            entities[str(eId)] = record
         if not titleOnly:
             for doc in documents:
                 entities[str(doc[N._id])][N.perm] = self._getPerm(

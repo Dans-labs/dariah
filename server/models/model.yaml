@@ -164,6 +164,9 @@ permissions:
     myassign:
       desc: list my assignments
       call: auth
+    resetwf:
+      desc: reset the workflow information
+      call: system
 
   owners:
     user:     _id
@@ -239,6 +242,7 @@ names:
   - REGIME
   - Rejected
   - repName
+  - reset
   - self
   - siblings
   - sn

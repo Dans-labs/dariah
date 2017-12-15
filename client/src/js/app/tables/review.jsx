@@ -4,7 +4,7 @@ import { emptyA, emptyO } from 'utils'
 import { headEntity } from 'tables'
 import { trimDate } from 'datatypes'
 import { itemReadField, itemEditField } from 'fields'
-import { getItem, isReviewerType, reviewerRole } from 'workflow'
+import { getItem, isReviewerType, reviewerRole, decisions } from 'workflow'
 
 //import Expand from 'Expand'
 //import Tooltip from 'Tooltip'
@@ -48,19 +48,14 @@ const templates = {
   mainAction({ settings, tables, table, me, v, w, s, fs }) {
     const thisReviewer = getItem(w('reviewers'))
     const { reviewerE, reviewerF } = thisReviewer
-    const myType = isReviewerType(me, reviewerE, reviewerF)
-    const { decision: { entities: dEntities = emptyO } = emptyO } = tables
-    const decisions = {}
-    Object.entries(dEntities).forEach(([dId, { values: { rep } = emptyO }]) => {
-      decisions[rep] = dId
-    })
-    const dAccept = decisions['accept']
-    const dReject = decisions['reject']
+    const myType = isReviewerType(me._id, reviewerE, reviewerF)
+    const thisType = isReviewerType(v('creator'), reviewerE, reviewerF)
+    const { dAccept, dReject } = decisions(tables)
     const theseDecisions = {}
     const theseDecisionDates = {}
     ;['E', 'F'].forEach(reviewType => {
-      const isMy = myType && reviewType === myType
-      if (isMy) {
+      const isThis = thisType && reviewType === thisType
+      if (isThis) {
         theseDecisions[reviewType] = v('decision')
         theseDecisionDates[reviewType] = s('dateDecided')
       } else {
@@ -187,7 +182,7 @@ const templates = {
   },
   insert: {
     assessment({ v, w, me, onInsert }) {
-      const myType = isReviewerType(me, v('reviewerE'), v('reviewerF'))
+      const myType = isReviewerType(me._id, v('reviewerE'), v('reviewerF'))
       const mine = myReview(me, w)
       const mineLink = `/data/review/mylist/item/${mine}`
       let otherDecided = true

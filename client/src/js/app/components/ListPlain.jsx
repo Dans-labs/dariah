@@ -12,7 +12,7 @@ import {
 } from 'utils'
 import { someEditable } from 'fields'
 import { getMasterTable } from 'details'
-import { editMode } from 'templates'
+import { editMode, applyTemplate } from 'templates'
 
 import {
 	insertItem,
@@ -147,6 +147,8 @@ class ListPlain extends Component {
 					const isactive = activeItems != null && activeItems.has(eId)
 					const thisStartMode = startMode === 0 ? startMode : startMode(values)
 
+          const extra = applyTemplate({settings, me, tables, table, eId, kind: 'head', values })
+
 					return (
 						<div key={eId} className={isactive ? 'isactive' : emptyS}>
 							{active ? (
@@ -194,6 +196,7 @@ class ListPlain extends Component {
 									>
 										<span className={`button small fa fa-angle-down`} /> {head}
 									</span>
+                  {extra}
 								</span>
 							)}
 						</div>

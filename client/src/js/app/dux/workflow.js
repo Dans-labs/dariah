@@ -1,5 +1,8 @@
+import update from 'immutability-helper'
+
+import { accessData } from 'server'
 import { memoize } from 'memo'
-import { emptyS, emptyA, emptyO, emptySet } from 'utils'
+import { makeReducer, emptyS, emptyA, emptyO, emptySet } from 'utils'
 
 import { getDateTime, sortTimeInterval, sortStringTemplate } from 'datatypes'
 
@@ -18,11 +21,70 @@ export const loadExtra = {
 
 /* ACTIONS */
 
+export const fetchWorkflow = accessData({
+  type: 'resetWorkflow',
+  contentType: 'db',
+  path: `/wf`,
+  desc: `get workflow reset info`,
+})
+export const resetWorkflow = accessData({
+  type: 'resetWorkflow',
+  contentType: 'db',
+  path: `/wf?reset=true`,
+  desc: `reset workflow`,
+})
+
 /* REDUCER */
+
+const flows = {
+  resetWorkflow(state, { data }) {
+    if (data == null) {
+      return state
+    }
+    const { resets, stats, total } = data
+    return update(state, {
+      resets: { $set: resets },
+      stats: { $set: stats },
+      total: { $set: total },
+    })
+  },
+}
+
+export default makeReducer(flows, emptyO)
 
 /* SELECTORS */
 
+export const getWorkflow = ({ workflow }) => ({ workflow })
+
 /* HELPERS */
+
+export const decisions = memoize(tables => {
+  const { decision: { entities: dEntities = emptyO } = emptyO } = tables
+  const decisions = {}
+  Object.entries(dEntities).forEach(([dId, { values: { rep } = emptyO }]) => {
+    decisions[rep] = dId
+  })
+  return {
+    dAccept: decisions['accept'],
+    dReject: decisions['reject'],
+    dRevise: decisions['revise'],
+  }
+}, emptyO)
+
+export const finalDecision = memoize((wreviewers, wreviews) => {
+  const { items: reviewers = emptyA } = wreviewers || emptyO
+  const { items: reviews = emptyA } = wreviews || emptyO
+  let finalDecision = null
+  if (reviewers.length && reviews.length) {
+    const reviewerSet = new Set(reviewers.map(x => x.reviewerF))
+    reviews.forEach(({ creator, decision }) => {
+      if (reviewerSet.has(creator)) {
+        finalDecision = decision
+      }
+    })
+  }
+  return finalDecision
+}, emptyO)
 
 const compileActiveItems = memoize(
   (entitiesPkg, entitiesTyp, entitiesCri, field = null) => {
@@ -106,8 +168,8 @@ export const getItem = (workflowData, multiple = false) => {
   return multiple ? items : items.length == 0 ? emptyO : items[0]
 }
 
-export const isReviewerType = (me, rE, rF) =>
-  me._id == null ? null : me._id === rE ? 'E' : me._id === rF ? 'F' : null
+export const isReviewerType = (creator, rE, rF) =>
+  creator === rE ? 'E' : creator === rF ? 'F' : null
 
 export const reviewerRole = {
   E: 'first reviewer (expert)',

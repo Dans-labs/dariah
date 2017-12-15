@@ -44,6 +44,7 @@ def utf8FromLatin1(s):
 def serverprint(msg):
     sys.stdout.write('o-o-o {}\n'.format(msg))
 
+
 def fillInSelect(select):
     params = {
         'curYear': now().year,

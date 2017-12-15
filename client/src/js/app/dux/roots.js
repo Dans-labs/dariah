@@ -13,6 +13,7 @@ import filters from 'filters'
 import alter from 'alter'
 import select from 'select'
 import grid from 'grid'
+import workflow from 'workflow'
 
 /* ACTIONS */
 
@@ -61,6 +62,7 @@ export default configureStore(
 		form,
 		select,
 		grid,
+		workflow,
 	}),
 )
 

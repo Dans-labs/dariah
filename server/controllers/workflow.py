@@ -147,6 +147,7 @@ def _compute_assessmentScore(wf, myDocMap, otherDocMap, w):
 class WorkflowApi(object):
     def __init__(self, MONGO):
         self.MONGO = MONGO
+        self.manageWorkflow(reset=True, init=True)
 
     def workflowLookup(self, table, rowFilter, fieldSet, msgs, sort=None):
         MONGO = self.MONGO
@@ -160,14 +161,98 @@ class WorkflowApi(object):
             )
         return result
 
-    def readWorkflow(self, msgs, table, myDocMap):
-        result = {}
-        for w in DM.get(table, {}).get(N.workflow, {}).get(N.read, []):
-            self._computeWorkflow(msgs, table, myDocMap, w, result)
+    def manageWorkflow(self, reset=False, init=False):
+        MONGO = self.MONGO
+
+        msgs = []
+        error = False
+
+        if reset or init:
+            if init:
+                MONGO[N.workflow].drop()
+            else:
+                MONGO[N.workflow].delete_many({N.table: {'$ne': N.workflow}})
+            affected = []
+            for (table, tableInfo) in DM.items():
+                if N.workflow not in tableInfo:
+                    continue
+
+                docs = list(MONGO[table].find())
+                affected.append(
+                    'reset workflow on {} ({} items)'.format(table, len(docs))
+                )
+                for doc in docs:
+                    self.readWorkflow(
+                        msgs, table, {doc.get(N._id, None): doc}, compute=True
+                    )
+            error = any(msg[N.kind] == N.error for msg in msgs)
+            MONGO[N.workflow].insert_one({
+                N.table: N.workflow,
+                'dateReset': now(),
+                'affected': affected
+            })
+        wfDocs = []
+        docs = list(MONGO[N.workflow].find({}).sort([['dateReset', -1]]))
+        attributeCount = {}
+        n = 0
+        for doc in docs:
+            if doc.get(N.table, None) == N.workflow:
+                wfDocs.append(doc)
+            else:
+                n += 1
+                table = doc.get(N.table, '')
+                for attribute in doc.get(N.attributes, {}):
+                    m = attributeCount.setdefault(attribute,
+                                                  {}).setdefault(table, 0)
+                    attributeCount[attribute][table] = m + 1
+        return {
+            N.good: not error,
+            N.msgs: msgs,
+            N.data: {
+                'resets': wfDocs,
+                'stats': attributeCount,
+                'total': n
+            }
+        }
+
+    def readWorkflow(self, msgs, table, myDocMap, compute=False):
+        if compute:
+            result = {}
+            for w in DM.get(table, {}).get(N.workflow, {}).get(N.read, []):
+                self._computeWorkflow(msgs, table, myDocMap, w, result)
+            self._storeWorkflow(table, result)
+        else:
+            result = self.loadWorkflow(table, myDocMap)
         return result
 
+    def loadWorkflow(self, table, myDocMap):
+        MONGO = self.MONGO
+        result = {}
+        selectInfo = {N.table: table, 'eId': {'$in': list(myDocMap.keys())}}
+        workflowResults = list(MONGO[N.workflow].find(selectInfo))
+        for wf in workflowResults:
+            eId = wf['eId']
+            attributes = wf.get(N.attributes, None)
+            if attributes is not None:
+                result[eId] = attributes
+        return result
+
+    def _storeWorkflow(self, table, result):
+        MONGO = self.MONGO
+        for (eId, attributes) in result.items():
+            selectInfo = {N.table: table, 'eId': eId}
+            if not attributes:
+                MONGO[N.workflow].delete_one(selectInfo)
+            else:
+                updateInfo = {}
+                updateInfo.update(selectInfo)
+                updateInfo[N.attributes] = attributes
+                MONGO[N.workflow].update_one(
+                    selectInfo, {'$set': updateInfo}, upsert=True
+                )
+
     def adjustWorkflow(self, msgs, table, document, adjustedValues):
-        return self._applyAdjustWorkflow(
+        result = self._applyAdjustWorkflow(
             msgs,
             self._combineAffected(
                 self._getAffected(
@@ -181,6 +266,10 @@ class WorkflowApi(object):
                 .get(N.adjust, [])
             ),
         )
+        for (table, docId, attributes) in result:
+            self._storeWorkflow(table, {docId: attributes})
+
+        return result
 
     def enforceWorkflow(self, workflow, currentDoc, newDoc, action, msgs):
         allow = True
@@ -582,7 +671,7 @@ class WorkflowApi(object):
     def _applyAdjustWorkflow(self, msgs, allAffected):
         workflowEntries = []
         for (table, docMap) in allAffected.items():
-            workflow = self.readWorkflow(msgs, table, docMap)
+            workflow = self.readWorkflow(msgs, table, docMap, compute=True)
             for docId in docMap:
                 workflowEntries.append([table, docId, workflow.get(docId, {})])
         return workflowEntries

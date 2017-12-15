@@ -1,31 +1,23 @@
 import React, { Fragment } from 'react'
 
 import { emptyS, emptyA, emptyO } from 'utils'
+import { decisions, finalDecision } from 'workflow'
 
 import Expand from 'Expand'
 import ScoreBox from 'ScoreBox'
 
 const templates = {
+  head({ tables, v, w }) {
+    console.warn({ _id: v('_id'), reviews: w('reviews') })
+    const decision = finalDecision(w('reviewers'), w('reviews'))
+    const { dAccept } = decisions(tables)
+    const approved = decision === dAccept
+    return approved ? '+++' : '---'
+  },
   mainAction({ tables, w, m }) {
-    let approved = false
-    const { items: reviewers = emptyA } = w('reviewers') || emptyO
-    const { items: reviews = emptyA } = w('reviews') || emptyO
-    if (reviewers.length && reviews.length) {
-      const reviewerSet = new Set(reviewers.map(x => x.reviewerF))
-      const { decision: { entities: dEntities = emptyO } = emptyO } = tables
-      const decisions = {}
-      Object.entries(dEntities).forEach(
-        ([dId, { values: { rep } = emptyO }]) => {
-          decisions[rep] = dId
-        },
-      )
-      const dAccept = decisions['accept']
-      reviews.forEach(({ creator, decision }) => {
-        if (reviewerSet.has(creator) && decision === dAccept) {
-          approved = true
-        }
-      })
-    }
+    const decision = finalDecision(w('reviewers'), w('reviews'))
+    const { dAccept } = decisions(tables)
+    const approved = decision === dAccept
     let result
     if (approved) {
       const scoreItems = (w('score') || emptyO).items || emptyA

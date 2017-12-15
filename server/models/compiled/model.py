@@ -63,6 +63,8 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                          'desc': 'modify (insert/update/delete) an item'},
                                 'myassign': {'call': 'auth', 'desc': 'list my assignments'},
                                 'mylist': {'call': 'EDIT', 'desc': 'list my items'},
+                                'resetwf': { 'call': 'system',
+                                             'desc': 'reset the workflow information'},
                                 'view': {'call': 'public', 'desc': 'details of an item'}},
                    'owners': {'user': '_id'},
                    'unauth': 'public'},

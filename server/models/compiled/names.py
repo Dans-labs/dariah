@@ -179,6 +179,8 @@ class N:
     remarks = 'remarks'
     rep = 'rep'
     repName = 'repName'
+    reset = 'reset'
+    resetwf = 'resetwf'
     review = 'review'
     reviewEntry = 'reviewEntry'
     reviewType = 'reviewType'
