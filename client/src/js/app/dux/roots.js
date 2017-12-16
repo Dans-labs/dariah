@@ -29,41 +29,41 @@ const predicate = (state, action) => !action.type.startsWith('@@redux-form')
 //const predicate = () => true // if you want to see all actions
 
 const configureStore = reducer => {
-	let store
-	if (process.env.NODE_ENV === `development`) {
-		const { createLogger } = require(`redux-logger`)
-		const { composeWithDevTools } = require('redux-devtools-extension')
-		const composeEnhancers = composeWithDevTools({ predicate })
-		store = createStore(
-			reducer,
-			composeEnhancers(
-				applyMiddleware(thunkMiddleware, createLogger({ predicate })),
-			),
-		)
-	} else {
-		store = createStore(reducer, applyMiddleware(thunkMiddleware))
-	}
-	return store
+  let store
+  if (process.env.NODE_ENV === `development`) {
+    const { createLogger } = require(`redux-logger`)
+    const { composeWithDevTools } = require('redux-devtools-extension')
+    const composeEnhancers = composeWithDevTools({ predicate })
+    store = createStore(
+      reducer,
+      composeEnhancers(
+        applyMiddleware(thunkMiddleware, createLogger({ predicate })),
+      ),
+    )
+  } else {
+    store = createStore(reducer, applyMiddleware(thunkMiddleware))
+  }
+  return store
 }
 
 /* REDUCER */
 
 export default configureStore(
-	combineReducers({
-		settings,
-		win,
-		server,
-		notes,
-		docs,
-		tables,
-		me,
-		filters,
-		alter,
-		form,
-		select,
-		grid,
-		workflow,
-	}),
+  combineReducers({
+    settings,
+    win,
+    server,
+    notes,
+    docs,
+    tables,
+    me,
+    filters,
+    alter,
+    form,
+    select,
+    grid,
+    workflow,
+  }),
 )
 
 /* SELECTORS */

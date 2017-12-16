@@ -421,20 +421,16 @@ class DbAccess(object):
             documents = list(
                 MONGO[table].find(theRowFilter, fieldFilter).sort(sort)
             )
-        workflow = {}
-        if my:
-            workflow = WF.loadWorkflow(
-                table, {doc.get(N._id): doc
-                        for doc in documents}
-            )
 
         allIds = [doc[N._id] for doc in documents]
         entities = {}
         for doc in documents:
             eId = doc[N._id]
             record = {N.values: doc}
-            if my and eId in workflow:
-                record[N.workflow] = workflow[eId]
+            if my:
+                workflow = WF.loadWorkflow(table, doc.get(N._id, None))
+                if workflow:
+                    record[N.workflow] = workflow
             entities[str(eId)] = record
         if not titleOnly:
             for doc in documents:
@@ -589,10 +585,8 @@ class DbAccess(object):
         myWorkflow = WF.readWorkflow(
             msgs,
             table,
-            {
-                None: insertValues
-            },
-        ).get(None, {})
+            insertValues,
+        )
         if not WF.enforceWorkflow(
             myWorkflow, {}, insertValues, N.insert, msgs
         ):
@@ -660,10 +654,8 @@ class DbAccess(object):
         myWorkflow = WF.readWorkflow(
             msgs,
             table,
-            {
-                document[N._id]: document
-            },
-        ).get(document[N._id], {})
+            document,
+        )
         if not WF.enforceWorkflow(myWorkflow, document, {}, N.delete, msgs):
             return False
 
@@ -872,10 +864,8 @@ class DbAccess(object):
         myWorkflow = WF.readWorkflow(
             msgs,
             table,
-            {
-                document[N._id]: document
-            },
-        ).get(document[N._id], {})
+            document,
+        )
         if not WF.enforceWorkflow(
             myWorkflow, document, newDocument, N.update, msgs
         ):
@@ -892,10 +882,10 @@ class DbAccess(object):
 
         # check for updates in the workflow information
         myWorkflow = WF.readWorkflow(
-            msgs, table, {
-                newDocument[N._id]: newDocument
-            }
-        ).get(document[N._id], {})
+            msgs,
+            table,
+            newDocument,
+        )
         workflow.extend(WF.adjustWorkflow(msgs, table, document, newDocument))
 
         recordInfo = {
@@ -938,12 +928,6 @@ class DbAccess(object):
         if ldoc == 0:
             msgs.append({N.kind: N.error, N.text: failText}, )
             return failData
-        workflow = WF.readWorkflow(
-            msgs,
-            table,
-            {doc[N._id]: doc
-             for doc in documents},
-        )
         if multiple:
             data = []
             for document in documents:
@@ -957,6 +941,11 @@ class DbAccess(object):
                 if not mayRead:
                     continue
                 perm = self._getPerm(table, document, msgs)
+                workflow = WF.readWorkflow(
+                    msgs,
+                    table,
+                    document,
+                )
                 data.append({
                     N.values: {
                         f: v
@@ -965,7 +954,7 @@ class DbAccess(object):
                     },
                     N.perm: perm,
                     N.fields: mongoFields(fieldSet),
-                    N.workflow: workflow.get(document[N._id], {})
+                    N.workflow: workflow
                 })
             return data
         else:
@@ -980,6 +969,11 @@ class DbAccess(object):
             if not mayRead:
                 return failData
             perm = self._getPerm(table, document, msgs)
+            workflow = WF.readWorkflow(
+                msgs,
+                table,
+                document,
+            )
             return {
                 N.values: {
                     f: v
@@ -988,7 +982,7 @@ class DbAccess(object):
                 },
                 N.perm: perm,
                 N.fields: mongoFields(fieldSet),
-                N.workflow: workflow.get(document[N._id], {})
+                N.workflow: workflow
             }
 
     def _findDocs(self, records, msgs, workflow):
@@ -1016,10 +1010,8 @@ class DbAccess(object):
             myWorkflow = WF.readWorkflow(
                 msgs,
                 table,
-                {
-                    document[N._id]: document
-                },
-            ).get(document[N._id], {})
+                document,
+            )
             tables.append({
                 N.table: table,
                 N.values: {

@@ -9,78 +9,57 @@ WM = M[N.workflow]
 # BASIC RULE COMPUTATION METHODS THAT CAN BE CONFIGURED IN A WORKFLOW
 
 
-def _compute_hasValue(wf, myDocMap, otherDocMap, w):
+def _compute_hasValue(wf, myDoc, otherDocs, w):
     otherField = w.get(N.otherField, None)
     value = w.get(N.value, None)
 
     return {
-        myDocId: {
-            N.on: True
-        }
-        for (myDocId, otherDocs) in otherDocMap.items()
-        if any(
-            otherDoc.get(otherField, None) == value for otherDoc in otherDocs
-        )
-    }
+        N.on: True
+    } if any(
+        otherDoc.get(otherField, None) == value for otherDoc in otherDocs
+    ) else {}
 
 
-def _compute_hasIncomplete(wf, myDocMap, otherDocMap, w):
+def _compute_hasIncomplete(wf, myDoc, otherDocs, w):
     emptyFields = w.get(N.emptyFields, None)
 
-    incompleteMap = {
-        myDocId: [
-            otherDoc.get(N._id) for otherDoc in otherDocs
-            if any(
-                _isEmpty(otherDoc.get(emptyField, None))
-                for emptyField in emptyFields
-            )
-        ]
-        for (myDocId, otherDocs) in otherDocMap.items()
-    }
-    return {
-        myDocId: {
-            N.on: True,
-            'n': len(otherDocs)
-        }
-        for (myDocId, otherDocs) in incompleteMap.items() if len(otherDocs) > 0
-    }
+    incompletes = [
+        otherDoc.get(N._id) for otherDoc in otherDocs
+        if any(
+            _isEmpty(otherDoc.get(emptyField, None))
+            for emptyField in emptyFields
+        )
+    ]
+    return {N.on: True, 'n': len(incompletes)} if len(incompletes) > 0 else {}
 
 
-def _compute_hasDifferent(wf, myDocMap, otherDocMap, w):
+def _compute_hasDifferent(wf, myDoc, otherDocs, w):
     myField = w.get(N.myField, None)
     otherField = w.get(N.otherField, None)
 
     return {
-        myDocId: {
-            N.on: True
-        }
-        for (myDocId, otherDocs) in otherDocMap.items()
-        if any(
-            otherDoc.get(otherField, None) != myDocMap[myDocId]
-            .get(myField, None) for otherDoc in otherDocs
-        )
-    }
+        N.on: True
+    } if any(
+        otherDoc.get(otherField, None) != myDoc.get(myField, None)
+        for otherDoc in otherDocs
+    ) else {}
 
 
-def _compute_getValues(wf, myDocMap, otherDocMap, w):
+def _compute_getValues(wf, myDoc, otherDocs, w):
     otherFields = w.get(N.otherFields, [])
 
     return {
-        myDocId: {
-            N.items: [{
-                otherField: otherDoc.get(otherField)
-                for otherField in otherFields if otherField in otherDoc
-            } for otherDoc in otherDocs]
-        }
-        for (myDocId, otherDocs) in otherDocMap.items()
+        N.items: [{
+            otherField: otherDoc.get(otherField)
+            for otherField in otherFields if otherField in otherDoc
+        } for otherDoc in otherDocs]
     }
 
 
-def _compute_assessmentScore(wf, myDocMap, otherDocMap, w):
+def _compute_assessmentScore(wf, myDoc, otherDocs, w):
     MONGO = wf.MONGO
-    if not myDocMap:
+    if not myDoc:
         return {}
-    result = {}
     scoreData = list(
         MONGO[N.score].find({}, {
             N._id: True,
@@ -97,51 +76,47 @@ def _compute_assessmentScore(wf, myDocMap, otherDocMap, w):
         if prevMax is None or score > prevMax:
             maxScoreByCrit[crit] = score
 
-    for (myDocId, otherDocs) in otherDocMap.items():
-        resultItems = []
-        for otherDoc in otherDocs:
-            aId = otherDoc.get(N._id, None)
-            if not aId:
-                continue
-            myCriteriaData = list(
-                MONGO[N.criteriaEntry].find({
-                    N.assessment: aId
-                }, {
-                    N._id: True,
-                    N.criteria: True,
-                    N.score: True
-                })
-            )
-            myCriteriaEntries = [(
-                cd[N.criteria], scoreMapping.get(cd.get(N.score, None), 0),
-                maxScoreByCrit[cd[N.criteria]]
-            ) for cd in myCriteriaData]
+    resultItems = []
+    for otherDoc in otherDocs:
+        aId = otherDoc.get(N._id, None)
+        if not aId:
+            continue
+        myCriteriaData = list(
+            MONGO[N.criteriaEntry].find({
+                N.assessment: aId
+            }, {
+                N._id: True,
+                N.criteria: True,
+                N.score: True
+            })
+        )
+        myCriteriaEntries = [(
+            cd[N.criteria], scoreMapping.get(cd.get(N.score, None), 0),
+            maxScoreByCrit[cd[N.criteria]]
+        ) for cd in myCriteriaData]
 
-            allMax = sum(x[2] for x in myCriteriaEntries)
-            allN = len(myCriteriaEntries)
+        allMax = sum(x[2] for x in myCriteriaEntries)
+        allN = len(myCriteriaEntries)
 
-            relevantCriteriaEntries = [
-                x for x in myCriteriaEntries if x[1] >= 0
-            ]
-            relevantMax = sum(x[2] for x in relevantCriteriaEntries)
-            relevantScore = sum(x[1] for x in relevantCriteriaEntries)
-            relevantN = len(relevantCriteriaEntries)
-            overall = 0 if relevantMax == 0 else (
-                round(relevantScore * 100 / relevantMax)
+        relevantCriteriaEntries = [x for x in myCriteriaEntries if x[1] >= 0]
+        relevantMax = sum(x[2] for x in relevantCriteriaEntries)
+        relevantScore = sum(x[1] for x in relevantCriteriaEntries)
+        relevantN = len(relevantCriteriaEntries)
+        overall = 0 if relevantMax == 0 else (
+            round(relevantScore * 100 / relevantMax)
+        )
+        resultItems.append(
+            dict(
+                overall=overall,
+                relevantScore=relevantScore,
+                relevantMax=relevantMax,
+                allMax=allMax,
+                relevantN=relevantN,
+                allN=allN,
+                aId=aId,
             )
-            resultItems.append(
-                dict(
-                    overall=overall,
-                    relevantScore=relevantScore,
-                    relevantMax=relevantMax,
-                    allMax=allMax,
-                    relevantN=relevantN,
-                    allN=allN,
-                    aId=aId,
-                )
-            )
-        result[myDocId] = {N.items: resultItems}
-    return result
+        )
+    return {N.items: resultItems}
 
 
 class WorkflowApi(object):
@@ -182,9 +157,7 @@ class WorkflowApi(object):
                     'reset workflow on {} ({} items)'.format(table, len(docs))
                 )
                 for doc in docs:
-                    self.readWorkflow(
-                        msgs, table, {doc.get(N._id, None): doc}, compute=True
-                    )
+                    self.readWorkflow(msgs, table, doc, compute=True)
             error = any(msg[N.kind] == N.error for msg in msgs)
             MONGO[N.workflow].insert_one({
                 N.table: N.workflow,
@@ -215,41 +188,41 @@ class WorkflowApi(object):
             }
         }
 
-    def readWorkflow(self, msgs, table, myDocMap, compute=False):
+    def readWorkflow(self, msgs, table, myDoc, compute=False):
+        myId = myDoc.get(N._id)
         if compute:
             result = {}
             for w in DM.get(table, {}).get(N.workflow, {}).get(N.read, []):
-                self._computeWorkflow(msgs, table, myDocMap, w, result)
-            self._storeWorkflow(table, result)
+                self._computeWorkflow(msgs, table, myDoc, w, result)
+            if myId:
+                self._storeWorkflow(table, myId, result)
         else:
-            result = self.loadWorkflow(table, myDocMap)
+            result = self.loadWorkflow(table, myId)
         return result
 
-    def loadWorkflow(self, table, myDocMap):
+    def loadWorkflow(self, table, myId):
         MONGO = self.MONGO
-        result = {}
-        selectInfo = {N.table: table, 'eId': {'$in': list(myDocMap.keys())}}
+        result = None
+        selectInfo = {N.table: table, 'eId': myId}
         workflowResults = list(MONGO[N.workflow].find(selectInfo))
         for wf in workflowResults:
-            eId = wf['eId']
             attributes = wf.get(N.attributes, None)
             if attributes is not None:
-                result[eId] = attributes
+                result = attributes
         return result
 
-    def _storeWorkflow(self, table, result):
+    def _storeWorkflow(self, table, myId, result):
         MONGO = self.MONGO
-        for (eId, attributes) in result.items():
-            selectInfo = {N.table: table, 'eId': eId}
-            if not attributes:
-                MONGO[N.workflow].delete_one(selectInfo)
-            else:
-                updateInfo = {}
-                updateInfo.update(selectInfo)
-                updateInfo[N.attributes] = attributes
-                MONGO[N.workflow].update_one(
-                    selectInfo, {'$set': updateInfo}, upsert=True
-                )
+        selectInfo = {N.table: table, 'eId': myId}
+        if not result:
+            MONGO[N.workflow].delete_one(selectInfo)
+        else:
+            updateInfo = {}
+            updateInfo.update(selectInfo)
+            updateInfo[N.attributes] = result
+            MONGO[N.workflow].update_one(
+                selectInfo, {'$set': updateInfo}, upsert=True
+            )
 
     def adjustWorkflow(self, msgs, table, document, adjustedValues):
         result = self._applyAdjustWorkflow(
@@ -267,7 +240,7 @@ class WorkflowApi(object):
             ),
         )
         for (table, docId, attributes) in result:
-            self._storeWorkflow(table, {docId: attributes})
+            self._storeWorkflow(table, docId, attributes)
 
         return result
 
@@ -484,7 +457,54 @@ class WorkflowApi(object):
 
 # SELECTOR FUNCTIONS
 
-    def _selectDocsRead(self, msgs, table, myDocMap, w):
+    def _selectDocsRead(self, msgs, table, myDoc, w):
+        inspect = w.get(N.inspect, None)
+        linkField = w.get(N.linkField, None)
+        otherTable = w.get(N.otherTable, None)
+        equalField = w.get(N.equalField, None)
+
+        if inspect == N.self:
+            otherDocs = [myDoc]
+        elif inspect == N.details:
+            otherDocs = self.workflowLookup(
+                otherTable,
+                {linkField: myDoc.get(N._id, None)},
+                True,
+                msgs,
+            )
+        elif inspect == N.master:
+            otherDocs = self.workflowLookup(
+                otherTable,
+                {N._id: myDoc.get(linkField, None)},
+                True,
+                msgs,
+            )
+        elif inspect == N.siblings:
+            selectInfo = {
+                linkField: myDoc.get(linkField, None),
+                N._id: {
+                    '$ne': myDoc.get(N._id, None)
+                }
+            }
+            if equalField is not None:
+                myEqualValue = myDoc.get(equalField, None)
+                if myEqualValue is None:
+                    selectInfo[equalField] = {'$exists': False}
+                else:
+                    selectInfo[equalField] = myEqualValue
+            otherDocs = self.workflowLookup(
+                otherTable,
+                selectInfo,
+                True,
+                msgs,
+            )
+        else:
+            # workflow config error
+            otherDocs = []
+
+        return otherDocs
+
+    def _selectDocsRead_old(self, msgs, table, myDocMap, w):
         inspect = w.get(N.inspect, None)
         linkField = w.get(N.linkField, None)
         otherTable = w.get(N.otherTable, None)
@@ -623,23 +643,22 @@ class WorkflowApi(object):
 # HELPERS READ WORKFLOW
 
     def _applyReadWorkflow(self, workflowResults, attribute, result):
-        for (myWorkflowId, myWorkflowMap) in workflowResults.items():
+        if workflowResults:
             for (k, v) in attribute.items():
                 if k != N.name:
-                    myWorkflowMap[k] = v.format(
-                        **myWorkflowMap
+                    workflowResults[k] = v.format(
+                        **workflowResults
                     ) if k == N.desc else v
-            result.setdefault(myWorkflowId,
-                              {})[attribute[N.name]] = myWorkflowMap
+            result[attribute[N.name]] = workflowResults
 
-    def _computeWorkflow(self, msgs, table, myDocs, w, result):
+    def _computeWorkflow(self, msgs, table, myDoc, w, result):
         method = w.get(N.method, None)
         attribute = w.get(N.attribute, None)
 
-        otherDocMap = self._selectDocsRead(msgs, table, myDocs, w)
+        otherDocs = self._selectDocsRead(msgs, table, myDoc, w)
 
         myWorkflowResults = globals()['_compute_{}'.format(method)](
-            self, myDocs, otherDocMap, w
+            self, myDoc, otherDocs, w
         )
         self._applyReadWorkflow(myWorkflowResults, attribute, result)
 
@@ -662,18 +681,23 @@ class WorkflowApi(object):
         return (None, [])
 
     def _combineAffected(self, affecteds):
-        allAffected = {}
+        allAffectedProto = {}
         for (table, docs) in affecteds:
             for doc in docs:
-                allAffected.setdefault(table, {})[doc.get(N._id, None)] = doc
-        return allAffected
+                allAffectedProto.setdefault(table, {})[doc.get(N._id,
+                                                               None)] = doc
+        return {
+            table: set(docMap.values())
+            for (table, docMap) in allAffectedProto.items()
+        }
 
     def _applyAdjustWorkflow(self, msgs, allAffected):
         workflowEntries = []
-        for (table, docMap) in allAffected.items():
-            workflow = self.readWorkflow(msgs, table, docMap, compute=True)
-            for docId in docMap:
-                workflowEntries.append([table, docId, workflow.get(docId, {})])
+        for (table, docs) in allAffected.items():
+            for doc in docs:
+                docId = doc.get(N._id, None)
+                workflow = self.readWorkflow(msgs, table, doc, compute=True)
+                workflowEntries.append([table, docId, workflow])
         return workflowEntries
 
 # MISCELLANEOUS FUNCTIONS

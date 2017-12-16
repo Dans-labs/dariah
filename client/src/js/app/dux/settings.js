@@ -8,9 +8,9 @@ export const adjust = (key, value) => ({ type: 'setSetting', key, value })
 /* REDUCER */
 
 const flows = {
-	setSetting(state, { key, value }) {
-		return update(state, { [key]: { $set: value } })
-	},
+  setSetting(state, { key, value }) {
+    return update(state, { [key]: { $set: value } })
+  },
 }
 
 /* trim dates:
@@ -21,18 +21,18 @@ const flows = {
  */
 
 const initSettings = () => ({
-	provenanceFields: new Set(['creator', 'dateCreated', 'modified']),
-	hideProvenance: true,
-	longDates: {
-		assessment: {
-			dateSubmitted: 1,
-			dateWithdrawn: 1,
-		},
+  provenanceFields: new Set(['creator', 'dateCreated', 'modified']),
+  hideProvenance: true,
+  longDates: {
+    assessment: {
+      dateSubmitted: 1,
+      dateWithdrawn: 1,
+    },
     review: {
       dateDecided: 1,
     },
-	},
-	showTooltips: true,
+  },
+  showTooltips: true,
 })
 
 export default makeReducer(flows, initSettings())

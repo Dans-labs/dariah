@@ -6,12 +6,12 @@ import { makeSubmit, makeSubmitTime, editClass } from 'edit'
 import Tooltip from 'Tooltip'
 
 const fieldRemove = (fields, i, submit) => () => {
-	fields.remove(i)
-	submit()
+  fields.remove(i)
+  submit()
 }
 const fieldPush = (fields, submit) => () => {
-	fields.push()
-	submit()
+  fields.push()
+  submit()
 }
 /* N.B.
  * fieldRemove and fieldPush MUST NOT be memoized.
@@ -20,58 +20,58 @@ const fieldPush = (fields, submit) => () => {
  */
 
 export default ({
-	componentSingle,
-	validateSingle,
-	normalizeSingle,
-	meta: { dirty, invalid, submitting, error },
-	fields,
-	table,
-	eId,
-	valType,
-	nameC,
-	reset,
-	submitValues,
-	...props
+  componentSingle,
+  validateSingle,
+  normalizeSingle,
+  meta: { dirty, invalid, submitting, error },
+  fields,
+  table,
+  eId,
+  valType,
+  nameC,
+  reset,
+  submitValues,
+  ...props
 }) => {
-	const submit = makeSubmit(dirty, invalid, submitting, submitValues)
-	const submitTime = makeSubmitTime(submitValues)
-	return (
-		<div className={`${editClass(dirty, invalid)} multi-field ${valType}`}>
-			{fields.map((field, i) => (
-				<div key={field} className={'multi-content'}>
-					<Tooltip tip={'remove entry'} at={'left'}>
-						<div
-							className={'button medium'}
-							onClick={fieldRemove(fields, i, submitTime)}
-						>
-							{'×'}
-						</div>
-					</Tooltip>
-					<Field
-						name={field}
-						component={componentSingle}
-						validate={validateSingle}
-						normalize={normalizeSingle}
-						label={i}
-						table={table}
-						eId={eId}
-						reset={reset}
-						submitValues={submit}
-						{...props}
-					/>
-				</div>
-			))}
-			<div className={'multi-content'}>
-				<Tooltip tip={'more entries'} at={'left'}>
-					<div
-						className={'button medium'}
-						onClick={fieldPush(fields, submitTime)}
-					>
-						{'+'}
-					</div>
-				</Tooltip>
-			</div>
-			{error && <p className={'invalid diag'}>{error}</p>}
-		</div>
-	)
+  const submit = makeSubmit(dirty, invalid, submitting, submitValues)
+  const submitTime = makeSubmitTime(submitValues)
+  return (
+    <div className={`${editClass(dirty, invalid)} multi-field ${valType}`}>
+      {fields.map((field, i) => (
+        <div key={field} className={'multi-content'}>
+          <Tooltip tip={'remove entry'} at={'left'}>
+            <div
+              className={'button medium'}
+              onClick={fieldRemove(fields, i, submitTime)}
+            >
+              {'×'}
+            </div>
+          </Tooltip>
+          <Field
+            name={field}
+            component={componentSingle}
+            validate={validateSingle}
+            normalize={normalizeSingle}
+            label={i}
+            table={table}
+            eId={eId}
+            reset={reset}
+            submitValues={submit}
+            {...props}
+          />
+        </div>
+      ))}
+      <div className={'multi-content'}>
+        <Tooltip tip={'more entries'} at={'left'}>
+          <div
+            className={'button medium'}
+            onClick={fieldPush(fields, submitTime)}
+          >
+            {'+'}
+          </div>
+        </Tooltip>
+      </div>
+      {error && <p className={'invalid diag'}>{error}</p>}
+    </div>
+  )
 }
