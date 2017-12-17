@@ -2,14 +2,28 @@
 title: Business Logic
 ---
 
+Here we document the functionality of the app from the perspective of the users
+and stakeholders. We focus on the scenarios that are supported.
+
+**N.B.:**
+
+(✗) Items marked with a **single** ✗, are not implemented yet, but are expected
+to make to the delivery on 2017-12-31.
+
+(✗✗) Items marked with a **double** ✗, are not expected to be implemented before
+the delivery on 2017-12-31. They may or may not be implemented in 2018.
+
+Contributions
+=============
+
 A contribution is a piece of work in Digital Humanities, delivered by a person
 or institute, and potentially relevant to the European DARIAH research
 infrastructure. The national members of DARIAH may add such a contribution to
 their agreed budget of in-kind contributions to DARIAH as a whole. This makes it
 necessary to assess contributions against a set of well-defined criteria.
 
-Assessment model
-================
+Assessment scenario
+===================
 
 Contributions may represent diverse efforts such as consultancy, workshops,
 software development, and hosting services. This asks for a diversification of
@@ -47,7 +61,7 @@ ones in different ways.
 Assessing
 ---------
 
-Applicants with write access to a contribution can add a self-assessment to a
+Applicants with write-access to a contribution can add a self-assessment to a
 contribution. A self assessment is a record in the **assessment** table, and
 consists of a few metadata fields.
 
@@ -68,14 +82,12 @@ which are detail records of criteria. Scores have a number, typically `0`, `2`,
 `4`, and a short description, typically `None`, `Partial`, `Full`, but the
 number and nature of scores may vary freely between criteria.
 
-The score of an assessment as a whole s the sum of the individual scores
-expressed as percentage of the total amount of points that can be assigned. A
-temporary overall score is obtained by treating unfilled scores as having value
-`0`.
+The score of an assessment as a whole
+i`s the sum of the individual scores expressed as percentage of the total amount of points that can be assigned. A temporary overall score is obtained by treating unfilled scores as having value`0\`.
 
 However, some criteria may allow scores with a value `-1` (non-applicable). If
 an assessment assigns that score to a criterion, 0 points are added, but points
-missed from this criterion will be subtracted from the total score. the
+missed from this criterion will be subtracted from the total score, so that this
 criterion will not be counted in the average.
 
 *Example*: Suppose there are four criteria, A, B, C, D.
@@ -97,77 +109,79 @@ total | 12 | 16
 score | 100% | 75%
 
 See how U does better than V although they have an equal number of points. But
-for U criterion D does not count, while for V it counts, bit the score is 0.
+for U criterion D does not count, while for V it counts, but the score is 0.
 
 **N.B.** Not all criteria will allow `-1` values!
 
-Review model
-============
+Review scenario
+===============
 
-After a contributor has filled out an assessment, (s)he can ask for a review.
-Two reviewers will be selected, and they will get access to the self assessment.
+After a contributor has filled out an assessment, (s)he can submit it for
+review. The office will select two reviewers, and they will get access to the
+self assessment.
 
-Upon asking for review, the assessment and the contribution will be made
-immutable, temporarily.
+Upon asking for review, the assessment and the contribution will be locked
+temporarily.
 
 The two reviewers have distinct roles:
 
-*   **reviewer (expert)** inspects the assessment closely and proposes a decision;
-*   **reviewer (final say)** take the decision.
+*   **reviewer 1 (expert)** inspects the assessment closely and *advises* a
+    decision;
+*   **reviewer 2(final say)** *makes* the decision.
 
-Both reviewers can enter comments in a comment stream, which are detail records
-of the assessment.
+(✗✗) Both reviewers can enter comments in a comment stream, which are detail
+records of the assessment.
 
-At a certain point, the reviewer with the final say can take a three fold
-decision:
+The advice/decison that can be made by the reviewers is
 
 *   **approve**
 *   **reject**
-*   **modifications needed**
+*   (✗) **revise**
 
-In all cases, a *consolidated* version of the assessment will be made. This is a
-record, where all links to related records have been replaced by concrete values
-present at that time. consolidated records do not contain fields that point to
-other records.
+(✗) In all cases, a *consolidated* version of the reviews will be made. This
+records contains the information of both of the reviews, the assessment and the
+contribution. Consolidated means that all links to related records have been
+replaced by the concrete values found in those records at that time.
+Consolidated records do not contain fields that point to other records, only
+concrete text/number/datetime values.
+
+(✗✗) Consolidated records will be exported and stored as PDF.
 
 Approve
 -------
 
-Consolidated assessments will be stored in a collection called
-`assessmentConsolidated`. They contain the `_id` of the *live* assessment, and a
-time stamp of the moment of consolidating.
+A consolidated review-set will be stored in a collection called
+`reviewConsolidated`. Apart from the consolidated materials of the reviews, the
+assessment and the contribution, it contains the `_id` of the *live*
+contribution, and a time stamp of the moment of consolidating.
 
 The *live* assessment will remain immutable, but the *live* contribution becomes
-mutable again. Note that an assessment has a link to its contribution, and when
-we consolidate an assessment, it will contain a consolidated contribution.
+mutable again.
 
-So the consolidated assessment contains all information upon which the outcome
-of the assessment is based.
+So the consolidated review-set contains all information upon which the outcome
+of the assessment is based, even if the live contribution undergoes subsequent
+development.
 
 The reason why contributions will not be permanently immutable is this:
 contributions are likely to continue to evolve after assessment; their metadata
 (among which URLs and email addresses) may change, and the contributor may wish
-to keep the data for his/her contribution up to data, especially in view of data
+to keep the data for his/her contribution up to date, especially in view of data
 exchange between the contribution tool and the Market Place.
 
 Reject
 ------
 
+A consolidated version of the review will be stored.
+
 The *live* assessment will remain immutable, but the *live* contribution becomes
-mutable again. The applicant may enter an objection. In that case the back
-office will ask a second opinion and take appropriate action.
+mutable again.
 
-*   If the second opinion is still *reject*, a new consolidated version of the
-    assessment is saved. This version contains the objection and the final
-    decision.
-*   If the second opinion is *approve*, a new consolidated version of the
-    assessment is saved, and the final verdict will be changed to *accept*
-*   If the second opinion is *re-assess*, the applicant is invited to create a new
-    self assessment and offer it for review. Two different reviewers will be
-    chosen.
+(✗✗) The applicant may enter an objection. In that case the back office will ask
+a second opinion and take appropriate action, which might lead to a change of
+decision, e.g. towards *revise*, or to a new review by other reviewers.
 
-Modifications needed
---------------------
+Revise
+------
 
 The *live* assessment and *live* contribution will become mutable again, and the
 applicant can modify both in response to comments by the reviewers. When (s)he
@@ -182,20 +196,24 @@ has gone on in the following form:
 *   **live contribution** The contribution record is still in place, mutable, and
     contains only the actual situation
 *   **live assessment** The assessment record is still in place, but immutable.
-*   **live comments trail**
-    *   by reviewers: comments and suggestions for modification
-    *   by the applicant: to state an objection
-*   **consolidated versions of assessments** There are snapshots of the assessment
+*   (✗✗) **live comments trail**
+    *   (✗✗) by reviewers: comments and suggestions for modification
+    *   (✗✗) by the applicant: to state an objection
+*   (✗) **consolidated versions of assessments** There are snapshots of the assessment
     at pivotal points in time:
 
-    *   when the assessment has been offered for review
-    *   when reviewers have made decisions
-    *   when second opinions have been asked and given
+    *   (✗✗) when the assessment has been offered for review
+    *   (✗✗) when reviewers have made decisions
+    *   (✗✗) when second opinions have been asked and given
 
-    These snapshots contain snapshots of all detail records, including
+Management information
+======================
 
-    *   the contribution in question
-    *   the then active criteria
-    *   the then active scores
-    *   the filled out criteriaEntry records
-    *   the comment trail at that point in time.
+The app compiles management information of a statistical nature, both to the public and
+authenticated users.
+The quantity of information given is dependent on user rights.
+
+The public can see contributions, but not assessments and reviews, except the ones that 
+are finalized with outcome "accept".
+
+(✗) In those cases, the assessment score is also visible.
