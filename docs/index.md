@@ -10,8 +10,8 @@ title: Home
 This is the documentation for the DARIAH contribution tool, an instrument to
 register and assess community contributions to the [DARIAH]({{site.dariah}}).
 
-The documentation contains a functional part, the *workflow* of assessment and
-reviewing, and a technical part: architecture, technology, software design.
+The documentation contains parts that range from *functional*, *conceptual*,
+*technical* to *mundane*.
 
 About
 -----

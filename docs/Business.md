@@ -136,7 +136,7 @@ The advice/decison that can be made by the reviewers is
 
 *   **approve**
 *   **reject**
-*   (✗) **revise**
+*   **revise**
 
 (✗) In all cases, a *consolidated* version of the reviews will be made. This
 records contains the information of both of the reviews, the assessment and the
@@ -199,8 +199,8 @@ has gone on in the following form:
 *   (✗✗) **live comments trail**
     *   (✗✗) by reviewers: comments and suggestions for modification
     *   (✗✗) by the applicant: to state an objection
-*   (✗) **consolidated versions of assessments** There are snapshots of the assessment
-    at pivotal points in time:
+*   (✗) **consolidated versions of assessments** There are snapshots of the
+    assessment at pivotal points in time:
 
     *   (✗✗) when the assessment has been offered for review
     *   (✗✗) when reviewers have made decisions
@@ -209,11 +209,36 @@ has gone on in the following form:
 Management information
 ======================
 
-The app compiles management information of a statistical nature, both to the public and
-authenticated users.
-The quantity of information given is dependent on user rights.
+The app compiles management information of a statistical nature, both to the
+public and authenticated users. The quantity of information given is dependent
+on user rights.
 
-The public can see contributions, but not assessments and reviews, except the ones that 
-are finalized with outcome "accept".
+The public can see contributions, but not assessments and reviews, except the
+ones that are finalized with outcome "accept".
 
 (✗) In those cases, the assessment score is also visible.
+
+Left-overs
+==========
+
+Email notification
+------------------
+
+It might be handy to send emails to users involved in assessing and reviewing to
+notify them that a key event has occurred, such as the submission of an
+assessment, the appointment of reviewers, the decisions by reviewers.
+
+Push notification
+-----------------
+
+When an assessor calls up his/her assessment, and at the same time a reviewer
+takes a decision, this fact is not pushed to the assessor's browsing session.
+Only when the assessor feels like refreshing the page, (s)he will see the
+effects of that decision.
+
+We need some mechanism of hinting the user that important changes have been made
+and a refresh is needed.
+
+I know it can be
+[done](https://blog.pusher.com/how-to-build-a-realtime-activity-feed-with-react-and-pusher/),
+but it requires a bit of research to find the best way to do it.
