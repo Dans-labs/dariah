@@ -20,6 +20,18 @@ def _compute_hasValue(wf, myDoc, otherDocs, w):
     ) else {}
 
 
+def _compute_hasComplete(wf, myDoc, otherDocs, w):
+    emptyFields = w.get(N.emptyFields, None)
+
+    completes = all(
+        all(
+            not _isEmpty(otherDoc.get(emptyField, None))
+            for emptyField in emptyFields
+        ) for otherDoc in otherDocs
+    )
+    return {N.on: True} if completes else {}
+
+
 def _compute_hasIncomplete(wf, myDoc, otherDocs, w):
     emptyFields = w.get(N.emptyFields, None)
 
@@ -201,7 +213,7 @@ class WorkflowApi(object):
             if myId:
                 self._storeWorkflow(table, myId, result)
         else:
-            result = self.loadWorkflow(table, myId)
+            result = self.loadWorkflow(table, myId=myId)
         return result
 
     def loadWorkflow(self, table, myId=None):
@@ -221,7 +233,7 @@ class WorkflowApi(object):
                 if attributes is not None:
                     result[eId] = attributes
         else:
-            result = None
+            result = {}
             for wf in workflowResults:
                 attributes = wf.get(N.attributes, None)
                 if attributes is not None:
@@ -262,6 +274,8 @@ class WorkflowApi(object):
         return result
 
     def enforceWorkflow(self, workflow, currentDoc, newDoc, action, msgs):
+        if not workflow:
+            return True
         allow = True
         for (attribute, actionPreventions) in WM[N.prevent].items():
             attributeMap = workflow.get(attribute, {})
@@ -521,90 +535,13 @@ class WorkflowApi(object):
 
         return otherDocs
 
-    def _selectDocsRead_old(self, msgs, table, myDocMap, w):
-        inspect = w.get(N.inspect, None)
-        linkField = w.get(N.linkField, None)
-        otherTable = w.get(N.otherTable, None)
-        equalField = w.get(N.equalField, None)
-
-        if inspect == N.self:
-            otherDocMap = {id: [doc] for (id, doc) in myDocMap.items()}
-        elif inspect == N.details:
-            details = self.workflowLookup(
-                otherTable,
-                {linkField: {
-                    '$in': list(myDocMap.keys())
-                }},
-                True,
-                msgs,
-            )
-            otherDocMap = {}
-            for detail in details:
-                masterId = detail.get(linkField, None)
-                otherDocMap.setdefault(masterId, []).append(detail)
-        elif inspect == N.master:
-            masterIdFromDetailId = {
-                detailId: detailDoc.get(linkField, None)
-                for (detailId, detailDoc) in myDocMap.items()
-            }
-            detailIdsFromMasterId = _makeInverse(masterIdFromDetailId)
-            masters = self.workflowLookup(
-                otherTable,
-                {N._id: {
-                    '$in': list(masterIdFromDetailId.values())
-                }},
-                True,
-                msgs,
-            )
-            otherDocMap = {}
-            for master in masters:
-                masterId = master.get(N._id, None)
-                detailIds = detailIdsFromMasterId[masterId]
-                for detailId in detailIds:
-                    otherDocMap.setdefault(detailId, []).append(master)
-
-        elif inspect == N.siblings:
-            masterIdFromDetailId = {
-                detailId: detailDoc.get(linkField, None)
-                for (detailId, detailDoc) in myDocMap.items()
-            }
-            detailIdsFromMasterId = _makeInverse(masterIdFromDetailId)
-            siblings = self.workflowLookup(
-                otherTable,
-                {linkField: {
-                    '$in': list(masterIdFromDetailId.values())
-                }},
-                True,
-                msgs,
-            )
-            otherDocMap = {}
-            for sibling in siblings:
-                masterId = sibling.get(linkField, None)
-                detailIds = detailIdsFromMasterId[masterId]
-                for detailId in detailIds:
-                    if detailId != sibling.get(N._id, None):
-                        if (
-                            not equalField or
-                            myDocMap[detailId].get(equalField, None) ==
-                            sibling.get(equalField, None)
-                        ):
-                            otherDocMap.setdefault(
-                                detailId,
-                                [],
-                            ).append(sibling)
-        else:
-            # workflow config error
-            otherDocMap = {}
-
-        return otherDocMap
-
     def _selectDocsAdjust(self, msgs, table, myDocs, w):
         inspect = w.get(N.inspect, None)
         linkField = w.get(N.linkField, None)
         otherTable = w.get(N.otherTable, None)
 
         if inspect == N.self:
-            return []
+            return (table, myDocs)
 
         if inspect == N.self:
             otherDocs = myDocs

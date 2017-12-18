@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 
-import { emptyA, emptyO } from 'utils'
+import { emptyA, emptyO, emptyS } from 'utils'
 import { itemReadField, itemEditField } from 'fields'
 import { decisions, processStatus, finalDecision } from 'workflow'
 
@@ -68,7 +68,9 @@ const templates = {
             'Submission',
             <Fragment>
               {!isSubmitted && isWithdrawn
-                ? `${l('dateWithdrawn')}: ${s('dateWithdrawn')}`
+                ? `${reOpen ? 'Revised' : l('dateWithdrawn')}: ${s(
+                    'dateWithdrawn',
+                  )}`
                 : null}
               {isSubmitted
                 ? `${l('dateSubmitted')}: ${s('dateSubmitted')}`
@@ -87,7 +89,7 @@ const templates = {
                     onClick={h}
                   >{`${
                     e('submitted')
-                      ? 'Submit for review'
+                      ? `Submit for review${reOpen ? ' (again)' : emptyS}`
                       : reOpen ? 'Enter revisions' : 'Withdraw from review'
                   }`}</span>
                 ))
@@ -122,7 +124,9 @@ const templates = {
         ) : null}
         {m('title') && w('locked').on && !reOpen ? (
           <div className={'label large workflow info'}>
-            {`This assessment is locked because it ${decided ? 'has been reviewed' : w('locked').desc}.`}
+            {`This assessment is locked because it ${
+              decided ? 'has been reviewed' : w('locked').desc
+            }.`}
           </div>
         ) : null}
       </Fragment>

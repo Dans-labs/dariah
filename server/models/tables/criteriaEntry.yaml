@@ -31,6 +31,12 @@ workflow:
       otherTable: review
       triggerFields:
         - _id
+    - inspect: siblings
+      linkField: assessment
+      masterTable: assessment
+      otherTable: review
+      triggerFields:
+        - score
 
 title: criteria
 

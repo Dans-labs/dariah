@@ -179,6 +179,9 @@ workflow:
     locked:
       delete: true
       update: except
+    fixed:
+      delete: true
+      update: except
     stalled:
       update:
         submitted:

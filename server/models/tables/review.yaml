@@ -10,6 +10,15 @@ timing:
 
 workflow:
   read:
+    - inspect: self
+      method: hasComplete
+      emptyFields:
+        - decision
+      attribute:
+        name: fixed
+        desc: 'verdict has been given'
+        except:
+          - decision
     - inspect: siblings
       method: getValues
       linkField: assessment
@@ -41,6 +50,13 @@ workflow:
       attribute:
         name: reviewers
         desc: all reviewers of this assessment
+    - inspect: master
+      method: assessmentScore
+      linkField: assessment
+      otherTable: assessment
+      attribute:
+        name: score
+        desc: assessment score
     - inspect: details
       method: hasIncomplete
       linkField: review
@@ -69,6 +85,15 @@ workflow:
       otherTable: contrib
       triggerFields:
         - creator
+        - decision
+    - inspect: details
+      linkField: review
+      otherTable: reviewEntry
+      triggerFields:
+        - decision
+    - inspect: self
+      otherTable: review
+      triggerFields:
         - decision
 
 title: title

@@ -20,6 +20,15 @@ workflow:
         name: reviews
         desc: entries by other reviewers
     - inspect: master
+      method: hasComplete
+      linkField: review
+      otherTable: review
+      emptyFields:
+        - decision
+      attribute:
+        name: fixed
+        desc: 'verdict has been given'
+    - inspect: master
       method: getValues
       linkField: assessment
       otherTable: assessment
