@@ -3,7 +3,13 @@ perm:
   read:   public
   update: office
   insert: public
-  delete: office
+  delete: nobody
+
+fieldOrder:
+  - sign
+  - acro
+  - rep
+  - participle
 
 fieldSpecs:
   acro:
