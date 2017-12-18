@@ -4,3 +4,37 @@ perm:
   update: office
   insert: public
   delete: office
+
+fieldSpecs:
+  acro:
+    perm:
+      list:   public
+      read:   public
+      update: nobody
+    label: code
+    valType: text
+    multiple: false
+  sign:
+    perm:
+      list:   public
+      read:   public
+      update: office
+    label: sign
+    valType: text
+    multiple: false
+  rep:
+    perm:
+      list:   public
+      read:   public
+      update: office
+    label: representation
+    valType: text
+    multiple: false
+  participle:
+    perm:
+      list:   public
+      read:   public
+      update: office
+    label: representation as participle
+    valType: text
+    multiple: false

@@ -4,7 +4,13 @@ import { emptyA, emptyO } from 'utils'
 import { headEntity } from 'tables'
 import { trimDate } from 'datatypes'
 import { itemReadField, itemEditField } from 'fields'
-import { getItem, isReviewerType, reviewerRole, decisions } from 'workflow'
+import {
+  getItem,
+  isReviewerType,
+  reviewerRole,
+  decisions,
+  processStatus,
+} from 'workflow'
 
 //import Expand from 'Expand'
 //import Tooltip from 'Tooltip'
@@ -15,9 +21,23 @@ const eField = (field, l, fe, m, key) =>
   itemEditField(field, l(field), fe(field), m(field), key)
 
 const myReview = (me, w) =>
-  me._id && ((w('reviews') || emptyO).items || emptyA).find(x => x.creator == me._id)
+  me._id &&
+  ((w('reviews') || emptyO).items || emptyA).find(x => x.creator == me._id)
 
 const templates = {
+  head({ tables, v, w, me }) {
+    const thisReviewer = getItem(w('reviewers'))
+    const { reviewerE, reviewerF } = thisReviewer
+    const myType = isReviewerType(me._id, reviewerE, reviewerF)
+    return processStatus(
+      w('reviewers'),
+      myType === 'E'
+        ? w('reviews')
+        : { items: [{ creator: v('creator'), decision: v('decision') }] },
+      !w('locked').on,
+      { tables, v, w, me },
+    )
+  },
   main({ l, f }) {
     return (
       <div className={'grid fragments'}>
@@ -45,12 +65,12 @@ const templates = {
       </Fragment>
     )
   },
-  mainAction({ settings, tables, table, me, v, w, s, fs }) {
+  mainAction({ settings, tables, table, me, v, w, s, fs, m }) {
     const thisReviewer = getItem(w('reviewers'))
     const { reviewerE, reviewerF } = thisReviewer
     const myType = isReviewerType(me._id, reviewerE, reviewerF)
     const thisType = isReviewerType(v('creator'), reviewerE, reviewerF)
-    const { dAccept, dReject } = decisions(tables)
+    const { dAcro, dId, dRep, dPart } = decisions(tables.decision)
     const theseDecisions = {}
     const theseDecisionDates = {}
     ;['E', 'F'].forEach(reviewType => {
@@ -79,14 +99,13 @@ const templates = {
           {['E', 'F'].map(reviewType => {
             const isMy = myType && reviewType === myType
             const dLabel = reviewType === 'E' ? 'advice' : 'decision'
-            const dLabeled = reviewType === 'E' ? '' : 'ed'
             const dLabelMade = reviewType === 'E' ? 'given' : 'made'
             const decision = theseDecisions[reviewType]
-            const decisionRep = decision
-              ? headEntity(tables, 'decision', decision, settings)
-              : 'No decision yet'
-            const dTaken = decision ? `${dLabel}: ${decisionRep}${dLabeled}` : `${dLabel}: not yet ${dLabelMade}`
-            const dTakenDate = decision ? ` ${dLabelMade} on ${theseDecisionDates[reviewType]}` : ''
+            const acro = decision ? dAcro[decision] : 'info'
+            const decisionRep = decision ? dPart[acro] : `No ${dLabel} yet`
+            const dTakenDate = decision
+              ? ` ${dLabelMade} on ${theseDecisionDates[reviewType]}`
+              : ''
             return (
               <div
                 key={reviewType}
@@ -117,14 +136,8 @@ const templates = {
                     </div>
                   ) : decision ? (
                     <div>
-                      <div
-                        className={`label large workflow ${
-                          decision === dAccept
-                            ? 'good'
-                            : decision === dReject ? 'error' : 'warning'
-                        }`}
-                      >
-                        {dTaken}
+                      <div className={`label large workflow ${acro}`}>
+                        {decisionRep}
                       </div>
                       {dTakenDate}
                       {reviewType === 'F' || !theseDecisions['F']
@@ -133,7 +146,7 @@ const templates = {
                               className={'button large workflow warning'}
                               onClick={h}
                             >
-                              {`Revise ${dLabel}`}
+                              {`Revoke ${dLabel}`}
                             </span>
                           ))
                         : null}
@@ -141,34 +154,24 @@ const templates = {
                   ) : (
                     <div>
                       {`${dLabel}: `}
-                      {fs('decision', dAccept, h => (
-                        <span
-                          className={'button large workflow good'}
-                          onClick={h}
-                        >
-                          {'Accept'}
-                        </span>
-                      ))}
-                      {fs('decision', dReject, h => (
-                        <span
-                          className={'button large workflow error'}
-                          onClick={h}
-                        >
-                          {'Reject'}
-                        </span>
+                      {['good', 'error', 'warning'].map(acro => (
+                        <Fragment key={acro}>
+                          {fs('decision', dId[acro], h => (
+                            <span
+                              className={`button large workflow ${acro}`}
+                              onClick={h}
+                            >
+                              {dRep[acro]}
+                            </span>
+                          ))}
+                        </Fragment>
                       ))}
                     </div>
                   )
                 ) : (
                   <div>
-                    <div
-                      className={`label large workflow ${
-                        decision === dAccept
-                          ? 'good'
-                          : decision === dReject ? 'error' : 'info'
-                      }`}
-                    >
-                      {dTaken}
+                    <div className={`label large workflow ${acro}`}>
+                      {decisionRep}
                     </div>
                     {dTakenDate}
                   </div>
@@ -177,6 +180,11 @@ const templates = {
             )
           })}
         </div>
+        {m('title') && w('locked').on ? (
+          <div className={'label large workflow info'}>
+            {`This review is locked because: ${w('locked').desc}`}
+          </div>
+        ) : null}
       </Fragment>
     )
   },
@@ -210,11 +218,7 @@ const templates = {
                 {`Start review`}
               </span>
             ) : (
-              <span className={'label large workflow warning'}>
-                {
-                  'You can review after the first reviewer has advised a decision'
-                }
-              </span>
+              <span className={'label large workflow warning'}>{}</span>
             )
           ) : (
             <span className={'label large workflow warning'}>

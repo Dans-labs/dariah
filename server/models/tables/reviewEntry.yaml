@@ -29,6 +29,15 @@ workflow:
       attribute:
         name: reviewers
         desc: all reviewers of this assessment
+    - inspect: master
+      method: hasValue
+      linkField: assessment
+      otherTable: assessment
+      otherField: submitted
+      value: false
+      attribute:
+        name: locked
+        desc: assessment is being revised
   adjust:
     - inspect: siblings
       linkField: assessment

@@ -2,6 +2,7 @@ import React, { Fragment } from 'react'
 
 import { emptyA, emptyO } from 'utils'
 import { itemReadField, itemEditField } from 'fields'
+import { decisions, processStatus, finalDecision } from 'workflow'
 
 import Tooltip from 'Tooltip'
 import ScoreBox from 'ScoreBox'
@@ -12,6 +13,14 @@ const eField = (field, l, fe, m, key) =>
   itemEditField(field, l(field), fe(field), m(field), key)
 
 const templates = {
+  head({ tables, v, w, me }) {
+    return processStatus(
+      { items: [{ reviewerF: v('reviewerF') }] },
+      w('reviews'),
+      v('submitted'),
+      { tables, v, w, me },
+    )
+  },
   main({ l, f }) {
     return (
       <div className={'grid fragments'}>
@@ -37,11 +46,18 @@ const templates = {
       </Fragment>
     )
   },
-  mainAction({ l, e, w, s, fe, fs, m }) {
+  mainAction({ tables, l, e, v, w, s, fe, fs, m }) {
     const scoreItems = (w('score') || emptyO).items || emptyA
     const score = scoreItems.length ? scoreItems[0] : emptyO
     const isWithdrawn = !e('dateWithdrawn')
     const isSubmitted = !e('submitted')
+    const { dId } = decisions(tables.decision)
+    const decision = finalDecision(
+      { items: [{ reviewerF: v('reviewerF') }] },
+      w('reviews'),
+    )
+    const reOpen = decision === dId['warning']
+    const decided = !!decision
     return (
       <Fragment>
         <ScoreBox score={score} />
@@ -57,18 +73,25 @@ const templates = {
               {isSubmitted
                 ? `${l('dateSubmitted')}: ${s('dateSubmitted')}`
                 : null}
-              {w('incomplete').on || w('stalled').on
-                ? null
-                : fs('submitted', e('submitted'), h => (
-                    <span
-                      className={`button large workflow ${
-                        e('submitted') ? 'info' : 'error'
-                      }`}
-                      onClick={h}
-                    >{`${
-                      e('submitted') ? 'Submit for' : 'Withdraw from'
-                    } review`}</span>
-                  ))}
+              {w('incomplete').on || w('stalled').on ? null : decided &&
+              !reOpen ? (
+                <span className={`label large workflow info`}>
+                  {'Review finished'}
+                </span>
+              ) : (
+                fs('submitted', e('submitted'), h => (
+                  <span
+                    className={`button large workflow ${
+                      e('submitted') ? 'info' : reOpen ? 'info' : 'error'
+                    }`}
+                    onClick={h}
+                  >{`${
+                    e('submitted')
+                      ? 'Submit for review'
+                      : reOpen ? 'Enter revisions' : 'Withdraw from review'
+                  }`}</span>
+                ))
+              )}
             </Fragment>,
             m('submitted'),
           )}
@@ -97,9 +120,9 @@ const templates = {
               `}
           </div>
         ) : null}
-        {m('title') && w('locked').on ? (
+        {m('title') && w('locked').on && !reOpen ? (
           <div className={'label large workflow info'}>
-            {`This assessment is locked because it is ${w('locked').desc}.`}
+            {`This assessment is locked because it ${decided ? 'has been reviewed' : w('locked').desc}.`}
           </div>
         ) : null}
       </Fragment>

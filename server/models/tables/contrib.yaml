@@ -16,7 +16,7 @@ workflow:
       value: true
       attribute:
         name: locked
-        desc: being reviewed
+        desc: is being reviewed
     - inspect: details
       method: getValues
       linkField: contrib

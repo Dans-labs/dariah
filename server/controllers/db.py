@@ -13,7 +13,6 @@ from controllers.utils import (
     mongoFields,
     mongoRows,
     andRows,
-    pp,
 )
 from controllers.workflow import WorkflowApi
 from models.compiled.model import model as M
@@ -422,15 +421,15 @@ class DbAccess(object):
                 MONGO[table].find(theRowFilter, fieldFilter).sort(sort)
             )
 
+        workflow = WF.loadWorkflow(table)
         allIds = [doc[N._id] for doc in documents]
         entities = {}
         for doc in documents:
             eId = doc[N._id]
             record = {N.values: doc}
-            if my:
-                workflow = WF.loadWorkflow(table, doc.get(N._id, None))
-                if workflow:
-                    record[N.workflow] = workflow
+            thisWorkflow = workflow.get(eId, None)
+            if thisWorkflow:
+                record[N.workflow] = thisWorkflow
             entities[str(eId)] = record
         if not titleOnly:
             for doc in documents:

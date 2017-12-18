@@ -58,32 +58,53 @@ export const getWorkflow = ({ workflow }) => ({ workflow })
 
 /* HELPERS */
 
-export const decisions = memoize(tables => {
-  const { decision: { entities: dEntities = emptyO } = emptyO } = tables
-  const decisions = {}
-  Object.entries(dEntities).forEach(([dId, { values: { rep } = emptyO }]) => {
-    decisions[rep] = dId
+export const decisions = memoize(decisionData => {
+  const { entities: dEntities = emptyO } = decisionData || emptyO
+  const dAcro = {}
+  const dId = {}
+  const dSign = {}
+  const dRep = {}
+  const dPart = {}
+  Object.values(dEntities).forEach(({ values: { _id, acro, sign, rep, participle } = emptyO }) => {
+    dAcro[_id] = acro
+    dId[acro] = _id
+    dSign[acro] = sign
+    dRep[acro] = rep
+    dPart[acro] = participle
   })
-  return {
-    dAccept: decisions['accept'],
-    dReject: decisions['reject'],
-    dRevise: decisions['revise'],
-  }
+  return { dAcro, dId, dSign, dRep, dPart }
 }, emptyO)
 
 export const finalDecision = memoize((wreviewers, wreviews) => {
   const { items: reviewers = emptyA } = wreviewers || emptyO
   const { items: reviews = emptyA } = wreviews || emptyO
-  let finalDecision = null
+  let fDecision = null
   if (reviewers.length && reviews.length) {
     const reviewerSet = new Set(reviewers.map(x => x.reviewerF))
     reviews.forEach(({ creator, decision }) => {
       if (reviewerSet.has(creator)) {
-        finalDecision = decision
+        fDecision = decision
       }
     })
   }
-  return finalDecision
+  return fDecision
+}, emptyO)
+
+export const processStatus = memoize((reviewers, reviews, submitted, { tables, w, v, me }) => {
+  const limited = !me || me.groupRep === 'public' || (me.groupRep === 'auth' && me._id !== v('creator'))
+  const decision = finalDecision(reviewers, reviews)
+  const { dId, dSign, dAcro } = decisions(tables.decision)
+  if (limited) {
+    const reviewResult = decision === dId['good'] ? dSign['good'] : emptyS
+    return reviewResult
+  }
+  else {
+    const reviewResult = decision ? dSign[dAcro[decision]] : emptyS
+    const { items: scores = emptyA } = w('score') || emptyO
+    const score = scores.length ? scores[0] : null
+    const assessmentResult = score == null ? emptyS : `${submitted ? '▶' : '✍'} (${score.overall}%) `
+    return `${assessmentResult} ${reviewResult}`
+  }
 }, emptyO)
 
 const compileActiveItems = memoize(

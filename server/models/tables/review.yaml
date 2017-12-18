@@ -23,6 +23,15 @@ workflow:
         name: reviews
         desc: other reviews of the same assessment
     - inspect: master
+      method: hasValue
+      linkField: assessment
+      otherTable: assessment
+      otherField: submitted
+      value: false
+      attribute:
+        name: locked
+        desc: assessment is being revised
+    - inspect: master
       method: getValues
       linkField: assessment
       otherTable: assessment

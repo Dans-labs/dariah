@@ -300,8 +300,26 @@ testOwner:
       ? AAI
 
 decisions:
-  - accept
-  - reject
+  order:
+    - accept
+    - reject
+    - revise
+  values:
+    accept:
+      acro: good
+      rep: Accept
+      participle: Accepted
+      sign: '✔'
+    reject:
+      acro: error
+      rep: Reject
+      participle: Rejected
+      sign: '✘'
+    revise:
+      acro: warning
+      rep: Revise
+      participle: Revision needed
+      sign: '✋'
 
 MAIN_TABLES:
 - contrib

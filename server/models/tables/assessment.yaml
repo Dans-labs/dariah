@@ -37,7 +37,7 @@ workflow:
           - submitted
           - reviewerE
           - reviewerF
-        desc: being reviewed
+        desc: is being reviewed
     - inspect: details
       method: hasIncomplete
       linkField: assessment
@@ -75,12 +75,14 @@ workflow:
       linkField: assessment
       otherTable: reviewEntry
       triggerFields:
+        - submitted
         - reviewerE
         - reviewerF
     - inspect: details
       linkField: assessment
       otherTable: review
       triggerFields:
+        - submitted
         - reviewerE
         - reviewerF
   assign:

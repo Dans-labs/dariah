@@ -202,9 +202,9 @@ class ListPlain extends Component {
                     className={'link head'}
                     onClick={this.showHide(table, select, eId, true, nextAlt)}
                   >
-                    <span className={`button small fa fa-angle-down`} /> {head}
+                    <span className={`button small fa fa-angle-down`} />
+                    {` ${extra || emptyS} ${head}`}
                   </span>
-                  {extra}
                 </span>
               )}
             </div>

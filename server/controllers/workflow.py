@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from controllers.utils import now, mongoFields, mongoRows
+from controllers.utils import now, mongoFields, mongoRows, serverprint, pp
 from models.compiled.model import model as M
 from models.compiled.names import N
 
@@ -144,6 +144,7 @@ class WorkflowApi(object):
 
         if reset or init:
             if init:
+                serverprint('Computing workflow data...')
                 MONGO[N.workflow].drop()
             else:
                 MONGO[N.workflow].delete_many({N.table: {'$ne': N.workflow}})
@@ -178,6 +179,9 @@ class WorkflowApi(object):
                     m = attributeCount.setdefault(attribute,
                                                   {}).setdefault(table, 0)
                     attributeCount[attribute][table] = m + 1
+        if init:
+            pp.pprint(attributeCount)
+            serverprint('Computed {} workflow records'.format(len(docs)))
         return {
             N.good: not error,
             N.msgs: msgs,
@@ -200,15 +204,28 @@ class WorkflowApi(object):
             result = self.loadWorkflow(table, myId)
         return result
 
-    def loadWorkflow(self, table, myId):
+    def loadWorkflow(self, table, myId=None):
         MONGO = self.MONGO
-        result = None
-        selectInfo = {N.table: table, 'eId': myId}
+        selectInfo = {
+            N.table: table
+        } if myId is None else {
+            N.table: table,
+            'eId': myId
+        }
         workflowResults = list(MONGO[N.workflow].find(selectInfo))
-        for wf in workflowResults:
-            attributes = wf.get(N.attributes, None)
-            if attributes is not None:
-                result = attributes
+        if myId is None:
+            result = {}
+            for wf in workflowResults:
+                eId = wf.get('eId', None)
+                attributes = wf.get(N.attributes, None)
+                if attributes is not None:
+                    result[eId] = attributes
+        else:
+            result = None
+            for wf in workflowResults:
+                attributes = wf.get(N.attributes, None)
+                if attributes is not None:
+                    result = attributes
         return result
 
     def _storeWorkflow(self, table, myId, result):
@@ -681,14 +698,14 @@ class WorkflowApi(object):
         return (None, [])
 
     def _combineAffected(self, affecteds):
-        allAffectedProto = {}
+        allAffectedMap = {}
         for (table, docs) in affecteds:
             for doc in docs:
-                allAffectedProto.setdefault(table, {})[doc.get(N._id,
-                                                               None)] = doc
+                allAffectedMap.setdefault(table, {})[doc.get(N._id,
+                                                             None)] = doc
         return {
-            table: set(docMap.values())
-            for (table, docMap) in allAffectedProto.items()
+            table: list(docMap.values())
+            for (table, docMap) in allAffectedMap.items()
         }
 
     def _applyAdjustWorkflow(self, msgs, allAffected):

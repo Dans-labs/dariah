@@ -1,23 +1,24 @@
 import React, { Fragment } from 'react'
 
 import { emptyS, emptyA, emptyO } from 'utils'
-import { decisions, finalDecision } from 'workflow'
+import { decisions, processStatus, finalDecision } from 'workflow'
 
 import Expand from 'Expand'
 import ScoreBox from 'ScoreBox'
 
 const templates = {
-  head({ tables, v, w }) {
-    console.warn({ _id: v('_id'), reviews: w('reviews') })
-    const decision = finalDecision(w('reviewers'), w('reviews'))
-    const { dAccept } = decisions(tables)
-    const approved = decision === dAccept
-    return approved ? '+++' : '---'
+  head({ tables, v, w, me }) {
+    return processStatus(
+      w('reviewers'),
+      w('reviews'),
+      w('locked').on,
+      { tables, v, w, me },
+    )
   },
   mainAction({ tables, w, m }) {
     const decision = finalDecision(w('reviewers'), w('reviews'))
-    const { dAccept } = decisions(tables)
-    const approved = decision === dAccept
+    const { dId } = decisions(tables.decision)
+    const approved = decision === dId['good']
     let result
     if (approved) {
       const scoreItems = (w('score') || emptyO).items || emptyA
@@ -35,7 +36,7 @@ const templates = {
       result
     ) : m('title') && w('locked').on ? (
       <div className={'label large workflow info'}>
-        {`This contribution is locked because it is ${w('locked').desc}.`}
+        {`This contribution is locked because it ${w('locked').desc}.`}
       </div>
     ) : null
   },
