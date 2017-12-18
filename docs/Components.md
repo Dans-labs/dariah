@@ -1012,7 +1012,7 @@ The `eId` prop is the one that contains the item to navigate to.
 [ListFilter]({{site.appBase}}/components/ListFilter.jsx)
 ========================================================
 
-(life cycle) connected via [filters](Dux#filters)
+(life cycle) connected via [tables](Dux#tables) and [filters](Dux#filters)
 
 #### [Props](#standard-props) ####
 
@@ -1071,7 +1071,7 @@ is available under a key.
 [ListPlain]({{site.appBase}}/components/ListPlain.jsx)
 ======================================================
 
-(life cycle) connected via [filters](Dux#filters)
+(life cycle) connected via [tables](Dux#tables)
 
 #### [Props](#standard-props) ####
 
@@ -1091,6 +1091,20 @@ and values of the item. If the user has edit permissions, he can edit the item
 from here.
 
 If the user inserts a new item, the component will navigate to that item.
+
+[ListStats]({{site.appBase}}/components/ListStats.jsx)
+======================================================
+
+(life cycle) connected via [tables](Dux#tables)
+
+#### [Props](#standard-props) ####
+
+###### settings tables table ######
+
+### Task ###
+
+Displays aggregated management information about contributions, assessments and
+reviews.
 
 [Login]({{site.appBase}}/components/Login.jsx)
 ==============================================
@@ -1459,3 +1473,32 @@ main window to the state.
 On mounting an event listener is installed, and on unmounting the event handler
 is removed. During resizing, the frequency of emitted events is throttled to one
 per second, in order to prevent screen flicker.
+
+[WorkflowInfo]({{site.appBase}}/components/WorkflowInfo.jsx)
+============================================================
+
+presents [workflow](Dux#workflow)
+
+#### Props ####
+
+###### resets ######
+
+Information about the (manual) workflow resets after the last startup of the
+webserver.
+
+###### stats ######
+
+This is an object, containing several statistical quantities about the workflow
+attributes.
+
+###### total ######
+
+The number of records that have workflow information associated with them.
+
+### Task ###
+
+Present overview information about the workflow information that is currently in
+use.
+
+Offer a control to *reset* the workflow information (i.e. *recompute* it). See
+[Workflow](Workflow#manageworkflow).

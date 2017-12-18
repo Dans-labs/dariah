@@ -47,8 +47,9 @@
             {% for item in dux %}
                 {% assign dux_down = item[0] | downcase %}
                 {% assign components_doc = 'Components' %}
-                {% if dux_down == 'workflow' %}
+                {% if dux_down == 'workflow(t)' %}
                     {% assign components_doc = 'Tables' %}
+                    {% assign dux-down = 'workflow' %}
                 {% endif %}
             <h4 class="dux"><a href="{{ '/Dux.html#' | append:dux_down | relative_url }}">{{ item[0] }}</a></h4>
             <table>

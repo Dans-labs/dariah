@@ -14,8 +14,8 @@ constraints.
 ![diag](design/design.011.png)
 
 These additional *workflow* attributes are computed by the server on the fly,
-without storing them in the database. From then on the following happens with
-the workflow attributes:
+and then stored in a separate table in the database: `workflow`. From then on
+the following happens with the workflow attributes:
 
 *   they are sent to client, together with the *permission* information for each
     record
@@ -58,10 +58,16 @@ The principal functions exported are discussed here.
 
 ### readWorkflow ###
 
-Given a document in some table, this function compiles the workflow attributes
-and gives them a proper value. The determination of these attributes is dictated
-by the [data model](Model), in the individual
-[tables]({{site.serverBase}}/models/tables), under the key `workflow/read`.
+Given a document in some table, this function loads the workflow attributes for
+that document (if any). The attributes are loaded from the workflow table. That
+table has records with fields `table`, `eId` and `attributes`, where `table` and
+`eId` specify exactly which the record in question is, and `attributes` is a
+dictionary of all workflow data for that record that is currently stored.
+
+If `compute=True` is passed, the workflow attributes will be computed. The
+determination of these attributes is dictated by the [data model](Model), in the
+individual [tables]({{site.serverBase}}/models/tables), under the key
+`workflow/read`.
 
 There you find a sequence of instructions by which the system can compute
 workflow attributes for each record in a table. Let us look at an example:
@@ -250,6 +256,19 @@ In words: if an assessment has an `assessmentType` field with a different value
 that the `contributionType` field of its master contribution, then the
 assessment counts as stalled.
 
+### manageWorkflow ###
+
+When the webserver loads, it makes sure that correct workflow information is
+stored in the workflow table. It does so by dropping the existing workflow table
+and recomputing all workflow information from scratch.
+
+A sysadmin can also reset the workflow from within the app. Then the workflow
+table will be cleared (not dropped), and all workflow info will be recomputed.
+
+The [WorkflowInfo](Components#workflowinfo) component presents the previous
+resets since the webserver was last started, and gives an overview of the
+recomputed workflow attributes.
+
 ### Inspecting other documents ###
 
 Both `readWorkflow` and `adjustWorkflow` have instructions to look up related
@@ -281,6 +300,11 @@ with `_compute_`. Below we name them without this prefix.
 #### hasValue ####
 
 Returns `{'on': True }` if one of the other docs has a field with a given value.
+
+#### hasComplete ####
+
+Returns `{'on': True}` if all of the other docs have no empty field among a
+given list of fields.
 
 #### hasIncomplete ####
 

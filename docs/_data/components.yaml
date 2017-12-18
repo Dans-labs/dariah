@@ -60,8 +60,9 @@
   - ItemRead
   - ListContainer
   - ListFilter
-  - ListPlain
   - ListGrid
+  - ListPlain
+  - ListStats
   - MarkdownArea
   - OpenCloseAll
   - RelSelect
@@ -69,13 +70,15 @@
   - App
   - SubApp
   - Window
-- workflow:
+- workflow(t):
   - assessment
   - contrib
   - criteriaEntry
   - review
   - reviewEntry
+- workflow:
   - ScoreBox
+  - WorkflowInfo
 - __none__:
   - ErrorBoundary
   - NavLink

@@ -35,12 +35,12 @@ out the value that you find there. Alas, there are several complicating factors:
 
 The first two concerns are built into the generic logic, in the components
 
-*   [EditInsert](#editinsert)
-*   [ItemRead](#itemread)
-*   [ItemEdit](#itemedit)
-*   [FieldRead](#fieldread)
-*   [FieldEdit](#fieldedit) and we do not want to reimplement this logic when we
-    want to cater for the third concern by means of templates.
+*   [EditInsert](Components#editinsert)
+*   [ItemRead](Components#itemread)
+*   [ItemEdit](Components#itemedit)
+*   [FieldRead](Components#fieldread)
+*   [FieldEdit](Components#fieldedit) and we do not want to reimplement this logic
+    when we want to cater for the third concern by means of templates.
 
 Our solution is that templates are not static strings into which field values
 are merged dynamically.
@@ -58,12 +58,13 @@ functions use the general machinery to
 *   `s(field)` fetch the plain string values for fields, replacing identifiers
     into related tables by headings of related records; by entity titles;
 *   `f(field)` fetch values for fields (with related lookup), and wrap them in
-    [FieldRead](#fieldread) components;
-*   `f(field)` fetch values for fields, and wrap them in [FieldEdit](#fieldedit)
-    components, which are controls to let the user edit the value;
+    [FieldRead](Components#fieldread) components;
+*   `f(field)` fetch values for fields, and wrap them in
+    [FieldEdit](Components#fieldedit) components, which are controls to let the
+    user edit the value;
 *   `fs(field)` present custom controls for fields and wrap them in
-    [FieldSet](#fieldset) components, which react to click events: upon a click, a
-    baked in value will be saved for this field to the database;
+    [FieldSet](Components#fieldset) components, which react to click events: upon
+    a click, a baked in value will be saved for this field to the database;
 *   `n` (only for insert templates): the number of detail records in the list
 *   `at` a set of the *active* contribution types
 *   `o` check whether the current record is owned by the user or whether the user
@@ -81,8 +82,9 @@ Applying a template means feeding a higher order React component with a
 properties object of field rendering functions, which results in a concrete
 React component.
 
-The templates will be applied by [EditInsert](#editinsert),
-[ItemRead](#itemread), [ItemEdit](#itemedit), and [ItemAction](#itemaction), .
+The templates will be applied by [EditInsert](Components#editinsert),
+[ItemRead](Components#itemread), [ItemEdit](Components#itemedit),
+[ItemAction](Components#itemaction), and [ListPlain](Components#listplain).
 using the functions [applyTemplate](Templates#applytemplate),
 [applyEditTemplate](Templates#applyedittemplate),
 [applyInsertTemplate](Templates#applyinserttemplate), and
@@ -94,6 +96,7 @@ Template organization
 There are several purposes for which we invoke the template mechanism:
 
 *   The presentation of:
+    *   headings in lists of records
     *   main records
     *   related records
     *   detail records
@@ -112,6 +115,7 @@ Read, Edit, Action
 
 For main and detail records, we have several sets of templates:
 
+*   **Head** for presentation of record headings in lists,
 *   **Read** for presentation of records in read-only mode,
 *   **Edit** for presenting records as forms with editable fields,
 *   **Action** for presenting actions upon records.
@@ -132,6 +136,16 @@ For lists of detail records we have templates that format the insert button.
 These templates can also choose not to show the insert button, depending on
 conditions determined by the master record and the number of items in the detail
 list.
+
+Head
+----
+
+When records are listed, we see a vertical list of record headings. For things
+that are handled by workflows, such as contributions, assessments and review, it
+is desirable to display some workflow information right in front of the heading.
+Think of an assessment *score* for assessments and contributions, or a review
+status, telling whether the assessment is being reviewed, and if it has been
+reviewed, what the final decision was.
 
 Main, related, detail, consolidated
 -----------------------------------
@@ -202,6 +216,13 @@ See the library module [templates]({{site.libBase}}/templates.js)
 
 Details of the kinds of templates
 =================================
+
+head
+----
+
+The templates for record headings.
+The result should be a string, not anything that is more complex.
+If there is no result, do not deliver `null`, but `emptyS` (the empty string).
 
 main
 ----
