@@ -14,7 +14,6 @@ import sys
 import re
 import collections
 import yaml
-import xlsxwriter
 from functools import reduce
 from lxml import etree
 from datetime import datetime, date
@@ -898,6 +897,7 @@ INSR = documents to be inserted, avoiding overwriting
             db[mt].insert_many(insertRows)
 
     def exportXlsx(self):
+        import xlsxwriter
         workbook = xlsxwriter.Workbook(
             self.EXPORT_ORIG, {
                 'strings_to_urls': False
