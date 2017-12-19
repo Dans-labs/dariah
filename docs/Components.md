@@ -29,6 +29,10 @@ on, we omit the types.
     `alter` only gets data for a single section; in this way components will not
     be dependent on too big a part of the state; those dependencies may cause
     spurious re-renderings;
+*   `alterTag` **string**; name that lives within a section of the `alter` state;
+    this functions as the address of a component that needs to expand or collapse;
+    the triggering event will change the `alter` state, keyed by `alterSection`
+    and then by `alterTag`;
 *   `amounts` **object**; for a faceted filter: contains the amount of items that
     match each facet; see [computeFiltering](Dux#computefiltering);
 *   `children` **components**; a special prop defined by React itself; it contains
@@ -389,6 +393,75 @@ mitigate this effect, by using proportional radii only for values below a
 certain threshold (`LEVEL_OFF`). For higher values we essentially take the
 square root.
 
+[Expand]({{site.appBase}}/components/Expand.jsx)
+================================================
+
+presents [alter](Dux#alter)
+
+#### [Props](#standard-props) ####
+
+###### alter alterSection alterTag className ######
+
+###### `initAlt` number ######
+
+Initial expand/collapse state.
+
+###### `headActive` string ######
+
+Clickable part of the component.
+
+###### `headLine` string ######
+
+Part of the component that is visible in both states.
+
+###### `full` component ######
+
+Part of the component that is visible in the expanded state only.
+
+###### `iconOpen` component ######
+
+Icon, clickable, to trigger expansion.
+
+###### `iconClose` component ######
+
+Icon, clickable, to trigger collapse.
+
+###### `titleOpen` string ######
+
+Tooltip for the expansion trigger.
+
+###### `titleClose` string ######
+
+Tooltip for the collapse trigger.
+
+### Task ###
+
+Shows a expandable / collapsable component, together with controls to trigger
+these actions.
+
+In expanded form, only the `headActive` and `headLine` are visible. The
+`headActive` is the part that the user can click on to trigger expansion and
+collapse. The `headActive` is combined with `iconOpen` and `iconClose`, which
+are indicators for the state of the component. All this is wrapped in a
+[Tooltip](#tooltip) components, that display the `titleOpen` and `titleClose`
+texts.
+
+In the full form, also the `full` is visible.
+
+Sometimes you need more distance between the control and the material of the
+component. So we export related components as well:
+
+### ExpandHead ###
+
+Works with the same args as `Expand`, minus `full`. This component presents the
+headline part, including the clickable part to trigger the actions.
+
+### ExpandBody ###
+
+Works with the same args as `Expand`, minus `alter`, `alterSection`, `alterTag`,
+`initAlt`, `className`. This component presents the fully expanded part if the
+states indicate so, or else nothing.
+
 [Facet]({{site.appBase}}/components/Facet.jsx)
 ==============================================
 
@@ -698,6 +771,14 @@ component. There are controls to remove values, and to add fresh, empty values.
 Validation and normalization are done per individual *Field*.
 
 It is a [controlled component](React#controlled-component).
+
+[Insert]({{site.appBase}}/components/Insert.jsx)
+================================================
+
+Button to insert a blank record into a table. Unlike [EditInsert](#editinsert),
+this does not have to be a currently displayed table. After insertion the app
+will navigate to the table in which the item has been inserted, and it will open
+the freshly created item.
 
 [ItemAction]({{site.appBase}}/components/ItemAction.jsx)
 ========================================================
@@ -1404,7 +1485,9 @@ prop.
 [Tooltip]({{site.appBase}}/components/Tooltip.jsx)
 ==================================================
 
-presents **none**
+(life cycle) connected via [settings](Dux#settings)
+
+### Task ###
 
 A dynamic tooltip, based on CSS3 techniques. The tooltip is initially put as
 content with an absolute position and with opcaity 0. A lot can happen on the
@@ -1422,6 +1505,10 @@ Apart from this, the tooltip machinery does not use special React/Redux
 mechanisms. All is done at DOM level and with CSS3.
 
 #### Props ####
+
+#### [Props](#standard-props) ####
+
+###### settings ######
 
 ###### `tip` string or fragment ######
 
@@ -1457,6 +1544,19 @@ An additional CSS class to pass on to the element that holds the tooltip.
 
 An additional CSS class to pass on to the element that holds the little arrow of
 the tooltip.
+
+[TooltipSwitch]({{site.appBase}}/components/TooltipSwitch.jsx)
+==============================================================
+
+connected via [settings](Dux#settings)
+
+#### [Props](#standard-props) ####
+
+###### settings dispatch ######
+
+### Task ###
+
+Switches tooltips on or off, globally.
 
 [Window]({{site.appBase}}/components/Window.jsx)
 ================================================

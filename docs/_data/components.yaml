@@ -28,14 +28,18 @@
 - select:
   - RelSelect
 - server:
-  - docs
-  - me
-  - tables
+  - Doc
+  - ItemContainer
+  - ListContainer
+  - Login
+  - Notification
+  - WorkflowInfo
 - settings:
   - ItemContainer
   - FieldRead
   - ListGrid
   - RelSelect
+  - Tooltip
   - TooltipSwitch
 - tables:
   - EditControl
@@ -82,4 +86,3 @@
   - NavLink
   - NotFound
   - Static
-  - Tooltip

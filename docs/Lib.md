@@ -654,7 +654,7 @@ re-rendering of components. If that happens too often, the cost adds up or even
 multiplies quickly.
 
 makeReducer
-------------------------
+-----------
 
 Arguments: `(flows, init)`
 
@@ -678,7 +678,7 @@ Returns the minimum of an array of numbers. If the array is empty, return
 positive infinity.
 
 propsChanged
-----------------------------------------------------
+------------
 
 Arguments: `(newProps, need, oldProps, keyPropNames)`
 
@@ -705,7 +705,7 @@ The idea, however, is right, and this function is a variant of the `update()`
 function with auto vivification.
 
 withParams
----------------------
+----------
 
 Arguments: `(Component)`
 
@@ -744,7 +744,7 @@ the item is active or not, and merge them into the other attributes. Used in
 component [RelSelect](Components#relselect).
 
 getValType
--------------------
+----------
 
 Arguments: `(valType)`
 
