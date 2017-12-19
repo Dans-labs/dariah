@@ -28,9 +28,10 @@ triggering the display of workflow buttons and info panels.
 
 ### Assessment score ###
 
-In particularm the current score of the assessment is computed by the workflow
-function [assessmentScore](Dux#assessmentscore). Not only the score is
-presented, but also its derivation.
+In particular the current score of the assessment is presented here. The score
+is computed server-side by the workflow function
+[assessmentScore](Workflow#assessmentscore). Not only the score is presented,
+but also its derivation.
 
 ### Submission ###
 
@@ -44,16 +45,19 @@ This is not the whole truth, the presence of these action buttons is dependent
 on additional constraints, such as whether the current user has rights to
 submit, and whether the assessment is complete.
 
+It can also be the case that the assessment has been reviewed with outcome `revise`.
+In that case, the submit button changes into an `Enter revisions` button, and
+later to `Submit for review (again)`. 
+
 If the contribution has received an other *type* since the creation of this
 assessment, this assessment will count as *stalled*, and cannot be used for
 review.
 
-In this case, the criteria of the assessment are not the criteria by
-which the contribution should be assessed. So the system stalls this assessment.
-It is doomed, it can never be submitted. Unless you decide to change back the
-type of the contribution. If that is not an option, the best thing to do is to
-copy the worthwhile material from this assessment into a fresh assessment.
-
+In this case, the criteria of the assessment are not the criteria by which the
+contribution should be assessed. So the system stalls this assessment. It is
+doomed, it can never be submitted. Unless you decide to change back the type of
+the contribution. If that is not an option, the best thing to do is to copy the
+worthwhile material from this assessment into a fresh assessment.
 
 [contrib]({{site.appBase}}/tables/contrib.jsx)
 ==============================================
@@ -70,7 +74,7 @@ copy the worthwhile material from this assessment into a fresh assessment.
 
 [data model]({{site.serverBase}}/models/tables/review.yaml)
 
-[review]({{site.appBase}}/tables/reviewEntry.jsx)
+[reviewEntry]({{site.appBase}}/tables/reviewEntry.jsx)
 =================================================
 
 [data model]({{site.serverBase}}/models/tables/reviewEntry.yaml)

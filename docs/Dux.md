@@ -916,11 +916,34 @@ See for example the field `typeContribution` in the tables `package` and
 Actions
 -------
 
+### fetchWorkflow ###
+
+Fetch the info about the workflow information from the server, in particular the
+reset history since the last startup of the web server.
+
+### resetWorkflow ###
+
+Fetch the same information as `fetchWorkflow` does, but add `?reset=true` to the
+URL that is used to query this information from the server. This will instruct
+the server to perform a workflow reset.
+
 Reducer
 -------
 
+The reducer is simple, it only has to perform one action: put incoming workflow
+data unto the state. No sophisticated merging is needed, because this workflow
+meta information is only needed for one component,
+[WorkflowInfo](Components#workflowinfo), which is meant for sysadmins only.
+
+Note that the factual workflow data moves from server to client on the shoulders
+of the [tables](Dux#tables) reducer.
+
 Selectors
 ---------
+
+### getWorkflow ###
+
+Returns the `workflow` slice of the state.
 
 Helpers
 -------
@@ -931,3 +954,61 @@ Computes the active packages, types and criteria and deliver them in an object,
 keyed by kind of item and containing an array of active item MongoDB ids for
 that kind.
 
+### decisions ###
+
+Most of the contents of the `decision` table, in the form of objects by which
+you can find various user-facing strings associated with the three possible
+review decisions: `accept`, `revise`, and `reject`.
+
+### finalDecision ###
+
+From workflow attributes that contain reviewers and reviews respectively, find
+out whether there has been a final decision by reviewer 2, and if so, what it
+was.
+
+### getItem ###
+
+Peels out items of data from a workflow attribute that has fetched arrays of
+data from other records.
+
+### isReviewerType ###
+
+Computes whether a given author is the first or second reviewer.
+
+### loadExtra ###
+
+This is a configuration object that specifies which extra tables should be
+fetched from the server along with particular other tables. For example, the app
+can only perform its business logic on contributions, if the tables `package`,
+`criteria`, `typeContribution`, and `decision` are all present on the state.
+
+### processStatus ###
+
+Produce a string that contains the current assessment status and review status
+of an assessment. This function can be called from a contribution, an assessment
+and a review. So for all these kinds of document we can produce a short overview
+of the state they have reached in the assessment / review process.
+
+The outcome has a bit that reveals the assessment status and a bit about the
+review status.
+
+When it is run on behalf of a user with marginal rights, it delivers either the
+empty string, or the outcome of the final review, but only if there has been a
+positive outcome.
+
+For users with more rights:
+
+*   **assessment status:**
+    *   `▶` if the assessment has been (re)submitted;
+    *   `✍` otherwise;
+    *   the assessment score
+*   **review status:**
+    *   empty string if there review has not reached a final decision;
+    *   `✔` on `accept`;
+    *   `✋` on `revise`;
+    *   `✘` on `reject`.
+
+### reviewerRole ###
+
+Object that maps the acronyms `E` and `F` to appropriate labels designating
+first and second reviewer.
