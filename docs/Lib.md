@@ -59,6 +59,13 @@ Sort by time interval. Sorting by time intervals should works as follows:
 
 Used in [workflow](Dux#workflow).
 
+trimDate
+--------
+
+Removes the milliseconds from an ISO string representing a datetime. Can also
+remove the whole time part from a datetime. This essentially presents a datetime
+as a date.
+
 validation
 ----------
 
@@ -325,8 +332,10 @@ The solution is to use a [memoized](#memo) version of `handleItem`.
 
 The following functions are conveniences for doing exactly that.
 
-handle(dispatch, actionCreator, actionArgs)
--------------------------------------------
+handle-1
+--------
+
+Arguments: `(dispatch, actionCreator, actionArgs)`
 
 This is a memoized action *creator* wrapper. It return a function, that can be
 called with an event. After receiving the event, the passed `actionCreator` will
@@ -338,8 +347,8 @@ This particular function `handle` will not use the information in the event. It
 takes trouble to neutralize the event instead. If there is relevant information
 in the event, use one of the following functions.
 
-handlE
-------
+handlE-2
+--------
 
 Like `handle`, and the information in the event is not used, but the default
 behaviour of the event and its propagation are not suppressed.
@@ -403,11 +412,10 @@ immediately obvious how to use this solution if you have more than one argument,
 and if you mix non-object values and functions with real objects.
 
 These problems can be solved, and `memoize()` has evolved into a flexible
-memoizer for all kinds of situations. \\
-What you can do with it is to stringify a shallow to-level structure of an object,
-to a given depth, and from then on work with object identity and WeakMaps. You can
-also forego object identity altogether and use solely stringify, which is often the
-most efficient solution.
+memoizer for all kinds of situations. \\ What you can do with it is to stringify
+a shallow to-level structure of an object, to a given depth, and from then on
+work with object identity and WeakMaps. You can also forego object identity
+altogether and use solely stringify, which is often the most efficient solution.
 
 We have built quite a few [tests]({{site.repBase}}/client/src/test/memo.js) to
 verify the logic and the performance of this memoizer.
@@ -560,8 +568,10 @@ in edit mode. If it is possibly complete, it will be opened in read-only mode.
 [utils]({{site.libBase}}/utils.js)
 ==================================
 
-combineSelectors(...selectors)
-------------------------------
+combineSelectors
+----------------
+
+Arguments: `(...selectors)`
 
 Given a list of *selector* functions, creates a combined selector that returns
 an object containing the results of the individual selectors. This function uses
@@ -571,6 +581,28 @@ We use it quite often when components need multiple sections of the state.
 
 emptyX (S A O F)
 ----------------
+
+### emptyA ###
+
+Array.
+
+### emptyF ###
+
+Function.
+
+### emptyO ###
+
+Object.
+
+### emptyS ###
+
+String.
+
+### emptySet ###
+
+Set.
+
+#### Explanation ####
 
 Many objects get created during rendering and re-rendering. If we render a list
 of thousand entries, and we pass each item component a property with a value
@@ -583,12 +615,6 @@ garbage collected soon after that. But if we are interested in the value of the
 empty object, without an intention to modify it, this is an utter waste.
 
 Therefore we declare a few *empty* concepts:
-
-*   emptyS (string)
-*   emptyA (array),
-*   emptyO (object),
-*   emptyF (function).
-*   emptySet (set).
 
 We also [freeze]({{site.javascript}}/Global_Objects/Object/freeze) them, so that
 we cannot inadvertently mutate them.
@@ -627,8 +653,10 @@ we fail to detect the equality of objects, which results in spurious
 re-rendering of components. If that happens too often, the cost adds up or even
 multiplies quickly.
 
-makeReducer(flows, init)
+makeReducer
 ------------------------
+
+Arguments: `(flows, init)`
 
 Given an object of *flows* and an initial state, returns a *reducer* function.
 The *flows* is an object with functions, named after *actions*. These functions
@@ -649,8 +677,10 @@ min
 Returns the minimum of an array of numbers. If the array is empty, return
 positive infinity.
 
-propsChanged(newProps, need, oldProps, keyPropNames)
+propsChanged
 ----------------------------------------------------
+
+Arguments: `(newProps, need, oldProps, keyPropNames)`
 
 Determines whether `newProps` differ significantly from `oldProps`, based on the
 props with `keyPropNames` only. If the props are sufficiently changed, it uses
@@ -674,8 +704,10 @@ the code for that becomes tedious quickly.
 The idea, however, is right, and this function is a variant of the `update()`
 function with auto vivification.
 
-withParams(Component)
+withParams
 ---------------------
+
+Arguments: `(Component)`
 
 Higher order function that turns a Component (which is a function) into another
 component.
@@ -711,8 +743,10 @@ When composing a Field component for an item, compute attributes telling whether
 the item is active or not, and merge them into the other attributes. Used in
 component [RelSelect](Components#relselect).
 
-getValType(valType)
+getValType
 -------------------
+
+Arguments: `(valType)`
 
 For a given value type, such as `text`, `URL`, `number`, return a component and
 subtype for handling the input of such values, e.g. `<input type="URL" />`.

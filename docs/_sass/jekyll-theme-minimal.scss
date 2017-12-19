@@ -54,6 +54,9 @@ header h3 {
   font-size: medium;
   margin: 1ex 0 1ex 0;
 }
+header h3.lib {
+  color: #888888;
+}
 h4 {
   line-height:1.05;
   font-size: medium;
@@ -66,6 +69,13 @@ header h4.dux {
   font-size: small;
   margin: 0ex 0 0.2ex 0;
   font-weight: bold;
+}
+header h4.lib {
+  font-size: small;
+  margin: 0ex 0 0.2ex 0;
+  font-style: italic;
+  font-weight: normal;
+  color: #888888;
 }
 h5 {
   line-height:1.05;
@@ -89,10 +99,16 @@ a {
   color:#0000ff;
   text-decoration:none;
 }
+a.lib {
+  color:#888888;
+}
 
 a:hover {
   color:#0000ff;
   text-decoration:underline;
+}
+a.lib:hover {
+  color:#888888;
 }
 
 a small {

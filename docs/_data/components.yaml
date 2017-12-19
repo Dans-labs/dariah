@@ -22,8 +22,6 @@
   - SubApp
 - notes:
   - Notification
-- presentation:
-  - Templates
 - roots:
   - main
   - Root

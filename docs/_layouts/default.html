@@ -66,6 +66,26 @@
                 </tbody>
             </table>
         {% endfor %}
+        <h3 class="lib">Library</h3>
+        {% for lib in site.data.lib %}
+            {% for item in lib %}
+                {% assign lib_down = item[0] | downcase | replace:'.','' %}
+                {% assign lib_doc = 'Lib' %}
+            <h4 class="lib"><a class="lib" href="{{ '/Lib.html#' | append:lib_down | relative_url }}">{{ item[0] }}</a></h4>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                {% for func in item[1] %}
+                    {% assign func_down = func | downcase  %}
+                    <a class="lib" href="{{ lib_doc | append:'.html#' | append:func_down | relative_url }}">{{ func }}</a>
+                {% endfor %}
+            {% endfor %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endfor %}
       </header>
       <section>
 
