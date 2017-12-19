@@ -67,12 +67,12 @@ consists of a few metadata fields.
 
 When an assessment record is created, additional *detail records* will be
 created as well. These are **criteriaEntry** records. For each assessment, there
-is a fixed set of criteriaEntry records. This set is determined by the currently
-active set of criteria: one criteriaEntry record will be created per active
-criterion.
+is a fixed set of `criteriaEntry` records. This set is determined by the
+currently active set of criteria: one `criteriaEntry` record will be created per
+active criterion.
 
-A criteriaEntry record has a field for choosing a **score** and a text field for
-entering the evidence. Scores are defined in yet another type of record.
+A `criteriaEntry` record has a field for choosing a **score** and a text field
+for entering the evidence. Scores are defined in yet another type of record.
 
 Scoring
 -------
@@ -82,8 +82,10 @@ which are detail records of criteria. Scores have a number, typically `0`, `2`,
 `4`, and a short description, typically `None`, `Partial`, `Full`, but the
 number and nature of scores may vary freely between criteria.
 
-The score of an assessment as a whole
-i`s the sum of the individual scores expressed as percentage of the total amount of points that can be assigned. A temporary overall score is obtained by treating unfilled scores as having value`0\`.
+The score of an assessment as a whole is the sum of the individual scores
+expressed as percentage of the total amount of points that can be assigned. A
+temporary overall score is obtained by treating unfilled scores as having value
+`0`.
 
 However, some criteria may allow scores with a value `-1` (non-applicable). If
 an assessment assigns that score to a criterion, 0 points are added, but points
@@ -98,8 +100,8 @@ D has scores `-1`, `0`, `2`, `4`.
 
 Now there are two contributions U and V, with scores as follows:
 
-criterion | contrib U | contrib V
---------- | --------- | ---------
+Criterion | `contrib` U | `contrib` V
+--------- | ----------- | -----------
 A | 4 | 4
 B | 4 | 4
 C | 4 | 4
@@ -132,7 +134,7 @@ The two reviewers have distinct roles:
 (✗✗) Both reviewers can enter comments in a comment stream, which are detail
 records of the assessment.
 
-The advice/decison that can be made by the reviewers is
+The advice/decision that can be made by the reviewers is
 
 *   **approve**
 *   **reject**
@@ -239,6 +241,6 @@ effects of that decision.
 We need some mechanism of hinting the user that important changes have been made
 and a refresh is needed.
 
-I know it can be
-[done](https://blog.pusher.com/how-to-build-a-realtime-activity-feed-with-react-and-pusher/),
-but it requires a bit of research to find the best way to do it.
+I know it can be done ( [socket]({{site.socket}}),
+[python-socket]({{site.socketPython}}) ) but it requires a bit of research to
+find the best way to do it.

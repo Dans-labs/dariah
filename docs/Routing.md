@@ -17,7 +17,8 @@ Routing
 -------
 
 The second priority is to set up the routes configuration, i.e. the way URLs
-give rise to activating certain components. ![diag](design/design.006.png)
+give rise to activating certain components.
+![diag](design/design.006.png)
 
 We are still talking about *client* side routing.
 

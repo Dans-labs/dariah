@@ -63,8 +63,11 @@ state, assume that your component will receive that information as *properties*.
 And when it needs to modify the state, assume that it will receive callbacks,
 also as *properties*, to dispatch actions. See also [connect](React#connect).
 
-[Dux](Dux) as glue between [components](Components) and the [state](React#redux)
-================================================================================
+[Dux](Dux)
+==========
+
+We employ a glue between [components](Components) and the [state](React#redux):
+*dux*.
 
 If you have written your component, say `MyComp`, and you need a piece of the
 state `mySlice` that is provided by a *selector* `getMySlice`, and you need to

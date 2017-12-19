@@ -40,7 +40,7 @@ Client
 ------
 
 Workflow logic is predominantly found in the [templates](Templates), which may
-include workflow buttons and info panels. but also in
+include workflow buttons and info panels, but also in
 [workflow.js](Dux#workflow), which computes special items to present to the
 user, and for some of them workflow information is used. The templates
 themselves are applied by functions in
@@ -144,10 +144,10 @@ an assessment that has been submitted.
 
 Whereas `readWorkflow` computes all relevant workflow for a given record in a
 given table, `adjustWorkflow` delivers a list of *other* records in other
-tables, that need new workflow attributes after a change in a given record.
-whether it be an insert. update or delete.
+tables, that need new workflow attributes after a change in a given record,
+whether it be an insert, update or delete.
 
-The determination of these attributes is dictated by the [data model](Model). in
+The determination of these attributes is dictated by the [data model](Model), in
 the individual [tables]({{site.serverBase}}/models/tables), under the key
 `workflow/adjust`.
 
@@ -169,12 +169,13 @@ assessment:
         - submitted
 ```
 
-it says that if an assessment record is changed, some other records are
-affected, namely its master record in the contrib table. But not all changes in
-the assessment trigger adjustments, only changes in one of the `triggerFields`,
-in this case obviously the field `submitted`. The system add the `linkField`
-silently to the `triggerField`, because if we, for whatever reason, reassigned
-this assessment to a different contribution, then that contribution has to know!
+It says that if an assessment record is changed, some other records are
+affected, namely its master record in the `contrib` table. But not all changes
+in the assessment trigger adjustments, only changes in one of the
+`triggerFields`, in this case obviously the field `submitted`. The system add
+the `linkField` silently to the `triggerField`, because if we, for whatever
+reason, reassigned this assessment to a different contribution, then that
+contribution has to know!
 
 The other trigger field, `assessmentType` is mentioned because of an other
 workflow rule, which we have not mentioned here as an example.
@@ -258,7 +259,7 @@ assessment counts as stalled.
 
 ### manageWorkflow ###
 
-When the webserver loads, it makes sure that correct workflow information is
+When the web server loads, it makes sure that correct workflow information is
 stored in the workflow table. It does so by dropping the existing workflow table
 and recomputing all workflow information from scratch.
 
@@ -266,7 +267,7 @@ A sysadmin can also reset the workflow from within the app. Then the workflow
 table will be cleared (not dropped), and all workflow info will be recomputed.
 
 The [WorkflowInfo](Components#workflowinfo) component presents the previous
-resets since the webserver was last started, and gives an overview of the
+resets since the web server was last started, and gives an overview of the
 recomputed workflow attributes.
 
 ### Inspecting other documents ###
@@ -335,7 +336,7 @@ values `value1b` and `value2b` that can be found in all other docs.
 
 #### assessmentScore ####
 
-Computes the overall score of an assessment, based on its detail criteriaEntry
+Computes the overall score of an assessment, based on its detail `criteriaEntry`
 records.
 
 The data returned is a dictionary containing:
@@ -365,7 +366,7 @@ Above we see a good deal of the workflow rules that govern contributions and
 their assessments and reviews, each with their detail records of criteria
 entries (in the self-assessment) and review entries (in the reviews).
 
-The colored squares are particular records in the contribution, assessment,
+The coloured squares are particular records in the contribution, assessment,
 review, etc. collections. We only mention the fields that play a role in the
 workflow.
 

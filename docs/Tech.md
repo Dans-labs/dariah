@@ -42,6 +42,7 @@ References
     *   [webpack]({{site.webpack}}) build tool for javascript
 *   [leaflet]({{site.leaflet}}) geo-mapping library
 *   [markdown]({{site.markdownDoc}}) rich text from plain text
+    *   [remark]({{site.remark}}) linter and formatter for markdown
 *   [mongodb]({{site.mongodb}}) NO-SQL database, JSON/Javascript based
 *   [python]({{site.python}}) data-oriented scripting language
     *   [bottle]({{site.bottle}}) minimal web framework
@@ -64,6 +65,8 @@ References
     *   [react-redux]({{site.reactReduxRepo}}) bindings for redux in react
 *   [✗ shebanq]({{site.shebanq}}) web interface for Hebrew text and linguistic
     annotations
+*   [✗ socket]({{site.socket}}) push messages from server to all connected clients
+    *   [✗ python-socket]({{site.socketPython}}) python wrapper for *socket.io*
 *   [spa]({{site.spa}}) single page application:
 *   [webApi]({{site.webApi}}) interacting with the loaded document in a browser
 *   [yaml]({{site.yaml}}) configuration language, as simple as markdown.

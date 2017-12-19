@@ -98,6 +98,7 @@ reactReselect: https://github.com/reactjs/reselect
 reactRouter: https://github.com/ReactTraining/react-router/blob/v3/docs
 reactRouterTutorial: https://github.com/reactjs/react-router-tutorial/tree/master
 reactSelect: https://github.com/JedWatson/react-select
+remark: https://github.com/remarkjs/remark
 redux: http://redux.js.org
 reduxFormBase: https://redux-form.com
 reduxFormIssues: https://github.com/erikras/redux-form/issues
@@ -105,6 +106,8 @@ reduxFormV: 7.1.2
 reduxVideos: https://egghead.io/courses/getting-started-with-redux
 sassDoc: http://sass-lang.com
 shebanq: https://github.com/etcbc/shebanq
+socket: https://socket.io
+socketPython: http://python-socketio.readthedocs.io/en/latest/
 spa: https://en.wikipedia.org/wiki/Single-page_application
 sublimeText: https://www.sublimetext.com
 vim: http://www.vim.org
