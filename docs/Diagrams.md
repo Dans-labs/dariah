@@ -12,6 +12,10 @@ title: Diagrams
 
 [![diag](design/design.003.png){:width="300px"}](Authentication)
 
+### [Business](Business) ###
+
+[![diag](design/design.013.png){:width="300px"}](Business#consolidation)
+
 ### [Components](Components)
 
 [![diag](design/design.010.png){:width="300px"}](Components#errorboundary)

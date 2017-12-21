@@ -140,22 +140,38 @@ The advice/decision that can be made by the reviewers is
 *   **reject**
 *   **revise**
 
-In all cases, a *consolidated* version of the reviews will be made. This
-records contains the information of both of the reviews, the assessment and the
+Consolidation
+-------------
+
+In all cases, a *consolidated* version of the reviews will be made. This records
+contains the information of both of the reviews, the assessment and the
 contribution. Consolidated means that all links to related records have been
 replaced by the concrete values found in those records at that time.
 Consolidated records do not contain fields that point to other records, only
 concrete text/number/datetime values.
 
-Currently, the consolidated version is stored in the database as a tree
-of documents. All these documents are consolidated versions of documents that
-the final review document refers to, directly or indirectly.
-Because the final review refers to the self-assessment, and the self-assessment
-to both reviews, the other review is also included in the tree.
+Currently, the consolidated version is stored in the database as a tree of
+documents. All these documents are consolidated versions of documents that the
+final review document refers to, directly or indirectly. Because the final
+review refers to the self-assessment, and the self-assessment to both reviews,
+the other review is also included in the tree.
 
-(✗✗) Consolidated records will be stored as PDF and viewable from within the app.
-What needs to be done here, is to write templates that select the desired information
-from the tree of consolidated documents.
+The output below shows how this tree ends up in the client, on the application
+state. It is shown by the console of the web page, in development mode. You can
+see how this tree is a mini database of records and related records, hanging
+together with simple identifiers of the form `"ddd"` where `d` is a digit.
+
+![diag](design/design.013.png)
+
+It is not completely trivial to distil a nice, well-readable document out of
+this. What we need is a consolidation *template*, that grabs the relevant data
+from this mini-database. From that template, we can produce first HTML and then
+PDF. Rather than a single template, we should make templates for each of the
+tables involved.
+
+(✗✗) Consolidated records will be stored as PDF and viewable from within the
+app. What needs to be done here, is to write templates that select the desired
+information from the tree of consolidated documents.
 
 Approve
 -------
