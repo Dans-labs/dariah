@@ -204,13 +204,16 @@ names:
   - action
   - affiliation
   - allIds
+  - anchor
   - Approved
   - before
   - bool
   - cn
   - complete
+  - consolidated
   - criteriaEntities
   - criteriaIds
+  - crossref
   - DARIAH
   - data
   - datetime
@@ -242,6 +245,7 @@ names:
   - number
   - o
   - 'on'
+  - records
   - REGIME
   - Rejected
   - repName

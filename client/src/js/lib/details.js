@@ -18,10 +18,10 @@ export const makeDetails = ({ tables, table, eId }) => {
         fieldSpecs: { [linkField]: { multiple } },
       } = detailTableData
       const detailListIds = multiple
-        ? detailAllIds.filter(_id =>
+        ? (detailAllIds || emptyA).filter(_id =>
             (detailEntities[_id].values[linkField] || emptyA).includes(eId),
           )
-        : detailAllIds.filter(
+        : (detailAllIds || emptyA).filter(
             _id => detailEntities[_id].values[linkField] === eId,
           )
       return {

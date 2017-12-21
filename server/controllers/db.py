@@ -33,8 +33,6 @@ PM = M[N.permissions]
 # and being sent to the client,
 # complies with the configured permissions.
 
-NA = 'N/A'
-
 
 def _theseFields(table, fieldSet):
     tableInfo = DM.get(table, {})
@@ -98,7 +96,7 @@ class DbAccess(object):
         )
         return self.stop({N.data: data, N.msgs: msgs})
 
-    def getItem(self, controller, table, ident):
+    def getItem(self, controller, table, eId):
         Perm = self.Perm
         msgs = []
 
@@ -111,7 +109,7 @@ class DbAccess(object):
         if not good:
             return self.stop({N.msgs: msgs})
 
-        if ident is None:
+        if eId is None:
             thisRowFilter = andRows(
                 rowFilter,
                 {N._id: {
@@ -131,7 +129,7 @@ class DbAccess(object):
         else:
             thisRowFilter = andRows(
                 rowFilter,
-                {N._id: oid(ident)},
+                {N._id: oid(eId)},
             )
             data = self._findDoc(
                 table,
@@ -181,7 +179,7 @@ class DbAccess(object):
         WF.weed(workflow, records, action)
         return self.stop({
             N.data: {
-                'records': records,
+                N.records: records,
                 N.workflow: workflow,
             },
             N.msgs: msgs,
@@ -569,7 +567,6 @@ class DbAccess(object):
         # hook for workflow-specific actions: extra fields, extra details
         (extraGood, extraData) = WF.detailInsert(
             msgs,
-            self._head,
             table=table,
             masterDocument=masterDocument,
         )
@@ -592,15 +589,19 @@ class DbAccess(object):
             return False
 
         result = MONGO[table].insert_one(insertValues)
-        ident = result.inserted_id
-        records.append((table, ident, readFieldFilter))
+        eId = result.inserted_id
+        insertValues[N._id] = eId
+        records.append((table, eId, readFieldFilter))
+
+        # update the workflow information
+        myWorkflow = WF.readWorkflow(msgs, table, insertValues, compute=True)
 
         # use the extra details, if any
         if extraData and N.detailData in extraData:
             for (detailTable,
                  detailRecords) in extraData[N.detailData].items():
                 for detailRecord in detailRecords:
-                    detailRecord[N.masterId] = ident
+                    detailRecord[N.masterId] = eId
                     good = self._insertItem(
                         controller, detailTable, detailRecord, records, msgs,
                         workflow
@@ -620,8 +621,8 @@ class DbAccess(object):
         MONGO = self.MONGO
         WF = self.WF
         Perm = self.Perm
-        ident = newData.get(N._id, None)
-        if ident is None:
+        eId = newData.get(N._id, None)
+        if eId is None:
             msgs.append({
                 N.kind:
                     N.error,
@@ -630,7 +631,7 @@ class DbAccess(object):
                     .format(table)
             }, )
             return False
-        theRowFilter = andRows(rowFilter, {N._id: oid(ident)})
+        theRowFilter = andRows(rowFilter, {N._id: oid(eId)})
         documents = list(MONGO[table].find(theRowFilter))
         if len(documents) != 1:
             msgs.append({
@@ -680,7 +681,7 @@ class DbAccess(object):
                 continue
             theDetailRowFilter = andRows(
                 detailRowFilter, {
-                    linkField: oid(ident)
+                    linkField: oid(eId)
                 }
             )
             detailDocuments = list(
@@ -747,7 +748,7 @@ class DbAccess(object):
             # finally delete the main record
             MONGO[table].delete_one(theRowFilter)
             workflow.extend(WF.adjustWorkflow(msgs, table, document, {}))
-            records.append((table, str(ident)))
+            records.append((table, str(eId)))
 
         return not self._hasErrors(msgs)
 
@@ -758,8 +759,8 @@ class DbAccess(object):
         MONGO = self.MONGO
         WF = self.WF
         Perm = self.Perm
-        ident = newData.get(N._id, None)
-        if ident is None:
+        eId = newData.get(N._id, None)
+        if eId is None:
             msgs.append({
                 N.kind:
                     N.error,
@@ -768,7 +769,7 @@ class DbAccess(object):
                     .format(table),
             })
             return
-        theRowFilter = andRows(rowFilter, {N._id: oid(ident)})
+        theRowFilter = andRows(rowFilter, {N._id: oid(eId)})
         documents = list(MONGO[table].find(theRowFilter))
         if len(documents) != 1:
             msgs.append({
@@ -817,7 +818,7 @@ class DbAccess(object):
                     N.warning,
                 N.text:
                     'table {}, item {}: invalid values in {}'
-                    .format(table, ident, invalidFields)
+                    .format(table, eId, invalidFields)
             }, )
 
         modDate = now()
@@ -879,12 +880,8 @@ class DbAccess(object):
              }},
         )
 
-        # check for updates in the workflow information
-        myWorkflow = WF.readWorkflow(
-            msgs,
-            table,
-            newDocument,
-        )
+        # update the workflow information
+        myWorkflow = WF.readWorkflow(msgs, table, newDocument, compute=True)
         workflow.extend(WF.adjustWorkflow(msgs, table, document, newDocument))
 
         recordInfo = {
@@ -893,6 +890,16 @@ class DbAccess(object):
             N.diags: validationDiags,
             N.workflow: myWorkflow,
         }
+
+        # see whether the record should be consolidated
+        (consGood, consDoc) = WF.consolidateDoc(
+            table,
+            newDocument,
+            myWorkflow,
+            msgs,
+        )
+        if consGood and consDoc:
+            records.append(('{}_{}'.format(table, N.consolidated), consDoc))
 
         # if we happen to modify a user record,
         # we add group info to the information
@@ -988,8 +995,8 @@ class DbAccess(object):
         MONGO = self.MONGO
         WF = self.WF
         tables = []
-        for (table, ident, fieldFilter) in records:
-            theRowFilter = {N._id: ident}
+        for (table, eId, fieldFilter) in records:
+            theRowFilter = {N._id: eId}
             # we make a shallow copy (intentionally)
             theFieldFilter = {x: y for (x, y) in fieldFilter.items()}
             theFieldFilter[N.creator] = True
@@ -1001,7 +1008,7 @@ class DbAccess(object):
                         N.error,
                     N.text:
                         'Could not find back record {} in table {}'
-                        .format(ident, table),
+                        .format(eId, table),
                 })
                 continue
             document = documents[0]
@@ -1024,158 +1031,3 @@ class DbAccess(object):
             })
         records.clear()
         records.extend(tables)
-
-    def _consolidateDocs(
-        self,
-        controller,
-        table,
-        documents,
-        msgs,
-        consolidatedDocs,
-        level=0,
-        withDetails=False
-    ):
-        MONGO = self.MONGO
-        Perm = self.Perm
-        (good, rowFilter, fieldSet) = Perm.allow(
-            table,
-            N.read,
-            msgs,
-            controller=controller,
-        )
-
-        if not good:
-            return
-
-        tableInfo = DM.get(table, {})
-        (fieldOrder, fieldSpecs, fieldFilter) = _theseFields(table, fieldSet)
-        detailOrder = tableInfo.get(N.detailOrder, None)
-        details = tableInfo.get(N.details, None)
-        docs = documents if type(documents) is list else [documents]
-        for document in docs:
-            consDoc = {}
-            for field in fieldOrder:
-                if field not in document:
-                    consDoc[field] = None
-                    continue
-                fieldSpec = fieldSpecs[field]
-                valType = fieldSpec[N.valType]
-                multiple = fieldSpec[N.multiple]
-                docVal = document[field]
-                if type(valType) is str:
-                    consDoc[field] = [
-                        _simpleVal(valType, val) for val in docVal
-                    ] if multiple else _simpleVal(valType, docVal)
-                    continue
-                else:
-                    valueTable = valType[N.relTable]
-                    relatedDocs = list(
-                        MONGO[valueTable].find({
-                            N._id: {
-                                '$in': [
-                                    _id
-                                    for _id in
-                                    (docVal if multiple else [docVal])
-                                ]
-                            }
-                        })
-                    )
-                    if len(relatedDocs) == 0:
-                        valRep = None
-                    else:
-                        valRep = [
-                            self._head(valueTable, doc) for doc in relatedDocs
-                        ] if multiple else self._head(
-                            valueTable, relatedDocs[0]
-                        )
-                    consDoc[field] = valRep
-                    continue
-            if withDetails and detailOrder and details:
-                for detail in detailOrder:
-                    detailSpec = details[detail]
-                    detailTable = detailSpec[N.table]
-                    linkField = detailSpec[N.linkField]
-                    detailDocs = list(
-                        MONGO[detailTable].find({
-                            linkField: document[N._id]
-                        })
-                    )
-                    consDoc.setdefault(N.details, []).append((
-                        detail,
-                        self._consolidateDocs(
-                            detailTable,
-                            detailDocs,
-                            msgs,
-                            level=level + 1,
-                            withDetails=False,
-                        )
-                    ))
-            consolidatedDocs.append(consDoc)
-
-    def _head(self, table, doc):
-        methodName = '_head_{}'.format(table)
-        if hasattr(self, methodName):
-            return getattr(self, methodName)(doc)
-        tableInfo = DM.get(table, {})
-        title = tableInfo[N.title]
-        return str(doc.get(title, 'no {}'.format(title))).rstrip('\n')
-
-    def _head_user(self, doc):
-        name = doc.get(N.name, '')
-        org = doc.get(N.org, '')
-        if org:
-            org = ' ({})'.format(org)
-        if name:
-            return name + org
-        firstName = doc.get(N.firstName, '')
-        lastName = doc.get(N.lastName, '')
-        if firstName or lastName:
-            return '{}{}{}{}'.format(
-                firstName, ' ' if firstName and lastName else '', lastName, org
-            )
-        email = doc.get(N.email, '')
-        if email:
-            return email + org
-        eppn = doc.get(N.eppn, '')
-        authority = doc.get(N.authority, '')
-        if authority:
-            authority = ' - {}'.format(authority)
-        if eppn:
-            return '{}{}{}'.format(eppn, authority, org)
-        return '!unidentified user!'
-
-    def _head_country(self, doc):
-        return '{} = {}, {}a DARIAH member'.format(
-            doc.get(N.iso, ''),
-            doc.get(N.name, ''),
-            '' if doc.get(N.isMember, False) else 'not ',
-        )
-
-    def _head_typeContribution(self, doc):
-        mainType = doc.get(N.mainType, '')
-        subType = doc.get(N.subType, '')
-        sep = ' / ' if mainType and subType else ''
-        return '{}{}{}'.format(
-            mainType,
-            sep,
-            subType,
-        )
-
-    def _head_score(self, doc):
-        score = doc.get(N.score, NA)
-        level = doc.get(N.level, NA)
-        description = doc.get(N.description, '')
-        return '{} - {}'.format(
-            score, level
-        ) if score or level else description
-
-
-def _simpleVal(valType, val):
-    result = (
-        '[{}](mailto:{})'.format(val, val)
-        if valType == N.email else '[{}]({})'.format(val, val)
-        if valType == N.url else str(val).split('.', 1)[0]
-        if valType == N.datetime else (N.Yes if val else N.No)
-        if valType == N.bool else str(val) if valType == N.number else val
-    )
-    return result.rstrip('\n')

@@ -6,6 +6,8 @@ from models.compiled.names import N
 DM = M[N.tables]
 WM = M[N.workflow]
 
+NA = 'N/A'
+
 # BASIC RULE COMPUTATION METHODS THAT CAN BE CONFIGURED IN A WORKFLOW
 
 
@@ -391,7 +393,6 @@ class WorkflowApi(object):
     def detailInsert(
         self,
         msgs,
-        head,
         table=None,
         masterDocument=None,
     ):
@@ -416,7 +417,7 @@ class WorkflowApi(object):
                     })
                 else:
                     typeDoc = typeInfo[masterType]
-                    typeHead = head(N.typeContribution, typeDoc)
+                    typeHead = self._head(N.typeContribution, typeDoc)
                     if masterType not in typeIds:
                         good = False
                         msgs.append({
@@ -485,6 +486,112 @@ class WorkflowApi(object):
                 N.insertValues: insertValues,
             }
         return (good, data)
+
+    def consolidateDoc(
+        self,
+        table,
+        document,
+        workflow,
+        msgs,
+    ):
+        MONGO = self.MONGO
+        if table == N.review:
+            if document.get(N.decision, None):
+                consMaterial = {}
+                consMap = {}
+                self._consolidate(
+                    table, [document], msgs, consMaterial, consMap
+                )
+                MONGO['{}_{}'.format(table,
+                                     N.consolidated)].insert_one(consMaterial)
+                return (True, consMaterial)
+        return (True, None)
+
+    def _consolidate(self, table, documents, msgs, consMaterial, consMap):
+        MONGO = self.MONGO
+        tableInfo = DM.get(table, {})
+        fieldOrder = tableInfo[N.fieldOrder]
+        fieldSpecs = tableInfo[N.fieldSpecs]
+        detailOrder = tableInfo.get(N.detailOrder, None)
+        details = tableInfo.get(N.details, None)
+        docRefs = []
+        fmt = '{:>03}'
+        for document in documents:
+            consDoc = {}
+            eId = document.get(N._id, None)
+            docRef = consMap.setdefault(table, {}).get(eId, None)
+            done = True
+            if docRef is None:
+                docRef = len(consMap[table])
+                consMap[table][eId] = docRef
+                done = False
+            docRefs.append(
+                (table, fmt.format(docRef), self._head(table, document))
+            )
+            if done:
+                continue
+            consMaterial.setdefault(table, {})[fmt.format(docRef)] = consDoc
+            for field in fieldOrder:
+                if field not in document:
+                    consDoc[field] = None
+                    continue
+                fieldSpec = fieldSpecs[field]
+                valType = fieldSpec[N.valType]
+                multiple = fieldSpec[N.multiple]
+                docVal = document[field]
+                if type(valType) is str:
+                    consDoc[field] = docVal
+                else:
+                    relTable = valType[N.relTable]
+                    relTableInfo = DM.get(relTable, {})
+                    relSort = relTableInfo[N.sort]
+                    relatedDocs = list(
+                        MONGO[relTable].find({
+                            N._id: {
+                                '$in': [
+                                    _id
+                                    for _id in
+                                    (docVal if multiple else [docVal])
+                                ]
+                            }
+                        }).sort(relSort)
+                    )
+                    if len(relatedDocs) == 0:
+                        consDoc[field] = None
+                    else:
+                        theseDocRefs = self._consolidate(
+                            relTable,
+                            relatedDocs,
+                            msgs,
+                            consMaterial,
+                            consMap,
+                        )
+                        consDoc[
+                            field
+                        ] = theseDocRefs if multiple else theseDocRefs[0]
+            if detailOrder and details:
+                for detail in detailOrder:
+                    detailSpec = details[detail]
+                    detailTable = detailSpec[N.table]
+                    linkField = detailSpec[N.linkField]
+                    detailTableInfo = DM.get(detailTable, {})
+                    detailSort = detailTableInfo[N.sort]
+                    detailDocs = list(
+                        MONGO[detailTable].find({
+                            linkField: document[N._id]
+                        }).sort(detailSort)
+                    )
+                    consDoc.setdefault(N.details, []).append((
+                        detail,
+                        self._consolidate(
+                            detailTable,
+                            detailDocs,
+                            msgs,
+                            consMaterial,
+                            consMap,
+                        )
+                    ))
+        return docRefs
 
 # SELECTOR FUNCTIONS
 
@@ -708,6 +815,27 @@ class WorkflowApi(object):
         }
         return result
 
+    def _head(self, table, doc):
+        MONGO = self.MONGO
+        methodName = '_head_{}'.format(table)
+        method = globals().get(methodName, None)
+        if method:
+            return method(doc)
+        tableInfo = DM.get(table, {})
+        title = tableInfo[N.title]
+        fieldSpecs = tableInfo[N.fieldSpecs]
+        fieldSpec = fieldSpecs.get(title, {})
+        valType = fieldSpec[N.valType]
+        titleValue = doc.get(title, None)
+        noTitle = 'no {}'.format(title)
+        if type(valType) is str:
+            head = titleValue or noTitle
+        else:
+            relTable = valType[N.relTable]
+            relDocs = list(MONGO[relTable].find({'_id': titleValue}))
+            head = self._head(relTable, relDocs[0]) if relDocs else noTitle
+        return head
+
 
 # utility functions
 
@@ -721,3 +849,65 @@ def _makeInverse(sourceDict):
 
 def _isEmpty(val):
     return not val or (type(val) is list and len([v for v in val if v]) == 0)
+
+
+def _simpleVal(valType, val):
+    result = (
+        '[{}](mailto:{})'.format(val, val)
+        if valType == N.email else '[{}]({})'.format(val, val)
+        if valType == N.url else str(val).split('.', 1)[0]
+        if valType == N.datetime else (N.Yes if val else N.No)
+        if valType == N.bool else str(val) if valType == N.number else val
+    )
+    return result.rstrip('\n')
+
+
+def _head_user(doc):
+    name = doc.get(N.name, '')
+    org = doc.get(N.org, '')
+    if org:
+        org = ' ({})'.format(org)
+    if name:
+        return name + org
+    firstName = doc.get(N.firstName, '')
+    lastName = doc.get(N.lastName, '')
+    if firstName or lastName:
+        return '{}{}{}{}'.format(
+            firstName, ' ' if firstName and lastName else '', lastName, org
+        )
+    email = doc.get(N.email, '')
+    if email:
+        return email + org
+    eppn = doc.get(N.eppn, '')
+    authority = doc.get(N.authority, '')
+    if authority:
+        authority = ' - {}'.format(authority)
+    if eppn:
+        return '{}{}{}'.format(eppn, authority, org)
+    return '!unidentified user!'
+
+
+def _head_country(doc):
+    return '{} = {}, {}a DARIAH member'.format(
+        doc.get(N.iso, ''),
+        doc.get(N.name, ''),
+        '' if doc.get(N.isMember, False) else 'not ',
+    )
+
+
+def _head_typeContribution(doc):
+    mainType = doc.get(N.mainType, '')
+    subType = doc.get(N.subType, '')
+    sep = ' / ' if mainType and subType else ''
+    return '{}{}{}'.format(
+        mainType,
+        sep,
+        subType,
+    )
+
+
+def _head_score(doc):
+    score = doc.get(N.score, NA)
+    level = doc.get(N.level, NA)
+    description = doc.get(N.description, '')
+    return '{} - {}'.format(score, level) if score or level else description
