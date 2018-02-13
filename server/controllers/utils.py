@@ -96,8 +96,9 @@ def _thinM(chunks):
             thinned.append((p, sorted(dates)[-1]))
         for m in sorted(thinned, key=lambda x: x[1]):
             modified.append(m)
-    for m in chunks[-1]:
-        modified.append(m)
+    if len(chunks):
+        for m in chunks[-1]:
+            modified.append(m)
     return modified
 
 
