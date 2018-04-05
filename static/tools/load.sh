@@ -25,7 +25,7 @@
 # Does not perform data import, but does a modification:
 # It assigns the role 'root' to a user, configured as rootUser in the config file
 
-# ADIR   : directory where the web app $APP resides (and also web2py itself)
+# ADIR   : directory where the web app $APP resides
 
 APP="dariah"
 

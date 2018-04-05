@@ -92,4 +92,15 @@ export const makeReset = memoize(
         },
 )
 
-export const onSubmitSuccess = (result, dispatch, { reset }) => reset()
+/* Workaround (6.6.3) for issue https://github.com/erikras/redux-form/issues/2841
+ * We do a mostly unnecessary reset() after a successful submit.
+ * There is bug in redux-form: if you remove a field from a field array, a spurious
+ * empty field will be present after a submit.
+ * This reset removes that field.
+ *
+ * Still needed in 6.7.0
+ *
+ * No longer needed in 7.3.0
+
+ export const onSubmitSuccess = (result, dispatch, { reset }) => reset()
+ */

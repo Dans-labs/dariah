@@ -1,11 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { browserHistory } from 'react-router'
+import { withRouter } from 'react-router'
 
-import { memoize } from 'memo'
 import {
   combineSelectors,
-  withParams,
   getUrlParts,
   emptyS,
   emptyO,
@@ -42,7 +40,12 @@ class ListPlain extends Component {
     this.gotoNew = true
   }
   gotoItem = eId => {
-    const { props: { table, alterSection, dispatch } } = this
+    const { props: { table, alterSection, history, location: { pathname }, dispatch } } = this
+    const { base, controller, eId: origEid } = getUrlParts(pathname)
+    const xBase = `${base}/${table}/${controller}`
+    if (origEid !== eId) {
+      history.push(`/${xBase}/${eId}/`)
+    }
     const { putAlt } = compileAlternatives(
       alterSection,
       nAlts,
@@ -214,24 +217,25 @@ class ListPlain extends Component {
     )
   }
 
-  showHide = memoize((table, select, eId, active, nextAlt) => () => {
+  showHide = (table, select, eId, active, nextAlt) => () => {
     if (select === DETAILS) {
       nextAlt()
       return
     }
-    const { base, controller, eId: origEid } = getUrlParts(browserHistory)
+    const { props: { history, location: { pathname } } } = this
+    const { base, controller, eId: origEid } = getUrlParts(pathname)
     const xBase = `${base}/${table}/${controller}`
     if (active) {
       if (origEid !== eId) {
-        browserHistory.push(`${xBase}/item/${eId}/`)
+        history.push(`/${xBase}/${eId}/`)
       }
     } else {
       if (origEid !== emptyS) {
-        browserHistory.push(`${xBase}/`)
+        history.push(`/${xBase}/`)
       }
       nextAlt()
     }
-  })
+  }
 
   gotoNewItem() {
     const { props: { tables, table, navItem } } = this
@@ -277,4 +281,4 @@ class ListPlain extends Component {
 
 const getInfo = combineSelectors(getSettings, getMe, getAltSection)
 
-export default connect(getInfo)(withParams(ListPlain))
+export default connect(getInfo)(withRouter(ListPlain))

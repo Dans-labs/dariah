@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { combineSelectors, withParams, emptyA } from 'utils'
+import { combineSelectors, emptyA } from 'utils'
 import { loadExtra } from 'workflow'
 
 import { getTables, needTables, fetchTables, MYIDS } from 'tables'
@@ -103,4 +103,4 @@ class ListContainer extends Component {
 
 const getInfo = combineSelectors(getTables, getFilters)
 
-export default connect(getInfo)(withParams(ListContainer))
+export default connect(getInfo)(ListContainer)

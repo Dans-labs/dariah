@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Markdown from 'react-markdown'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import { combineSelectors } from 'utils'
 

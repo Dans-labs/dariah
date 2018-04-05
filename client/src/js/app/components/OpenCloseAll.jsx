@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 import { getAltSection } from 'alter'
 import { handleOpenAll, handleCloseAll } from 'tables'
@@ -17,6 +18,8 @@ const OpenCloseAll = ({
   initial,
   openAll,
   expand,
+  location: {pathname },
+  history,
   dispatch,
 }) => {
   const hasItems = listIds.length > 0
@@ -52,6 +55,8 @@ const OpenCloseAll = ({
               nAlts,
               initial,
               listIds,
+              pathname,
+              history,
               dispatch,
             )}
           />
@@ -61,4 +66,4 @@ const OpenCloseAll = ({
   )
 }
 
-export default connect(getAltSection)(OpenCloseAll)
+export default connect(getAltSection)(withRouter(OpenCloseAll))

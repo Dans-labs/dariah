@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment, createRef } from 'react'
 import { connect } from 'react-redux'
 
 import { emptyS } from 'utils'
@@ -79,6 +79,12 @@ const getPos = at => (container, target, obj, maySwap) => {
 }
 
 class Tooltip extends Component {
+  constructor(props) {
+    super(props)
+    this.target = createRef()
+    this.tip = createRef()
+    this.arrow = createRef()
+  }
   render() {
     const {
       props: {
@@ -95,7 +101,7 @@ class Tooltip extends Component {
     return showTooltips ? (
       <Fragment>
         <span
-          ref={this.storeTarget}
+          ref={this.target}
           className={`${className} tooltipped focus ${
             focusOnly ? emptyS : 'hover'
           }`}
@@ -105,11 +111,11 @@ class Tooltip extends Component {
           {children}
         </span>
         <span>
-          <span ref={this.storeTip} className={`tooltip ${classTip}`}>
+          <span ref={this.tip} className={`tooltip ${classTip}`}>
             {tip}
           </span>
           <span
-            ref={this.storeArrow}
+            ref={this.arrow}
             className={`toolarrow toolarrow-${at} ${classArrow}`}
           />
         </span>
@@ -118,22 +124,13 @@ class Tooltip extends Component {
       children
     )
   }
-  storeTarget = domElem => {
-    this.target = domElem
-  }
-  storeTip = domElem => {
-    this.tip = domElem
-  }
-  storeArrow = domElem => {
-    this.arrow = domElem
-  }
 
   handlePositioning = () => {
     const {
       props: { at = 'top', fixed = false, settings: { showTooltips } },
-      target,
-      tip,
-      arrow,
+      target: { current: target},
+      tip: {current: tip},
+      arrow: {current: arrow},
     } = this
     if (!showTooltips || fixed) {
       return

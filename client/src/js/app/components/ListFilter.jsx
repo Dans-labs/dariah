@@ -18,10 +18,34 @@ const initial = 0
 const nAlts = 2
 
 class ListFilter extends Component {
+  constructor(props) {
+    super(props)
+    const { tables, table, filterTag, dispatch } = props
+    dispatch(initFiltering(tables, table, filterTag))
+  }
+  /*
   componentWillMount() {
     const { props: { tables, table, filterTag, dispatch } } = this
     dispatch(initFiltering(tables, table, filterTag))
   }
+  */
+  componentDidUpdate(newProps) {
+    const {
+      tables,
+      table,
+      filterTag,
+      filters: { [table]: { [filterTag]: filterSettings } = emptyO },
+      dispatch,
+    } = newProps
+    const { props: { table: tableOld, filterTag: filterTagOld } } = this
+    if (
+      (tableOld !== table || filterTagOld !== filterTag) &&
+      filterSettings == null
+    ) {
+      dispatch(initFiltering(tables, table, filterTag))
+    }
+  }
+  /*
   componentWillReceiveProps(newProps) {
     const {
       tables,
@@ -38,6 +62,7 @@ class ListFilter extends Component {
       dispatch(initFiltering(tables, table, filterTag))
     }
   }
+  */
   render() {
     const {
       props: {

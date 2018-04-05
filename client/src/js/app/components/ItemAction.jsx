@@ -6,7 +6,6 @@ import { reduxForm } from 'redux-form'
 import { emptyO } from 'utils'
 
 import { applyEditTemplate } from 'templates'
-import { onSubmitSuccess } from 'edit'
 import { toDb, headEntity } from 'tables'
 import { getMe } from 'me'
 
@@ -53,6 +52,5 @@ export default connect(getMe)(
     keepDirtyOnReinitialize: false,
     touchOnBlur: true,
     touchOnChange: false,
-    onSubmitSuccess,
   })(ItemAction),
 )

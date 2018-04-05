@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { browserHistory } from 'react-router'
+import { withRouter } from 'react-router-dom'
 
 import { getUrlParts } from 'utils'
 
@@ -14,7 +14,7 @@ class Insert extends Component {
     this.gotoNew = true
   }
   gotoNewItem() {
-    const { props: { tables, table } } = this
+    const { props: { tables, table, location, history } } = this
     if (this.gotoNew) {
       const { [table]: tableInfo } = tables
       if (tableInfo == null) {
@@ -23,8 +23,8 @@ class Insert extends Component {
       const { lastInserted } = tableInfo
       if (lastInserted != null) {
         this.gotoNew = false
-        const { base } = getUrlParts(browserHistory)
-        browserHistory.push(`${base}/${table}/mylist/item/${lastInserted}/`)
+        const { base } = getUrlParts(location.pathname)
+        history.push(`/${base}/${table}/mylist/${lastInserted}/`)
       }
     }
   }
@@ -45,4 +45,4 @@ class Insert extends Component {
   }
 }
 
-export default connect(getTables)(Insert)
+export default connect(getTables)(withRouter(Insert))

@@ -6,7 +6,6 @@ import { emptyO } from 'utils'
 
 import { applyEditTemplate } from 'templates'
 import { itemEditField } from 'fields'
-import { onSubmitSuccess } from 'edit'
 import { toDb, headEntity } from 'tables'
 import { getMe } from 'me'
 
@@ -120,6 +119,5 @@ export default connect(getMe)(
     keepDirtyOnReinitialize: false,
     touchOnBlur: true,
     touchOnChange: false,
-    onSubmitSuccess,
   })(ItemEdit),
 )

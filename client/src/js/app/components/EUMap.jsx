@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment, createRef } from 'react'
 import L from 'leaflet'
 
 import { countryBorders } from 'europe.geo'
@@ -63,18 +63,14 @@ class EUMap extends Component {
   constructor(props) {
     super(props)
     this.features = {}
-  }
-  setMap = dom => {
-    if (dom) {
-      this.dom = dom
-    }
+    this.dom = createRef()
   }
 
   render() {
-    const { props, setMap } = this
+    const { props } = this
     return (
       <Fragment>
-        <div ref={setMap} />
+        <div ref={this.dom} />
         <ByValue {...props} />
       </Fragment>
     )
@@ -88,7 +84,7 @@ class EUMap extends Component {
         amounts,
         tables: { country },
       },
-      dom,
+      dom: { current: dom },
     } = this
     const {
       HEIGHT,

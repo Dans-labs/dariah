@@ -417,7 +417,7 @@ a shallow to-level structure of an object, to a given depth, and from then on
 work with object identity and WeakMaps. You can also forego object identity
 altogether and use solely stringify, which is often the most efficient solution.
 
-We have built quite a few [tests]({{site.repBase}}/client/src/test/memo.js) to
+We have built quite a few [tests]({{site.testBase}}/memo.js) to
 verify the logic and the performance of this memoizer.
 
 The flip-side of a memoizer is that you end-up with a lot of obsolete function
@@ -482,7 +482,7 @@ to the memo key in the following way:
 N.B: *Function arguments* can not be stringified, they always go by way of
 object identitiy.
 
-For exmaples, see the [test suite]({{site.repBase}}/client/src/test/memo.js).
+For examples, see the [test suite]({{site.testBase}}/memo.js).
 
 ### Config ###
 

@@ -32,8 +32,8 @@
     </head>
     <body>
         <div id="body"/>
-        <script src="/static/dist/framework.js"></script>
-        <script src="/static/dist/lib.js"></script>
+        <script src="/static/dist/vendor.js"></script>
+        <!--<script src="/static/dist/lib.js"></script>-->
         <script src="/static/dist/app.js"></script>
     </body>
 </html>

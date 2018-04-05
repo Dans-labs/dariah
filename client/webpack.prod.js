@@ -1,41 +1,103 @@
-const merge = require('webpack-merge');
-const common = require('./webpack.common.js');
-
 const webpack = require('webpack')
-const autoprefixer = require('autoprefixer')
 
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const extractCSS = new ExtractTextPlugin('main.css')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-const isProd = process.env.NODE_ENV == 'production'
-
-module.exports = merge(common, {
+module.exports = {
+  context: __dirname + '/src',
+  entry: {
+    app: './js/app/main.jsx',
+    main: './css/main.css',
+  },
+  output: {
+    filename: '[name].js',
+    path: __dirname + '/../static/dist',
+  },
+  resolve: {
+    extensions: ['.js', '.jsx'],
+    modules: [
+      __dirname + '/src/js/app/dux',
+      __dirname + '/src/js/app/components',
+      __dirname + '/src/js/app/tables',
+      __dirname + '/src/js/lib',
+      'node_modules',
+    ],
+  },
   module: {
     rules: [
       {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+              plugins: [
+                '@babel/plugin-transform-react-jsx',
+                '@babel/plugin-proposal-object-rest-spread',
+                '@babel/plugin-proposal-class-properties',
+              ],
+              presets: [
+                '@babel/preset-env',
+                '@babel/preset-react',
+              ],
+            },
+          },
+        ],
+      },
+      {
         test: /\.css$/,
-        use: extractCSS.extract([
+        use: [
+          MiniCssExtractPlugin.loader,
           {
             loader: 'css-loader',
-            options: { minimize: true },
+            options: {
+              minimize: true,
+            },
           },
-          {
-            loader: 'postcss-loader',
-            options: { plugins: [autoprefixer] },
-          },
-        ]),
+        ],
       },
-    ],
+      {
+        test: /\.gif?$/,
+        loader: 'url-loader',
+        options: {
+          mimetype: 'image/png',
+        },
+      },
+      {
+        test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
+        loader: 'url-loader',
+        options: {
+          mimetype: 'application/font-woff',
+        },
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?v=[0-9].[0-9].[0-9])?$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+        },
+      },
+    ]
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('production')
-      }
+    new MiniCssExtractPlugin({
+      filename: 'main.css',
+      chunkFileName: '[id].css',
     }),
-    extractCSS,
-    new UglifyJSPlugin(),
+    new CleanWebpackPlugin(['../static/dist'], { allowExternal: true }),
   ],
-});
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      name: 'vendor',
+    },
+  },
+  performance: {
+    hints: 'warning',
+    maxEntrypointSize: 1500000,
+    maxAssetSize: 700000,
+  },
+};
 

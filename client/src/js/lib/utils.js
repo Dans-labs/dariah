@@ -22,8 +22,15 @@ export const propsChanged = (newProps, need, oldProps, keyPropNames) => {
   return result
 }
 
+/*
 export const withParams = Component => ({ params, route, ...props }) => {
   const allProps = { ...props, ...params, ...route }
+  return <Component {...allProps} />
+}
+*/
+
+export const injectProps = (Component, inject) => ({ match: { params } = emptyO, ...props }) => {
+  const allProps = { ...props, ...params, ...inject }
   return <Component {...allProps} />
 }
 
@@ -74,31 +81,27 @@ export const jString = (o, indent) =>
     indent,
   )
 
-export const getUrlParts = browserHistory => {
-  const url = browserHistory
-    .getCurrentLocation()
-    .pathname.replace(/\/$/, emptyS)
+export const getUrlParts = urlLoc => {
+  const url = urlLoc.replace(/\/$/, emptyS)
   let parts
-  parts = url.match(/^(.*)\/([^/]+)\/([^/]+)\/item\/([^/]+)\/?$/)
+  parts = url.match(/^\/(.*)\/([^/]+)\/([^/]+)\/([^/]+)\/?$/)
   if (!parts) {
-    parts = url.match(/^(.*)\/([^/]+)\/([^/]+)\/item\/?$/)
+    parts = url.match(/^\/(.*)\/([^/]+)\/([^/]+)\/?$/)
   }
   if (!parts) {
-    parts = url.match(/^(.*)\/([^/]+)\/([^/]+)\/?$/)
+    parts = url.match(/^\/(.*)\/([^/]+)\/?$/)
   }
   if (!parts) {
-    parts = url.match(/^(.*)\/([^/]+)\/?$/)
-  }
-  if (!parts) {
-    parts = url.match(/^(.*)\/?$/)
+    parts = url.match(/^\/(.*)\/?$/)
   }
   parts = parts.slice(1)
-  return {
+  const result = {
     base: parts[0] || emptyS,
     table: parts[1] || emptyS,
     controller: parts[2] || emptyS,
     eId: parts[3] || emptyS,
   }
+  return result
 }
 
 export const max = arr =>

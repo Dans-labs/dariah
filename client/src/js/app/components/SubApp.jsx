@@ -1,11 +1,14 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
+import { Route, Switch, NavLink } from 'react-router-dom'
 
-import { withParams, emptyA, emptyS } from 'utils'
+import { injectProps, emptyA, emptyS } from 'utils'
 import { getMe } from 'me'
+import { ALLIDS, MYIDS } from 'tables'
+import WorkflowInfo from 'WorkflowInfo'
+import ListContainer from 'ListContainer'
 
 import ErrorBoundary from 'ErrorBoundary'
-import NavLink from 'NavLink'
 import Insert from 'Insert'
 import Tooltip from 'Tooltip'
 
@@ -33,6 +36,7 @@ const tableLinks = (me, { name, forWhom, details }) =>
                   <NavLink
                     to={path}
                     className={button ? 'button large workflow info' : emptyS}
+                    activeClassName={'active'}
                   >
                     {subName}
                   </NavLink>
@@ -294,7 +298,7 @@ const navBarItems = [
   },
 ]
 
-const SubApp = ({ me, routes, children }) => (
+const SubApp = ({ me }) => (
   <div className={'sub-app'}>
     <div className={'subnavbar'}>
       <ErrorBoundary>
@@ -303,19 +307,36 @@ const SubApp = ({ me, routes, children }) => (
     </div>
     <div className={'submaterial'}>
       <ErrorBoundary>
-        {routes.length === 0 || routes.length == 1 ||
-        routes[1].path !== 'data' ? null : routes.length === 2 ? (
-          'All tables'
-        ) : routes[2].path === 'workflow' ? null : routes.length === 3 ? (
-          <Fragment>
-            <h3>{'Registry'}</h3>
-            <p>{'Use the side bar to navigate to a section'}</p>
-          </Fragment>
-        ) : null}
+        <Switch>
+          <Route path={'/data/workflow'} component={WorkflowInfo} />
+          <Route
+            path={'/data/:table/mylist/:eId?'}
+            render={injectProps(ListContainer, { select: MYIDS, mode: 'list' })}
+          />
+          <Route
+            path={'/data/:table/myassign/:eId?'}
+            render={injectProps(ListContainer, { select: MYIDS, mode: 'list', extra: true })}
+          />
+          <Route
+            path={'/data/:table/list/:eId?'}
+            render={injectProps(ListContainer, { select: ALLIDS, mode: 'list' })}
+          />
+          <Route
+            path={'/data/:table/grid/:eId?'}
+            render={injectProps(ListContainer, { select: ALLIDS, mode: 'grid' })}
+          />
+          <Route
+            path={'/data/:table/filter/:eId?'}
+            render={injectProps(ListContainer, { select: ALLIDS, mode: 'list', filtered: true })}
+          />
+          <Route
+            path={'/data/:table/stats'}
+            render={injectProps(ListContainer, { select: ALLIDS, mode: 'stats', filtered: false })}
+          />
+        </Switch>
       </ErrorBoundary>
-      <ErrorBoundary>{children}</ErrorBoundary>
     </div>
   </div>
 )
 
-export default connect(getMe)(withParams(SubApp))
+export default connect(getMe)(SubApp)

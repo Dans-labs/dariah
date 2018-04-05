@@ -59,7 +59,7 @@ const valuePrepare = memoize(
     if (typeof valType === 'object') {
       const { relTable } = valType
       const relRecord = tables[relTable].entities[value]
-      const linkMe = `/data/${relTable}/list/item/${value}`
+      const linkMe = `/data/${relTable}/list/${value}`
       if (value != null) {
         const templateApplied = applyTemplate({
           settings,

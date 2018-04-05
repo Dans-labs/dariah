@@ -192,7 +192,7 @@ const templates = {
     assessment({ v, w, me, onInsert }) {
       const myType = isReviewerType(me._id, v('reviewerE'), v('reviewerF'))
       const mine = myReview(me, w)
-      const mineLink = `/data/review/mylist/item/${mine}`
+      const mineLink = `/data/review/mylist/${mine}`
       let otherDecided = true
       if (myType === 'F') {
         const { items: otherReviews = emptyA } = w('reviews') || emptyO

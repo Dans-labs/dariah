@@ -1,6 +1,7 @@
 #!/bin/sh
 
 root=`pwd`
+webpack='node_modules/.bin/webpack'
 
 function codestats {
     cd $root
@@ -44,7 +45,7 @@ elif [[ "$1" == "docs" ]]; then
 elif [[ "$1" == "dev" ]]; then
     cd client
     export NODE_ENV="development"
-    webpack --config webpack.dev.js
+    $webpack --mode=development --config webpack.dev.js
 elif [[ "$1" == "model" ]]; then
 	cd server
     python3 compile.py
@@ -55,7 +56,7 @@ elif [[ "$1" == "serve" ]]; then
 elif [[ "$1" == "hot" ]]; then
     cd client
     export NODE_ENV="development"
-    webpack-dev-server --config webpack.dev.js
+    $webpack-dev-server --mode=development --config webpack.dev.js
 elif [[ "$1" == "data" ]]; then
     cd static/tools
     python3 mongoFromFm.py development
@@ -65,7 +66,7 @@ elif [[ "$1" == "root" ]]; then
 elif [[ "$1" == "prod" ]]; then
     pushd client
     export NODE_ENV="production"
-    webpack --config webpack.prod.js
+    $webpack --mode=production --config webpack.prod.js
     popd
 elif [[ "$1" == "shipdocs" ]]; then
     shift
@@ -86,7 +87,7 @@ elif [[ "$1" == "shipcode" ]]; then
     bundle exec jekyll build
     popd
     export NODE_ENV="production"
-    webpack --config webpack.prod.js
+    $webpack --config webpack.prod.js
     popd
     git add --all .
     git commit -m "ship: $*"

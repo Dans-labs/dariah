@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 
 import { getWinDim } from 'win'
 
@@ -9,8 +10,11 @@ import Static from 'Static'
 import Notification from 'Notification'
 import Tooltip from 'Tooltip'
 import TooltipSwitch from 'TooltipSwitch'
+import SubApp from 'SubApp'
+import Doc from 'Doc'
+import NotFound from 'NotFound'
 
-const App = ({ children, win }) => {
+const App = ({ win }) => {
   const { height, width } = win
   const text = `${width} x ${height}`
   return (
@@ -35,9 +39,24 @@ const App = ({ children, win }) => {
           <Login />
         </ErrorBoundary>
       </div>
-      <ErrorBoundary>{children}</ErrorBoundary>
+      <ErrorBoundary>
+        <Switch>
+          <Redirect from={'/login'} to={'/docs/about.md'} />
+          <Redirect from={'/logout'} to={'/docs/about.md'} />
+          <Redirect from={'/slogout'} to={'/docs/about.md'} />
+          <Redirect exact={true} from={'/'} to={'/docs/about.md'} />
+          <Redirect exact={true} from={'/docs'} to={'/docs/about.md'} />
+          <Redirect exact={true} from={'/about'} to={'/docs/about.md'} />
+          <Redirect exact={true} from={'/docs/about'} to={'/docs/about.md'} />
+          <Route path={'/docs/:docFile'} component={Doc} />
+          <Route path={'/tech/docs/gen/:docFile'} component={Doc} />
+          <Route path={'/tech/docs/:docFile'} component={Doc} />
+          <Route path={'/data'} component={SubApp} />
+          <Route path={'*'} component={NotFound} />
+        </Switch>
+      </ErrorBoundary>
     </ErrorBoundary>
   )
 }
 
-export default connect(getWinDim)(App)
+export default connect(getWinDim)(withRouter(App))

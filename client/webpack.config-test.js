@@ -16,7 +16,7 @@ module.exports = {
     ],
   },
   //devtool: "inline-cheap-module-source-map",
-  devtool: 'inline-source-map',
+  //devtool: 'inline-source-map',
   module: {
     rules: [
       {
@@ -27,16 +27,14 @@ module.exports = {
             loader: 'babel-loader',
             options: {
               plugins: [
-                'babel-plugin-transform-object-rest-spread',
-                'babel-plugin-transform-class-properties',
+                '@babel-plugin-proposal-class-properties',
+                '@babel/plugin-proposal-object-rest-spread',
                 '@babel/plugin-transform-react-jsx',
               ],
               presets: [
                 '@babel/preset-react',
                 '@babel/preset-env',
               ],
-              "minified": true,
-              "comments": false,
             },
           },
         ],

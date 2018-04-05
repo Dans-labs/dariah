@@ -1,7 +1,5 @@
 import update from 'immutability-helper'
 
-import { browserHistory } from 'react-router'
-
 import { accessData } from 'server'
 import { memoize } from 'memo'
 import {
@@ -198,13 +196,10 @@ const flows = {
       if (Array.isArray(record)) {
         const [consTable, consRecord] = record
         const { _id } = consRecord
-        newState = updateAuto(
-          newState,
-          [consTable],
-          { [_id]: { $set: consRecord } },
-        )
-      }
-      else {
+        newState = updateAuto(newState, [consTable], {
+          [_id]: { $set: consRecord },
+        })
+      } else {
         const {
           values,
           values: { _id },
@@ -705,30 +700,36 @@ export const handleOpenAll = memoize(
   emptyO,
 )
 
-export const handleCloseAll = memoize(
-  (alter, alterSection, nAlts, initial, items, dispatch) => {
-    const makeAlternatives = compileAlternatives(
-      alterSection,
-      nAlts,
-      initial,
-      dispatch,
-    )
-    const { base, table, controller } = getUrlParts(browserHistory)
-    const xBase = `${base}/${table}/${controller}`
-    return () => {
-      browserHistory.push(`${xBase}/`)
-      const alts = []
-      items.forEach(eId => {
-        const { getAlt } = makeAlternatives(eId)
-        const alt = getAlt(alter)
-        if (alt !== initial) {
-          alts.push(eId)
-        }
-      })
-      if (alts.length) {
-        dispatch(setItems(alts, alterSection, initial))
+export const handleCloseAll = (
+  alter,
+  alterSection,
+  nAlts,
+  initial,
+  items,
+  pathname,
+  history,
+  dispatch,
+) => {
+  const makeAlternatives = compileAlternatives(
+    alterSection,
+    nAlts,
+    initial,
+    dispatch,
+  )
+  const { base, table, controller } = getUrlParts(pathname)
+  const xBase = `${base}/${table}/${controller}`
+  return () => {
+    history.push(`/${xBase}/`)
+    const alts = []
+    items.forEach(eId => {
+      const { getAlt } = makeAlternatives(eId)
+      const alt = getAlt(alter)
+      if (alt !== initial) {
+        alts.push(eId)
       }
+    })
+    if (alts.length) {
+      dispatch(setItems(alts, alterSection, initial))
     }
-  },
-  emptyO,
-)
+  }
+}

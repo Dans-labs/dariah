@@ -16,6 +16,7 @@
 	padding: 0.6rem 0.5rem;
 	text-transform: none;
 	font-size: 1rem;
+    z-index: 3000;
 }
 
 .toolarrow {
@@ -28,6 +29,7 @@
 	margin: auto;
 	display: block;
 	border: 5px solid transparent;
+    z-index: 3000;
 }
 
 .toolarrow-top {
