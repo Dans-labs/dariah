@@ -33,7 +33,6 @@ class UserApi(object):
 
     def deliver(self):
         self.DB.addGroupInfo(self.userInfo)
-        print('during DELIVER:', self.userInfo and self.userInfo.get(N.eppn, 'no eppn'))
         return {N.data: self.userInfo, N.msgs: [], N.good: True}
 
     def _store(self, newUserInfo):

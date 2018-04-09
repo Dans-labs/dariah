@@ -1,6 +1,6 @@
 from time import sleep
 import bottle
-from bottle import post, get, route, template
+from bottle import post, get, route, template, response
 
 from controllers.db import DbAccess
 from controllers.file import FileApi
@@ -37,43 +37,35 @@ def serveApiFile(doc):
 
 @route('/api/db/who/ami')
 def serveApiDbWho():
-    print('START /who/ami')
     Auth.authenticate()
-    print('AFTER AUTH /who/ami')
+    response.set_header('cache_control', 'no-cache')
     return Auth.deliver()
 
 
 @post('/api/db/<verb:re:[a-z0-9_]+>')
 @get('/api/db/<verb:re:[a-z0-9_]+>')
 def serveApiDb(verb):
-    print('START', verb)
     Auth.authenticate()
-    print('AFTER AUTH', verb)
     Perm = PermApi(Auth)
+    response.set_header('cache_control', 'no-cache')
     return Controller.data(verb, Perm)
 
 
 @route('/slogout')
 def serveSlogout():
-    print('START /slogout')
     Auth.deauthenticate()
-    print('END /slogout')
     bottle.redirect('/Shibboleth.sso/Logout')
 
 
 @route('/login')
 def serveLogin():
-    print('START /login')
     Auth.authenticate(login=True)
-    print('AFTER AUTH /login')
     return template('index')
 
 
 @route('/logout')
 def serveLogout():
-    print('START /logout')
     Auth.deauthenticate()
-    print('AFTER DEAUTH /logout')
     return template('index')
 
 

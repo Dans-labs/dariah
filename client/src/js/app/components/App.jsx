@@ -41,6 +41,9 @@ const App = ({ win }) => {
       </div>
       <ErrorBoundary>
         <Switch>
+          <Redirect push={true} from={'/login'} to={'/docs/about.md'} />
+          <Redirect push={true} from={'/logout'} to={'/docs/about.md'} />
+          <Redirect push={true} from={'/slogout'} to={'/docs/about.md'} />
           <Redirect exact={true} from={'/'} to={'/docs/about.md'} />
           <Redirect exact={true} from={'/docs'} to={'/docs/about.md'} />
           <Redirect exact={true} from={'/about'} to={'/docs/about.md'} />
@@ -55,9 +58,5 @@ const App = ({ win }) => {
     </ErrorBoundary>
   )
 }
-  /*
-          <Redirect push={true} from={'/login'} to={'/docs/about.md'} />
-          <Redirect push={true} from={'/logout'} to={'/docs/about.md'} />
-          <Redirect push={true} from={'/slogout'} to={'/docs/about.md'} />
-  */
+
 export default connect(getWinDim)(withRouter(App))
