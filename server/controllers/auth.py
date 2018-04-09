@@ -15,11 +15,13 @@ class AuthApi(UserApi):
 
         # determine production or devel
         self.isDevel = os.environ.get(N.REGIME, None) == N.devel
+        print('DEVEL', self.isDevel)
 
         # read secret from the system
         self.secret = ''
         with open(secret_file) as fh:
             self.secret = fh.read()
+        print('SECRET', self.secret)
 
         # wrap the app to enable session middleware
         self.app = bottle.default_app()
@@ -67,6 +69,8 @@ class AuthApi(UserApi):
         authId = self.DB.idFromGroup[auth]
         self.userInfo = None
         eppn = self._get_session()
+        print('during AUTH', eppn)
+        print('SESSION', bottle.request.environ.get(self._session_key))
         if eppn is not None:
             userInfo = self.getUser(eppn)
             if userInfo is not None:
@@ -95,26 +99,40 @@ class AuthApi(UserApi):
                     self.userInfo[N.group] = authId
                 self.userInfo[N.groupRep
                               ] = self.DB.groupFromId[self.userInfo[N.group]]
+        print('end AUTH:', self.userInfo and self.userInfo.get(N.eppn, 'no eppn'))
 
     def deauthenticate(self):
         unauth = PM[N.unauth]
         unauthId = self.DB.idFromGroup[unauth]
         self.userInfo = {N.group: unauthId, N.groupRep: unauth}
+        print('start DELETE SESSION')
         self._delete_session()
+        print('end DELETE SESSION')
+        print('end DEAUTH:', self.userInfo and self.userInfo.get(N.eppn, 'no eppn'))
 
     def _create_session(self):
         session = bottle.request.environ.get(self._session_key)
+        print('begin SESSION SAVE', session)
         session[N.eppn] = self.userInfo[N.eppn]
         session.save()
+        print('end SESSION SAVE', session)
 
     def _delete_session(self):
         env = bottle.request.environ
         session = env.get(self._session_key, None)
         if session:
+            session[N.eppn] = None
+            #session.invalidate()
             session.delete()
+            print('SESSION DELETED')
+            print('after delete SESSION', env.get(self._session_key))
+        else:
+            print('NO SESSION TO DELETE')
 
     def _get_session(self):
+        print('get SESSION')
         session = bottle.request.environ.get(self._session_key)
+        print('SESSION', session)
         return session.get(N.eppn, None)
 
     def _checkLogin(self, force=False):

@@ -87,7 +87,7 @@ elif [[ "$1" == "shipcode" ]]; then
     bundle exec jekyll build
     popd
     export NODE_ENV="production"
-    $webpack --config webpack.prod.js
+    $webpack --mode=production --config webpack.prod.js
     popd
     git add --all .
     git commit -m "ship: $*"

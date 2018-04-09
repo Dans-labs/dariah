@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 import { presentUser } from 'tables'
 import { getMe, fetchMe } from 'me'
@@ -38,15 +39,8 @@ class Login extends Component {
   }
   componentDidMount() {
     const { props: { dispatch } } = this
-    dispatch(
-      fetchMe({
-        type: 'fetchMe',
-        contentType: 'db',
-        path: '/who/ami',
-        desc: 'me',
-      }),
-    )
+    dispatch(fetchMe())
   }
 }
 
-export default connect(getMe)(Login)
+export default connect(getMe)(withRouter(Login))
