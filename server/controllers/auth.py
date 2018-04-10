@@ -26,13 +26,15 @@ class AuthApi(UserApi):
 
         session_opts = {
             'session.key': 'dariah.session.id',
-            'session.use_cookies': False,
-            'session.type': 'cookie',
+            'session.auto': True,
+            'session.use_cookies': True,
+            'session.type': 'memory',
             'session.cookie_expires': True,
+            'session.data_serializer': 'json',
             'session.encrypt_key': self.secret,
             'session.httponly': True,
             'session.timeout': 3600 * 24,  # 1 day
-            'session.validate_key': True,
+            'session.validate_key': 'xxx',
             'session.secure': not self.isDevel,
         }
         self._session_key = 'dariah.session'
@@ -110,7 +112,7 @@ class AuthApi(UserApi):
         session = bottle.request.environ.get(self._session_key)
         session[N.eppn] = self.userInfo[N.eppn]
         self.debugPrint(f'SESSION CREATED {session}')
-        session.save()
+        # session.save()
 
     def _delete_session(self):
         env = bottle.request.environ
@@ -118,6 +120,8 @@ class AuthApi(UserApi):
         if session:
             self.debugPrint(f'SESSION DELETE {session}')
             session.delete()
+            # session.invalidate()
+            self.debugPrint(f'SESSION DELETED {session}')
 
     def _get_session(self):
         session = bottle.request.environ.get(self._session_key)

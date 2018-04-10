@@ -51,7 +51,6 @@ export const accessData = task => (dispatch, getState) => {
       body: JSON.stringify(sendData),
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache',
       },
     }
   }

@@ -1,4 +1,3 @@
-from time import sleep
 import bottle
 from bottle import post, get, route, template, response
 
@@ -38,7 +37,6 @@ def serveApiFile(doc):
 @route('/api/db/who/ami')
 def serveApiDbWho():
     Auth.authenticate()
-    response.set_header('cache_control', 'no-cache')
     return Auth.deliver()
 
 
@@ -47,7 +45,6 @@ def serveApiDbWho():
 def serveApiDb(verb):
     Auth.authenticate()
     Perm = PermApi(Auth)
-    response.set_header('cache_control', 'no-cache')
     return Controller.data(verb, Perm)
 
 
