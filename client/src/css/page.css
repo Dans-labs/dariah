@@ -88,6 +88,9 @@ div.submaterial {
 	flex: 1 1 70%;
 	padding: 0 0 0 0.5rem;
 }
+div.subsection > span {
+    max-width: 10rem;
+}
 div.item-workflow {
 	margin: 0.2rem 0 0.2rem 0;
 	padding: 1rem 0 1rem 0;

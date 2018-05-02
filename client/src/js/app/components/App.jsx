@@ -41,10 +41,10 @@ const App = ({ win }) => {
       </div>
       <ErrorBoundary>
         <Switch>
-          <Redirect push={true} from={'/login'} to={'/docs/about.md'} />
-          <Redirect push={true} from={'/logout'} to={'/docs/about.md'} />
-          <Redirect push={true} from={'/slogout'} to={'/docs/about.md'} />
-          <Redirect exact={true} from={'/'} to={'/docs/about.md'} />
+          <Redirect push={true} from={'/login'} to={'/data'} />
+          <Redirect push={true} from={'/logout'} to={'/data'} />
+          <Redirect push={true} from={'/slogout'} to={'/data'} />
+          <Redirect exact={true} from={'/'} to={'/data'} />
           <Redirect exact={true} from={'/docs'} to={'/docs/about.md'} />
           <Redirect exact={true} from={'/about'} to={'/docs/about.md'} />
           <Redirect exact={true} from={'/docs/about'} to={'/docs/about.md'} />

@@ -738,7 +738,7 @@ class FMConvert(object):
                                          for (i, v) in relInfo.items())
                 (ftype, fmult) = self.allFields[mt][f]
                 for row in rows:
-                    newValue = []
+                    newValue = None if fmult == 1 else []
                     for v in (
                         row[f] if fmult > 1 else [row[f]]
                         if row[f] is not None else []
@@ -763,6 +763,8 @@ class FMConvert(object):
                                 newValue.append(i)
                             else:
                                 newValue = i
+                    if f == 'typeContribution':
+                        print(f'{row[f]} => {newValue}')
                     row[f] = newValue
         self.relIndex = relIndex
 

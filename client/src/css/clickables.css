@@ -3,7 +3,7 @@
 	cursor: pointer;
 	background-color: var(--action-back);
 	border-color: var(--action-border);
-	white-space: nowrap;
+	/*white-space: nowrap;*/
 }
 .button.disabled {
 	cursor: default;

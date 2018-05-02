@@ -49,9 +49,7 @@ export const accessData = task => (dispatch, getState) => {
       ...settings,
       method: 'POST',
       body: JSON.stringify(sendData),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     }
   }
   const actionUrl = `${rootUrl}${contentType}${path}`

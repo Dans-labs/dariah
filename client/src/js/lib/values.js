@@ -59,6 +59,7 @@ const valuePrepare = memoize(
     if (typeof valType === 'object') {
       const { relTable } = valType
       const relRecord = tables[relTable].entities[value]
+      console.warn('valuePrepare', { value, valType, rep, relTable, relField, relRecord })
       const linkMe = `/data/${relTable}/list/${value}`
       if (value != null) {
         const templateApplied = applyTemplate({
@@ -188,6 +189,7 @@ export const wrappedRepr = memoize(
       values,
       settings,
     )
+    console.warn('wrappedRepr', { field, multiple, relField, values })
     const xReps = multiple
       ? (values || emptyA)
           .map((value, i) => prepare(value, reps[i]))
