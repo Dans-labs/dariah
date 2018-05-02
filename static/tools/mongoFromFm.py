@@ -763,8 +763,6 @@ class FMConvert(object):
                                 newValue.append(i)
                             else:
                                 newValue = i
-                    if f == 'typeContribution':
-                        print(f'{row[f]} => {newValue}')
                     row[f] = newValue
         self.relIndex = relIndex
 
