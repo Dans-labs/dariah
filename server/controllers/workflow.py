@@ -81,7 +81,7 @@ def _compute_assessmentScore(wf, myDoc, otherDocs, w):
             N.score: True
         })
     )
-    scoreMapping = {s[N._id]: s[N.score] for s in scoreData}
+    scoreMapping = {s[N._id]: s[N.score] for s in scoreData if N.score in s}
     maxScoreByCrit = {}
     for s in scoreData:
         crit = s[N.criteria]
