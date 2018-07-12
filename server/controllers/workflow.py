@@ -85,7 +85,7 @@ def _compute_assessmentScore(wf, myDoc, otherDocs, w):
     maxScoreByCrit = {}
     for s in scoreData:
         crit = s[N.criteria]
-        score = s[N.score]
+        score = s.get(N.score, 0)
         prevMax = maxScoreByCrit.setdefault(crit, None)
         if prevMax is None or score > prevMax:
             maxScoreByCrit[crit] = score
