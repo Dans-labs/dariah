@@ -8,7 +8,7 @@ DM = M[N.tables]
 
 
 def getq(name):
-    return request.forms.get(name, '')[0:64]
+    return request.query.get(name, '')[0:64]
 
 
 class Controller(object):
