@@ -25,6 +25,7 @@ fi
 
 cd $ADIR/$APP
 git pull origin master
+scl enable rh-python36 bash
 python3 -m compileall server
 
 if [ $ON_CLARIN ]; then
