@@ -1,4 +1,4 @@
-from controllers.utils import oid
+from controllers.utils import oid, serverprint
 from models.compiled.model import model as M
 from models.compiled.names import N
 
@@ -161,8 +161,11 @@ class PermApi(object):
                             continue
                     if newValues is not None:
                         newValueId = newValues.get(field, None)
-                        newValue = self.DB.groupFromId[oid(newValueId)]
-                        if newValue in {N.own, N.nobody}:
+                        newValue = (
+                            None if newValueId is None else
+                            self.DB.groupFromId[oid(newValueId)]
+                        )
+                        if newValue is not None and newValue in {N.own, N.nobody}:
                             if verbose:
                                 msgs.append({
                                     N.kind:
@@ -173,7 +176,7 @@ class PermApi(object):
                                         .format(newValue),
                                 })
                             continue
-                        elif newValue not in self.rank:
+                        elif newValue is not None and newValue not in self.rank:
                             if verbose:
                                 msgs.append({
                                     N.kind:
@@ -184,7 +187,7 @@ class PermApi(object):
                                         .format(newValue),
                                 })
                             continue
-                        elif self.rank[newValue] > self.rank[group]:
+                        elif newValue is not None and self.rank[newValue] > self.rank[group]:
                             if verbose:
                                 msgs.append({
                                     N.kind:
@@ -200,6 +203,7 @@ class PermApi(object):
                 permF, asList=document is None, isOwn=isOwn, isEditor=isEditor
             ):
                 fieldSet.add(field)
+            serverprint(fieldSet)
         return (True, rowFilter, fieldSet)
 
     def _isOwn(self, table, document):

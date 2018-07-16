@@ -832,7 +832,7 @@ class WorkflowApi(object):
             head = titleValue or noTitle
         else:
             relTable = valType[N.relTable]
-            relDocs = list(MONGO[relTable].find({'_id': titleValue}))
+            relDocs = list(MONGO[relTable].find({N._id: titleValue}))
             head = self._head(relTable, relDocs[0]) if relDocs else noTitle
         return head
 

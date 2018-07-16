@@ -97,8 +97,16 @@ class AuthApi(UserApi):
                 self.userInfo[N.group] = unauthId
                 self.userInfo[N.groupRep] = unauth
             else:
-                if N.group not in self.userInfo:
+                if (
+                    self.userInfo.get(N.group, None) is None or
+                    self.userInfo.get(N.authority, None)
+                ):
+                  if self.userInfo.get(N.group, None) is None:
                     self.userInfo[N.group] = authId
+                  if self.userInfo.get(N.authority, None) is None:
+                    authority = N.local if self.isDevel else N.DARIAH
+                    self.userInfo[N.authority] = authority
+                  self.storeUpdate(self.userInfo)
                 self.userInfo[N.groupRep
                               ] = self.DB.groupFromId[self.userInfo[N.group]]
 
@@ -111,21 +119,17 @@ class AuthApi(UserApi):
     def _create_session(self):
         session = bottle.request.environ.get(self._session_key)
         session[N.eppn] = self.userInfo[N.eppn]
-        self.debugPrint(f'SESSION CREATED {session}')
         # session.save()
 
     def _delete_session(self):
         env = bottle.request.environ
         session = env.get(self._session_key, None)
         if session:
-            self.debugPrint(f'SESSION DELETE {session}')
             session.delete()
             # session.invalidate()
-            self.debugPrint(f'SESSION DELETED {session}')
 
     def _get_session(self):
         session = bottle.request.environ.get(self._session_key)
-        self.debugPrint(f'SESSION GET {session}')
         return session.get(N.eppn, None)
 
     def _checkLogin(self, force=False):

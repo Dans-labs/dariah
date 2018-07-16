@@ -204,7 +204,7 @@ names:
   - action
   - affiliation
   - allIds
-  - anchor
+#  - anchor
   - Approved
   - before
   - bool
@@ -213,7 +213,7 @@ names:
   - consolidated
   - criteriaEntities
   - criteriaIds
-  - crossref
+  #  - crossref
   - DARIAH
   - data
   - datetime

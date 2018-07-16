@@ -18,12 +18,13 @@ class UserApi(object):
         testUsers = {}
         records = self.DB.userLocal()
         for r in records:
+          if N.eppn in r:
             testUsers[r[N.eppn]] = r
         return testUsers
 
     def storeUpdate(self, newUserInfo):
-        eppn = newUserInfo[N.eppn]
-        email = newUserInfo[N.email]
+        eppn = newUserInfo.get(N.eppn, None)
+        email = newUserInfo.get(N.email, None)
         record = self.getUser(eppn, email=email)
         if not record:
             record = self._store(newUserInfo)
