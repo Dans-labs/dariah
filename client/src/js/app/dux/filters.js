@@ -384,7 +384,7 @@ const gatherValues = memoize(
       } else {
         const { [relTable]: { entities: relEntities } } = tables
         const relValues = Array.from(
-          new Set(fieldIds.map(_id => relEntities[_id].values[filterRelField])),
+          new Set(fieldIds.map(_id => (((relEntities[_id] || emptyO).values) || emptyO)[filterRelField])),
         ).sort()
         relValues.forEach(val => {
           fieldValues[val] = val
