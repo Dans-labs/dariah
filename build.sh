@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# use the right python
+source ~/local/python/dariah/bin/activate
+
 root=`pwd`
 webpack='node_modules/.bin/webpack'
 
@@ -122,3 +125,6 @@ else
     echo "shipcode \$1 : production - build client app and docs, commit and push to github. \$=commit message!"
     echo "shipdata    : production - transfer Filemaker legacy data to production server" 
 fi
+
+# back to normal python
+deactivate

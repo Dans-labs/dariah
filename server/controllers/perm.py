@@ -1,4 +1,4 @@
-from controllers.utils import oid, serverprint
+from controllers.utils import oid
 from models.compiled.model import model as M
 from models.compiled.names import N
 
@@ -203,7 +203,6 @@ class PermApi(object):
                 permF, asList=document is None, isOwn=isOwn, isEditor=isEditor
             ):
                 fieldSet.add(field)
-            serverprint(fieldSet)
         return (True, rowFilter, fieldSet)
 
     def _isOwn(self, table, document):

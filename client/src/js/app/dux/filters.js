@@ -401,8 +401,20 @@ export const makeTag = (select, masterId, linkField) =>
   masterId == null ? select : `${select}-${masterId}-${linkField}`
 
 const entityFieldVal = memoize(
-  relField => (tables, relTable, valId) =>
-    tables[relTable].entities[valId].values[relField],
+  relField => (tables, relTable, valId) => {
+    const {
+      [relTable]: {
+        entities: {
+          [valId]: {
+            values: {
+              [relField]: result,
+            } = emptyO,
+          } = emptyO,
+        } = emptyO,
+      } = emptyO,
+    } = tables
+    return result
+  },
   emptyO,
 )
 
