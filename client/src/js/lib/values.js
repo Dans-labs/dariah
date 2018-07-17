@@ -69,7 +69,7 @@ const valuePrepare = memoize(
           eId: value,
           kind: 'related',
           relTable: table,
-          values: relRecord.values,
+          values: (relRecord || emptyO).values,
           linkMe,
         })
         if (templateApplied) {
