@@ -402,6 +402,11 @@ export const makeTag = (select, masterId, linkField) =>
 
 const entityFieldVal = memoize(
   relField => (tables, relTable, valId) => {
+    console.warn('relTable', relTable, tables[relField])
+    console.warn('entities', tables[relTable].entities)
+    console.warn('valId', valId, tables[relTable].entities[valId])
+    console.warn('values', tables[relTable].entities[valId].values)
+    console.warn('relField', relField, tables[relTable].entities[valId].values[relField])
     const {
       [relTable]: {
         entities: {
