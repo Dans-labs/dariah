@@ -30,7 +30,8 @@ echo "UPDATE.SH: Pulling the dariah app from GitHub"
 git pull origin master
 echo "UPDATE.SH: Dariah app pulled from GitHub"
 echo "UPDATE.SH: Enabling rh-python36"
-scl enable rh-python36 bash
+source /opt/rh/rh-python36/enable
+# scl enable rh-python36 bash
 echo "UPDATE.SH: rh-python36 enabled"
 echo "UPDATE.SH: Python byte-compiling server code"
 python3 -m compileall server
