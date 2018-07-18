@@ -1,4 +1,5 @@
 import os
+import re
 import bottle
 from beaker.middleware import SessionMiddleware
 from controllers.user import UserApi
@@ -8,6 +9,36 @@ from models.compiled.names import N
 
 PM = M[N.permissions]
 
+CSS = '<link href="/static/dist/main.css" rel="stylesheet">'
+JS = '''
+  <script type="text/javascript" src="/static/dist/vendor.js"></script>
+  <script type="text/javascript" src="/static/dist/app.js"></script>
+  <script type="text/javascript" src="/static/dist/main.js"></script>
+'''
+
+DYN_INFO_FILE = '../static/dist/bundle.html'
+
+cssRe = re.compile('<link [^>]*>', re.S)
+jsRe = re.compile('<body>(.*)</body>', re.S)
+
+
+def readBundleNames():
+  if os.path.exists(DYN_INFO_FILE):
+    serverprint('READ DYN INFO FILE')
+    with open(DYN_INFO_FILE) as dh:
+      html = dh.read()
+    html = html.replace('src="', 'src="../static/dist/')
+    html = html.replace('href="', 'href="../static/dist/')
+    match = cssRe.search(html)
+    css = match.group(0)
+    match = jsRe.search(html)
+    js = match.group(1).strip().replace('</script><script', '</script>\n<script')
+  else:
+    serverprint('STATIC INFO')
+    css = CSS
+    js = JS
+  return (css, js)
+
 
 class AuthApi(UserApi):
     def __init__(self, DB, secret_file):
@@ -15,6 +46,10 @@ class AuthApi(UserApi):
 
         # determine production or devel
         self.isDevel = os.environ.get(N.REGIME, None) == N.devel
+
+        # read the code to import the generated CSS and Javascripts when in production
+
+        (self.CSS, self.JS) = readBundleNames()
 
         # read secret from the system
         self.secret = ''

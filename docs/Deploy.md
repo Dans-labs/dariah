@@ -259,3 +259,24 @@ overview of what it can do, or run
     ./build.sh
 
 (without arguments).
+
+### Cache busting
+
+When this app is developed, and a new version is released, we want browsers to pick
+it up, instead of serving the old version from cache.
+
+That is why new bundles always have different names.
+
+Webpack provide a bit of infrastructure to append *hashes* after the chunks that make up a bundle.
+The other thing is to pick those names up in the html template that embodies the Single Page App:
+[index.tpl]({{site.serverBase}}/views/index.tpl).
+
+You see that the links to the CSS and the Javascript are variable elements of this template.
+When the server starts, it may encounter two cases:
+
+*   there is no `/static/dist` directory. That means that we are in development mode
+    running under the webpack dev-server. In this case we do not use hashed names,
+    and the server can use fixed file names for the css and js code.
+*   there is a `/static/dist` directory. In there is a webpack generated minimal html file
+    that includes the css and js bundles. The server extracts that info when it starts up and
+    uses it to fill the template variables. 

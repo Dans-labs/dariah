@@ -10,6 +10,7 @@ module.exports = merge(common, {
     _who: 'webpack/hot/only-dev-server',
   },
   output: {
+    filename: '[name].js',
     publicPath: 'http://localhost:8080/static/dist/',
   },
   module: {
@@ -34,10 +35,11 @@ module.exports = merge(common, {
     new webpack.NamedModulesPlugin(),
     new webpack.LoaderOptionsPlugin({ options: {} }),
   ],
-  devtool: 'inline-source-map', 
+  devtool: 'inline-source-map',
   devServer: {
     publicPath: '/static/dist/',
     proxy: {
+      '/': 'http://localhost:8001',
       '/static/': 'http://localhost:8001',
       '/favicons': 'http://localhost:8001',
       '/api': 'http://localhost:8001',
@@ -46,6 +48,7 @@ module.exports = merge(common, {
       '/slogout': 'http://localhost:8001',
     },
     historyApiFallback: {
+      index: '/',
       disableDotRule: true,
     }
   },

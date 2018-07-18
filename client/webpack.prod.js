@@ -1,6 +1,7 @@
 const webpack = require('webpack')
 
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 module.exports = {
@@ -10,7 +11,7 @@ module.exports = {
     main: './css/main.css',
   },
   output: {
-    filename: '[name].js',
+    filename: '[name].[chunkhash].js',
     path: __dirname + '/../static/dist',
   },
   resolve: {
@@ -87,6 +88,10 @@ module.exports = {
       chunkFileName: '[id].css',
     }),
     new CleanWebpackPlugin(['../static/dist'], { allowExternal: true }),
+    new HtmlWebpackPlugin({
+      template: __dirname + '/../client/src/html/bundle.html',
+      filename: __dirname + '/../static/dist/bundle.html',
+    }),
   ],
   optimization: {
     splitChunks: {

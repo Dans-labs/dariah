@@ -1,5 +1,5 @@
 import bottle
-from bottle import post, get, route, template, response
+from bottle import post, get, route, template
 
 from controllers.db import DbAccess
 from controllers.file import FileApi
@@ -16,7 +16,7 @@ app = Auth.app
 
 @route('/static/<filepath:path>')
 def serveStatic(filepath):
-    return File.static(filepath)
+  return File.static(filepath)
 
 
 @route('/favicons/<filepath:path>')
@@ -24,49 +24,55 @@ def serveFavicons(filepath):
     return File.static('favicons/{}'.format(filepath))
 
 
+@route('/index.html')
+def serveIndex():
+  print('serveIndex')
+  return template('index', css=Auth.CSS, js=Auth.JS)
+
+
 @route('/api/json/<doc:re:[/A-Za-z0-9_.-]+>')
 def serveApiJson(doc):
-    return File.json(doc)
+  return File.json(doc)
 
 
 @route('/api/file/<doc:re:[/A-Za-z0-9_.-]+>')
 def serveApiFile(doc):
-    return File.static(doc)
+  return File.static(doc)
 
 
 @route('/api/db/who/ami')
 def serveApiDbWho():
-    Auth.authenticate()
-    return Auth.deliver()
+  Auth.authenticate()
+  return Auth.deliver()
 
 
 @post('/api/db/<verb:re:[a-z0-9_]+>')
 @get('/api/db/<verb:re:[a-z0-9_]+>')
 def serveApiDb(verb):
-    Auth.authenticate()
-    Perm = PermApi(Auth)
-    return Controller.data(verb, Perm)
+  Auth.authenticate()
+  Perm = PermApi(Auth)
+  return Controller.data(verb, Perm)
 
 
 @route('/slogout')
 def serveSlogout():
-    Auth.deauthenticate()
-    bottle.redirect('/Shibboleth.sso/Logout')
+  Auth.deauthenticate()
+  bottle.redirect('/Shibboleth.sso/Logout')
 
 
 @route('/login')
 def serveLogin():
-    Auth.authenticate(login=True)
-    return template('index')
+  Auth.authenticate(login=True)
+  return template('index', css=Auth.CSS, js=Auth.JS)
 
 
 @route('/logout')
 def serveLogout():
-    Auth.deauthenticate()
-    return template('index')
+  Auth.deauthenticate()
+  return template('index', css=Auth.CSS, js=Auth.JS)
 
 
 @route('/<anything:re:.*>')
 def client(anything):
-    Auth.authenticate()
-    return template('index')
+  Auth.authenticate()
+  return template('index', css=Auth.CSS, js=Auth.JS)
