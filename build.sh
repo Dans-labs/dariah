@@ -15,7 +15,10 @@ function codestats {
     cat $rf
 }
 
-if [[ "$1" == "module" ]]; then
+if [[ "$1" == "python" ]]; then
+    source ~/local/python/dariah/bin/activate
+    bash
+elif [[ "$1" == "module" ]]; then
     cd client
     if [[ "$2" == "" ]]; then
         npm install
@@ -107,6 +110,7 @@ else
     fi
     echo "./build.sh <task>"
     echo "    where <task> is one of:"
+    echo "python      : activate the version of python used for dariah"
     echo "module      : js module management - install all modules in package.json from npm"
     echo "module \$1   : js module management - install single module \$1"
     echo "xmodule \$1  : js module management - remove single module \$1"

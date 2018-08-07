@@ -113,7 +113,7 @@ def mongoRows(rowFilter):
 def andRows(rowFilter1, rowFilter2):
     free1 = rowFilter1 is True or rowFilter1 is None
     free2 = rowFilter2 is True or rowFilter2 is None
-    if free1 and free2 is True:
+    if free1 and free2:
         return {}
     if free1:
         return mongoRows(rowFilter2)
