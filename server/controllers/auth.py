@@ -27,8 +27,8 @@ def readBundleNames():
     serverprint('READ DYN INFO FILE')
     with open(DYN_INFO_FILE) as dh:
       html = dh.read()
-    html = html.replace('src="', 'src="../static/dist/')
-    html = html.replace('href="', 'href="../static/dist/')
+    html = html.replace('src="', 'src="/static/dist/')
+    html = html.replace('href="', 'href="/static/dist/')
     match = cssRe.search(html)
     css = match.group(0)
     match = jsRe.search(html)
