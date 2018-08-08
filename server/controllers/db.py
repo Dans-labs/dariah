@@ -401,6 +401,21 @@ class DbAccess(object):
         title = tableInfo[N.title]
         item = tableInfo[N.item]
         sort = tableInfo[N.sort]
+        extraTables = tableInfo.get(N.extra, [])
+
+        for extraTable in extraTables:
+            self._getList(
+                controller,
+                extraTable,
+                data,
+                msgs,
+                titleOnly=False,
+                withValueLists=True,
+                withDetails=True,
+                my=False,
+                verbose=False,
+            )
+
         mayInsert = Perm.allow(
             table,
             N.insert,

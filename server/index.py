@@ -26,7 +26,6 @@ def serveFavicons(filepath):
 
 @route('/index.html')
 def serveIndex():
-  print('serveIndex')
   return template('index', css=Auth.CSS, js=Auth.JS)
 
 

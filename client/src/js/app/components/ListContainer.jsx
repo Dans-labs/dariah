@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { combineSelectors, emptyA } from 'utils'
-import { loadExtra } from 'workflow'
+import { combineSelectors } from 'utils'
 
-import { getTables, needTables, fetchTables, MYIDS } from 'tables'
+import { getTables, needTables, fetchTable, MYIDS } from 'tables'
 import { getFilters, makeTag } from 'filters'
 
 import ErrorBoundary from 'ErrorBoundary'
@@ -22,7 +21,7 @@ class ListContainer extends Component {
     if (
       needTables(
         tables,
-        [[table, select, complete]].concat(loadExtra[table] || emptyA),
+        [[table, select, complete]],
       )
     ) {
       return <div />
@@ -84,20 +83,12 @@ class ListContainer extends Component {
   componentDidMount() {
     const { props: { tables, table, select, extra, mode, dispatch } } = this
     const complete = mode === 'grid'
-    fetchTables(
-      tables,
-      [[table, select, extra, complete]].concat(loadExtra[table] || emptyA),
-      dispatch,
-    )
+    fetchTable(tables, table, select, extra, complete, dispatch)
   }
   componentDidUpdate() {
     const { props: { tables, table, select, extra, mode, dispatch } } = this
     const complete = mode === 'grid'
-    fetchTables(
-      tables,
-      [[table, select, extra, complete]].concat(loadExtra[table] || emptyA),
-      dispatch,
-    )
+    fetchTable(tables, table, select, extra, complete, dispatch)
   }
 }
 

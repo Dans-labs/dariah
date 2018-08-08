@@ -84,6 +84,7 @@ class N:
     expand = 'expand'
     expanded = 'expanded'
     explanation = 'explanation'
+    extra = 'extra'
     field = 'field'
     fieldOrder = 'fieldOrder'
     fieldSpecs = 'fieldSpecs'

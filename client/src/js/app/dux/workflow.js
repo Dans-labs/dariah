@@ -13,12 +13,6 @@ export const CRITERIA_TABLE = 'criteria'
 export const TYPE_TABLE = 'typeContribution'
 export const TYPE_FIELD = 'typeContribution'
 
-/* CONFIGURATION */
-
-export const loadExtra = {
-  contrib: [['package'], ['criteria'], ['typeContribution'], ['decision']],
-}
-
 /* ACTIONS */
 
 export const fetchWorkflow = accessData({

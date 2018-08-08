@@ -271,6 +271,12 @@ details:
     mode: list
     filtered: false
 
+extra:
+  - package
+  - criteria
+  - typeContribution
+  - decision
+
 filters:
   - field: title
     label: title

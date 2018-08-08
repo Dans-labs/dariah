@@ -284,6 +284,7 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                     'linkField': 'contrib',
                                                     'mode': 'list',
                                                     'table': 'review'}},
+                           'extra': ['package', 'criteria', 'typeContribution', 'decision'],
                            'fieldOrder': [ 'title',
                                            'year',
                                            'country',

@@ -25,7 +25,7 @@ export const MYIDS = 'myIds'
  * Most actions call accessData, which will dispatch the ultimate fetch action.
  */
 
-export const fetchTable = (table, select = ALLIDS, extra, complete) =>
+const fetchTableAction = (table, select = ALLIDS, extra, complete) =>
   accessData({
     type: 'fetchTable',
     contentType: 'db',
@@ -36,12 +36,10 @@ export const fetchTable = (table, select = ALLIDS, extra, complete) =>
     table,
   })
 
-export const fetchTables = (tables, tableList, dispatch) => {
-  tableList.forEach(([table, select = ALLIDS, extra, complete = true]) => {
-    if (needTable(tables, table, select, complete)) {
-      dispatch(fetchTable(table, select, extra, complete))
-    }
-  })
+export const fetchTable = (tables, table, select = ALLIDS, extra, complete = true, dispatch) => {
+  if (needTable(tables, table, select, complete)) {
+    dispatch(fetchTableAction(table, select, extra, complete))
+  }
 }
 
 export const fetchItem = (table, eId, head) =>
