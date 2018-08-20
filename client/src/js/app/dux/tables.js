@@ -336,7 +336,7 @@ export const needTable = (tables, table, select = ALLIDS, complete) => {
   if (complete && !hasTableKey(tables, table, 'complete', true)) {
     return true
   }
-  const { [table]: { fieldSpecs } } = tables
+  const { [table]: { fieldSpecs = emptyO } = emptyO } = tables
   const relTables = Array.from(
     new Set(
       Object.entries(fieldSpecs)

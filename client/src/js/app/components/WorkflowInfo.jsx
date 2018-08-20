@@ -14,7 +14,7 @@ class WorkflowInfo extends Component {
   }
 
   render() {
-    const { props: { workflow: { resets, stats, total } = emptyO } } = this
+    const { props: { workflow: { resets, stats = emptyO, total } = emptyO } } = this
     if (total == null) {
       return <div>{'No workflow reset information'}</div>
     }
@@ -28,7 +28,7 @@ class WorkflowInfo extends Component {
           <Fragment key={attribute}>
             <p><b>{attribute}</b></p>
             <ul>
-            {Object.entries(tableInfo).map(([table, count]) => (
+            {Object.entries(tableInfo || emptyO).map(([table, count]) => (
             <li key={table}>{`${table}: ${count} x`}</li>
             ))}
           </ul>

@@ -171,9 +171,9 @@ export const compileActive = (tables, field) => {
     return field ? emptySet : emptyO
   }
   const {
-    [PACKAGE_TABLE]: { entities: entitiesPkg },
-    [CRITERIA_TABLE]: { entities: entitiesCri },
-    [TYPE_TABLE]: { entities: entitiesTyp },
+    [PACKAGE_TABLE]: { entities: entitiesPkg = emptyO } = emptyO,
+    [CRITERIA_TABLE]: { entities: entitiesCri = emptyO } = emptyO,
+    [TYPE_TABLE]: { entities: entitiesTyp = emptyO } = emptyO,
   } = tables
   return compileActiveItems(entitiesPkg, entitiesTyp, entitiesCri, field)
 }

@@ -134,7 +134,7 @@ export const compileValues = memoize(
   (tables, table, filterTag, listIds, filterField, filterRelField) => {
     const { [table]: tableData } = tables
     if (tableData == null) {
-      return emptyA
+      return emptyO
     }
     const { fieldSpecs } = tableData
     const fieldIds = compileFieldIds(tableData, filterTag, listIds)[filterField]
