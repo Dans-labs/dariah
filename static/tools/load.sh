@@ -36,6 +36,10 @@ fi
 
 cd $ADIR/$APP
 
+# scl enable rh-python36 bash
+source /opt/rh/rh-python36/enable
+echo "UPDATE.SH: rh-python36 enabled"
+
 if [ "$1" == "-r" ]; then
     cd static/tools
     python3 mongoFromFm.py production -r

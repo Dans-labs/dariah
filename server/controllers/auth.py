@@ -38,7 +38,7 @@ def readBundleNames(regime):
 
   There are three scenarios for running the DARIAH app:
   (1) a production build served by a production webserver
-  (2) a develop build served by the local bottle webserver
+  (2) a production build served by the local bottle webserver
   (3) a develop build served by the webpack devserver
 
   For cases 1 and 2 we need the hashed filenames, but for case 3 we do not.
@@ -50,9 +50,8 @@ def readBundleNames(regime):
     it will set the environment variable REGIME to "hot"
 
   The DYN_INFO_FILE will be created by the build script for the client with argument:
-  In case (1): "prod" or "shipcode"
-  In case (2): "dev"
-  In case (3): "hot"
+    "prod" or "shipcode" : for cases (1) and (2)
+    "hot" : for case (3)
   """
   if regime == N.hot:
     serverprint('STATIC INFO')

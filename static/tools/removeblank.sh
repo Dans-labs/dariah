@@ -31,6 +31,10 @@ fi
 git pull origin master
 
 cd static/tools
+
+# scl enable rh-python36 bash
+source /opt/rh/rh-python36/enable
+echo "UPDATE.SH: rh-python36 enabled"
 python3 removeblank.py
 
 if [ $ON_CLARIN ]; then
