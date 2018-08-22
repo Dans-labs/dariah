@@ -22,21 +22,57 @@ cssRe = re.compile('<link [^>]*>', re.S)
 jsRe = re.compile('<body>(.*)</body>', re.S)
 
 
-def readBundleNames():
-  if os.path.exists(DYN_INFO_FILE):
-    serverprint('READ DYN INFO FILE')
-    with open(DYN_INFO_FILE) as dh:
-      html = dh.read()
-    html = html.replace('src="', 'src="/static/dist/')
-    html = html.replace('href="', 'href="/static/dist/')
-    match = cssRe.search(html)
-    css = match.group(0)
-    match = jsRe.search(html)
-    js = match.group(1).strip().replace('</script><script', '</script>\n<script')
-  else:
+def readBundleNames(regime):
+  """Cache busting
+
+  For production, the JS and CSS bundles for the browser
+  have names with a random hash in it, so that an update of
+  the app will trigger all clients to fetch a new version
+  of these bundles instead of relying on their cached versions.
+
+  The server generates the HTML index page that will load these bundles,
+  to we have to fiddle those hashes into the index template.
+
+  We have set up the client build script (webpack) in such a way
+  that the hashed file names are written to DYN_INFO_FILE.
+
+  There are three scenarios for running the DARIAH app:
+  (1) a production build served by a production webserver
+  (2) a develop build served by the local bottle webserver
+  (3) a develop build served by the webpack devserver
+
+  For cases 1 and 2 we need the hashed filenames, but for case 3 we do not.
+
+  In case (1) the build script for serving will not be run and REGIME will not be set
+  In case (2), use build script with argument "serve":
+    it will set the environment variable REGIME to "develop"
+  In case (3), use build script with argument "servehot":
+    it will set the environment variable REGIME to "hot"
+
+  The DYN_INFO_FILE will be created by the build script for the client with argument:
+  In case (1): "prod" or "shipcode"
+  In case (2): "dev"
+  In case (3): "hot"
+  """
+  if regime == N.hot:
     serverprint('STATIC INFO')
     css = CSS
     js = JS
+  else:
+    if not os.path.exists(DYN_INFO_FILE):
+      serverprint(f'CANNOT READ {DYN_INFO_FILE}. Falling back to static info ...')
+      css = CSS
+      js = JS
+    else:
+      serverprint(f'DYNAMIC INFO from {DYN_INFO_FILE}')
+      with open(DYN_INFO_FILE) as dh:
+        html = dh.read()
+      html = html.replace('src="', 'src="/static/dist/')
+      html = html.replace('href="', 'href="/static/dist/')
+      match = cssRe.search(html)
+      css = match.group(0)
+      match = jsRe.search(html)
+      js = match.group(1).strip().replace('</script><script', '</script>\n<script')
   return (css, js)
 
 
@@ -45,11 +81,12 @@ class AuthApi(UserApi):
         super().__init__(DB)
 
         # determine production or devel
-        self.isDevel = os.environ.get(N.REGIME, None) == N.devel
+        regime = os.environ.get(N.REGIME, None)
+        self.isDevel = regime in {N.devel, N.hot}
 
         # read the code to import the generated CSS and Javascripts when in production
 
-        (self.CSS, self.JS) = readBundleNames()
+        (self.CSS, self.JS) = readBundleNames(regime)
 
         # read secret from the system
         self.secret = ''

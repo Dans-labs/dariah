@@ -59,6 +59,10 @@ elif [[ "$1" == "serve" ]]; then
 	cd server
     python3 compile.py
     export REGIME=devel; python3 -m bottle --debug --reload --bind localhost:8001 index:app
+elif [[ "$1" == "servehot" ]]; then
+	cd server
+    python3 compile.py
+    export REGIME=hot; python3 -m bottle --debug --reload --bind localhost:8001 index:app
 elif [[ "$1" == "hot" ]]; then
     cd client
     export NODE_ENV="development"

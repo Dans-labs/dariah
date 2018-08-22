@@ -104,6 +104,7 @@ class N:
     groupValues = 'groupValues'
     groups = 'groups'
     grow = 'grow'
+    hot = 'hot'
     id = 'id'
     inactive = 'inactive'
     incomplete = 'incomplete'

@@ -228,6 +228,7 @@ names:
   - groupDesc
   - groupRep
   - groupValues
+  - hot
   - id
   - info
   - insertValues

@@ -30,20 +30,26 @@ const tableLinks = (me, { name, forWhom, details }) =>
         {(details || emptyA)
           .filter(({ forWhom: subFor }) => forMe(me.groupRep, subFor))
           .map(
-            ({ button, component, path, name: subName, hint }) =>
-              component == null ? (
-                <Tooltip key={path} tip={hint} at={'right'}>
-                  <NavLink
-                    to={path}
-                    className={button ? 'button large workflow info' : emptyS}
-                    activeClassName={'active'}
-                  >
-                    {subName}
-                  </NavLink>
-                </Tooltip>
-              ) : (
-                component
-              ),
+            ({ button, component, cName, path, name: subName, hint }) =>
+            <Tooltip
+              key={component == null ? path : cName}
+              tip={hint}
+              at={'right'}
+            >
+                {
+                  component == null ? (
+                      <NavLink
+                        to={path}
+                        className={button ? 'button large workflow info' : emptyS}
+                        activeClassName={'active'}
+                      >
+                        {subName}
+                      </NavLink>
+                  ) : (
+                    component
+                  )
+                }
+              </Tooltip>
           )}
       </div>
     </div>
@@ -85,6 +91,7 @@ const navBarItems = [
         component: (
           <Insert key={'newcontrib'} table={'contrib'} thing={'contribution'} />
         ),
+        cName: Insert.displayName,
         forWhom: 'auth',
         hint: 'Start here to add a contribution',
       },
