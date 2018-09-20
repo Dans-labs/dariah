@@ -7,7 +7,7 @@ Root
 
 All API calls are structured like this:
 
-`{{site.liveBase}}`**verb**`?`**parameters**
+`{{site.liveBase}}`/api/db/**verb**`?`**parameters**
 
 Below there is a partial specification of the verbs and their parameters.
 
