@@ -603,7 +603,8 @@ class FMConvert(object):
         groupMapping = dict()
         groups = []
         collectionName = 'permissionGroup'
-        for (name, description) in sorted(self.groups.items()):
+        for name in self.groupsOrder:
+            description = self.groups[name]
             g = dict(rep=name, description=description)
             g['_id'] = self.mongo.newId('group')
             groups.append(g)

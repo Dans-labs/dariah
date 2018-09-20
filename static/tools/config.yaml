@@ -85,6 +85,17 @@ groups:
   edit:   authenticated user and editor of records in question
   coord:  national coordinator
 
+groupsOrder:
+  - public
+  - auth
+  - own
+  - office
+  - system
+  - root
+  - nobody
+  - edit
+  - coord
+
 countryExtra:
   AM:
     name: Armenia
