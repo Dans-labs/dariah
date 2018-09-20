@@ -86,13 +86,13 @@ groups:
   coord:  national coordinator
 
 groupsOrder:
-  - public
   - auth
-  - own
-  - office
-  - system
-  - root
   - nobody
+  - office
+  - own
+  - public
+  - root
+  - system
   - edit
   - coord
 
