@@ -22,6 +22,7 @@ fieldOrder:
   - name
   - firstName
   - lastName
+  - country
   - org
   - rel
   - membership
@@ -71,6 +72,18 @@ fieldSpecs:
       update: office
     label: Last name
     valType: text
+    multiple: false
+  country:
+    perm:
+      list:   public
+      read:   public
+      update: office
+    label: Country
+    valType:
+      relTable: country
+      select:
+        isMember: true
+      allowNew: false
     multiple: false
   org:
     perm:

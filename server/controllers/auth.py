@@ -47,11 +47,11 @@ def readBundleNames(regime):
   In case (2), use build script with argument "serve":
     it will set the environment variable REGIME to "develop"
   In case (3), use build script with argument "servehot":
-    it will set the environment variable REGIME to "hot"
+    it will set the environment variable REGIME to `hot`
 
   The DYN_INFO_FILE will be created by the build script for the client with argument:
     "prod" or "shipcode" : for cases (1) and (2)
-    "hot" : for case (3)
+    `hot` : for case (3)
   """
   if regime == N.hot:
     serverprint('STATIC INFO')

@@ -75,13 +75,15 @@ CREATOR:
 # so we make a fixed group table
 
 groups:
-  public: unauthenticated user
+  public: user, not logged in
   auth:   authenticated user
   own:    authenticated user and creator of records in question
   office: management user
   system: system administrator
   root:   all powerful
   nobody: nobody
+  edit:   authenticated user and editor of records in question
+  coord:  national coordinator
 
 countryExtra:
   AM:

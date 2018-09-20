@@ -42,6 +42,7 @@ class N:
     contrib = 'contrib'
     contribution = 'contribution'
     contributions = 'contributions'
+    coord = 'coord'
     costDescription = 'costDescription'
     costTotal = 'costTotal'
     countries = 'countries'

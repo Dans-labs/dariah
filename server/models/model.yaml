@@ -83,6 +83,7 @@ permissions:
     auth:   authenticated user
     edit:   authenticated user and editor of records in question
     own:    authenticated user and creator of records in question
+    coord:  national coordinator
     office: back office user
     system: system administrator
     root: full control
@@ -95,6 +96,7 @@ permissions:
     - EDIT
     - own
     - OWN
+    - coord
     - office
     - system
     - root
@@ -104,6 +106,14 @@ permissions:
     public: 
       public: 1
     auth:
+      public: 1
+      auth:   1
+      edit:  -2
+      EDIT:  -2
+      own:   -1
+      OWN:   -1
+      ownLT: -1
+    coord:
       public: 1
       auth:   1
       edit:  -2
