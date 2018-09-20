@@ -15,9 +15,11 @@ import Tooltip from 'Tooltip'
 const levels = {
   public: 1,
   auth: 2,
-  office: 3,
-  system: 4,
-  root: 5,
+  coord: 3,
+  office: 4,
+  system: 5,
+  root: 6,
+  nobody: 7,
 }
 
 const forMe = (my, item) => levels[my] >= levels[item]
