@@ -2,6 +2,8 @@ import bottle
 from bottle import post, get, route, template
 
 from controllers.db import DbAccess
+from controllers.info import getInfo, selectContrib
+from controllers.info import getInfo
 from controllers.file import FileApi
 from controllers.controller import Controller
 from controllers.auth import AuthApi
@@ -12,6 +14,10 @@ DB = DbAccess()
 Auth = AuthApi(DB, '/opt/web-apps/dariah_jwt.secret')
 Controller = Controller(DB)
 app = Auth.app
+
+infoPages = set('''
+    ourcountry
+'''.strip().split())
 
 
 @route('/static/<filepath:path>')
@@ -29,6 +35,15 @@ def serveIndex():
   return template('index', css=Auth.CSS, js=Auth.JS)
 
 
+@route('/info/<verb:re:[a-z0-9_]+>')
+def serveInfo(verb):
+  Auth.authenticate()
+  if verb in infoPages:
+    data = getInfo(verb, Auth.userInfo)
+    return(template('info', userInfo=Auth.userInfo, **data))
+  return template('index', css=Auth.CSS, js=Auth.JS)
+
+
 @route('/api/json/<doc:re:[/A-Za-z0-9_.-]+>')
 def serveApiJson(doc):
   return File.json(doc)
@@ -43,6 +58,13 @@ def serveApiFile(doc):
 def serveApiDbWho():
   Auth.authenticate()
   return Auth.deliver()
+
+
+@post('/api/db/selectc')
+@get('/api/db/selectc')
+def selectC():
+  Auth.authenticate()
+  return selectContrib(Auth.userInfo)
 
 
 @post('/api/db/<verb:re:[a-z0-9_]+>')

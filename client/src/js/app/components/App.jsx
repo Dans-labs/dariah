@@ -48,6 +48,7 @@ const App = ({ win }) => {
           <Redirect exact={true} from={'/docs'} to={'/docs/about.md'} />
           <Redirect exact={true} from={'/about'} to={'/docs/about.md'} />
           <Redirect exact={true} from={'/docs/about'} to={'/docs/about.md'} />
+          <Redirect from={'/info/ourcountry'} to={'/info/ourcountry'} />
           <Route path={'/docs/:docFile'} component={Doc} />
           <Route path={'/tech/docs/gen/:docFile'} component={Doc} />
           <Route path={'/tech/docs/:docFile'} component={Doc} />

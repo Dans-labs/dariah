@@ -118,6 +118,8 @@ def checkNames(names, extraNames):
     Nnames = collections.Counter()
     for path in glob('{}/*.py'.format(controllers)):
         fName = os.path.splitext(os.path.basename(path))[0]
+        if fName == 'info':
+          continue
         with open(path) as ph:
             for (i, line) in enumerate(ph):
                 line = line.strip()

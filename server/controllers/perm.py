@@ -30,7 +30,6 @@ class PermApi(object):
         controller=None,
         document=None,
         newValues=None,
-        extraMy=None,
         verbose=True,
     ):
         # sanity checks

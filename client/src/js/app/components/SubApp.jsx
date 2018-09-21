@@ -32,7 +32,7 @@ const tableLinks = (me, { name, forWhom, details }) =>
         {(details || emptyA)
           .filter(({ forWhom: subFor }) => forMe(me.groupRep, subFor))
           .map(
-            ({ button, component, cName, path, name: subName, hint }) =>
+            ({ forWhom, button, component, cName, path, name: subName, hint, ...atts }) =>
             <Tooltip
               key={component == null ? path : cName}
               tip={hint}
@@ -44,6 +44,7 @@ const tableLinks = (me, { name, forWhom, details }) =>
                         to={path}
                         className={button ? 'button large workflow info' : emptyS}
                         activeClassName={'active'}
+                        {...atts}
                       >
                         {subName}
                       </NavLink>
@@ -143,6 +144,20 @@ const navBarItems = [
         forWhom: 'auth',
         hint: 'my reviews',
         button: true,
+      },
+    ],
+  },
+  {
+    name: 'Our country',
+    forWhom: 'auth',
+    details: [
+      {
+        path: '/info/ourcountry',
+        name: 'Our contributions',
+        forWhom: 'auth',
+        hint: 'Contributions coming from our country',
+        button: true,
+        target: '_self',
       },
     ],
   },

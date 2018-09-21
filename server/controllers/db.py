@@ -81,6 +81,7 @@ class DbAccess(object):
         withValueLists=True,
         withDetails=True,
         my=False,
+        our=False,
     ):
         data = {}
         msgs = []
@@ -93,6 +94,7 @@ class DbAccess(object):
             withValueLists=withValueLists,
             withDetails=withDetails,
             my=my,
+            our=our,
         )
         return self.stop({N.data: data, N.msgs: msgs})
 
@@ -373,6 +375,7 @@ class DbAccess(object):
         withValueLists=True,
         withDetails=True,
         my=False,
+        our=False,
         verbose=True,
     ):
         if table in data:
@@ -381,14 +384,12 @@ class DbAccess(object):
         MONGO = self.MONGO
         WF = self.WF
         Perm = self.Perm
-        extraMy = my if type(my) is list else None
 
         (good, rowFilter, fieldSet) = Perm.allow(
             table,
             N.list,
             msgs,
             controller=controller,
-            extraMy=extraMy,
             verbose=verbose,
         )
 
@@ -413,6 +414,7 @@ class DbAccess(object):
                 withValueLists=True,
                 withDetails=True,
                 my=False,
+                our=False,
                 verbose=False,
             )
 
@@ -467,6 +469,8 @@ class DbAccess(object):
         }
         if my:
             result[N.myIds] = allIds
+        elif our:
+            result[N.ourIds] = allIds
         else:
             result[N.allIds] = allIds
 

@@ -32,6 +32,11 @@ class Controller(object):
         complete = getq(N.complete) == N.true
         return self.DB.getList(name, table, titleOnly=not complete, my=True)
 
+    def ourlist(self, name):
+        table = getq(N.table)
+        complete = getq(N.complete) == N.true
+        return self.DB.getList(name, table, titleOnly=not complete, my=False, our=True)
+
     def myassign(self, name):
         table = getq(N.table)
         complete = getq(N.complete) == N.true
