@@ -243,7 +243,6 @@ class AuthApi(UserApi):
             sKey = 'Shib-Session-ID'
             authenticated = sKey in env and env[sKey]
             if authenticated:
-                print('XXX', env)
                 self.userInfo = {
                     N.eppn: utf8FromLatin1(env[N.eppn]),
                     N.email: utf8FromLatin1(env[N.mail]),
