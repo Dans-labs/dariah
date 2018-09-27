@@ -2,6 +2,7 @@ import json
 from bottle import request, install, JSONPlugin
 from pymongo import MongoClient
 from controllers.utils import (
+    oid,
     json_string,
 )
 
@@ -13,6 +14,20 @@ VCC = {None: '??'}
 TYPE = {None: '??'}
 
 COORD = 'coord'
+
+CONTRIB_COLSPECS = (
+    ('vcc', str, 'VCC'),
+    ('year', int),
+    ('type', str),
+    ('cost', int,),
+    ('selected', bool),
+    ('title', str),
+)
+CONTRIB_COLS = [c[0] for c in CONTRIB_COLSPECS]
+CONTRIB_COLSET = {c[0] for c in CONTRIB_COLSPECS}
+CONTRIB_TYPES = dict((c[0], c[1]) for c in CONTRIB_COLSPECS)
+CONTRIB_LABELS = dict((c[0], c[2] if len(c) > 2 else c[0]) for c in CONTRIB_COLSPECS)
+CONTRIB_SORT_DEFAULT = CONTRIB_COLS[-1]
 
 
 def dbAccess():
@@ -78,10 +93,10 @@ def selectContrib(userInfo):
     return {
         'good': False,
         'kind': 'error',
-        'msg': 'You try to select contributions of another country than your own',
+        'msg': 'You try to select a contribution of another country than your own',
     }
 
-  value = request.json.get('selected', None)
+  value = request.json.get('select', None)
   MONGO.contrib.update_one(
       {'_id': contribId},
       {'$set': {'selected': value}},
@@ -94,11 +109,58 @@ def selectContrib(userInfo):
 def getInfo(verb, userInfo):
   dbAccess()
   if verb == 'ourcountry':
-    return getOurcountry(userInfo)
+    sortCol = request.query.sortcol
+    reverse = request.query.reverse
+    if sortCol not in CONTRIB_COLSET:
+      sortCol = CONTRIB_SORT_DEFAULT
+    if reverse not in {'-1', '1'}:
+      reverse = False
+    else:
+      reverse = reverse == '-1'
+    return getOurcountry(userInfo, sortCol, reverse)
   return {}
 
 
-def getOurcountry(userInfo):
+def ourCountryHeaders(sortCol, reverse):
+  headers = '<tr>'
+  dirClass = 'desc' if reverse else 'asc'
+  dirIcon = 'angle-down' if reverse else 'angle-up'
+  for col in CONTRIB_COLS:
+    isSorted = col == sortCol
+    if isSorted:
+      thisClass = dirClass
+      nextReverse = not reverse
+      icon = f'&nbsp;<span class="fa fa-{dirIcon}"/>'
+    else:
+      thisClass = ''
+      nextReverse = False
+      icon = ''
+    reverseRep = -1 if nextReverse else 1
+    label = CONTRIB_LABELS[col]
+    colControl = f'<a href="/info/ourcountry?sortcol={col}&reverse={reverseRep}">{label}{icon}</a>'
+    headers += f'''
+    <th class="och {thisClass}">{colControl}</th>
+  '''
+  headers += '</tr>'
+  return headers
+
+
+def contribKey(col):
+  colType = CONTRIB_TYPES[col]
+
+  def makeKey(contrib):
+    value = contrib.get(col, 0)
+    if value is None:
+      return '' if colType is str else 0
+    if colType is str:
+      return value.lower()
+    if colType is bool:
+      return 1 if value else -1
+    return value
+  return makeKey
+
+
+def getOurcountry(userInfo, sortCol, reverse):
   group = userInfo.get('groupRep', 'public')
   editable = group == COORD
   countryId = userInfo.get('country', None)
@@ -129,31 +191,35 @@ def getOurcountry(userInfo):
 <h1>Contributions from {full}</h1>
 <table class="cc">
 <tbody>
-  <tr>
-    <th>VCC</th>
-    <th>year</th>
-    <th>type</th>
-    <th>cost</th>
-    <th>selected</th>
-    <th>title</th>
-  </tr>
+  {ourCountryHeaders(sortCol, reverse)}
 '''
 
         contribs = []
+        contribSelection = {}
         for doc in MONGO.contrib.find({'country': countryId}):
+          contribId = doc.get('_id', None)
+          contribSelected = doc.get('selected', None)
           contribs.append({
-              '_id': doc.get('_id', None),
+              '_id': contribId,
               'year': YEAR.get(doc.get('year', None), '??'),
               'vcc': ' + '.join(VCC.get(d, '??') for d in doc.get('vcc', [])),
               'type': TYPE.get(doc.get('typeContribution', None), '??'),
               'title': doc.get('title', '??'),
-              'cost': euro(doc.get('costTotal', None)),
-              'selected': doc.get('selected', None)
+              'cost': doc.get('costTotal', None),
+              'selected': contribSelected,
           })
-        material += '\n'.join(formatContrib(contrib, editable) for contrib in contribs)
+          contribSelection[str(contribId)] = contribSelected
+        sortedContribs = sorted(contribs, key=contribKey(sortCol), reverse=reverse)
+        material += '\n'.join(formatContrib(contrib, editable) for contrib in sortedContribs)
         material += '''
 </tbody>
 </table>
+'''
+        if editable:
+          material += f'''
+<script>
+var contribSelection = {json.dumps(contribSelection)}
+</script>
 '''
 
   data = {
@@ -165,23 +231,11 @@ def getOurcountry(userInfo):
 def euro(amount):
   if amount is None:
     return '??'
-  return str(int(round(amount)))
+  return f'€ {int(round(amount))}'
 
 
-def editTri(tri, contribId):
-  material = ''
-  sep = ''
-  for t in (True, None, False):
-    icon = 'question' if t is None else 'check' if t else 'times'
-    className = 's-focus' if t is tri else ''
-    if t is tri:
-      elem = f'<span class="fa fa-{icon} {className}"/>'
-    else:
-      value = 'none' if t is None else 'false' if t is False else 'true'
-      elem = f'<a href="#" contrib="{contribId}" value="{value}" class="fa fa-{icon} {className}"/>'
-    material += f'{sep}{elem}'
-    sep = '&nbsp;'
-  return material
+def editTri(contribId):
+  return f'<span class="selectctl" contrib="{contribId}"></span>'
 
 
 def roTri(tri):
@@ -199,8 +253,8 @@ def formatContrib(contrib, editable):
   <td class="c-vcc">{contrib['vcc']}</td>
   <td>{contrib['year']}</td>
   <td class="c-type">{contrib['type']}</td>
-  <td class="c-cost">€ {contrib['cost']}</td>
-  <td>{editTri(selected, contribId) if editable else roTri(selected)}</td>
+  <td class="c-cost">{euro(contrib['cost'])}</td>
+  <td>{editTri(contribId) if editable else roTri(selected)}</td>
   <td><a href="/data/contrib/list/{contribId}">{contrib['title']}</a></td>
 </tr>
   '''

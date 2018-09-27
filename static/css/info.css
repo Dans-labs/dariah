@@ -130,11 +130,40 @@ table.cc td:nth-child(6) {
 } 
 .c-cost {
    color: #222222;
+   font-size: medium;
    font-weight: bold;
    font-family: monospace;
    font-weight: medium;
 } 
 
 .s-focus {
-    background-color: yellow;
+    color: #ffffff;
+    font-weight: bold;
+    background-color: #000000;
+    padding: 0.1em 0.2em;
+    border-radius: 0.2em;
+}
+.s-focus.fa-times {
+    background-color: #dd0000;
+}
+.s-focus.fa-check {
+    background-color: #00dd00;
+}
+a[select] {
+    color: #7777ff;
+    font-weight: normal;
+    background-color: #ffffff;
+    padding: 0.1em 0.2em;
+    border-radius: 0.2em;
+}
+.och {
+    font-size: medium;
+}
+.och.asc {
+    font-style: italic;
+    background-color: #eeffee;
+}
+.och.desc {
+    font-style: italic;
+    background-color: #ffeeee;
 }

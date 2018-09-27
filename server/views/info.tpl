@@ -35,5 +35,7 @@
         <div>
             {{!material}}
         </div>
+        <script src="/static/js/jquery.js"></script>
+        <script src="/static/js/dariah.js"/></script>
     </body>
 </html>
