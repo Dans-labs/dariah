@@ -15,8 +15,8 @@ VCC = {None: '??'}
 TYPE = {None: '??'}
 
 COORD = 'coord'
-OFFICE = 'office'
-ALLOWED = {COORD, OFFICE}
+ALLOWED = {COORD, 'office', 'system', 'root', 'nobody'}
+POWER = ALLOWED - {COORD}
 
 ASSESSED_STATUS = (
     (-160, 'no', 'a-none'),
@@ -240,7 +240,7 @@ def getOurcountry(userInfo, country, rawSortCol, rawReverse):
 '''
 
         editable = (
-            group == OFFICE
+            group in POWER
             or
             (
                 group == COORD
