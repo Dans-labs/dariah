@@ -190,7 +190,7 @@ def getInfo(verb, userInfo):
   return {}
 
 
-def ourCountryHeaders(sortCol, reverse):
+def ourCountryHeaders(country, sortCol, reverse):
   headers = '<tr>'
   dirClass = 'desc' if reverse else 'asc'
   dirIcon = 'angle-down' if reverse else 'angle-up'
@@ -206,7 +206,10 @@ def ourCountryHeaders(sortCol, reverse):
       icon = ''
     reverseRep = -1 if nextReverse else 1
     label = CONTRIB_LABELS[col]
-    colControl = f'<a href="/info/ourcountry?sortcol={col}&reverse={reverseRep}">{label}{icon}</a>'
+    colControl = (
+        f'<a href="/info/ourcountry?country={country}&sortcol={col}&reverse={reverseRep}">'
+        f'{label}{icon}</a>'
+    )
     headers += f'''
     <th class="och {thisClass}">{colControl}</th>
   '''
@@ -285,7 +288,7 @@ def getOurcountry(userInfo, country, rawSortCol, rawReverse):
 <h1>Contributions from {full}</h1>
 <table class="cc">
 <tbody>
-  {ourCountryHeaders(sortCol, reverse)}
+  {ourCountryHeaders(country, sortCol, reverse)}
 '''
 
         editable = (
