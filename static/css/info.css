@@ -158,6 +158,22 @@ table.cc td:nth-child(6) {
     background-color: #66ff66;
 }
 
+.c-focus {
+    color: #ffffff;
+    font-size: medium;
+    font-weight: bold;
+    background-color: #0000cc;
+}
+.c-control {
+    color: #0000cc;
+    font-weight: normal;
+    font-size: small;
+    background-color: #eeeeff;
+}
+.c-control,.c-focus {
+    padding: 0.1em 0.2em;
+    border-radius: 0.2em;
+}
 .s-focus {
     color: #ffffff;
     font-weight: bold;
@@ -188,4 +204,9 @@ a[select] {
 .och.desc {
     font-style: italic;
     background-color: #ffeeee;
+}
+.selectctl {
+    padding: 0.1em 0.2em;
+    border-radius: 0.2em;
+    background-color: #eeeeff;
 }

@@ -9,11 +9,14 @@ from controllers.utils import (
 MONGO = None
 
 COUNTRY = {None: '??'}
+COUNTRI = {None: '??'}
 YEAR = {None: '??'}
 VCC = {None: '??'}
 TYPE = {None: '??'}
 
 COORD = 'coord'
+OFFICE = 'office'
+ALLOWED = {COORD, OFFICE}
 
 ASSESSED_STATUS = (
     (-160, 'no', 'a-none'),
@@ -51,14 +54,20 @@ def dbAccess():
   )
   clientm = MongoClient()
   global MONGO
+  global COUNTRIES
   MONGO = clientm.dariah
 
+  countries = []
   for doc in MONGO.country.find():
     COUNTRY[doc['_id']] = {
         'iso': doc['iso'],
         'name': doc['name'],
         'isMember': doc['isMember'],
     }
+    COUNTRI[doc['iso']] = doc['_id']
+    if doc['isMember']:
+      countries.append((f'{doc["name"]} ({doc["iso"]})', doc['iso'], doc['_id']))
+    COUNTRIES = sorted(countries)
   for doc in MONGO.year.find():
     YEAR[doc['_id']] = doc['rep']
   for doc in MONGO.vcc.find():
@@ -73,11 +82,11 @@ def dbAccess():
 def selectContrib(userInfo):
   group = userInfo.get('groupRep', 'public')
   myCountryId = userInfo.get('country', None)
-  if group != COORD:
+  if group not in ALLOWED:
     return {
         'good': False,
         'kind': 'error',
-        'msg': 'You are not a national coordinator',
+        'msg': 'You are not a national coordinator or a member of the backoffice',
     }
   contribId = request.json.get('contrib', None)
   if contribId is None:
@@ -102,11 +111,14 @@ def selectContrib(userInfo):
         'kind': 'error',
         'msg': 'Contribution is not asscoiated with a country',
     }
-  if countryId != myCountryId:
+  if countryId != myCountryId and group == COORD:
     return {
         'good': False,
         'kind': 'error',
-        'msg': 'You try to select a contribution of another country than your own',
+        'msg': (
+            'You try to select a contribution of another country'
+            ' than for which you are national coordinator'
+        ),
     }
 
   value = request.json.get('select', None)
@@ -124,13 +136,8 @@ def getInfo(verb, userInfo):
   if verb == 'ourcountry':
     sortCol = request.query.sortcol
     reverse = request.query.reverse
-    if sortCol not in CONTRIB_COLSET:
-      sortCol = CONTRIB_SORT_DEFAULT
-    if reverse not in {'-1', '1'}:
-      reverse = False
-    else:
-      reverse = reverse == '-1'
-    return getOurcountry(userInfo, sortCol, reverse)
+    country = request.query.country
+    return getOurcountry(userInfo, country, sortCol, reverse)
   return {}
 
 
@@ -173,19 +180,44 @@ def contribKey(col):
   return makeKey
 
 
-def getOurcountry(userInfo, sortCol, reverse):
+def getOurcountry(userInfo, country, rawSortCol, rawReverse):
+  sortCol = CONTRIB_SORT_DEFAULT if rawSortCol not in CONTRIB_COLSET else rawSortCol
+  reverse = False if rawReverse not in {'-1', '1'} else rawReverse == '-1'
   group = userInfo.get('groupRep', 'public')
-  editable = group == COORD
-  countryId = userInfo.get('country', None)
+  myCountryId = userInfo.get('country', None)
+  if country:
+    countryId = COUNTRI.get(country, None)
+  else:
+    countryId = myCountryId
+
+  material = ''
+  for (name, iso, cid) in COUNTRIES:
+    material += (
+        f'''
+            <span class="c-focus">{name}</span>
+        '''
+        if cid == countryId else
+        f'''
+            <a
+              class="c-control"
+              href="/info/ourcountry?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}"
+            >{name}</a>
+        '''
+    )
   if countryId is None:
-    material = f'''
+    msg = (
+        'I do not know which country you are from '
+        if country is None else
+        f'Unknown country selected: "{country}"'
+    )
+    material += f'''
 <div class="error-boundary">
-  <p>I do not know which country you are from</p>
+  <p>{msg}</p>
 </div>'''
   else:
     countryInfo = COUNTRY.get(countryId, None)
     if countryInfo is None:
-      material = f'''
+      material += f'''
 <div class="error-boundary">
   <p>I do not know which country this is: {countryId}</p>
 </div>'''
@@ -195,18 +227,29 @@ def getOurcountry(userInfo, sortCol, reverse):
       full = f'{name} ({iso})'
       isMember = countryInfo['isMember']
       if not isMember:
-        material = f'''
+        material += f'''
 <div class="error-boundary">
   <p>{full} is not member of DARIAH</p>
 </div>'''
       else:
-        material = f'''
+        material += f'''
 <h1>Contributions from {full}</h1>
 <table class="cc">
 <tbody>
   {ourCountryHeaders(sortCol, reverse)}
 '''
 
+        editable = (
+            group == OFFICE
+            or
+            (
+                group == COORD
+                and
+                myCountryId is not None
+                and
+                countryId == myCountryId
+            )
+        )
         contribs = {}
         contribSelection = {}
         for doc in MONGO.contrib.find({'country': countryId}):
