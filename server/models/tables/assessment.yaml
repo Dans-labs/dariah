@@ -229,4 +229,10 @@ details:
     cascade: true
     fixed: true
 
+extra:
+  - package
+  - criteria
+  - typeContribution
+  - decision
+
 needMaster: true

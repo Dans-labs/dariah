@@ -64,6 +64,7 @@ fieldOrder:
   - title
   - year
   - country
+  - selected
   - vcc
   - typeContribution
   - description
@@ -87,6 +88,14 @@ fieldSpecs:
       update: edit
     label: Title
     valType: text
+    multiple: false
+  selected:
+    perm:
+      list:   public
+      read:   public
+      update: backoffice
+    label: Selected by National Coordinator
+    valType: bool
     multiple: false
   contactPersonName:
     perm:
@@ -283,16 +292,16 @@ filters:
     type: Fulltext
     maxCols: null
     expanded: null
-  - field: submitted
-    detail: assessment
-    type: ByValue
-    maxcols: 1
-    expanded: true 
   - field: country
     label: country
     type: EUMap
     maxCols: 2
     expanded: true
+  - field: selected
+    label: selected
+    type: ByValue
+    maxcols: 1
+    expanded: true 
   - field: vcc
     label: vcc
     type: ByValue

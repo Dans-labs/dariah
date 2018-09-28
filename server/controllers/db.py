@@ -406,7 +406,7 @@ class DbAccess(object):
 
         for extraTable in extraTables:
             self._getList(
-                controller,
+                'list',
                 extraTable,
                 data,
                 msgs,

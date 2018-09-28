@@ -15,11 +15,24 @@ TYPE = {None: '??'}
 
 COORD = 'coord'
 
+ASSESSED_STATUS = (
+    (-160, 'no', 'a-none'),
+    (-80, 'started', 'a-started'),
+    (-40, 'self', 'a-self'),
+    (-20, 'in review', 'a-inreview'),
+    (-10, 'rejected', 'a-rejected'),
+)
+ASSESSED_LABELS = dict((c[0], c[1]) for c in ASSESSED_STATUS)
+ASSESSED_CLASS = dict((c[0], c[2]) for c in ASSESSED_STATUS)
+ASSESSED_DEFAULT = ASSESSED_STATUS[0][0]
+ASSESSED_ACCEPTED_CLASS = 'a-accepted'
+
 CONTRIB_COLSPECS = (
     ('vcc', str, 'VCC'),
     ('year', int),
     ('type', str),
     ('cost', int,),
+    ('assessed', int,),
     ('selected', bool),
     ('title', str),
 )
@@ -194,22 +207,26 @@ def getOurcountry(userInfo, sortCol, reverse):
   {ourCountryHeaders(sortCol, reverse)}
 '''
 
-        contribs = []
+        contribs = {}
         contribSelection = {}
         for doc in MONGO.contrib.find({'country': countryId}):
           contribId = doc.get('_id', None)
           contribSelected = doc.get('selected', None)
-          contribs.append({
+          contribs[contribId] = {
               '_id': contribId,
               'year': YEAR.get(doc.get('year', None), '??'),
               'vcc': ' + '.join(VCC.get(d, '??') for d in doc.get('vcc', [])),
               'type': TYPE.get(doc.get('typeContribution', None), '??'),
               'title': doc.get('title', '??'),
               'cost': doc.get('costTotal', None),
+              'assessed': ASSESSED_DEFAULT,
               'selected': contribSelected,
-          })
+          }
           contribSelection[str(contribId)] = contribSelected
-        sortedContribs = sorted(contribs, key=contribKey(sortCol), reverse=reverse)
+        for doc in MONGO.assessment.find({'contrib': {'$in': list(contribs.keys())}}):
+          contribId = doc['contrib']
+          contribs[contribId]['assessed'] = ASSESSED_STATUS[1][0]
+        sortedContribs = sorted(contribs.values(), key=contribKey(sortCol), reverse=reverse)
         material += '\n'.join(formatContrib(contrib, editable) for contrib in sortedContribs)
         material += '''
 </tbody>
@@ -248,12 +265,16 @@ def roTri(tri):
 def formatContrib(contrib, editable):
   selected = contrib.get('selected', None)
   contribId = contrib.get('_id', None)
+  assessedCode = contrib.get('assessed', ASSESSED_DEFAULT)
+  assessedLabel = ASSESSED_LABELS.get(assessedCode, f'score {assessedCode}')
+  assessedClass = ASSESSED_CLASS.get(assessedCode, ASSESSED_ACCEPTED_CLASS)
   return f'''
 <tr>
   <td class="c-vcc">{contrib['vcc']}</td>
   <td>{contrib['year']}</td>
   <td class="c-type">{contrib['type']}</td>
   <td class="c-cost">{euro(contrib['cost'])}</td>
+  <td class="c-ass {assessedClass}">{assessedLabel}</td>
   <td>{editTri(contribId) if editable else roTri(selected)}</td>
   <td><a href="/data/contrib/list/{contribId}">{contrib['title']}</a></td>
 </tr>

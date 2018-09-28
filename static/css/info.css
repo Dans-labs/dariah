@@ -135,6 +135,28 @@ table.cc td:nth-child(6) {
    font-family: monospace;
    font-weight: medium;
 } 
+.c-ass {
+   color: #222222;
+   font-weight: bold;
+} 
+.c-ass.a-none {
+    background-color: #ff8888;
+}
+.c-ass.a-started {
+    background-color: #ffcc88;
+}
+.c-ass.a-self {
+    background-color: #ffcccc;
+}
+.c-ass.a-inreview {
+    background-color: #ffff00;
+}
+.c-ass.a-rejected {
+    background-color: #ff4444;
+}
+.c-ass.a-accepted {
+    background-color: #66ff66;
+}
 
 .s-focus {
     color: #ffffff;
