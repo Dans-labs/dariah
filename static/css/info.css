@@ -129,33 +129,38 @@ table.cc td:nth-child(6) {
    font-weight: bold;
 } 
 .c-cost {
-   color: #222222;
+   color: #000000;
    font-size: medium;
    font-weight: bold;
    font-family: monospace;
    font-weight: medium;
 } 
 .c-ass {
-   color: #222222;
    font-weight: bold;
 } 
 .c-ass.a-none {
-    background-color: #ff8888;
+    color: #ffffff;
+    background-color: #dddddd;
 }
 .c-ass.a-started {
-    background-color: #ffcc88;
+    color: #ffffff;
+    background-color: #ff8800;
 }
 .c-ass.a-self {
-    background-color: #ffcccc;
+    color: #ffffff;
+    background-color: #eebb00;
 }
 .c-ass.a-inreview {
-    background-color: #ffff00;
+    color: #444444;
+    background-color: #eeee00;
 }
 .c-ass.a-rejected {
-    background-color: #ff4444;
+    color: #ffffff;
+    background-color: #ff0000;
 }
 .c-ass.a-accepted {
-    background-color: #66ff66;
+    color: #000000;
+    background-color: #88ff88;
 }
 
 .c-focus {

@@ -7,28 +7,37 @@ from controllers.utils import (
 )
 
 MONGO = None
+COUNTRIES = None
+SCORE_MAPPING = None
+MAX_SCORE_BY_CRIT = None
+CRITERIA_ENTRIES = {}
 
 COUNTRY = {None: '??'}
 COUNTRI = {None: '??'}
 YEAR = {None: '??'}
 VCC = {None: '??'}
 TYPE = {None: '??'}
+DECISION = {None: '??'}
+
+DECISION_ACCEPT = 'Accept'
+DECISION_REJECT = 'Reject'
 
 COORD = 'coord'
 ALLOWED = {COORD, 'office', 'system', 'root', 'nobody'}
 POWER = ALLOWED - {COORD}
 
 ASSESSED_STATUS = (
-    (-160, 'no', 'a-none'),
-    (-80, 'started', 'a-started'),
-    (-40, 'self', 'a-self'),
-    (-20, 'in review', 'a-inreview'),
-    (-10, 'rejected', 'a-rejected'),
+    (-1600, 'no', 'a-none'),
+    (-800, 'started', 'a-started'),
+    (-400, 'self', 'a-self'),
+    (-200, 'in review', 'a-inreview'),
+    (-64000, 'rejected', 'a-rejected'),
+    (0, 'accepted', 'a-accepted'),
 )
 ASSESSED_LABELS = dict((c[0], c[1]) for c in ASSESSED_STATUS)
 ASSESSED_CLASS = dict((c[0], c[2]) for c in ASSESSED_STATUS)
 ASSESSED_DEFAULT = ASSESSED_STATUS[0][0]
-ASSESSED_ACCEPTED_CLASS = 'a-accepted'
+ASSESSED_ACCEPTED_CLASS = ASSESSED_STATUS[-1][2]
 
 CONTRIB_COLSPECS = (
     ('vcc', str, 'VCC'),
@@ -55,6 +64,10 @@ def dbAccess():
   clientm = MongoClient()
   global MONGO
   global COUNTRIES
+  global SCORE_MAPPING
+  global MAX_SCORE_BY_CRIT
+  global CRITERIA_ENTRIES
+
   MONGO = clientm.dariah
 
   countries = []
@@ -77,6 +90,42 @@ def dbAccess():
     subType = doc.get('subType', '')
     sep = ' / ' if mainType and subType else ''
     TYPE[doc['_id']] = f'{doc["mainType"]}{sep}{doc["subType"]}'
+  for doc in MONGO.decision.find():
+    DECISION[doc['_id']] = doc['rep']
+
+  scoreData = list(MONGO.score.find())
+
+  for doc in MONGO.criteriaEntry.find():
+    aId = doc.get('assessment', None)
+    if aId is not None:
+      CRITERIA_ENTRIES.setdefault(aId, []).append(doc)
+
+  SCORE_MAPPING = {s['_id']: s['score'] for s in scoreData if 'score' in s}
+  MAX_SCORE_BY_CRIT = {}
+
+  for s in scoreData:
+      crit = s['criteria']
+      score = s.get('score', 0)
+      prevMax = MAX_SCORE_BY_CRIT.setdefault(crit, None)
+      if prevMax is None or score > prevMax:
+          MAX_SCORE_BY_CRIT[crit] = score
+
+
+def computeScore(aDoc):
+  aId = aDoc['_id']
+  myCriteriaData = CRITERIA_ENTRIES.get(aId, [])
+  myCriteriaEntries = [(
+      cd['criteria'], SCORE_MAPPING.get(cd.get('score', None), 0),
+      MAX_SCORE_BY_CRIT[cd['criteria']]
+  ) for cd in myCriteriaData]
+
+  relevantCriteriaEntries = [x for x in myCriteriaEntries if x[1] >= 0]
+  relevantMax = sum(x[2] for x in relevantCriteriaEntries)
+  relevantScore = sum(x[1] for x in relevantCriteriaEntries)
+  overall = 0 if relevantMax == 0 else (
+      round(relevantScore * 100 / relevantMax)
+  )
+  return overall
 
 
 def selectContrib(userInfo):
@@ -266,9 +315,40 @@ def getOurcountry(userInfo, country, rawSortCol, rawReverse):
               'selected': contribSelected,
           }
           contribSelection[str(contribId)] = contribSelected
+        assessmentScore = {}
+        assessmentStatus = {}
+        assessments = {}
+        finalReviewers = {}
         for doc in MONGO.assessment.find({'contrib': {'$in': list(contribs.keys())}}):
-          contribId = doc['contrib']
-          contribs[contribId]['assessed'] = ASSESSED_STATUS[1][0]
+          aId = doc['_id']
+          assessments[aId] = doc
+          reviewerF = doc.get('reviewerF', None)
+          if reviewerF is not None:
+            finalReviewers[aId] = reviewerF
+        reviews = {}
+        for doc in MONGO.review.find({'assessment': {'$in': list(assessments.keys())}}):
+          reviews[doc['_id']] = doc
+        for rDoc in reviews.values():
+          aId = rDoc['assessment']
+          reviewer = rDoc['creator']
+          thisStatus = None
+          if reviewer == finalReviewers.get(aId, None):
+            decision = rDoc.get('decision', None)
+            if DECISION.get(decision, None) == DECISION_REJECT:
+              thisStatus = 4
+            elif DECISION.get(decision, None) == DECISION_ACCEPT:
+              thisStatus = 5
+              assessmentScore[aId] = computeScore(assessments[aId])
+          assessmentStatus[aId] = 3 if thisStatus is None else thisStatus
+        for (aId, aDoc) in assessments.items():
+          if aId in assessmentStatus:
+            aIndex = assessmentStatus[aId]
+          else:
+            aIndex = 2 if aDoc.get('submitted', False) else 1
+          contribId = aDoc['contrib']
+          contribs[contribId]['assessed'] = ASSESSED_STATUS[aIndex][0]
+          if aId in assessmentScore:
+            contribs[contribId]['score'] = assessmentScore[aId]
         sortedContribs = sorted(contribs.values(), key=contribKey(sortCol), reverse=reverse)
         material += '\n'.join(formatContrib(contrib, editable) for contrib in sortedContribs)
         material += '''
@@ -309,7 +389,13 @@ def formatContrib(contrib, editable):
   selected = contrib.get('selected', None)
   contribId = contrib.get('_id', None)
   assessedCode = contrib.get('assessed', ASSESSED_DEFAULT)
-  assessedLabel = ASSESSED_LABELS.get(assessedCode, f'score {assessedCode}')
+  assessedScore = contrib.get('score', None)
+  assessedLabel = (
+      ASSESSED_LABELS.get(assessedCode, '??')
+      if assessedScore is None else
+      f'score {assessedScore}%'
+  )
+
   assessedClass = ASSESSED_CLASS.get(assessedCode, ASSESSED_ACCEPTED_CLASS)
   return f'''
 <tr>
