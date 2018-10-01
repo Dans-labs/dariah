@@ -406,7 +406,7 @@ class DbAccess(object):
 
         for extraTable in extraTables:
             self._getList(
-                'list',
+                N.list,
                 extraTable,
                 data,
                 msgs,

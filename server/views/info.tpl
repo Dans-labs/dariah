@@ -32,6 +32,7 @@
     </head>
     <body>
         <p><a class="button large" href="/data/contrib">Back to the contribution tool</a></p>
+        <hr/>
         <div>
             {{!material}}
         </div>
