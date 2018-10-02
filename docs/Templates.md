@@ -59,7 +59,7 @@ functions use the general machinery to
     into related tables by headings of related records; by entity titles;
 *   `f(field)` fetch values for fields (with related lookup), and wrap them in
     [FieldRead](Components#fieldread) components;
-*   `f(field)` fetch values for fields, and wrap them in
+*   `fe(field)` fetch values for fields, and wrap them in
     [FieldEdit](Components#fieldedit) components, which are controls to let the
     user edit the value;
 *   `fs(field)` present custom controls for fields and wrap them in
@@ -68,6 +68,7 @@ functions use the general machinery to
 *   `n` (only for insert templates): the number of detail records in the list
 *   `at` a set of the *active* contribution types
 *   `o` check whether the current record is owned by the user or whether the user
+*   `m(field)` check whether the field is editable by the current user;
     is in the list of editors;
 *   `me` all attributes of the logged in user (empty if the user is not logged
     in);

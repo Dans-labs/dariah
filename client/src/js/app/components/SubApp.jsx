@@ -60,20 +60,6 @@ const tableLinks = (me, { name, forWhom, details }) =>
 
 const navBarItems = [
   {
-    name: 'Our country',
-    forWhom: 'auth',
-    details: [
-      {
-        path: '/info/ourcountry',
-        name: 'Our contributions',
-        forWhom: 'auth',
-        hint: 'Contributions coming from our country',
-        button: true,
-        target: '_self',
-      },
-    ],
-  },
-  {
     name: 'Contribution overview',
     forWhom: 'public',
     details: [

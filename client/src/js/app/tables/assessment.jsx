@@ -46,7 +46,7 @@ const templates = {
       </Fragment>
     )
   },
-  mainAction({ tables, l, e, v, w, s, fe, fs, m }) {
+  mainAction({ tables, l, e, v, w, s, f, fe, fs, m }) {
     const scoreItems = (w('score') || emptyO).items || emptyA
     const score = scoreItems.length ? scoreItems[0] : emptyO
     const isWithdrawn = !e('dateWithdrawn')
@@ -62,7 +62,7 @@ const templates = {
       <Fragment>
         <ScoreBox score={score} />
         <div className={'grid fragments'}>
-          {m('submitted') ? null : eField('submitted', l, fe, m)}
+          {m('submitted') ? null : rField('submitted', l, f)}
           {itemEditField(
             'submitted',
             'Submission',

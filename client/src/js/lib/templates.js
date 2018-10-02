@@ -268,7 +268,7 @@ const makeF = memoize(
 const makeEditF = memoize(
   (settings, tables, table, eId, fieldInfo = emptyO) => (field, relField) => {
     const {
-      [field]: { fragment: { myValues = emptyO } = emptyO } = emptyO,
+      [field]: { fragment: { myValues } = emptyO } = emptyO,
     } = fieldInfo
     return (
       <FieldRead
@@ -297,7 +297,7 @@ const makeEditFE = memoize(
     reset,
   ) => (field, editOptions) => {
     const {
-      [field]: { fragment: { myValues = emptyO, ...fieldProps } = emptyO },
+      [field]: { fragment: { myValues, ...fieldProps } = emptyO },
     } = fieldInfo
     const editable = m(field)
     return editable ? (

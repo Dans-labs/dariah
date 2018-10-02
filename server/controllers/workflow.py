@@ -401,6 +401,7 @@ class WorkflowApi(object):
         if table == N.assessment:
             detailData = []
             insertValues = {}
+            insertValues['submitted'] = False
             if masterDocument is not None:
                 activeItems = self._getActiveItems(msgs)
                 criteriaIds = activeItems[N.criteriaIds]
