@@ -18,6 +18,8 @@ function codestats {
 if [[ "$1" == "python" ]]; then
     source ~/local/python/dariah/bin/activate
     bash
+elif [[ "$1" == "mongo" ]]; then
+    mongod -f /usr/local/etc/mongod.conf 
 elif [[ "$1" == "module" ]]; then
     cd client
     if [[ "$2" == "" ]]; then

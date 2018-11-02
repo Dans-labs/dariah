@@ -29,14 +29,14 @@ class ListFilter extends Component {
     dispatch(initFiltering(tables, table, filterTag))
   }
   */
-  componentDidUpdate(newProps) {
+  componentDidUpdate(prevProps) {
     const {
       tables,
       table,
       filterTag,
       filters: { [table]: { [filterTag]: filterSettings } = emptyO },
       dispatch,
-    } = newProps
+    } = prevProps
     const { props: { table: tableOld, filterTag: filterTagOld } } = this
     if (
       (tableOld !== table || filterTagOld !== filterTag) &&
