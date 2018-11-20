@@ -4,7 +4,7 @@ import { Route, Switch, NavLink } from 'react-router-dom'
 
 import { injectProps, emptyA, emptyS } from 'utils'
 import { getMe } from 'me'
-import { ALLIDS, MYIDS } from 'tables'
+import { ALLIDS, MYIDS, OURIDS } from 'tables'
 import WorkflowInfo from 'WorkflowInfo'
 import ListContainer from 'ListContainer'
 
@@ -140,7 +140,7 @@ const navBarItems = [
     forWhom: 'auth',
     details: [
       {
-        path: '/data/assessment/myassign',
+        path: '/data/assessment/ourlist',
         name: 'My assignments',
         forWhom: 'auth',
         hint: 'my review assignments',
@@ -339,8 +339,8 @@ const SubApp = ({ me }) => (
             render={injectProps(ListContainer, { select: MYIDS, mode: 'list' })}
           />
           <Route
-            path={'/data/:table/myassign/:eId?'}
-            render={injectProps(ListContainer, { select: MYIDS, mode: 'list', extra: true })}
+            path={'/data/:table/ourlist/:eId?'}
+            render={injectProps(ListContainer, { select: OURIDS, mode: 'list' })}
           />
           <Route
             path={'/data/:table/list/:eId?'}

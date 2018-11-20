@@ -22,7 +22,7 @@ happens in conformance with the data model and its permissions.
 Contains the methods to compute permissions for controllers, tables and fields.
 Here are the main methods.
 
-allow( table, action, msgs, controller=None, document=None, newValues=None, extraMy=None, verbose=True)
+allow( table, action, msgs, controller=None, document=None, newValues=None, my=None, verbose=True)
 ----------------------------------
 
 Given table and an action (such as `read`, `update`), this method computes
@@ -117,7 +117,15 @@ lists, these value lists will be fetched as well.
 `withFilters`: if true, the filter specifications of the table will also be
 returned.
 
-`my`: only fetches rows that have been created by the current user.
+`my`: if True: only fetches rows that have been created by the current user.
+
+If `my` is a list of fields, these are *ourFields*. These fields contain user ids,
+and only records with the current user occurring in one of those fields, will be fetched.
+
+Where as `my=True` is intended to fetch records that are owned or editable by the current user, 
+`my=ourFields` is intended to fetch records that are relevant to the current user in an other, configurable way.
+
+It only works if there is a section `ourFields` in the data model of `table`, which lists a number of fields.
 
 getItem(controller, table, ident)
 ---------------------------------

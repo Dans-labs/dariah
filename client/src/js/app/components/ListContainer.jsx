@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { combineSelectors } from 'utils'
 
-import { getTables, needTables, fetchTable, MYIDS } from 'tables'
+import { getTables, needTables, fetchTable, MYIDS, OURIDS } from 'tables'
 import { getFilters, makeTag } from 'filters'
 
 import ErrorBoundary from 'ErrorBoundary'
@@ -27,9 +27,9 @@ class ListContainer extends Component {
       return <div />
     }
     const { [table]: tableData } = tables
-    const { title, item, perm, myIds, allIds } = tableData
+    const { title, item, perm, myIds, ourIds, allIds } = tableData
     const things = item[1]
-    const listIds = select === MYIDS ? myIds : allIds
+    const listIds = select === MYIDS ? myIds : select == OURIDS ? ourIds : allIds
     const filterTag = makeTag(select, null, null)
     return (
       <ErrorBoundary>
@@ -81,14 +81,14 @@ class ListContainer extends Component {
     )
   }
   componentDidMount() {
-    const { props: { tables, table, select, extra, mode, dispatch } } = this
+    const { props: { tables, table, select, mode, dispatch } } = this
     const complete = mode === 'grid'
-    fetchTable(tables, table, select, extra, complete, dispatch)
+    fetchTable(tables, table, select, complete, dispatch)
   }
   componentDidUpdate() {
-    const { props: { tables, table, select, extra, mode, dispatch } } = this
+    const { props: { tables, table, select, mode, dispatch } } = this
     const complete = mode === 'grid'
-    fetchTable(tables, table, select, extra, complete, dispatch)
+    fetchTable(tables, table, select, complete, dispatch)
   }
 }
 

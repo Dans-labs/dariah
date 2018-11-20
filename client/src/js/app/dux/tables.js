@@ -19,26 +19,27 @@ import { compileAlternatives, setItems } from 'alter'
 export const DETAILS = 'details'
 export const ALLIDS = 'allIds'
 export const MYIDS = 'myIds'
+export const OURIDS = 'ourIds'
 
 /* ACTIONS */
 /*
  * Most actions call accessData, which will dispatch the ultimate fetch action.
  */
 
-const fetchTableAction = (table, select = ALLIDS, extra, complete) =>
+const fetchTableAction = (table, select = ALLIDS, complete) =>
   accessData({
     type: 'fetchTable',
     contentType: 'db',
-    path: `/${select === MYIDS ? 'my' : emptyS}${
-      extra && select === MYIDS ? 'assign' : 'list'
-    }?table=${table}&complete=${complete}`,
+    path: `/${
+      select === MYIDS ? 'my' : select == OURIDS ? 'our' : emptyS
+    }list?table=${table}&complete=${complete}`,
     desc: `${table} table`,
     table,
   })
 
-export const fetchTable = (tables, table, select = ALLIDS, extra, complete = true, dispatch) => {
+export const fetchTable = (tables, table, select = ALLIDS, complete = true, dispatch) => {
   if (needTable(tables, table, select, complete)) {
-    dispatch(fetchTableAction(table, select, extra, complete))
+    dispatch(fetchTableAction(table, select, complete))
   }
 }
 
@@ -145,6 +146,22 @@ const updateWorkflow = (state, workflow = emptyA) => {
   return newState
 }
 
+const changeOur = (newState, table, values, uid) => {
+  const { [table]: { ourFields, ourIds } } = newState
+  if (uid == null || ourFields == null || ourIds == null) {
+    return newState
+  }
+  const inNew = ourFields && ourFields.some(f => values[f] == uid)
+  const { _id } = values
+  const otherIds = ourIds.filter(x => x !== _id)
+  const inOld = otherIds.length != ourIds.length
+  return inOld == inNew
+    ? newState
+    : inNew
+      ? updateAuto(newState, [table, OURIDS], { $set: otherIds.concat([_id]) }, true)
+      : updateAuto(newState, [table, OURIDS], { $set: otherIds }, true)
+}
+
 const flows = {
   fetchTable(state, { data }) {
     if (data == null) {
@@ -188,7 +205,7 @@ const flows = {
     if (data == null) {
       return state
     }
-    const { records = emptyA, workflow } = data
+    const { records = emptyA, workflow, uid } = data
     let newState = state
     for (const record of records) {
       if (Array.isArray(record)) {
@@ -213,6 +230,7 @@ const flows = {
           [table, 'entities', _id, 'values'],
           fieldUpdates,
         )
+        newState = changeOur(newState, table, values, uid)
         newState = updateAuto(newState, [table, 'entities', _id, 'workflow'], {
           $set: ownWorkflow,
         })
@@ -239,7 +257,7 @@ const flows = {
     if (data == null) {
       return state
     }
-    const { records = emptyA, workflow } = data
+    const { records = emptyA, workflow, uid } = data
     let newState = state
     for (const record of records) {
       const { table: thisTable, ...dataRest } = record
@@ -258,6 +276,7 @@ const flows = {
       if (select === MYIDS && table === thisTable) {
         newState = updateAuto(newState, [table, MYIDS], { $push: [_id] }, true)
       }
+      newState = changeOur(newState, thisTable, dataRest, uid)
       newState = update(newState, {
         [thisTable]: {
           lastInserted: { $set: _id },
@@ -278,8 +297,8 @@ const flows = {
       newState = update(newState, {
         [thisTable]: { entities: { $unset: [_id] } },
       })
-      const { [thisTable]: { myIds, allIds } } = newState
-      for (const [name, list] of Object.entries({ myIds, allIds })) {
+      const { [thisTable]: { myIds, ourIds, allIds } } = newState
+      for (const [name, list] of Object.entries({ myIds, ourIds, allIds })) {
         if (list != null) {
           const otherIds = list.filter(x => x !== _id)
           newState = update(newState, {

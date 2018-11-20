@@ -94,9 +94,7 @@ def genConstants(contribId):
   ALL_GROUPSET = set(GROUP_COLS)
 
 
-COL_PLURAL = dict(
-    country='countries',
-)
+COL_PLURAL = dict(country='countries', )
 
 SUBHEAD_X_COLS = set('''
   cost
@@ -105,19 +103,12 @@ SUBHEAD_X_COLS = set('''
 
 
 def colRep(col, n):
-  itemRep = (
-      col if n == 1 else
-      COL_PLURAL.get(col, f'{col}s')
-  )
+  itemRep = (col if n == 1 else COL_PLURAL.get(col, f'{col}s'))
   return f'{n} {itemRep}'
 
 
 def dbAccess():
-  install(
-      JSONPlugin(
-          json_dumps=lambda body: json.dumps(body, default=json_string)
-      )
-  )
+  install(JSONPlugin(json_dumps=lambda body: json.dumps(body, default=json_string)))
   clientm = MongoClient()
   global MONGO
   global COUNTRIES
@@ -163,27 +154,24 @@ def dbAccess():
   MAX_SCORE_BY_CRIT = {}
 
   for s in scoreData:
-      crit = s['criteria']
-      score = s.get('score', 0)
-      prevMax = MAX_SCORE_BY_CRIT.setdefault(crit, None)
-      if prevMax is None or score > prevMax:
-          MAX_SCORE_BY_CRIT[crit] = score
+    crit = s['criteria']
+    score = s.get('score', 0)
+    prevMax = MAX_SCORE_BY_CRIT.setdefault(crit, None)
+    if prevMax is None or score > prevMax:
+      MAX_SCORE_BY_CRIT[crit] = score
 
 
 def computeScore(aDoc):
   aId = aDoc['_id']
   myCriteriaData = CRITERIA_ENTRIES.get(aId, [])
   myCriteriaEntries = [(
-      cd['criteria'], SCORE_MAPPING.get(cd.get('score', None), 0),
-      MAX_SCORE_BY_CRIT[cd['criteria']]
+      cd['criteria'], SCORE_MAPPING.get(cd.get('score', None), 0), MAX_SCORE_BY_CRIT[cd['criteria']]
   ) for cd in myCriteriaData]
 
   relevantCriteriaEntries = [x for x in myCriteriaEntries if x[1] >= 0]
   relevantMax = sum(x[2] for x in relevantCriteriaEntries)
   relevantScore = sum(x[1] for x in relevantCriteriaEntries)
-  overall = 0 if relevantMax == 0 else (
-      round(relevantScore * 100 / relevantMax)
-  )
+  overall = 0 if relevantMax == 0 else (round(relevantScore * 100 / relevantMax))
   return overall
 
 
@@ -221,8 +209,10 @@ def selectContrib(userInfo):
     }
   if countryId != myCountryId and group == COORD:
     return {
-        'good': False,
-        'kind': 'error',
+        'good':
+            False,
+        'kind':
+            'error',
         'msg': (
             'You try to select a contribution of another country'
             ' than for which you are national coordinator'
@@ -231,8 +221,12 @@ def selectContrib(userInfo):
 
   value = request.json.get('select', None)
   MONGO.contrib.update_one(
-      {'_id': contribId},
-      {'$set': {'selected': value}},
+      {
+          '_id': contribId
+      },
+      {'$set': {
+          'selected': value
+      }},
   )
   return {
       'good': True,
@@ -315,6 +309,7 @@ def contribKey(col, individual=False):
     if colType is bool:
       return 1 if value else -1
     return value
+
   return makeKeyInd if individual else makeKey
 
 
@@ -339,9 +334,7 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
     material += (
         f'''
 <span class="c-focus{extraClass}">{name}</span>
-        '''
-        if cid == countryId else
-        f'''
+        ''' if cid == countryId else f'''
 <a
   class="c-control{extraClass}"
   href="{PAGE}?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}&groups={groups}"
@@ -351,9 +344,7 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
   material += '</p>'
   if countryId is None:
     if country:
-      msg = (
-          f'Unknown country selected: "{country}"'
-      )
+      msg = (f'Unknown country selected: "{country}"')
       material += f'''
   <div class="error-boundary">
     <p>{msg}</p>
@@ -380,30 +371,22 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
         groupsAvailable = sorted(ALL_GROUPSET - set(groupsChosen))
         groupSet = set(groupsChosen)
         groupOrder = groupsChosen + [g for g in CONTRIB_COLS if g not in groupSet]
-        availableReps = ' '.join(
-            (
-                f'<a class="g-add" href="'
-                f'{PAGE}'
-                f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}'
-                f'&groups={addGroup(groupsChosen, g)}'
-                f'">+{g}</a>'
-            )
-            for g in groupsAvailable
-        )
-        chosenReps = ' '.join(
-            (
-                f'<a class="g-rm" href="'
-                f'{PAGE}'
-                f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}'
-                f'&groups={rmGroup(groupsChosen, g)}'
-                f'">-{g}</a>'
-            )
-            for g in groupsChosen
-        )
+        availableReps = ' '.join((
+            f'<a class="g-add" href="'
+            f'{PAGE}'
+            f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}'
+            f'&groups={addGroup(groupsChosen, g)}'
+            f'">+{g}</a>'
+        ) for g in groupsAvailable)
+        chosenReps = ' '.join((
+            f'<a class="g-rm" href="'
+            f'{PAGE}'
+            f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}'
+            f'&groups={rmGroup(groupsChosen, g)}'
+            f'">-{g}</a>'
+        ) for g in groupsChosen)
         clearGroups = (
-            ''
-            if len(chosenReps) == 0 else
-            (
+            '' if len(chosenReps) == 0 else (
                 f'<a '
                 f'class="g-x fa fa-times" '
                 f'title="clear all groups" '
@@ -415,14 +398,7 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
         )
         editable = (
             group in POWER
-            or
-            (
-                group == COORD
-                and
-                myCountryId is not None
-                and
-                countryId == myCountryId
-            )
+            or (group == COORD and myCountryId is not None and countryId == myCountryId)
         )
         material += f'''
 <h3>Grouping</h3>
@@ -446,11 +422,7 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
 
         contribs = {}
         contribSelection = {}
-        countrySelector = (
-            {}
-            if countryId == ALL else
-            {'country': countryId}
-        )
+        countrySelector = ({} if countryId == ALL else {'country': countryId})
         for doc in MONGO.contrib.find(countrySelector):
           contribId = doc.get('_id', None)
           countryId = doc.get('country', None)
@@ -514,7 +486,12 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
           score = assessmentScore[aId] if aId in assessmentScore else None
           contribs[contribId]['assessed'] = (assessed, score)
         (thisMaterial, groupRel) = groupList(
-            contribs.values(), groupsChosen, sortCol, reverse, editable, full,
+            contribs.values(),
+            groupsChosen,
+            sortCol,
+            reverse,
+            editable,
+            full,
         )
         material += f'''
 {thisMaterial}
@@ -583,20 +560,23 @@ def groupList(contribs, groups, sortCol, reverse, editable, selectedCountry):
         nDocs += 1
         nGroups += 1
         cost += doc.get('cost', 0) or 0
-        material.append(
-            formatContrib(doc, editable, thisGroupId, groupOrder=groupOrder, hide=True)
-        )
+        material.append(formatContrib(doc, editable, thisGroupId, groupOrder=groupOrder, hide=True))
     else:
       newGroup = groups[depth]
       for groupValue in sorted(
-          gList.keys(), key=contribKey(newGroup, individual=True), reverse=reverse,
+          gList.keys(),
+          key=contribKey(newGroup, individual=True),
+          reverse=reverse,
       ):
         nGroups += 1
         newGroupValues = {}
         newGroupValues.update(groupValues)
         newGroupValues[newGroup] = groupValue
         (nDocsG, costG) = groupMaterial(
-            gList[groupValue], depth + 1, newGroupValues, thisGroupId,
+            gList[groupValue],
+            depth + 1,
+            newGroupValues,
+            thisGroupId,
         )
         nDocs += nDocsG
         cost += costG
@@ -613,7 +593,9 @@ def groupList(contribs, groups, sortCol, reverse, editable, selectedCountry):
         controls = expandAcontrols(g) if g in groups or g == 'title' else ''
         groupValuesT[g] = f'{label} {controls}'
     material[headIndex] = formatContrib(
-        groupValuesT, False, parentGroupId,
+        groupValuesT,
+        False,
+        parentGroupId,
         groupOrder=groupOrder,
         groupSet=groupSet,
         subHead=True,
@@ -627,8 +609,7 @@ def groupList(contribs, groups, sortCol, reverse, editable, selectedCountry):
 
   groupMaterial(groupedList, 0, {}, 1)
   return (
-      '\n'.join(material),
-      f'''
+      '\n'.join(material), f'''
 <script>
 var groupRel = {json.dumps(groupRel)}
 </script>
@@ -667,17 +648,16 @@ def roTri(tri):
 
 def subHeadClass(col, groupSet, subHead, allHead):
   theClass = (
-      'allhead'
-      if allHead and col == 'selected' else
-      'subhead'
-      if allHead or (subHead and (col in groupSet or col in SUBHEAD_X_COLS)) else
-      ''
+      'allhead' if allHead and col == 'selected' else 'subhead' if allHead or
+      (subHead and (col in groupSet or col in SUBHEAD_X_COLS)) else ''
   )
   return f' {theClass}' if theClass else ''
 
 
 def formatContrib(
-    contrib, editable, groupId,
+    contrib,
+    editable,
+    groupId,
     groupOrder=None,
     groupSet=set(),
     subHead=False,
@@ -697,37 +677,23 @@ def formatContrib(
     assessedClass = ''
   else:
     selected = contrib.get('selected', None)
-    selected = (
-        editTri(contribId)
-        if editable else
-        roTri(selected)
-    ) if 'selected' in contrib else ''
+    selected = (editTri(contribId)
+                if editable else roTri(selected)) if 'selected' in contrib else ''
 
     (assessedCode, assessedScore) = contrib.get('assessed', (ASSESSED_DEFAULT, None))
-    assessedLabel = (
-        (
-            ASSESSED_LABELS.get(assessedCode, '??')
-            if assessedScore is None else
-            f'score {assessedScore}%'
-        )
-        if 'assessed' in contrib else
-        ''
-    )
+    assessedLabel = ((
+        ASSESSED_LABELS.get(assessedCode, '??')
+        if assessedScore is None else f'score {assessedScore}%'
+    ) if 'assessed' in contrib else '')
     assessedClass = (
-        ASSESSED_CLASS.get(assessedCode, ASSESSED_ACCEPTED_CLASS)
-        if 'assessed' in contrib else
-        ''
+        ASSESSED_CLASS.get(assessedCode, ASSESSED_ACCEPTED_CLASS) if 'assessed' in contrib else ''
     )
   title = (
-      contrib.get('title', '')
-      if subHead else
-      (
+      contrib.get('title', '') if subHead else (
           f'<a href="/data/contrib/list/{contribId}">'
           f'''{contrib['title'] or '? missing title ?'}'''
           f'</a>'
-      )
-      if 'title' in contrib else
-      ''
+      ) if 'title' in contrib else ''
   )
 
   values = {
@@ -746,23 +712,18 @@ def formatContrib(
     xRep = colRep(xName, nGroups)
     values[xGroup] = (
         f'{expandControls(thisGroupId, True)} {xRep}'
-        if xGroup == 'title' else
-        f'{values[xGroup]} ({xRep}) {expandControls(thisGroupId)}'
-        if depth > 0 else
-        f'{values[xGroup]} ({xRep}) {expandControls(thisGroupId)}'
+        if xGroup == 'title' else f'{values[xGroup]} ({xRep}) {expandControls(thisGroupId)}'
+        if depth > 0 else f'{values[xGroup]} ({xRep}) {expandControls(thisGroupId)}'
     )
   classes = {col: f'c-{col}' for col in groupOrder}
   classes['assessed'] += f' {assessedClass}'
   if editable:
     classes['selected'] += ' editable'
-  columns = '\n'.join(
-      (
-          f'<td class="{classes[col]}'
-          f'{subHeadClass(col, groupSet, subHead, allHead)}'
-          f'">{values[col]}</td>'
-      )
-      for col in groupOrder
-  )
+  columns = '\n'.join((
+      f'<td class="{classes[col]}'
+      f'{subHeadClass(col, groupSet, subHead, allHead)}'
+      f'">{values[col]}</td>'
+  ) for col in groupOrder)
   hideRep = ' hide' if hide else ''
   displayAtts = '' if groupId is None else f''' class="dd{hideRep}" gid="{groupId}"'''
   return f'<tr{displayAtts}>{columns}</tr>'

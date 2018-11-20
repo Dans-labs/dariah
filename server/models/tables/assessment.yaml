@@ -85,9 +85,6 @@ workflow:
         - submitted
         - reviewerE
         - reviewerF
-  assign:
-    - reviewerE
-    - reviewerF
 
 title: title
 
@@ -108,6 +105,10 @@ fieldOrder:
   - submitted
   - dateSubmitted
   - dateWithdrawn
+  - reviewerE
+  - reviewerF
+
+ourFields:
   - reviewerE
   - reviewerF
 
