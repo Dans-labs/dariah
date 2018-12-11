@@ -1,13 +1,11 @@
-import json
 from copy import deepcopy
-from bottle import request, install, JSONPlugin
+from flask import request
 from pymongo import MongoClient
 
 from controllers.utils import (
     oid,
     now,
     dtm,
-    json_string,
     fillInSelect,
     filterModified,
     mongoFields,
@@ -55,7 +53,6 @@ def _allFields(table):
 class DbAccess(object):
 
   def __init__(self):
-    install(JSONPlugin(json_dumps=lambda body: json.dumps(body, default=json_string)))
     clientm = MongoClient()
     MONGO = clientm.dariah
     self.MONGO = MONGO
@@ -111,7 +108,7 @@ class DbAccess(object):
       thisRowFilter = andRows(
           rowFilter,
           {N._id: {
-              '$in': [oid(i) for i in request.json]
+              '$in': [oid(i) for i in request.get_json()]
           }},
       )
       data = self._findDoc(
@@ -154,7 +151,7 @@ class DbAccess(object):
     if not good:
       return self.stop({N.data: none, N.msgs: msgs})
 
-    newData = request.json
+    newData = request.get_json()
     records = []
     workflow = []
 
@@ -529,8 +526,9 @@ class DbAccess(object):
         insertValues[field] = value
 
     if title not in insertValues:
-      insertValues[title] = '{} of {}'.format(item, masterDocument[masterTitle]
-                                             ) if masterDocument else noTitle
+      insertValues[title] = '{} of {}'.format(
+          item, masterDocument[masterTitle]
+      ) if masterDocument else noTitle
 
     # hook for workflow-specific actions: extra fields, extra details
     (extraGood, extraData) = WF.detailInsert(

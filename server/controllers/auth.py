@@ -1,7 +1,6 @@
 import os
 import re
-import bottle
-from beaker.middleware import SessionMiddleware
+from flask import request, session
 from controllers.user import UserApi
 from controllers.utils import utf8FromLatin1, serverprint
 from models.compiled.model import model as M
@@ -38,7 +37,7 @@ def readBundleNames(regime):
 
   There are three scenarios for running the DARIAH app:
   (1) a production build served by a production webserver
-  (2) a production build served by the local bottle webserver
+  (2) a production build served by the local flask webserver
   (3) a develop build served by the webpack devserver
 
   For cases 1 and 2 we need the hashed filenames, but for case 3 we do not.
@@ -77,8 +76,9 @@ def readBundleNames(regime):
 
 class AuthApi(UserApi):
 
-  def __init__(self, DB, secret_file):
+  def __init__(self, DB, app, secret_file):
     super().__init__(DB)
+    self.app = app
 
     # determine production or devel
     regime = os.environ.get(N.REGIME, None)
@@ -91,26 +91,24 @@ class AuthApi(UserApi):
     # read secret from the system
     self.secret = ''
     with open(secret_file) as fh:
-      self.secret = fh.read()
+      app.secret_key = fh.read()
 
     # wrap the app to enable session middleware
-    self.app = bottle.default_app()
 
-    session_opts = {
-        'session.key': 'dariah.session.id',
-        'session.auto': True,
-        'session.use_cookies': True,
-        'session.type': 'memory',
-        'session.cookie_expires': True,
-        'session.data_serializer': 'json',
-        'session.encrypt_key': self.secret,
-        'session.httponly': True,
-        'session.timeout': 3600 * 24,  # 1 day
-        'session.validate_key': 'xxx',
-        'session.secure': not self.isDevel,
-    }
-    self._session_key = 'dariah.session'
-    self.app = SessionMiddleware(self.app, session_opts, environ_key=self._session_key)
+    # session_opts = {
+    #     'session.key': 'dariah.session.id',
+    #     'session.auto': True,
+    #     'session.use_cookies': True,
+    #     'session.type': 'memory',
+    #     'session.cookie_expires': True,
+    #     'session.data_serializer': 'json',
+    #     'session.encrypt_key': self.secret,
+    #     'session.httponly': True,
+    #     'session.timeout': 3600 * 24,  # 1 day
+    #     'session.validate_key': 'xxx',
+    #     'session.secure': not self.isDevel,
+    # }
+    # self._session_key = 'dariah.session'
 
   def debugPrint(self, msg):
     if self.isDevel:
@@ -182,23 +180,16 @@ class AuthApi(UserApi):
     self._delete_session()
 
   def _create_session(self):
-    session = bottle.request.environ.get(self._session_key)
     session[N.eppn] = self.userInfo[N.eppn]
-    # session.save()
 
   def _delete_session(self):
-    env = bottle.request.environ
-    session = env.get(self._session_key, None)
-    if session:
-      session.delete()
-      # session.invalidate()
+    session.pop(N.eppn, None)
 
   def _get_session(self):
-    session = bottle.request.environ.get(self._session_key)
     return session.get(N.eppn, None)
 
   def _checkLogin(self, force=False):
-    env = bottle.request.environ
+    env = request.environ
     if force and self.isDevel:
       testUsers = self.getTestUsers()
 

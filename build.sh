@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # use the right python
-source ~/local/python/dariah/bin/activate
+# source ~/local/python/dariah/bin/activate
 
 root=`pwd`
 webpack='node_modules/.bin/webpack'
@@ -15,10 +15,10 @@ function codestats {
     cat $rf
 }
 
-if [[ "$1" == "python" ]]; then
-    source ~/local/python/dariah/bin/activate
-    bash
-elif [[ "$1" == "mongo" ]]; then
+# if [[ "$1" == "python" ]]; then
+#    source ~/local/python/dariah/bin/activate
+#    bash
+if [[ "$1" == "mongo" ]]; then
     mongod -f /usr/local/etc/mongod.conf 
 elif [[ "$1" == "module" ]]; then
     cd client
@@ -60,11 +60,11 @@ elif [[ "$1" == "model" ]]; then
 elif [[ "$1" == "serve" ]]; then
 	cd server
     python3 compile.py
-    export REGIME=devel; python3 -m bottle --debug --reload --bind localhost:8001 index:app
+    export REGIME=devel FLASK_APP=index.py FLASK_ENV=development FLASK_RUN_PORT=8001; python3 -m flask run
 elif [[ "$1" == "servehot" ]]; then
 	cd server
     python3 compile.py
-    export REGIME=hot; python3 -m bottle --debug --reload --bind localhost:8001 index:app
+    export REGIME=hot FLASK_APP=index.py FLASK_ENV=development FLASK_RUN_PORT=8001; python3 -m flask run
 elif [[ "$1" == "hot" ]]; then
     cd client
     export NODE_ENV="development"
@@ -116,7 +116,7 @@ else
     fi
     echo "./build.sh <task>"
     echo "    where <task> is one of:"
-    echo "python      : activate the version of python used for dariah"
+#    echo "python      : activate the version of python used for dariah"
     echo "module      : js module management - install all modules in package.json from npm"
     echo "module \$1   : js module management - install single module \$1"
     echo "xmodule \$1  : js module management - remove single module \$1"
@@ -138,4 +138,4 @@ else
 fi
 
 # back to normal python
-deactivate
+# deactivate

@@ -27,11 +27,16 @@
     <meta name="msapplication-config" content="/static/favicons/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
-    {{!css}}
-    <link rel="stylesheet" href="/static/css/leaflet.css"/>
+    <link rel="stylesheet" href="/static/css/vars.css"/>
+    <link rel="stylesheet" href="/static/css/info.css"/>
     </head>
     <body>
-        <div id="body"/>
-        {{!js}}
+        <p><a class="button large" href="/data/contrib">Back to the contribution tool</a></p>
+        <hr/>
+        <div>
+            {{material|safe}}
+        </div>
+        <script src="/static/js/jquery.js"></script>
+        <script src="/static/js/dariah.js"/></script>
     </body>
 </html>

@@ -1,5 +1,5 @@
 import traceback
-from bottle import request
+from flask import request
 from controllers.utils import serverprint
 from models.compiled.model import model as M
 from models.compiled.names import N
@@ -8,7 +8,7 @@ DM = M[N.tables]
 
 
 def getq(name):
-  return request.query.get(name, '')[0:64]
+  return request.args.get(name, '')[0:64]
 
 
 class Controller(object):
@@ -38,7 +38,7 @@ class Controller(object):
 
   def view(self, name):
     table = getq(N.table)
-    ident = getq(N.id) if N.id in request.query else None
+    ident = getq(N.id) if N.id in request.args else None
     return self.DB.getItem(name, table, ident)
 
   def mod(self, name):

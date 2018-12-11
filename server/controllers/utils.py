@@ -1,7 +1,9 @@
 import sys
 import pprint
 from datetime import datetime as dt
+
 from bson.objectid import ObjectId
+from flask.json import JSONEncoder
 
 ISO_DTP = '%Y-%m-%dT%H:%M:%S.%f'
 ISO_DT = '%Y-%m-%dT%H:%M:%S'
@@ -21,7 +23,7 @@ def dtm(isostr):
   isostr = isostr.rstrip('Z')
   try:
     date = dt.strptime(isostr, ISO_DTP)
-  except Exception as errDummy:
+  except Exception:
     try:
       date = dt.strptime(isostr, ISO_DT)
     except Exception as err:
@@ -29,12 +31,16 @@ def dtm(isostr):
   return ('', date)
 
 
-def json_string(obj):
-  if isinstance(obj, dt):
-    return obj.isoformat()
-  elif isinstance(obj, ObjectId):
-    return str(obj)
-  raise TypeError('Not sure how to serialize %s' % (obj, ))
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):
+      if isinstance(obj, dt):
+        return obj.isoformat()
+      elif isinstance(obj, ObjectId):
+        return str(obj)
+      return JSONEncoder.default(self, obj)
+
+
+dbjson = CustomJSONEncoder().encode
 
 
 def utf8FromLatin1(s):

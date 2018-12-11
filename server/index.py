@@ -1,6 +1,12 @@
-import bottle
-from bottle import post, get, route, template
+from bson.json_util import loads, dumps
 
+from flask import (
+    Flask,
+    render_template,
+    redirect,
+)
+
+from controllers.utils import dbjson
 from controllers.db import DbAccess
 from controllers.info import getInfo, selectContrib
 from controllers.file import FileApi
@@ -8,91 +14,91 @@ from controllers.controller import Controller
 from controllers.auth import AuthApi
 from controllers.perm import PermApi
 
+app = Flask(__name__, static_url_path='/xxx')
+
 File = FileApi()
 DB = DbAccess()
-Auth = AuthApi(DB, '/opt/web-apps/dariah_jwt.secret')
+Auth = AuthApi(DB, app, '/opt/web-apps/dariah_jwt.secret')
 Controller = Controller(DB)
-app = Auth.app
 
 infoPages = set('''
     ourcountry
 '''.strip().split())
 
 
-@route('/static/<filepath:path>')
+@app.route('/static/<path:filepath>')
 def serveStatic(filepath):
   return File.static(filepath)
 
 
-@route('/favicons/<filepath:path>')
+@app.route('/favicons/<path:filepath>')
 def serveFavicons(filepath):
     return File.static('favicons/{}'.format(filepath))
 
 
-@route('/index.html')
+@app.route('/index.html')
 def serveIndex():
-  return template('index', css=Auth.CSS, js=Auth.JS)
+  return render_template('index.html', css=Auth.CSS, js=Auth.JS)
 
 
-@route('/info/<verb:re:[a-z0-9_]+>')
+@app.route('/info/<string:verb>')
 def serveInfo(verb):
   Auth.authenticate()
   if verb in infoPages:
     data = getInfo(verb, Auth.userInfo)
-    return(template('info', userInfo=Auth.userInfo, **data))
-  return template('index', css=Auth.CSS, js=Auth.JS)
+    return(render_template('info.html', userInfo=Auth.userInfo, **data))
+  return render_template('index.html', css=Auth.CSS, js=Auth.JS)
 
 
-@route('/api/json/<doc:re:[/A-Za-z0-9_.-]+>')
+@app.route('/api/json/<path:doc>')
 def serveApiJson(doc):
-  return File.json(doc)
+  return dbjson(File.json(doc))
 
 
-@route('/api/file/<doc:re:[/A-Za-z0-9_.-]+>')
+@app.route('/api/file/<path:doc>')
 def serveApiFile(doc):
   return File.static(doc)
 
 
-@route('/api/db/who/ami')
+@app.route('/api/db/who/ami')
 def serveApiDbWho():
   Auth.authenticate()
-  return Auth.deliver()
+  return dbjson(Auth.deliver())
 
 
-@post('/api/db/selectc')
-@get('/api/db/selectc')
+@app.route('/api/db/selectc', methods=['GET', 'POST'])
 def selectC():
   Auth.authenticate()
-  return selectContrib(Auth.userInfo)
+  return dbjson(selectContrib(Auth.userInfo))
 
 
-@post('/api/db/<verb:re:[a-z0-9_]+>')
-@get('/api/db/<verb:re:[a-z0-9_]+>')
+@app.route('/api/db/<path:verb>', methods=['GET', 'POST'])
 def serveApiDb(verb):
   Auth.authenticate()
   Perm = PermApi(Auth)
-  return Controller.data(verb, Perm)
+  return dbjson(Controller.data(verb, Perm))
 
 
-@route('/slogout')
+@app.route('/slogout')
 def serveSlogout():
   Auth.deauthenticate()
-  bottle.redirect('/Shibboleth.sso/Logout')
+  redirect('/Shibboleth.sso/Logout')
 
 
-@route('/login')
+@app.route('/login')
 def serveLogin():
   Auth.authenticate(login=True)
-  return template('index', css=Auth.CSS, js=Auth.JS)
+  return render_template('index.html', css=Auth.CSS, js=Auth.JS)
 
 
-@route('/logout')
+@app.route('/logout')
 def serveLogout():
   Auth.deauthenticate()
-  return template('index', css=Auth.CSS, js=Auth.JS)
+  return render_template('index.html', css=Auth.CSS, js=Auth.JS)
 
 
-@route('/<anything:re:.*>')
-def client(anything):
+@app.route('/')
+@app.route('/<path:anything>')
+def client(anything=None):
   Auth.authenticate()
-  return template('index', css=Auth.CSS, js=Auth.JS)
+  return render_template('index.html', css=Auth.CSS, js=Auth.JS)

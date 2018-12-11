@@ -1,10 +1,6 @@
-import json
-from bottle import request, install, JSONPlugin
+from flask import request
 from pymongo import MongoClient
-from controllers.utils import (
-    oid,
-    json_string,
-)
+from controllers.utils import oid
 
 PAGE = '/info/ourcountry'
 ALL = 'ALL'
@@ -108,7 +104,6 @@ def colRep(col, n):
 
 
 def dbAccess():
-  install(JSONPlugin(json_dumps=lambda body: json.dumps(body, default=json_string)))
   clientm = MongoClient()
   global MONGO
   global COUNTRIES
@@ -184,7 +179,7 @@ def selectContrib(userInfo):
         'kind': 'error',
         'msg': 'You are not a national coordinator or a member of the backoffice',
     }
-  contribId = request.json.get('contrib', None)
+  contribId = request.get_json().get('contrib', None)
   if contribId is None:
     return {
         'good': False,
@@ -219,7 +214,7 @@ def selectContrib(userInfo):
         ),
     }
 
-  value = request.json.get('select', None)
+  value = request.get_json().get('select', None)
   MONGO.contrib.update_one(
       {
           '_id': contribId
@@ -236,10 +231,10 @@ def selectContrib(userInfo):
 def getInfo(verb, userInfo):
   dbAccess()
   if verb == 'ourcountry':
-    sortCol = request.query.sortcol
-    reverse = request.query.reverse
-    country = request.query.country
-    groups = request.query.groups
+    sortCol = request.args.get('sortcol', '')
+    reverse = request.args.get('reverse', '')
+    country = request.args.get('country', '')
+    groups = request.args.get('groups', '')
     return getOurcountry(userInfo, country, groups, sortCol, reverse)
   return {}
 

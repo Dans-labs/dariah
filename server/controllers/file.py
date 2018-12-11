@@ -1,6 +1,6 @@
 import os
 
-from bottle import static_file
+from flask import send_file
 
 from models.compiled.names import N
 
@@ -18,7 +18,7 @@ def determine_origin(path):
       root = origins[origin]
       path = path.replace(origin, '', 1)
       break
-  return (root, path)
+  return (os.path.abspath(root), path)
 
 
 class FileApi(object):
@@ -28,11 +28,11 @@ class FileApi(object):
 
   def static(self, path):
     (root, fpath) = determine_origin(path)
-    return static_file(fpath, root=root)
+    return send_file(f'{root}/{fpath}')
 
   def json(self, path):
     (root, fpath) = determine_origin(path)
-    filepath = root + fpath
+    filepath = f'{root}/{fpath}'
     if os.path.exists(filepath):
       with open(filepath) as fh:
         text = fh.read()
