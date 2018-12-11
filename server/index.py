@@ -3,7 +3,6 @@ from bottle import post, get, route, template
 
 from controllers.db import DbAccess
 from controllers.info import getInfo, selectContrib
-from controllers.info import getInfo
 from controllers.file import FileApi
 from controllers.controller import Controller
 from controllers.auth import AuthApi
