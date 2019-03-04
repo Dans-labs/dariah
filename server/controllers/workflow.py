@@ -61,7 +61,7 @@ def _compute_getValues(wf, myDoc, otherDocs, w):
           for otherField in otherFields
           if otherField in otherDoc
       }
-                for otherDoc in otherDocs]
+          for otherDoc in otherDocs]
   }
 
 
