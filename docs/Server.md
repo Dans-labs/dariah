@@ -171,14 +171,14 @@ what permission groups users belong.
 ===============================================
 
 Contains the methods to authenticate users. Here all the logic about user
-sessions and session cookies is written down. It builds on the bottle web
+sessions and session cookies is written down. It builds on the Flask web
 framework.
 
 [file]({{site.serverBase}}/controllers/file.py)
 ===============================================
 
 Contains the methods to get file data from the server. There is a method to
-serve static files by calling the web framework bottle. And there is a method to
+serve static files by calling the web framework Flask. And there is a method to
 read a file and deliver its content as JSON.
 
 [utils]({{site.serverBase}}/controllers/utils.py)

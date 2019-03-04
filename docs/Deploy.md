@@ -31,14 +31,14 @@ brew services start MongoDB
 Web-app overview
 ================
 
-For the *server* application code we use [Bottle]({{site.bottle}}), a Python3
+For the *server* application code we use [Flask]({{site.flask}}), a Python3
 micro framework to route URLs to functions that perform requests and return
 responses. It contains a development web server.
 
 The list of Python dependencies to be installed is in
 [requirements.txt]({{site.serverBase}}/config/requirements.txt).
 
-The production web server is **httpd (Apache)**. Bottle connects to it through
+The production web server is **httpd (Apache)**. Flask connects to it through
 [mod_wsgi]({{site.wsgi}}) (take care to use a version that speaks Python3). This
 connection is defined in the default config file See
 [default_example.conf]({{site.serverBase}}/config/default_example.conf).
@@ -150,29 +150,27 @@ We assume httpd (Apache) is already installed, and MongoDB likewise.
 
 Python can be installed by means of the package manager.
 
-yum install rh-python35 rh-python35-python-pymongo rh-python35-mod_wsgi scl
-enable rh-python35 bash cp
-/opt/rh/httpd24/root/usr/lib64/httpd/modules/mod_rh-python35-wsgi.so modules cd
-/etc/httpd cp
-/opt/rh/httpd24/root/etc/httpd/conf.modules.d/10-rh-python35-wsgi.conf
-conf.modules.d/ pip install bottle beaker
+```
+yum install rh-python36 rh-python36-python-pymongo rh-python36-mod_wsgi
+scl enable rh-python36 bash
+cp /opt/rh/httpd24/root/usr/lib64/httpd/modules/mod_rh-python36-wsgi.so modules
+cd /etc/httpd
+cp /opt/rh/httpd24/root/etc/httpd/conf.modules.d/10-rh-python36-wsgi.conf conf.modules.d/
+pip install flask
+```
 
 On a development server, install `Python3`.*x*`.`*y* from its
 [download page]({{site.python}}/downloads/). Then install additional modules by
 means of `pip3`:
 
-    pip3 install pymongo bottle beaker
+    pip3 install pymongo flask
 
 More info about running Python3 in the web server
 [mod_wsgi guide]({{site.wsgi}}/user-guides/quick-installation-guide.html).
 
 The website runs with SELinux enforced, and also the updating process works.
 
-The server framework is [Bottle]({{site.bottle}}),
-
-We use the plugins:
-
-*   [beaker]({{site.beaker}}) for session middleware
+The server framework is [Flask]({{site.flask}}),
 
 The code for the server is basically a mapping between routes (URL patterns) and
 functions (request => response transformers). The app source code for the server
@@ -198,7 +196,7 @@ On the mac you have to say
 Running
 -------
 
-In development, **bottle** runs its own little web server, in production it is
+In development, **flask** runs its own little web server, in production it is
 connected to Apache through **wsgi**. You can run the development server by
 saying, in the `server` directory
 

@@ -14,6 +14,7 @@ from controllers.perm import PermApi
 
 
 def factory():
+  print(f'name={__name__}')
   app = Flask(__name__, static_url_path='/xxx')
 
   File = FileApi()

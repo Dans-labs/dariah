@@ -45,9 +45,8 @@ References
     *   [remark]({{site.remark}}) linter and formatter for markdown
 *   [mongodb]({{site.mongodb}}) NO-SQL database, JSON/Javascript based
 *   [python]({{site.python}}) data-oriented scripting language
-    *   [bottle]({{site.bottle}}) minimal web framework
-    *   [beaker]({{site.beaker}}) session management
     *   [flake8]({{site.flake8}}) code linter for Python
+    *   [flask]({{site.flask}}) micro web framework
     *   [wsgi]({{site.wsgi}}) bridge between the python language and webservers
     *   [yapf]({{site.yapf}}) code formatter for Python
 *   [react]({{site.react}}) web framework for rendering in the browser

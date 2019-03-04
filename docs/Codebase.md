@@ -89,7 +89,7 @@ the [lib](Lib) section of the app. One of the most crucial is
 A general purpose scripting language with excellent data processing facilities.
 
 This app uses python (version 3.6.1+) for the web server. The web server itself
-is [Bottle]({{site.bottle}}), a light-weight framework for handling http(s)
+is [Flask]({{site.flask}}), a light-weight framework for handling http(s)
 requests.
 
 We have added a set of [controllers](Server). The actual

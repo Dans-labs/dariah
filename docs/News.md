@@ -2,6 +2,10 @@
 title: News
 ---
 
+### 2018-12-11 ###
+
+* Bottle has been replaced by Flask
+
 ### 2017-12-14 ###
 
 The workflow functions have developed into a serious engine,

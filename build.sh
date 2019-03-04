@@ -60,11 +60,11 @@ elif [[ "$1" == "model" ]]; then
 elif [[ "$1" == "serve" ]]; then
 	cd server
     python3 compile.py
-    export REGIME=devel FLASK_APP=index.py FLASK_ENV=development FLASK_RUN_PORT=8001; python3 -m flask run
+    export REGIME=devel FLASK_APP=index:factory FLASK_ENV=development FLASK_RUN_PORT=8001; python3 -m flask run
 elif [[ "$1" == "servehot" ]]; then
 	cd server
     python3 compile.py
-    export REGIME=hot FLASK_APP=index.py FLASK_ENV=development FLASK_RUN_PORT=8001; python3 -m flask run
+    export REGIME=hot FLASK_APP=index:factory FLASK_ENV=development FLASK_RUN_PORT=8001; python3 -m flask run
 elif [[ "$1" == "hot" ]]; then
     cd client
     export NODE_ENV="development"
