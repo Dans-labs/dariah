@@ -140,7 +140,7 @@ fieldSpecs:
   costTotal:
     perm:
       list:   auth
-      read:   auth
+      read:   coord
       update: edit
     label: cost (total)
     valType: number
@@ -148,7 +148,7 @@ fieldSpecs:
   costDescription:
     perm:
       list:   edit
-      read:   edit
+      read:   coord
       update: edit
     label: cost (description)
     valType: textarea

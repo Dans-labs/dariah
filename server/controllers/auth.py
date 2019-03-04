@@ -171,7 +171,9 @@ class AuthApi(UserApi):
             authority = N.local if self.isDevel else N.DARIAH
             self.userInfo[N.authority] = authority
           self.storeUpdate(self.userInfo)
-        self.userInfo[N.groupRep] = self.DB.groupFromId[self.userInfo[N.group]]
+        group = self.userInfo[N.group]
+        groupRep = self.DB.groupFromId[group]
+        self.userInfo[N.groupRep] = groupRep
 
   def deauthenticate(self):
     unauth = PM[N.unauth]

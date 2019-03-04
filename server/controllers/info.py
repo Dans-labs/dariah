@@ -172,9 +172,9 @@ def computeScore(aDoc):
 
 
 def selectContrib(userInfo):
-  group = userInfo.get('groupRep', 'public')
+  userGroup = userInfo.get('groupRep', 'public')
   myCountryId = userInfo.get('country', None)
-  if group not in ALLOWED:
+  if userGroup not in ALLOWED:
     return {
         'good': False,
         'kind': 'error',
@@ -203,7 +203,7 @@ def selectContrib(userInfo):
         'kind': 'error',
         'msg': 'Contribution is not asscoiated with a country',
     }
-  if countryId != myCountryId and group == COORD:
+  if countryId != myCountryId and userGroup == COORD:
     return {
         'good':
             False,
@@ -310,12 +310,14 @@ def contribKey(col, individual=False):
 
 
 def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
-  group = userInfo.get('groupRep', 'public')
+  userGroup = userInfo.get('groupRep', 'public')
   myCountryId = userInfo.get('country', None)
   if country:
     countryId = COUNTRI.get(country, None)
   else:
     countryId = myCountryId
+  countryInfo = COUNTRY[myCountryId]
+  myCountry = f'{countryInfo["name"]} ({countryInfo["iso"]})'
 
   genConstants(countryId)
   if countryId is not None and countryId != ALL:
@@ -393,8 +395,8 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
             )
         )
         editable = (
-            group in POWER
-            or (group == COORD and myCountryId is not None and countryId == myCountryId)
+            userGroup in POWER
+            or (userGroup == COORD and myCountryId is not None and countryId == myCountryId)
         )
         material += f'''
 <h3>Grouping</h3>
@@ -437,6 +439,7 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
 
           contribs[contribId] = {
               '_id': contribId,
+              '_cn': countryRep,
               'country': countryRep,
               'vcc': vccRep,
               'year': yearRep,
@@ -488,6 +491,9 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
             reverse,
             editable,
             full,
+            userGroup,
+            myCountry,
+            countryRep,
         )
         material += f'''
 {thisMaterial}
@@ -509,10 +515,33 @@ var allGroups = {json.dumps(ALL_GROUPS)}
   return data
 
 
-def groupList(contribs, groups, sortCol, reverse, editable, selectedCountry):
+def groupList(
+    contribs,
+    groups,
+    sortCol,
+    reverse,
+    editable,
+    selectedCountry,
+    userGroup,
+    myCountry,
+    chosenCountry,
+):
   if len(groups) == 0:
     groupedList = sorted(contribs, key=contribKey(sortCol), reverse=reverse)
-    return ('\n'.join(formatContrib(contrib, editable, None) for contrib in groupedList), '')
+    return (
+        '\n'.join(
+            formatContrib(
+                contrib,
+                editable,
+                None,
+                userGroup,
+                myCountry,
+                chosenCountry,
+            )
+            for contrib in groupedList
+        ),
+        '',
+    )
 
   preGroups = groups[0:-1]
   lastGroup = groups[-1]
@@ -549,14 +578,32 @@ def groupList(contribs, groups, sortCol, reverse, editable, selectedCountry):
     cost = 0
     if type(gList) is list:
       for doc in sorted(
-          ({k: v for (k, v) in doc.items() if k not in groupValues} for doc in gList),
+          (
+              {
+                  k: v
+                  for (k, v) in list(d.items())
+                  if k not in groupValues
+              }
+              for d in gList
+          ),
           key=contribKey(sortCol),
           reverse=reverse,
       ):
         nDocs += 1
         nGroups += 1
         cost += doc.get('cost', 0) or 0
-        material.append(formatContrib(doc, editable, thisGroupId, groupOrder=groupOrder, hide=True))
+        material.append(
+            formatContrib(
+                doc,
+                editable,
+                thisGroupId,
+                userGroup,
+                myCountry,
+                chosenCountry,
+                groupOrder=groupOrder,
+                hide=True,
+            )
+        )
     else:
       newGroup = groups[depth]
       for groupValue in sorted(
@@ -583,6 +630,7 @@ def groupList(contribs, groups, sortCol, reverse, editable, selectedCountry):
     # groupValuesT.update(groupValues)
     groupValuesT['cost'] = cost
     groupValuesT['title'] = colRep('contribution', nDocs)
+    groupValuesT['_cn'] = groupValues.get('country', None)
     if depth == 0:
       for g in GROUP_COLS + ['title']:
         label = selectedCountry if g == 'country' else 'all'
@@ -592,6 +640,9 @@ def groupList(contribs, groups, sortCol, reverse, editable, selectedCountry):
         groupValuesT,
         False,
         parentGroupId,
+        userGroup,
+        myCountry,
+        chosenCountry,
         groupOrder=groupOrder,
         groupSet=groupSet,
         subHead=True,
@@ -650,10 +701,24 @@ def subHeadClass(col, groupSet, subHead, allHead):
   return f' {theClass}' if theClass else ''
 
 
+def disclose(values, colName, userGroup, myCountry, docCountry):
+  disclosed = (
+      colName != 'cost'
+      or
+      userGroup in POWER
+      or (userGroup == COORD and myCountry is not None and docCountry == myCountry)
+  )
+  value = values[colName] if disclosed else 'undisclosed'
+  return value
+
+
 def formatContrib(
     contrib,
     editable,
     groupId,
+    userGroup,
+    myCountry,
+    chosenCountry,
     groupOrder=None,
     groupSet=set(),
     subHead=False,
@@ -702,6 +767,7 @@ def formatContrib(
       'selected': selected,
       'title': title,
   }
+  docCountry = contrib.get('_cn', None) or values.get('country', None) or chosenCountry
   if depth is not None:
     xGroup = groupOrder[depth] if depth == 0 or depth < groupLen else 'title'
     xName = 'contribution' if xGroup == 'title' else xGroup
@@ -718,7 +784,7 @@ def formatContrib(
   columns = '\n'.join((
       f'<td class="{classes[col]}'
       f'{subHeadClass(col, groupSet, subHead, allHead)}'
-      f'">{values[col]}</td>'
+      f'">{disclose(values, col, userGroup, myCountry, docCountry)}</td>'
   ) for col in groupOrder)
   hideRep = ' hide' if hide else ''
   displayAtts = '' if groupId is None else f''' class="dd{hideRep}" gid="{groupId}"'''

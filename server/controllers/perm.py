@@ -12,6 +12,7 @@ class PermApi(object):
 
     self.userInfo = Auth.userInfo
     self.uid = self.userInfo.get(N._id, None)
+    self.ucn = self.userInfo.get(N.country, None)
     self.eppn = self.userInfo.get(N.eppn, None)
     self.group = self.userInfo[N.groupRep]
     self.rank = {lev: n for (n, lev) in enumerate(PM[N.levels])}
@@ -77,18 +78,21 @@ class PermApi(object):
     isOwn = False
     isEditor = False
     isOur = False
+    sameCountry = False
     if document is None:
       allowed = self._authorize(perm, asList=True)
     else:
       isOwn = self._isOwn(table, document)
       isEditor = self._isEditor(table, document)
       isOur = self._isRelated(table, document, my)
+      sameCountry = self._sameCountry(table, document)
       allowed = self._authorize(
           perm,
           asList=False,
           isOwn=isOwn,
           isEditor=isEditor,
           isOur=isOur,
+          sameCountry=sameCountry,
       )
 
     if not allowed:
@@ -184,8 +188,14 @@ class PermApi(object):
                     ).format(newValue, group),
                 })
               continue
-      if self._authorize(permF, asList=document is None, isOwn=isOwn, isEditor=isEditor,
-                         isOur=isOur):
+      if self._authorize(
+          permF,
+          asList=document is None,
+          isOwn=isOwn,
+          isEditor=isEditor,
+          isOur=isOur,
+          sameCountry=sameCountry,
+      ):
         fieldSet.add(field)
     return (True, rowFilter, fieldSet)
 
@@ -215,7 +225,17 @@ class PermApi(object):
         break
     return related
 
-  def _authorize(self, perm, asList=False, isOwn=None, isEditor=None, isOur=None):
+  def _sameCountry(self, table, document):
+    docCountry = document.get(N.country)
+    if not docCountry:
+      return True
+    if not self.ucn:
+      return False
+    return self.ucn == docCountry
+
+  def _authorize(
+      self, perm, asList=False, isOwn=None, isEditor=None, isOur=None, sameCountry=None
+  ):
     group = self.group
     authorize = PM[N.authorize]
     may = authorize.get(group, {}).get(perm, 0)
@@ -226,6 +246,11 @@ class PermApi(object):
     if may == -2 and isOwn is False and isEditor is False:
       may = 0
     if may == -3 and isOur is False:
+      may = 0
+    if (
+        may == -4 and isOwn is False and isEditor is False and isOur is False and
+        sameCountry is False
+    ):
       may = 0
     return may
 
