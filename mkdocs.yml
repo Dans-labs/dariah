@@ -1,0 +1,155 @@
+site_name: Tech Doc DARIAH contribution tool
+site_description: > 
+  The technical documentation of the DARIAH Contribution Tool.
+  Design, specs, rationales, patterns, diagrams.
+
+site_url: "https://dans-labs.github.io/dariah/" 
+
+site_author: Dirk Roorda
+
+
+extra:
+  # App
+  liveBase: https://dariah-beta.dans.knaw.nl
+  serverBase: https://github.com/Dans-labs/dariah/blob/master/server
+  clientBase: https://github.com/Dans-labs/dariah/blob/master/client
+  staticBase: https://github.com/Dans-labs/dariah/blob/master/static
+  cssBase: https://github.com/Dans-labs/dariah/blob/master/client/src/css
+  appBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/app
+  libBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/lib
+  testBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/test
+  repBase: https://github.com/Dans-labs/dariah/blob/master
+  repo: https://github.com/Dans-labs/dariah
+  docSite: https://dans-labs.github.io/dariah/
+
+  # DARIAH
+  dans: https://dans.knaw.nl
+  dariah: https://www.dariah.eu
+  dariahIDP: https://wiki.de.dariah.eu/display/publicde/DARIAH+AAI+Documentation
+  dariahShib: https://wiki.de.dariah.eu/display/publicde/Integrating+Shibboleth+Authentication+into+your+Application
+
+  # TECH
+  ale: https://github.com/w0rp/ale
+  atom: https://atom.io 
+  autovivification: https://en.wikipedia.org/wiki/Autovivification
+  babel: https://babeljs.io
+  bash: https://www.gnu.org/software/bash/
+  beaker: https://beaker.readthedocs.io/en/latest/
+  bottle: https://bottlepy.org/docs/dev/
+  cloc: https://github.com/AlDanial/cloc
+  css: https://developer.mozilla.org/en-US/docs/Web/CSS
+  ducks: https://github.com/erikras/ducks-modular-redux
+  es7cp: http://borgs.cybrilla.com/tils/es7-class-properties/
+  eslint: http://eslint.org
+  flake8: https://github.com/PyCQA/flake8
+  flask: http://flask.pocoo.org/docs/1.0/
+  flexbox: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+  geojson: http://geojson.org
+  githubBase: https://github.com/
+  grid: https://CSS-tricks.com/snippets/CSS/complete-guide-grid/
+  hsl: https://en.wikipedia.org/wiki/HSL_and_HSV
+  html: https://developer.mozilla.org/en-US/docs/Web/HTML
+  ide: https://en.wikipedia.org/wiki/Integrated_development_environment 
+  immutability: https://github.com/kolodny/immutability-helper
+  iso8601: https://en.wikipedia.org/wiki/ISO_8601
+  javascript: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
+  leaflet: http://leafletjs.com
+  lodash: https://lodash.com/docs 
+  markdownDoc: https://guides.github.com/features/mastering-markdown/
+  mern: http://mern.io
+  meteor: https://www.meteor.com
+  mocha: https://mochajs.org
+  mongodb: https://docs.mongodb.com
+  node: https://nodejs.org
+  npm: https://www.npmjs.com
+  prettier: https://prettier.io
+  python: https://docs.python.org/3/
+  react: https://facebook.github.io/react/docs
+  reactDocs: https://facebook.github.io/react/docs
+  reactRedux: https://github.com/reactjs/react-redux/blob/master
+  reactReduxRepo: https://github.com/reactjs/react-redux
+  reactReselect: https://github.com/reactjs/reselect
+  reactRouter: https://github.com/ReactTraining/react-router/blob/v3/docs
+  reactRouterTutorial: https://github.com/reactjs/react-router-tutorial/tree/master
+  reactSelect: https://github.com/JedWatson/react-select
+  remark: https://github.com/remarkjs/remark
+  redux: http://redux.js.org
+  reduxFormBase: https://redux-form.com
+  reduxFormIssues: https://github.com/erikras/redux-form/issues
+  reduxFormV: 7.1.2
+  reduxVideos: https://egghead.io/courses/getting-started-with-redux
+  sassDoc: http://sass-lang.com
+  shebanq: https://github.com/etcbc/shebanq
+  socket: https://socket.io
+  socketPython: http://python-socketio.readthedocs.io/en/latest/
+  spa: https://en.wikipedia.org/wiki/Single-page_application
+  sublimeText: https://www.sublimetext.com
+  vim: http://www.vim.org
+  vsc: https://code.visualstudio.com
+  webApi: https://developer.mozilla.org/en-US/docs/Web/API/document
+  webpack: https://webpack.js.org/concepts/
+  webstorm: https://www.jetbrains.com/webstorm/
+  wsgi: https://modwsgi.readthedocs.io/en/develop
+  yapf: https://github.com/google/yapf 
+  yaml: http://www.yaml.org
+
+theme:
+  name: material
+  logo: 'images/tf-small.png'
+  logo: 'images/inkind_logo.png'
+  favicon: 'icons/favicon.ico'
+  feature:
+    tabs: false
+repo_url: 'https://github.com/dans-labs/dariah/'
+
+strict: false
+
+nav:
+  - Home: 'index.md'
+  - About:
+    - Codebase: 'About/Codebase.md'
+    - Stats: 'About/Stats.md'
+    - News: 'About/News.md'
+    - Lessons: 'About/Lessons.md'
+    - Diagrams: 'About/Diagrams.md'
+  - Functionality:
+    - Business: 'Functionality/Business.md'
+    - Tables: 'Functionality/Tables.md'
+    - Templates: 'Functionality/Templates.md'
+    - Workflow: 'Functionality/Workflow.md'
+  - Legacy:
+    - Content: 'Legacy/Content.md'
+  - Concepts:
+    - Architecture: 'Concepts/Architecture.md'
+    - Model: 'Concepts/Model.md'
+    - Routing: 'Concepts/Routing.md'
+  - Server:
+    - Authentication: 'Server/Authentication.md'
+    - Server: 'Server/Server.md'
+  - Client:
+    - Components: 'Client/Components.md'
+    - Dux: 'Client/Dux.md'
+    - Lib: 'Client/Lib.md'
+  - Technology:
+    - Tech: 'Technology/Tech.md'
+    - ES6: 'Technology/ES6.md'
+    - React: 'Technology/React.md'
+  - Integration:
+    - API: 'Integration/API.md'
+  - Maintenance:
+    - Deploy: 'Maintenance/Deploy.md'
+    - Tests: 'Maintenance/Tests.md'
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+      linenums: true
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.mark
+
+plugins:
+  - markdownextradata

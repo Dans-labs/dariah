@@ -1,0 +1,1183 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="The technical documentation of the DARIAH Contribution Tool. Design, specs, rationales, patterns, diagrams.
+">
+      
+      
+        <link rel="canonical" href="https://dans-labs.github.io/dariah/Technology/ES6/">
+      
+      
+        <meta name="author" content="Dirk Roorda">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../../icons/favicon.ico">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.0.6">
+    
+    
+      
+        <title>ES6 - Tech Doc DARIAH contribution tool</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/application.451f80e5.css">
+      
+      
+    
+    
+      <script src="../../assets/javascripts/modernizr.1aa3b519.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../../assets/fonts/material-icons.css">
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="__github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#es6" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://dans-labs.github.io/dariah/" title="Tech Doc DARIAH contribution tool" class="md-header-nav__button md-logo">
+          
+            <img src="../../images/inkind_logo.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                Tech Doc DARIAH contribution tool
+              </span>
+              <span class="md-header-nav__topic">
+                ES6
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/dans-labs/dariah/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#__github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://dans-labs.github.io/dariah/" title="Tech Doc DARIAH contribution tool" class="md-nav__button md-logo">
+      
+        <img src="../../images/inkind_logo.png" width="48" height="48">
+      
+    </a>
+    Tech Doc DARIAH contribution tool
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/dans-labs/dariah/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#__github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+    
+    <label class="md-nav__link" for="nav-2">
+      About
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        About
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Codebase/" title="Codebase" class="md-nav__link">
+      Codebase
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Stats/" title="Stats" class="md-nav__link">
+      Stats
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/News/" title="News" class="md-nav__link">
+      News
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Lessons/" title="Lessons" class="md-nav__link">
+      Lessons
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Diagrams/" title="Diagrams" class="md-nav__link">
+      Diagrams
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Functionality
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Functionality
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Functionality/Business/" title="Business" class="md-nav__link">
+      Business
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Functionality/Tables/" title="Tables" class="md-nav__link">
+      Tables
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Functionality/Templates/" title="Templates" class="md-nav__link">
+      Templates
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Functionality/Workflow/" title="Workflow" class="md-nav__link">
+      Workflow
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Legacy
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        Legacy
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Legacy/Content/" title="Content" class="md-nav__link">
+      Content
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+    
+    <label class="md-nav__link" for="nav-5">
+      Concepts
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Concepts
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Concepts/Architecture/" title="Architecture" class="md-nav__link">
+      Architecture
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Concepts/Model/" title="Model" class="md-nav__link">
+      Model
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Concepts/Routing/" title="Routing" class="md-nav__link">
+      Routing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+    
+    <label class="md-nav__link" for="nav-6">
+      Server
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        Server
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Server/Authentication/" title="Authentication" class="md-nav__link">
+      Authentication
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Server/Server/" title="Server" class="md-nav__link">
+      Server
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      Client
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        Client
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Client/Components/" title="Components" class="md-nav__link">
+      Components
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Client/Dux/" title="Dux" class="md-nav__link">
+      Dux
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Client/Lib/" title="Lib" class="md-nav__link">
+      Lib
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-8" type="checkbox" id="nav-8" checked>
+    
+    <label class="md-nav__link" for="nav-8">
+      Technology
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-8">
+        Technology
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Tech/" title="Tech" class="md-nav__link">
+      Tech
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        ES6
+      </label>
+    
+    <a href="./" title="ES6" class="md-nav__link md-nav__link--active">
+      ES6
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#general" title="General" class="md-nav__link">
+    General
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#class-notation" title="Class notation" class="md-nav__link">
+    Class notation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arrow-functions" title="Arrow Functions" class="md-nav__link">
+    Arrow Functions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#object-notations" title="Object Notations" class="md-nav__link">
+    Object Notations
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#promise" title="Promise" class="md-nav__link">
+    Promise
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../React/" title="React" class="md-nav__link">
+      React
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-9" type="checkbox" id="nav-9">
+    
+    <label class="md-nav__link" for="nav-9">
+      Integration
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-9">
+        Integration
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Integration/API/" title="API" class="md-nav__link">
+      API
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-10" type="checkbox" id="nav-10">
+    
+    <label class="md-nav__link" for="nav-10">
+      Maintenance
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-10">
+        Maintenance
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Maintenance/Deploy/" title="Deploy" class="md-nav__link">
+      Deploy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Maintenance/Tests/" title="Tests" class="md-nav__link">
+      Tests
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#general" title="General" class="md-nav__link">
+    General
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#class-notation" title="Class notation" class="md-nav__link">
+    Class notation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arrow-functions" title="Arrow Functions" class="md-nav__link">
+    Arrow Functions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#object-notations" title="Object Notations" class="md-nav__link">
+    Object Notations
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#promise" title="Promise" class="md-nav__link">
+    Promise
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/dans-labs/dariah/edit/master/docs/Technology/ES6.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="es6">ES6<a class="headerlink" href="#es6" title="Permanent link">&para;</a></h1>
+<h2 id="general">General<a class="headerlink" href="#general" title="Permanent link">&para;</a></h2>
+<p>We use
+<a href="https://babeljs.io/learn-es2015/">ECMAScript 6, also known as ES6, also known as ES2015, also known as JavaScript</a>
+for the client side of the app.</p>
+<p>The code is <em>transpiled</em> through Babel into a version of JavaScript that all
+major browsers understand. The compilation from source code to what the browser
+eventually gets is way more complicated. It is taken care of by the build tool
+of our choice: <a href="https://webpack.js.org/concepts/">Webpack</a></p>
+<p>Our source code conforms to a number of style guides, which are checked by
+<a href="http://eslint.org">eslint</a>. There are many options and choices, ours are
+<a href="https://github.com/Dans-labs/dariah/blob/master/client/eslint.yaml">here</a>. Not all of these are relevant, because
+we also enforce style by means of <a href="https://prettier.io">prettier</a>.</p>
+<p>The evolution of JavaScript to ES6 and beyond has transformed JavaScript from a
+"horrible language" into a performant language with a beautiful syntax on one of
+the most widely supported platforms: the browser. Instead of pushing JavaScript
+out of sight, we fully embrace it as our principal programming formalism at the
+client side.</p>
+<p>Others (see for example <a href="https://www.meteor.com">Meteor</a>) go even further and use it on
+the server as well, but we have not (yet) taken that step.</p>
+<p>We highlight a few, not all, concepts in ES6 that we make use of.</p>
+<h2 id="class-notation"><a href="https://babeljs.io/learn-es2015/#ecmascript-2015-features-classes">Class notation</a><a class="headerlink" href="#class-notation" title="Permanent link">&para;</a></h2>
+<p>In our code, we do not do that much with classes and object-oriented
+programming. Wherever possible, we prefer writing functions that can be used
+irrespective of classes. In the React/Redux world, function composition is the
+preferred way of building up complex functionality out of simpler functionality.
+Still, there are cases where object orientation definitely has advantages.</p>
+<p>The new syntax for classes is like this:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">class</span> <span class="nx">Foo</span> <span class="kr">extends</span> <span class="nx">Bar</span> <span class="p">{</span>
+    <span class="nx">constructor</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kr">super</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="nx">method1</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">z</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">prop</span> <span class="o">=</span> <span class="nx">x</span>
+    <span class="p">}</span>
+    <span class="nx">method2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">f</span><span class="p">,</span> <span class="nx">g</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">event</span> <span class="o">=</span> <span class="nx">e</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+<p>This is nice, terse, clean syntax. Note the difference between <code>method1</code> and
+<code>method2</code>. <code>method1</code> is an ordinary method, and the <code>this</code> in the body points to
+the caller. So if you want to send <code>method1</code> around as a callback, you have to
+manually bind the <code>this</code>:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="nx">callback</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">method1</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+</pre></div>
+</td></tr></table>
+
+<p>In several react contexts, it is undesirable to do this binding, because behind
+the screens it creates a new object. In a react component, it is much more
+efficient to pass a statically defined callback around. <code>method2</code> comes to the
+rescue. It is a <em>class property</em>, and the <code>this</code> is now <em>lexical</em>. So, whoever
+calls it, <code>this</code> is the <code>this</code> of class <code>Foo</code>. So you can just say:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="nx">callback</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">method2</span>
+</pre></div>
+</td></tr></table>
+
+<p>Note that this syntax of <a href="http://borgs.cybrilla.com/tils/es7-class-properties/">class properties</a> is in ES7, beyond
+ES6. Yet we can use it without issue because of
+<a href="https://babeljs.io/docs/plugins/transform-class-properties/">Babel</a>.</p>
+<h2 id="arrow-functions"><a href="https://babeljs.io/learn-es2015/#ecmascript-2015-features-arrows-and-lexical-this">Arrow Functions</a><a class="headerlink" href="#arrow-functions" title="Permanent link">&para;</a></h2>
+<p>There is now a very handy notation to write functions: <strong>arrow</strong> notation.
+Instead of</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kd">function</span> <span class="nx">myFunc</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">x</span> <span class="o">+</span> <span class="nx">y</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+<p>you can write:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">myFunc</span> <span class="o">=</span> <span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">x</span> <span class="o">+</span> <span class="nx">y</span>
+</pre></div>
+</td></tr></table>
+
+<p>If there is only 1 argument, it is even shorter:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">myFunc</span> <span class="o">=</span> <span class="nx">x</span> <span class="p">=&gt;</span> <span class="nx">x</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+</td></tr></table>
+
+<p>If you have functions that return functions, everything goes smoother now:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">handleEvent</span> <span class="o">=</span> <span class="nx">id</span> <span class="p">=&gt;</span> <span class="nx">event</span> <span class="p">=&gt;</span> <span class="nx">dispatch</span><span class="p">({</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span> <span class="p">})</span>
+</pre></div>
+</td></tr></table>
+
+<p>There is more to this, notably, for arrow functions the <code>this</code> is lexical.</p>
+<h2 id="object-notations">Object Notations<a class="headerlink" href="#object-notations" title="Permanent link">&para;</a></h2>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer">shorthand</a>,
+<a href="https://babeljs.io/learn-es2015/#ecmascript-2015-features-destructuring">destructuring</a>,
+<a href="https://babeljs.io/learn-es2015/#ecmascript-2015-features-destructuring">rest spread</a>.</p>
+<p>Objects are central to JavaScript. ES6 contains new syntax, that makes working
+with objects very pleasant indeed. In our app we have activated linters that
+insist on using that syntax to the maximum amount possible. It will dramatically
+change the general outlook of a piece of JavaScript code. Just to have a taste,
+look at this bit of <a href="https://github.com/Dans-labs/dariah/blob/master/client/src/js/app/components/ListFilter.jsx">source code</a>.</p>
+<p>An <em>object</em> contains key-value pairs like this:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">props</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="mi">3</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+<p>If we want to extract the <code>foo</code> and <code>y</code> part, we could say:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">props</span><span class="p">.</span><span class="nx">foo</span>
+<span class="kr">const</span> <span class="nx">y</span> <span class="o">=</span> <span class="nx">props</span><span class="p">.</span><span class="nx">bar</span><span class="p">.</span><span class="nx">y</span>
+</pre></div>
+</td></tr></table>
+
+<p>But there is a more elegant way, using <em>destructuring</em>:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="p">{</span> <span class="nx">y</span><span class="o">:</span> <span class="nx">y</span> <span class="p">}</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">props</span>
+</pre></div>
+</td></tr></table>
+
+<p>This does in one statement exactly the same as in the previous statement.</p>
+<p>On top of it, there is another trick: <em>shorthand</em>. If you have a pattern like
+<code>name: name</code> inside an object, you may also say <code>{ name }</code>.</p>
+<p>And if you are in a scope where <code>name</code> is bound to a value <em>v</em>, you may define
+an object like this:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">props</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span> <span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+<p>So we can write our <em>foo bar</em> example even more compactly:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="p">{</span> <span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="p">{</span> <span class="nx">y</span> <span class="p">}</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">props</span>
+</pre></div>
+</td></tr></table>
+
+<p>If <code>props</code> has a lot of keys, and we are interested in doing something with its
+keys <code>foo</code> and <code>bar</code>, and want to pass the remaining keys on, we can do so using
+<em>object rest spread</em>, as follows:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="p">{</span> <span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="p">,</span> <span class="p">...</span><span class="nx">rest</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">props</span>
+<span class="nx">doSomething</span><span class="p">(</span><span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="p">)</span>
+<span class="nx">passOn</span><span class="p">(</span><span class="nx">rest</span><span class="p">)</span>
+</pre></div>
+</td></tr></table>
+
+<p>These things also may occurs in function definitions:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3
+4</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">process</span> <span class="o">=</span> <span class="p">({</span> <span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="p">,</span> <span class="p">...</span><span class="nx">rest</span> <span class="p">})</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">doSomething</span><span class="p">(</span><span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="p">)</span>
+    <span class="nx">passOn</span><span class="p">(</span><span class="nx">rest</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+<p>If you use object destructuring and the key you destructure is not present in
+the object, you get undefined. But you can also specify defaults:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3
+4</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">process</span> <span class="o">=</span> <span class="p">({</span> <span class="nx">foo</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="nx">bar</span><span class="o">=</span><span class="p">{</span> <span class="nx">x</span><span class="o">:</span><span class="mi">0</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="mi">0</span> <span class="p">},</span> <span class="p">...</span><span class="nx">rest</span> <span class="p">})</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">doSomething</span><span class="p">(</span><span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="p">)</span>
+    <span class="nx">passOn</span><span class="p">(</span><span class="nx">rest</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+<p>Object rest spread is also handy to make a shallow copy of an object with some
+keys changed. Suppose we have a <code>state</code> object, with many keys, but we only want
+to update the key called <code>filter</code> and give it value <code>{ 35: true }</code>, where 35 is
+stored in local constant <code>id</code>. This is how you do that:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">newState</span> <span class="o">=</span> <span class="p">{</span> <span class="p">...</span><span class="nx">state</span><span class="p">,</span> <span class="nx">filter</span><span class="o">:</span> <span class="p">{</span> <span class="p">[</span><span class="nx">id</span><span class="p">]</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+<p>Suppose that you do not want to replace the filter object with the one given
+above, but only its key 35, leaving all other keys intact. You can use <em>object
+spread</em> twice to achieve this:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kr">const</span> <span class="nx">newState</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">...</span><span class="nx">state</span><span class="p">,</span>
+    <span class="nx">filter</span><span class="o">:</span> <span class="p">{</span>
+        <span class="p">...</span><span class="nx">state</span><span class="p">.</span><span class="nx">filter</span><span class="p">,</span>
+        <span class="p">[</span><span class="nx">id</span><span class="p">]</span><span class="o">:</span> <span class="mi">35</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+<p>This kind of code is often needed in <em>reducers</em>, functions that compute a new
+state from an old state in such a way that everything that is changed, is copied
+shallowly to a new object, and every thing that is the same, remains the same
+object.</p>
+<p>However, if what has changed is really deeply nested, there are better methods
+to achieve is, e.g. <a href="https://lodash.com/docs/#merge">lodash merge</a>.</p>
+<h2 id="promise"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a><a class="headerlink" href="#promise" title="Permanent link">&para;</a></h2>
+<p><em>Promise</em> is an ES6 data structure to contain the result of an asynchronous
+function. It has as state that is either <em>pending</em>, <em>failed</em> or <em>resolved</em>. Once
+the state is <em>failed</em> or <em>resolved</em>, it will not change any more. If the state
+is <em>resolved</em>, the return value is available, and will not change any more.</p>
+<p>The typical way to use a promise is</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>  const dataStore = {}
+  const getData = url =&amp;gt; fetch(url)
+  // assuming that fetch returns a Promise, we can then say
+  getData(&#39;/api/blob/23&#39;).
+  then(
+    blob =&amp;gt; {dataStore.url = blob},
+    error =&amp;gt; console.error(error),
+  )
+</pre></div>
+</td></tr></table>
+
+<p><strong>Example</strong>: <a href="https://github.com/Dans-labs/dariah/blob/master/client/src/js/lib/server.js">server.js</a></p>
+<p>This is virtually the only occurrence in our code where we use Promise syntax.</p>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">External documentation</a></p>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../Tech/" title="Tech" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Tech
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../React/" title="React" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                React
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+        
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/application.5e60981f.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:"../.."}})</script>
+      
+    
+    
+      
+    
+  </body>
+</html>

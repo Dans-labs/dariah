@@ -1,0 +1,1065 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="The technical documentation of the DARIAH Contribution Tool. Design, specs, rationales, patterns, diagrams.
+">
+      
+      
+        <link rel="canonical" href="https://dans-labs.github.io/dariah/Concepts/Architecture/">
+      
+      
+        <meta name="author" content="Dirk Roorda">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../../icons/favicon.ico">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.0.6">
+    
+    
+      
+        <title>Architecture - Tech Doc DARIAH contribution tool</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/application.451f80e5.css">
+      
+      
+    
+    
+      <script src="../../assets/javascripts/modernizr.1aa3b519.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../../assets/fonts/material-icons.css">
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="__github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#architecture" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://dans-labs.github.io/dariah/" title="Tech Doc DARIAH contribution tool" class="md-header-nav__button md-logo">
+          
+            <img src="../../images/inkind_logo.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                Tech Doc DARIAH contribution tool
+              </span>
+              <span class="md-header-nav__topic">
+                Architecture
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/dans-labs/dariah/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#__github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://dans-labs.github.io/dariah/" title="Tech Doc DARIAH contribution tool" class="md-nav__button md-logo">
+      
+        <img src="../../images/inkind_logo.png" width="48" height="48">
+      
+    </a>
+    Tech Doc DARIAH contribution tool
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/dans-labs/dariah/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#__github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+    
+    <label class="md-nav__link" for="nav-2">
+      About
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        About
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Codebase/" title="Codebase" class="md-nav__link">
+      Codebase
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Stats/" title="Stats" class="md-nav__link">
+      Stats
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/News/" title="News" class="md-nav__link">
+      News
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Lessons/" title="Lessons" class="md-nav__link">
+      Lessons
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Diagrams/" title="Diagrams" class="md-nav__link">
+      Diagrams
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Functionality
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Functionality
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Functionality/Business/" title="Business" class="md-nav__link">
+      Business
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Functionality/Tables/" title="Tables" class="md-nav__link">
+      Tables
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Functionality/Templates/" title="Templates" class="md-nav__link">
+      Templates
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Functionality/Workflow/" title="Workflow" class="md-nav__link">
+      Workflow
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Legacy
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        Legacy
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Legacy/Content/" title="Content" class="md-nav__link">
+      Content
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" checked>
+    
+    <label class="md-nav__link" for="nav-5">
+      Concepts
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Concepts
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Architecture
+      </label>
+    
+    <a href="./" title="Architecture" class="md-nav__link md-nav__link--active">
+      Architecture
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" title="Introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" title="Overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#components-and-dux" title="Components and Dux" class="md-nav__link">
+    Components and Dux
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dux" title="Dux" class="md-nav__link">
+    Dux
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-dux-of-this-app" title="The dux of this app" class="md-nav__link">
+    The dux of this app
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Model/" title="Model" class="md-nav__link">
+      Model
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Routing/" title="Routing" class="md-nav__link">
+      Routing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+    
+    <label class="md-nav__link" for="nav-6">
+      Server
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        Server
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Server/Authentication/" title="Authentication" class="md-nav__link">
+      Authentication
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Server/Server/" title="Server" class="md-nav__link">
+      Server
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      Client
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        Client
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Client/Components/" title="Components" class="md-nav__link">
+      Components
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Client/Dux/" title="Dux" class="md-nav__link">
+      Dux
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Client/Lib/" title="Lib" class="md-nav__link">
+      Lib
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-8" type="checkbox" id="nav-8">
+    
+    <label class="md-nav__link" for="nav-8">
+      Technology
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-8">
+        Technology
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Technology/Tech/" title="Tech" class="md-nav__link">
+      Tech
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Technology/ES6/" title="ES6" class="md-nav__link">
+      ES6
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Technology/React/" title="React" class="md-nav__link">
+      React
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-9" type="checkbox" id="nav-9">
+    
+    <label class="md-nav__link" for="nav-9">
+      Integration
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-9">
+        Integration
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Integration/API/" title="API" class="md-nav__link">
+      API
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-10" type="checkbox" id="nav-10">
+    
+    <label class="md-nav__link" for="nav-10">
+      Maintenance
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-10">
+        Maintenance
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Maintenance/Deploy/" title="Deploy" class="md-nav__link">
+      Deploy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Maintenance/Tests/" title="Tests" class="md-nav__link">
+      Tests
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" title="Introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" title="Overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#components-and-dux" title="Components and Dux" class="md-nav__link">
+    Components and Dux
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dux" title="Dux" class="md-nav__link">
+    Dux
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-dux-of-this-app" title="The dux of this app" class="md-nav__link">
+    The dux of this app
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/dans-labs/dariah/edit/master/docs/Concepts/Architecture.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h1>
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<p>This app consists of many <a href="React">React</a> components. By default React components
+have a private state where they can store everything that changes in their life
+courses. That is: user interaction and server data.</p>
+<p>If many components handle overlapping data, problems arise, and they manifest
+themselves first as subtle bugs. Hard to reproduce, hard to fix, because they
+have to do with unpredictable timing of changing entities.</p>
+<p>That is where <a href="React#redux">Redux</a> comes to the rescue. Redux provides a central
+state as a <em>single source of truth</em>. Redux itself is a very small library, under
+600 lines of code, but using it will have a dramatic effect on all your React
+components, especially if you use Redux in an <em>idiomatic</em> way.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p><img alt="diag" src="../../design/design.007.png" /></p>
+<h2 id="components-and-dux"><a href="Components">Components</a> and <a href="Dux">Dux</a><a class="headerlink" href="#components-and-dux" title="Permanent link">&para;</a></h2>
+<p>In Redux, every component may obtain read access to the state, and has indirect
+write access to it by <em>dispatching</em> <em>actions</em>. The state is held in a <em>store</em>
+and the store manages all access to the state. When actions are dispatched to
+the store, the store calls a <em>reducer</em>, which is a function written by the
+application developer.</p>
+<p>The reducer is given the action, which has a <em>type</em> and a payload, and on that
+basis, and that basis alone, it produces a new state from the old state.</p>
+<p>An app has many concerns, some of which are pretty well separable from others.
+Such a concern tends to be centred around a specific slice of the state,
+involving a specific set of actions, and a dedicated partial reducer of that
+slice. The components involved do not need the whole state, but only this
+specific slice of the state. Some of the actions may become really specialized,
+involved, and complex, and for those one writes dedicated <em>helpers</em>.</p>
+<p>We have organized these concerns into <em>dux</em> (plural of <em>duct</em> or more
+affectionately: <em>duck</em>), where a duct is one file of <a href="ES6">ES6</a> code that
+exports</p>
+<ul>
+<li><em>action</em> creator functions (one or more as named exports); their names
+    typically start with <code>handle</code>, <code>change</code>, <code>fetch</code>; <code>fetch</code> as in
+    "asynchronously fetch data from the server".</li>
+<li>a single <em>reducer</em> function (as the default export);</li>
+<li><em>selector</em> functions (one or more as named exports); their names always start
+    with <code>get</code>; <code>get</code> as in: "get a fragment of the whole state".</li>
+<li><em>helper</em> functions (some of which do not have to be exported); quite often
+    their names start with <code>compile</code> as in "compile the state data into something
+    that may component can readily consume".</li>
+</ul>
+<p>Such a <em>duct</em> ties in very well with the way that React components can be
+connected to the state. The idiomatic approach is to write your component as a
+pure, stateless function, even if it needs state. When it does need to read the
+state, assume that your component will receive that information as <em>properties</em>.
+And when it needs to modify the state, assume that it will receive callbacks,
+also as <em>properties</em>, to dispatch actions. See also <a href="React#connect">connect</a>.</p>
+<h2 id="dux"><a href="Dux">Dux</a><a class="headerlink" href="#dux" title="Permanent link">&para;</a></h2>
+<p>We employ a glue between <a href="Components">components</a> and the <a href="React#redux">state</a>:
+<em>dux</em>.</p>
+<p>If you have written your component, say <code>MyComp</code>, and you need a piece of the
+state <code>mySlice</code> that is provided by a <em>selector</em> <code>getMySlice</code>, and you need to
+dispatch an action <code>handle</code> in response of a user click, and the action creator
+<code>changeSlice</code> provides that, then you can wrap your component by means of the
+Redux higher order function <code>connect</code> like this:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>    export connect(getMySlice, { handle: changeSlice })(MyComp)
+</pre></div>
+</td></tr></table>
+
+<p>In this way, most components that deal with change can still be written as pure
+functions, relatively easy to understand, while the response to change is
+expressed in a very simple pattern. This will reduce the potential bugs
+considerably.</p>
+<p><img alt="diag" src="../../design/design.008.png" /></p>
+<p>Note that all code to make the connection between components and a (slice of
+the) state are located in a duct. We are talking about the <em>selectors</em>, the
+<em>actions</em>, and possibly the <em>helpers</em>. The reducer is something that is hidden
+from the component code. It is only used by the store, via a kind of
+subscription. The structure of the reducer follows the types of the actions very
+closely so it really makes sense to have all four things in one file.</p>
+<h2 id="the-dux-of-this-app">The <a href="Dux">dux</a> of this app<a class="headerlink" href="#the-dux-of-this-app" title="Permanent link">&para;</a></h2>
+<p>Currently, these are the dux of this app:</p>
+<ul>
+<li><a href="Dux#alter">alter</a>: show/hide, cycle through <em>n</em> alternative representations
+    of a piece of user interface; example: widgets that can be expanded and
+    collapsed by the user;</li>
+<li><a href="Dux#workflow">workflow</a>: specialized logic for the assessment and review
+    workflow e.g. to determine what are the active contribution types and
+    assessment criteria at a given point in time;</li>
+<li><a href="Dux#docs">docs</a>: fetch documents, especially markdown ones, and show them in
+    two representations: source and formatted;</li>
+<li><a href="Dux#filters">filters</a>: the machinery of faceted and full text filtering of
+    entities from tables;</li>
+<li><a href="Dux#forms">forms</a>: the state of all data entry forms in the app; managed by
+    <a href="https://redux-form.com">redux-form</a>; but other parts of the app need to
+    inspect the <code>form</code> slice of the state as well;</li>
+<li><a href="Dux#grid">grid</a>: the display state of all lists in grid layout: the sort
+    columns and the directions of sorting;</li>
+<li><a href="Dux#me">me</a>: data about the currently logged-in user;</li>
+<li><a href="Dux#notes">notes</a>: the notification system; this is what displays progress
+    and error messages; it can be accessed by the user by clicking the unobtrusive
+    open circle in the upper right corner of the browser window;</li>
+<li><a href="Dux#roots">roots</a>: combining all the other dux;</li>
+<li><a href="Dux#select">select</a>: the state of all multi-select widgets in the app;</li>
+<li><a href="Dux#server">server</a>: handling asynchronous actions and reporting about
+    success, failure and pending requests; it also prevents subsequent requests of
+    data between the first request and the arrival of the data;</li>
+<li><a href="Dux#settings">settings</a>: cross-cutting operational parameters, such as
+    whether to show or hide the provenance fields (creator, created data, sequence
+    of modified-by records);</li>
+<li><a href="Dux#tables">tables</a>: manage all database data that has been fetched from the
+    server; in fact, we construct a normalized copy of all tables that contain
+    information that is application needs; when more data is needed, the
+    application fetches it from the server and merges it in <code>tables</code> slice of the
+    state; this slice not only holds the data of the tables, but also the specs of
+    them, such as the fields, their types, the relations between tables, the
+    master-detail structure, etc.;</li>
+<li><a href="Dux#win">win</a>: react to the resizing of the browser window; earlier stages of
+    the application used this to resize certain areas in the application window;
+    however, by using new CSS features such as <a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/">flexbox</a> we do
+    not have any real need to make the window size known to the app; this might
+    change when the app acquires new functionality, so for the moment we retain
+    this mechanism.</li>
+</ul>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../../Legacy/Content/" title="Content" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Content
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../Model/" title="Model" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Model
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+        
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/application.5e60981f.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:"../.."}})</script>
+      
+    
+    
+      
+    
+  </body>
+</html>

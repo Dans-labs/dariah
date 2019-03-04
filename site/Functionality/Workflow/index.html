@@ -1,0 +1,1524 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="The technical documentation of the DARIAH Contribution Tool. Design, specs, rationales, patterns, diagrams.
+">
+      
+      
+        <link rel="canonical" href="https://dans-labs.github.io/dariah/Functionality/Workflow/">
+      
+      
+        <meta name="author" content="Dirk Roorda">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../../icons/favicon.ico">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.0.6">
+    
+    
+      
+        <title>Workflow - Tech Doc DARIAH contribution tool</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/application.451f80e5.css">
+      
+      
+    
+    
+      <script src="../../assets/javascripts/modernizr.1aa3b519.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../../assets/fonts/material-icons.css">
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="__github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#workflow-engine" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://dans-labs.github.io/dariah/" title="Tech Doc DARIAH contribution tool" class="md-header-nav__button md-logo">
+          
+            <img src="../../images/inkind_logo.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                Tech Doc DARIAH contribution tool
+              </span>
+              <span class="md-header-nav__topic">
+                Workflow
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/dans-labs/dariah/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#__github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://dans-labs.github.io/dariah/" title="Tech Doc DARIAH contribution tool" class="md-nav__button md-logo">
+      
+        <img src="../../images/inkind_logo.png" width="48" height="48">
+      
+    </a>
+    Tech Doc DARIAH contribution tool
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/dans-labs/dariah/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#__github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+    
+    <label class="md-nav__link" for="nav-2">
+      About
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        About
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Codebase/" title="Codebase" class="md-nav__link">
+      Codebase
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Stats/" title="Stats" class="md-nav__link">
+      Stats
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/News/" title="News" class="md-nav__link">
+      News
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Lessons/" title="Lessons" class="md-nav__link">
+      Lessons
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../About/Diagrams/" title="Diagrams" class="md-nav__link">
+      Diagrams
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      Functionality
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Functionality
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Business/" title="Business" class="md-nav__link">
+      Business
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Tables/" title="Tables" class="md-nav__link">
+      Tables
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Templates/" title="Templates" class="md-nav__link">
+      Templates
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Workflow
+      </label>
+    
+    <a href="./" title="Workflow" class="md-nav__link md-nav__link--active">
+      Workflow
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#description" title="Description" class="md-nav__link">
+    Description
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#realization" title="Realization" class="md-nav__link">
+    Realization
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#client" title="Client" class="md-nav__link">
+    Client
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server" title="Server" class="md-nav__link">
+    Server
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#readworkflow" title="readWorkflow" class="md-nav__link">
+    readWorkflow
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adjustworkflow" title="adjustWorkflow" class="md-nav__link">
+    adjustWorkflow
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enforceworkflow" title="enforceWorkflow" class="md-nav__link">
+    enforceWorkflow
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manageworkflow" title="manageWorkflow" class="md-nav__link">
+    manageWorkflow
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inspecting-other-documents" title="Inspecting other documents" class="md-nav__link">
+    Inspecting other documents
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#computing-attributes" title="Computing attributes" class="md-nav__link">
+    Computing attributes
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hasvalue" title="hasValue" class="md-nav__link">
+    hasValue
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hascomplete" title="hasComplete" class="md-nav__link">
+    hasComplete
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hasincomplete" title="hasIncomplete" class="md-nav__link">
+    hasIncomplete
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hasdifferent" title="hasDifferent" class="md-nav__link">
+    hasDifferent
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getvalues" title="getValues" class="md-nav__link">
+    getValues
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#assessmentscore" title="assessmentScore" class="md-nav__link">
+    assessmentScore
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wiring" title="Wiring" class="md-nav__link">
+    Wiring
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Legacy
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        Legacy
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Legacy/Content/" title="Content" class="md-nav__link">
+      Content
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+    
+    <label class="md-nav__link" for="nav-5">
+      Concepts
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Concepts
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Concepts/Architecture/" title="Architecture" class="md-nav__link">
+      Architecture
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Concepts/Model/" title="Model" class="md-nav__link">
+      Model
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Concepts/Routing/" title="Routing" class="md-nav__link">
+      Routing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+    
+    <label class="md-nav__link" for="nav-6">
+      Server
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        Server
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Server/Authentication/" title="Authentication" class="md-nav__link">
+      Authentication
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Server/Server/" title="Server" class="md-nav__link">
+      Server
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      Client
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        Client
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Client/Components/" title="Components" class="md-nav__link">
+      Components
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Client/Dux/" title="Dux" class="md-nav__link">
+      Dux
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Client/Lib/" title="Lib" class="md-nav__link">
+      Lib
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-8" type="checkbox" id="nav-8">
+    
+    <label class="md-nav__link" for="nav-8">
+      Technology
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-8">
+        Technology
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Technology/Tech/" title="Tech" class="md-nav__link">
+      Tech
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Technology/ES6/" title="ES6" class="md-nav__link">
+      ES6
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Technology/React/" title="React" class="md-nav__link">
+      React
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-9" type="checkbox" id="nav-9">
+    
+    <label class="md-nav__link" for="nav-9">
+      Integration
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-9">
+        Integration
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Integration/API/" title="API" class="md-nav__link">
+      API
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-10" type="checkbox" id="nav-10">
+    
+    <label class="md-nav__link" for="nav-10">
+      Maintenance
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-10">
+        Maintenance
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Maintenance/Deploy/" title="Deploy" class="md-nav__link">
+      Deploy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Maintenance/Tests/" title="Tests" class="md-nav__link">
+      Tests
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#description" title="Description" class="md-nav__link">
+    Description
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#realization" title="Realization" class="md-nav__link">
+    Realization
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#client" title="Client" class="md-nav__link">
+    Client
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server" title="Server" class="md-nav__link">
+    Server
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#readworkflow" title="readWorkflow" class="md-nav__link">
+    readWorkflow
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adjustworkflow" title="adjustWorkflow" class="md-nav__link">
+    adjustWorkflow
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enforceworkflow" title="enforceWorkflow" class="md-nav__link">
+    enforceWorkflow
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manageworkflow" title="manageWorkflow" class="md-nav__link">
+    manageWorkflow
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inspecting-other-documents" title="Inspecting other documents" class="md-nav__link">
+    Inspecting other documents
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#computing-attributes" title="Computing attributes" class="md-nav__link">
+    Computing attributes
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hasvalue" title="hasValue" class="md-nav__link">
+    hasValue
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hascomplete" title="hasComplete" class="md-nav__link">
+    hasComplete
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hasincomplete" title="hasIncomplete" class="md-nav__link">
+    hasIncomplete
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hasdifferent" title="hasDifferent" class="md-nav__link">
+    hasDifferent
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getvalues" title="getValues" class="md-nav__link">
+    getValues
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#assessmentscore" title="assessmentScore" class="md-nav__link">
+    assessmentScore
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wiring" title="Wiring" class="md-nav__link">
+    Wiring
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/dans-labs/dariah/edit/master/docs/Functionality/Workflow.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="workflow-engine">Workflow Engine<a class="headerlink" href="#workflow-engine" title="Permanent link">&para;</a></h1>
+<h2 id="description">Description<a class="headerlink" href="#description" title="Permanent link">&para;</a></h2>
+<p>The workflow engine of this app is a system to handle business logic.</p>
+<p>Whereas the database consists of neutral things (fields, records, lists), the
+workflow engine weaves additional attributes around it, that indicate additional
+constraints.</p>
+<p><img alt="diag" src="../../design/design.011.png" /></p>
+<p>These additional <em>workflow</em> attributes are computed by the server on the fly,
+and then stored in a separate table in the database: <code>workflow</code>. From then on
+the following happens with the workflow attributes:</p>
+<ul>
+<li>they are sent to client, together with the <em>permission</em> information for each
+    record</li>
+<li>the client uses the workflow info to show or hide workflow related controls,
+    and to suppress controls that lead to actions that violate the business logic</li>
+<li>the server uses the workflow info to enforce the business logic;</li>
+<li>the server updates the workflow attributes after any insert/update/delete
+    action.</li>
+</ul>
+<p>No matter how good a job the client does in supporting the business logic and
+prohibiting actions that violate the business logic, the server always has the
+last word. Every access to bits and pieces in the database is first subjected to
+the permissions (a lower layer) and then to the additional workflow constraints.</p>
+<h2 id="realization">Realization<a class="headerlink" href="#realization" title="Permanent link">&para;</a></h2>
+<p>Workflow is realized at the server and at the client. To a large extent, its
+rules are specified in the <a href="Model">data model</a>.</p>
+<h3 id="client">Client<a class="headerlink" href="#client" title="Permanent link">&para;</a></h3>
+<p>Workflow logic is predominantly found in the <a href="Templates">templates</a>, which may
+include workflow buttons and info panels, but also in
+<a href="Dux#workflow">workflow.js</a>, which computes special items to present to the
+user, and for some of them workflow information is used. The templates
+themselves are applied by functions in
+<a href="https://github.com/Dans-labs/dariah/blob/master/client/src/js/lib/templates.js">templates.js</a>. These functions are given
+workflow attributes that they pass on to the templates.</p>
+<h3 id="server">Server<a class="headerlink" href="#server" title="Permanent link">&para;</a></h3>
+<p>The heart of the workflow code is at the server, in
+<a href="https://github.com/Dans-labs/dariah/blob/master/server/controllers/workflow.py">workflow.py</a>. Its functions are
+called from <a href="https://github.com/Dans-labs/dariah/blob/master/server/controllers/db.py">db.py</a> in many places.</p>
+<p>The principal functions exported are discussed here.</p>
+<h4 id="readworkflow">readWorkflow<a class="headerlink" href="#readworkflow" title="Permanent link">&para;</a></h4>
+<p>Given a document in some table, this function loads the workflow attributes for
+that document (if any). The attributes are loaded from the workflow table. That
+table has records with fields <code>table</code>, <code>eId</code> and <code>attributes</code>, where <code>table</code> and
+<code>eId</code> specify exactly which the record in question is, and <code>attributes</code> is a
+dictionary of all workflow data for that record that is currently stored.</p>
+<p>If <code>compute=True</code> is passed, the workflow attributes will be computed. The
+determination of these attributes is dictated by the <a href="Model">data model</a>, in the
+individual <a href="https://github.com/Dans-labs/dariah/blob/master/server/models/tables">tables</a>, under the key
+<code>workflow/read</code>.</p>
+<p>There you find a sequence of instructions by which the system can compute
+workflow attributes for each record in a table. Let us look at an example:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">workflow</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">read</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">inspect</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">details</span>
+      <span class="l l-Scalar l-Scalar-Plain">method</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">hasValue</span>
+      <span class="l l-Scalar l-Scalar-Plain">linkField</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">contrib</span>
+      <span class="l l-Scalar l-Scalar-Plain">otherTable</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">assessment</span>
+      <span class="l l-Scalar l-Scalar-Plain">otherField</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">submitted</span>
+      <span class="l l-Scalar l-Scalar-Plain">myField</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+      <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+      <span class="l l-Scalar l-Scalar-Plain">attribute</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">locked</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">being assessed</span>
+</pre></div>
+</td></tr></table>
+
+<p>Basically, this instructs the system to look at various other tables and records
+and fields, and if certain conditions are met the attributes <code>locked</code> and
+<code>lockedReason</code> are added to the workflow attributes.</p>
+<p>Line by line:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>- inspect: details
+</pre></div>
+</td></tr></table>
+
+<p>This is an instruction to look into the detail record(s) of the current record.
+Other possible values are: <code>master</code> and <code>self</code>, with the obvious meanings.</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>method: hasValue
+</pre></div>
+</td></tr></table>
+
+<p>The name of the method by which the inspected value is taken and turned in
+either <code>True</code> or <code>False</code>. There is a fixed, limited supply of methods, which are
+hard-coded in the program, see
+<a href="https://github.com/Dans-labs/dariah/blob/master/server/controllers/workflow.py"><code>hasValue</code>, <code>hasDifferent</code>, <code>hasIncomplete</code></a>.</p>
+<p>Not all of the following parameters need to be present for all methods, and
+there are more possible parameters, e.g.</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>emptyFields:
+  - score
+  - evidence
+</pre></div>
+</td></tr></table>
+
+<p>a list of fields in the other table that will be checked for emptiness.</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>linkField: contrib
+</pre></div>
+</td></tr></table>
+
+<p>This is the name of the field by which detail records point to their master.</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>- otherTable: assessment
+</pre></div>
+</td></tr></table>
+
+<p>This is the name of the other table (which can be the master table, the details
+table, or the own table, depending on the value of <code>inspect</code>).</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>otherField: submitted
+</pre></div>
+</td></tr></table>
+
+<p>The name of the field in the other table to look at.</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>myField: null
+</pre></div>
+</td></tr></table>
+
+<p>The name of the field in the own table to look at.</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>value: true
+</pre></div>
+</td></tr></table>
+
+<p>A reference value to compare the inspected value with.</p>
+<p>Summarizing: you just saw just one instruction to inspect related values and to
+deliver or not deliver a specific set of workflow attributes. More precisely,
+this is the rule that states that a contribution record becomes locked if it has
+an assessment that has been submitted.</p>
+<h4 id="adjustworkflow">adjustWorkflow<a class="headerlink" href="#adjustworkflow" title="Permanent link">&para;</a></h4>
+<p>Whereas <code>readWorkflow</code> computes all relevant workflow for a given record in a
+given table, <code>adjustWorkflow</code> delivers a list of <em>other</em> records in other
+tables, that need new workflow attributes after a change in a given record,
+whether it be an insert, update or delete.</p>
+<p>The determination of these attributes is dictated by the <a href="Model">data model</a>, in
+the individual <a href="https://github.com/Dans-labs/dariah/blob/master/server/models/tables">tables</a>, under the key
+<code>workflow/adjust</code>.</p>
+<p>Typically, when a record gets workflow attributes based on master or detail
+records, these attributes must be updated on any change in the master or in one
+of the details. The system is not clever enough to generate these adjust rules
+itself. We have to do that.</p>
+<p>Let us look at the same example, but now at its <code>adjust</code> rule:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">assessment</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">adjust</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">inspect</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">master</span>
+      <span class="l l-Scalar l-Scalar-Plain">linkField</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">contrib</span>
+      <span class="l l-Scalar l-Scalar-Plain">otherTable</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">contrib</span>
+      <span class="l l-Scalar l-Scalar-Plain">triggerFields</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">assessmentType</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">submitted</span>
+</pre></div>
+</td></tr></table>
+
+<p>It says that if an assessment record is changed, some other records are
+affected, namely its master record in the <code>contrib</code> table. But not all changes
+in the assessment trigger adjustments, only changes in one of the
+<code>triggerFields</code>, in this case obviously the field <code>submitted</code>. The system add
+the <code>linkField</code> silently to the <code>triggerField</code>, because if we, for whatever
+reason, reassigned this assessment to a different contribution, then that
+contribution has to know!</p>
+<p>The other trigger field, <code>assessmentType</code> is mentioned because of an other
+workflow rule, which we have not mentioned here as an example.</p>
+<h4 id="enforceworkflow">enforceWorkflow<a class="headerlink" href="#enforceworkflow" title="Permanent link">&para;</a></h4>
+<p>Finally, the server has to know the consequences of the workflow attributes for
+behaviour. This is dictated in the generic <a href="Model">data model</a>, under the key
+<code>workflow/prevent/</code><em>attribute</em> where <code>attribute</code> is a name such as <code>locked</code> or
+<code>incomplete</code>.</p>
+<p>For each attribute there are optional constraints for the <code>update</code> and <code>delete</code>
+actions.</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">prevent</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">locked</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">delete</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</td></tr></table>
+
+<p>means that it is forbidden to delete a record that carries the <code>locked</code>
+attribute.</p>
+<p>Likewise,</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">prevent</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">locked</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">update</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</td></tr></table>
+
+<p>means that any update whatsoever is forbidden to such a record.</p>
+<p>However, we can relax update constraints:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3
+4</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">prevent</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">locked</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">update</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">submitted</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</td></tr></table>
+
+<p>means that any update that changes the value of the field <code>submitted</code> is
+forbidden.</p>
+<p>We can relax this even further, and here we take a real example, under attribute
+<code>stalled</code> instead of <code>locked</code>:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">prevent</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">stalled</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">update</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">submitted</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">after</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</td></tr></table>
+
+<p>This means that any update that leads to field <code>submitted</code> having value <code>true</code>
+is forbidden.</p>
+<p>Here we say that a stalled assessment cannot be submitted. For the sake of
+clarity, here is the rule that says when an assessment is <code>stalled</code>:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>  <span class="l l-Scalar l-Scalar-Plain">workflow</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">read</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">inspect</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">master</span>
+        <span class="l l-Scalar l-Scalar-Plain">method</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">hasDifferent</span>
+        <span class="l l-Scalar l-Scalar-Plain">linkField</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">contrib</span>
+        <span class="l l-Scalar l-Scalar-Plain">otherTable</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">contrib</span>
+        <span class="l l-Scalar l-Scalar-Plain">otherField</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">typeContribution</span>
+        <span class="l l-Scalar l-Scalar-Plain">myField</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">assessmentType</span>
+        <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+        <span class="l l-Scalar l-Scalar-Plain">workflow</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">stalled</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+          <span class="l l-Scalar l-Scalar-Plain">stalledReason</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">assessment type is different from contribution type</span>
+</pre></div>
+</td></tr></table>
+
+<p>In words: if an assessment has an <code>assessmentType</code> field with a different value
+that the <code>contributionType</code> field of its master contribution, then the
+assessment counts as stalled.</p>
+<h4 id="manageworkflow">manageWorkflow<a class="headerlink" href="#manageworkflow" title="Permanent link">&para;</a></h4>
+<p>When the web server loads, it makes sure that correct workflow information is
+stored in the workflow table. It does so by dropping the existing workflow table
+and recomputing all workflow information from scratch.</p>
+<p>A sysadmin can also reset the workflow from within the app. Then the workflow
+table will be cleared (not dropped), and all workflow info will be recomputed.</p>
+<p>The <a href="Components#workflowinfo">WorkflowInfo</a> component presents the previous
+resets since the web server was last started, and gives an overview of the
+recomputed workflow attributes.</p>
+<h4 id="inspecting-other-documents">Inspecting other documents<a class="headerlink" href="#inspecting-other-documents" title="Permanent link">&para;</a></h4>
+<p>Both <code>readWorkflow</code> and <code>adjustWorkflow</code> have instructions to look up related
+documents and then apply a computing method to all those documents.</p>
+<p>The target documents can be specified with these instructions:</p>
+<ul>
+<li><strong>self</strong> don't look further, look at yourself. The information from which
+    workflow attributes are to be derived, is already present in the document
+    itself.</li>
+<li><strong>master</strong> look at your master document. A document can have multiple masters,
+    so you have to specify the field in yourself that points to the master, and
+    also what table that is.</li>
+<li><strong>details</strong> look at your details. A document can have multiple kinds of
+    details, so you have to specify the table that holds the details, and the
+    field in the details that points to you.</li>
+<li><strong>siblings</strong> look at records with the same master. You have to specify your
+    field that points to the master, the field in your siblings that points to the
+    master, and the table that holds your siblings.</li>
+</ul>
+<h4 id="computing-attributes">Computing attributes<a class="headerlink" href="#computing-attributes" title="Permanent link">&para;</a></h4>
+<p>When the other documents have been found, it is time to extract information from
+them, in order to put it into workflow attributes. There is a limited set of
+functions you can call, they are all listed in
+<a href="https://github.com/Dans-labs/dariah/blob/master/server/controllers/workflow.py">worklow.py</a> and their names start
+with <code>_compute_</code>. Below we name them without this prefix.</p>
+<h5 id="hasvalue">hasValue<a class="headerlink" href="#hasvalue" title="Permanent link">&para;</a></h5>
+<p>Returns <code>{'on': True }</code> if one of the other docs has a field with a given value.</p>
+<h5 id="hascomplete">hasComplete<a class="headerlink" href="#hascomplete" title="Permanent link">&para;</a></h5>
+<p>Returns <code>{'on': True}</code> if all of the other docs have no empty field among a
+given list of fields.</p>
+<h5 id="hasincomplete">hasIncomplete<a class="headerlink" href="#hasincomplete" title="Permanent link">&para;</a></h5>
+<p>Returns <code>{'on': True, 'n': n }</code> if one of the other docs has an empty field
+among a given list of fields. If so, <code>n</code> is the number of such docs.</p>
+<h5 id="hasdifferent">hasDifferent<a class="headerlink" href="#hasdifferent" title="Permanent link">&para;</a></h5>
+<p>Returns <code>{'on': True }</code> if one of the other docs has a different value than you
+for a given field.</p>
+<h5 id="getvalues">getValues<a class="headerlink" href="#getvalues" title="Permanent link">&para;</a></h5>
+<p>Returns</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="p">{</span><span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[</span>
+  <span class="p">{</span><span class="s1">&#39;field1&#39;</span><span class="p">:</span> <span class="n">value1a</span><span class="p">,</span> <span class="s1">&#39;field2&#39;</span><span class="p">:</span> <span class="n">value2a</span><span class="p">},</span>
+  <span class="p">{</span><span class="s1">&#39;field1&#39;</span><span class="p">:</span> <span class="n">value1b</span><span class="p">,</span> <span class="s1">&#39;field2&#39;</span><span class="p">:</span> <span class="n">value2b</span><span class="p">},</span>
+  <span class="o">...</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+<p>where <code>field1</code> and <code>field2</code> are given fields, and <code>value1a</code> and <code>value2a</code> are
+values for those fields found in the other docs, and likewise for all such
+values <code>value1b</code> and <code>value2b</code> that can be found in all other docs.</p>
+<h5 id="assessmentscore">assessmentScore<a class="headerlink" href="#assessmentscore" title="Permanent link">&para;</a></h5>
+<p>Computes the overall score of an assessment, based on its detail <code>criteriaEntry</code>
+records.</p>
+<p>The data returned is a dictionary containing:</p>
+<ul>
+<li><code>overall</code>: the overall score as percentage of points scored with respect to
+    total of scorable points</li>
+<li><code>relevantScore</code>: the sum of the scores for all criteria that have not been
+    scored as <code>-1</code> (non-applicable)</li>
+<li><code>relevantMax</code>: the total of the maximum scores for all criteria that have not
+    been scored as <code>-1</code></li>
+<li><code>allMax</code>: the total of the maximum scores for all criteria</li>
+<li><code>relevantN</code>: the number of criteria that have not been scored as <code>-1</code></li>
+<li><code>allN</code>: the number of criteria.</li>
+<li><code>aId</code>: the id of the assessment in question.</li>
+</ul>
+<p>See more about the computation in the <a href="Business#scoring">business logic</a>.</p>
+<h2 id="wiring">Wiring<a class="headerlink" href="#wiring" title="Permanent link">&para;</a></h2>
+<p>Let us finish with an example, to show the intricate wiring of data that is
+going on in the workflow system.</p>
+<p><img alt="diag" src="../../design/design.012.png" /></p>
+<p>Above we see a good deal of the workflow rules that govern contributions and
+their assessments and reviews, each with their detail records of criteria
+entries (in the self-assessment) and review entries (in the reviews).</p>
+<p>The coloured squares are particular records in the contribution, assessment,
+review, etc. collections. We only mention the fields that play a role in the
+workflow.</p>
+<p>The rounded labels indicate the workflow attributes that are computed for those
+records. The arrows show which fields are used for which workflow attributes.</p>
+<p>In fact, the arrows correspond exactly with the <code>workflow/read</code> and
+<code>workflow/adjust</code> instructions given in the <a href="Model">data model</a>. The reading of
+an arrow is like this:</p>
+<ol>
+<li><strong>read workflow</strong>: whenever a record needs to be sent to the client, compute
+    the indicated workflow labels, based on the information in the fields
+    indicated by following the arrows in the opposite direction;</li>
+<li><strong>adjust workflow</strong>: whenever a record is inserted, deleted, or updated,
+    follow any arrow from any of its fields, and for every record at the opposite
+    end, trigger a recomputation of its workflow, and send that to the client as
+    part of the result op the modification action.</li>
+</ol>
+<p>In this way, whenever the user changes a record, not only the affected records
+are reported back, but also the records with updated workflow information. This
+will ultimately update the user interface in all relevant parts.</p>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../Templates/" title="Templates" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Templates
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../../Legacy/Content/" title="Content" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Content
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+        
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/application.5e60981f.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:"../.."}})</script>
+      
+    
+    
+      
+    
+  </body>
+</html>
