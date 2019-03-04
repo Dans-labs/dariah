@@ -6,4 +6,6 @@ targetDir = '{}{}'.format(dir, '/' if dir else '')
 os.chdir(targetDir)
 sys.path.append('.')
 
-from index import factory # NOQA F401
+from index import factory  # noqa
+
+application = factory()
