@@ -1,8 +1,12 @@
 # News
 
+## 2019-03-04 ###
+
+* Bottle has been replaced by Flask also online
+
 ## 2018-12-11 ###
 
-* Bottle has been replaced by Flask
+* Bottle has been replaced by Flask (not yet online)
 
 ## 2017-12-14 ###
 

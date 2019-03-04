@@ -1,3 +1,9 @@
-from index import factory
+import os
+import sys
 
-application = factory()
+dir = os.path.dirname(__file__)
+targetDir = '{}{}'.format(dir, '/' if dir else '')
+os.chdir(targetDir)
+sys.path.append('.')
+
+from index import factory # NOQA F401
