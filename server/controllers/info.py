@@ -316,8 +316,9 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
     countryId = COUNTRI.get(country, None)
   else:
     countryId = myCountryId
-  countryInfo = COUNTRY[myCountryId]
-  myCountry = f'{countryInfo["name"]} ({countryInfo["iso"]})'
+  myCountryInfo = COUNTRY.get(myCountryId, None)
+  myCountry = f'{myCountryInfo["name"]} ({myCountryInfo["iso"]})' if myCountryInfo else None
+  chosenCountry = None
 
   genConstants(countryId)
   if countryId is not None and countryId != ALL:
@@ -365,6 +366,7 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
   <p>{full} is not member of DARIAH</p>
 </div>'''
       else:
+        chosenCountry = f'{name} ({iso})'
         groupsChosen = [] if not groups else groups.split(',')
         groupsAvailable = sorted(ALL_GROUPSET - set(groupsChosen))
         groupSet = set(groupsChosen)
@@ -424,11 +426,11 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
         for doc in MONGO.contrib.find(countrySelector):
           contribId = doc.get('_id', None)
           countryId = doc.get('country', None)
-          if countryId not in COUNTRY:
-            countryRep = None
-          else:
+          if countryId in COUNTRY:
             countryInfo = COUNTRY[countryId]
-            countryRep = f'{countryInfo["name"]} ({countryInfo["iso"]})'
+            countryRep = f'{countryInfo["name"]} ({countryInfo["iso"]})' if countryInfo else None
+          else:
+            countryRep = None
           vccs = doc.get('vcc', [])
           vccRep = ' + '.join(VCC[v] for v in vccs)
           year = doc.get('year', None)
@@ -493,7 +495,7 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
             full,
             userGroup,
             myCountry,
-            countryRep,
+            chosenCountry,
         )
         material += f'''
 {thisMaterial}
