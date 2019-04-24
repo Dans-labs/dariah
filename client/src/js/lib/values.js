@@ -8,10 +8,12 @@ import { applyTemplate } from 'templates'
 import { repr } from 'tables'
 
 import Input from 'Input'
+import Bool3 from 'Bool3'
 import MarkdownArea from 'MarkdownArea'
 
 const valTypes = {
   bool: { component: Input, type: 'checkbox', props: emptyO },
+  bool3: {component: Bool3, props: emptyO },
   number: { component: Input, type: 'text', props: emptyO },
   text: { component: Input, type: 'text', props: emptyO },
   datetime: { component: Input, type: 'text', props: emptyO },
@@ -145,7 +147,7 @@ const putElem = ([rep, attributes, elem], i) => {
     return <Markdown {...atts} />
   }
   const Elem = elem || 'span'
-  return <Elem {...atts}>{r}</Elem>
+  return <Elem {...atts}>{r}{' '}</Elem>
 }
 
 /*

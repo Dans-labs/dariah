@@ -10,7 +10,7 @@ import {
   emptyA,
   emptyO,
 } from 'utils'
-import { trimDate } from 'datatypes'
+import { trimDate, normalization } from 'datatypes'
 
 import { compileAlternatives, setItems } from 'alter'
 
@@ -587,6 +587,8 @@ export const repr1Head = (tables, table, field, valType, value, settings) => {
         return trimDate(value, table, field, settings)
       case 'bool':
         return value ? 'Yes' : 'No'
+      case 'bool3':
+        return normalization.bool3(value)
       default:
         return value
     }

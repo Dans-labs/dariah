@@ -22,7 +22,7 @@ const flows = {
 
 const initSettings = () => ({
   provenanceFields: new Set(['creator', 'dateCreated', 'modified']),
-  hideProvenance: true,
+  hideProvenance: false,
   longDates: {
     assessment: {
       dateSubmitted: 1,

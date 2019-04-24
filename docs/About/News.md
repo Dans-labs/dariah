@@ -1,5 +1,13 @@
 # News
 
+## 2019-04-24 ###
+
+* The info page with tables that give an overview of the DARIAH
+  contributions now have a button to download the overview to Excel.
+  The Excel data is based on the same data as the overview.
+  The format is csv (technically: in utf-16-le with BOM mark).
+  This format can be opened without questions by Excel and Numbers.
+
 ## 2019-03-04 ###
 
 * Bottle has been replaced by Flask also online

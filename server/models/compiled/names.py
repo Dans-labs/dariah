@@ -94,6 +94,8 @@ class N:
     filters = 'filters'
     firstName = 'firstName'
     fixed = 'fixed'
+    frozen = 'frozen'
+    frozenOn = 'frozenOn'
     generic = 'generic'
     givenName = 'givenName'
     good = 'good'

@@ -7,6 +7,7 @@ from flask.json import JSONEncoder
 
 ISO_DTP = '%Y-%m-%dT%H:%M:%S.%f'
 ISO_DT = '%Y-%m-%dT%H:%M:%S'
+ISO_D = '%Y-%m-%d'
 
 pp = pprint.PrettyPrinter(indent=2, width=100, compact=False)
 
@@ -26,8 +27,11 @@ def dtm(isostr):
   except Exception:
     try:
       date = dt.strptime(isostr, ISO_DT)
-    except Exception as err:
-      return ('{}'.format(err), isostr)
+    except Exception:
+      try:
+        date = dt.strptime(isostr, ISO_D)
+      except Exception as err:
+        return ('{}'.format(err), isostr)
   return ('', date)
 
 
@@ -80,8 +84,16 @@ def _decomposeM(modified):
   return [(m[0], dtm(m[1].replace(' ', 'T'))[1]) for m in splits]
 
 
+def _trimM(mdt, trim):
+  return (
+      str(mdt).split(' ')[0]
+      if trim == 1 else
+      str(mdt).split('.')[0]
+  )
+
+
 def _composeM(modified):
-  return ['{} on {}'.format(*m) for m in modified]
+  return [f'{m[0]} on {_trimM(m[1], trim)}' for (m, trim) in modified]
 
 
 def _perDay(modified):
@@ -101,10 +113,10 @@ def _thinM(chunks):
     for (p, dates) in people.items():
       thinned.append((p, sorted(dates)[-1]))
     for m in sorted(thinned, key=lambda x: x[1]):
-      modified.append(m)
+      modified.append((m, 1))
   if len(chunks):
     for m in chunks[-1]:
-      modified.append(m)
+      modified.append((m, 2))
   return modified
 
 

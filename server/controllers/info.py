@@ -1,9 +1,10 @@
 import json
-from flask import request
+from flask import request, make_response
 from pymongo import MongoClient
 from controllers.utils import oid
 
 PAGE = '/info/ourcountry'
+PAGEX = '/info/ourcountry.tsv'
 ALL = 'ALL'
 MONGO = None
 COUNTRIES = None
@@ -178,7 +179,7 @@ def selectContrib(userInfo):
     return {
         'good': False,
         'kind': 'error',
-        'msg': 'You are not a national coordinator or a member of the backoffice',
+        'msg': 'You are not a national coordinator or a member of the back office',
     }
   contribId = request.get_json().get('contrib', None)
   if contribId is None:
@@ -229,46 +230,59 @@ def selectContrib(userInfo):
   }
 
 
-def getInfo(verb, userInfo):
+def getInfo(verb, userInfo, asTsv):
   dbAccess()
-  if verb == 'ourcountry':
+  if verb.startswith('ourcountry'):
     sortCol = request.args.get('sortcol', '')
     reverse = request.args.get('reverse', '')
     country = request.args.get('country', '')
     groups = request.args.get('groups', '')
-    return getOurcountry(userInfo, country, groups, sortCol, reverse)
+    return getOurcountry(userInfo, country, groups, sortCol, reverse, asTsv)
   return {}
 
 
-def ourCountryHeaders(country, groups, sortCol, reverse, editable, groupOrder=None):
+def ourCountryHeaders(country, groups, sortCol, reverse, editable, asTsv, groupOrder=None):
   if groupOrder is None:
     groupOrder = CONTRIB_COLS
-  headers = '<tr>'
-  dirClass = 'desc' if reverse else 'asc'
-  dirIcon = 'angle-down' if reverse else 'angle-up'
+  headers = '' if asTsv else '<tr>'
+  if not asTsv:
+    dirClass = 'desc' if reverse else 'asc'
+    dirIcon = 'angle-down' if reverse else 'angle-up'
+  else:
+    sep = ''
   for col in groupOrder:
-    isSorted = col == sortCol
-    thisClass = f'c-{col}'
-    if editable and col == 'selected':
-      thisClass += ' editable'
-    if isSorted:
-      thisClass += f' {dirClass}'
-      nextReverse = not reverse
-      icon = f'&nbsp;<span class="fa fa-{dirIcon}"/>'
-    else:
-      nextReverse = False
-      icon = ''
-    reverseRep = -1 if nextReverse else 1
+    if not asTsv:
+      isSorted = col == sortCol
+      thisClass = f'c-{col}'
+      if editable and col == 'selected':
+        thisClass += ' editable'
+      if isSorted:
+        thisClass += f' {dirClass}'
+        nextReverse = not reverse
+        icon = f'&nbsp;<span class="fa fa-{dirIcon}"/>'
+      else:
+        nextReverse = False
+        icon = ''
+      reverseRep = -1 if nextReverse else 1
     label = CONTRIB_LABELS[col]
     colControl = (
-        f'<a href="{PAGE}?country={country}&sortcol={col}&reverse={reverseRep}'
-        f'&groups={groups}">'
-        f'{label}{icon}</a>'
+        label
+        if asTsv else
+        (
+            f'<a href="{PAGE}?country={country}&sortcol={col}&reverse={reverseRep}'
+            f'&groups={groups}">'
+            f'{label}{icon}</a>'
+        )
     )
-    headers += f'''
-    <th class="och {thisClass}">{colControl}</th>
-  '''
-  headers += '</tr>'
+    headers += (
+        f'{sep}{colControl}'
+        if asTsv else
+        f'<th class="och {thisClass}">{colControl}</th>\n'
+    )
+    if asTsv:
+      sep = '\t'
+  if not asTsv:
+    headers += '</tr>'
   return headers
 
 
@@ -309,7 +323,7 @@ def contribKey(col, individual=False):
   return makeKeyInd if individual else makeKey
 
 
-def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
+def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
   userGroup = userInfo.get('groupRep', 'public')
   myCountryId = userInfo.get('country', None)
   if country:
@@ -318,42 +332,52 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
     countryId = myCountryId
   myCountryInfo = COUNTRY.get(myCountryId, None)
   myCountry = f'{myCountryInfo["name"]} ({myCountryInfo["iso"]})' if myCountryInfo else None
+  myCountryStr = myCountryInfo.get('iso', 'unknown')
+  userStr = f'{userGroup}-from-{myCountryStr}'
   chosenCountry = None
 
   genConstants(countryId)
   if countryId is not None and countryId != ALL:
     groups = rmGroup(groups.split(','), 'country')
+  groupsChosen = [] if not groups else groups.split(',')
+  groupSet = set(groupsChosen)
+  groupStr = ('-by-' if groupSet else '') + '-'.join(sorted(groupSet))
 
   sortCol = CONTRIB_SORT_DEFAULT if rawSortCol not in CONTRIB_COLSET else rawSortCol
   reverse = False if rawReverse not in {'-1', '1'} else rawReverse == '-1'
 
-  material = '<h3>Country selection</h3><p class="countries">'
-  for (name, iso, cid, isFake) in COUNTRIES:
-    extraClass = ' fake' if isFake else ''
-    material += (
-        f'''
+  material = ''
+  if not asTsv:
+    material = '<h3>Country selection</h3><p class="countries">'
+    for (name, iso, cid, isFake) in COUNTRIES:
+      extraClass = ' fake' if isFake else ''
+      material += (
+          f'''
 <span class="c-focus{extraClass}">{name}</span>
-        ''' if cid == countryId else f'''
+          ''' if cid == countryId else f'''
 <a
   class="c-control{extraClass}"
   href="{PAGE}?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}&groups={groups}"
 >{name}</a>
-        '''
-    )
-  material += '</p>'
+          '''
+      )
+    material += '</p>'
   if countryId is None:
     if country:
-      msg = (f'Unknown country selected: "{country}"')
-      material += f'''
-  <div class="error-boundary">
-    <p>{msg}</p>
-  </div>'''
+      msg = f'Unknown country selected: "{country}"'
+      if not asTsv:
+        material += f'''
+<div class="error-boundary">
+  <p>{msg}</p>
+</div>'''
   else:
     countryInfo = COUNTRY.get(countryId, None)
     if countryInfo is None:
-      material += f'''
+      msg = f'I do not know which country this is: {countryId}'
+      if not asTsv:
+        material += f'''
 <div class="error-boundary">
-  <p>I do not know which country this is: {countryId}</p>
+  <p>{msg}</p>
 </div>'''
     else:
       name = countryInfo['name']
@@ -361,46 +385,54 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
       full = f'{name} ({iso})'
       isMember = countryInfo['isMember']
       if not isMember:
-        material += f'''
+        msg = f'{full} is not member of DARIAH'
+        if not asTsv:
+          material += f'''
 <div class="error-boundary">
-  <p>{full} is not member of DARIAH</p>
+  <p>{msg}</p>
 </div>'''
       else:
         chosenCountry = f'{name} ({iso})'
-        groupsChosen = [] if not groups else groups.split(',')
         groupsAvailable = sorted(ALL_GROUPSET - set(groupsChosen))
-        groupSet = set(groupsChosen)
         groupOrder = groupsChosen + [g for g in CONTRIB_COLS if g not in groupSet]
-        availableReps = ' '.join((
-            f'<a class="g-add" href="'
-            f'{PAGE}'
-            f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}'
-            f'&groups={addGroup(groupsChosen, g)}'
-            f'">+{g}</a>'
-        ) for g in groupsAvailable)
-        chosenReps = ' '.join((
-            f'<a class="g-rm" href="'
-            f'{PAGE}'
-            f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}'
-            f'&groups={rmGroup(groupsChosen, g)}'
-            f'">-{g}</a>'
-        ) for g in groupsChosen)
-        clearGroups = (
-            '' if len(chosenReps) == 0 else (
-                f'<a '
-                f'class="g-x fa fa-times" '
-                f'title="clear all groups" '
-                f'href="'
-                f'{PAGE}'
-                f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}'
-                f'"></a>'
-            )
+        if not asTsv:
+          availableReps = ' '.join((
+              f'<a class="g-add" href="'
+              f'{PAGE}'
+              f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}'
+              f'&groups={addGroup(groupsChosen, g)}'
+              f'">+{g}</a>'
+          ) for g in groupsAvailable)
+          chosenReps = ' '.join((
+              f'<a class="g-rm" href="'
+              f'{PAGE}'
+              f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}'
+              f'&groups={rmGroup(groupsChosen, g)}'
+              f'">-{g}</a>'
+          ) for g in groupsChosen)
+          clearGroups = (
+              '' if len(chosenReps) == 0 else (
+                  f'<a '
+                  f'class="g-x fa fa-times" '
+                  f'title="clear all groups" '
+                  f'href="'
+                  f'{PAGE}'
+                  f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}'
+                  f'"></a>'
+              )
+          )
+          editable = (
+              userGroup in POWER
+              or (userGroup == COORD and myCountryId is not None and countryId == myCountryId)
+          )
+          rArgs = (
+              f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}&groups={groups}'
+          )
+        headerLine = ourCountryHeaders(
+            country, groups, sortCol, reverse, not asTsv and editable, asTsv, groupOrder=groupOrder
         )
-        editable = (
-            userGroup in POWER
-            or (userGroup == COORD and myCountryId is not None and countryId == myCountryId)
-        )
-        material += f'''
+        if not asTsv:
+          material += f'''
 <h3>Grouping</h3>
 <table class="mt">
 <tr>
@@ -414,10 +446,12 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
   <td>{clearGroups}</td>
 </tr>
 </table>
-<h3>Contributions from {full}</h3>
+<h3>Contributions from {full}
+<a href="{PAGEX}{rArgs}" target="_blank" class="button large">Download as Excel</a>
+</h3>
 <table class="cc">
 <tbody>
-  {ourCountryHeaders(country, groups, sortCol, reverse, editable, groupOrder=groupOrder)}
+  {headerLine}
 '''
 
         contribs = {}
@@ -491,29 +525,47 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse):
             groupsChosen,
             sortCol,
             reverse,
-            editable,
+            not asTsv and editable,
             full,
             userGroup,
             myCountry,
             chosenCountry,
+            asTsv
         )
-        material += f'''
+        material += (
+            thisMaterial
+            if asTsv else
+            f'''
 {thisMaterial}
 </tbody>
 </table>
 {groupRel}
 '''
-        if editable:
-          material += f'''
+        )
+        if not asTsv:
+          if editable:
+            material += f'''
 <script>
 var contribSelection = {json.dumps(contribSelection)}
 var allGroups = {json.dumps(ALL_GROUPS)}
 </script>
 '''
 
-  data = {
-      'material': material,
-  }
+  if asTsv:
+    fileName = f'dariah-{country or "all-countries"}{groupStr}-for-{userStr}'
+    headers = {
+        'Expires': '0',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Content-Type': 'text/csv',
+        'Content-Disposition': f'attachment; filename="{fileName}"',
+        'Content-Encoding': 'identity',
+    }
+    tsv = f'\ufeff{headerLine}\n{material}'.encode('utf_16_le')
+    data = make_response(tsv, headers)
+  else:
+    data = {
+        'material': material,
+    }
   return data
 
 
@@ -527,6 +579,7 @@ def groupList(
     userGroup,
     myCountry,
     chosenCountry,
+    asTsv,
 ):
   if len(groups) == 0:
     groupedList = sorted(contribs, key=contribKey(sortCol), reverse=reverse)
@@ -539,6 +592,7 @@ def groupList(
                 userGroup,
                 myCountry,
                 chosenCountry,
+                asTsv,
             )
             for contrib in groupedList
         ),
@@ -602,6 +656,7 @@ def groupList(
                 userGroup,
                 myCountry,
                 chosenCountry,
+                asTsv,
                 groupOrder=groupOrder,
                 hide=True,
             )
@@ -637,7 +692,7 @@ def groupList(
       for g in GROUP_COLS + ['title']:
         label = selectedCountry if g == 'country' else 'all'
         controls = expandAcontrols(g) if g in groups or g == 'title' else ''
-        groupValuesT[g] = f'{label} {controls}'
+        groupValuesT[g] = label if asTsv else f'{label} {controls}'
     material[headIndex] = formatContrib(
         groupValuesT,
         False,
@@ -645,6 +700,7 @@ def groupList(
         userGroup,
         myCountry,
         chosenCountry,
+        asTsv,
         groupOrder=groupOrder,
         groupSet=groupSet,
         subHead=True,
@@ -695,6 +751,10 @@ def roTri(tri):
   return f'<span class="fa fa-{icon}"/>'
 
 
+def valTri(tri):
+  return '' if tri is None else '+' if tri else '-'
+
+
 def subHeadClass(col, groupSet, subHead, allHead):
   theClass = (
       'allhead' if allHead and col == 'selected' else 'subhead' if allHead or
@@ -721,6 +781,7 @@ def formatContrib(
     userGroup,
     myCountry,
     chosenCountry,
+    asTsv,
     groupOrder=None,
     groupSet=set(),
     subHead=False,
@@ -736,12 +797,25 @@ def formatContrib(
   contribId = contrib.get('_id', None)
   if allHead:
     selected = contrib.get('selected', '')
+    if asTsv:
+      selected = valTri(selected)
     assessedLabel = contrib.get('assessed', '')
     assessedClass = ''
   else:
     selected = contrib.get('selected', None)
-    selected = (editTri(contribId)
-                if editable else roTri(selected)) if 'selected' in contrib else ''
+    selected = (
+        (
+            valTri(selected)
+            if asTsv else
+            (
+                editTri(contribId)
+                if editable else
+                roTri(selected)
+            )
+        )
+        if 'selected' in contrib else
+        ''
+    )
 
     (assessedCode, assessedScore) = contrib.get('assessed', (ASSESSED_DEFAULT, None))
     assessedLabel = ((
@@ -751,12 +825,18 @@ def formatContrib(
     assessedClass = (
         ASSESSED_CLASS.get(assessedCode, ASSESSED_ACCEPTED_CLASS) if 'assessed' in contrib else ''
     )
+  rawTitle = contrib.get('title', '')
   title = (
-      contrib.get('title', '') if subHead else (
+      rawTitle
+      if asTsv else
+      rawTitle
+      if subHead else (
           f'<a href="/data/contrib/list/{contribId}">'
-          f'''{contrib['title'] or '? missing title ?'}'''
+          f'''{rawTitle or '? missing title ?'}'''
           f'</a>'
-      ) if 'title' in contrib else ''
+      )
+      if 'title' in contrib else
+      ''
   )
 
   values = {
@@ -775,19 +855,36 @@ def formatContrib(
     xName = 'contribution' if xGroup == 'title' else xGroup
     xRep = colRep(xName, nGroups)
     values[xGroup] = (
-        f'{expandControls(thisGroupId, True)} {xRep}'
-        if xGroup == 'title' else f'{values[xGroup]} ({xRep}) {expandControls(thisGroupId)}'
-        if depth > 0 else f'{values[xGroup]} ({xRep}) {expandControls(thisGroupId)}'
+        xRep
+        if asTsv else
+        (
+            f'{expandControls(thisGroupId, True)} {xRep}'
+            if xGroup == 'title' else
+            f'{values[xGroup]} ({xRep}) {expandControls(thisGroupId)}'
+            if depth > 0 else
+            f'{values[xGroup]} ({xRep}) {expandControls(thisGroupId)}'
+        )
     )
-  classes = {col: f'c-{col}' for col in groupOrder}
-  classes['assessed'] += f' {assessedClass}'
-  if editable:
-    classes['selected'] += ' editable'
-  columns = '\n'.join((
-      f'<td class="{classes[col]}'
-      f'{subHeadClass(col, groupSet, subHead, allHead)}'
-      f'">{disclose(values, col, userGroup, myCountry, docCountry)}</td>'
-  ) for col in groupOrder)
-  hideRep = ' hide' if hide else ''
-  displayAtts = '' if groupId is None else f''' class="dd{hideRep}" gid="{groupId}"'''
-  return f'<tr{displayAtts}>{columns}</tr>'
+  if not asTsv:
+    classes = {col: f'c-{col}' for col in groupOrder}
+    classes['assessed'] += f' {assessedClass}'
+    if editable:
+      classes['selected'] += ' editable'
+  if asTsv:
+    columns = '\t'.join((
+        f'{disclose(values, col, userGroup, myCountry, docCountry)}'
+    ) for col in groupOrder)
+  else:
+    columns = '\n'.join((
+        f'<td class="{classes[col]}'
+        f'{subHeadClass(col, groupSet, subHead, allHead)}'
+        f'">{disclose(values, col, userGroup, myCountry, docCountry)}</td>'
+    ) for col in groupOrder)
+  if not asTsv:
+    hideRep = ' hide' if hide else ''
+    displayAtts = '' if groupId is None else f''' class="dd{hideRep}" gid="{groupId}"'''
+  return (
+      columns
+      if asTsv else
+      f'<tr{displayAtts}>{columns}</tr>'
+  )

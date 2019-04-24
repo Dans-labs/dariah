@@ -44,6 +44,8 @@ textarea:focus {
 	outline: 4px inset var(--edit-focus-border);
 	border: 0;
 }
+span.dirty,
+span.dirty:focus,
 input.dirty,
 input.dirty:focus,
 textarea.dirty,
@@ -52,6 +54,8 @@ textarea.dirty:focus {
 	background-color: var(--edit-dirty-back);
 	outline: 4px dashed var(--edit-dirty-border);
 }
+span.invalid,
+span.invalid:focus,
 input.invalid,
 input.invalid:focus,
 .input invalid,

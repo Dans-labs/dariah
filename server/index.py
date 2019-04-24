@@ -23,6 +23,7 @@ def factory():
 
   infoPages = set('''
       ourcountry
+      ourcountry.tsv
   '''.strip().split())
 
   @app.route('/static/<path:filepath>')
@@ -41,8 +42,13 @@ def factory():
   def serveInfo(verb):
     Auth.authenticate()
     if verb in infoPages:
-      data = getInfo(verb, Auth.userInfo)
-      return(render_template('info.html', userInfo=Auth.userInfo, **data))
+      asTsv = verb.endswith('.tsv')
+      data = getInfo(verb, Auth.userInfo, asTsv)
+      return (
+          data
+          if asTsv else
+          render_template('info.html', userInfo=Auth.userInfo, **data)
+      )
     return render_template('index.html', css=Auth.CSS, js=Auth.JS)
 
   @app.route('/api/json/<path:doc>')
