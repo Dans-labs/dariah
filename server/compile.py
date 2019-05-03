@@ -107,11 +107,11 @@ def checkNames(names, extraNames):
         quote,
     )
     stringNamesRe = re.compile(stringNamesPat)
-    getattrNamesPat = 'getattr\(N\s*,\s*{}([A-Za-z0-9_]+){}'.format(
+    getattrNamesPat = r'getattr\(N\s*,\s*{}([A-Za-z0-9_]+){}'.format(
         quote, quote
     )
     getattrNamesRe = re.compile(getattrNamesPat)
-    NNamesRe = re.compile('N\.([A-Za-z0-9_]*)')
+    NNamesRe = re.compile(r'N\.([A-Za-z0-9_]*)')
     nfound = 0
     Nfound = 0
     occs = 0

@@ -1,5 +1,10 @@
 # News
 
+## 2019-05-03 ###
+
+The overview page lead to a server error in some circumstances.
+The critical error is fixed, maybe there is an other root cause to discover.
+
 ## 2019-04-24 ###
 
 * The info page with tables that give an overview of the DARIAH

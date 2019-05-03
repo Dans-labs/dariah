@@ -330,8 +330,12 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
     countryId = COUNTRI.get(country, None)
   else:
     countryId = myCountryId
-  myCountryInfo = COUNTRY.get(myCountryId, None)
-  myCountry = f'{myCountryInfo["name"]} ({myCountryInfo["iso"]})' if myCountryInfo else None
+  myCountryInfo = COUNTRY.get(myCountryId, {})
+  myCountry = (
+      f'{myCountryInfo.get("name", "unknown")} ({myCountryInfo.get("iso", "")})'
+      if myCountryInfo else
+      None
+  )
   myCountryStr = myCountryInfo.get('iso', 'unknown')
   userStr = f'{userGroup}-from-{myCountryStr}'
   chosenCountry = None
