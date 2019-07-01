@@ -4,10 +4,33 @@ site_description: >
   Design, specs, rationales, patterns, diagrams.
 
 site_url: "https://dans-labs.github.io/dariah/" 
-
 site_author: Dirk Roorda
 
+repo_url: 'https://github.com/dans-labs/dariah/'
 
+theme:
+  name: dans
+  logo: 'images/inkind_logo.png'
+  favicon: 'icons/favicon.ico'
+  development: true
+  development_label: still in beta
+  production_link: ''
+
+strict: false
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+      linenums: true
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.mark
+
+plugins:
+  - markdownextradata
 extra:
   # App
   liveBase: https://dariah-beta.dans.knaw.nl
@@ -93,17 +116,6 @@ extra:
   yapf: https://github.com/google/yapf 
   yaml: http://www.yaml.org
 
-theme:
-  name: material
-  logo: 'images/tf-small.png'
-  logo: 'images/inkind_logo.png'
-  favicon: 'icons/favicon.ico'
-  feature:
-    tabs: false
-repo_url: 'https://github.com/dans-labs/dariah/'
-
-strict: false
-
 nav:
   - Home: 'index.md'
   - About:
@@ -139,17 +151,3 @@ nav:
   - Maintenance:
     - Deploy: 'Maintenance/Deploy.md'
     - Tests: 'Maintenance/Tests.md'
-
-markdown_extensions:
-  - admonition
-  - codehilite:
-      guess_lang: false
-      linenums: true
-  - toc:
-      permalink: true
-  - pymdownx.details
-  - pymdownx.superfences
-  - pymdownx.mark
-
-plugins:
-  - markdownextradata

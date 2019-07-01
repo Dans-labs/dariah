@@ -250,7 +250,7 @@ chosen as reviewer.
 
 ###### `fixed` ######
 
-A fixed field can assigned a value, and after that it is frozen. If a field is
+A fixed field can be assigned a value, and after that it is frozen. If a field is
 fixed, the user interface will be informed to not provide edit controls for it,
 and the server will be instructed not to modify this field.
 

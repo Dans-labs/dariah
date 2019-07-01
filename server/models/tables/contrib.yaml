@@ -65,8 +65,6 @@ fieldOrder:
   - year
   - country
   - selected
-  - frozen
-  - frozenOn
   - vcc
   - typeContribution
   - description
@@ -98,22 +96,6 @@ fieldSpecs:
       update: coord
     label: Selected by National Coordinator
     valType: bool3
-    multiple: false
-  frozen:
-    perm:
-      list:   public
-      read:   public
-      update: office
-    label: Frozen
-    valType: bool
-    multiple: false
-  frozenOn:
-    perm:
-      list:   public
-      read:   public
-      update: nobody
-    label: Time of freezing
-    valType: datetime
     multiple: false
   contactPersonName:
     perm:
