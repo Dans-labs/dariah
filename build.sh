@@ -117,6 +117,7 @@ else
     echo "test        : testing - run all tests"
     echo "test \$1     : testing - run specific test \$1"
     echo "model       : development - compile data model"
+    echo "mongo       : development - start mongo db daemon"
     echo "serve       : development - start webserver"
     echo "servehot    : development - start webserver tuned to webpack devserver"
     echo "docs        : development - build and serve github pages documentation"
