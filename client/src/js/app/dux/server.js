@@ -1,4 +1,4 @@
-import 'whatwg-fetch'
+/* import 'whatwg-fetch' */
 import { SubmissionError } from 'redux-form'
 import update from 'immutability-helper'
 
