@@ -42,7 +42,7 @@
     "immutability-helper": "^2.9.1",
     "leaflet": "^1.5.1",
     "lodash.mapvalues": "^4.6.0",
-    "lodash.merge": "^4.6.1",
+    "lodash.merge": "^4.6.2",
     "lodash.orderby": "^4.6.0",
     "lodash.padend": "^4.6.1",
     "lodash.padstart": "^4.6.1",
