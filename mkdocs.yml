@@ -6,6 +6,7 @@ site_description: >
 site_url: "https://dans-labs.github.io/dariah/" 
 site_author: Dirk Roorda
 
+repo_name: Dans-labs/dariah
 repo_url: 'https://github.com/dans-labs/dariah/'
 
 theme:
