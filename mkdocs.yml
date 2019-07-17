@@ -15,6 +15,10 @@ theme:
   development: true
   development_label: still in beta
   production_link: ''
+  client:
+    name: DARIAH
+    url: https://www.dariah.eu
+    logo: images/dariah.png 
   feature:
     tabs: true
 
