@@ -1,12 +1,30 @@
 perm:
   list:   public
   read:   public
-  update: edit
+  update: coord
   insert: auth
   delete: own
 
 workflow:
   read:
+    - inspect: self
+      method: hasValue
+      otherField: selected
+      value: true
+      attribute:
+        name: frozen
+        except:
+          - selected
+        desc: contribution has been selected by DARIAH
+    - inspect: self
+      method: hasValue
+      otherField: selected
+      value: false
+      attribute:
+        name: frozen
+        except:
+          - selected
+        desc: contribution has been rejected by DARIAH
     - inspect: details
       method: hasValue
       linkField: contrib
@@ -16,6 +34,8 @@ workflow:
       value: true
       attribute:
         name: locked
+        except:
+          - selected
         desc: is being reviewed
     - inspect: details
       method: getValues
@@ -93,7 +113,8 @@ fieldSpecs:
     perm:
       list:   public
       read:   public
-      update: coord
+      set: coord
+      update: office
     label: Selected by National Coordinator
     valType: bool3
     multiple: false

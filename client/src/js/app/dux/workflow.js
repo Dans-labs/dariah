@@ -84,21 +84,25 @@ export const finalDecision = memoize((wreviewers, wreviews) => {
   return fDecision
 }, emptyO)
 
-export const processStatus = memoize((reviewers, reviews, submitted, { tables, w, v, me }) => {
+export const processStatus = memoize((reviewers, reviews, submitted, frozen, { tables, w, v, me }) => {
   const limited = !me || me.groupRep === 'public' || (me.groupRep === 'auth' && me._id !== v('creator'))
   const decision = finalDecision(reviewers, reviews)
   const { dId, dSign, dAcro } = decisions(tables.decision)
+  const frozenStr = frozen ? '≡' : ''
+  let result
   if (limited) {
     const reviewResult = decision === dId['good'] ? dSign['good'] : emptyS
-    return reviewResult
+    result = reviewResult
   }
   else {
     const reviewResult = decision ? dSign[dAcro[decision]] : emptyS
     const { items: scores = emptyA } = w('score') || emptyO
     const score = scores.length ? scores[0] : null
-    const assessmentResult = score == null ? emptyS : `${submitted ? '▶' : '✍'} (${score.overall}%) `
-    return `${assessmentResult} ${reviewResult}`
+    const assessmentResult = score == null
+      ? emptyS : `${submitted ? '→' : '✍'} (${score.overall}%) `
+    result = `${assessmentResult} ${reviewResult}`
   }
+  return `${frozenStr}${result}`
 }, emptyO)
 
 const compileActiveItems = memoize(

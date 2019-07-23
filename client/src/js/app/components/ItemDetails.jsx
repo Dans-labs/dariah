@@ -21,6 +21,7 @@ const ItemDetails = ({
   tables,
   table,
   eId,
+  workflow,
   detailFragments,
   dispatch,
 }) => {
@@ -94,6 +95,7 @@ const ItemDetails = ({
                       gridTag={gridTag}
                       filterTag={filterTag}
                       masterId={eId}
+                      masterWf={workflow}
                       linkField={linkField}
                       expand={expand}
                       border={border}
@@ -110,6 +112,7 @@ const ItemDetails = ({
                       select={DETAILS}
                       title={detailTitle}
                       masterId={eId}
+                      masterWf={workflow}
                       linkField={linkField}
                       expand={expand}
                       border={border}
@@ -126,6 +129,7 @@ const ItemDetails = ({
                       select={DETAILS}
                       gridTag={gridTag}
                       masterId={eId}
+                      masterWf={workflow}
                       linkField={linkField}
                       fixed={fixed}
                     />

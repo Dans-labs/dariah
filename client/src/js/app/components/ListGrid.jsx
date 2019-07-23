@@ -40,6 +40,7 @@ const ListGrid = ({
   select,
   perm: tablePerm,
   masterId,
+  masterWf,
   linkField,
   fixed,
   grid,
@@ -106,6 +107,7 @@ const ListGrid = ({
         table={table}
         eId={eId}
         masterId={masterId}
+        masterWf={masterWf}
         linkField={linkField}
         isactive={isactive}
         initialValues={initialValues}
@@ -128,6 +130,7 @@ const ListGrid = ({
             select={select}
             masterTable={masterTable}
             masterId={masterId}
+            masterWf={masterWf}
             nItems={listIds.length}
             fixed={fixed}
             item={item}

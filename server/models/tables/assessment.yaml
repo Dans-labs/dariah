@@ -22,6 +22,24 @@ workflow:
       attribute:
         name: stalled
         desc: assessment type is different from contribution type
+    - inspect: master
+      method: hasValue
+      linkField: contrib
+      otherTable: contrib
+      otherField: selected
+      value: true
+      attribute:
+        name: frozen
+        desc: contribution has been selected by DARIAH
+    - inspect: master
+      method: hasValue
+      linkField: contrib
+      otherTable: contrib
+      otherField: selected
+      value: false
+      attribute:
+        name: frozen
+        desc: contribution has been rejected by DARIAH
     - inspect: self
       method: assessmentScore
       attribute:
@@ -66,6 +84,7 @@ workflow:
         - assessmentType
         - submitted
         - reviewerF
+        - selected
     - inspect: details
       linkField: assessment
       otherTable: criteriaEntry

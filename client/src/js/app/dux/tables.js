@@ -219,6 +219,7 @@ const flows = {
           values,
           values: { _id },
           newValues,
+          perm,
           workflow: ownWorkflow,
         } = record
         const fieldUpdates = {}
@@ -231,6 +232,9 @@ const flows = {
           fieldUpdates,
         )
         newState = changeOur(newState, table, values, uid)
+        newState = updateAuto(newState, [table, 'entities', _id, 'perm'], {
+          $set: perm,
+        })
         newState = updateAuto(newState, [table, 'entities', _id, 'workflow'], {
           $set: ownWorkflow,
         })
@@ -587,8 +591,10 @@ export const repr1Head = (tables, table, field, valType, value, settings) => {
         return trimDate(value, table, field, settings)
       case 'bool':
         return value ? 'Yes' : 'No'
-      case 'bool3':
-        return normalization.bool3(value)
+      case 'bool3': {
+        const nValue = normalization.bool3(value)
+        return nValue == null ? 'No value' : nValue ? 'Yes' : 'No'
+      }
       default:
         return value
     }

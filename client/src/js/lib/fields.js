@@ -36,7 +36,9 @@ export const checkDisabled = (activeItems, inactive) => value =>
 export const someEditable = (fields, perm, workflow) =>
   !(workflow && workflow.locked && workflow.locked.on) &&
   fields &&
-  Object.keys(fields).some(field => perm && perm.update && perm.update[field])
+    Object.keys(fields).some(field => (
+      perm && perm.update && perm.update[field]
+    ))
 
 export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
   const { initialValues } = props
@@ -49,7 +51,9 @@ export const makeFields = ({ tables, table, eId, fields, perm, ...props }) => {
       continue
     }
     const { [field]: { label, valType, multiple } } = fieldSpecs
-    const { update: { [field]: editable } } = perm
+    const {
+      update: { [field]: editable } = emptyO,
+    } = perm
     const { [field]: myValues } = initialValues
     const theField = {
       editable,

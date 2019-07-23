@@ -127,6 +127,8 @@ class PermApi(object):
             rowFilter = {N._id: {'$in': []}}  # intentionally always false
           else:
             rowFilter = {'$or': [{ourField: self.uid} for ourField in my]}
+        elif allowed == -4:
+          rowFilter = {N.country: self.ucn}
     else:
       rowFilter = None
 
@@ -136,9 +138,12 @@ class PermApi(object):
 
     for field in fields:
       permF = fields[field].get(N.perm, {}).get(action, None)
-      if permF is None:
+      permFset = fields[field].get(N.perm, {}).get('set', None)
+      if permF is None and permFset is None:
         continue
+      setOnly = False
       if document is not None:
+        setOnly = document.get(field, None) is None
         if permF == N.ownLT:
           oldValueId = document.get(field, None)
           oldValue = (None if oldValueId is None else self.DB.groupFromId[oid(oldValueId)])
@@ -188,6 +193,8 @@ class PermApi(object):
                     ).format(newValue, group),
                 })
               continue
+      if setOnly and permFset is not None:
+        permF = permFset
       if self._authorize(
           permF,
           asList=document is None,

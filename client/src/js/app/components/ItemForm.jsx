@@ -39,6 +39,7 @@ const ItemForm = props => {
     workflow,
     dispatch,
   } = props
+  /*
   let { fieldFragments, detailFragments } = props
   if (fieldFragments == null) {
     fieldFragments = makeFields(props)
@@ -46,6 +47,9 @@ const ItemForm = props => {
   if (detailFragments == null) {
     detailFragments = makeDetails(props)
   }
+  */
+  const fieldFragments = makeFields(props)
+  const detailFragments = makeDetails(props)
   const keep = makeKeepInfo(detailFragments)
   const hasEditable = someEditable(fields, perm, workflow)
   const { getAlt, nextAlt } = compileAlternatives(
@@ -142,6 +146,7 @@ const ItemForm = props => {
         tables={tables}
         table={table}
         eId={eId}
+        workflow={workflow}
       />
     </div>
   )

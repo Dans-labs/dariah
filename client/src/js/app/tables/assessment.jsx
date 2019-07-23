@@ -18,6 +18,7 @@ const templates = {
       { items: [{ reviewerF: v('reviewerF') }] },
       w('reviews'),
       v('submitted'),
+      w('frozen').on,
       { tables, v, w, me },
     )
   },
@@ -58,6 +59,8 @@ const templates = {
     )
     const reOpen = decision === dId['warning']
     const decided = !!decision
+    const frozen = w('frozen').on
+    const frozenDesc = w('frozen').desc
     return (
       <Fragment>
         <ScoreBox score={score} />
@@ -76,7 +79,7 @@ const templates = {
                 ? `${l('dateSubmitted')}: ${s('dateSubmitted')}`
                 : null}
               {w('incomplete').on || w('stalled').on ? null : decided &&
-              !reOpen ? (
+              !reOpen && !frozen ? (
                 <span className={`label large workflow info`}>
                   {'Review finished'}
                 </span>
@@ -122,7 +125,12 @@ const templates = {
               `}
           </div>
         ) : null}
-        {m('title') && w('locked').on && !reOpen ? (
+        {frozen ? (
+          <div className={'label large workflow info'}>
+            {`This assessment is frozen because ${frozenDesc}.`}
+          </div>
+        ) : null}
+        {m('title') && w('locked').on && !reOpen && !frozen ? (
           <div className={'label large workflow info'}>
             {`This assessment is locked because it ${
               decided ? 'has been reviewed' : w('locked').desc
@@ -133,8 +141,9 @@ const templates = {
     )
   },
   insert: {
-    contrib({ at, v, n, o, onInsert }) {
-      return at.has(v('typeContribution')) ? (
+    contrib({ at, v, w, n, o, onInsert }) {
+    return w('frozen').on ? null :
+      at.has(v('typeContribution')) ? (
         o ? (
           n == 0 ? (
             <span className={`button large workflow info`} onClick={onInsert}>

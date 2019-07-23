@@ -140,8 +140,11 @@ export const normalization = {
     }
   },
   bool3(val) {
+    if (val == null) {
+      return null
+    }
     try {
-      const properVal = val == null || val === true || val === false ? val : null
+      const properVal = Boolean(val)
       return properVal
     } catch (error) {
       return val

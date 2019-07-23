@@ -34,7 +34,8 @@ const templates = {
       myType === 'E'
         ? w('reviews')
         : { items: [{ creator: v('creator'), decision: v('decision') }] },
-      !w('locked').on,
+      w('locked').on,
+      w('frozen').on,
       { tables, v, w, me },
     )
   },
@@ -73,6 +74,8 @@ const templates = {
     const { dAcro, dId, dRep, dPart } = decisions(tables.decision)
     const theseDecisions = {}
     const theseDecisionDates = {}
+    const frozen = w('frozen').on
+    const frozenDesc = w('frozen').desc
     ;['E', 'F'].forEach(reviewType => {
       const isThis = thisType && reviewType === thisType
       if (isThis) {
@@ -140,7 +143,7 @@ const templates = {
                         {decisionRep}
                       </div>
                       {dTakenDate}
-                      {reviewType === 'F' || !theseDecisions['F']
+                      {!frozen && (reviewType === 'F' || !theseDecisions['F'])
                         ? fs('decision', null, h => (
                             <span
                               className={'button large workflow warning'}
@@ -154,18 +157,19 @@ const templates = {
                   ) : (
                     <div>
                       {`${dLabel}: `}
-                      {['good', 'error', 'warning'].map(acro => (
-                        <Fragment key={acro}>
-                          {fs('decision', dId[acro], h => (
-                            <span
-                              className={`button large workflow ${acro}`}
-                              onClick={h}
-                            >
-                              {dRep[acro]}
-                            </span>
-                          ))}
-                        </Fragment>
-                      ))}
+                      {!frozen ?
+                        ['good', 'error', 'warning'].map(acro => (
+                          <Fragment key={acro}>
+                            {fs('decision', dId[acro], h => (
+                              <span
+                                className={`button large workflow ${acro}`}
+                                onClick={h}
+                              >
+                                {dRep[acro]}
+                              </span>
+                            ))}
+                          </Fragment>
+                      )) : null}
                     </div>
                   )
                 ) : (
@@ -180,7 +184,12 @@ const templates = {
             )
           })}
         </div>
-        {m('title') && w('locked').on ? (
+        {frozen ? (
+          <div className={'label large workflow info'}>
+            {`This review is frozen because ${frozenDesc}.`}
+          </div>
+        ) : null}
+        {m('title') && w('locked').on && !frozen ? (
           <div className={'label large workflow info'}>
             {`This review is locked because: ${w('locked').desc}`}
           </div>
@@ -203,28 +212,31 @@ const templates = {
           }
         }
       }
+      const frozen = w('frozen').on
+
       return myType ? (
         <Fragment>
           <span className={`label large workflow ${myType ? 'info' : 'error'}`}>
             {`Your reviewer role is: ${reviewerRole[myType]}`}
           </span>
-          {mine ? (
-            <a className={`button large workflow info`} href={mineLink}>
-              {`Continue reviewing`}
-            </a>
-          ) : v('submitted') ? (
-            otherDecided ? (
-              <span className={`button large workflow info`} onClick={onInsert}>
-                {`Start review`}
-              </span>
+          {frozen ? null :
+            mine ? (
+              <a className={`button large workflow info`} href={mineLink}>
+                {`Continue reviewing`}
+              </a>
+            ) : v('submitted') ? (
+              otherDecided ? (
+                <span className={`button large workflow info`} onClick={onInsert}>
+                  {`Start review`}
+                </span>
+              ) : (
+                <span className={'label large workflow warning'}>{}</span>
+              )
             ) : (
-              <span className={'label large workflow warning'}>{}</span>
-            )
-          ) : (
-            <span className={'label large workflow warning'}>
-              {'You can review after the self-assessment has been submitted'}
-            </span>
-          )}
+              <span className={'label large workflow warning'}>
+                {'You can review after the self-assessment has been submitted'}
+              </span>
+            )}
         </Fragment>
       ) : (
         emptyA

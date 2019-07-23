@@ -73,6 +73,7 @@ class ListFilter extends Component {
         perm,
         select,
         masterId,
+        masterWf,
         linkField,
         expand,
         border,
@@ -113,6 +114,7 @@ class ListFilter extends Component {
               select={select}
               masterTable={masterTable}
               masterId={masterId}
+              masterWf={masterWf}
               nItems={listIds.length}
               fixed={fixed}
               item={item}
@@ -172,6 +174,7 @@ class ListFilter extends Component {
               select={select}
               title={title}
               masterId={masterId}
+              masterWf={masterWf}
               linkField={linkField}
               expand={expand}
               border={border}
@@ -190,6 +193,7 @@ class ListFilter extends Component {
               select={select}
               gridTag={gridTag}
               masterId={masterId}
+              masterWf={masterWf}
               linkField={linkField}
               fixed={fixed}
             />

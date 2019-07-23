@@ -204,17 +204,30 @@ def selectContrib(userInfo):
         'kind': 'error',
         'msg': 'Contribution is not asscoiated with a country',
     }
-  if countryId != myCountryId and userGroup == COORD:
-    return {
-        'good':
-            False,
-        'kind':
-            'error',
-        'msg': (
-            'You try to select a contribution of another country'
-            ' than for which you are national coordinator'
-        ),
-    }
+  if userGroup == COORD:
+    if countryId != myCountryId:
+      return {
+          'good':
+              False,
+          'kind':
+              'error',
+          'msg': (
+              'You try to select a contribution of another country'
+              ' than for which you are national coordinator'
+          ),
+      }
+    origSelected = contrib.get('selected', None)
+    if origSelected is not None:
+      return {
+          'good':
+              False,
+          'kind':
+              'error',
+          'msg': (
+              'You try to change a selection decision'
+              ' If you really need this, ask the DARIAH office.'
+          ),
+      }
 
   value = request.get_json().get('select', None)
   MONGO.contrib.update_one(

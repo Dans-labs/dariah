@@ -34,7 +34,7 @@ rules are specified in the [data model](Model).
 
 ### Client
 
-Workflow logic is predominantly found in the [templates](Templates), which may
+Workflow logic is predominantly found in the [templates](Templates.md), which may
 include workflow buttons and info panels, but also in
 [workflow.js](Dux#workflow), which computes special items to present to the
 user, and for some of them workflow information is used. The templates

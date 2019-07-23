@@ -11,19 +11,22 @@ export default ({ perm, workflow, keep, fixed, button, onClick }) => {
     .map(table => keep[table])
     .join(', ')
   const locked = workflow && workflow.locked && workflow.locked.on
-  const lockedDesc =
-    (workflow && workflow.locked && workflow.locked.desc) || emptyS
+  const lockedDesc = workflow && workflow.locked && workflow.locked.desc || emptyS
+  const completed = workflow && workflow.completed && workflow.completed.on
+  const completedDesc = workflow && workflow.completed && workflow.completed.desc || emptyS
+  const frozen = workflow && workflow.frozen && workflow.frozen.on
+  const frozenDesc = workflow && workflow.frozen && workflow.frozen.desc || emptyS
   const tipInfo =
-    doKeep || locked
-      ? (doKeep
-          ? `This item cannot deleted because related items exist: ${keepInfo}`
-          : emptyS) +
-        (locked ? `This item is locked because: ${lockedDesc}` : emptyS)
-      : 'delete this record'
+    frozen ? frozenDesc :
+    completed ? completedDesc :
+    locked ? lockedDesc :
+    doKeep ? `This item cannot deleted because related items exist: ${keepInfo}` :
+    'delete this record'
+  const mayDelete = !doKeep && !locked && !completed && !frozen
   const icon = doKeep ? 'puzzle-piece' : 'trash'
-  const disabled = doKeep ? 'disabled' : 'error-o'
-  const activate = doKeep ? emptyO : { onClick }
-  return !fixed && perm.delete && !locked ? (
+  const disabled = mayDelete ? 'error-o' : 'disabled'
+  const activate = mayDelete ? { onClick } : emptyO
+  return !fixed && perm.delete ? (
     <Tooltip tip={tipInfo} at={'left'} className={'inlineR'}>
       <div
         className={`grid-cell ${button} ${disabled} fa fa-${icon} delete`}

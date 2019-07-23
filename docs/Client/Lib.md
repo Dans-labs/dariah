@@ -206,7 +206,7 @@ function to render its editable fields.
 This function can be conveniently used in custom templates to render some fields
 in the standard way.
 
-**Example**: [Templates](Components#templates)
+**Example**: [Templates](../Functionality/Tempates.md)
 
 ### itemReadField
 
@@ -217,7 +217,7 @@ function to render its read-only fields.
 This function can be conveniently used in custom templates to render some fields
 in the standard way.
 
-**Example**: [Templates](Components#templates)
+**Example**: [Templates](../Functionality/Templates.md)
 
 ### makeFields
 
@@ -456,7 +456,7 @@ particular slowness.
 ## [templates]({{libBase}}/templates.js)
 
 This library contains templates that customize the presentation of records and
-fields. See [Templates](Templates) for how the template system is structured.
+fields. See [Templates](../Functionality/Templates.md) for how the template system is structured.
 This library contains the functions to *apply* templates.
 
 ### applyInsertTemplate
@@ -481,7 +481,7 @@ template with [FieldRead](Components#fieldread) components, as well as with
 
 **Examples**: [ItemRead](Components#itemread) [ItemEdit](Components#itemedit)
 
-See also [Templates](Templates).
+See also [Templates](../Functionality/Templates.md).
 
 ### editMode
 

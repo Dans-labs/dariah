@@ -719,7 +719,7 @@ class DbAccess(object):
     if not mayUpdate:
       return
 
-    fieldSpecs = _theseFields(table, fieldSet)[1]
+    fieldSpecs = _theseFields(table, fieldSetU)[1]
     uFields = set()
     for uField in fieldSetU:
       valType = fieldSpecs[uField][N.valType]
@@ -800,6 +800,10 @@ class DbAccess(object):
         },
     )
 
+    # update the permission information (this changes if the user has updated a field
+    # that has "set" permission only: after that, it is readonly
+
+    newPerm = self._getPerm(table, newDocument, msgs)
     # update the workflow information
     myWorkflow = WF.readWorkflow(msgs, table, newDocument, compute=True)
     workflow.extend(WF.adjustWorkflow(msgs, table, document, newDocument))
@@ -807,6 +811,7 @@ class DbAccess(object):
     recordInfo = {
         N.values: updateSaveValues,
         N.newValues: newValues,
+        N.perm: newPerm,
         N.diags: validationDiags,
         N.workflow: myWorkflow,
     }

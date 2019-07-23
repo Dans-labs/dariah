@@ -3,7 +3,7 @@
 Here are the particulars of our templates. Below you find all tables for which
 we do have specialized templates.
 
-Consult [Templates](Templates) to read how the mechanism of applying templates
+Consult [Templates](Templates.md) to read how the mechanism of applying templates
 works.
 
 ## [assessment]({{appBase}}/tables/assessment.jsx)

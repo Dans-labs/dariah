@@ -700,7 +700,7 @@ connected via [tables](Dux#tables)
 
 ???+ abstract "Task"
     Manages the display of a single record, but only as far as an
-    [ActionTemplate](Templates) has been provided for that table. The action
+    [ActionTemplate](../Functionality/Templates.md) has been provided for that table. The action
     template may contain controls that modify fields and save them to the database,
     exactly as [ItemEdit](#itemedit).
 
@@ -712,7 +712,7 @@ connected via [tables](Dux#tables)
 
 ??? note "Using templates"
     This component uses [applyEditTemplate](Lib#applyedittemplate) to see whether
-    there is an action template defined in [Templates](Templates). If yes, that
+    there is an action template defined in [Templates](../Functionality/Tempates.md). If yes, that
     template will be applied, if no, nothing will be rendered.
 
 ### [ItemContainer]({{appBase}}/components/ItemContainer.jsx)
@@ -853,7 +853,7 @@ connected via [tables](Dux#tables)
 ??? note "Using templates"
     Before setting up the fields of an item,
     [applyEditTemplate](Lib#applyedittemplate) is called. If it finds a suitable
-    template in [Templates](Templates) it will be applied. If not, all fields will
+    template in [Templates](../Functionality/Tempates.md) it will be applied. If not, all fields will
     be displayed in a generic presentation.
 
 ### [ItemForm]({{appBase}}/components/ItemForm.jsx)
@@ -896,7 +896,7 @@ connected via [tables](Dux#tables)
     contains that information.
 
     Before setting up the fields of an item, [applyTemplate](Lib#applytemplate) is
-    called. If it finds a suitable template in [Templates](Templates) it will be
+    called. If it finds a suitable template in [Templates](../Functionality/Tempates.md) it will be
     applied. If not, all fields will be displayed in a generic presentation.
 
 ### [ItemRow]({{appBase}}/components/ItemRow.jsx)

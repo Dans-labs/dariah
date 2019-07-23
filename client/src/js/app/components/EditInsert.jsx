@@ -18,6 +18,7 @@ const EditInsert = ({
   select,
   masterTable,
   masterId,
+  masterWf,
   perm,
   fixed,
   item,
@@ -26,7 +27,8 @@ const EditInsert = ({
   onInsert,
 }) => {
   const thing = item[0]
-  return !fixed &&
+  const frozen = masterWf && masterWf.frozen && masterWf.frozen.on
+  return !fixed && !frozen &&
     perm != null &&
     perm.insert &&
     (!perm.needMaster || select == DETAILS)

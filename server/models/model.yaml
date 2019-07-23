@@ -173,6 +173,7 @@ permissions:
     insert: create item
     list:   read item title
     read:   read item
+    set:    give item initial value
     update: update item
     delete: delete item
 
@@ -191,7 +192,7 @@ permissions:
       call: public
     mod:
       desc: modify (insert/update/delete) an item
-      call: edit
+      call: coord
     resetwf:
       desc: reset the workflow information
       call: system
@@ -206,9 +207,15 @@ workflow:
   prevent:
     locked:
       delete: true
+      set:    except
       update: except
-    fixed:
+    completed:
       delete: true
+      set:    except
+      update: except
+    frozen:
+      delete: true
+      set:    except
       update: except
     stalled:
       update:

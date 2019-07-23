@@ -83,10 +83,10 @@ React component.
 The templates will be applied by [EditInsert](Components#editinsert),
 [ItemRead](Components#itemread), [ItemEdit](Components#itemedit),
 [ItemAction](Components#itemaction), and [ListPlain](Components#listplain).
-using the functions [applyTemplate](Templates#applytemplate),
-[applyEditTemplate](Templates#applyedittemplate),
-[applyInsertTemplate](Templates#applyinserttemplate), and
-[editMode](Templates#editmode).
+using the functions [applyTemplate](../Client/Lib.md#applytemplate),
+[applyEditTemplate](../Client/Lib.md#applyedittemplate),
+[applyInsertTemplate](../Client/Lib.md#applyinserttemplate), and
+[editMode](../Client/Lib.md#editmode).
 
 ## Template organization
 

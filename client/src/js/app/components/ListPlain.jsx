@@ -85,6 +85,7 @@ class ListPlain extends Component {
         table,
         select,
         masterId,
+        masterWf,
         linkField,
         fixed,
         listIds,
@@ -118,6 +119,7 @@ class ListPlain extends Component {
               select={select}
               masterTable={masterTable}
               masterId={masterId}
+              masterWf={masterWf}
               nItems={listIds.length}
               fixed={fixed}
               item={item}
