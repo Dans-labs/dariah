@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 
 import { emptyA, emptyO, emptyS } from 'utils'
 import { itemReadField, itemEditField } from 'fields'
@@ -35,7 +35,7 @@ const templates = {
   },
   mainEdit({ l, f, fe, m, editButton }) {
     return (
-      <Fragment>
+      <>
         {editButton}
         <div className={'grid fragments'}>
           {eField('title', l, fe, m)}
@@ -44,7 +44,7 @@ const templates = {
           {eField('remarks', l, fe, m)}
           {eField('editors', l, fe, m)}
         </div>
-      </Fragment>
+      </>
     )
   },
   mainAction({ tables, l, e, v, w, s, f, fe, fs, m }) {
@@ -62,14 +62,14 @@ const templates = {
     const frozen = w('frozen').on
     const frozenDesc = w('frozen').desc
     return (
-      <Fragment>
+      <>
         <ScoreBox score={score} />
         <div className={'grid fragments'}>
           {m('submitted') ? null : rField('submitted', l, f)}
           {itemEditField(
             'submitted',
             'Submission',
-            <Fragment>
+            <>
               {!isSubmitted && isWithdrawn
                 ? `${reOpen ? 'Revised' : l('dateWithdrawn')}: ${s(
                     'dateWithdrawn',
@@ -97,7 +97,7 @@ const templates = {
                   }`}</span>
                 ))
               )}
-            </Fragment>,
+            </>,
             m('submitted'),
           )}
           {e('submitted') ? null : eField('reviewerE', l, fe, m)}
@@ -137,7 +137,7 @@ const templates = {
             }.`}
           </div>
         ) : null}
-      </Fragment>
+      </>
     )
   },
   insert: {
@@ -152,7 +152,7 @@ const templates = {
           ) : (
             <Tooltip
               tip={
-                <Fragment>
+                <>
                   <p>
                     {'Normally a contribution needs just one self-assessment.'}
                   </p>
@@ -172,7 +172,7 @@ const templates = {
                         of the old assessment into the new one and delete the old one.`}
                     </b>
                   </p>
-                </Fragment>
+                </>
               }
               at={'top'}
             >
@@ -201,12 +201,12 @@ const templates = {
     trail({ s }) {
       // consolidated assessment within a trail record
       return (
-        <Fragment>
+        <>
           <div>{s('title')}</div>
           <div>
             {s('vcc', ', ')} {s.year}
           </div>
-        </Fragment>
+        </>
       )
     },
   },

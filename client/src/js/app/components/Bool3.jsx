@@ -59,7 +59,7 @@ class Bool3 extends Component {
             type={'checkbox'}
             className={editClass(dirty, invalid)}
             checked={value}
-            onClick={this.handleCheck}
+            onChange={this.handleCheck}
           />
         </Tooltip>
         {error && <span className={'invalid diag'}>{error}</span>}

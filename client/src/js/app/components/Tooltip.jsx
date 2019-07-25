@@ -1,4 +1,4 @@
-import React, { Component, Fragment, createRef } from 'react'
+import React, { Component, createRef } from 'react'
 import { connect } from 'react-redux'
 
 import { emptyS } from 'utils'
@@ -99,7 +99,7 @@ class Tooltip extends Component {
       },
     } = this
     return showTooltips ? (
-      <Fragment>
+      <>
         <span
           ref={this.target}
           className={`${className} tooltipped focus ${
@@ -119,7 +119,7 @@ class Tooltip extends Component {
             className={`toolarrow toolarrow-${at} ${classArrow}`}
           />
         </span>
-      </Fragment>
+      </>
     ) : (
       children
     )

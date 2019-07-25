@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
@@ -27,7 +27,7 @@ const OpenCloseAll = ({
   const itemsRep = listIds.length === 1 ? thing : things
   const nItemsRep = `${listIds.length} ${itemsRep} `
   return (
-    <Fragment>
+    <>
       <span>{nItemsRep}</span>
       {hasItems && openAll && !expand ? (
         <Tooltip tip={`open all ${itemsRep}`} at={'bottom'}>
@@ -62,7 +62,7 @@ const OpenCloseAll = ({
           />
         </Tooltip>
       ) : null}
-    </Fragment>
+    </>
   )
 }
 

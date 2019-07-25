@@ -1,7 +1,7 @@
 perm:
   list:   public
   read:   public
-  update: coord
+  update: edit
   insert: auth
   delete: own
 
@@ -69,6 +69,21 @@ workflow:
       otherTable: assessment
       triggerFields:
         - typeContribution
+        - selected
+    - inspect: granddetails
+      interField: contrib
+      interTable: assessment
+      linkField: assessment
+      otherTable: criteriaEntry
+      triggerFields:
+        - selected
+    - inspect: granddetails
+      interField: contrib
+      interTable: review
+      linkField: review
+      otherTable: reviewEntry
+      triggerFields:
+        - selected
 
 title: title
 

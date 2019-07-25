@@ -104,7 +104,7 @@ const ListStats = ({ settings, tables, table }) => {
   ]
 
   return (
-    <Fragment>
+    <>
       <div className={'stats-section head'}>
         <div className={'stats-line head'}>
           <div className={'stats-item value head'}>{'value'}</div>
@@ -145,7 +145,7 @@ const ListStats = ({ settings, tables, table }) => {
             ))}
         </div>
       ))}
-    </Fragment>
+    </>
   )
 }
 

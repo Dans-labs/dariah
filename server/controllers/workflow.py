@@ -146,6 +146,7 @@ class WorkflowApi(object):
         serverprint('Computing workflow data...')
         MONGO[N.workflow].drop()
       else:
+        serverprint('Resetting workflow data...')
         MONGO[N.workflow].delete_many({N.table: {'$ne': N.workflow}})
       affected = []
       for (table, tableInfo) in DM.items():
@@ -153,6 +154,7 @@ class WorkflowApi(object):
           continue
 
         docs = list(MONGO[table].find())
+        serverprint(f'\tworkflow data... {table} ({len(docs)} docs)')
         affected.append('reset workflow on {} ({} items)'.format(table, len(docs)))
         for doc in docs:
           self.readWorkflow(msgs, table, doc, compute=True)
@@ -524,6 +526,8 @@ class WorkflowApi(object):
 
   def _selectDocsRead(self, msgs, table, myDoc, w):
     inspect = w.get(N.inspect, None)
+    interField = w.get(N.interField, None)
+    interTable = w.get(N.interTable, None)
     linkField = w.get(N.linkField, None)
     otherTable = w.get(N.otherTable, None)
     equalField = w.get(N.equalField, None)
@@ -537,10 +541,40 @@ class WorkflowApi(object):
           True,
           msgs,
       )
+    elif inspect == N.granddetails:
+      interDocs = self.workflowLookup(
+          interTable,
+          {interField: myDoc.get(N._id, None)},
+          {N._id},
+          msgs,
+      )
+      otherDocs = self.workflowLookup(
+          otherTable,
+          {linkField: {
+              '$in': [doc.get(N._id, None) for doc in interDocs]
+          }},
+          True,
+          msgs,
+      )
     elif inspect == N.master:
       otherDocs = self.workflowLookup(
           otherTable,
           {N._id: myDoc.get(linkField, None)},
+          True,
+          msgs,
+      )
+    elif inspect == N.grandmaster:
+      interDocs = self.workflowLookup(
+          interTable,
+          {N._id: myDoc.get(interField, None)},
+          {linkField},
+          msgs,
+      )
+      otherDocs = self.workflowLookup(
+          otherTable,
+          {N._id: {
+              '$in': [doc.get(linkField, None) for doc in interDocs]
+          }},
           True,
           msgs,
       )
@@ -566,6 +600,8 @@ class WorkflowApi(object):
 
   def _selectDocsAdjust(self, msgs, table, myDocs, w):
     inspect = w.get(N.inspect, None)
+    interField = w.get(N.interField, None)
+    interTable = w.get(N.interTable, None)
     linkField = w.get(N.linkField, None)
     otherTable = w.get(N.otherTable, None)
 
@@ -584,8 +620,44 @@ class WorkflowApi(object):
           True,
           msgs,
       )
+    elif inspect == N.granddetails:
+      interDocs = self.workflowLookup(
+          interTable,
+          {interField: {
+              '$in': [doc.get(N._id, None) for doc in myDocs]
+          }},
+          {N._id},
+          msgs,
+      )
+      otherDocs = self.workflowLookup(
+          otherTable,
+          {linkField: {
+              '$in': [doc.get(N._id, None) for doc in interDocs]
+          }},
+          True,
+          msgs,
+      )
     elif inspect == N.master:
       otherIds = {doc.get(linkField, None) for doc in myDocs}
+      otherDocs = self.workflowLookup(
+          otherTable,
+          {N._id: {
+              '$in': list(otherIds)
+          }},
+          True,
+          msgs,
+      )
+    elif inspect == N.grandmaster:
+      interIds = {doc.get(interField, None) for doc in myDocs}
+      interDocs = self.workflowLookup(
+          interTable,
+          {N._id: {
+              '$in': list(interIds)
+          }},
+          {linkField},
+          msgs,
+      )
+      otherIds = {doc.get(linkField, None) for doc in interDocs}
       otherDocs = self.workflowLookup(
           otherTable,
           {N._id: {

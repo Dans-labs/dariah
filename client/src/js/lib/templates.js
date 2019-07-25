@@ -75,7 +75,7 @@ const isOwner = (me, v) =>
 
 const makeM = memoize(
   fieldInfo => field => {
-    const { [field]: { valType, fragment: { editable } } = emptyO } = fieldInfo
+    const { [field]: { valType, fragment: { editable } = emptyO } = emptyO } = fieldInfo
     return editable && (typeof valType != 'object' || !valType.fixed)
   },
   emptyO,

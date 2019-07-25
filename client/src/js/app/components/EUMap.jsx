@@ -1,4 +1,4 @@
-import React, { Component, Fragment, createRef } from 'react'
+import React, { Component, createRef } from 'react'
 import L from 'leaflet'
 
 import { countryBorders } from 'europe.geo'
@@ -46,8 +46,8 @@ const mapOptions = {
   },
 }
 
-const computeRadius = (_id, filteredAmountOthers, amounts) => {
-  const amount = amounts ? amounts[_id] || 0 : 0
+const computeRadius = (mongoId, filteredAmountOthers, amounts) => {
+  const amount = amounts ? amounts[mongoId] || 0 : 0
   if (amount === 0) {
     return 0
   }
@@ -69,10 +69,10 @@ class EUMap extends Component {
   render() {
     const { props } = this
     return (
-      <Fragment>
+      <>
         <div ref={this.dom} />
         <ByValue {...props} />
-      </Fragment>
+      </>
     )
   }
 
@@ -105,9 +105,9 @@ class EUMap extends Component {
     const { allIds, entities } = country
     this.idFromIso = {}
     this.inDariah = {}
-    allIds.forEach(_id => {
-      const { [_id]: { values: { iso, isMember } } } = entities
-      this.idFromIso[iso] = _id
+    allIds.forEach(mongoId => {
+      const { [mongoId]: { values: { iso, isMember } } } = entities
+      this.idFromIso[iso] = mongoId
       this.inDariah[iso] = isMember
     })
     L.geoJSON(countryBorders, {
@@ -115,11 +115,11 @@ class EUMap extends Component {
       onEachFeature: feature => {
         const { properties: { iso2, lat, lng } } = feature
         if (this.inDariah[iso2]) {
-          const { idFromIso: { [iso2]: _id } } = this
-          const { [_id]: isOn = false } = filterSetting || emptyO
+          const { idFromIso: { [iso2]: mongoId } } = this
+          const { [mongoId]: isOn = false } = filterSetting || emptyO
           const marker = L.circleMarker([lat, lng], {
             ...MARKER_COLOR[isOn],
-            radius: computeRadius(_id, filteredAmountOthers, amounts),
+            radius: computeRadius(mongoId, filteredAmountOthers, amounts),
             ...MARKER_SHAPE,
             pane: 'markerPane',
           }).addTo(this.map)
@@ -133,9 +133,9 @@ class EUMap extends Component {
     const { props: { filterSetting, filteredAmountOthers, amounts } } = this
     const { MARKER_COLOR } = mapOptions
     Object.entries(this.features).forEach(([iso2, marker]) => {
-      const { idFromIso: { [iso2]: _id } } = this
-      const { [_id]: isOn = false } = filterSetting || emptyO
-      marker.setRadius(computeRadius(_id, filteredAmountOthers, amounts))
+      const { idFromIso: { [iso2]: mongoId } } = this
+      const { [mongoId]: isOn = false } = filterSetting || emptyO
+      marker.setRadius(computeRadius(mongoId, filteredAmountOthers, amounts))
       marker.setStyle(MARKER_COLOR[isOn])
     })
   }

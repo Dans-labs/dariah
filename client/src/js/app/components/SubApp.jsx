@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Route, Switch, NavLink } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 
 import { injectProps, emptyA, emptyS } from 'utils'
 import { getMe } from 'me'
@@ -40,14 +40,13 @@ const tableLinks = (me, { name, forWhom, details }) =>
             >
                 {
                   component == null ? (
-                      <NavLink
-                        to={path}
-                        className={button ? 'button large workflow info' : emptyS}
-                        activeClassName={'active'}
-                        {...atts}
-                      >
-                        {subName}
-                      </NavLink>
+                    <a
+                      href={path}
+                      className={button ? 'button large workflow info' : emptyS}
+                      {...atts}
+                    >
+                      {subName}
+                    </a>
                   ) : (
                     component
                   )

@@ -1,5 +1,5 @@
 import orderBy from 'lodash/orderby'
-import mapValues from 'lodash/mapvalues'
+import mapValues from 'lodash/mapValues'
 
 import { memoize } from 'memo'
 import { makeReducer, emptyA, emptyO } from 'utils'

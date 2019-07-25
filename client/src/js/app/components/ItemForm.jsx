@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
 import { combineSelectors, emptyS } from 'utils'
@@ -77,7 +77,7 @@ const ItemForm = props => {
       }`}
     >
       {hasEditable && alt === 1 ? (
-        <Fragment>
+        <>
           <EditDelete
             perm={perm}
             workflow={workflow}
@@ -99,9 +99,9 @@ const ItemForm = props => {
             linkField={linkField}
             fieldFragments={fieldFragments}
           />
-        </Fragment>
+        </>
       ) : (
-        <Fragment>
+        <>
           {hasEditable ? (
             <Tooltip tip={`open an edit form for this record`} at={'right'}>
               <span
@@ -127,7 +127,7 @@ const ItemForm = props => {
             linkField={linkField}
             fieldFragments={fieldFragments}
           />
-        </Fragment>
+        </>
       )}
       <ItemAction
         settings={settings}

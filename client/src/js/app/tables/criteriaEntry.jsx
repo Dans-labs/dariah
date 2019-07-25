@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 
 import { emptyS } from 'utils'
 
@@ -62,10 +62,10 @@ const templates = {
             alterTag={l('evidence')}
             initAlt={1}
             full={
-              <Fragment>
+              <>
                 <b>{l('evidence')}</b>
                 {f('evidence')}
-              </Fragment>
+              </>
             }
             className={'comments'}
           />

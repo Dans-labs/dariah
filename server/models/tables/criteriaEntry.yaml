@@ -18,6 +18,28 @@ workflow:
         except:
           - submitted
         desc: is being reviewed
+    - inspect: grandmaster
+      method: hasValue
+      interField: assessment
+      interTable: assessment
+      linkField: contrib
+      otherTable: contrib
+      otherField: selected
+      value: true
+      attribute:
+        name: frozen
+        desc: contribution has been selected by DARIAH
+    - inspect: grandmaster
+      method: hasValue
+      interField: assessment
+      interTable: assessment
+      linkField: contrib
+      otherTable: contrib
+      otherField: selected
+      value: false
+      attribute:
+        name: frozen
+        desc: contribution has been rejected by DARIAH
   adjust:
     - inspect: master
       linkField: assessment

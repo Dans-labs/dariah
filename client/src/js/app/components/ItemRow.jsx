@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
 import { memoize } from 'memo'
@@ -119,7 +119,7 @@ const ItemRow = ({
           )}
         </div>
       ) : (
-        <Fragment>
+        <>
           <div className={'grid-status-cell'}>
             {fieldsButton(nextAlt, table, eId, update, false)}
           </div>
@@ -141,7 +141,7 @@ const ItemRow = ({
             detailFragments={detailFragments}
             fixed={fixed}
           />
-        </Fragment>
+        </>
       )}
     </div>
   )

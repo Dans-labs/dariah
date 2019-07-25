@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
@@ -13,7 +13,7 @@ class Login extends Component {
     return (
       <span className={'login'}>
         {me.eppn ? (
-          <Fragment>
+          <>
             <Tooltip tip={'you are logged in'} at={'bottom'}>
               <span className={'fa fa-user'} />
               <strong>{presentUser(me)}</strong>{' '}
@@ -25,7 +25,7 @@ class Login extends Component {
             <Tooltip tip={'sign out from DARIAH'} at={'top'}>
               <a href={'/slogout'} className={'control fa fa-users'} />
             </Tooltip>
-          </Fragment>
+          </>
         ) : (
           <Tooltip tip={'click to log in'} at={'bottom'}>
             <a href={'/login'} className={'control'}>

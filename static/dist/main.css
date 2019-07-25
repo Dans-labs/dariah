@@ -1,0 +1,1727 @@
+/* prettier-ignore */
+:root {
+    /* COLORS */
+    --action-fore:                     hsla(210, 100%,  30%, 1  );
+    --action-back:                     hsla(210, 100%,  90%, 1  );
+    --action-border:                   hsla(210, 100%,  50%, 0.5);
+    --action-disabled-back:            hsla(210,   0%,  90%, 1  );
+    --action-link-fore:                hsla(210, 100%,  20%, 1  );
+    --action-link-back:                hsla(210, 100%,  90%, 1  );
+    --action-active-fore:              hsla(210, 100%,  40%, 1  );
+    --action-active-back:              hsla(060,  80%,  90%, 0.8);
+    --action-active-border:            hsla(060, 100%,  50%, 0.5);
+
+    --assessment-quoted-fore:          hsla( 60, 100%,  10%, 1  );
+    --assessment-quoted-back:          hsla( 60, 100%,  90%, 1  );
+    --assessment-quoted-border:        hsla( 60, 100%,  35%, 0.5);
+
+    --entry-complete-back:             hsla(120, 100%, 100%, 1  );
+    --entry-complete-border:           hsla(120, 100%,  50%, 0.5);
+    --entry-incomplete-back:           hsla(  0, 100%, 100%, 1  );
+    --entry-incomplete-border:         hsla(  0, 100%,  50%, 0.5);
+    --entry-edit-complete-back:        hsla(120, 100%, 100%, 1  );
+    --entry-edit-complete-border:      hsla(120, 100%,  50%, 0.5);
+    --entry-edit-incomplete-back:      hsla(  0, 100%, 100%, 1  );
+    --entry-edit-incomplete-border:    hsla(  0, 100%,  50%, 0.5);
+
+    --dim-fore-o:                      hsla(  0,   0%,  30%, 1  );
+    --dim-fore:                        hsla(  0,   0%,  50%, 1  );
+    --dim-back:                        hsla(  0,   0%,  85%, 0.5);
+
+    --edit-help-fore:                  hsla( 50, 100%,  20%, 1  );
+    --edit-help-back:                  hsla( 50, 100%,  80%, 0.9);
+    --edit-help-border:                hsla( 50, 100%,  50%, 0.5);
+    --edit-help-code-fore:             hsla(210, 100%,  40%, 1  );
+    --edit-help-item-back:             hsla( 50, 100%,  95%, 1  );
+
+    --edit-text-fore:                  hsla(240,  50%,  30%, 1  );
+    --edit-text-back:                  hsla(210, 100%,  98%, 1  );
+    --edit-text-border:                hsla(210, 100%,  50%, 0.5);
+    --edit-focus-fore:                 hsla(240, 100%,  40%, 1  );
+    --edit-focus-back:                 hsla(210, 100%,  95%, 1  );
+    --edit-focus-border:               hsla(210, 100%,  50%, 0.9);
+    --edit-dirty-fore:                 hsla( 30, 100%,  20%, 1  );
+    --edit-dirty-back:                 hsla(210, 100%,  90%, 1  );
+    --edit-dirty-border:               hsla( 30, 100%,  40%, 0.9);
+    --edit-invalid-fore:               hsla(240,  70%, 100%, 1  );
+    --edit-invalid-back:               hsla(  0, 100%,  30%, 1  );
+    --edit-invalid-border:             hsla(  0, 100%,  30%, 0.5);
+    --edit-invalid-diag-fore:          hsla(  0, 100%,  30%, 1  );
+    --edit-invalid-diag-back:          hsla(  0, 100%,  80%, 0.5);
+
+    --error-fore-o:                    hsla(  0, 100%,  30%, 1  );
+    --error-fore:                      hsla(  0, 100%,  50%, 1  );
+    --error-back:                      hsla(  0, 100%,  80%, 0.5);
+
+    --errorboundary-fore:              hsla(  0, 100%,   0%, 1  );
+    --errorboundary-back:              hsla(  0, 100%,  80%, 0.8);
+    --errorboundary-border:            hsla(  0, 100%,  50%, 0.5);
+
+    --good-fore-o:                     hsla(120, 100%,  30%, 1  );
+    --good-fore:                       hsla(120, 100%,  50%, 1  );
+    --good-back:                       hsla(120, 100%,  80%, 0.5);
+
+    --info-fore-o:                     hsla(120,   0%,  30%, 1  );
+    --info-fore:                       hsla(120,   0%,  50%, 1  );
+    --info-back:                       hsla(120,   0%,  80%, 0.5);
+
+    --msg-box-back:                    hsla(  0,   0%,  90%, 1  );
+    --msg-box-border:                  hsla(  0,   0%,  50%, 0.5);
+
+    --record-back:                     hsla(  0,   0%,  90%, 0.8);
+    --record-border:                   hsla(  0,   0%,  70%, 0.5);
+    --record-edit-back:                hsla(  0,   0%,  80%, 0.8);
+    --record-edit-border:              hsla(  0,   0%,  80%, 0.5);
+    --record-border-no:                hsla(  0,   0%,   0%, 0  );
+
+    --resize-fore:                     hsla(  0,   0%,  50%, 0.1);
+
+    --review-my-back:                  hsla(240, 100%,  98%, 0.8);
+    --review-my-border:                hsla(240,  80%,  50%, 0.9);
+
+    --review-other-back:               hsla(  0,   0%,  90%, 0.8);
+    --review-other-border:             hsla(  0,   0%,  70%, 0.5);
+
+    --score-fore:                      hsla(120,  80%,  30%, 1  );
+    --score-back:                      hsla(120, 100%,  98%, 1  );
+    --score-border:                    hsla(120,  80%,  50%, 0.5);
+
+    --select-fore:                     hsla(240,  50%,  30%, 1  );
+    --select-back:                     hsla(240, 100%, 100%, 0.5);
+    --select-border:                   hsla(210, 100%,  50%, 0.5);
+    --select-emptytag-fore:            hsla(210, 100%,  30%, 1  );
+    --select-emptytag-back:            hsla(210, 100%,  90%, 1  );
+    --select-emptytag-border:          hsla(210, 100%,  50%, 0.5);
+    --select-active-fore:              hsla(210, 100%,  40%, 1  );
+    --select-active-back:              hsla(060,  80%,  50%, 0.8);
+    --select-active-border:            hsla(060, 100%,  50%, 0.5);
+    --select-newtag-fore:              hsla(210, 100%,  30%, 1  );
+    --select-newtag-back:              hsla( 30, 100%,  90%, 1  );
+    --select-newtag-border:            hsla( 30, 100%,  50%, 0.5);
+    --select-option-fore:              hsla(210, 100%,  30%, 1  );
+    --select-option-back:              hsla(270, 100%,  95%, 1  );
+    --select-option-border:            hsla(270, 100%,  50%, 0.5);
+    --select-option-hover-fore:        hsla(210, 100%,  30%, 1  );
+    --select-option-hover-back:        hsla(210, 100%,  90%, 1  );
+    --select-option-hover-border:      hsla(210, 100%,  50%, 0.5);
+    --select-options-back:             hsla(240, 100%,  99%, 0.9);
+    --select-options-border:           hsla(210, 100%,  50%, 0.5);
+    --select-typing-fore:              hsla(210,  50%,  30%, 1  );
+    --select-typing-back:              hsla( 30, 100%,  98%, 1  );
+    --select-typing-border:            hsla( 30, 100%,  50%, 0.5);
+    --select-typing-focus-fore:        hsla(240, 100%,  40%, 1  );
+    --select-typing-focus-back:        hsla( 30, 100%,  95%, 1  );
+    --select-typing-focus-border:      hsla( 30, 100%,  50%, 0.9);
+
+    --sort-back:                       hsla(120, 100%,  95%, 1  );
+    --sort--col-back:                  hsla(120,   0%,  95%, 1  );
+    --sort--specs-fore:                hsla(120,   0%,  40%, 1  );
+
+    --stats-border:                    hsla(  0,   0%,  50%, 0.5);
+    --stats-cost-fore:                 hsla(120,  20%,  10%, 1  );
+    --stats-cost-back:                 hsla(120,  20%,  98%, 1  );
+    --stats-n-fore:                    hsla(120,  20%,  10%, 1  );
+    --stats-n-back:                    hsla(120,  20%,  94%, 1  );
+    --stats-title-fore:                hsla(  0,   0%, 100%, 1  );
+    --stats-title-back:                hsla(  0,   0%,  10%, 1  );
+    --stats-title-border:              hsla(  0,   0%,  95%, 0.8);
+    --stats-value-fore:                hsla(  0,   0%,   0%, 1  );
+    --stats-value-back:                hsla(  0,   0%,  90%, 1  );
+
+    --subbar-back:                     hsla( 30,  30%,  80%, 0.4);
+
+    --special-fore-o:                  hsla(120,  00%,  30%, 1  );
+    --special-fore:                    hsla(120,  00%,  50%, 1  );
+    --special-back:                    hsla(120, 100%,  95%, 0.5);
+
+    --tag-fore:                        hsla(240,  50%,  30%, 1  );
+    --tag-back:                        hsla(210, 100%,  98%, 1  );
+    --tag-border:                      hsla(210, 100%,  50%, 0.5);
+    --tag-var-fore:                    hsla(  0,  50%,  50%, 1  );
+    --tag-var-back:                    hsla(210, 100%,  95%, 1  );
+    --tag-link-fore:                   hsla(210,  50%,  30%, 1  );
+    --tag-link-back:                   hsla(210,  50%,  98%, 1  );
+    --tag-inactive-fore:               hsla(  0, 100%,   0%, 1  );
+    --tag-inactive-back:               hsla(  0, 100%,  80%, 1  );
+    --tag-inactive-border:             hsla(  0, 100%,  50%, 0.5);
+    --tag-disabled-fore:               hsla(  0,   0%, 100%, 1  );
+    --tag-disabled-back:               hsla(  0, 100%,  40%, 1  );
+    --tag-disabled-border:             hsla(  0, 100%,  50%, 0.5);
+
+    --template-error:                  hsla(  0,  80%,  50%, 1  );
+    --template-good:                   hsla(120,  80%,  50%, 1  );
+
+    --tooltip-fore:                    hsla( 50, 100%,  20%, 1  );
+    --tooltip-back:                    hsla( 50, 100%,  70%, 1  );
+    --tooltip-arrow:                   hsla( 30, 100%,  40%, 1  );
+
+    --topbar-back:                     hsla( 30,  30%,  80%, 0.4);
+
+    --value-back:                      hsla(120, 100%, 100%, 1  );
+    --value-edit-back:                 hsla(  0,   0%,  95%, 1  );
+    --value-border:                    hsla(120,  40%,  90%, 1  );
+
+    --warning-fore-o:                  hsla( 30, 100%,  30%, 1  );
+    --warning-fore:                    hsla( 30, 100%,  50%, 1  );
+    --warning-back:                    hsla( 30, 100%,  80%, 0.5);
+
+    --widget-fixed-fore:               hsla(120,  40%,  10%, 1  );
+    --widget-fixed-back:               hsla(120,  40%, 100%, 1  );
+    --widget-fixed-edit-back:          hsla(  0,   0%,  80%, 0.8);
+    --widget-border:                   hsla(120,  40%,  90%, 1  );
+
+    --workflow-active:                 hsla(120, 100%,  80%, 0.8);
+    --workflow-item-back:              hsla(120,   0%,  50%, 0.8);
+
+    --workflow-action-info-fore:       hsla(240, 100%, 100%, 1  );
+    --workflow-action-info-back:       hsla(240, 100%,  30%, 1  );
+    --workflow-action-info-border:     hsla(240, 100%,  90%, 0.7);
+
+    --workflow-action-good-fore:       hsla(120, 100%, 100%, 1  );
+    --workflow-action-good-back:       hsla(120, 100%,  30%, 1  );
+    --workflow-action-good-border:     hsla(120, 100%,  90%, 0.7);
+
+    --workflow-action-warning-fore:    hsla( 30, 100%, 100%, 1  );
+    --workflow-action-warning-back:    hsla( 30, 100%,  40%, 1  );
+    --workflow-action-warning-border:  hsla( 30, 100%,  90%, 0.7);
+
+    --workflow-action-error-fore:      hsla(  0, 100%, 100%, 1  );
+    --workflow-action-error-back:      hsla(  0, 100%,  40%, 1  );
+    --workflow-action-error-border:    hsla(  0, 100%,  90%, 0.7);
+
+    --workflow-action-active-fore:     hsla(210, 100%,  40%, 1  );
+    --workflow-action-active-back:     hsla(060,  80%,  90%, 0.8);
+    --workflow-action-active-border:   hsla(060, 100%,  50%, 0.5);
+
+    --workflow-info-fore:              hsla(240,   0%,   0%, 1  );
+    --workflow-info-back:              hsla(240, 100%,  95%, 1  );
+    --workflow-info-border:            hsla(240, 100%,  95%, 1  );
+
+    --workflow-good-fore:              hsla(120,   0%,   0%, 1  );
+    --workflow-good-back:              hsla(120, 100%,  90%, 1  );
+    --workflow-good-border:            hsla(120, 100%,  90%, 1  );
+
+    --workflow-warning-fore:           hsla( 30,   0%,   0%, 1  );
+    --workflow-warning-back:           hsla( 30, 100%,  90%, 1  );
+    --workflow-warning-border:         hsla( 30, 100%,  90%, 1  );
+
+    --workflow-error-fore:             hsla(  0,   0%,   0%, 1  );
+    --workflow-error-back:             hsla(  0, 100%,  80%, 1  );
+    --workflow-error-border:           hsla(  0, 100%,  80%, 1  );
+
+
+    /* SIZES */
+
+    --logo-height:                     3rem;
+
+    --subapp-top:                      calc(0rem - var(--topbar-bottom));
+    --subapp-height:                   calc(100vh - var(--topbar-height) + var(--topbar-bottom));
+
+    --topbar-height:                   2rem;
+    --topbar-bottom:                   calc(var(--topbar-height) - var(--logo-height));
+}
+
+.tooltips-on {
+	background-color: var(--tooltip-back);
+}
+.tooltips-off {
+	background-color: var(--action-back);
+}
+.tooltip {
+	width: fit-content;
+	max-width: 40vh;
+	position: absolute;
+	top: 0;
+	left: 0;
+	color: var(--tooltip-fore);
+	background-color: var(--tooltip-back);
+	border-radius: 1rem;
+	padding: 0.6rem 0.5rem;
+	text-transform: none;
+	font-size: 1rem;
+    z-index: 3000;
+}
+
+.toolarrow {
+	width: 0;
+	height: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	content: '';
+	margin: auto;
+	display: block;
+	border: 5px solid transparent;
+    z-index: 3000;
+}
+
+.toolarrow-top {
+	border-bottom: none;
+	border-top-color: var(--tooltip-arrow);
+}
+
+.toolarrow-left {
+	border-right: none;
+	border-left-color: var(--tooltip-arrow);
+}
+
+.toolarrow-right {
+	border-left: none;
+	border-right-color: var(--tooltip-arrow);
+}
+
+.toolarrow-bottom {
+	border-top: none;
+	border-bottom-color: var(--tooltip-arrow);
+}
+
+.tooltip,
+.toolarrow {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.tooltipped.focus:focus-within + span > .tooltip,
+.tooltipped.focus:focus-within + span > .toolarrow,
+.tooltipped.hover:hover + span > .tooltip,
+.tooltipped.hover:hover + span > .toolarrow {
+	opacity: 0.95;
+	transition: opacity 1s 0.5s ease, top 1s ease, left 1s ease;
+}
+
+.hidden {
+	color: var(--widget-fixed-back);
+}
+.widget-large,
+.widget-medium,
+.widget-small {
+	color: var(--widget-fixed-fore);
+	background-color: var(--widget-fixed-back);
+	border-color: var(--widget-border);
+}
+.widget-large {
+	--size: medium;
+	--radius: 0.5rem;
+	--border: 2px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+}
+.widget-medium {
+	--size: medium;
+	--radius: 0.4rem;
+	--border: 1px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+}
+.widget-small {
+	--size: small;
+	--radius: 0.3rem;
+	--border: 0px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+}
+
+.fixed-large,
+.fixed-medium,
+.fixed-small {
+	color: var(--widget-fixed-fore);
+	background-color: var(--widget-fixed-back);
+}
+.fixed-large {
+	--size: large;
+	--hor: 1rem;
+	--ver: 0.5rem;
+	--border: 0;
+	font-size: var(--size);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: var(--ver);
+	padding-bottom: var(--ver);
+	padding-left: var(--hor);
+	padding-right: var(--hor);
+}
+.fixed-medium {
+	--size: medium;
+	--hor: 0.5rem;
+	--ver: 0.3rem;
+	--border: 0;
+	font-size: var(--size);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: var(--ver);
+	padding-bottom: var(--ver);
+	padding-left: var(--hor);
+	padding-right: var(--hor);
+}
+.fixed-small {
+	--size: small;
+	--hor: 0.2rem;
+	--ver: 0;
+	--border: 0;
+	font-size: var(--size);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: var(--ver);
+	padding-bottom: var(--ver);
+	padding-left: var(--hor);
+	padding-right: var(--hor);
+}
+
+.label {
+	--size: medium;
+	--hor: 0.5rem;
+	--ver: 0.3rem;
+	--border: 0;
+	font-size: var(--size);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: var(--ver);
+	padding-bottom: var(--ver);
+	padding-left: var(--hor);
+	padding-right: var(--hor);
+	font-weight: bold;
+}
+
+.button {
+	color: var(--action-fore);
+	cursor: pointer;
+	background-color: var(--action-back);
+	border-color: var(--action-border);
+	/*white-space: nowrap;*/
+}
+.button.disabled {
+	cursor: default;
+	background-color: var(--action-disabled-back);
+}
+.button.large,
+.label.large {
+	--size: medium;
+	--radius: 0.5rem;
+	--border: 2px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+}
+.button.medium,
+.label.medium {
+	--size: medium;
+	--radius: 0.4rem;
+	--border: 1px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+}
+.button.small,
+.label.small {
+	--size: small;
+	--radius: 0.3rem;
+	--border: 0;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+}
+
+.link {
+	color: var(--action-fore);
+	cursor: pointer;
+}
+
+.error {
+	color: var(--error-fore);
+	background-color: var(--error-back);
+}
+.error-o {
+	color: var(--error-fore-o);
+}
+.warning {
+	color: var(--warning-fore);
+	background-color: var(--warning-back);
+}
+.warning-o {
+	color: var(--warning-fore-o);
+}
+.good {
+	color: var(--good-fore);
+	background-color: var(--good-back);
+}
+.good-o {
+	color: var(--good-fore-o);
+}
+.info {
+	color: var(--info-fore);
+	background-color: var(--info-back);
+}
+.info-o {
+	color: var(--info-fore-o);
+}
+.special {
+	color: var(--special-fore);
+	background-color: var(--special-back);
+}
+.special-o {
+	color: var(--special-fore-o);
+}
+.msg-high {
+	font-weight: bold;
+}
+.msg-line {
+	padding-top: 0;
+	padding-bottom: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.msg-trash {
+	padding-top: 2;
+	padding-bottom: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-size: medium;
+	float: left;
+}
+.msg-dismiss {
+	padding-top: 2;
+	padding-bottom: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-style: italic;
+	font-size: small;
+	float: right;
+}
+.msg-box {
+	width: 50%;
+	height: 100;
+	position: fixed;
+	top: 40;
+	bottom: auto;
+	left: auto;
+	right: 10;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	padding-left: 10;
+	padding-right: 10;
+	z-index: 2000;
+	opacity: 0.9;
+	vertical-align: middle;
+	cursor: pointer;
+	background-color: var(--msg-box-back);
+	border: 2px solid var(--msg-box-border);
+	border-radius: 0.8rem;
+	font-size: small;
+}
+.msg-spinner {
+	width: 5rem;
+	height: 2rem;
+	color: var(--action-fore);
+	cursor: pointer;
+	position: fixed;
+	top: 0.05rem;
+	bottom: auto;
+	left: auto;
+	right: 1rem;
+	text-align: right;
+	padding-left: 0;
+	padding-right: 0;
+	z-index: 2000;
+	opacity: 0.9;
+	vertical-align: middle;
+}
+.msg-spinner-tip {
+	position: fixed;
+	top: 0.3rem;
+	bottom: auto;
+	left: auto;
+	right: 2.2rem;
+}
+.msg-spinner-arrow {
+	position: fixed;
+	bottom: auto;
+	top: 1.2rem;
+	left: auto;
+	right: 2rem;
+}
+.msg-dot {
+	font-size: small;
+}
+
+.progress {
+	display: inline-block;
+	text-align: center;
+	vertical-align: top;
+}
+
+.dirty {
+	color: var(--edit-dirty-fore);
+	background-color: var(--edit-dirty-back);
+}
+.invalid {
+	color: var(--edit-invalid-fore);
+	background-color: var(--edit-invalid-back);
+}
+.invalid.diag {
+	color: var(--edit-invalid-diag-fore);
+	background-color: var(--edit-invalid-diag-back);
+	font-size: small;
+	display: block;
+	padding: 0.5rem;
+}
+input {
+	color: var(--action-fore);
+	background-color: var(--action-back);
+	border: 0;
+	padding: 0.2rem;
+}
+input[type='text'],
+textarea {
+	color: var(--edit-text-fore);
+	background-color: var(--edit-text-back);
+	outline: 2px inset var(--edit-text-border);
+	border: 0;
+	font-size: large;
+	font-family: monospace;
+}
+input[type='text'] {
+	width: calc(100% - 1rem);
+	margin: 0.3rem 0.3rem;
+}
+textarea {
+	width: calc(100% - 1rem);
+	height: 10rem;
+	margin: 0.3rem 0.3rem;
+}
+input[type='text']:focus,
+textarea:focus {
+	color: var(--edit-focus-text);
+	background-color: var(--edit-focus-back);
+	outline: 4px inset var(--edit-focus-border);
+	border: 0;
+}
+span.dirty,
+span.dirty:focus,
+input.dirty,
+input.dirty:focus,
+textarea.dirty,
+textarea.dirty:focus {
+	color: var(--edit-dirty-fore);
+	background-color: var(--edit-dirty-back);
+	outline: 4px dashed var(--edit-dirty-border);
+}
+span.invalid,
+span.invalid:focus,
+input.invalid,
+input.invalid:focus,
+.input invalid,
+textarea.invalid,
+textarea.invalid:focus {
+	color: var(--edit-invalid-fore);
+	background-color: var(--edit-invalid-back);
+	outline: 4px dashed var(--edit-invalid-border);
+}
+
+/* edit status */
+.edit-action {
+	color: var(--action-fore);
+	cursor: pointer;
+	--size: medium;
+	--radius: 0.5rem;
+	--border: 2px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+	background-color: var(--warning-back);
+}
+.edit-action-small {
+	color: var(--action-fore);
+	cursor: pointer;
+	--size: small;
+	--radius: 0.4rem;
+	--border: 1px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+	background-color: var(--warning-back);
+}
+.reset-action {
+	color: var(--action-fore);
+	cursor: pointer;
+	--size: medium;
+	--radius: 0.3rem;
+	--border: 2px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+	color: var(--error-fore);
+}
+.reset-action-small {
+	color: var(--action-fore);
+	cursor: pointer;
+	--size: medium;
+	--radius: 3;
+	--border: 1px;
+	font-size: var(--size);
+	border-radius: var(--radius);
+	border-style: solid;
+	border-width: var(--border);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+	color: var(--error-fore);
+}
+.edit-noaction {
+	background-color: var(--warning-back);
+}
+
+/* values */
+
+.values {
+	line-height: 1.5;
+}
+
+.left {
+}
+.right {
+	float: right;
+}
+.multi-field {
+	width: 100%;
+	margin-left: 0;
+	padding-left: 0;
+	display: inline-flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-items: top;
+	align-content: flex-start;
+}
+.multi-field.textarea {
+	width: 100%;
+	margin-left: 0;
+	padding-left: 0;
+	display: inline-flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-items: top;
+	align-content: flex-start;
+}
+.multi-content {
+	width: 100%;
+	overflow: visible;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	align-content: flex-start;
+	align-items: flex-start;
+	/*-webkit-overflow-scrolling: touch;*/
+}
+.textarea .multi-content {
+	width: calc(100% - 1rem);
+	padding: 0 0 0 1rem;
+	overflow: visible;
+	/*-webkit-overflow-scrolling: touch;*/
+}
+.wideInput {
+	width: 100%;
+}
+.md-field {
+	width: 100%;
+	margin-left: 0;
+	padding-left: 0;
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: flex-start;
+}
+.field-content {
+	width: 100%;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.field-control {
+    /*
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+    */
+}
+.fragments {
+	width: calc(100% - 1rem);
+	max-width: calc(100% - 1rem);
+}
+div.detail-control {
+	flex: 1 1 1rem;
+}
+div.detail-body {
+	flex: 1 1 calc(100% - 1rem);
+}
+.label-col {
+	text-align: right;
+	padding: 0.2rem 0.2rem 0.2rem 0.1rem;
+	background-color: var(--widget-fixed-back);
+	flex: 0 0 10rem;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.label-col.edit {
+	background-color: var(--widget-fixed-edit-back);
+}
+.list-title {
+	text-align: left;
+	padding: 0.2rem;
+	background-color: var(--widget-fixed-back);
+	font-weight: bold;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.label-col-grid {
+	padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+	background-color: var(--widget-fixed-back);
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	font-size: small;
+}
+.value-col {
+	text-align: left;
+	padding: 0.2rem 0.1rem 0.2rem 0.2rem;
+	background-color: var(--value-back);
+	flex: 1 1 auto;
+	overflow: visible;
+	/*-webkit-overflow-scrolling: touch;*/
+}
+.value-col-grid {
+	text-align: left;
+	padding: 0.1rem 0.1rem 0.1rem 0.1rem;
+	border-bottom: 2px solid var(--value-border);
+	background-color: var(--value-back);
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.value-col-grid.edit {
+	background-color: var(--value-edit-back);
+}
+.delete {
+	float: right;
+}
+
+div.edit-help {
+	color: var(--edit-help-fore);
+	background-color: var(--edit-help-back);
+	border-radius: 1rem;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	font-size: small;
+}
+div.help-item {
+	color: var(--edit-help-fore);
+	background-color: var(--edit-help-item-back);
+	border: 0;
+	border-radius: 0.2rem;
+	flex: 0 1 auto;
+	padding: 0.1rem;
+	margin-top: 0.2rem;
+	margin-bottom: 0.1rem;
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
+.help-code {
+	color: var(--edit-help-code-fore);
+	font-weight: bold;
+	font-size: large;
+	font-family: monospace;
+}
+.mdh1 {
+	font-weight: bold;
+	font-size: 120%;
+}
+.mdh2 {
+	font-weight: bold;
+	font-size: 110%;
+}
+
+pre.md-source {
+	font-size: medium;
+	color: var(--edit-text-fore);
+	background-color: var(--edit-text-back);
+	white-space: pre-wrap;
+}
+
+/* PAGE LAYOUT */
+
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
+html {
+	height: 100vh;
+}
+body {
+	height: 100%;
+	margin: 0;
+}
+#body,
+body,
+p,
+div,
+td,
+li {
+	font-family: sans-serif;
+}
+
+.topnavbar {
+	height: var(--topbar-height);
+	background-color: var(--topbar-back);
+	padding: 0 8rem 0 0;
+	overflow: visible;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-items: center;
+}
+.topnavbar img {
+	height: var(--logo-height);
+	margin-top: 0 0 var(--topbar-bottom) 0;
+	display: inline-block;
+	vertical-align: top;
+}
+.topnavbar a {
+	padding: 0.2rem 1rem;
+}
+
+div.sub-app {
+	height: var(--subapp-height);
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-content: flex-start;
+	align-items: flex-start;
+	margin-top: var(--subapp-top);
+	padding: 0;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+div.subnavbar {
+	max-height: var(--subapp-height);
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	background-color: var(--subbar-back);
+	padding: 0;
+}
+.subnavbar .section {
+	padding: 0.2rem;
+}
+.subnavbar .section .head {
+	font-weight: bold;
+}
+.subnavbar .subsection {
+    /*
+	flex-basis: content;
+	flex-grow: 0;
+	flex-shrink: 0;
+	display: inline-flex;*/
+    display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: start-end;
+	margin-left: 1rem;
+	font-size: small;
+	padding: 0.2rem;
+}
+div.submaterial {
+	max-height: var(--subapp-height);
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	flex: 1 1 70%;
+	padding: 0 0 0 0.5rem;
+}
+div.subsection > span {
+    max-width: 10rem;
+}
+div.item-workflow {
+	margin: 0.2rem 0 0.2rem 0;
+	padding: 1rem 0 1rem 0;
+	background-color: var(--workflow-item-back);
+}
+span.login {
+	float: right;
+	color: var(--widget-fixed-fore);
+	font-size: medium;
+}
+.small {
+	font-size: small;
+}
+
+div.sized {
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.inlineL {
+	float: left;
+}
+.inlineR {
+	float: right;
+}
+div.error-boundary {
+	font-size: medium;
+	font-weight: normal;
+	background-color: var(--errorboundary-back);
+	color: var(--errorboundary-fore);
+	border: 2px dotted var(--errorboundary-border);
+	border-radius: 0.8rem;
+	padding: 0.3rem;
+}
+
+td {
+	vertical-align: top;
+}
+
+/* NAVIGATION ELEMENTS */
+
+a {
+	color: var(--action-fore);
+	text-decoration: none;
+}
+a:active,
+a:hover {
+	color: var(--action-fore);
+	text-decoration: underline;
+}
+a.spin-ok {
+	color: var(--action-fore);
+}
+a.spin-error {
+	color: var(--error-fore-o);
+}
+a.spin-warning {
+	color: var(--warning-fore-o);
+}
+a.control {
+	color: var(--action-fore);
+}
+a.active,
+.toplinks a.active {
+	color: var(--action-active-fore);
+	background-color: var(--action-active-back);
+	border: 1px solid var(--action-active-border);
+}
+.toplinks a {
+	color: var(--action-fore);
+	text-decoration: none;
+	border-radius: 0.5rem;
+	padding-right: 0.5rem;
+	padding-left: 0.5rem;
+}
+.resize {
+	font-size: x-small;
+	color: var(--resize-fore);
+}
+
+.facetFilter {
+	margin-top: 0.3rem;
+	margin-bottom: 0.1rem;
+	border: 1px solid var(--widget-border);
+	border-radius: 0.5rem;
+	color: var(--widget-fixed-fore);
+	background-color: var(--widget-fixed-back);
+}
+.facetHead {
+	margin-top: 0.05rem;
+	margin-bottom: 0.05rem;
+	font-size: small;
+	font-weight: bold;
+	padding-left: 0;
+	padding-right: 0;
+}
+input.facet {
+	color: var(--action-fore);
+	cursor: pointer;
+	margin: 0;
+	padding: 0;
+}
+
+input.search {
+	font-size: large;
+	font-family: monospace;
+	color: var(--action-fore);
+	background-color: var(--action-back);
+}
+input.search.compact {
+	height: 1.2rem;
+	width: 10rem;
+	max-width: 10rem;
+	font-size: medium;
+	font-family: monospace;
+	color: var(--action-fore);
+	background-color: var(--action-back);
+	line-height: 1rem;
+}
+
+.facet-container {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	align-content: flex-start;
+}
+.facet-row {
+	flex-grow: 0;
+	flex-shrink: 0;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-items: baseline;
+	align-content: flex-start;
+	padding-left: 0.2rem;
+	padding-right: 0.2rem;
+}
+.facet-value {
+	flex: 1 0 80%;
+	font-size: small;
+}
+.facetFilter.compact {
+	margin-top: 0.3rem;
+	margin-bottom: 0.1rem;
+	border: 1px solid var(--widget-border);
+	border-radius: 0.5rem;
+	color: var(--widget-fixed-fore);
+	background-color: var(--widget-fixed-back);
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-items: baseline;
+	align-content: flex-start;
+}
+.facetHead.compact {
+	font-size: small;
+	font-weight: bold;
+	flex: 0 0 auto;
+}
+.facet-container.compact {
+	max-width: 100%;
+	display: inline-flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+	flex: 0 0 auto;
+}
+.facet-row.compact {
+	flex: 0 0 auto;
+	display: inline-flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-items: baseline;
+	align-content: flex-start;
+	padding-left: 0.2rem;
+	padding-right: 0.4rem;
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+}
+.facet-value.compact {
+	flex: 1 0 auto;
+	font-size: small;
+}
+.facet-stat {
+	flex: 0.2 0 20%;
+	font-size: small;
+	text-align: right;
+	color: var(--dim-fore);
+	background-color: var(--dim-back);
+}
+
+.grid {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+}
+
+.grid-head {
+	display: inline-flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: baseline;
+	align-content: flex-start;
+}
+
+.grid-row {
+	width: 100%;
+	display: inline-flex;
+	margin-bottom: 0.1rem;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: flex-start;
+}
+.grid-row.form {
+	display: inline-flex;
+	margin-bottom: 0.1rem;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: flex-start;
+}
+.grid-cell {
+}
+.grid-head-cell {
+	font-weight: bold;
+}
+.grid-status-cell {
+	flex: 0 0 3rem;
+}
+.list-plain {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+}
+.sortspecs {
+	font-size: small;
+	color: var(--sort-specs-fore);
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+}
+.sortcol {
+	margin: 0 1rem 0 1rem;
+	background-color: var(--sort-col-back);
+	border-radius: 0.3rem;
+}
+.sorted {
+	background-color: var(--sort-back);
+}
+.unsorted {
+}
+div.list-filter {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	align-content: flex-start;
+	align-items: flex-start;
+}
+div.filters {
+	max-width: 40%;
+	flex: 1 1 45%;
+	padding-right: 0.5rem;
+}
+div.filters.outer {
+	max-height: 100%;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+div.filters.compact {
+	width: calc(100% - 1rem);
+	max-width: calc(100% - 1rem);
+	flex: 1 1 auto;
+}
+div.list {
+	flex: 1 1 45%;
+	padding-left: 0.5rem;
+}
+div.list.outer {
+	max-height: 100%;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+div.list.compact {
+	width: calc(100% - 1rem);
+	flex: 1 1 auto;
+}
+div.list-filter.compact {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+	align-items: flex-start;
+}
+div.filterSequence.compact {
+	width: 100%;
+	max-width: 100%;
+	display: inline-flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	align-content: flex-start;
+	align-items: baseline;
+}
+div.fulltext {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	align-content: flex-start;
+	align-items: baseline;
+}
+div.fulltext .search {
+	flex: 1 0.3 5rem;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.fulltext-stat {
+	flex: 0.5 0.2 5rem;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	text-align: right;
+	color: var(--dim-fore);
+	background-color: var(--dim-back);
+}
+.item-head {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+	align-items: baseline;
+}
+
+.itemRecord {
+	border: 0.2rem solid var(--record-border);
+	border-radius: 0.5rem;
+	background-color: var(--record-back);
+	width: 100%;
+}
+.itemRecord.edit {
+	border: 0.2rem solid var(--record-edit-border);
+	border-radius: 0.5rem;
+	background-color: var(--record-edit-back);
+}
+
+.itemRecord.noBorder,
+.itemRecord.edit.noBorder {
+	border: 0.2rem solid var(--record-border-no);
+}
+
+div.select {
+	width: 100%;
+	max-width: 100%;
+	display: inline-block;
+}
+div.select.multiselect {
+	background-color: var(--select-back);
+}
+.options {
+	max-width: 100%;
+	display: flex;
+	flex-flow: row wrap;
+	align-items: baseline;
+	border: 1px solid var(--select-options-border);
+	border-radius: 0.8rem;
+	background-color: var(--select-options-back);
+	resize: both;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.options.o-large {
+	height: 8rem;
+}
+.options.o-small {
+	height: min-content;
+}
+.option {
+	color: var(--action-fore);
+	cursor: pointer;
+	color: var(--select-fore);
+	background-color: var(--select-option-border);
+}
+.option-type,
+.option-head,
+.option {
+	margin: 0 0 0 0;
+	padding: 1 3 1 3;
+}
+.option-type,
+.option-head {
+	padding: 0.1rem 0.2rem 0.1rem 0.2rem;
+}
+.option-type {
+	color: var(--select-typing-fore);
+	background-color: var(--select-typing-back);
+}
+input.typing {
+	width: 80%;
+	outline: 2px inset var(--select-typing-border);
+	padding: 0.2rem;
+}
+input.typing[type='text']:focus {
+	color: var(--select-typing-focus-fore);
+	background-color: var(--select-typing-focus-back);
+	outline: 3px inset var(--select-typing-focus-border);
+}
+
+/* tags */
+
+.fa.up {
+	cursor: nw-resize;
+}
+.fa.down {
+	cursor: se-resize;
+}
+.tags {
+	display: flex;
+	flex-flow: row wrap;
+}
+.tag {
+	max-width: calc(100% - 1rem);
+	box-sizing: content-box;
+	display: inline-block;
+	padding: 0.1rem 0.2rem 0.1rem 0.2rem;
+	margin: 0.2rem 0.3rem 0.2rem 0.3rem;
+	color: var(--tag-fore);
+	background-color: var(--tag-back);
+	border-radius: 0.5rem;
+	border: 1px solid var(--tag-border);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	cursor: se-resize;
+}
+.tag.new {
+	color: var(--select-newtag-fore);
+	background-color: var(--select-newtag-back);
+	border: 1px dashed var(--select-newtag-border);
+}
+.tag.empty {
+	color: var(--select-emptytag-fore);
+	background-color: var(--select-emptytag-back);
+	border: 1px solid var(--select-emptytag-border);
+}
+.option.tag {
+	color: var(--select-option-fore);
+	background-color: var(--select-option-back);
+}
+.option.tag:hover {
+	color: var(--select-option-hover-fore);
+	background-color: var(--select-option-hover-back);
+	border-color: var(--select-option-hover-border);
+}
+.option.tag.selected,
+.option.tag.selected:hover {
+	color: var(--select-active-fore);
+	background-color: var(--select-active-back);
+	border: 1px solid var(--select-active-border);
+}
+
+.button-tag {
+	cursor: pointer;
+}
+.tag .button-tag {
+	color: var(--tag-var-fore);
+	background-color: var(--tag-var-back);
+	cursor: pointer;
+}
+a.tag,
+a.tag .button-tag {
+	color: var(--tag-link-fore);
+	background-color: var(--tag-link-back);
+	cursor: pointer;
+}
+
+.tag.option.inactive,
+.tag.inactive,
+.inactive {
+	color: var(--tag-inactive-fore);
+	background-color: var(--tag-inactive-back);
+	border: 1px solid var(--tag-inactive-border);
+}
+.tag.option.inactive.disabled,
+.tag.inactive.disabled,
+.inactive.disabled {
+	color: var(--tag-disabled-fore);
+	background-color: var(--tag-disabled-back);
+	border: 1px solid var(--tag-disabled-border);
+}
+
+.isactive {
+	background-color: var(--workflow-active);
+}
+
+.ass-score-box {
+	background-color: var(--score-back);
+	padding: 0.3rem;
+	margin-bottom: 0.3rem;
+	border: 3px solid var(--score-border);
+	border-radius: 0.5rem;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+.ass-score {
+	color: var(--score-fore);
+	font-size: xx-large;
+}
+.ass-score-deriv {
+	color: var(--score-fore);
+	font-size: medium;
+}
+
+div.entryRead,
+div.entryEdit {
+	border-radius: 0.5rem;
+	margin: 2px;
+}
+div.entryRead.complete {
+	border: 2px solid var(--entry-complete-border);
+	background-color: var(--entry-complete-back);
+}
+div.entryRead.incomplete {
+	border: 2px dotted var(--entry-incomplete-border);
+	background-color: var(--entry-incomplete-back);
+}
+div.entryEdit.complete {
+	border: 2px solid var(--entry-edit-complete-border);
+	background-color: var(--entry-edit-complete-back);
+}
+div.entryEdit.incomplete {
+	border: 2px dotted var(--entry-edit-incomplete-border);
+	background-color: var(--entry-edit-incomplete-back);
+}
+
+div.entry {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+div.review.allcomments {
+    display: flex;
+    flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+div.review.reviewer {
+    flex: 0 0 50%;
+}
+div.review.reviewer.my {
+    background-color: var(--review-my-back);
+    border: 2px solid var(--review-my-border);
+}
+div.review.reviewer.other {
+    background-color: var(--review-other-back);
+    border: 2px solid var(--review-other-border);
+}
+div.fat {
+	flex: 0 1 80%;
+}
+div.slim {
+	flex: 0 1 10rem;
+}
+div.xSlim {
+	flex: 0 1 2rem;
+}
+div.comments {
+	margin-left: 2rem;
+	margin-right: 3.5rem;
+}
+div.comments.criteria {
+	font-size: small;
+	margin-left: 0;
+	margin-right: 3.5rem;
+}
+
+div.comments.assessment {
+	color: var(--assessment-quoted-fore);
+	background-color: var(--assessment-quoted-back);
+	border: 2px solid var(--assessment-quoted-border);
+	border-radius: 0.2rem;
+	padding: 0.2rem;
+}
+
+div.comments.review {
+	font-size: medium;
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
+	margin-left: 0.25rem;
+	margin-right: 0.25rem;
+}
+
+div.assessment .tag {
+	color: var(--workflow-info-fore);
+	background-color: var(--workflow-info-back);
+	border-color: var(--workflow-info-border);
+}
+
+.vtop {
+	vertical-align: top;
+}
+.tError {
+	color: var(--template-error);
+}
+.tGood {
+	color: var(--template-good);
+}
+
+.button.workflow,
+.label.workflow {
+	font-weight: bold;
+	padding: 0.5rem;
+	margin: 0.5rem 1rem;
+	display: inline-block;
+    max-width: 100%;
+}
+.button.workflow {
+	border-width: 0.3rem;
+	border-style: outset;
+}
+.label.workflow {
+	border-radius: 0;
+}
+.label.workflow.info {
+	font-weight: bold;
+	color: var(--workflow-info-fore);
+	background-color: var(--workflow-info-back);
+	border-color: var(--workflow-info-border);
+}
+.label.workflow.good {
+	font-weight: bold;
+	color: var(--workflow-good-fore);
+	background-color: var(--workflow-good-back);
+	border-color: var(--workflow-good-border);
+}
+.label.workflow.warning {
+	font-weight: bold;
+	color: var(--workflow-warning-fore);
+	background-color: var(--workflow-warning-back);
+	border-color: var(--workflow-warning-border);
+}
+.label.workflow.error {
+	font-weight: bold;
+	color: var(--workflow-error-fore);
+	background-color: var(--workflow-error-back);
+	border-color: var(--workflow-error-border);
+}
+.button.workflow.info {
+	font-weight: bold;
+	color: var(--workflow-action-info-fore);
+	background-color: var(--workflow-action-info-back);
+	border-color: var(--workflow-action-info-border);
+}
+.button.workflow.good {
+	font-weight: bold;
+	color: var(--workflow-action-good-fore);
+	background-color: var(--workflow-action-good-back);
+	border-color: var(--workflow-action-good-border);
+}
+.button.workflow.warning {
+	font-weight: bold;
+	color: var(--workflow-action-warning-fore);
+	background-color: var(--workflow-action-warning-back);
+	border-color: var(--workflow-action-warning-border);
+}
+.button.workflow.error {
+	font-weight: bold;
+	color: var(--workflow-action-error-fore);
+	background-color: var(--workflow-action-error-back);
+	border-color: var(--workflow-action-error-border);
+}
+.button.workflow.info.active,
+.button.workflow.good.active,
+.button.workflow.warning.active,
+.button.workflow.error.active {
+	color: var(--workflow-action-active-fore);
+	background-color: var(--workflow-action-active-back);
+	border-color: var(--workflow-action-active-border);
+}
+
+.stats-section.head,
+.stats-line.head,
+.stats-title.head,
+.stats-item.head {
+  font-weight: bold;
+}
+.stats-section {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: flex-start;
+}
+.stats-title
+{
+  font-size: large;
+  padding: 0.5rem 0 0.3rem 0;
+  width: 20rem;
+  color: var(--stats-title-fore);
+  background-color: var(--stats-title-back);
+  border: 2px solid var(--stats-title-border);
+}
+.stats-item.head {
+  color: var(--stats-title-fore);
+  background-color: var(--stats-title-back);
+  border: 2px solid var(--stats-title-border);
+}
+.stats-line {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: flex-start;
+}
+.stats-item {
+  text-align: right;
+  padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+  border: 2px solid var(--stats-border);
+}
+.stats-item.n {
+  flex: 0 0 3rem;
+  color: var(--stats-n-fore);
+  background-color: var(--stats-n-back);
+}
+.stats-item.cost {
+  flex: 0 0 10rem;
+  color: var(--stats-cost-fore);
+  background-color: var(--stats-cost-back);
+}
+.stats-item.ncost {
+  flex: 0 0 13rem;
+}
+.stats-item.value {
+  flex: 0 0 20rem;
+  color: var(--stats-value-fore);
+  background-color: var(--stats-value-back);
+  text-align: left;
+}
+
+/* imports */
+

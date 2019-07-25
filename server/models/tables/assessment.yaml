@@ -84,7 +84,6 @@ workflow:
         - assessmentType
         - submitted
         - reviewerF
-        - selected
     - inspect: details
       linkField: assessment
       otherTable: criteriaEntry

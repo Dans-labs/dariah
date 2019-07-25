@@ -198,14 +198,14 @@ def selectContrib(userInfo):
     }
   contrib = contribs[0]
   countryId = contrib.get('country', None)
-  if countryId is None:
-    return {
-        'good': False,
-        'kind': 'error',
-        'msg': 'Contribution is not asscoiated with a country',
-    }
   if userGroup == COORD:
-    if countryId != myCountryId:
+    if countryId is None:
+      return {
+          'good': False,
+          'kind': 'error',
+          'msg': 'Contribution is not asscoiated with a country',
+      }
+    elif countryId != myCountryId:
       return {
           'good':
               False,

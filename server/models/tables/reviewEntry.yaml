@@ -47,6 +47,32 @@ workflow:
       attribute:
         name: locked
         desc: assessment is being revised
+    - inspect: grandmaster
+      method: hasValue
+      interField: review
+      interTable: review
+      linkField: contrib
+      otherTable: contrib
+      otherField: selected
+      value: true
+      attribute:
+        name: frozen
+        except:
+          - submitted
+        desc: contribution has been selected by DARIAH
+    - inspect: grandmaster
+      method: hasValue
+      interField: review
+      interTable: review
+      linkField: contrib
+      otherTable: contrib
+      otherField: selected
+      value: false
+      attribute:
+        name: frozen
+        except:
+          - submitted
+        desc: contribution has been rejected by DARIAH
   adjust:
     - inspect: siblings
       linkField: assessment

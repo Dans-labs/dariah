@@ -93,13 +93,13 @@ permissions:
   levels:
     - public
     - auth
-    - coord
     - our
     - OUR
     - edit
     - EDIT
     - own
     - OWN
+    - coord
     - office
     - system
     - root
@@ -111,7 +111,7 @@ permissions:
     auth:
       public: 1
       auth:   1
-      coord: -2
+      coord: 0
       our:   -3
       OUR:   -3
       edit:  -2
@@ -192,7 +192,7 @@ permissions:
       call: public
     mod:
       desc: modify (insert/update/delete) an item
-      call: coord
+      call: edit
     resetwf:
       desc: reset the workflow information
       call: system
@@ -260,6 +260,8 @@ names:
   - filterList
   - givenName
   - good
+  - granddetails
+  - grandmaster
   - groupDesc
   - groupRep
   - groupValues
@@ -267,6 +269,8 @@ names:
   - id
   - info
   - insertValues
+  - interField
+  - interTable
   - isMemberOf
   - isPristine
   - kind

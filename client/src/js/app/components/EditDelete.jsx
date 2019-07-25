@@ -17,9 +17,9 @@ export default ({ perm, workflow, keep, fixed, button, onClick }) => {
   const frozen = workflow && workflow.frozen && workflow.frozen.on
   const frozenDesc = workflow && workflow.frozen && workflow.frozen.desc || emptyS
   const tipInfo =
-    frozen ? frozenDesc :
-    completed ? completedDesc :
-    locked ? lockedDesc :
+    frozen ? `This item cannot deleted because ${frozenDesc}` :
+    completed ? `This item cannot deleted because ${completedDesc}` :
+    locked ? `This item cannot deleted because ${lockedDesc}` :
     doKeep ? `This item cannot deleted because related items exist: ${keepInfo}` :
     'delete this record'
   const mayDelete = !doKeep && !locked && !completed && !frozen

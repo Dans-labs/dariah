@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 
 import { emptyS, emptyA, emptyO } from 'utils'
 import { decisions, processStatus, finalDecision } from 'workflow'
@@ -28,12 +28,12 @@ const templates = {
       const scoreItems = (w('score') || emptyO).items || emptyA
       const score = scoreItems.length ? scoreItems[0] : emptyO
       resultApproved = (
-        <Fragment>
+        <>
           <ScoreBox score={score} />
           <div className={'label large workflow good'}>
             {`This contribution has been reviewed positively.`}
           </div>
-        </Fragment>
+        </>
       )
     }
     else {
@@ -49,7 +49,7 @@ const templates = {
         </div>
     ) : null
     const decideYes = (
-      <Fragment>
+      <>
         {
           fs('selected', true, h => (
             <span
@@ -60,10 +60,10 @@ const templates = {
             </span>
           ))
         }
-      </Fragment>
+      </>
     )
     const decideNo = (
-      <Fragment>
+      <>
         {
           fs('selected', false, h => (
             <span
@@ -74,10 +74,10 @@ const templates = {
             </span>
           ))
         }
-      </Fragment>
+      </>
     )
     const unDecide = (
-      <Fragment>
+      <>
         {
           fs('selected', null, h => (
             <span
@@ -88,10 +88,10 @@ const templates = {
             </span>
           ))
         }
-      </Fragment>
+      </>
     )
     const resultSelected = (selected == null) ? (
-      <Fragment>
+      <>
         <div className={'label large workflow info'}>
           {`No selection decision taken by National Coordinator`}
         </div>
@@ -99,9 +99,9 @@ const templates = {
             {decideYes}
             {decideNo}
         </div>
-      </Fragment>
+      </>
     ) : selected ? (
-      <Fragment>
+      <>
         {resultFrozen}
         <div className={'label large workflow good'}>
           {`Selected by National Coordinator`}
@@ -110,9 +110,9 @@ const templates = {
             {decideNo}
             {unDecide}
         </div>
-      </Fragment>
+      </>
     ) : (
-      <Fragment>
+      <>
         {resultFrozen}
         <div className={'label large workflow error'}>
           {`Rejected by National Coordinator`}
@@ -121,20 +121,20 @@ const templates = {
             {decideYes}
             {unDecide}
         </div>
-      </Fragment>
+      </>
     )
     return (
-        <Fragment>
+        <>
             {resultApproved}
             {resultSelected}
-        </Fragment>
+        </>
     )
   },
   related: {
     assessment({ v, e, s, f, linkMe }) {
       const cTitle = s('title')
       return (
-        <Fragment>
+        <>
           <div>
             {e('urlContribution') ? (
               cTitle
@@ -159,7 +159,7 @@ const templates = {
               e('costTotal') ? 'Not given' : s('costTotal')
             }`}
             headLine={emptyS}
-            full={<Fragment>{f('costDescription')}</Fragment>}
+            full={<>{f('costDescription')}</>}
           />
           <Expand
             alterSection={`contribution_in_assessment${v('_id')}`}
@@ -177,7 +177,7 @@ const templates = {
               )
             }
             full={
-              <Fragment>
+              <>
                 <div>{f('description')}</div>
                 <div>
                   <div>
@@ -199,7 +199,7 @@ const templates = {
                     <b>{'Keywords:'}</b> {f('keyword')}
                   </div>
                 </div>
-              </Fragment>
+              </>
             }
           />
           <Expand
@@ -212,7 +212,7 @@ const templates = {
             headActive={'Provenance'}
             headLine={emptyS}
             full={
-              <Fragment>
+              <>
                 <div>
                   {'Created '}
                   {f('dateCreated')}
@@ -227,12 +227,12 @@ const templates = {
                     <div key={i}>{mod}</div>
                   ))}
                 </div>
-              </Fragment>
+              </>
             }
           />
           <div>{<a href={linkMe}>{'To the contribution record'}</a>}</div>
           <div>{f('typeContribution')}</div>
-        </Fragment>
+        </>
       )
     },
   },

@@ -34,7 +34,11 @@ export const checkDisabled = (activeItems, inactive) => value =>
   !activeItems.has(value)
 
 export const someEditable = (fields, perm, workflow) =>
-  !(workflow && workflow.locked && workflow.locked.on) &&
+  !(workflow && (
+    workflow.locked && workflow.locked.on ||
+    workflow.completed && workflow.completed.on ||
+    workflow.frozen && workflow.frozen.on
+  )) &&
   fields &&
     Object.keys(fields).some(field => (
       perm && perm.update && perm.update[field]

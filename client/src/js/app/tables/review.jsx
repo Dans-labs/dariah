@@ -53,7 +53,7 @@ const templates = {
   },
   mainEdit({ l, f, fe, m, editButton }) {
     return (
-      <Fragment>
+      <>
         {editButton}
         <div className={'grid fragments'}>
           {eField('title', l, fe, m)}
@@ -63,7 +63,7 @@ const templates = {
           {eField('remarks', l, fe, m)}
           {eField('editors', l, fe, m)}
         </div>
-      </Fragment>
+      </>
     )
   },
   mainAction({ settings, tables, table, me, v, w, s, fs, m }) {
@@ -97,7 +97,7 @@ const templates = {
       }
     })
     return (
-      <Fragment>
+      <>
         <div className={'review allcomments'}>
           {['E', 'F'].map(reviewType => {
             const isMy = myType && reviewType === myType
@@ -194,7 +194,7 @@ const templates = {
             {`This review is locked because: ${w('locked').desc}`}
           </div>
         ) : null}
-      </Fragment>
+      </>
     )
   },
   insert: {
@@ -215,7 +215,7 @@ const templates = {
       const frozen = w('frozen').on
 
       return myType ? (
-        <Fragment>
+        <>
           <span className={`label large workflow ${myType ? 'info' : 'error'}`}>
             {`Your reviewer role is: ${reviewerRole[myType]}`}
           </span>
@@ -237,7 +237,7 @@ const templates = {
                 {'You can review after the self-assessment has been submitted'}
               </span>
             )}
-        </Fragment>
+        </>
       ) : (
         emptyA
       ) // null will cause the default button to appear, but we want to suppress that

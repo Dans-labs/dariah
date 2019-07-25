@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { emptyS } from 'utils'
@@ -36,7 +36,7 @@ class Notification extends Component {
     const highlight = lastNote > -1
     const busyBlocks = new Array(busy < 0 ? 0 : busy).fill(1)
     return (
-      <Fragment>
+      <>
         <Tooltip
           tip={'click circle to show/hide notifications and progress messages'}
           at={'left'}
@@ -86,7 +86,7 @@ class Notification extends Component {
             ) : null}
           </div>
         ) : null}
-      </Fragment>
+      </>
     )
   }
   componentDidMount() {

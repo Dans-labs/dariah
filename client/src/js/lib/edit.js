@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 
 import { memoize } from 'memo'
 import { emptyS, emptyO } from 'utils'
@@ -17,7 +17,7 @@ export const editControl = canSubmit => ({
   handleSubmit,
   nextAlt,
 }) => (
-  <Fragment>
+  <>
     {canSubmit && !dirty && !submitting ? (
       <Tooltip tip={'close the edit form'} at={'right'}>
         <span className={'button medium fa fa-eye'} onClick={nextAlt} />
@@ -58,7 +58,7 @@ export const editControl = canSubmit => ({
       </Tooltip>
     ) : null}{' '}
     {error && canSubmit && <span className={'invalid diag'}>{error}</span>}
-  </Fragment>
+  </>
 )
 
 export const makeSubmit = memoize(

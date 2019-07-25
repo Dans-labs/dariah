@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
 import { combineSelectors, emptyA } from 'utils'
@@ -120,7 +120,7 @@ const ListGrid = ({
     )
   }
   return (
-    <Fragment>
+    <>
       {!(filtered && select === DETAILS) ? (
         <div>
           <EditInsert
@@ -235,7 +235,7 @@ const ListGrid = ({
         </div>
         {rows}
       </div>
-    </Fragment>
+    </>
   )
 }
 

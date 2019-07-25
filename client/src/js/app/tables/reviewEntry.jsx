@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import Markdown from 'react-markdown'
 
 import { emptyS } from 'utils'
@@ -91,7 +91,7 @@ const putReviewAll = (
   editable,
   { tables, settings, l, w, theF },
 ) => (
-  <Fragment>
+  <>
     <p>
       <b>{l('comments')}</b>
     </p>
@@ -127,7 +127,7 @@ const putReviewAll = (
         )
       })}
     </div>
-  </Fragment>
+  </>
 )
 
 const putReviewReviewer = (
