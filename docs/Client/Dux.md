@@ -137,7 +137,8 @@ other `alterSections`.
 
 Manages Markdown documents. Fetches raw source from the server and stores it
 into the state, under a key, which is the path information of the document. The
-[DocMd](Components#docmd) provides a widget for such documents.
+[DocMd](Components.md#docmd)
+provides a widget for such documents.
 
 ### Actions
 
@@ -189,12 +190,15 @@ This duct not only needs data from the `filters` slice, but also from the
 
 #### changeFulltext ###
 
-Responds to a change in the search text in a [Fulltext](Components#fulltext)
+Responds to a change in the search text in a
+[Fulltext](Components.md#fulltext)
 search widget.
 
 #### changeFacet ###
 
-Responds to a click in the checkbox of a facet [Facet](Components#facet).
+Responds to a click in the checkbox of a facet
+[Facet](Components.md#facet)
+.
 
 #### changeFacetAll ###
 
@@ -203,10 +207,18 @@ Responds to a click to (de)select all facets of a field.
 #### initFiltering ###
 
 Initializes filtering for a table. This action also looks at the tables slice of
-the state, which is managed by [tables](#tables). The actual work is done by a
-memoized helper function: [compileFieldIds](#compilefieldids). On the basis of
+the state, which is managed by
+[tables](#tables)
+.
+The actual work is done by a
+memoized helper function:
+[compileFieldIds](#compilefieldids)
+.
+On the basis of
 this, initial settings of facet filters can be made. This is done by the helper
-function [initFilterSettings](#initfiltersettings) and these settings are to be
+function
+[initFilterSettings](#initfiltersettings)
+and these settings are to be
 added to the `filters` slice of the state under the key `table` and then under a
 key `filterTag`. In this way you can set up various kinds of filtering for the
 same table.
@@ -225,9 +237,15 @@ consumed by components.
 
 Reads the current settings of a filter and injects it as `filters` into the
 props of the receiving components, which are typically the filter widgets that
-receive user interaction: [Fulltext](Components#fulltext)
-[Facet](Components#facet), and also [CheckboxI](Components#checkboxi),
-[EUMap](Components#eumap).
+receive user interaction:
+[Fulltext](Components.md#fulltext)
+[Facet](Components.md#facet)
+,
+and also
+[CheckboxI](Components.md#checkboxi)
+,
+[EUMap](Components.md#eumap)
+.
 
 ### Helpers
 
@@ -236,17 +254,25 @@ receive user interaction: [Fulltext](Components#fulltext)
 For every field that is chosen for faceted browsing, the list of values will be
 compiled.
 
-The result is used by [ByValue](Components#byvalue). This component is
+The result is used by
+[ByValue](Components.md#byvalue)
+.
+This component is
 responsible for all the facets of a field.
 
 It is useful to store the results of this compilation, but where? We do not
 store it in the state, because it is derived data, and we adhere to the
 principle that the state is a
-[normalized single source of truth]({{redux}}/docs/recipes/reducers/NormalizingStateShape.html).
+[normalized single source of truth]({{redux}}/docs/recipes/reducers/NormalizingStateShape.html)
+.
 Selectors are invoked upon each rendering, but in this case we do not want to
 redo the compilation all the time. The solution is to use a
-[memoized function]({{redux}}/docs/recipes/ComputingDerivedData.html). I
-have created my own [memoizer](Lib#memo).
+[memoized function]({{redux}}/docs/recipes/ComputingDerivedData.html)
+.
+I
+have created my own
+[memoizer](Lib.md#memo)
+.
 
 #### computeFiltering ###
 
@@ -279,7 +305,8 @@ steer the *collective* checkbox that governs all facets.
 ## [forms]({{appBase}}/dux/forms.js)
 
 The `forms` slice of the state is under control of the
-[Redux-Form]({{reduxFormBase}}) module. It contains all current form data
+[Redux-Form]({{reduxFormBase}})
+module. It contains all current form data
 of components where the user is interacting with forms.
 
 Some other components might want to know whether a component is engaged in data
@@ -349,7 +376,8 @@ a table.
 ## [me]({{appBase}}/dux/me.js)
 
 Powers the login widget, top right on the screen, realized by the component
-[Login](Components#login).
+[Login](Components.md#login)
+.
 
 The login procedure caters for shibboleth logins. Upon successful login, the
 server sends information about the currently logged in user to the client.
@@ -367,7 +395,9 @@ except by asking the server. The current user can be retrieved by
 #### fetchMe ###
 
 Fetches data about *me*, the logged in user. It is actually handled by the
-helper [server](Lib#server).
+helper
+[server](Lib.md#server)
+.
 
 ### Reducer
 
@@ -380,7 +410,9 @@ in.
 #### getMe ###
 
 Plainly hand over the attributes of the currently logged in user. At the moment
-only the [Login](Components#login) component is interested in it.
+only the
+[Login](Components.md#login)
+component is interested in it.
 
 ### Helpers
 
@@ -389,7 +421,9 @@ No helpers.
 ## [notes]({{appBase}}/dux/notes.js)
 
 Powers the notification widget, top right on the screen, realized by the
-component [Notification](Components#notification).
+component
+[Notification](Components.md#notification)
+.
 
 A notification has a *kind* and a *text*. The kind is one of `error`, `warning`,
 `special`, `info`. All non-info messages are considered important.
@@ -419,7 +453,8 @@ Turns the visibility of notification panel on or off.
 
 Other components can issue notifications easily, either by importing these
 actions, or by dispatching the right actions themselves. The helper function
-[accessData](Lib#server) can issue notifications. These notifications are given
+[accessData](Lib#.mdserver)
+can issue notifications. These notifications are given
 the type `async` and convey a status `pending`, `success`, or `error`.
 
 ### Reducer
@@ -436,7 +471,8 @@ spinner if `busy > 0`.
 The notification widget gets the notifications from the state, including `busy`
 and `show`, the latter indicating whether the notification panel should be
 hidden or not. For the convenience of the
-[Notification](Components#notification) component, the index of the last
+[Notification](Components.md#notification)
+component, the index of the last
 important notification message is also computed, and its kind.
 
 ### Helpers
@@ -453,7 +489,9 @@ other dux.
 #### configureStore ###
 
 `Root` does not have proper actions of its own. But it does set up the store,
-and passes it on to the [main](Components#main) component.
+and passes it on to the
+[main](Components.md#main)
+component.
 
 ### Reducer
 
@@ -468,7 +506,9 @@ No helpers.
 
 ## [select]({{appBase}}/dux/select.js)
 
-Manages the UI-state of the [RelSelect](Components#relselect) component. Every
+Manages the UI-state of the
+[RelSelect](Components.md#relselect)
+component. Every
 *RelSelect* instance must be identified by a tag, so that the states of the
 select controls do not get confused. The most obvious choice for a tag value is
 a composition of the table name, the entity id, and the field name.
@@ -537,7 +577,9 @@ A `task` object specifies what to fetch, and can contain data to send to the
 server.
 
 It can be used for database queries or file content. During the stages of a
-request, [notify](Dux#notes) actions will be dispatched.
+request,
+[notify](Dux.md#notes)
+actions will be dispatched.
 
 ##### progress ####
 
@@ -565,7 +607,8 @@ fired to the server).
 
 #### Note ###
 
-But all actions except `accessData` are also picked up by the [notes](#notes)
+But all actions except `accessData` are also picked up by the
+[notes](#notes)
 reducer, where they result in notifications.
 
 ### Selectors
@@ -610,13 +653,17 @@ and it improves consistency, because all data consuming components look at the
 same data.
 
 Principal data consuming components are
-[ListContainer](Components#listcontainer) and [Items](Components#itemmy).
+[ListContainer](Components.md#listcontainer)
+and
+[Items](Components.md#itemmy)
+.
 
 In order to do the job properly, a fair amount of metadata about tables and
 fields is also fetched and stored. In particular, tables specify which filters
 can be used on which fields. This filter setup is not hard-wired into the client
 app, but comes from the server, where it is configured in the
-[data model](Model).
+[data model](../Concepts/Model.md)
+.
 
 ### Actions
 
@@ -694,26 +741,36 @@ achieves. It might look hard to take care of this merging, under the constraint
 that only those branches of the state should be touched that are actually
 updated.
 
-But the [lodash mergeWith]({{lodash}}/#mergewith) makes this a breeze.
+But the
+[lodash mergeWith]({{lodash}}/#mergewith)
+makes this a breeze.
 
 Unfortunately, this library does not always leave unchanged values untouched,
 which results in unnecessary re-renderings of components.
 
-The best solution turned out to be [Immutability-Helper]({{immutability}}).
+The best solution turned out to be
+[Immutability-Helper]({{immutability}})
+.
 
 If you want to dive deeper into this issue, see the
-[tests about merging](Tests#merge), which includes tests that makes this issue
+[tests about merging](../Maintenance/Tests.md#merge)
+,
+which includes tests that makes this issue
 crystal clear.
 
 The methods of the Immutability-Helper have a syntax inspired by the MongoDB
 commands, which is a nice reduction of cognitive load, since we use MongoDB at
 the server side.
 
-Have a look again at the [reducer source code]({{appBase}}/dux/tables.js)
+Have a look again at the
+[reducer source code]({{appBase}}/dux/tables.js)
 and see how straightforward it is to code one of the most tricky reducers in
 this app.
 
-This reducer actively covered by [tests](Tests#tablesreducer). Have a look at
+This reducer actively covered by
+[tests](../Maintenance/Tests.md#tablesreducer)
+.
+Have a look at
 them to get more feeling of how table actions cause state transitions.
 
 ### Selectors
@@ -726,8 +783,12 @@ Return the whole `tables` slice of the state.
 
 #### entityHead ###
 
-Computes the title for an item, based on the [data model](Model) or on
-specialized functions, defined here. See also [repr](#repr).
+Computes the title for an item, based on the
+[data model](../Concepts/Model.md)
+or on
+specialized functions, defined here. See also
+[repr](#repr)
+.
 
 #### needTable ###
 
@@ -782,21 +843,28 @@ the corresponding records (if needed).
 When a user clicks on an *Close All* button, this function is invoked to
 collapse the corresponding records and remove the `_id`s of the previously open
 records from the URL, using
-[browserHistory]({{reactRouterTutorial}}/lessons/10-clean-urls).
+[browserHistory]({{reactRouterTutorial}}/lessons/10-clean-urls)
+.
 
 ## [win]({{appBase}}/dux/win.js)
 
 Reacts to window resizing by the user. It will deliver the new window size after
 resizing. Useful for components that care about the window size, such as
-[App](Components#app).
+[App](Components.md#app)
+.
 
 ### Actions
 
 #### changeWinDim ###
 
-Responds to window resizing, as set up in [Window](Components#window). It is
+Responds to window resizing, as set up in
+[Window.md](Components.md#window)
+.
+It is
 just a matter of storing the `height` and the `width` of the window into the
-state. Note that the event emitter in [Window](Components#window) is being
+state. Note that the event emitter in
+[Window.md](Components.md#window)
+is being
 throttled, so that it does not run too frequently during the actual resizing.
 
 ### Reducer
@@ -817,7 +885,9 @@ No helpers.
 ## [workflow]({{appBase}}/dux/workflow.js)
 
 A lot of the logic of showing lists, items, related items and fields is purely
-generic and driven by the [data model](Model).
+generic and driven by the
+[data model](../Concepts/Model.md)
+.
 
 But there is considerably more to an app than this kind of generic logic. The
 `workflow` duct is the entry point for additional, non-trivial business logic.
@@ -841,7 +911,9 @@ The generic List and Item components can be made sensitive to this notion of
 activity. Active items can be formatted specially, and likewise the non-active
 items, which can also be disabled in some contexts.
 
-The way (in)active items are displayed is controlled by the [data model](Model).
+The way (in)active items are displayed is controlled by the
+[data model](../Concepts/Model.md)
+.
 See for example the field `typeContribution` in the tables `package` and
 `criteria`.
 
@@ -863,10 +935,14 @@ the server to perform a workflow reset.
 The reducer is simple, it only has to perform one action: put incoming workflow
 data unto the state. No sophisticated merging is needed, because this workflow
 meta information is only needed for one component,
-[WorkflowInfo](Components#workflowinfo), which is meant for sysadmins only.
+[WorkflowInfo](Components.md#workflowinfo)
+,
+which is meant for sysadmins only.
 
 Note that the factual workflow data moves from server to client on the shoulders
-of the [tables](Dux#tables) reducer.
+of the
+[tables](Dux.md#tables)
+reducer.
 
 ### Selectors
 

@@ -8,7 +8,7 @@ webpack='node_modules/.bin/webpack'
 
 function codestats {
     cd $root
-    xd="__pycache__,node_modules,.tmp,.git,_temp,.ipynb_checkpoints,images,fonts,favicons,.sass_cache,_site,_sass,compiled"
+    xd="__pycache__,node_modules,.tmp,.git,_temp,.ipynb_checkpoints,images,fonts,favicons,.sass_cache,site,_site,_sass,compiled"
     xf="cloc_exclude.lst"
     rf="docs/About/Stats.md"
     client/node_modules/cloc/lib/cloc --no-autogen --exclude_dir=$xd --exclude-list-file=$xf --report-file=$rf --md . ../dariah.wiki

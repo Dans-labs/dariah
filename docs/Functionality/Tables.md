@@ -3,7 +3,9 @@
 Here are the particulars of our templates. Below you find all tables for which
 we do have specialized templates.
 
-Consult [Templates](Templates.md) to read how the mechanism of applying templates
+Consult
+[Templates](Templates.md)
+to read how the mechanism of applying templates
 works.
 
 ## [assessment]({{appBase}}/tables/assessment.jsx)
@@ -18,14 +20,18 @@ to perform a next step in the workflow, instead of the minute standard controls.
 
 ### mainAction
 
-A lot happens here, in terms of reading [workflow](Workflow) attributes and
+A lot happens here, in terms of reading
+[workflow](Workflow.md)
+attributes and
 triggering the display of workflow buttons and info panels.
 
 #### Assessment score ###
 
 In particular the current score of the assessment is presented here. The score
 is computed server-side by the workflow function
-[assessmentScore](Workflow#assessmentscore). Not only the score is presented,
+[assessmentScore](Workflow.md#assessmentscore)
+.
+Not only the score is presented,
 but also its derivation.
 
 #### Submission ###

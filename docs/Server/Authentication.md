@@ -6,7 +6,8 @@ The login/logout actions take place at the server after visiting `/login`,
 `/logout` or `/slogout`.
 
 The server performs shibboleth authentication, with credentials coming from the
-[DARIAH Identity provider]({{dariahIDP}}).
+[DARIAH Identity provider]({{dariahIDP}})
+.
 
 Currently, `/logout` performs a logout from this app, but not from the DARIAH
 Identity Provider. To do the latter, one has to go to `/slogout` and close the
@@ -120,9 +121,12 @@ A consequence is, that if there is no `root` in the system, nobody can be made
 `root` from within the system.
 
 When importing data into the system by means of
-[load.sh]({{staticBase}}/tools/load.sh) you can specify to make a specific
+[load.sh]({{staticBase}}/tools/load.sh)
+you can specify to make a specific
 user `root`. Which user that is, is specified in
-[config.yaml]({{staticBase}}/tools/config.yaml), see `rootUser`.
+[config.yaml]({{staticBase}}/tools/config.yaml)
+,
+see `rootUser`.
 
 Once the root user is in place, (s)he can assign system admins and back office
 people. Once those are in place, the daily governance of the system can take

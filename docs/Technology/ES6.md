@@ -9,12 +9,19 @@ for the client side of the app.
 The code is *transpiled* through Babel into a version of JavaScript that all
 major browsers understand. The compilation from source code to what the browser
 eventually gets is way more complicated. It is taken care of by the build tool
-of our choice: [Webpack]({{webpack}})
+of our choice:
+[Webpack]({{webpack}})
 
 Our source code conforms to a number of style guides, which are checked by
-[eslint]({{eslint}}). There are many options and choices, ours are
-[here]({{clientBase}}/eslint.yaml). Not all of these are relevant, because
-we also enforce style by means of [prettier]({{prettier}}).
+[eslint]({{eslint}})
+.
+There are many options and choices, ours are
+[here]({{clientBase}}/eslint.yaml)
+.
+Not all of these are relevant, because
+we also enforce style by means of
+[prettier]({{prettier}})
+.
 
 The evolution of JavaScript to ES6 and beyond has transformed JavaScript from a
 "horrible language" into a performant language with a beautiful syntax on one of
@@ -22,7 +29,9 @@ the most widely supported platforms: the browser. Instead of pushing JavaScript
 out of sight, we fully embrace it as our principal programming formalism at the
 client side.
 
-Others (see for example [Meteor]({{meteor}})) go even further and use it on
+Others (see for example
+[Meteor]({{meteor}})
+) go even further and use it on
 the server as well, but we have not (yet) taken that step.
 
 We highlight a few, not all, concepts in ES6 that we make use of.
@@ -70,9 +79,12 @@ calls it, `this` is the `this` of class `Foo`. So you can just say:
 callback = this.method2
 ```
 
-Note that this syntax of [class properties]({{es7cp}}) is in ES7, beyond
+Note that this syntax of
+[class properties]({{es7cp}})
+is in ES7, beyond
 ES6. Yet we can use it without issue because of
-[Babel]({{babel}}/docs/plugins/transform-class-properties/).
+[Babel]({{babel}}/docs/plugins/transform-class-properties/)
+.
 
 ## [Arrow Functions]({{babel}}/learn-es2015/#ecmascript-2015-features-arrows-and-lexical-this)
 
@@ -107,15 +119,20 @@ There is more to this, notably, for arrow functions the `this` is lexical.
 
 ## Object Notations
 
-[shorthand]({{javascript}}/Operators/Object_initializer),
-[destructuring]({{babel}}/learn-es2015/#ecmascript-2015-features-destructuring),
-[rest spread]({{babel}}/learn-es2015/#ecmascript-2015-features-destructuring).
+[shorthand]({{javascript}}/Operators/Object_initializer)
+,
+[destructuring]({{babel}}/learn-es2015/#ecmascript-2015-features-destructuring)
+,
+[rest spread]({{babel}}/learn-es2015/#ecmascript-2015-features-destructuring)
+.
 
 Objects are central to JavaScript. ES6 contains new syntax, that makes working
 with objects very pleasant indeed. In our app we have activated linters that
 insist on using that syntax to the maximum amount possible. It will dramatically
 change the general outlook of a piece of JavaScript code. Just to have a taste,
-look at this bit of [source code]({{appBase}}/components/ListFilter.jsx).
+look at this bit of
+[source code]({{appBase}}/components/ListFilter.jsx)
+.
 
 An *object* contains key-value pairs like this:
 
@@ -212,7 +229,9 @@ shallowly to a new object, and every thing that is the same, remains the same
 object.
 
 However, if what has changed is really deeply nested, there are better methods
-to achieve is, e.g. [lodash merge]({{lodash}}/#merge).
+to achieve is, e.g.
+[lodash merge]({{lodash}}/#merge)
+.
 
 ## [Promise]({{javascript}}/Global_Objects/Promise)
 
@@ -232,7 +251,8 @@ The typical way to use a promise is
         error => console.error(error),
       )
 
-**Example**: [server.js]({{libBase}}/server.js)
+**Example**:
+[server.js]({{libBase}}/server.js)
 
 This is virtually the only occurrence in our code where we use Promise syntax.
 

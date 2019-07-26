@@ -249,6 +249,9 @@ effects of that decision.
 We need some mechanism of hinting the user that important changes have been made
 and a refresh is needed.
 
-I know it can be done ( [socket]({{socket}}),
-[python-socket]({{socketPython}}) ) but it requires a bit of research to
+I know it can be done (
+[socket]({{socket}})
+,
+[python-socket]({{socketPython}})
+) but it requires a bit of research to
 find the best way to do it.

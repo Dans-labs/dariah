@@ -61,7 +61,9 @@ of issues of an information-logistic nature had to be solved.
 
 Talking of which: the conversion of legacy content has now improved. The import
 is repeatable, and will not disturb data that has been added later, using the
-contribution tool itself. Read [more](Content).
+contribution tool itself. Read
+[more](../Legacy/Content.md)
+.
 
 ## 2017-07-01 ###
 
@@ -76,7 +78,8 @@ the database.
 
 ## Technically ###
 
-We count the lines of code in all formats used. See the [codebase](Codebase)
+We count the lines of code in all formats used. See the
+[codebase](Codebase.md)
 page.
 
 Many changes in the table area: lists and items and filters. It has become more
@@ -95,5 +98,8 @@ The documentation has been reworked extensively.
 
 ## 2017-05-19 ###
 
-Fixed subtle issues in form entry: [FieldEdit](Components#fieldedit) and
-[InputMulti]({{appBase}}/components/InputMulti.jsx).
+Fixed subtle issues in form entry:
+[FieldEdit](../Client/Components.md#fieldedit)
+and
+[InputMulti]({{appBase}}/components/InputMulti.jsx)
+.

@@ -1,7 +1,11 @@
 # Components (React)
 
-These are the [React](React) components, that make up the part of the app that
-is visible in the browser. They lean on the [dux](Dux) that work for them in the
+These are the
+[React](../Technology/React.md)
+components, that make up the part of the app that
+is visible in the browser. They lean on the
+[dux](Dux.md)
+that work for them in the
 background.
 
 Click on the names in the titles to view their source code on GitHub.
@@ -19,27 +23,27 @@ on, we omit the types.
 ??? explanation "List of standard props"
     name | type | description
     --- | --- | ---
-    `alter` | **object** | a slice of the state from [getAltSection](Dux#getaltsection); Group of settings for components with alternative renderings: these settings tell which alternative has been chosen for each of those components;
+    `alter` | **object** | a slice of the state from [getAltSection](Dux.md#getaltsection); Group of settings for components with alternative renderings: these settings tell which alternative has been chosen for each of those components;
     `alterSection` | **string** | name of a section of the `alter` state; such a section contains the choice of alternative for a bunch of components that are relevant to the present component; each component that requests data from `alter` only gets data for a single section; in this way components will not be dependent on too big a part of the state; those dependencies may cause spurious re-renderings;
     `alterTag` | **string** | name that lives within a section of the `alter` state; this functions as the address of a component that needs to expand or collapse; the triggering event will change the `alter` state, keyed by `alterSection` and then by `alterTag`;
-    `amounts` | **object** | for a faceted filter: contains the amount of items that match each facet; see [computeFiltering](Dux#computefiltering);
+    `amounts` | **object** | for a faceted filter: contains the amount of items that match each facet; see [computeFiltering](Dux.md#computefiltering);
     `children` | **components** | a special prop defined by React itself; it contains the material that has been put in the component; you find it in the `render` function of the component; it is everything between `<Component>` and `</Component>`;
     `className` | **string** | a class name to be put in the top level element of the rendered component;
     `compact` | **bool** | whether the component should minimize the real estate on the screen that it uses;
-    `detailFragments` | **array of object** | the information on the basis of which the detail records of an item can be rendered; every entry in the array corresponds to a detail table that may contain detail records of the master record that is being dealt with; ultimately computed by [makeDetails](Lib#makedetails) and then passed to child components;
+    `detailFragments` | **array of object** | the information on the basis of which the detail records of an item can be rendered; every entry in the array corresponds to a detail table that may contain detail records of the master record that is being dealt with; ultimately computed by [makeDetails](Lib.md#makedetails) and then passed to child components;
     `dirty` | **bool** | whether a field or item has been changed on the interface but not saved to the database
     `dispatch` | **function** | this function belongs to the store that holds the state; it is generally injected into the props of a component by [connect]({{reactRedux}}/docs/api.md#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options)ing a component to the store; this only happens if `connect()` is called with zero or one argument (the `MapDispatchToProps` argument should be undefined); the `dispatch` function enables the component to trigger an action that changes the state; where you would call `setState()` in vanilla-React you put `dispatch(action)` if your app uses Redux;
     `eId` | **string** | the MongoDB id of an entity that is being dealt with; *   `field` **string**; the name of a field that is being dealt with;
-    `fieldFragments` | **array** | an array with instructions per field how to render it; ultimately computed by [makeFields](Lib#makefields) and then passed to child components;
-    `filtered` | **bool** | whether the list should be accompanied by filters; the specification of the filters themselves is in the [data model](Model);
+    `fieldFragments` | **array** | an array with instructions per field how to render it; ultimately computed by [makeFields](Lib#.mdmakefields) and then passed to child components;
+    `filtered` | **bool** | whether the list should be accompanied by filters; the specification of the filters themselves is in the [data model](../Concepts/Model.md);
     `fields` | **objects** | defines a subset of all fields: these are the fields that the component has to deal with;
-    `filteredAmount` | **number** | the number of items that pass all filters; see [computeFiltering](Dux#computefiltering);
-    `filteredAmountOthers` | **object** | for each filter, the amount of items that passes all filters except that one filter; see [computeFiltering](Dux#computefiltering);
-    `filterField` | **string** | the name of the field that the current filter is acting upon; (as in the [data model](Model);
-    `filterRelField` | **string** | the name of the related field that the current filter is acting upon; this is relevant for fields that point to a related table: you can filter on the values of a specific field in the related table; (as in the [data model](Model);
+    `filteredAmount` | **number** | the number of items that pass all filters; see [computeFiltering](Dux.md#computefiltering);
+    `filteredAmountOthers` | **object** | for each filter, the amount of items that passes all filters except that one filter; see [computeFiltering](Dux.md#computefiltering);
+    `filterField` | **string** | the name of the field that the current filter is acting upon; (as in the [data model](../Concepts/Model.md);
+    `filterRelField` | **string** | the name of the related field that the current filter is acting upon; this is relevant for fields that point to a related table: you can filter on the values of a specific field in the related table; (as in the [data model](../Concepts/Model.md);
     `filterId` | **number** | the sequence number of a specific filter which identifies it among all filters for the same table;
     `filterLabel` | **string** | the user-facing name of the filter;
-    `filters` | **object** | a slice of the state from [getFilters](Dux#getfilters); contains the actual filter settings, i.e. what the user has entered in search boxes and which facets the user has clicked; organized by table and then by `filterTag` and then by `filterId`;
+    `filters` | **object** | a slice of the state from [getFilters](Dux.md#getfilters); contains the actual filter settings, i.e. what the user has entered in search boxes and which facets the user has clicked; organized by table and then by `filterTag` and then by `filterId`;
     `filterSettings` | **object** | a slice of the state, sub-slice of `filters`, corresponding to the filters of a single `filterTag` of a single `table`;
     `filterSetting` | **object** or **string** | a slice of the state, sub-slice of `filterSetting`, corresponding to a single filter, identified by `filterId`; whether this is an object or a string, depends on the nature of the filter: for a [Fulltext](#fulltext) filter it is a string (the search text), for a [ByValue](#byvalue) filter it is an object, containing the status (boolean) of all its facet checkboxes;
     `filterTag` | **string** | identifies a group of filters for a single table; tables may have multiple incarnations; a table can be a main table, but also a detail table for a specific record; the filters for a table when it displays details may be distinct from the filters of the same table when it is displayed as the main table; we separate those cases by means of a `filterTag` prop;
@@ -49,16 +53,16 @@ on, we omit the types.
     `listIds` | **array of string** | a sequence of strings which are essentially MongoDB identifiers of entities in a table; components that display lists use this prop to determine which entities must be actually appear on the screen and in what order; see also the prop `filteredIds`;
     `masterId` | **string** | when rendering a list of records that are details of some master record, this holds the MongoDB id of the master record;
     `masterTable` | **string** | when rendering a list of records that are details of some master record, this holds the name of the table in which the master record resides;
-    `me` | **object** | a slice of the state from [getMe](Dux#getme); the information about the currently logged-in user, fetched from the server;
+    `me` | **object** | a slice of the state from [getMe](Dux.md#getme); the information about the currently logged-in user, fetched from the server;
     `mode` | **string** | either `list` or `grid`; whether the list of items should render as a list of expandable headings, or as a grid with full field information;
     `myValues` | **object** | ultimately extracted from the `tables` slice of the state; it contains the values of the fields of the entity that is being dealt with;
     `perm` | **object** | Holds permissions for a record: whether deleting is allowed, and per field whether updating is allowed;
     `select` | **string** | sometimes a list is fetched as a whole, sometimes only *my own* records are displayed and yet other times only records that are the details of some master record must be shown; this property indicates which is which;
-    `settings` | **object** | a slice of the state from [getSettings](Dux#getsettings); settings are pieces of custom information that are relevant to many components of the app;
+    `settings` | **object** | a slice of the state from [getSettings](Dux.md#getsettings); settings are pieces of custom information that are relevant to many components of the app;
     `table` | **string** | name of the table that the component must deal with;
     `submitValues` | **function** | a callback that is used to save form values to the database; used for components that supply edit controls for form values: they can call `submitValues` after a change or upon loss of focus; it is basically the `handleSubmit` from Redux-From, with a specific first argument passed (`toDb`) that saves values to the database;
-    `tables` | **object** | a slice of the state from [getTables](Dux#gettables); all data that comes from database tables; organized by `table` name; for each table there is spec information and actual entity data;
-    `win` | **{**`width` **number**`, height` **number**`}` | a slice of the state from [getWinDim](Dux#getwindim); contains the physical dimensions of the window at any time.
+    `tables` | **object** | a slice of the state from [getTables](Dux.md#gettables); all data that comes from database tables; organized by `table` name; for each table there is spec information and actual entity data;
+    `win` | **{**`width` **number**`, height` **number**`}` | a slice of the state from [getWinDim](Dux.md#getwindim); contains the physical dimensions of the window at any time.
     `workflow` | **object** | slice of the state that contains workflow information.
 
 ---
@@ -67,27 +71,42 @@ on, we omit the types.
 
 ### [main]({{appBase}}/main.jsx)
 
-connected via [roots](Dux#roots)
+connected via
+[roots](Dux.md#roots)
 
 ???+ abstract "Task"
-    Entry point of the client side app. Contains the [routing](Routing), wrapped in
-    a [Root](#root) component, that sets up the store in which the central state
+    Entry point of the client side app. Contains the
+    [routing](../Concepts/Routing.md)
+    ,
+    wrapped in
+    a
+    [Root](#root)
+    component, that sets up the store in which the central state
     lives.
 
 ### [Root]({{appBase}}/components/Root.jsx)
 
-presents [roots](Dux#roots)
+presents
+[roots](Dux.md#roots)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `children`
 
 ???+ abstract "Task"
     Top-level wrapping component to set up the central store. It does so by
-    configuring the store, calling [configureStore](Dux#configurestore), and passing
-    it to the special [Provider](React#redux) component of Redux.
+    configuring the store, calling
+    [configureStore](Dux.md#configurestore)
+    ,
+    and passing
+    it to the special
+    [Provider](../Technology/React.md#redux)
+    component of Redux.
 
-    Then it wraps the whole remaining app in a [Window](#window) component for
+    Then it wraps the whole remaining app in a
+    [Window](#window)
+    component for
     detecting some global UI events.
 
 ---
@@ -96,7 +115,8 @@ presents [roots](Dux#roots)
 
 ### [Tooltip]({{appBase}}/components/Tooltip.jsx)
 
-(life cycle) connected via [settings](Dux#settings)
+(life cycle) connected via
+[settings](Dux#.mdsettings)
 
 ???+ abstract "Task"
     A dynamic tooltip, based on CSS3 techniques. The tooltip is initially put as
@@ -109,13 +129,16 @@ presents [roots](Dux#roots)
     to make a tooltip visible is a focus event or a mouse-over event.
 
     It is possible to switch all tooltips off. This is governed by `showTooltips`, a
-    boolean setting in [settings](Dux#settings).
+    boolean setting in
+    [settings](Dux.md#settings)
+    .
 
     Apart from this, the tooltip machinery does not use special React/Redux
     mechanisms. All is done at DOM level and with CSS3.
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `settings`
 
     Specific props:
@@ -138,10 +161,12 @@ presents [roots](Dux#roots)
 
 ### [TooltipSwitch]({{appBase}}/components/TooltipSwitch.jsx)
 
-connected via [settings](Dux#settings)
+connected via
+[settings](Dux.md#settings)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `settings` `dispatch`
 
 ???+ abstract "Task"
@@ -153,7 +178,8 @@ connected via [settings](Dux#settings)
 
 ### [ScoreBox]({{appBase}}/components/ScoreBox.jsx)
 
-presents [workflow](Dux#workflow)
+presents
+[workflow](Dux.md#workflow)
 
 ??? abstract "Props"
     Specific props:
@@ -170,12 +196,16 @@ presents [workflow](Dux#workflow)
     that score.
 
     It should be used in templates that have access to workflow attributes. See the
-    `mainAction` templates of [contrib]({{appBase}}/tables/contrib.jsx) and
-    [assessment]({{appBase}}/tables/assessment.jsx).
+    `mainAction` templates of
+    [contrib]({{appBase}}/tables/contrib.jsx)
+    and
+    [assessment]({{appBase}}/tables/assessment.jsx)
+    .
 
 ### [WorkflowInfo]({{appBase}}/components/WorkflowInfo.jsx)
 
-presents [workflow](Dux#workflow)
+presents
+[workflow](Dux.md#workflow)
 
 ??? abstract "Props"
     name | type | description
@@ -189,7 +219,8 @@ presents [workflow](Dux#workflow)
     use.
 
     Offer a control to *reset* the workflow information (i.e. *recompute* it). See
-    [Workflow](Workflow#manageworkflow).
+    [manageWorkflow](../Functionality/Workflow.md)
+    .
 
 ---
 
@@ -197,10 +228,12 @@ presents [workflow](Dux#workflow)
 
 ### [Login]({{appBase}}/components/Login.jsx)
 
-(life cycle) connected via [me](Dux#me)
+(life cycle) connected via
+[me](Dux.md#me)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `me` `dispatch`
 
 ???+ abstract "Task"
@@ -209,10 +242,12 @@ presents [workflow](Dux#workflow)
 
 ### [SubApp]({{appBase}}/components/SubApp.jsx)
 
-presents [win](Dux#win)
+presents
+[win](Dux.md#win)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `me` `table` `children`
 
     Specific props:
@@ -222,7 +257,10 @@ presents [win](Dux#win)
     `routes` | **components** | these are objects passed by [React-Router]({{reactRouter}}). From this the navigation route that the user has followed to arrive here, can be read
 
 ???+ abstract "Task"
-    This is one of the components just below [App](#app). It contains a set of panes
+    This is one of the components just below
+    [App](#app)
+    .
+    It contains a set of panes
     and navigation links to main subcomponents to display in those panes. Most of
     those subcomponents are linked to a main table, which is passed in the `table`
     prop.
@@ -233,10 +271,12 @@ presents [win](Dux#win)
 
 ### [App]({{appBase}}/components/App.jsx)
 
-connected via [win](Dux#win)
+connected via
+[win](Dux.md#win)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `children` `win`
 
 ???+ abstract "Task"
@@ -245,15 +285,19 @@ connected via [win](Dux#win)
 
     `App` is always in view and consists of the top navigation bar with
 
-    *   logo, [Login](#login);
-    *   [Notification](#notification);
+    *   logo,
+        [Login](#login)
+        ;
+    *   [Notification](#notification)
+        ;
     *   static links to documentation.
 
     It is only used to display the height and the width somewhere on the screen.
 
 ### [Window]({{appBase}}/components/Window.jsx)
 
-(life cycle) connected via [win](Dux#win)
+(life cycle) connected via
+[win](Dux.md#win)
 
 ???+ abstract "Task"
     Detects window resize events and passes the resulting height and width of the
@@ -269,7 +313,8 @@ connected via [win](Dux#win)
 
 ### [Doc]({{appBase}}/components/Doc.jsx)
 
-presents [docs](Dux#docs)
+presents
+[docs](Dux.md#docs)
 
 ??? abstract "Props"
     Specific props:
@@ -281,11 +326,17 @@ presents [docs](Dux#docs)
 ???+ abstract "Task"
     Handles the display of documents. Depending on the type of document (markdown,
     html, pdf) it delegates work to specialized document components:
-    [DocMd](#docmd), [DocHtml](#dochtml) and [DocPdf](#docpdf).
+    [DocMd](#docmd)
+    ,
+    [DocHtml](#dochtml)
+    and
+    [DocPdf](#docpdf)
+    .
 
 ### [DocHtml]({{appBase}}/components/DocHtml.jsx)
 
-presents [docs](Dux#docs)
+presents
+[docs](Dux.md#docs)
 
 ??? abstract "Props"
     Specific props:
@@ -301,19 +352,23 @@ presents [docs](Dux#docs)
 
 ### [DocMd]({{appBase}}/components/DocMd.jsx)
 
-(life cycle) connected via [docs](Dux#docs)
+(life cycle) connected via
+[docs](Dux.md#docs)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `alter` `alterSection` `dispatch`
 
     name | type | description
     --- | --- | ---
     `docName` | **string** | the name of the document.
-    `text` | **string** | from [getDoc](Dux#getdoc), the raw content of the document
+    `text` | **string** | from [getDoc](Dux.md#getdoc), the raw content of the document
 
 ???+ abstract "Task"
-    Show [Markdown]({{markdownDoc}}) text, coming from files on the server. The
+    Show
+    [Markdown]({{markdownDoc}})
+    text, coming from files on the server. The
     conversion to HTML is done client side, and the user gets a control to switch
     between Markdown source and formatted HTML.
 
@@ -326,7 +381,8 @@ presents [docs](Dux#docs)
 
 ### [DocPdf]({{appBase}}/components/DocPdf.jsx)
 
-presents [docs](Dux#docs)
+presents
+[docs](Dux.md#docs)
 
 ??? abstract "Props"
     Specific props:
@@ -351,17 +407,20 @@ presents [docs](Dux#docs)
 
 ### [Notification]({{appBase}}/components/Notification.jsx)
 
-(life cycle) connected via [notes](Dux#notes)
+(life cycle) connected via
+[notes](Dux.md#notes)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `dispatch`
 
     Specific props:
 
     ??? note "Injected"
         The following properties are injected from the state by
-        [getNotes](Dux#getnotes):
+        [getNotes](Dux.md#getnotes)
+        :
 
     name | type | description
     --- | --- | ---
@@ -391,17 +450,24 @@ presents [docs](Dux#docs)
 ???+ abstract "Task"
     A component that shows the current edit status of a record. It is presented as a
     button that can be clicked to submit and save a form. It can only be used as
-    descendant of a [redux-form]({{reduxFormBase}})-enabled `<form>`-carrying
-    component. See also [EditStatus](#editstatus).
+    descendant of a
+    [redux-form]({{reduxFormBase}})
+    -enabled `<form>`-carrying
+    component. See also
+    [EditStatus](#editstatus)
+    .
 
-    Uses the library function [editControl]({{libBase}}/edit.js).
+    Uses the library function
+    [editControl]({{libBase}}/edit.js)
+    .
 
 ### [EditDelete]({{appBase}}/components/EditDelete.jsx)
 
 presentational
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `perm` `workflow` `fixed`
 
     Specific props:
@@ -420,7 +486,8 @@ presentational
 ### [EditHelp]({{appBase}}/components/EditHelp.jsx)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `dirty`
 
     Specific props:
@@ -436,7 +503,8 @@ presentational
 ### [EditInsert]({{appBase}}/components/EditInsert.jsx)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `settings` `me` `tables` `select`
     `masterTable` `masterId`
     `perm` `fixed` `item`
@@ -458,19 +526,29 @@ presentational
 
 ???+ abstract "Task"
     A component that shows the current edit status of a record. It is presented as a
-    `<span>` that looks exactly as an [EditControl](#editcontrol), but it cannot be
+    `<span>` that looks exactly as an
+    [EditControl](#editcontrol)
+    ,
+    but it cannot be
     clicked to submit and save values. It can be used everywhere, and it is itself
-    enhanced by [redux-form]({{reduxFormBase}}). Because it is outside a
+    enhanced by
+    [redux-form]({{reduxFormBase}})
+    .
+    Because it is outside a
     `<form>` context, submitting will not work.
 
-    Uses the library function [editControl]({{libBase}}/edit.js).
+    Uses the library function
+    [editControl]({{libBase}}/edit.js)
+    .
 
 ### [FieldEdit]({{appBase}}/components/FieldEdit.jsx)
 
-connected via [tables](Dux#tables)
+connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `alter` `tables` `table` `eId` `field` `dispatch` `submitValues`
 
     Specific props:
@@ -495,16 +573,22 @@ connected via [tables](Dux#tables)
         There are many more props that get passed to `FieldEdit`. They have been
         injected by the wrapper
         [redux-form()]({{reduxFormBase}}/{{reduxFormV}}/docs/api/ReduxForm.md/)
-        into [ItemForm](#itemform), the parent of this component, and they will be
+        into
+        [ItemForm](#itemform)
+        ,
+        the parent of this component, and they will be
         passed on to *Field* and *FieldArray*, so that they can do their magic.
 
 ???+ abstract "Task"
     Edit control for an editable field. Depending on the type of the field and the
     multiplicity, it presents the right control. Basically, this component produces
     one or more
-    [Field]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/) or
+    [Field]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/)
+    or
     [FieldArray]({{reduxFormBase}}/{{reduxFormV}}/docs/api/FieldArray.md/)
-    components (which are provided by [redux-form]({{reduxFormBase}}).
+    components (which are provided by
+    [redux-form]({{reduxFormBase}})
+    .
 
     Note that we do not pass the actual values to these components. They know how to
     get the current values from the state, and what actions must be dispatched to
@@ -515,13 +599,20 @@ connected via [tables](Dux#tables)
 
     For the actual presentation, you can plug in a component of choice. We will use
     `<input type="..." />`, `<textarea>...</textarea>` elements and our own custom
-    component [RelSelect](#relselect) for multi-select controls.
+    component
+    [RelSelect](#relselect)
+    for multi-select controls.
 
     We enhance *textareas* by offering markdown previews of their content. See
-    [MarkdownArea](#markdownarea).
+    [MarkdownArea](#markdownarea)
+    .
 
-    We wrap multiple *input*s in [InputMulti](#inputmulti) and single inputs in
-    [Input](#input). The extra level of wrapping of these presentational components
+    We wrap multiple *input*s in
+    [InputMulti](#inputmulti)
+    and single inputs in
+    [Input](#input)
+    .
+    The extra level of wrapping of these presentational components
     is needed for showing validation errors.
 
 ??? explanation "Problems solved"
@@ -540,7 +631,9 @@ connected via [tables](Dux#tables)
         passed on to the component function by redux-form.
 
         This is actually documented in the redux-form docs. You need
-        [this]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/), section
+        [this]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/)
+        ,
+        section
         **2. A stateless function**
 
         > You must define the stateless function outside of your render() method, or
@@ -551,7 +644,8 @@ connected via [tables](Dux#tables)
 
         and
 
-        [this]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/#props):
+        [this]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/#props)
+        :
 
         > Any custom props passed to Field will be merged into the props object on the
         > same level as the input and meta objects.
@@ -560,19 +654,26 @@ connected via [tables](Dux#tables)
         that should be bound to the proper form, becomes bound to the wrong form. As
         far as I can see, all other things work as expected, so it was difficult to
         see why this occurred. The explanation is in a
-        [GitHub issue]({{reduxFormIssues}}/2886). Summarized: the construction of
+        [GitHub issue]({{reduxFormIssues}}/2886)
+        .
+        Summarized: the construction of
         the `onChange` function is effectively memoized. It is determined upon
         mounting of the component, but not on updating it. The workaround is easy: add
         an extra key property to the form. Another cause for the same problem I
-        encountered in [InputMulti](#inputmulti), where I had memoized the callbacks
+        encountered in
+        [InputMulti](#inputmulti)
+        ,
+        where I had memoized the callbacks
         for adding and removing values to/from a sequence.
 
 ### [FieldRead]({{appBase}}/components/FieldRead.jsx)
 
-connected via [tables](Dux#tables)
+connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `settings` `tables` `table` `myValues` `field`
 
 ???+ abstract "Task"
@@ -581,10 +682,12 @@ connected via [tables](Dux#tables)
 
 ### [FieldSet]({{appBase}}/components/FieldSet.jsx)
 
-presents [tables](Dux#tables)
+presents
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `submitValues`
 
     Specific props:
@@ -598,16 +701,21 @@ presents [tables](Dux#tables)
 ???+ abstract "Task"
     This is a form input component meant to be passed to a
     [Field]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/)
-    component, like [Input](#input). But unlike an `Input`, it only handles a click
+    component, like
+    [Input](#input)
+    .
+    But unlike an `Input`, it only handles a click
     event, upon which it will change the value in the field to `setValue`, and save
     the form to the database.
 
 ### [Input]({{appBase}}/components/Input.jsx)
 
-presents [tables](Dux#tables)
+presents
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `submitValues`
 
     Specific props:
@@ -622,14 +730,18 @@ presents [tables](Dux#tables)
     Shows an `<input type="..." />` control, and shows validation errors if the
     value entered by the user does not validate.
 
-    It is a [controlled component](React#controlled-component).
+    It is a
+    [controlled component](../Technology/React.md#controlled-component)
+    .
 
 ### [InputMulti]({{appBase}}/components/InputMulti.jsx)
 
-presents [tables](Dux#tables)
+presents
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `submitValues`
     `table` `eId` `fields`
 
@@ -647,8 +759,13 @@ presents [tables](Dux#tables)
         There are many more props that must be passed to `Field`. They have been
         injected by the wrapper
         [reduxForm()]({{reduxFormBase}}/{{reduxFormV}}/docs/api/ReduxForm.md/)
-        into [ItemForm](#itemform), the uncle (`InputMulti` is passed as attribute to
-        `Field` which is a child of [FieldEdit](#fieldedit)) of this component, and they
+        into
+        [ItemForm](#itemform)
+        ,
+        the uncle (`InputMulti` is passed as attribute to
+        `Field` which is a child of
+        [FieldEdit](#fieldedit)
+        ) of this component, and they
         are just passed on to *Field* and *FieldArray*, so that they can do their magic.
 
 ???+ abstract "Task"
@@ -660,11 +777,14 @@ presents [tables](Dux#tables)
 
     Validation and normalization are done per individual *Field*.
 
-    It is a [controlled component](React#controlled-component).
+    It is a
+    [controlled component](../Technology/React.md#controlled-component)
+    .
 
 ### [Insert]({{appBase}}/components/Insert.jsx)
 
-(life cycle) connected via [tables](Dux#tables)
+(life cycle) connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
     Specific props:
@@ -674,17 +794,21 @@ presents [tables](Dux#tables)
     `thing` | **string** | English name for the thing to insert
 
 ???+ abstract "Task"
-    Button to insert a blank record into a table. Unlike [EditInsert](#editinsert),
+    Button to insert a blank record into a table. Unlike
+    [EditInsert](#editinsert)
+    ,
     this does not have to be a currently displayed table. After insertion the app
     will navigate to the table in which the item has been inserted, and it will open
     the freshly created item.
 
 ### [ItemAction]({{appBase}}/components/ItemAction.jsx)
 
-connected via [tables](Dux#tables)
+connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `settings` `tables` `table` `eId` `linkField` `fieldFragments` `dispatch`
 
     name | type | description
@@ -700,9 +824,12 @@ connected via [tables](Dux#tables)
 
 ???+ abstract "Task"
     Manages the display of a single record, but only as far as an
-    [ActionTemplate](../Functionality/Templates.md) has been provided for that table. The action
+    [ActionTemplate](../Functionality/Templates.md)
+    has been provided for that table. The action
     template may contain controls that modify fields and save them to the database,
-    exactly as [ItemEdit](#itemedit).
+    exactly as
+    [ItemEdit](#itemedit)
+    .
 
     The component does not show *save* and *reset* buttons. It is meant for controls
     that save changed values on their own.
@@ -711,16 +838,23 @@ connected via [tables](Dux#tables)
     view and in edit-view.
 
 ??? note "Using templates"
-    This component uses [applyEditTemplate](Lib#applyedittemplate) to see whether
-    there is an action template defined in [Templates](../Functionality/Tempates.md). If yes, that
+    This component uses
+    [applyEditTemplate](Lib.md#applyedittemplate)
+    to see whether
+    there is an action template defined in
+    [Templates](../Functionality/Templates.md)
+    .
+    If yes, that
     template will be applied, if no, nothing will be rendered.
 
 ### [ItemContainer]({{appBase}}/components/ItemContainer.jsx)
 
-(life cycle) connected via [tables](Dux#tables)
+(life cycle) connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `settings` `tables` `table` `eId` `filters` `dispatch`
 
 ???+ abstract "Task"
@@ -729,10 +863,12 @@ connected via [tables](Dux#tables)
 
 ### [ItemDetails]({{appBase}}/components/ItemDetails.jsx)
 
-connected via [tables](Dux#tables)
+connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `alter` `alterSection` `tables` `table` `eId` `filters` `detailFragments` `dispatch`
 
 ???+ abstract "Task"
@@ -740,10 +876,12 @@ connected via [tables](Dux#tables)
 
 ### [ItemEdit]({{appBase}}/components/ItemEdit.jsx)
 
-connected via [tables](Dux#tables)
+connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `tables` `table` `eId` `fieldFragments` `dispatch`
 
     Specific props:
@@ -777,7 +915,9 @@ connected via [tables](Dux#tables)
 
     ??? caution "handleSubmit"
         This function is passed
-        from [redux-form]({{reduxFormBase}}) and handles all the form submission
+        from
+        [redux-form]({{reduxFormBase}})
+        and handles all the form submission
         machinery. It also calls a function that you can pass to it as first argument.
         We pass it our `toDb(table, eId, mod)` function. This is a function that takes a
         `values` object, and calls `mod(table, eId, values)`, where `mod` is the
@@ -786,11 +926,17 @@ connected via [tables](Dux#tables)
 
 ???+ abstract "Task"
     Manages the display and editing of a single record. It is only used if there are
-    editable field. If that is not the case, [ItemRead](#itemread) is being used. We
+    editable field. If that is not the case,
+    [ItemRead](#itemread)
+    is being used. We
     do this to avoid to invoke the costly machinery of editable forms when it is not
     needed.
 
-    The component also shows [save](EditControl) and [reset](EditControl) buttons
+    The component also shows
+    [save](Components.md#editcontrol)
+    and
+    [reset](Components.md#editcontrol)
+    buttons
     (if appropriate).
 
     The component has two render modes: read-only view and edit-view. When a user
@@ -799,7 +945,9 @@ connected via [tables](Dux#tables)
     select controls do not open the choice when you click on it. Instead such a
     click takes to an item view of that value in its own table.
 
-    We use [redux-form]({{reduxFormBase}}) for displaying forms, filling them
+    We use
+    [redux-form]({{reduxFormBase}})
+    for displaying forms, filling them
     out, submitting them, sending the values to the database, validating and
     normalizing values.
 
@@ -807,7 +955,8 @@ connected via [tables](Dux#tables)
     get it integrated.
 
     The work horses are the
-    [Field]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/) and
+    [Field]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/)
+    and
     [FieldArray]({{reduxFormBase}}/{{reduxFormV}}/docs/api/FieldArray.md/)
     components.
 
@@ -847,21 +996,29 @@ connected via [tables](Dux#tables)
 ??? note "Implementation"
     The construction of the actual fields is done by a function `makeFields()`, that
     generates an array of fragments, one for each field. An editable field will be
-    handled by a [\`<FieldEdit />](#fieldedit) component, and a read-only field by a
-    [\`\\<FieldRead />](#fieldread) component.
+    handled by a
+    [FieldEdit](#fieldedit)
+    component, and a read-only field by a
+    [FieldRead](#fieldread)
+    component.
 
 ??? note "Using templates"
     Before setting up the fields of an item,
-    [applyEditTemplate](Lib#applyedittemplate) is called. If it finds a suitable
-    template in [Templates](../Functionality/Tempates.md) it will be applied. If not, all fields will
+    [applyEditTemplate](Lib.md#applyedittemplate)
+    is called. If it finds a suitable
+    template in
+    [Templates](../Functionality/Templates.md)
+    it will be applied. If not, all fields will
     be displayed in a generic presentation.
 
 ### [ItemForm]({{appBase}}/components/ItemForm.jsx)
 
-connected via [tables](Dux#tables)
+connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `alter` `alterSection`
     `tables` `table` `eId`
     `filters` `fields` `perm`
@@ -872,7 +1029,8 @@ connected via [tables](Dux#tables)
     name | type | description
     --- | --- | ---
     `initialValues` | **object** | an object with the initial values of all fields that are being managed by the form as a whole
-    `isactive` | **string** | a CSS class name to add extra formatting if the record in question is deemed *inactive*. The notion of active items is defined in the duct [workflow](Dux#workflow)
+    `isactive` | **string** | a CSS class name to add extra formatting if the record in question is deemed *inactive*. The notion of active items is defined in the duct
+    [workflow](Dux.md#workflow)
 
 ???+ abstract "Task"
     This is the component that can open an item and show its fields, either for
@@ -882,29 +1040,39 @@ connected via [tables](Dux#tables)
 
 ### [ItemRead]({{appBase}}/components/ItemRead.jsx)
 
-connected via [tables](Dux#tables)
+connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `tables` `eId` `fieldFragments`
 
 ???+ abstract "Task"
     Manages the display (read-only) of a single record. It is used if no fields need
-    to be edited. For editing records, [ItemEdit](#itemedit) is being used.
+    to be edited. For editing records,
+    [ItemEdit](#itemedit)
+    is being used.
 
     You might wonder why `table` is missing in the props. The `fieldFragment`s prop
     contains that information.
 
-    Before setting up the fields of an item, [applyTemplate](Lib#applytemplate) is
-    called. If it finds a suitable template in [Templates](../Functionality/Tempates.md) it will be
+    Before setting up the fields of an item,
+    [applyTemplate](Lib.md#applytemplate)
+    is
+    called. If it finds a suitable template in
+    [Templates](../Functionality/Templates.md)
+    it will be
     applied. If not, all fields will be displayed in a generic presentation.
 
 ### [ItemRow]({{appBase}}/components/ItemRow.jsx)
 
-connected via [tables](Dux#tables)
+connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `tables` `table` `eId` `fields` `perm` `filters` `widthStyles`
 
     Specific props:
@@ -915,24 +1083,29 @@ connected via [tables](Dux#tables)
     `widthStyles` | **object** | since this component has to render records in a grid view, it must know something about the widths of the columns. That information is contained in this prop, as a CSS style per column
     `alt` | **bool** | the component must know whether it is an ordinary grid row, or whether the fields should be expanded into a vertical form
     `nextAlt` | **function** | this function can be used by a control by which the user can switch between row view and vertical view of the record
-    `isactive` | **string** | a CSS class name to add extra formatting if the record in question is deemed *inactive*. The notion of active items is defined in the duct [workflow](Dux#workflow)
+    `isactive` | **string** | a CSS class name to add extra formatting if the record in question is deemed *inactive*. The notion of active items is defined in the duct [workflow](Dux.md#workflow)
 
 ???+ abstract "Task"
     This component displays a record in row form, so that it fits in a grid view of
-    the whole table. See [ListGrid](#listgrid).
+    the whole table. See
+    [ListGrid](#listgrid)
+    .
 
 ### [ListContainer]({{appBase}}/components/ListContainer.jsx)
 
-(life cycle) connected via [tables](Dux#tables)
+(life cycle) connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `tables` `table` `eId` `select` `mode` `filtered` `dispatch`
 
 ???+ abstract "Task"
     Manages a table. Responsible for fetching data from the server. The display of
     the (filtered) table is left to other components, such as
-    [ListFilter](#listfilter).
+    [ListFilter](#listfilter)
+    .
 
     It can be instructed to navigate to a specific item. This is used when the id of
     the item to navigate to is contained in the URL.
@@ -941,10 +1114,14 @@ connected via [tables](Dux#tables)
 
 ### [ListFilter]({{appBase}}/components/ListFilter.jsx)
 
-(life cycle) connected via [tables](Dux#tables) and [filters](Dux#filters)
+(life cycle) connected via
+[tables](Dux.md#tables)
+and
+[filters](Dux.md#filters)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `filteredAmount` `filteredAmountOthers` `amounts`
 
     Specific props:
@@ -957,16 +1134,22 @@ connected via [tables](Dux#tables)
 ???+ abstract "Task"
     Parent component of a table and all its filters. The table must be present.
     Fetching tables is done by other components, such as
-    [ListContainer](#listcontainer). This component is for processing user
+    [ListContainer](#listcontainer)
+    .
+    This component is for processing user
     interaction on the filters. The filters and the list of filtered items are shown
-    in separate [Pane](#pane)s.
+    in separate
+    [Pane](#pane)
+    s.
 
 ### [ListGrid]({{appBase}}/components/ListGrid.jsx)
 
-connected via [tables](Dux#tables)
+connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `alter` `alterSection`
     `settings`
     `tables` `table` `listIds` `select`
@@ -976,12 +1159,15 @@ connected via [tables](Dux#tables)
 
     name | type | description
     --- | --- | ---
-    `grid` | **object** | slice of the state, obtained with [getGrid](Dux#getgrid), which holds sorting information of table grids
+    `grid` | **object** | slice of the state, obtained with [getGrid](Dux.md#getgrid), which holds sorting information of table grids
     `gridTag` | **string** | key under which the component finds its information about which columns are sorted in what order and direction
 
 ???+ abstract "Task"
-    This component shows a table as a grid. It uses [CSS flex-box]({{flexBox}})
-    for the grid layout. There is also [CSS grid]({{grid}}) but at the time of
+    This component shows a table as a grid. It uses
+    [CSS flex-box]({{flexBox}})
+    for the grid layout. There is also
+    [CSS grid]({{grid}})
+    but at the time of
     writing this app, browser support for grid was substantially inferior to browser
     support for flex.
 
@@ -993,10 +1179,12 @@ connected via [tables](Dux#tables)
 
 ### [ListPlain]({{appBase}}/components/ListPlain.jsx)
 
-(life cycle) connected via [tables](Dux#tables)
+(life cycle) connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `alter` `alterSection` `tables` `table` `listIds` `select` `filters` `perm` `masterId` `linkField` `dispatch`
 
     Specific props:
@@ -1016,10 +1204,12 @@ connected via [tables](Dux#tables)
 
 ### [ListStats]({{appBase}}/components/ListStats.jsx)
 
-(life cycle) connected via [tables](Dux#tables)
+(life cycle) connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `settings` `tables` `table`
 
 ???+ abstract "Task"
@@ -1028,10 +1218,12 @@ connected via [tables](Dux#tables)
 
 ### [MarkdownArea]({{appBase}}/components/MarkdownArea.jsx)
 
-connected via [tables](Dux#tables)
+connected via
+[tables](Dux.md#tables)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `alter` `alterSection` `table` `eId` `dispatch` `submitValues`
 
     Specific props:
@@ -1052,7 +1244,8 @@ connected via [tables](Dux#tables)
 ### [OpenCloseAll]({{appBase}}/components/OpenCloseAll.jsx)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     alter laterSection table listIds item
 
     Specific props:
@@ -1069,7 +1262,8 @@ connected via [tables](Dux#tables)
     way.
 
     The real work is done by the functions `handleOpenAll`, `handleCloseAll` in
-    [tables]({{appBase}}/dux/tables.jsx).
+    [tables]({{appBase}}/dux/tables.jsx)
+    .
 
 ---
 
@@ -1077,14 +1271,18 @@ connected via [tables](Dux#tables)
 
 ### [CheckboxI]({{appBase}}/components/CheckboxI.jsx)
 
-(life cycle) connected via [filters](Dux#filters)
+(life cycle) connected via
+[filters](Dux.md#filters)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `table` `filterTag` `filterId` `filterSetting` `dispatch`
 
 ???+ abstract "Task"
-    Displays a *collective* checkbox for a [facet filter](#byvalue) with many
+    Displays a *collective* checkbox for a
+    [facet filter](#byvalue)
+    with many
     facets.
 
     Clicking on this box will collectively check and uncheck all associate
@@ -1095,26 +1293,32 @@ connected via [tables](Dux#tables)
     This checkbox can have an indeterminate state, if some but not all of the
     associate checkboxes are checked.
 
-    We have to resort to a [DOM](React#dom) manipulation after rendering to get the
+    We have to resort to a
+    [DOM](../Technology/React.md#dom)
+    manipulation after rendering to get the
     indeterminate state across.
 
 ### [EUMap]({{appBase}}/components/EUMap.jsx)
 
-(life cycle) connected via [filters](Dux#filters)
+(life cycle) connected via
+[filters](Dux.md#filters)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `alter` `alterSection`
     `tables` `table`
     `filterTag` `filterSetting` `filterId` `filterField` `filterLabel`
     `listIds` `dispatch`
 
     ??? note
-        These are the same props as [ByValue](#byvalue)
+        These are the same props as
+        [ByValue](#byvalue)
 
 ???+ abstract "Task"
     A complex component! It is a facet filter for the field *country*, using
-    [ByValue](#byvalue) for that. It also contains a map of Europe, visualizing by
+    [ByValue](#byvalue)
+    for that. It also contains a map of Europe, visualizing by
     means of markers, how the filter result is distributed over the DARIAH
     countries.
 
@@ -1122,10 +1326,14 @@ connected via [tables](Dux#tables)
     but by including a `<ByValue/>` component in the rendering of the `<EUMap/>`
     component.
 
-    The map is a [Leaflet]({{leaflet}}) module on a blank pane, with a
-    [geojson]({{libBase}}/europe.geo.js) file of country boundaries laid out on
+    The map is a
+    [Leaflet]({{leaflet}})
+    module on a blank pane, with a
+    [geojson]({{libBase}}/europe.geo.js)
+    file of country boundaries laid out on
     it. The map is not React-aware, it will be rendered in its own `<div/>`. The
-    [life cycle](React#life-cycle) methods of this component set up the map and
+    [life cycle](../Technology/React.md#life-cycle)
+    methods of this component set up the map and
     update when new filter settings have been applied.
 
 ??? explanation "Compute Marker Radius"
@@ -1138,10 +1346,12 @@ connected via [tables](Dux#tables)
 
 ### [ByValue]({{appBase}}/components/ByValue.jsx)
 
-connected via [filters](Dux#filters)
+connected via
+[filters](Dux.md#filters)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `alter` `alterSection`
     `tables` `table`
     `filterTag` `filterSetting`
@@ -1157,17 +1367,24 @@ connected via [filters](Dux#filters)
     `expanded` | **bool** | whether the facets should be initially expanded or collapsed (hidden)
 
 ???+ abstract "Task"
-    A widget by which the user can click the [facet](#facet)s associated with one
-    field. There is also a [collective checkbox](#checkboxi), by which the user can
+    A widget by which the user can click the
+    [facet](#facet)
+    s associated with one
+    field. There is also a
+    [collective checkbox](#checkboxi)
+    ,
+    by which the user can
     check or uncheck all facets in one go. All values that occur are displayed, with
     statistics in the form *subtotal of total*.
 
 ### [Facet]({{appBase}}/components/Facet.jsx)
 
-connected via [filters](Dux#filters)
+connected via
+[filters](Dux.md#filters)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `table` `filterTag` `filterId` `filterSetting` `className` `dispatch`
 
     Specific props:
@@ -1181,14 +1398,17 @@ connected via [filters](Dux#filters)
     Displays a single facet. Just a checkbox and a value representation.
 
     Note that we use the strategy of
-    [controlled components](React#controlled-component) here.
+    [controlled components](../Technology/React.md#controlled-component)
+    here.
 
 ### [Filter]({{appBase}}/components/Filter.jsx)
 
-connected via [filters](Dux#filters)
+connected via
+[filters](Dux.md#filters)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `tables` `table` `listIds`
     `filters` `filterTag` `filteredAmount` `filteredAmountOthers` `amounts`
     `compact`
@@ -1197,11 +1417,17 @@ connected via [filters](Dux#filters)
     A control to filter a list of items. The following types of filters are
     implemented.
 
-    *   [Fulltext](#fulltext): Search in a textual field for a pattern. The pattern is
+    *   [Fulltext](#fulltext)
+        :
+        Search in a textual field for a pattern. The pattern is
         entered by the user, the search is incremental, after each keystroke the
         results are updated.
-    *   [ByValue](#byvalue): Faceted search for values of a specific field.
-        *   [EUMap](#eumap): Faceted search on country, together with a map
+    *   [ByValue](#byvalue)
+        :
+        Faceted search for values of a specific field.
+        *   [EUMap](#eumap)
+            :
+            Faceted search on country, together with a map
             visualization
 
     The list of the available filter types and their characteristics are not
@@ -1214,10 +1440,12 @@ connected via [filters](Dux#filters)
 
 ### [Fulltext]({{appBase}}/components/Fulltext.jsx)
 
-connected via [filters](Dux#filters)
+connected via
+[filters](Dux.md#filters)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `table`
     `filterTag` `filterId` `filterLabel` `filterSetting` `filteredAmount` `filteredAmountOthers`
     `compact` `dispatch`
@@ -1229,14 +1457,17 @@ connected via [filters](Dux#filters)
     character entered.
 
     Note that we use the strategy of
-    [controlled components](React#controlled-component) here.
+    [controlled components](../Technology/React.md#controlled-component)
+    here.
 
 ### [Stat]({{appBase}}/components/Stat.jsx)
 
-presents [filters](Dux#filters)
+presents
+[filters](Dux.md#filters)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `className`
 
     Specific props:
@@ -1256,10 +1487,12 @@ presents [filters](Dux#filters)
 
 ### [RelSelect]({{appBase}}/components/RelSelect.jsx)
 
-presents [select](Dux#select)
+presents
+[select](Dux.md#select)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `settings` `tables` `table` `select` `field` `dispatch` `submitValues`
 
     Specific props:
@@ -1269,7 +1502,7 @@ presents [select](Dux#select)
     `multiple` | **bool** | whether to display a select widget where the user can make multi-selections or only single selections
     `allowNew` | **bool** | whether to allow the user to add new options
     `selectTag` | **string** | a key under which this component stores its data on the `select` slice of the global state. This is about whether the options have popped up and what search text the user has entered in the filter box
-    `activeItems` | **array** | the notion of active items is defined in the duct [workflow](Dux#workflow)
+    `activeItems` | **array** | the notion of active items is defined in the duct [workflow](Dux.md#workflow)
     `isactive` | **string** | a CSS class name to add extra formatting if the record in question is deemed *inactive*
     `allowed` | **object** | an array of entity ids that are the allowed elements when the field is a multiple choice field
     `input` | **object** | contains attributes related to the actual value that is being held. These attributes are passed verbatim to the underlying `<input />`
@@ -1278,7 +1511,8 @@ presents [select](Dux#select)
 
 ???+ abstract "Task"
     An implementation of multi-select widgets. There is a fairly complete
-    [react-select]({{reactSelect}}) component on GitHub. However, it has some
+    [react-select]({{reactSelect}})
+    component on GitHub. However, it has some
     flaws that prevents a successful usage of it in our app. That is why I have
     written this component.
 
@@ -1290,7 +1524,9 @@ presents [select](Dux#select)
     *   options can be filtered by a full text filter;
     *   only one copy of an option can be chosen;
     *   selected options are removed from the list of selectable options;
-    *   plays well with [Redux-Form]({{reduxFormBase}});
+    *   plays well with
+        [Redux-Form]({{reduxFormBase}})
+        ;
     *   facilitates disabling some options and presenting options in custom ways
 
 ---
@@ -1299,10 +1535,12 @@ presents [select](Dux#select)
 
 ### [Expand]({{appBase}}/components/Expand.jsx)
 
-presents [alter](Dux#alter)
+presents
+[alter](Dux.md#alter)
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
     `alter` `alterSection` `alterTag` `className`
 
     Specific props:
@@ -1326,7 +1564,8 @@ presents [alter](Dux#alter)
     `headActive` is the part that the user can click on to trigger expansion and
     collapse. The `headActive` is combined with `iconOpen` and `iconClose`, which
     are indicators for the state of the component. All this is wrapped in a
-    [Tooltip](#tooltip) components, that display the `titleOpen` and `titleClose`
+    [Tooltip](#tooltip)
+    components, that display the `titleOpen` and `titleClose`
     texts.
 
     In the full form, also the `full` is visible.
@@ -1374,7 +1613,8 @@ presents [alter](Dux#alter)
 presents **none**
 
 ??? abstract "Props"
-    [Standard props](#standard-props):
+    [Standard props](#standard-props)
+    :
 
     Specific props:
 
@@ -1402,7 +1642,11 @@ presents **none**
     `splat` | **string** | the text to display on the 404 page
 
 ???+ abstract "Task"
-    Displays a 404 if no [route](React#routing) in [main](#main) matches.
+    Displays a 404 if no
+    [route](../Technology/React.md#routing)
+    in
+    [main](#main)
+    matches.
 
 ### [Overview]({{appBase}}/components/Overview.jsx)
 

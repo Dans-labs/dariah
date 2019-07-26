@@ -4,9 +4,13 @@
 
 ### Entry point
 
-At the client side, the app starts in [main](Components#main).
+At the client side, the app starts in
+[main](../Client/Components.md#main)
+.
 
-The first priority is to create a Redux [Provider](React#redux) component, which
+The first priority is to create a Redux
+[Provider](../Technology/React.md#redux)
+component, which
 will be ancestor to all other components.
 
 ### Routing
@@ -27,8 +31,11 @@ like this, and the diagram visualizes the same logic.
 ### Fall-back behaviour
 
 The server responds to any URL with sending the
-[index]({{serverBase}}/views/index.tpl) page, which also causes the bundled
-app in [dist]({{repBase}}/static/dist) to load.
+[index]({{serverBase}}/views/index.tpl)
+page, which also causes the bundled
+app in
+[dist]({{repBase}}/static/dist)
+to load.
 
 The server's rules are very simple: no matter what the URL, respond with the
 whole app. The response is static, it is always the same. The client has to
@@ -53,7 +60,12 @@ static JavaScript app in the first place.
 If the URL points to `/api/`, the server will respond in a variety of ways,
 depending on the rest of the URL. By means of these `/api/` URLs the client can
 ask for additional data services, from file system or database. The server side
-routing in [index.py]({{serverBase}}/index.py) maps these URLs to specific
+routing in
+[index.py]({{serverBase}}/index.py)
+maps these URLs to specific
 controllers that fetch and assemble the requested data.
 
-Not only the client app can access this [api](API), you can too.
+Not only the client app can access this
+[api](../Integration/API.md)
+,
+you can too.

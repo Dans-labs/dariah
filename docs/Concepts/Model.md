@@ -5,7 +5,10 @@ any specified data model, respecting access privileges.
 
 ## MongoDB
 
-We store the data in a [MongoDB]({{mongodb}}). A MongoDB does not work with
+We store the data in a
+[MongoDB]({{mongodb}})
+.
+A MongoDB does not work with
 a fixed schema. A MongoDB *collection* consists of *documents*, which are
 essentially JSON-like structures, arbitrarily large and arbitrarily nested. That
 makes it easy to add new kinds of data to documents and collections when the
@@ -25,8 +28,11 @@ inside the main records.
 
 ## Configuration
 
-The [model]({{serverbase}}/models/model.yaml) and the files in
-[table]({{serverbase}}/models/tables) are YAML configuration files, and by
+The
+[model]({{serverbase}}/models/model.yaml)
+and the files in
+[table]({{serverbase}}/models/tables)
+are YAML configuration files, and by
 tweaking them you can achieve a lot of customization.
 
 ### Name handling
@@ -56,10 +62,12 @@ a way that we are protected agains typos?
 
 Well, we convert the `.yaml` model files to Python modules that expose the same
 model, but now as Python data structure. This is done by means of the
-[compile.py]({{serverBase}}/compile.py) script, just before starting the
+[compile.py]({{serverBase}}/compile.py)
+script, just before starting the
 server. That enables us to collect the names and generate some code. Every part
 of the `.yaml` files that may act as a name, is collected. We generate a module
-[names.py]({{serverBase}}/models/names.py) that contains a line
+[names.py]({{serverBase}}/models/names.py)
+that contains a line
 
 `N_`*name* `= '`*name*`'`
 
@@ -70,7 +78,9 @@ consequently using `N_`*names* instead of plain strings, we guard ourselves
 against typos, because the Python parser will complain about undefined
 variables.
 
-Moreover, the same [compile.py]({{serverBase}}/compile.py) module also
+Moreover, the same
+[compile.py]({{serverBase}}/compile.py)
+module also
 checks all the code in the controllers directory for names:
 
 *   whether every `N_`*name* is defined in the `names.py` and
@@ -116,8 +126,11 @@ The *generic* dictionary contains field names that are used in many tables, such
 as `dateCreated`.
 
 The *custom* dictionary is a list of names used in custom workflows, such as
-defined in [workflow]({{serverbase}}/controllers/workflow.py) (see also
-[Workflow](Workflow).
+defined in
+[workflow]({{serverbase}}/controllers/workflow.py)
+(see also
+[Workflow](../Functionality/Workflow.md)
+.
 
 The *tables* dictionary has a key for each table, and contains all model
 information that the application needs to work with that table.
@@ -176,14 +189,17 @@ contain the following bits of information:
 *   `valType`: the type of the field and its other behavioural characteristics:
     see the section **valType** below.
 *   `grid`: this is a branch of settings relevant for laying out the table in a
-    grid. They are the CSS [flex]({{flexBox}}) attributes. `width`: the
+    grid. They are the CSS
+    [flex]({{flexBox}})
+    attributes. `width`: the
     intended width of the column in which this field is presented; `grow`
     (*optional: default:* `0`) the degree by which the column width is allowed to
     increase `shrink` (*optional: default:* `0`) the degree by which the column
     width is allowed to decrease.
 *   `valid`: the name of a client-side validation function by which new and
     modified values for this field are validated. The validators are exposed in
-    [fields.js]({{libBase}}/fields.js) as member functions of a `validation`
+    [fields.js]({{libBase}}/fields.js)
+    as member functions of a `validation`
     object.
 
     **N.B:** the server carries out extensive, non-customizable validation as
@@ -200,7 +216,8 @@ Possible types are:
 
 *   `bool`: `true` or `false`.
 *   `datetime`: a date time, mostly represented in its
-    [ISO 8601]({{iso8601}}) format.
+    [ISO 8601]({{iso8601}})
+    format.
 *   `number`: an integer or real number.
 *   `text`: a string of characters, usually just a one-liner.
 *   `url`: a syntactically valid URL: i.e. a string of text that can be
@@ -209,7 +226,9 @@ Possible types are:
     this.
 *   `textarea`: a string of characters, which may extend to several pages. It is
     assumed that this is Markdown text, and its formatted version will be shown on
-    the interface, see [MarkdownArea](Components#markdownarea).
+    the interface, see
+    [MarkdownArea](../Client/Components.md#markdownarea)
+    .
 
 When a field refers to other records, there is much more to specify. In this
 case `valType` is a branch with the following information.
@@ -226,7 +245,10 @@ case `valType` is a branch with the following information.
 *   `fixed` (*optional, default:* `false`) whether the value of this field is
     fixed after it has been assigned initially; see section **fixed** below.
 *   `inactive`: (*optional*) this field relates to custom presentations, defined
-    in [Workflow](Workflow); see section **inactive** below.
+    in
+    [Workflow](../Functionality/Workflow.md)
+    ;
+    see section **inactive** below.
 
 ###### `select` ######
 
@@ -277,7 +299,10 @@ branch with settings how to present inactive items:
     will do, there are no additional constraints.
 
 **Example:** The `typeContribution` field of a `contrib` record may be obsolete,
-because it is not specified in the current package (see [Workflow](Workflow). In
+because it is not specified in the current package (see
+[Workflow](../Functionality/Workflow.md)
+.
+In
 the `valType` for this field we see the following specification:
 
 ```yaml
@@ -302,7 +327,9 @@ When we need to show a related record as a single value, we use its title field,
 as specified by its `title` entry in the table info, if present, otherwise we
 look it up from the generic branch. However, the client code may have
 implemented special code for certain tables, such as `user`, and `country`. See
-[repCountry and repUser]({{appBase}}/dux/table.js). Note, that in many
+[repCountry and repUser]({{appBase}}/dux/table.js)
+.
+Note, that in many
 cases, the related table is a *value list*: every record consists of an `_id`
 field (the standard MongoDB identifier field) and a field called `rep`, which
 contains the representation of the value. Value lists may or may not have table
@@ -399,7 +426,9 @@ For each originating kind there is the following information:
     details may be added or removed. Individual details may still be modified.
 
     **Example:** once an `assessment` record for a contribution has been created,
-    a special [workflow](Workflow) takes care to lookup the list of criteria that
+    a special
+    [workflow](../Functionality/Workflow.md)
+    takes care to lookup the list of criteria that
     apply to this contribution, based on its `typeContribution` field. (This
     mapping is read from the `criteria` detail records of the currently active
     `package` records). For each criterion a `criteriaEntry` detail record is

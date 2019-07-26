@@ -2,7 +2,7 @@
 
 ## Statistics
 
-[cloc tool]({{cloc}}) 
+[cloc tool]({{cloc}})
 
 [Statistics](Stats.md)
 
@@ -12,18 +12,25 @@ The numbers stand for lines of code. 1000 lines is ~ 20 typed A4 pages of text.
 
 ### [YAML]({{yaml}})
 
-A simple plain-text way to convey structured data. What [Markdown](#markdown) is
+A simple plain-text way to convey structured data. What
+[Markdown](#markdown)
+is
 to text, YAML is to XML-JSON. In this app we use YAML for configuration details.
 
 *   the conversion of legacy contribution data into MongoDB is steered by a
-    [config.yaml]({{staticBase}}/tools/config.yaml).
-*   the [data model](Model) lists all the tables and fields, including how they
+    [config.yaml]({{staticBase}}/tools/config.yaml)
+    .
+*   the
+    [data model](../Concepts/Model.md)
+    lists all the tables and fields, including how they
     hang together and how we want to represent them on screen. It also defines
     access control. If you, as developer, need to add new tables and fields, you
     can do so by modifying these files:
 
     *   [model]({{serverBase}}/models/model.yaml)
-    *   [per table]({{serverBase}}/models/tables). No extra coding is needed.
+    *   [per table]({{serverBase}}/models/tables)
+        .
+        No extra coding is needed.
 
 ### [Markdown]({{markdownDoc}})
 
@@ -39,13 +46,19 @@ If you use GitHub, one of the first things is to write a README file for your
 project. This must be a markdown file. If you use other documentation options on
 GitHub, such as Wiki or Pages, you will also write markdown.
 
-Markdown has a sister: [YAML](#yaml), which is used for structured data.
+Markdown has a sister:
+[YAML](#yaml)
+,
+which is used for structured data.
 
 In this app we use markdown in the following ways:
 
 *   all documentation here is written in markdown
-*   the app can present markdown [documents](Components#docmd)
-*   all big [text fields](Components#markdownarea) in this app support markdown.
+*   the app can present markdown
+    [documents](../Client/Components.md#docmd)
+*   all big
+    [text fields](../Client/Components.md#markdownarea)
+    in this app support markdown.
 
 ### [JavaScript]({{javascript}})
 
@@ -56,39 +69,59 @@ and in websites.
 This app uses JavaScript in the client only. We use it as a work horse which
 takes care of a copy of data from the database. It reacts to changes by
 integrating new bits of data into the existing state, a process that is called
-[reducing](React#redux).
+[reducing](../Technology/React.md#redux)
+.
 
 ### [JSX]({{reactDocs}}/introducing-JSX.html)
 
 This is also JavaScript, but with a thin layer of syntactic sugar, by which you
-can present your code as a collection of [React]({{reactDocs}})
-[components]({{reactDocs}}/react-component.html).
+can present your code as a collection of
+[React]({{reactDocs}})
+[components]({{reactDocs}}/react-component.html)
+.
 
 In this app we have dozens of JSX files, each containing exactly one component
-(with a few exceptions). [Components](Components) are pieces of code that
+(with a few exceptions).
+[Components](../Client/Components.md)
+are pieces of code that
 realize parts of the website that you can actually see, and often interact with.
 
-They are supported by sophisticated [plumbing (dux, ducts)](Dux), which connects
+They are supported by sophisticated
+[plumbing (dux, ducts)](../Client/Dux.md)
+,
+which connects
 them to the global state of the app. The state is divided in sections, where
 individual duct connects such a section with several components. See
-[Architecture](Architecture) for how this hangs together.
+[Architecture](../Concepts/Architecture.md)
+for how this hangs together.
 
 The plumbing needs some specialized, technical functions, which are collected in
-the [lib](Lib) section of the app. One of the most crucial is
-[memoization](Lib#memo).
+the
+[lib](../Client/Lib.md)
+section of the app. One of the most crucial is
+[memoization](../Client/Lib.md#memo)
+.
 
 ### [Python]({{python}})
 
 A general purpose scripting language with excellent data processing facilities.
 
 This app uses python (version 3.6.1+) for the web server. The web server itself
-is [Flask]({{flask}}), a light-weight framework for handling http(s)
+is
+[Flask]({{flask}})
+,
+a light-weight framework for handling http(s)
 requests.
 
-We have added a set of [controllers](Server). The actual
-[code there]({{serverBase}}/controllers/controller.py) is quite lean, but
+We have added a set of
+[controllers](../Server/Server.md)
+.
+The actual
+[code there]({{serverBase}}/controllers/controller.py)
+is quite lean, but
 when it comes to database access, the module
-[db]({{serverBase}}/controllers/db.py) does the heavy lifting and tends to
+[db]({{serverBase}}/controllers/db.py)
+does the heavy lifting and tends to
 become uglier and uglier.
 
 ### [CSS]({{css}})
@@ -99,23 +132,34 @@ control the resulting mess, and one of the best is to use the modern features of
 CSS.
 
 Cascading style sheets are the ultimate way to paint the final look and feel of
-the website. By using [flex boxes]({{flexBox}}) instead of tables we can
+the website. By using
+[flex boxes]({{flexBox}})
+instead of tables we can
 make the app respond gracefully to changes in the size of the display without
 resorting to the bureaucracy of overdefining style properties. Note that our app
 does not use the HTML `<table>` element any more for aligning pieces of content.
 
-We use a lot of the CSS-3 features, including [variables]({{css}}/var), and
-[calc()]({{css}}/calc).
+We use a lot of the CSS-3 features, including
+[variables]({{css}}/var)
+,
+and
+[calc()]({{css}}/calc)
+.
 
 This lessens our need for a style sheet preprocessor such as
-[SASS]({{sassDoc}}) to 0%.
+[SASS]({{sassDoc}})
+to 0%.
 
 Note especially how colour management has become easy:
 
 1.  all colour definitions are in variables
-2.  all colour definitions are in [HSLA]({{hsl}}), which allows a very
+2.  all colour definitions are in
+    [HSLA]({{hsl}})
+    ,
+    which allows a very
     consistent definition of families of colours. Quote from
-    [Mozilla]({{css}}/color_value):
+    [Mozilla]({{css}}/color_value)
+    :
 
 > One advantage of HSLA over RGB is that it is more intuitive: you can guess
 
@@ -123,7 +167,9 @@ Note especially how colour management has become easy:
     a set of matching colors (e.g., by keeping the hue the same, while varying
     the lightness/darkness and saturation).
 
-This is exactly what we do. See [vars.css]({{cssBase}}/vars.css).
+This is exactly what we do. See
+[vars.css]({{cssBase}}/vars.css)
+.
 
 ### [Shell]({{bash}})
 
@@ -133,22 +179,33 @@ code, pushing code to GitHub, transporting databases to the production server
 are done by specialized frameworks. These frameworks must be steered by
 intricate commands with many options which are easily forgotten.
 
-That's why we have a [build]({{repBase}}/build.sh) script. You have to pass
+That's why we have a
+[build]({{repBase}}/build.sh)
+script. You have to pass
 it just the name of a task, and the script executes that task with all the
 sophistication needed.
 
 ### [HTML]({{html}})
 
 The core language of the web. Surprisingly, our code does not contain HTML any
-more. In [JSX](#JSX) there are fragments that look like HTML, but that is
+more. In
+[JSX](#JSX)
+there are fragments that look like HTML, but that is
 exactly what it is, and real HTML it is not.
 
 When the browser encounters HTML material, it parses it and stores it in its
-memory in a certain standard representation: the [DOM](React#dom).
+memory in a certain standard representation: the
+[DOM](../Technology/React.md#dom)
+.
 
 But our server does not send HTML any more to the browser, except for a very
-first [short page]({{serverBase}}/views/index.tpl), that serves to load a
-bulk of style sheets and [JavaScript](#JavaScript) into the browser. This
+first
+[short page]({{serverBase}}/views/index.tpl)
+,
+that serves to load a
+bulk of style sheets and
+[JavaScript](#JavaScript)
+into the browser. This
 JavaScript code builds and manipulates the DOM directly, without generating any
 formal HTML.
 
@@ -162,8 +219,12 @@ other. JSON achieves that.
 In our app, we use JSON:
 
 *   to send data from server to client
-*   [configure]({{clientBase}}/webpack.config.js) the main development tools,
-    such as [Webpack]({{webpack}}) for building and [Mocha]({{mocha}})
+*   [configure]({{clientBase}}/webpack.config.js)
+    the main development tools,
+    such as
+    [Webpack]({{webpack}})
+    for building and
+    [Mocha]({{mocha}})
     for testing.
 
 ## Keeping the code tidy
@@ -198,15 +259,27 @@ of all style inconsistencies.
 
 ### Tools
 
-For JavaScript we use [eslint]({{eslint}}) as linter, and
-[prettier]({{prettier}}) as formatter.
-
-For Python we use [flake8]({{flake8}}) as linter, and [yapf]({{yapf}})
+For JavaScript we use
+[eslint]({{eslint}})
+as linter, and
+[prettier]({{prettier}})
 as formatter.
 
-For Markdown we use [remark]({{remark}}) as linter.
-As formatter we use a combo: first [prettier]({{prettier}}) (which can wrap long lines,
-and then [remark]({{remark}}).
+For Python we use
+[flake8]({{flake8}})
+as linter, and
+[yapf]({{yapf}})
+as formatter.
+
+For Markdown we use
+[remark]({{remark}})
+as linter.
+As formatter we use a combo: first
+[prettier]({{prettier}})
+(which can wrap long lines,
+and then
+[remark]({{remark}})
+.
 
 Formatters are not perfect, sometimes they produce code at which the linter
 balks, especially *yapf* is doing that. Luckily, you can selectively suppress
@@ -217,12 +290,18 @@ certain kinds of transformations.
 For projects like these, you need a good editing environment. IDEs can give you
 that, but the good old ones like Eclipse are not really suited to the JavaScript
 and Python environments. There are interesting modern ones such as GitHub's
-[Atom]({{atom}}) modernized ones such as Microsoft's
-[Visual Studio Code]({{vsc}}) and commercial ones such as
-[Webstorm]({{webstorm}}).
+[Atom]({{atom}})
+modernized ones such as Microsoft's
+[Visual Studio Code]({{vsc}})
+and commercial ones such as
+[Webstorm]({{webstorm}})
+.
 
 You can also choose to work with a text editor, such as the free
-[Vim]({{vim}}) or the commercial [Sublime Text]({{sublimeText}}).
+[Vim]({{vim}})
+or the commercial
+[Sublime Text]({{sublimeText}})
+.
 
 My choice has been Vim, since I use it from its start in 1991. These are the key
 reasons for which Vim stands out:
@@ -237,7 +316,8 @@ Just for the record, here is a piece of my `.vimrc` file (the configuration
 file, which draws in plugins, and customises the interface).
 
 You can find out more about the plugins by visiting
-[GitHub]({{githubBase}}) and append the full plugin reference to the URL,
+[GitHub]({{githubBase}})
+and append the full plugin reference to the URL,
 since they are all GitHub repos.
 
 ```vim
@@ -255,7 +335,9 @@ call plug#end()
 
 ```
 
-An honourable mention for the [ALE]({{ale}}) plugin. This is an arch plugin
+An honourable mention for the
+[ALE]({{ale}})
+plugin. This is an arch plugin
 that invokes linters for your files while you edit. The beauty is, that if you
 have installed the linters first outside Vim, ALE is smart enough to detect them
 and run them for you, asynchronously, and with zero configuration.

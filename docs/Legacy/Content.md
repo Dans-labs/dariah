@@ -34,11 +34,15 @@ be read. We do the following:
 *   import a moderately denormalized version of the data into MongoDB.
 
 The machinery for this is programmed in the script, and the configuration
-details are spelled out in a [config]({{staticBase}}/tools/config.yaml).
+details are spelled out in a
+[config]({{staticBase}}/tools/config.yaml)
+.
 
 ## Importing and reimporting
 
-The source data model is complex, the [target data model](Model) is complex, and
+The source data model is complex, the
+[target data model](../Concepts/Model.md)
+is complex, and
 the app as a whole must support a complex workflow. It is impossible to design
 everything up-front, so we need to be able to retrace and our steps and redo the
 import. As long as the system is not in production, we can just regenerate the
@@ -50,7 +54,8 @@ jumps to make.
 
 So we need an import script that can reimport the initial data without
 disturbing the new data. We have written
-[mongoFromFm.py]({{staticBase}}/tools/mongoFromFm.py) that does exactly
+[mongoFromFm.py]({{staticBase}}/tools/mongoFromFm.py)
+that does exactly
 this.
 
 ### From transfer to import
@@ -79,7 +84,9 @@ The task for the import script boils down to these requirements:
     overwritten;
 *   existing relationships between records **MUST** be preserved.
 
-See later, under [Discussion](#discussion) how this is achieved.
+See later, under
+[Discussion](#discussion)
+how this is achieved.
 
 ## Usage
 

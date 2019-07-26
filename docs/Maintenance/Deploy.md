@@ -2,11 +2,14 @@
 
 ## Basic information
 
-**source code** GitHub repository [{{repo}}]({{repo}})
+**source code** GitHub repository
+[{{repo}}]({{repo}})
 
-**tech doc** GitHub Pages [{{docSite}}]({{docSite}})
+**tech doc** GitHub Pages
+[{{docSite}}]({{docSite}})
 
-**server** [{{liveBase}}]({{liveBase}})
+**server**
+[{{liveBase}}]({{liveBase}})
 
 **database** MongoDB via pymongo (no connection information needed). Version
 3.4.10 or higher. On the Mac: installing:
@@ -27,32 +30,48 @@ brew services start MongoDB
 
 ## Web-app overview
 
-For the *server* application code we use [Flask]({{flask}}), a Python3
+For the *server* application code we use
+[Flask]({{flask}})
+,
+a Python3
 micro framework to route URLs to functions that perform requests and return
 responses. It contains a development web server.
 
 The list of Python dependencies to be installed is in
-[requirements.txt]({{serverBase}}/config/requirements.txt).
+[requirements.txt]({{serverBase}}/config/requirements.txt)
+.
 
 The production web server is **httpd (Apache)**. Flask connects to it through
-[mod_wsgi]({{wsgi}}) (take care to use a version that speaks Python3). This
+[mod_wsgi]({{wsgi}})
+(take care to use a version that speaks Python3). This
 connection is defined in the default config file See
-[default_example.conf]({{serverBase}}/config/default_example.conf).
+[default_example.conf]({{serverBase}}/config/default_example.conf)
+.
 
 *   `/etc/httpd/config.d/`
 *   `default.conf` (config for this site)
 *   `shib.conf` (config for shibboleth authentication)
 *   ...
 
-The *client* code is done in [React]({{reactDocs}}) using the
-[JSX]({{reactDocs}}/introducing-jsx.html) idiom. We have added
-[Redux]({{redux}}) to the mix and various other libraries, obtained through
-[npm]({{npm}}). Everything is glued together by means of modern JavaScript:
-[ES6 = ES2015]({{babel}}/docs/learn-es2015/). The build tool is
-[Webpack]({{webpack}}).
+The *client* code is done in
+[React]({{reactDocs}})
+using the
+[JSX]({{reactDocs}}/introducing-jsx.html)
+idiom. We have added
+[Redux]({{redux}})
+to the mix and various other libraries, obtained through
+[npm]({{npm}})
+.
+Everything is glued together by means of modern JavaScript:
+[ES6 = ES2015]({{babel}}/docs/learn-es2015/)
+.
+The build tool is
+[Webpack]({{webpack}})
+.
 
 We make use of the DARIAH infrastructure for *user authentication*
-[AAI]({{dariahIDP}}) (see in particular
+[AAI]({{dariahIDP}})
+(see in particular
 [Integrating Shibboleth Authentication into your Application]({{dariahShib}})
 
 The app itself gives access to *documentation*, not only for end users, but also
@@ -78,7 +97,9 @@ The absolute location is not important. Here we assume everything resides in
                 *   `auth.py` handle the login process
                 *   `user.py` handle the user data
                 *   `perm.py` permission control
-            *   `models` yaml files defining the [data model](Model) (these files have
+            *   `models` yaml files defining the
+                [data model](../Concepts/Model.md)
+                (these files have
                 been converted to python files):
                 *   `model.yaml` (generic settings)
                 *   `tables`
@@ -153,17 +174,22 @@ pip install flask
 ```
 
 On a development server, install `Python3`.*x*`.`*y* from its
-[download page]({{python}}/downloads/). Then install additional modules by
+[download page]({{python}}/downloads/)
+.
+Then install additional modules by
 means of `pip3`:
 
     pip3 install pymongo flask
 
 More info about running Python3 in the web server
-[mod_wsgi guide]({{wsgi}}/user-guides/quick-installation-guide.html).
+[mod_wsgi guide]({{wsgi}}/user-guides/quick-installation-guide.html)
+.
 
 The website runs with SELinux enforced, and also the updating process works.
 
-The server framework is [Flask]({{flask}}),
+The server framework is
+[Flask]({{flask}})
+,
 
 The code for the server is basically a mapping between routes (URL patterns) and
 functions (request => response transformers). The app source code for the server
@@ -204,7 +230,10 @@ you save a python source file, the server reloads itself.
 This is only needed on machines where you want to develop the client
 application. If you merely want to run the app, this is not needed.
 
-Install **node** from its [download page]({{node}}/en/download/). Then
+Install **node** from its
+[download page]({{node}}/en/download/)
+.
+Then
 install all JavaScript dependencies in one go by executing
 
     cd /path/to/dariah/client
@@ -215,7 +244,10 @@ npm install
 
 The JSX and ES6 of client components and helpers will be bundled with other
 JavaScript sources from `node_modules`. The result ends up in `static/dist`.
-JavaScript from other sources, such as [leaflet]({{leaflet}}), resides in
+JavaScript from other sources, such as
+[leaflet]({{leaflet}})
+,
+resides in
 `static/js` and will be included directly by the main html file `index.html`.
 
 The build tool is **webpack**. You can perform builds, by saying, in the
@@ -242,7 +274,10 @@ The third one provides a minified production build.
 ##### build.sh ####
 
 We have collected all routine tasks for building and updating the app and its
-data into a [build script]({{repBase}}/build.sh). See the code for an
+data into a
+[build script]({{repBase}}/build.sh)
+.
+See the code for an
 overview of what it can do, or run
 
     ./build.sh
@@ -258,7 +293,8 @@ That is why new bundles always have different names.
 
 Webpack provide a bit of infrastructure to append *hashes* after the chunks that make up a bundle.
 The other thing is to pick those names up in the html template that embodies the Single Page App:
-[index.tpl]({{serverBase}}/views/index.tpl).
+[index.tpl]({{serverBase}}/views/index.tpl)
+.
 
 You see that the links to the CSS and the Javascript are variable elements of this template.
 When the server starts, it may encounter two cases:

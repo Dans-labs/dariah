@@ -5,7 +5,9 @@ coded at the client side, there are a bunch of things that are handled at the
 server side.
 
 All data access is handled by server side controllers that implement a data api.
-These controllers are informed by the [data model](Model).
+These controllers are informed by the
+[data model](../Concepts/Model.md)
+.
 
 When the web server starts, the data model files are read, and converted to
 python modules with the same base name that encapsulate the information in the
@@ -64,17 +66,24 @@ the set of permitted fields is returned.
 
 ## [db]({{serverBase}}/controllers/db.py)
 
-This is the data access module. It uses the [data model](Model) to serve any
+This is the data access module. It uses the
+[data model](../Concepts/Model.md)
+to serve any
 data to any user in such a way that no data is sent from server to client that
 the current user is not entitled to see.
 
 The code in `db` is generic, it does not contain explicit reference to
 particular tables and fields. All specifics are derived form the
-[model config file]({{serverBase}}/models/model.yaml) and the table
-specific files in [tables]({{serverBase}}/models/tables).
+[model config file]({{serverBase}}/models/model.yaml)
+and the table
+specific files in
+[tables]({{serverBase}}/models/tables)
+.
 
 There are also *hooks*, where specific behaviour for certain tables can be
-specified. That behaviour is coded in the [workflow module](#workflow).
+specified. That behaviour is coded in the
+[workflow module](#workflow)
+.
 
 We describe the main methods here.
 
@@ -186,17 +195,26 @@ action.
 
 The parameter `basicList` is a function that can retrieve documents from the
 database, in such a way that the access restrictions are respected. It is
-defined in [db](#db) and will be passed from there. So this module does not do
-its own data access, all data access is still coded in [db](#db).
+defined in
+[db](#db)
+and will be passed from there. So this module does not do
+its own data access, all data access is still coded in
+[db](#db)
+.
 
 ### detailInsert(basicList, table=None, masterDocument=None)
 
-Method invoked by [db](#db), just before an item is inserted. This method has
+Method invoked by
+[db](#db)
+,
+just before an item is inserted. This method has
 the opportunity to generate extra fields for that record, and to generate extra
 details in other tables, to be inserted.
 
 It needs to deliver a dictionary of insertValues (field=value pairs) and a
 dictionary of detail records, keyed by detail table name. The values are lists
-of field=value dictionaries. Before [db](#db) will proceed to insert them, the
+of field=value dictionaries. Before
+[db](#db)
+will proceed to insert them, the
 detail records will get the id of the just inserted main record. This will be
 used as masterId when the details get inserted.

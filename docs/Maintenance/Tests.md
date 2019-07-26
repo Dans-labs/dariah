@@ -1,6 +1,8 @@
 # Tests
 
-We use [Mocha]({{mocha}}) for testing. As we started building tests
+We use
+[Mocha]({{mocha}})
+for testing. As we started building tests
 relatively late (not a good practice!) we do not have too many of them.
 
 In fact, I started writing them in order to keep some of the subtler algorithms
@@ -9,13 +11,17 @@ mutate.
 
 ## [fields]({{testBase}}/fields.js)
 
-Contains a test for the [sortInterval](Lib#sorttimeinterval) function, which
+Contains a test for the
+[sortInterval](../Client/Lib.md#sorttimeinterval)
+function, which
 compares time intervals, including intervals that are open at either side, even
 at both sides.
 
 ## [memo]({{testBase}}/memo.js)
 
-Our [memoize](Lib#memoize) function is quite sophisticated, and used many times
+Our
+[memoize](../Client/Lib.md#memoize)
+function is quite sophisticated, and used many times
 in the app. So it should be tested thoroughly.
 
 There are extensive tests of the logic of the memoizer and there is a

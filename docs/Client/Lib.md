@@ -10,7 +10,9 @@ validate values.
 
 Convert a datetime object or string into a numerical value, so you can make
 comparisons. If absent, yield negative infinity for start dates and positive
-infinity for end dates. Used in [workflow](Dux#workflow).
+infinity for end dates. Used in
+[workflow](Dux.md#workflow)
+.
 
 ### normalization
 
@@ -22,7 +24,9 @@ normalize. All functions take a value, and return a normalized value.
 Compare function for sorting. Wraps the values to be compared in a template
 before actually comparing them.
 
-Used in [workflow](Dux#workflow).
+Used in
+[workflow](Dux.md#workflow)
+.
 
 ### sortTimeInterval
 
@@ -37,7 +41,9 @@ Sort by time interval. Sorting by time intervals should works as follows:
 *   if the end date is missing, the end date is assumed to be in the infinite
     future.
 
-Used in [workflow](Dux#workflow).
+Used in
+[workflow](Dux.md#workflow)
+.
 
 ### trimDate
 
@@ -55,7 +61,9 @@ string expressing the reason is returned.
 ## [details]({{libBase}}/detail.js)
 
 These functions help by setting up lists of detail records for master records.
-The carry out what has been specified in the [data model](Model) config files
+The carry out what has been specified in the
+[data model](../Concepts/Model.md)
+config files
 under the keys `detail` and `detailOrder`.
 
 ### getMasterTable
@@ -77,11 +85,15 @@ which components can easily construct a widget for handling lists of details
 Collects information on the basis of which it can be decided whether a record
 may be deleted or not. A record may be deleted if it has no detail records,
 except those that will be deleted as well. Those are the details which are
-marked as `cascade` in the [data model](Model). This function returns a list of
+marked as `cascade` in the
+[data model](../Concepts/Model.md)
+.
+This function returns a list of
 all non-cascade detail tables that have records linking to the record in
 question.
 
-**Example**: [ItemForm](Components#itemform)
+**Example**:
+[ItemForm](Components.md#itemform)
 
 ## [edit]({{libBase}}/edit.js)
 
@@ -105,23 +117,32 @@ of a record. Whether values have changed (`dirty`), values are `invalid`, or
 values are being `submitted`.
 
 If this component is put inside a `<form>` element under the control of
-[redux-form]({{reduxFormBase}}), it is also capable to trigger a submit and
+[redux-form]({{reduxFormBase}})
+,
+it is also capable to trigger a submit and
 save action.
 
 #### `canSubmit = true` ###
 
-The component [EditControl](Components#editcontrol) calls this function with
+The component
+[EditControl](Components.md#editcontrol)
+calls this function with
 submit capacity. It also has to provide the resulting component with typical
 form properties, such as `dirty`, `valid`, `handleSubmit`.
 
 Because in this case the component lives inside a component that is already
-enhanced with `reduxForm`, namely [ItemEdit](Components#itemedit), these
+enhanced with `reduxForm`, namely
+[ItemEdit](Components.md#itemedit)
+,
+these
 properties have been injected higher up in the component tree and can be passed
 down as props.
 
 #### `canSubmit = false` ###
 
-The the component [EditStatus](Components#editstatus) calls this function
+The the component
+[EditStatus](Components.md#editstatus)
+calls this function
 without submit capacity. The typical form properties are now obtained by
 enhancing this very component with `reduxForm`. However, because this component
 is not assumed to be within a `<form>` context, it cannot perform a submit.
@@ -164,23 +185,29 @@ This can be used after events that change a form, without a blur event. The
 event should trigger a submit and save, but first the triggering action should
 have done its work.
 
-**Example**: [Input](Components#input)
+**Example**:
+[Input](Components.md#input)
 
 ### onSubmitSuccess
 
 Needed in a workaround for an
-[issue in redux-form]({{reduxFormIssues}}/2841). See
-[ItemEdit](Components#itemedit)
+[issue in redux-form]({{reduxFormIssues}}/2841)
+.
+See
+[ItemEdit](Components.md#itemedit)
 
 ## [europe.geo]({{libBase}}/europe.geo.js)
 
 ### countryBorders
 
 Object that contains the borders of the European countries plus a bit of
-additional information in [geojson]({{geojson}}) format.
+additional information in
+[geojson]({{geojson}})
+format.
 
 See this
-[Jupyter notebook]({{staticBase}}/tools/country_compose/countries.ipynb) to
+[Jupyter notebook]({{staticBase}}/tools/country_compose/countries.ipynb)
+to
 see where this data comes from and how it has been tweaked for this website.
 
 ## [fields]({{libBase}}/fields.js)
@@ -188,60 +215,78 @@ see where this data comes from and how it has been tweaked for this website.
 ### checkDisabled
 
 Checks whether a certain value is inactive and should be disabled. See
-[workflow logic](Dux#workflow). Used in component
-[RelSelect](Components#relselect).
+[workflow logic](Dux.md#workflow)
+.
+Used in component
+[RelSelect](Components.md#relselect)
+.
 
 ### dealWithProvenance
 
 Remove provenance fields if current settings require that. See
-[settings](Dux#settings). Used in component
-[ItemContainer](Components#itemcontainer) and others.
+[settings](Dux.md#settings)
+.
+Used in component
+[ItemContainer](Components.md#itemcontainer)
+and others.
 
 ### itemEditField
 
 Render an edit field in standard presentation, like
-[ItemEdit](Components#itemedit) does it. In fact, ItemEdit uses this very
+[ItemEdit](Components.md#itemedit)
+does it. In fact, ItemEdit uses this very
 function to render its editable fields.
 
 This function can be conveniently used in custom templates to render some fields
 in the standard way.
 
-**Example**: [Templates](../Functionality/Tempates.md)
+**Example**:
+[Templates](../Functionality/Templates.md)
 
 ### itemReadField
 
 Render an read-only field in standard presentation, like
-[ItemRead](Components#itemread) does it. In fact, ItemRead uses this very
+[ItemRead](Components.md#itemread)
+does it. In fact, ItemRead uses this very
 function to render its read-only fields.
 
 This function can be conveniently used in custom templates to render some fields
 in the standard way.
 
-**Example**: [Templates](../Functionality/Templates.md)
+**Example**:
+[Templates](../Functionality/Templates.md)
 
 ### makeFields
 
 Prepare field components for an item of a table. Collect the specs from the
-`fieldOrder` and `fieldSpecs` fields of the [data model](Model) and put all
+`fieldOrder` and `fieldSpecs` fields of the
+[data model](../Concepts/Model.md)
+and put all
 information in an array objects, each corresponding to a field, from which
 components can easily construct a widget for showing or editing that field.
 
-**Example**: [ItemForm](Components#itemform)
+**Example**:
+[ItemForm](Components.md#itemform)
 
 ### someEditable
 
 Checks whether a list of fields contains at least one that the current user may
 edit.
 
-**Example**: [ItemForm](Components#itemform)
+**Example**:
+[ItemForm](Components.md#itemform)
 
 ### toFieldInfo
 
-Reduces the information in the fragments produced by [makeFields](#makefields)
+Reduces the information in the fragments produced by
+[makeFields](#makefields)
 to a simple object with only the value(s) of that field.
 
-Used in [ItemRead](Components#itemread) to pass an argument to
-[applyTemplate](#applytemplate).
+Used in
+[ItemRead](Components.md#itemread)
+to pass an argument to
+[applyTemplate](#applytemplate)
+.
 
 ## [handle]({{libBase}}/handle.js)
 
@@ -282,7 +327,9 @@ As it stands, this suffers from the same problem, because for every item a fresh
 bound function object is allocated. And if the list is rendered twice, the
 second time results in completely new function objects.
 
-The solution is to use a [memoized](#memo) version of `handleItem`.
+The solution is to use a
+[memoized](#memo)
+version of `handleItem`.
 
 The following functions are conveniences for doing exactly that.
 
@@ -316,7 +363,9 @@ final argument.
 
 We use plain objects, including `Array`s for all things on the state. But what
 if your component prefers the data as a
-[Set]({{javascript}}/Global_Objects/Set)? Well, it is easy to turn an
+[Set]({{javascript}}/Global_Objects/Set)
+?
+Well, it is easy to turn an
 object into a `Set`. But if you do it twice, based on an identical state, you
 get two copies of the same set, which is a waste. Here memoization is a
 solution. `makeSet` is a memoized function that takes an array and returns its
@@ -334,10 +383,14 @@ In development mode, if you call the memoized function without arguments, it
 sends usage information to the console: the number of times it has computed a
 result and the number of times it has retrieved a result from cache.
 
-In many cases, the [reselect]({{reactReselect}}) library is all we need for
+In many cases, the
+[reselect]({{reactReselect}})
+library is all we need for
 the memoization of *selector functions*. However, if you want to bind a callback
 function to concrete arguments, e.g. in
-[InputMulti]({{appBase}}/components/InputMulti.jsx), you need more powerful
+[InputMulti]({{appBase}}/components/InputMulti.jsx)
+,
+you need more powerful
 memoization, such as `memoize` here.
 
 However, a naive implementation of memoize has a big drawback. In order to store
@@ -354,7 +407,9 @@ argument. That can be a big object, e.g. `tables`, which hold all data that the
 app has downloaded from the server in the current section.
 
 In those cases it will not do to stringify the argument. Rather we fall back on
-object identity: we use a [WeakMap]({{javascript}}/Global_Objects/WeakMap),
+object identity: we use a
+[WeakMap]({{javascript}}/Global_Objects/WeakMap)
+,
 which seems to have been designed exactly for this purpose. However, it is not
 immediately obvious how to use this solution if you have more than one argument,
 and if you mix non-object values and functions with real objects.
@@ -365,7 +420,9 @@ a shallow to-level structure of an object, to a given depth, and from then on
 work with object identity and WeakMaps. You can also forego object identity
 altogether and use solely stringify, which is often the most efficient solution.
 
-We have built quite a few [tests]({{testBase}}/memo.js) to
+We have built quite a few
+[tests]({{testBase}}/memo.js)
+to
 verify the logic and the performance of this memoizer.
 
 The flip-side of a memoizer is that you end-up with a lot of obsolete function
@@ -379,7 +436,8 @@ emptied periodically. By default, every result will live at most 30 minutes
 after having been created, but this is configurable.
 
 This brings us to the reason why we use WeakMap and not the more versatile
-[Map]({{javascript}}/Global_Objects/Map) data structure. For `Map` does not
+[Map]({{javascript}}/Global_Objects/Map)
+data structure. For `Map` does not
 suffer the constraint that keys must be objects, so if your arguments are a
 mixture of objects and non-objects, `Map` seems the obvious choice.
 
@@ -429,7 +487,9 @@ to the memo key in the following way:
 N.B: *Function arguments* can not be stringified, they always go by way of
 object identitiy.
 
-For examples, see the [test suite]({{testBase}}/memo.js).
+For examples, see the
+[test suite]({{testBase}}/memo.js)
+.
 
 #### Config ###
 
@@ -440,7 +500,8 @@ The `config` parameter takes the following keys:
     from cache, or cleares it from cache, the debug string will be output through
     `console.warn`. Only in development mode! It is also possible to add extra
     bits of debugging information, by adapting the `debugStyle` object in the
-    [source code]({{libBase}}/memo.js).
+    [source code]({{libBase}}/memo.js)
+    .
 
 #### Caution ###
 
@@ -456,7 +517,9 @@ particular slowness.
 ## [templates]({{libBase}}/templates.js)
 
 This library contains templates that customize the presentation of records and
-fields. See [Templates](../Functionality/Templates.md) for how the template system is structured.
+fields. See
+[Templates](../Functionality/Templates.md)
+for how the template system is structured.
 This library contains the functions to *apply* templates.
 
 ### applyInsertTemplate
@@ -465,23 +528,32 @@ Applies a template for the *insert record* button for a list. This template
 cannot have field values, because it is for a whole list of records. However, it
 is invoked by lists that are detail lists, and hence there is a master record.
 This template has access to the fields of that master record. It is invoked in
-[EditInsert](Components#editinsert) components.
+[EditInsert](Components.md#editinsert)
+components.
 
 ### applyTemplate
 
 Applies a read only template. You can merge a template with
-[FieldRead](Components#fieldread) components.
+[FieldRead](Components.md#fieldread)
+components.
 
 ### applyEditTemplate
 
 Applies an edit template. There is a bit of extra data here compared to
 read-only templates, namely whether fields are editable or not. You can merge a
-template with [FieldRead](Components#fieldread) components, as well as with
-[FieldEdit](Components#fieldedit) components.
+template with
+[FieldRead](Components.md#fieldread)
+components, as well as with
+[FieldEdit](Components.md#fieldedit)
+components.
 
-**Examples**: [ItemRead](Components#itemread) [ItemEdit](Components#itemedit)
+**Examples**:
+[ItemRead](Components.md#itemread)
+[ItemEdit](Components.md#itemedit)
 
-See also [Templates](../Functionality/Templates.md).
+See also
+[Templates](../Functionality/Templates.md)
+.
 
 ### editMode
 
@@ -494,13 +566,16 @@ information which fields are empty.
 In practice we use this function to determine whether we start the presentation
 of a record in read-only mode or in edit mode.
 
-**Example** In [ListPlain](Components#listplain) we invoke this function to
+**Example** In
+[ListPlain](Components.md#listplain)
+we invoke this function to
 determine the `startMode` function, which computes for each record a choice
 between alternatives (edit mode or read-only mode), called `thisStartMode`.
 
 When ListPlain is called to display the `criteriaEntry` detail records of an
 `assessment` record, a test function is invoked, defined in
-[criteriaEntry]({{appBase}}/tables/criteriaEntry.js) telling to return `1`
+[criteriaEntry]({{appBase}}/tables/criteriaEntry.js)
+telling to return `1`
 if the `score` is empty or if the `evidence` is empty. Alternative `1`
 corresponds to edit mode.
 
@@ -516,7 +591,8 @@ Arguments: `(...selectors)`
 Given a list of *selector* functions, creates a combined selector that returns
 an object containing the results of the individual selectors. This function uses
 the *reselect's*
-[createSelector]({{reactReselect}}#createselectorinputselectors--inputselectors-resultfunc).
+[createSelector]({{reactReselect}}#createselectorinputselectors--inputselectors-resultfunc)
+.
 We use it quite often when components need multiple sections of the state.
 
 ### emptyX (S A O F)
@@ -555,7 +631,9 @@ empty object, without an intention to modify it, this is an utter waste.
 
 Therefore we declare a few *empty* concepts:
 
-We also [freeze]({{javascript}}/Global_Objects/Object/freeze) them, so that
+We also
+[freeze]({{javascript}}/Global_Objects/Object/freeze)
+them, so that
 we cannot inadvertently mutate them.
 
 The contract with ourselves is: do not ever use one of
@@ -572,13 +650,17 @@ Analyse URLs in order to extract a part `/item/`*itemID* from it (if present).
 This is needed if we open and close items in a list and want the URL to reflect
 that.
 
-See [ListPlain](Components#listplain) for an example.
+See
+[ListPlain](Components.md#listplain)
+for an example.
 
 ### jString
 
 When we need the value of an object as a key, for example when we
-[memoize](Lib#memo) functions, the most straightforward way is to
-[JSON.stringify]({{javascript}}/Global_Objects/JSON/stringify) that object
+[memoize](#memo)
+functions, the most straightforward way is to
+[JSON.stringify]({{javascript}}/Global_Objects/JSON/stringify)
+that object
 (if it is not forbiddingly large). But this has one defect: the order in which
 the keys of objects are serialized is not fixed. So two results of a stringify
 of objects with the same value can be different, due to different orders of
@@ -627,9 +709,16 @@ Returns the sum of an array of numbers. If the array is empty, return `0`.
 ### updateAuto
 
 The `update()` function of the
-[Immutability-Helper module]({{immutability}}) is great. But one thing is a
-bit clumsy: it does not have [auto-vivification]({{autovivification}}). The
-documentation points to a [way out]({{immutability}}#autovivification), but
+[Immutability-Helper module]({{immutability}})
+is great. But one thing is a
+bit clumsy: it does not have
+[auto-vivification]({{autovivification}})
+.
+The
+documentation points to a
+[way out]({{immutability}}#autovivification)
+,
+but
 the code for that becomes tedious quickly.
 
 The idea, however, is right, and this function is a variant of the `update()`
@@ -653,7 +742,8 @@ of its properties.
 We also do this for `route`, like `params`.
 
 This function is useful for components that occur as component on a route in
-[main](Components#main) on the one hand, but are also used as ordinary children
+[main](Components.md#main)
+on the one hand, but are also used as ordinary children
 that receive props from parents. In the first case, it receives some properties
 as `params`.
 
@@ -669,7 +759,9 @@ from the database.
 
 When composing a Field component for an item, compute attributes telling whether
 the item is active or not, and merge them into the other attributes. Used in
-component [RelSelect](Components#relselect).
+component
+[RelSelect](Components.md#relselect)
+.
 
 ### getValType
 
@@ -678,7 +770,8 @@ Arguments: `(valType)`
 For a given value type, such as `text`, `URL`, `number`, return a component and
 subtype for handling the input of such values, e.g. `<input type="URL" />`.
 
-**Example**: [FieldEdit](Components#fieldedit)
+**Example**:
+[FieldEdit](Components.md#fieldedit)
 
 ### wrappedRepr
 
@@ -686,4 +779,6 @@ Produces a representation for a field value, complete with surrounding elements
 and attributes. Values of link fields will be wrapped in `<a href="...">`
 elements,
 
-Used in [FieldRead](Components#fieldread).
+Used in
+[FieldRead](Components.md#fieldread)
+.

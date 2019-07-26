@@ -15,7 +15,9 @@ steep learning curve.
 
 ## This approach - alternative approaches
 
-A quick glance at the [statistics](Codebase) of the code base makes clear the
+A quick glance at the
+[statistics](Codebase.md)
+of the code base makes clear the
 amount of thought that has gone into the tool.
 
 I have asked myself the question: why do we need so much programming for such a
@@ -56,15 +58,20 @@ think we've got something to build on.
 ## The learning curve (for what it is worth)
 
 When I started writing, I had the experience of developing
-[SHEBANQ]({{shebanq}}). At first, the tools I used for SHEBANQ were a model
+[SHEBANQ]({{shebanq}})
+.
+At first, the tools I used for SHEBANQ were a model
 for developing this contrib tool. From the start it was clear that the contrib
 tool needed more profound underpinnings. I started out to write those
 underpinnings myself, programmed in pure, modern Javascript. That worked to a
 certain extent, but I doubted whether it was strong enough to carry the weight
 of the full app. After a while I started a big search, trying Google's Angular,
 Facebook's React, and various solutions that combined these frameworks in
-so-called full-stack setups, such as [Meteor]({{meteor}}) and
-[MERN]({{mern}}).
+so-called full-stack setups, such as
+[Meteor]({{meteor}})
+and
+[MERN]({{mern}})
+.
 
 Here is a selection of 10 lessons I learned during what followed.
 
@@ -115,8 +122,12 @@ all the best practices that are advised here, because the performance and
 correctness of the app depend crucially on them all.
 
 What also helped is a hint by Erik Ras, creator of
-[redux-form]({{reduxFormBase}}), to organize your redux code in files: the
-concept of [ducks]({{ducks}}).
+[redux-form]({{reduxFormBase}})
+,
+to organize your redux code in files: the
+concept of
+[ducks]({{ducks}})
+.
 
 ### Lesson 6: CRUD layer
 

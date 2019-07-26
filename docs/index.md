@@ -5,7 +5,9 @@
 [DARIAH contribution tool]({{liveBase}})
 
 This is the documentation for the DARIAH contribution tool, an instrument to
-register and assess community contributions to the [DARIAH]({{dariah}}).
+register and assess community contributions to the
+[DARIAH]({{dariah}})
+.
 
 The documentation contains parts that range from *functional*, *conceptual*,
 *technical* to *mundane*.
@@ -23,7 +25,8 @@ The documentation contains parts that range from *functional*, *conceptual*,
       regular and not comprehensive!
 * **Functionality**
       For a vivid impression of the intended functions of this app, see these
-      [slides](assets/Functions.pptx) which I made near the end of the project (2017-12-14).
+      [slides](assets/Functions.pptx)
+      which I made near the end of the project (2017-12-14).
     * [Business logic](Functionality/Business.md)
       The actual handling of contributions, assessments and reviews is the business
       logic of this app.
@@ -89,6 +92,8 @@ The documentation contains parts that range from *functional*, *conceptual*,
       after each change and refactoring. That way, you proactively discover your bugs
       before your users do.
 * **Author**
-      Dirk Roorda [DANS]({{dans}}) <mailto:dirk.roorda@dans.knaw.nl>
+      Dirk Roorda
+      [DANS]({{dans}})
+      <mailto:dirk.roorda@dans.knaw.nl>
       * 2019-03-04
       * 2017-12-14

@@ -10,7 +10,10 @@ in one big form.
 The challenge is to use as much of the generic machinery when we define custom
 presentations. Our solution here is by using *templates*.
 
-The particulars of our templates are documented in [Tables](Tables), but you
+The particulars of our templates are documented in
+[Tables](../Functionality/Tables.md)
+,
+but you
 might need to continue reading here first about the power and organization of
 themt.
 
@@ -28,15 +31,18 @@ out the value that you find there. Alas, there are several complicating factors:
     allowed to edit.
 3.  We should present values that are in some way *legacy* different from values
     that are *current*, where the current-ness of values is determined by certain
-    other fields in the database (see [business model](Business).
+    other fields in the database (see
+    [business model](Business.md)
+    .
 
 The first two concerns are built into the generic logic, in the components
 
-*   [EditInsert](Components#editinsert)
-*   [ItemRead](Components#itemread)
-*   [ItemEdit](Components#itemedit)
-*   [FieldRead](Components#fieldread)
-*   [FieldEdit](Components#fieldedit) and we do not want to reimplement this logic
+*   [EditInsert](../Client/Components.md#editinsert)
+*   [ItemRead](../Client/Components.md#itemread)
+*   [ItemEdit](../Client/Components.md#itemedit)
+*   [FieldRead](../Client/Components.md#fieldread)
+*   [FieldEdit](../Client/Components.md#fieldedit)
+    and we do not want to reimplement this logic
     when we want to cater for the third concern by means of templates.
 
 Our solution is that templates are not static strings into which field values
@@ -51,16 +57,21 @@ functions use the general machinery to
 *   `l(field)` fetch labels for fields;
 *   `e(field)` check whether fields have empty values;
 *   `v(field)` fetch the raw values for fields;
-*   `w(key)` fetch additional [workflow](Workflow) attributes for records;
+*   `w(key)` fetch additional
+    [workflow](Workflow.md)
+    attributes for records;
 *   `s(field)` fetch the plain string values for fields, replacing identifiers
     into related tables by headings of related records; by entity titles;
 *   `f(field)` fetch values for fields (with related lookup), and wrap them in
-    [FieldRead](Components#fieldread) components;
+    [FieldRead](../Client/Components.md#fieldread)
+    components;
 *   `fe(field)` fetch values for fields, and wrap them in
-    [FieldEdit](Components#fieldedit) components, which are controls to let the
+    [FieldEdit](../Client/Components.md#fieldedit)
+    components, which are controls to let the
     user edit the value;
 *   `fs(field)` present custom controls for fields and wrap them in
-    [FieldSet](Components#fieldset) components, which react to click events: upon
+    [FieldSet](../Client/Components.md#fieldset)
+    components, which react to click events: upon
     a click, a baked in value will be saved for this field to the database;
 *   `n` (only for insert templates): the number of detail records in the list
 *   `at` a set of the *active* contribution types
@@ -80,13 +91,28 @@ Applying a template means feeding a higher order React component with a
 properties object of field rendering functions, which results in a concrete
 React component.
 
-The templates will be applied by [EditInsert](Components#editinsert),
-[ItemRead](Components#itemread), [ItemEdit](Components#itemedit),
-[ItemAction](Components#itemaction), and [ListPlain](Components#listplain).
-using the functions [applyTemplate](../Client/Lib.md#applytemplate),
-[applyEditTemplate](../Client/Lib.md#applyedittemplate),
-[applyInsertTemplate](../Client/Lib.md#applyinserttemplate), and
-[editMode](../Client/Lib.md#editmode).
+The templates will be applied by
+[EditInsert](../Client/Components.md#editinsert)
+,
+[ItemRead](../Client/Components.md#itemread)
+,
+[ItemEdit](../Client/Components.md#itemedit)
+,
+[ItemAction](../Client/Components.md#itemaction)
+,
+and
+[ListPlain](../Client/Components.md#listplain)
+.
+using the functions
+[applyTemplate](../Client/Lib.md#applytemplate)
+,
+[applyEditTemplate](../Client/Lib.md#applyedittemplate)
+,
+[applyInsertTemplate](../Client/Lib.md#applyinserttemplate)
+,
+and
+[editMode](../Client/Lib.md#editmode)
+.
 
 ## Template organization
 
@@ -103,7 +129,9 @@ There are several purposes for which we invoke the template mechanism:
     *   edit modes.
 
 All templates can be found in files named after the tables for which they are
-defined. You can find them in the [tables]({{appBase}}/tables) directory.
+defined. You can find them in the
+[tables]({{appBase}}/tables)
+directory.
 For each table there is an object of template functions, first keyed by their
 purpose and then, optionally, by the related/detail table they are for.
 
@@ -176,7 +204,9 @@ the contribution. Yet we do not consider a contribution to be a detail of a
 year.
 
 If you want related records to be treated as detail records, you have to say so
-in the [data model](Model).
+in the
+[data model](../Concepts/Model.md)
+.
 
 These templates become active when records are displayed in the list of records
 below a master record.
@@ -200,9 +230,12 @@ functions that deliver field value information or workflow information:
     to a predefined value
 *   `e = field =>` *whether that field has an empty value*
 *   `m = field =>` *whether that field is editable by the current user*
-*   `w = kind =>` workflow information, see [workflow](Workflow).
+*   `w = kind =>` workflow information, see
+    [workflow](Workflow.md)
+    .
 
-See the library module [templates]({{libBase}}/templates.js)
+See the library module
+[templates]({{libBase}}/templates.js)
 
 [Templates]({{appBase}}/components/Templates.jsx)
 
@@ -227,7 +260,8 @@ not in relation to other, related records.
 
 These template functions are passed the `fe` function. There is an extra
 parameter `editButton`, which is a React component that holds the
-[edit/save button](EditCOntrol) for this record.
+[edit/save button](../Client/Components.md#editcontrol)
+for this record.
 
 ### mainAction
 
