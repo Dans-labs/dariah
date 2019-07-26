@@ -30,17 +30,22 @@ the permissions (a lower layer) and then to the additional workflow constraints.
 ## Realization
 
 Workflow is realized at the server and at the client. To a large extent, its
-rules are specified in the [data model](Model).
+rules are specified in the [data model](../Concepts/Model.md).
 
-### Client
+??? abstract "Client"
+    Workflow logic is predominantly used in the [templates](Templates.md), which may
+    include workflow buttons and info panels.
 
-Workflow logic is predominantly found in the [templates](Templates.md), which may
-include workflow buttons and info panels, but also in
-[workflow.js](Dux#workflow), which computes special items to present to the
-user, and for some of them workflow information is used. The templates
-themselves are applied by functions in
-[templates.js]({{libBase}}/templates.js). These functions are given
-workflow attributes that they pass on to the templates.
+    The workflow attributes are handled in the Dux
+    [workflow](../Client/Dux.md#workflow). 
+    There are also helper functions
+    to compute special items based on workflow information.
+
+    The templates
+    themselves are applied by functions defined in the library
+    [templates](../Client/Lib.md#templates).
+    These functions are given
+    workflow attributes as arguments that they pass on to the templates.
 
 ### Server
 

@@ -7,6 +7,7 @@
 }
 .button.disabled {
 	cursor: default;
+	color: var(--action-disabled-fore);
 	background-color: var(--action-disabled-back);
 }
 .button.large,
