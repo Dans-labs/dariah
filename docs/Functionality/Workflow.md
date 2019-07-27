@@ -373,12 +373,31 @@ The target documents can be specified with these instructions:
     *   `linkField`: the field in yourself that points to the master,
     *   `otherTable`: the table in which the master document resides.
 
+??? abstract "grandmaster"
+    Look at the master of your master document.
+    You have to specify
+
+    *   `interField`: the field in yourself that points to the intermediate master,
+    *   `interTable`: the table in which the intermediate master document resides,
+    *   `linkField`: the field in the intermediate master that points to the grandmaster,
+    *   `otherTable`: the table in which the grandmaster document resides.
+
 ??? abstract "details"
     Look at your detail documents. A document can have multiple kinds of
     details, so you have to specify
 
     *   `otherTable`: the table that holds the details, and the
     *   `linkField`: the field in the detail document that points to you.
+
+??? abstract "granddetails"
+    Look at details of your detail documents.
+    You have to specify
+
+    *   `interTable`: the table that holds the intermediate details,
+    *   `interField`: the field in the intermediate details that points to you,
+    *   `otherTable`: the table that holds the details of the details, and the
+    *   `linkField`: the field in the details of the details
+        that points to the intermediate details.
 
 ??? abstract "siblings"
     Look at records with the same master. You have to specify
@@ -394,6 +413,9 @@ functions you can call, they are all listed in
 [worklow.py]({{serverBase}}/controllers/workflow.py)
 and their names start
 with `_compute_`. Below we name them without this prefix.
+
+In the specifications we refer to the starting document(s) as *my document(s)* and to the
+reference documents as *other document(s)*.
 
 ??? abstract "hasValue"
     Takes
@@ -498,45 +520,168 @@ with `_compute_`. Below we name them without this prefix.
         the decision.
 
 ??? abstract "hasDifferent"
-    Returns `{'on': True }` if one of the other docs has a different value than you
-    for a given field.
+    Takes
+
+    * `otherField`: the name of a field in an other document whose value is to be retrieved;
+    * `myField`: the name of a field in my document whose value is to be retrieved; 
+
+    Returns `{'on': True }` if a value from an other document is different from a value
+    from my document.
+
+    ??? example "assessment checks whether its contribution type agrees with that of its contribution"
+        The
+        [assessment model]({{serverBase}}/models/tables/assessment.yaml)
+        specifies:
+
+
+        ```yaml
+        - inspect: master
+          method: hasDifferent
+          linkField: contrib
+          otherTable: contrib
+          otherField: typeContribution
+          myField: assessmentType
+          attribute:
+            name: stalled
+            desc: assessment type is different from contribution type
+        ```
+
+        In words: an assessment document compares its own `assessmentType` with
+        the `typeContribution` of its contribution document.
+
+        If so, it adds the `on: true` setting to the `stalled` attribute.
+
+        This assessment may contain important information, but its criteria no longer
+        match the kind of conbtribution, so the worthwhile bits of the assessment
+        have to be entered manually in a newly created assessment based on the
+        current `typeContribution`.
+
 
 ??? abstract "getValues"
+    Takes
+
+    * `otherFields`: a list of fields in an other document whose values are to be retrieved;
+
     Returns
 
     ```python
     {'items': [
-      {'field1': value1a, 'field2': value2a},
-      {'field1': value1b, 'field2': value2b},
+      {'otherField1': value1a, 'otherField2': value2a},
+      {'otherField1': value1b, 'otherField2': value2b},
       ...
       ]
     }
     ```
 
-    where `field1` and `field2` are given fields, and `value1a` and `value2a` are
-    values for those fields found in the other docs, and likewise for all such
-    values `value1b` and `value2b` that can be found in all other docs.
+    where
+
+    `value1a` and `value2a` are
+    values for the other fields found in the first other doc,
+
+    and
+
+    `value1a` and `value2a` are
+    values for the other fields found in the second other doc,
+
+    and so on for all other docs.
+
+    ??? example "assessment gathers the creators and decisions of its reviews"
+        The
+        [assessment model]({{serverBase}}/models/tables/assessment.yaml)
+        specifies:
+
+        ```yaml
+        - inspect: details
+          method: getValues
+          linkField: assessment
+          otherTable: review
+          otherFields:
+            - creator
+            - decision
+          attribute:
+            name: reviews
+            desc: reviews of this same assessment
+        ```
+
+        In words: an assessment document looks into its associated review documents
+        and reads off their creators and decisions.
 
 ??? abstract "assessmentScore"
+    Takes :
+
+    *   nothing
+
     Computes the overall score of an assessment, based on its detail `criteriaEntry`
     records.
 
-    The data returned is a dictionary containing:
+    Returns:
 
-    *   `overall`: the overall score as percentage of points scored with respect to
-        total of scorable points
-    *   `relevantScore`: the sum of the scores for all criteria that have not been
-        scored as `-1` (non-applicable)
-    *   `relevantMax`: the total of the maximum scores for all criteria that have not
-        been scored as `-1`
-    *   `allMax`: the total of the maximum scores for all criteria
-    *   `relevantN`: the number of criteria that have not been scored as `-1`
-    *   `allN`: the number of criteria.
-    *   `aId`: the id of the assessment in question.
+    *   A dictionary with the score details
+    
+    ??? explanation "Score details"
+        *   `overall`: the overall score as percentage of points scored with respect to
+            total of scorable points
+        *   `relevantScore`: the sum of the scores for all criteria that have not been
+            scored as `-1` (non-applicable)
+        *   `relevantMax`: the total of the maximum scores for all criteria that have not
+            been scored as `-1`
+        *   `allMax`: the total of the maximum scores for all criteria
+        *   `relevantN`: the number of criteria that have not been scored as `-1`
+        *   `allN`: the number of criteria.
+        *   `aId`: the id of the assessment in question.
 
-    See more about the computation in the
-    [business logic](Business.md#scoring)
-    .
+        See more about the computation in the
+        [business logic](Business.md#scoring)
+        .
+
+    ??? example "contrib gathers the assessment scores of its assessments"
+        The
+        [contrib model]({{serverBase}}/models/tables/contrib.yaml)
+        specifies:
+
+        ```yaml
+        - inspect: details
+          method: assessmentScore
+          linkField: contrib
+          otherTable: assessment
+          attribute:
+            name: score
+            desc: assessment score
+        ```
+
+        In words: a contrib document looks into its associated assessment documents
+        and computes their score details and stores the resulting dictionaries in the
+        `score` workflow attribute.
+
+    ??? example "How the score travels to the user interface"
+        The workflow engine takes care that the assessment score is computed on the server whenever
+        there is a need to do that.
+        The computed workflow attributes are delivered to the client whenever the client
+        wants to render a contribution.
+
+        Here is a fragment of the contribution template that reads the workflow information
+        (look at `w('score')`; `w()` is a function to read out workflow attributes for the 
+        document in question):
+
+        ```javascript
+        if (approved) {
+          const scoreItems = (w('score') || emptyO).items || emptyA
+          const score = scoreItems.length ? scoreItems[0] : emptyO
+          resultApproved = (
+            <>
+              <ScoreBox score={score} />
+              <div className={'label large workflow good'}>
+                {`This contribution has been reviewed positively.`}
+              </div>
+            </>
+          )
+        }
+        ```
+
+        If there are multiple assessments, the score is taken from the first one.
+        If there is a score, it consists of a dictionary with relevant score quantities.
+        They are passed as properties to the [ScoreBox](../Client/Components#scorebox)
+        component, which produces a nicely rendered representation of the assessment score.
 
 ## Wiring
 
@@ -545,32 +690,40 @@ going on in the workflow system.
 
 ![diag](../design/design.012.png)
 
-Above we see a good deal of the workflow rules that govern contributions and
-their assessments and reviews, each with their detail records of criteria
-entries (in the self-assessment) and review entries (in the reviews).
+??? explanation
+    Above we see a good deal of the workflow rules that govern contributions and
+    their assessments and reviews, each with their detail records of criteria
+    entries (in the self-assessment) and review entries (in the reviews).
 
-The coloured squares are particular records in the contribution, assessment,
-review, etc. collections. We only mention the fields that play a role in the
-workflow.
+    ???+ abstract "documents"
+        The coloured squares are particular records in the contribution, assessment,
+        review, etc. collections. We only mention the fields that play a role in the
+        workflow.
 
-The rounded labels indicate the workflow attributes that are computed for those
-records. The arrows show which fields are used for which workflow attributes.
+    ???+ abstract "workflow attributes"
+        The rounded labels indicate the workflow attributes that are computed for those
+        records.
 
-In fact, the arrows correspond exactly with the `workflow/read` and
-`workflow/adjust` instructions given in the
-[data model](../Concepts/Model.md)
-.
-The reading of
-an arrow is like this:
+    ???+ "arrows"
+        The arrows show which fields are used for which workflow attributes.
 
-1.  **read workflow**: whenever a record needs to be sent to the client, compute
-    the indicated workflow labels, based on the information in the fields
-    indicated by following the arrows in the opposite direction;
-2.  **adjust workflow**: whenever a record is inserted, deleted, or updated,
-    follow any arrow from any of its fields, and for every record at the opposite
-    end, trigger a recomputation of its workflow, and send that to the client as
-    part of the result op the modification action.
+        In fact, the arrows correspond exactly with the `workflow/read` and
+        `workflow/adjust` instructions given in the
+        [data model](../Concepts/Model.md)
+        .
 
-In this way, whenever the user changes a record, not only the affected records
-are reported back, but also the records with updated workflow information. This
-will ultimately update the user interface in all relevant parts.
+        The reading of
+        an arrow is like this:
+
+        1.  **read workflow**: whenever a record needs to be sent to the client, compute
+            the indicated workflow labels, based on the information in the fields
+            indicated by following the arrows in the opposite direction;
+        2.  **adjust workflow**: whenever a record is inserted, deleted, or updated,
+            follow any arrow from any of its fields, and for every record at the opposite
+            end, trigger a recomputation of its workflow, and send that to the client as
+            part of the result op the modification action.
+
+    ???+ "effect of the workflow on the user interface"
+        In this way, whenever the user changes a record, not only the affected records
+        are reported back, but also the records with updated workflow information. This
+        will ultimately update the user interface in all relevant parts.

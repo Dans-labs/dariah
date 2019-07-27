@@ -18,7 +18,6 @@ workflow:
       otherTable: contrib
       otherField: typeContribution
       myField: assessmentType
-      value: null
       attribute:
         name: stalled
         desc: assessment type is different from contribution type
