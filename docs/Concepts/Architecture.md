@@ -81,7 +81,7 @@ dispatch an action `handle` in response of a user click, and the action creator
 `changeSlice` provides that, then you can wrap your component by means of the
 Redux higher order function `connect` like this:
 
-```es6
+```javascript
     export connect(getMySlice, { handle: changeSlice })(MyComp)
 ```
 

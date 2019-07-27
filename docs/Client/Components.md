@@ -23,10 +23,10 @@ on, we omit the types.
 ??? explanation "List of standard props"
     name | type | description
     --- | --- | ---
-    `alter` | **object** | a slice of the state from [getAltSection](Dux.md#getaltsection); Group of settings for components with alternative renderings: these settings tell which alternative has been chosen for each of those components;
+    `alter` | **object** | a slice of the state from [getAltSection](Dux.md#alter); Group of settings for components with alternative renderings: these settings tell which alternative has been chosen for each of those components;
     `alterSection` | **string** | name of a section of the `alter` state; such a section contains the choice of alternative for a bunch of components that are relevant to the present component; each component that requests data from `alter` only gets data for a single section; in this way components will not be dependent on too big a part of the state; those dependencies may cause spurious re-renderings;
     `alterTag` | **string** | name that lives within a section of the `alter` state; this functions as the address of a component that needs to expand or collapse; the triggering event will change the `alter` state, keyed by `alterSection` and then by `alterTag`;
-    `amounts` | **object** | for a faceted filter: contains the amount of items that match each facet; see [computeFiltering](Dux.md#computefiltering);
+    `amounts` | **object** | for a faceted filter: contains the amount of items that match each facet; see [computeFiltering](Dux.md#filters);
     `children` | **components** | a special prop defined by React itself; it contains the material that has been put in the component; you find it in the `render` function of the component; it is everything between `<Component>` and `</Component>`;
     `className` | **string** | a class name to be put in the top level element of the rendered component;
     `compact` | **bool** | whether the component should minimize the real estate on the screen that it uses;
@@ -37,13 +37,13 @@ on, we omit the types.
     `fieldFragments` | **array** | an array with instructions per field how to render it; ultimately computed by [makeFields](Lib#.mdmakefields) and then passed to child components;
     `filtered` | **bool** | whether the list should be accompanied by filters; the specification of the filters themselves is in the [data model](../Concepts/Model.md);
     `fields` | **objects** | defines a subset of all fields: these are the fields that the component has to deal with;
-    `filteredAmount` | **number** | the number of items that pass all filters; see [computeFiltering](Dux.md#computefiltering);
-    `filteredAmountOthers` | **object** | for each filter, the amount of items that passes all filters except that one filter; see [computeFiltering](Dux.md#computefiltering);
+    `filteredAmount` | **number** | the number of items that pass all filters; see [computeFiltering](Dux.md#filters);
+    `filteredAmountOthers` | **object** | for each filter, the amount of items that passes all filters except that one filter; see [computeFiltering](Dux.md#filters);
     `filterField` | **string** | the name of the field that the current filter is acting upon; (as in the [data model](../Concepts/Model.md);
     `filterRelField` | **string** | the name of the related field that the current filter is acting upon; this is relevant for fields that point to a related table: you can filter on the values of a specific field in the related table; (as in the [data model](../Concepts/Model.md);
     `filterId` | **number** | the sequence number of a specific filter which identifies it among all filters for the same table;
     `filterLabel` | **string** | the user-facing name of the filter;
-    `filters` | **object** | a slice of the state from [getFilters](Dux.md#getfilters); contains the actual filter settings, i.e. what the user has entered in search boxes and which facets the user has clicked; organized by table and then by `filterTag` and then by `filterId`;
+    `filters` | **object** | a slice of the state from [getFilters](Dux.md#filters); contains the actual filter settings, i.e. what the user has entered in search boxes and which facets the user has clicked; organized by table and then by `filterTag` and then by `filterId`;
     `filterSettings` | **object** | a slice of the state, sub-slice of `filters`, corresponding to the filters of a single `filterTag` of a single `table`;
     `filterSetting` | **object** or **string** | a slice of the state, sub-slice of `filterSetting`, corresponding to a single filter, identified by `filterId`; whether this is an object or a string, depends on the nature of the filter: for a [Fulltext](#fulltext) filter it is a string (the search text), for a [ByValue](#byvalue) filter it is an object, containing the status (boolean) of all its facet checkboxes;
     `filterTag` | **string** | identifies a group of filters for a single table; tables may have multiple incarnations; a table can be a main table, but also a detail table for a specific record; the filters for a table when it displays details may be distinct from the filters of the same table when it is displayed as the main table; we separate those cases by means of a `filterTag` prop;
@@ -53,16 +53,16 @@ on, we omit the types.
     `listIds` | **array of string** | a sequence of strings which are essentially MongoDB identifiers of entities in a table; components that display lists use this prop to determine which entities must be actually appear on the screen and in what order; see also the prop `filteredIds`;
     `masterId` | **string** | when rendering a list of records that are details of some master record, this holds the MongoDB id of the master record;
     `masterTable` | **string** | when rendering a list of records that are details of some master record, this holds the name of the table in which the master record resides;
-    `me` | **object** | a slice of the state from [getMe](Dux.md#getme); the information about the currently logged-in user, fetched from the server;
+    `me` | **object** | a slice of the state from [getMe](Dux.md#me); the information about the currently logged-in user, fetched from the server;
     `mode` | **string** | either `list` or `grid`; whether the list of items should render as a list of expandable headings, or as a grid with full field information;
     `myValues` | **object** | ultimately extracted from the `tables` slice of the state; it contains the values of the fields of the entity that is being dealt with;
     `perm` | **object** | Holds permissions for a record: whether deleting is allowed, and per field whether updating is allowed;
     `select` | **string** | sometimes a list is fetched as a whole, sometimes only *my own* records are displayed and yet other times only records that are the details of some master record must be shown; this property indicates which is which;
-    `settings` | **object** | a slice of the state from [getSettings](Dux.md#getsettings); settings are pieces of custom information that are relevant to many components of the app;
+    `settings` | **object** | a slice of the state from [getSettings](Dux.md#settings); settings are pieces of custom information that are relevant to many components of the app;
     `table` | **string** | name of the table that the component must deal with;
     `submitValues` | **function** | a callback that is used to save form values to the database; used for components that supply edit controls for form values: they can call `submitValues` after a change or upon loss of focus; it is basically the `handleSubmit` from Redux-From, with a specific first argument passed (`toDb`) that saves values to the database;
-    `tables` | **object** | a slice of the state from [getTables](Dux.md#gettables); all data that comes from database tables; organized by `table` name; for each table there is spec information and actual entity data;
-    `win` | **{**`width` **number**`, height` **number**`}` | a slice of the state from [getWinDim](Dux.md#getwindim); contains the physical dimensions of the window at any time.
+    `tables` | **object** | a slice of the state from [getTables](Dux.md#tables); all data that comes from database tables; organized by `table` name; for each table there is spec information and actual entity data;
+    `win` | **{**`width` **number**`, height` **number**`}` | a slice of the state from [getWinDim](Dux.md#win); contains the physical dimensions of the window at any time.
     `workflow` | **object** | slice of the state that contains workflow information.
 
 ---
@@ -116,7 +116,7 @@ presents
 ### [Tooltip]({{appBase}}/components/Tooltip.jsx)
 
 (life cycle) connected via
-[settings](Dux#.mdsettings)
+[settings](Dux.md#settings)
 
 ???+ abstract "Task"
     A dynamic tooltip, based on CSS3 techniques. The tooltip is initially put as
@@ -363,7 +363,7 @@ presents
     name | type | description
     --- | --- | ---
     `docName` | **string** | the name of the document.
-    `text` | **string** | from [getDoc](Dux.md#getdoc), the raw content of the document
+    `text` | **string** | from [getDoc](Dux.md#docs), the raw content of the document
 
 ???+ abstract "Task"
     Show
@@ -419,7 +419,7 @@ presents
 
     ??? note "Injected"
         The following properties are injected from the state by
-        [getNotes](Dux.md#getnotes)
+        [getNotes](Dux.md#notes)
         :
 
     name | type | description
@@ -1159,7 +1159,7 @@ connected via
 
     name | type | description
     --- | --- | ---
-    `grid` | **object** | slice of the state, obtained with [getGrid](Dux.md#getgrid), which holds sorting information of table grids
+    `grid` | **object** | slice of the state, obtained with [getGrid](Dux.md#tables), which holds sorting information of table grids
     `gridTag` | **string** | key under which the component finds its information about which columns are sorted in what order and direction
 
 ???+ abstract "Task"

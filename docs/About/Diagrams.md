@@ -24,6 +24,8 @@
 
 [![diag](../design/design.002.png){:width="300px"}](../Client/Dux.md#filters)
 
+[![diag](../design/design.004.png){:width="300px"}](../Client/Dux.md#win)
+
 [![diag](../design/design.005.png){:width="300px"}](../Client/Dux.md#notes)
 
 ## [Routing](../Concepts/Routing.md)
