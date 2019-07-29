@@ -54,7 +54,7 @@ workflow:
           - submitted
           - reviewerE
           - reviewerF
-        desc: is being reviewed
+        desc: has been submitted for review
     - inspect: details
       method: hasIncomplete
       linkField: assessment

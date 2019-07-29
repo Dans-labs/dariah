@@ -36,7 +36,7 @@ rules are specified in the
 
 ??? abstract "Client"
     Workflow logic is predominantly used in the
-    [templates](Templates.md)
+    [templates](../Client/Templates.md)
     ,
     which may
     include workflow buttons and info panels.

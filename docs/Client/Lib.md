@@ -230,7 +230,7 @@ and components.
     in the standard way.
 
     ???+ example
-        [Templates](../Functionality/Templates.md)
+        [Templates](Templates.md)
 
 ??? explanation "itemReadField"
     Render an read-only field in standard presentation, like
@@ -242,7 +242,7 @@ and components.
     in the standard way.
 
     ???+ example
-        [Templates](../Functionality/Templates.md)
+        [Templates](Templates.md)
 
 ??? explanation "makeFields"
     Prepare field components for an item of a table. Collect the specs from the
@@ -506,7 +506,7 @@ and components.
 ???+ explanation
     This library contains templates that customize the presentation of records and
     fields. See
-    [Templates](../Functionality/Templates.md)
+    [Templates](Templates.md)
     for how the template system is structured.
     This library contains the functions to *apply* templates.
 
@@ -537,7 +537,7 @@ and components.
     [ItemEdit](Components.md#itemedit)
 
     See also
-    [Templates](../Functionality/Templates.md)
+    [Templates](Templates.md)
     .
 
 ??? explanation "editMode"

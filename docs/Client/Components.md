@@ -824,7 +824,7 @@ connected via
 
 ???+ abstract "Task"
     Manages the display of a single record, but only as far as an
-    [ActionTemplate](../Functionality/Templates.md)
+    [ActionTemplate](Templates.md)
     has been provided for that table. The action
     template may contain controls that modify fields and save them to the database,
     exactly as
@@ -842,7 +842,7 @@ connected via
     [applyEditTemplate](Lib.md#applyedittemplate)
     to see whether
     there is an action template defined in
-    [Templates](../Functionality/Templates.md)
+    [Templates](Templates.md)
     .
     If yes, that
     template will be applied, if no, nothing will be rendered.
@@ -932,66 +932,69 @@ connected via
     do this to avoid to invoke the costly machinery of editable forms when it is not
     needed.
 
-    The component also shows
-    [save](Components.md#editcontrol)
-    and
-    [reset](Components.md#editcontrol)
-    buttons
-    (if appropriate).
+    ??? explanation "Buttons"
+        The component also shows
+        [save](Components.md#editcontrol)
+        and
+        [reset](Components.md#editcontrol)
+        buttons
+        (if appropriate).
 
-    The component has two render modes: read-only view and edit-view. When a user
-    has edited the form, he can switch to the read only view to see the result. In
-    read-only view, markdown fields are rendered as formatted text, and tags in
-    select controls do not open the choice when you click on it. Instead such a
-    click takes to an item view of that value in its own table.
+    ??? explanation "Readonly and Edit view"
+        The component has two render modes: read-only view and edit-view. When a user
+        has edited the form, he can switch to the read only view to see the result. In
+        read-only view, markdown fields are rendered as formatted text, and tags in
+        select controls do not open the choice when you click on it. Instead such a
+        click takes to an item view of that value in its own table.
 
-    We use
-    [redux-form]({{reduxFormBase}})
-    for displaying forms, filling them
-    out, submitting them, sending the values to the database, validating and
-    normalizing values.
+    ??? explanation "Using Redux-Form"
+        We use
+        [redux-form]({{reduxFormBase}})
+        for displaying forms, filling them
+        out, submitting them, sending the values to the database, validating and
+        normalizing values.
 
-    Although *redux-form* has an awesome functionality, it is far from trivial to
-    get it integrated.
+        Although *redux-form* has an awesome functionality, it is far from trivial to
+        get it integrated.
 
-    The work horses are the
-    [Field]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/)
-    and
-    [FieldArray]({{reduxFormBase}}/{{reduxFormV}}/docs/api/FieldArray.md/)
-    components.
+        The work horses are the
+        [Field]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/)
+        and
+        [FieldArray]({{reduxFormBase}}/{{reduxFormV}}/docs/api/FieldArray.md/)
+        components.
 
-    These elements can be put in an arbitrary component, under a `<form/>` element.
-    The resulting component is enhanced by the
-    [reduxForm()]({{reduxFormBase}}/{{reduxFormV}}/docs/api/ReduxForm.md/)
-    function.
+        These elements can be put in an arbitrary component, under a `<form/>` element.
+        The resulting component is enhanced by the
+        [reduxForm()]({{reduxFormBase}}/{{reduxFormV}}/docs/api/ReduxForm.md/)
+        function.
 
-    The basic flow is this:
+        ??? explanation "Information flow"
+            *   we read the values of a record from the state and pass them to the
+                redux-form component as *initial values*;
+            *   *redux-form* manages its own slice of the state (`form`) and has its own set
+                of actions to respond to user interactions;
+            *   when the user interacts with the form,
+                the work ends up in the `form` slice of the state;
+            *   when the form is *submitted*:
+                *   the current values are sent to the database,
+                    and the updated record is read back from the database;
+                *   the updated values are passed to the form as new initial values
+                *   the form re-initializes itself, and the user can start again;
+            *   when the user interrupts editing the form,
+                and switches to another component, nothing is lost:
+                *   the edits are saved in the state;
+                *   when the form is mounted again, not only the initial values are fetched
+                    back, but also the edit state is restored;
+            *   submitting happens with *auto save*:
+                whenever an input field looses focus, the
+                form is submitted; submitting happens also for those fields in which you can
+                not have a cursor: whenever a field value is changed by a click, the form is
+                submitted.
 
-    *   we read the values of a record from the state and pass them to the redux-form
-        component as *initial values*;
-    *   *redux-form* manages its own slice of the state (`form`) and has its own set
-        of actions to respond to user interactions;
-    *   when the user interacts with the form, the work ends up in the `form` slice of
-        the state;
-    *   when the form is *submitted*:
-        *   the current values are sent to the database, and the updated record is read
-            back from the database;
-        *   the updated values are passed to the form as new initial values
-        *   the form re-initializes itself, and the user can start again;
-    *   when the user interrupts editing the form, and switches to another component,
-        nothing is lost:
-        *   the edits are saved in the state;
-        *   when the form is mounted again, not only the initial values are fetched
-            back, but also the edit state is restored;
-    *   submitting happens with *auto save*: whenever an input field looses focus, the
-        form is submitted; submitting happens also for those fields in which you can
-        not have a cursor: whenever a field value is changed by a click, the form is
-        submitted.
-
-    Hence it is easy to edit two forms at the same time, which can be handy if (s)he
-    edits two contributions that need to have a consistent wording. It is also
-    possible to edit the same records in multiple components on the interface. Both
-    refer to the same underlying state.
+        Hence it is easy to edit two forms at the same time, which can be handy if the user
+        edits two contributions that need to have a consistent wording. It is also
+        possible to edit the same records in multiple components on the interface. Both
+        refer to the same underlying state.
 
 ??? note "Implementation"
     The construction of the actual fields is done by a function `makeFields()`, that
@@ -1007,7 +1010,7 @@ connected via
     [applyEditTemplate](Lib.md#applyedittemplate)
     is called. If it finds a suitable
     template in
-    [Templates](../Functionality/Templates.md)
+    [Templates](Templates.md)
     it will be applied. If not, all fields will
     be displayed in a generic presentation.
 
@@ -1061,7 +1064,7 @@ connected via
     [applyTemplate](Lib.md#applytemplate)
     is
     called. If it finds a suitable template in
-    [Templates](../Functionality/Templates.md)
+    [Templates](Templates.md)
     it will be
     applied. If not, all fields will be displayed in a generic presentation.
 

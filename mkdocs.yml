@@ -134,6 +134,7 @@ extra:
   reduxFormV: 7.1.2
   reduxVideos: https://egghead.io/courses/getting-started-with-redux
   sassDoc: http://sass-lang.com
+  sha: https://www.softwareheritage.org
   shebanq: https://github.com/etcbc/shebanq
   socket: https://socket.io
   socketPython: http://python-socketio.readthedocs.io/en/latest/
@@ -147,6 +148,7 @@ extra:
   wsgi: https://modwsgi.readthedocs.io/en/develop
   yapf: https://github.com/google/yapf 
   yaml: http://www.yaml.org
+  zenodo: https://zenodo.org
 
 nav:
   - Home: 'index.md'
@@ -159,7 +161,6 @@ nav:
   - Functionality:
     - Business: 'Functionality/Business.md'
     - Tables: 'Functionality/Tables.md'
-    - Templates: 'Functionality/Templates.md'
     - Workflow: 'Functionality/Workflow.md'
   - Legacy:
     - Content: 'Legacy/Content.md'
@@ -173,6 +174,7 @@ nav:
   - Client:
     - Components: 'Client/Components.md'
     - Dux: 'Client/Dux.md'
+    - Templates: 'Client/Templates.md'
     - Lib: 'Client/Lib.md'
   - Technology:
     - Tech: 'Technology/Tech.md'
