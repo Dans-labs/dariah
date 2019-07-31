@@ -82,7 +82,7 @@ and components.
     may be deleted or not. A record may be deleted if it has no detail records,
     except those that will be deleted as well. Those are the details which are
     marked as `cascade` in the
-    [data model](../Concepts/Model.md)
+    [data model](../Concepts/Model.md#table-model)
     .
     This function returns a list of
     all non-cascade detail tables that have records linking to the record in

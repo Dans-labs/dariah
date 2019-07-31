@@ -5,17 +5,9 @@ perm:
   insert: public
   delete: office
 
-title: rep
-
 item:
   - year
   - years
-
-sort:
-  - [rep, 1]
-
-fieldOrder:
-  - rep
 
 fieldSpecs:
   rep:

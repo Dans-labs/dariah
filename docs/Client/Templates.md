@@ -26,7 +26,7 @@ The values of fields are natural candidates to act as template variables.
 
 ??? abstract "Problem"
     Looking up a field value might seem a very innocent operation: you retrieve the
-    appropriate document from the database, look up the field in question, and read
+    appropriate record from the database, look up the field in question, and read
     out the value that you find there. Alas, there are several complicating factors:
 
     1.  **That value might be a MongoDB object identifier pointing to a related record.**

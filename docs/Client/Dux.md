@@ -612,7 +612,7 @@ plumbing, hidden behind the walls and under the floors.
         entities (rows), keyed by their database id.
         For each id there is an object containing the field values, an object that
         contains the workflow information, and an object that contains the permissions
-        for that document.
+        for that record.
 
         The entities themselves have a `values` object, with all the field values, keyed
         by field name. Next to the values there is an attribute `complete` that tells
@@ -637,14 +637,14 @@ plumbing, hidden behind the walls and under the floors.
         permissions (table wide).
 
     ??? abstract "details"
-        An array of objects that describe the tables where the detail documents of the main
-        documents are.
+        An array of objects that describe the tables where the detail records of the main
+        records are.
 
     ??? abstract "detailOrder"
-        The display order of the lists of detail documents.
+        The display order of the lists of detail records.
 
     ??? abstract "complete"
-        Whether the table has been retireved complete, or only the titles of the documents.
+        Whether the table has been retireved complete, or only the titles of the records.
 
     ??? abstract "filterList"
         An array of filters that are in force.
@@ -887,7 +887,7 @@ plumbing, hidden behind the walls and under the floors.
     ??? explanation "processStatus"
         Produce a string that contains the current assessment status and review status
         of an assessment. This function can be called from a contribution, an assessment
-        and a review. So for all these kinds of document we can produce a short overview
+        and a review. So for all these kinds of record we can produce a short overview
         of the state they have reached in the assessment / review process.
 
         The outcome has a bit that reveals the assessment status and a bit about the

@@ -30,7 +30,7 @@ class PermApi(object):
       action,
       msgs,
       controller=None,
-      document=None,
+      record=None,
       newValues=None,
       my=False,
       verbose=True,
@@ -79,13 +79,13 @@ class PermApi(object):
     isEditor = False
     isOur = False
     sameCountry = False
-    if document is None:
+    if record is None:
       allowed = self._authorize(perm, asList=True)
     else:
-      isOwn = self._isOwn(table, document)
-      isEditor = self._isEditor(table, document)
-      isOur = self._isRelated(table, document, my)
-      sameCountry = self._sameCountry(table, document)
+      isOwn = self._isOwn(table, record)
+      isEditor = self._isEditor(table, record)
+      isOur = self._isConnected(table, record, my)
+      sameCountry = self._sameCountry(table, record)
       allowed = self._authorize(
           perm,
           asList=False,
@@ -104,7 +104,7 @@ class PermApi(object):
                 'You are not allowed to perform {} on table {}{}'.format(
                     action,
                     table,
-                    '' if document is None else ' on this particular document',
+                    '' if record is None else ' on this particular record',
                 ),
         })
       return (False, None, None)
@@ -112,7 +112,7 @@ class PermApi(object):
     # compute the rowFilter
     if action == N.insert:
       rowFilter = None
-    elif document is None:
+    elif record is None:
       if allowed == 1:
         rowFilter = True
       else:
@@ -142,14 +142,14 @@ class PermApi(object):
       if permF is None and permFset is None:
         continue
       setOnly = False
-      if document is not None:
-        setOnly = document.get(field, None) is None
+      if record is not None:
+        setOnly = record.get(field, None) is None
         if permF == N.ownLT:
-          oldValueId = document.get(field, None)
+          oldValueId = record.get(field, None)
           oldValue = (None if oldValueId is None else self.DB.groupFromId[oid(oldValueId)])
           group = self.group
           if oldValue is not None:
-            uid = document[N._id]
+            uid = record[N._id]
             if uid != self.uid and self.rank[oldValue] >= self.rank[group]:
               if verbose:
                 msgs.append({
@@ -197,7 +197,7 @@ class PermApi(object):
         permF = permFset
       if self._authorize(
           permF,
-          asList=document is None,
+          asList=record is None,
           isOwn=isOwn,
           isEditor=isEditor,
           isOur=isOur,
@@ -206,39 +206,39 @@ class PermApi(object):
         fieldSet.add(field)
     return (True, rowFilter, fieldSet)
 
-  def _isOwn(self, table, document):
+  def _isOwn(self, table, record):
     owners = PM[N.owners]
     ownField = owners.get(table, N.creator)
-    if ownField is None or ownField not in document:
+    if ownField is None or ownField not in record:
       return False
-    return document[ownField] == self.uid
+    return record[ownField] == self.uid
 
-  def _isEditor(self, table, document):
-    if self._isOwn(table, document):
+  def _isEditor(self, table, record):
+    if self._isOwn(table, record):
       return True
-    if N.editors not in document:
+    if N.editors not in record:
       return False
-    return self.uid in set(document[N.editors])
+    return self.uid in set(record[N.editors])
 
-  def _isRelated(self, table, document, my):
+  def _isConnected(self, table, record, my):
     if not my or my is True:
       return False
     related = False
     for ourField in my:
-      if ourField not in document:
+      if ourField not in record:
         continue
-      if self.uid == document[ourField]:
+      if self.uid == record[ourField]:
         related = True
         break
     return related
 
-  def _sameCountry(self, table, document):
-    docCountry = document.get(N.country)
-    if not docCountry:
+  def _sameCountry(self, table, record):
+    recCountry = record.get(N.country)
+    if not recCountry:
       return True
     if not self.ucn:
       return False
-    return self.ucn == docCountry
+    return self.ucn == recCountry
 
   def _authorize(
       self, perm, asList=False, isOwn=None, isEditor=None, isOur=None, sameCountry=None

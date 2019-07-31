@@ -116,36 +116,36 @@ def dbAccess():
   MONGO = clientm.dariah
 
   countries = []
-  for doc in MONGO.country.find():
-    if doc['isMember']:
-      COUNTRY[doc['_id']] = {
-          'iso': doc['iso'],
-          'name': doc['name'],
-          'isMember': doc['isMember'],
+  for rec in MONGO.country.find():
+    if rec['isMember']:
+      COUNTRY[rec['_id']] = {
+          'iso': rec['iso'],
+          'name': rec['name'],
+          'isMember': rec['isMember'],
       }
-      COUNTRI[doc['iso']] = doc['_id']
-  for (docId, doc) in COUNTRY.items():
-    if docId is not None:
-      countries.append((f'{doc["name"]} ({doc["iso"]})', doc['iso'], docId, doc['iso'] == ALL))
+      COUNTRI[rec['iso']] = rec['_id']
+  for (recId, rec) in COUNTRY.items():
+    if recId is not None:
+      countries.append((f'{rec["name"]} ({rec["iso"]})', rec['iso'], recId, rec['iso'] == ALL))
   COUNTRIES = sorted(countries, key=lambda c: '' if c[1] == ALL else c[0])
-  for doc in MONGO.year.find():
-    YEAR[doc['_id']] = doc['rep']
-  for doc in MONGO.vcc.find():
-    VCC[doc['_id']] = doc['rep']
-  for doc in MONGO.typeContribution.find():
-    mainType = doc.get('mainType', '')
-    subType = doc.get('subType', '')
+  for rec in MONGO.year.find():
+    YEAR[rec['_id']] = rec['rep']
+  for rec in MONGO.vcc.find():
+    VCC[rec['_id']] = rec['rep']
+  for rec in MONGO.typeContribution.find():
+    mainType = rec.get('mainType', '')
+    subType = rec.get('subType', '')
     sep = ' / ' if mainType and subType else ''
-    TYPE[doc['_id']] = f'{doc["mainType"]}{sep}{doc["subType"]}'
-  for doc in MONGO.decision.find():
-    DECISION[doc['_id']] = doc['rep']
+    TYPE[rec['_id']] = f'{rec["mainType"]}{sep}{rec["subType"]}'
+  for rec in MONGO.decision.find():
+    DECISION[rec['_id']] = rec['rep']
 
   scoreData = list(MONGO.score.find())
 
-  for doc in MONGO.criteriaEntry.find():
-    aId = doc.get('assessment', None)
+  for rec in MONGO.criteriaEntry.find():
+    aId = rec.get('assessment', None)
     if aId is not None:
-      CRITERIA_ENTRIES.setdefault(aId, []).append(doc)
+      CRITERIA_ENTRIES.setdefault(aId, []).append(rec)
 
   SCORE_MAPPING = {s['_id']: s['score'] for s in scoreData if 'score' in s}
   MAX_SCORE_BY_CRIT = {}
@@ -158,8 +158,8 @@ def dbAccess():
       MAX_SCORE_BY_CRIT[crit] = score
 
 
-def computeScore(aDoc):
-  aId = aDoc['_id']
+def computeScore(aRecord):
+  aId = aRecord['_id']
   myCriteriaData = CRITERIA_ENTRIES.get(aId, [])
   myCriteriaEntries = [(
       cd['criteria'], SCORE_MAPPING.get(cd.get('score', None), 0), MAX_SCORE_BY_CRIT[cd['criteria']]
@@ -474,21 +474,21 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
         contribs = {}
         contribSelection = {}
         countrySelector = ({} if countryId == ALL else {'country': countryId})
-        for doc in MONGO.contrib.find(countrySelector):
-          contribId = doc.get('_id', None)
-          countryId = doc.get('country', None)
+        for rec in MONGO.contrib.find(countrySelector):
+          contribId = rec.get('_id', None)
+          countryId = rec.get('country', None)
           if countryId in COUNTRY:
             countryInfo = COUNTRY[countryId]
             countryRep = f'{countryInfo["name"]} ({countryInfo["iso"]})' if countryInfo else None
           else:
             countryRep = None
-          vccs = doc.get('vcc', [])
+          vccs = rec.get('vcc', [])
           vccRep = ' + '.join(VCC[v] for v in vccs)
-          year = doc.get('year', None)
+          year = rec.get('year', None)
           yearRep = None if year is None else YEAR.get(year, None)
-          typ = doc.get('typeContribution', None)
+          typ = rec.get('typeContribution', None)
           typeRep = None if typ is None else TYPE.get(typ, None)
-          contribSelected = doc.get('selected', None)
+          contribSelected = rec.get('selected', None)
 
           contribs[contribId] = {
               '_id': contribId,
@@ -497,8 +497,8 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
               'vcc': vccRep,
               'year': yearRep,
               'type': typeRep,
-              'title': doc.get('title', None),
-              'cost': doc.get('costTotal', None),
+              'title': rec.get('title', None),
+              'cost': rec.get('costTotal', None),
               'assessed': (ASSESSED_DEFAULT, None),
               'selected': contribSelected,
           }
@@ -507,33 +507,33 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
         assessmentStatus = {}
         assessments = {}
         finalReviewers = {}
-        for doc in MONGO.assessment.find({'contrib': {'$in': list(contribs.keys())}}):
-          aId = doc['_id']
-          assessments[aId] = doc
-          reviewerF = doc.get('reviewerF', None)
+        for rec in MONGO.assessment.find({'contrib': {'$in': list(contribs.keys())}}):
+          aId = rec['_id']
+          assessments[aId] = rec
+          reviewerF = rec.get('reviewerF', None)
           if reviewerF is not None:
             finalReviewers[aId] = reviewerF
         reviews = {}
-        for doc in MONGO.review.find({'assessment': {'$in': list(assessments.keys())}}):
-          reviews[doc['_id']] = doc
-        for rDoc in reviews.values():
-          aId = rDoc['assessment']
-          reviewer = rDoc['creator']
+        for rec in MONGO.review.find({'assessment': {'$in': list(assessments.keys())}}):
+          reviews[rec['_id']] = rec
+        for rRecord in reviews.values():
+          aId = rRecord['assessment']
+          reviewer = rRecord['creator']
           thisStatus = None
           if reviewer == finalReviewers.get(aId, None):
-            decision = rDoc.get('decision', None)
+            decision = rRecord.get('decision', None)
             if DECISION.get(decision, None) == DECISION_REJECT:
               thisStatus = 4
             elif DECISION.get(decision, None) == DECISION_ACCEPT:
               thisStatus = 5
               assessmentScore[aId] = computeScore(assessments[aId])
           assessmentStatus[aId] = 3 if thisStatus is None else thisStatus
-        for (aId, aDoc) in assessments.items():
+        for (aId, aRecord) in assessments.items():
           if aId in assessmentStatus:
             aIndex = assessmentStatus[aId]
           else:
-            aIndex = 2 if aDoc.get('submitted', False) else 1
-          contribId = aDoc['contrib']
+            aIndex = 2 if aRecord.get('submitted', False) else 1
+          contribId = aRecord['contrib']
           assessed = ASSESSED_STATUS[aIndex][0]
           score = assessmentScore[aId] if aId in assessmentScore else None
           contribs[contribId]['assessed'] = (assessed, score)
@@ -646,11 +646,11 @@ def groupList(
 
     headIndex = len(material)
     material.append('-')
-    nDocs = 0
+    nRecords = 0
     nGroups = 0
     cost = 0
     if type(gList) is list:
-      for doc in sorted(
+      for rec in sorted(
           (
               {
                   k: v
@@ -662,12 +662,12 @@ def groupList(
           key=contribKey(sortCol),
           reverse=reverse,
       ):
-        nDocs += 1
+        nRecords += 1
         nGroups += 1
-        cost += doc.get('cost', 0) or 0
+        cost += rec.get('cost', 0) or 0
         material.append(
             formatContrib(
-                doc,
+                rec,
                 editable,
                 thisGroupId,
                 userGroup,
@@ -689,13 +689,13 @@ def groupList(
         newGroupValues = {}
         newGroupValues.update(groupValues)
         newGroupValues[newGroup] = groupValue
-        (nDocsG, costG) = groupMaterial(
+        (nRecordsG, costG) = groupMaterial(
             gList[groupValue],
             depth + 1,
             newGroupValues,
             thisGroupId,
         )
-        nDocs += nDocsG
+        nRecords += nRecordsG
         cost += costG
     groupValuesT = {}
     if depth > 0:
@@ -703,7 +703,7 @@ def groupList(
       groupValuesT[thisGroup] = groupValues[thisGroup]
     # groupValuesT.update(groupValues)
     groupValuesT['cost'] = cost
-    groupValuesT['title'] = colRep('contribution', nDocs)
+    groupValuesT['title'] = colRep('contribution', nRecords)
     groupValuesT['_cn'] = groupValues.get('country', None)
     if depth == 0:
       for g in GROUP_COLS + ['title']:
@@ -727,7 +727,7 @@ def groupList(
         thisGroupId=thisGroupId,
         nGroups=nGroups,
     )
-    return (nDocs, cost)
+    return (nRecords, cost)
 
   groupMaterial(groupedList, 0, {}, 1)
   return (
@@ -780,12 +780,12 @@ def subHeadClass(col, groupSet, subHead, allHead):
   return f' {theClass}' if theClass else ''
 
 
-def disclose(values, colName, userGroup, myCountry, docCountry):
+def disclose(values, colName, userGroup, myCountry, recCountry):
   disclosed = (
       colName != 'cost'
       or
       userGroup in POWER
-      or (userGroup == COORD and myCountry is not None and docCountry == myCountry)
+      or (userGroup == COORD and myCountry is not None and recCountry == myCountry)
   )
   value = values[colName] if disclosed else 'undisclosed'
   return value
@@ -866,7 +866,7 @@ def formatContrib(
       'selected': selected,
       'title': title,
   }
-  docCountry = contrib.get('_cn', None) or values.get('country', None) or chosenCountry
+  recCountry = contrib.get('_cn', None) or values.get('country', None) or chosenCountry
   if depth is not None:
     xGroup = groupOrder[depth] if depth == 0 or depth < groupLen else 'title'
     xName = 'contribution' if xGroup == 'title' else xGroup
@@ -889,13 +889,13 @@ def formatContrib(
       classes['selected'] += ' editable'
   if asTsv:
     columns = '\t'.join((
-        f'{disclose(values, col, userGroup, myCountry, docCountry)}'
+        f'{disclose(values, col, userGroup, myCountry, recCountry)}'
     ) for col in groupOrder)
   else:
     columns = '\n'.join((
         f'<td class="{classes[col]}'
         f'{subHeadClass(col, groupSet, subHead, allHead)}'
-        f'">{disclose(values, col, userGroup, myCountry, docCountry)}</td>'
+        f'">{disclose(values, col, userGroup, myCountry, recCountry)}</td>'
     ) for col in groupOrder)
   if not asTsv:
     hideRep = ' hide' if hide else ''

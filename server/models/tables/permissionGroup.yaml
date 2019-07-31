@@ -5,14 +5,9 @@ perm:
   insert: nobody
   delete: nobody
 
-title: rep
-
 item:
   - permission group
   - permission groups
-
-sort:
-  - [rep, 1]
 
 fieldOrder:
   - rep

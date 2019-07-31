@@ -68,11 +68,14 @@ extra:
   liveBase: https://dariah-beta.dans.knaw.nl
   serverBase: https://github.com/Dans-labs/dariah/blob/master/server
   clientBase: https://github.com/Dans-labs/dariah/blob/master/client
+  docsBase: https://github.com/Dans-labs/dariah/blob/master/docs
   staticBase: https://github.com/Dans-labs/dariah/blob/master/static
+  modelBase: https://github.com/Dans-labs/dariah/blob/master/server/models
   cssBase: https://github.com/Dans-labs/dariah/blob/master/client/src/css
   appBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/app
   libBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/lib
   testBase: https://github.com/Dans-labs/dariah/blob/master/client/src/js/test
+  distBase: https://github.com/Dans-labs/dariah/blob/master/static/dist
   repBase: https://github.com/Dans-labs/dariah/blob/master
   repo: https://github.com/Dans-labs/dariah
   docSite: https://dans-labs.github.io/dariah/
@@ -113,18 +116,23 @@ extra:
   markdownDoc: https://guides.github.com/features/mastering-markdown/
   mern: http://mern.io
   meteor: https://www.meteor.com
+  mkdocs: https://github.com/mkdocs/mkdocs
+  mkdocsmaterial: https://github.com/squidfunk/mkdocs-material
+  mkdocsdans: https://dans-labs.github.io/mkdocs-dans
   mocha: https://mochajs.org
   mongodb: https://docs.mongodb.com
   node: https://nodejs.org
   npm: https://www.npmjs.com
   prettier: https://prettier.io
-  python: https://docs.python.org/3/
+  python: https://www.python.org
+  pythondl: https://www.python.org/downloads
+  pythondocs: https://docs.python.org/3/
   react: https://facebook.github.io/react/docs
   reactDocs: https://facebook.github.io/react/docs
   reactRedux: https://github.com/reactjs/react-redux/blob/master
   reactReduxRepo: https://github.com/reactjs/react-redux
   reactReselect: https://github.com/reactjs/reselect
-  reactRouter: https://github.com/ReactTraining/react-router/blob/v3/docs
+  reactRouter: https://github.com/ReactTraining/react-router
   reactRouterTutorial: https://github.com/reactjs/react-router-tutorial/tree/master
   reactSelect: https://github.com/JedWatson/react-select
   remark: https://github.com/remarkjs/remark

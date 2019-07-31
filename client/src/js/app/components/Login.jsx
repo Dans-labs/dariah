@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 
 import { presentUser } from 'tables'
 import { getMe, fetchMe } from 'me'
@@ -43,4 +42,5 @@ class Login extends Component {
   }
 }
 
-export default connect(getMe)(withRouter(Login))
+export default connect(getMe)(Login)
+//export default connect(getMe)(withRouter(Login))

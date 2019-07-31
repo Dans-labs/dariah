@@ -44,16 +44,22 @@ involved, and complex, and for those one writes dedicated *helpers*.
 We have organized these concerns into *dux* (plural of *duct* or more
 affectionately: *duck*), where a duct is one file of
 [ES6](ES6)
-code that
-exports
+code that exports:
 
-*   *action* creator functions (one or more as named exports); their names
+??? abstract "actions"
+    *action* creator functions (one or more as named exports); their names
     typically start with `handle`, `change`, `fetch`; `fetch` as in
     "asynchronously fetch data from the server".
-*   a single *reducer* function (as the default export);
-*   *selector* functions (one or more as named exports); their names always start
+
+??? abstract "reducer"
+    a single *reducer* function (as the default export);
+
+??? abstract "selectors"
+    *selector* functions (one or more as named exports); their names always start
     with `get`; `get` as in: "get a fragment of the whole state".
-*   *helper* functions (some of which do not have to be exported); quite often
+
+??? abstract "helpers"
+    *helper* functions (some of which do not have to be exported); quite often
     their names start with `compile` as in "compile the state data into something
     that may component can readily consume".
 
@@ -103,61 +109,79 @@ closely so it really makes sense to have all four things in one file.
 
 Currently, these are the dux of this app:
 
-*   [alter](../Client/Dux.md#alter)
-    :
+??? abstract "alter"
+    [alter](../Client/Dux.md#alter)
+     
     show/hide, cycle through *n* alternative representations
     of a piece of user interface; example: widgets that can be expanded and
     collapsed by the user;
-*   [workflow](../Client/Dux.md#workflow)
-    :
-    specialized logic for the assessment and review
-    workflow e.g. to determine what are the active contribution types and
-    assessment criteria at a given point in time;
-*   [docs](../Client/Dux.md#docs)
-    :
+
+??? abstract "docs"
+    [docs](../Client/Dux.md#docs)
+     
     fetch documents, especially markdown ones, and show them in
     two representations: source and formatted;
-*   [filters](../Client/Dux.md#filters)
-    :
+
+??? abstract "filters"
+    [filters](../Client/Dux.md#filters)
+     
     the machinery of faceted and full text filtering of
     entities from tables;
-*   [forms](../Client/Dux.md#forms)
-    :
+
+??? abstract "forms"
+    [forms](../Client/Dux.md#forms)
+     
     the state of all data entry forms in the app; managed by
     [redux-form]({{reduxFormBase}})
     ;
     but other parts of the app need to
     inspect the `form` slice of the state as well;
-*   [grid](../Client/Dux.md#grid)
-    :
+
+??? abstract "grid"
+    [grid](../Client/Dux.md#grid)
+     
     the display state of all lists in grid layout: the sort
     columns and the directions of sorting;
-*   [me](../Client/Dux.md#me)
-    :
+
+??? abstract "me"
+    [me](../Client/Dux.md#me)
+     
     data about the currently logged-in user;
-*   [notes](../Client/Dux.md#notes)
-    :
+
+??? abstract "notes"
+    [notes](../Client/Dux.md#notes)
+     
     the notification system; this is what displays progress
     and error messages; it can be accessed by the user by clicking the unobtrusive
     open circle in the upper right corner of the browser window;
-*   [roots](../Client/Dux.md#roots)
-    :
+
+??? abstract "roots"
+    [roots](../Client/Dux.md#roots)
+     
     combining all the other dux;
-*   [select](../Client/Dux.md#select)
-    :
+
+??? abstract "select"
+    [select](../Client/Dux.md#select)
+     
     the state of all multi-select widgets in the app;
-*   [server](../Client/Dux.md#server)
-    :
+
+??? abstract "server"
+    [server](../Client/Dux.md#server)
+     
     handling asynchronous actions and reporting about
     success, failure and pending requests; it also prevents subsequent requests of
     data between the first request and the arrival of the data;
-*   [settings](../Client/Dux.md#settings)
-    :
+
+??? abstract "settings"
+    [settings](../Client/Dux.md#settings)
+     
     cross-cutting operational parameters, such as
     whether to show or hide the provenance fields (creator, created data, sequence
     of modified-by records);
-*   [tables](../Client/Dux.md#tables)
-    :
+
+??? abstract "tables"
+    [tables](../Client/Dux.md#tables)
+     
     manage all database data that has been fetched from the
     server; in fact, we construct a normalized copy of all tables that contain
     information that is application needs; when more data is needed, the
@@ -165,8 +189,10 @@ Currently, these are the dux of this app:
     state; this slice not only holds the data of the tables, but also the specs of
     them, such as the fields, their types, the relations between tables, the
     master-detail structure, etc.;
-*   [win](../Client/Dux.md#win)
-    :
+
+??? abstract "win"
+    [win](../Client/Dux.md#win)
+     
     react to the resizing of the browser window; earlier stages of
     the application used this to resize certain areas in the application window;
     however, by using new CSS features such as
@@ -175,3 +201,11 @@ Currently, these are the dux of this app:
     not have any real need to make the window size known to the app; this might
     change when the app acquires new functionality, so for the moment we retain
     this mechanism.
+
+??? abstract "workflow"
+    [workflow](../Client/Dux.md#workflow)
+     
+    specialized logic for the assessment and review
+    workflow e.g. to determine what are the active contribution types and
+    assessment criteria at a given point in time;
+

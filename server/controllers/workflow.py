@@ -11,63 +11,63 @@ NA = 'N/A'
 # BASIC RULE COMPUTATION METHODS THAT CAN BE CONFIGURED IN A WORKFLOW
 
 
-def _compute_hasValue(wf, myDoc, otherDocs, w):
+def _compute_hasValue(wf, myRecord, otherRecords, w):
   otherField = w.get(N.otherField, None)
   value = w.get(N.value, None)
 
   return {
       N.on: True
-  } if any(otherDoc.get(otherField, None) == value for otherDoc in otherDocs) else {}
+  } if any(otherRecord.get(otherField, None) == value for otherRecord in otherRecords) else {}
 
 
-def _compute_hasComplete(wf, myDoc, otherDocs, w):
+def _compute_hasComplete(wf, myRecord, otherRecords, w):
   emptyFields = w.get(N.emptyFields, None)
 
   completes = all(
-      all(not _isEmpty(otherDoc.get(emptyField, None))
+      all(not _isEmpty(otherRecord.get(emptyField, None))
           for emptyField in emptyFields)
-      for otherDoc in otherDocs
+      for otherRecord in otherRecords
   )
   return {N.on: True} if completes else {}
 
 
-def _compute_hasIncomplete(wf, myDoc, otherDocs, w):
+def _compute_hasIncomplete(wf, myRecord, otherRecords, w):
   emptyFields = w.get(N.emptyFields, None)
 
   incompletes = [
-      otherDoc.get(N._id)
-      for otherDoc in otherDocs
-      if any(_isEmpty(otherDoc.get(emptyField, None)) for emptyField in emptyFields)
+      otherRecord.get(N._id)
+      for otherRecord in otherRecords
+      if any(_isEmpty(otherRecord.get(emptyField, None)) for emptyField in emptyFields)
   ]
   return {N.on: True, 'n': len(incompletes)} if len(incompletes) > 0 else {}
 
 
-def _compute_hasDifferent(wf, myDoc, otherDocs, w):
+def _compute_hasDifferent(wf, myRecord, otherRecords, w):
   myField = w.get(N.myField, None)
   otherField = w.get(N.otherField, None)
 
   return {
       N.on: True
-  } if any(otherDoc.get(otherField, None) != myDoc.get(myField, None)
-           for otherDoc in otherDocs) else {}
+  } if any(otherRecord.get(otherField, None) != myRecord.get(myField, None)
+           for otherRecord in otherRecords) else {}
 
 
-def _compute_getValues(wf, myDoc, otherDocs, w):
+def _compute_getValues(wf, myRecord, otherRecords, w):
   otherFields = w.get(N.otherFields, [])
 
   return {
       N.items: [{
-          otherField: otherDoc.get(otherField)
+          otherField: otherRecord.get(otherField)
           for otherField in otherFields
-          if otherField in otherDoc
+          if otherField in otherRecord
       }
-          for otherDoc in otherDocs]
+          for otherRecord in otherRecords]
   }
 
 
-def _compute_assessmentScore(wf, myDoc, otherDocs, w):
+def _compute_assessmentScore(wf, myRecord, otherRecords, w):
   MONGO = wf.MONGO
-  if not myDoc:
+  if not myRecord:
     return {}
   scoreData = list(MONGO[N.score].find({}, {N._id: True, N.criteria: True, N.score: True}))
   scoreMapping = {s[N._id]: s[N.score] for s in scoreData if N.score in s}
@@ -80,8 +80,8 @@ def _compute_assessmentScore(wf, myDoc, otherDocs, w):
       maxScoreByCrit[crit] = score
 
   resultItems = []
-  for otherDoc in otherDocs:
-    aId = otherDoc.get(N._id, None)
+  for otherRecord in otherRecords:
+    aId = otherRecord.get(N._id, None)
     if not aId:
       continue
     myCriteriaData = list(
@@ -153,45 +153,45 @@ class WorkflowApi(object):
         if N.workflow not in tableInfo:
           continue
 
-        docs = list(MONGO[table].find())
-        serverprint(f'\tworkflow data... {table} ({len(docs)} docs)')
-        affected.append('reset workflow on {} ({} items)'.format(table, len(docs)))
-        for doc in docs:
-          self.readWorkflow(msgs, table, doc, compute=True)
+        recs = list(MONGO[table].find())
+        serverprint(f'\tworkflow data... {table} ({len(recs)} recs)')
+        affected.append('reset workflow on {} ({} items)'.format(table, len(recs)))
+        for rec in recs:
+          self.readWorkflow(msgs, table, rec, compute=True)
       error = any(msg[N.kind] == N.error for msg in msgs)
       MONGO[N.workflow].insert_one({N.table: N.workflow, 'dateReset': now(), 'affected': affected})
-    wfDocs = []
-    docs = list(MONGO[N.workflow].find({}).sort([['dateReset', -1]]))
+    wfRecords = []
+    recs = list(MONGO[N.workflow].find({}).sort([['dateReset', -1]]))
     attributeCount = {}
     n = 0
-    for doc in docs:
-      if doc.get(N.table, None) == N.workflow:
-        wfDocs.append(doc)
+    for rec in recs:
+      if rec.get(N.table, None) == N.workflow:
+        wfRecords.append(rec)
       else:
         n += 1
-        table = doc.get(N.table, '')
-        for attribute in doc.get(N.attributes, {}):
+        table = rec.get(N.table, '')
+        for attribute in rec.get(N.attributes, {}):
           m = attributeCount.setdefault(attribute, {}).setdefault(table, 0)
           attributeCount[attribute][table] = m + 1
     if init:
       pp.pprint(attributeCount)
-      serverprint('Computed {} workflow records'.format(len(docs)))
+      serverprint('Computed {} workflow records'.format(len(recs)))
     return {
         N.good: not error,
         N.msgs: msgs,
         N.data: {
-            'resets': wfDocs,
+            'resets': wfRecords,
             'stats': attributeCount,
             'total': n
         }
     }
 
-  def readWorkflow(self, msgs, table, myDoc, compute=False):
-    myId = myDoc.get(N._id)
+  def readWorkflow(self, msgs, table, myRecord, compute=False):
+    myId = myRecord.get(N._id)
     if compute:
       result = {}
       for w in DM.get(table, {}).get(N.workflow, {}).get(N.read, []):
-        self._computeWorkflow(msgs, table, myDoc, w, result)
+        self._computeWorkflow(msgs, table, myRecord, w, result)
       if myId:
         self._storeWorkflow(table, myId, result)
     else:
@@ -228,25 +228,25 @@ class WorkflowApi(object):
       updateInfo[N.attributes] = result
       MONGO[N.workflow].update_one(selectInfo, {'$set': updateInfo}, upsert=True)
 
-  def adjustWorkflow(self, msgs, table, document, adjustedValues):
+  def adjustWorkflow(self, msgs, table, record, adjustedValues):
     result = self._applyAdjustWorkflow(
         msgs,
         self._combineAffected(
             self._getAffected(
                 msgs,
                 table,
-                document,
+                record,
                 adjustedValues,
                 w,
             ) for w in DM.get(table, {}).get(N.workflow, {}).get(N.adjust, [])
         ),
     )
-    for (table, docId, attributes) in result:
-      self._storeWorkflow(table, docId, attributes)
+    for (table, recId, attributes) in result:
+      self._storeWorkflow(table, recId, attributes)
 
     return result
 
-  def enforceWorkflow(self, workflow, currentDoc, newDoc, action, msgs):
+  def enforceWorkflow(self, workflow, currentRecord, newRecord, action, msgs):
     if not workflow:
       return True
     allow = True
@@ -267,10 +267,10 @@ class WorkflowApi(object):
           thisAllow = True
           if actionPrevention == getattr(N, 'except'):
             exceptFields = set(attributeMap.get(getattr(N, 'except'), []))
-            for field in set(currentDoc) | set(newDoc):
+            for field in set(currentRecord) | set(newRecord):
               if field in exceptFields:
                 continue
-              if currentDoc.get(field, None) != newDoc.get(field, None):
+              if currentRecord.get(field, None) != newRecord.get(field, None):
                 thisAllow = False
                 msgs.append({
                     N.kind:
@@ -279,14 +279,14 @@ class WorkflowApi(object):
                         'Cannot {} field {} from {} to {}'.format(
                             action,
                             field,
-                            currentDoc.get(field, None),
-                            newDoc.get(field, None),
+                            currentRecord.get(field, None),
+                            newRecord.get(field, None),
                         ),
                 })
           elif actionPrevention:
             for (field, fieldPreventions) in actionPrevention.items():
               if fieldPreventions is True:
-                if currentDoc.get(field, None) != newDoc.get(field, None):
+                if currentRecord.get(field, None) != newRecord.get(field, None):
                   thisAllow = False
                   msgs.append({
                       N.kind: N.error,
@@ -299,7 +299,7 @@ class WorkflowApi(object):
                 for when in (N.before, N.after):
                   if when in fieldPreventions:
                     testValue = fieldPreventions[when]
-                    useSource = (currentDoc if when == N.before else newDoc)
+                    useSource = (currentRecord if when == N.before else newRecord)
                     useValue = useSource.get(field, None)
                     if testValue == useValue:
                       thisAllow = False
@@ -346,7 +346,7 @@ class WorkflowApi(object):
       self,
       msgs,
       table=None,
-      masterDocument=None,
+      masterRecord=None,
   ):
     good = True
     data = None
@@ -354,13 +354,13 @@ class WorkflowApi(object):
       detailData = []
       insertValues = {}
       insertValues[N.submitted] = False
-      if masterDocument is not None:
+      if masterRecord is not None:
         activeItems = self._getActiveItems(msgs)
         criteriaIds = activeItems[N.criteriaIds]
         typeCriteria = activeItems[N.typeCriteria]
         typeIds = activeItems[N.type]
         typeInfo = activeItems[N.typeInfo]
-        masterType = masterDocument.get(N.typeContribution, None)
+        masterType = masterRecord.get(N.typeContribution, None)
         insertValues[N.assessmentType] = masterType
         if masterType is None:
           good = False
@@ -369,8 +369,8 @@ class WorkflowApi(object):
               N.text: 'Contribution has no type',
           })
         else:
-          typeDoc = typeInfo[masterType]
-          typeHead = self._head(N.typeContribution, typeDoc)
+          typeRecord = typeInfo[masterType]
+          typeHead = self._head(N.typeContribution, typeRecord)
           if masterType not in typeIds:
             good = False
             msgs.append({
@@ -402,26 +402,26 @@ class WorkflowApi(object):
     elif table == N.review:
       detailData = []
       insertValues = {}
-      if masterDocument is not None:
-        assessmentId = masterDocument.get(N._id, None)
-        contribId = masterDocument.get(N.contrib, None)
-        masterType = masterDocument.get(N.assessmentType, None)
+      if masterRecord is not None:
+        assessmentId = masterRecord.get(N._id, None)
+        contribId = masterRecord.get(N.contrib, None)
+        masterType = masterRecord.get(N.assessmentType, None)
         insertValues[N.reviewType] = masterType
         insertValues[N.contrib] = contribId
-        criteriaEntryDocs = self.workflowLookup(
+        criteriaEntryRecords = self.workflowLookup(
             N.criteriaEntry,
             {N.assessment: assessmentId},
             {N.seq, N.criteria},
             msgs,
             sort=((N.seq, 1), ),
         )
-        for criteriaEntryDoc in criteriaEntryDocs:
+        for criteriaEntryRecord in criteriaEntryRecords:
           detailData.append({
               N.linkField: N.review,
               N.assessment: assessmentId,
-              N.criteria: criteriaEntryDoc.get(N.criteria, None),
-              N.criteriaEntry: criteriaEntryDoc.get(N._id, None),
-              N.seq: criteriaEntryDoc.get(N.seq, None),
+              N.criteria: criteriaEntryRecord.get(N.criteria, None),
+              N.criteriaEntry: criteriaEntryRecord.get(N._id, None),
+              N.seq: criteriaEntryRecord.get(N.seq, None),
               N.comments: [''],
           })
       data = {
@@ -432,77 +432,77 @@ class WorkflowApi(object):
       }
     return (good, data)
 
-  def consolidateDoc(
+  def consolidateRecord(
       self,
       table,
-      document,
+      record,
       workflow,
       msgs,
   ):
     MONGO = self.MONGO
     if table == N.review:
-      if document.get(N.decision, None):
+      if record.get(N.decision, None):
         consMaterial = {}
         consMap = {}
-        self._consolidate(table, [document], msgs, consMaterial, consMap)
+        self._consolidate(table, [record], msgs, consMaterial, consMap)
         MONGO['{}_{}'.format(table, N.consolidated)].insert_one(consMaterial)
         return (True, consMaterial)
     return (True, None)
 
-  def _consolidate(self, table, documents, msgs, consMaterial, consMap):
+  def _consolidate(self, table, records, msgs, consMaterial, consMap):
     MONGO = self.MONGO
     tableInfo = DM.get(table, {})
     fieldOrder = tableInfo[N.fieldOrder]
     fieldSpecs = tableInfo[N.fieldSpecs]
     detailOrder = tableInfo.get(N.detailOrder, None)
     details = tableInfo.get(N.details, None)
-    docRefs = []
+    recRefs = []
     fmt = '{:>03}'
-    for document in documents:
-      consDoc = {}
-      eId = document.get(N._id, None)
-      docRef = consMap.setdefault(table, {}).get(eId, None)
+    for record in records:
+      consRecord = {}
+      eId = record.get(N._id, None)
+      recRef = consMap.setdefault(table, {}).get(eId, None)
       done = True
-      if docRef is None:
-        docRef = len(consMap[table])
-        consMap[table][eId] = docRef
+      if recRef is None:
+        recRef = len(consMap[table])
+        consMap[table][eId] = recRef
         done = False
-      docRefs.append((table, fmt.format(docRef), self._head(table, document)))
+      recRefs.append((table, fmt.format(recRef), self._head(table, record)))
       if done:
         continue
-      consMaterial.setdefault(table, {})[fmt.format(docRef)] = consDoc
+      consMaterial.setdefault(table, {})[fmt.format(recRef)] = consRecord
       for field in fieldOrder:
-        if field not in document:
-          consDoc[field] = None
+        if field not in record:
+          consRecord[field] = None
           continue
         fieldSpec = fieldSpecs[field]
         valType = fieldSpec[N.valType]
         multiple = fieldSpec[N.multiple]
-        docVal = document[field]
+        recVal = record[field]
         if type(valType) is str:
-          consDoc[field] = docVal
+          consRecord[field] = recVal
         else:
           relTable = valType[N.relTable]
           relTableInfo = DM.get(relTable, {})
           relSort = relTableInfo[N.sort]
-          relatedDocs = list(
+          relatedRecords = list(
               MONGO[relTable].find({
                   N._id: {
-                      '$in': [_id for _id in (docVal if multiple else [docVal])]
+                      '$in': [_id for _id in (recVal if multiple else [recVal])]
                   }
               }).sort(relSort)
           )
-          if len(relatedDocs) == 0:
-            consDoc[field] = None
+          if len(relatedRecords) == 0:
+            consRecord[field] = None
           else:
-            theseDocRefs = self._consolidate(
+            theseRecordRefs = self._consolidate(
                 relTable,
-                relatedDocs,
+                relatedRecords,
                 msgs,
                 consMaterial,
                 consMap,
             )
-            consDoc[field] = theseDocRefs if multiple else theseDocRefs[0]
+            consRecord[field] = theseRecordRefs if multiple else theseRecordRefs[0]
       if detailOrder and details:
         for detail in detailOrder:
           detailSpec = details[detail]
@@ -510,21 +510,21 @@ class WorkflowApi(object):
           linkField = detailSpec[N.linkField]
           detailTableInfo = DM.get(detailTable, {})
           detailSort = detailTableInfo[N.sort]
-          detailDocs = list(MONGO[detailTable].find({linkField: document[N._id]}).sort(detailSort))
-          consDoc.setdefault(N.details, []).append(
+          detailRecords = list(MONGO[detailTable].find({linkField: record[N._id]}).sort(detailSort))
+          consRecord.setdefault(N.details, []).append(
               (detail, self._consolidate(
                   detailTable,
-                  detailDocs,
+                  detailRecords,
                   msgs,
                   consMaterial,
                   consMap,
               ))
           )
-    return docRefs
+    return recRefs
 
 # SELECTOR FUNCTIONS
 
-  def _selectDocsRead(self, msgs, table, myDoc, w):
+  def _selectRecordsRead(self, msgs, table, myRecord, w):
     inspect = w.get(N.inspect, None)
     interField = w.get(N.interField, None)
     interTable = w.get(N.interTable, None)
@@ -533,60 +533,63 @@ class WorkflowApi(object):
     equalField = w.get(N.equalField, None)
 
     if inspect == N.self:
-      otherDocs = [myDoc]
+      otherRecords = [myRecord]
     elif inspect == N.details:
-      otherDocs = self.workflowLookup(
+      otherRecords = self.workflowLookup(
           otherTable,
-          {linkField: myDoc.get(N._id, None)},
+          {linkField: myRecord.get(N._id, None)},
           True,
           msgs,
       )
     elif inspect == N.granddetails:
-      interDocs = self.workflowLookup(
+      interRecords = self.workflowLookup(
           interTable,
-          {interField: myDoc.get(N._id, None)},
+          {interField: myRecord.get(N._id, None)},
           {N._id},
           msgs,
       )
-      otherDocs = self.workflowLookup(
+      otherRecords = self.workflowLookup(
           otherTable,
           {linkField: {
-              '$in': [doc.get(N._id, None) for doc in interDocs]
+              '$in': [rec.get(N._id, None) for rec in interRecords]
           }},
           True,
           msgs,
       )
     elif inspect == N.master:
-      otherDocs = self.workflowLookup(
+      otherRecords = self.workflowLookup(
           otherTable,
-          {N._id: myDoc.get(linkField, None)},
+          {N._id: myRecord.get(linkField, None)},
           True,
           msgs,
       )
     elif inspect == N.grandmaster:
-      interDocs = self.workflowLookup(
+      interRecords = self.workflowLookup(
           interTable,
-          {N._id: myDoc.get(interField, None)},
+          {N._id: myRecord.get(interField, None)},
           {linkField},
           msgs,
       )
-      otherDocs = self.workflowLookup(
+      otherRecords = self.workflowLookup(
           otherTable,
           {N._id: {
-              '$in': [doc.get(linkField, None) for doc in interDocs]
+              '$in': [rec.get(linkField, None) for rec in interRecords]
           }},
           True,
           msgs,
       )
     elif inspect == N.siblings:
-      selectInfo = {linkField: myDoc.get(linkField, None), N._id: {'$ne': myDoc.get(N._id, None)}}
+      selectInfo = {
+          linkField: myRecord.get(linkField, None),
+          N._id: {'$ne': myRecord.get(N._id, None)},
+      }
       if equalField is not None:
-        myEqualValue = myDoc.get(equalField, None)
+        myEqualValue = myRecord.get(equalField, None)
         if myEqualValue is None:
           selectInfo[equalField] = {'$exists': False}
         else:
           selectInfo[equalField] = myEqualValue
-      otherDocs = self.workflowLookup(
+      otherRecords = self.workflowLookup(
           otherTable,
           selectInfo,
           True,
@@ -594,11 +597,11 @@ class WorkflowApi(object):
       )
     else:
       # workflow config error
-      otherDocs = []
+      otherRecords = []
 
-    return otherDocs
+    return otherRecords
 
-  def _selectDocsAdjust(self, msgs, table, myDocs, w):
+  def _selectRecordsAdjust(self, msgs, table, myRecords, w):
     inspect = w.get(N.inspect, None)
     interField = w.get(N.interField, None)
     interTable = w.get(N.interTable, None)
@@ -606,40 +609,40 @@ class WorkflowApi(object):
     otherTable = w.get(N.otherTable, None)
 
     if inspect == N.self:
-      return (table, myDocs)
+      return (table, myRecords)
 
     if inspect == N.self:
-      otherDocs = myDocs
+      otherRecords = myRecords
       otherTable = table
     elif inspect == N.details:
-      otherDocs = self.workflowLookup(
+      otherRecords = self.workflowLookup(
           otherTable,
           {linkField: {
-              '$in': [doc.get(N._id, None) for doc in myDocs]
+              '$in': [rec.get(N._id, None) for rec in myRecords]
           }},
           True,
           msgs,
       )
     elif inspect == N.granddetails:
-      interDocs = self.workflowLookup(
+      interRecords = self.workflowLookup(
           interTable,
           {interField: {
-              '$in': [doc.get(N._id, None) for doc in myDocs]
+              '$in': [rec.get(N._id, None) for rec in myRecords]
           }},
           {N._id},
           msgs,
       )
-      otherDocs = self.workflowLookup(
+      otherRecords = self.workflowLookup(
           otherTable,
           {linkField: {
-              '$in': [doc.get(N._id, None) for doc in interDocs]
+              '$in': [rec.get(N._id, None) for rec in interRecords]
           }},
           True,
           msgs,
       )
     elif inspect == N.master:
-      otherIds = {doc.get(linkField, None) for doc in myDocs}
-      otherDocs = self.workflowLookup(
+      otherIds = {rec.get(linkField, None) for rec in myRecords}
+      otherRecords = self.workflowLookup(
           otherTable,
           {N._id: {
               '$in': list(otherIds)
@@ -648,8 +651,8 @@ class WorkflowApi(object):
           msgs,
       )
     elif inspect == N.grandmaster:
-      interIds = {doc.get(interField, None) for doc in myDocs}
-      interDocs = self.workflowLookup(
+      interIds = {rec.get(interField, None) for rec in myRecords}
+      interRecords = self.workflowLookup(
           interTable,
           {N._id: {
               '$in': list(interIds)
@@ -657,8 +660,8 @@ class WorkflowApi(object):
           {linkField},
           msgs,
       )
-      otherIds = {doc.get(linkField, None) for doc in interDocs}
-      otherDocs = self.workflowLookup(
+      otherIds = {rec.get(linkField, None) for rec in interRecords}
+      otherRecords = self.workflowLookup(
           otherTable,
           {N._id: {
               '$in': list(otherIds)
@@ -667,8 +670,8 @@ class WorkflowApi(object):
           msgs,
       )
     elif inspect == N.siblings:
-      masterIds = {doc.get(linkField, None) for doc in myDocs}
-      otherDocs = self.workflowLookup(
+      masterIds = {rec.get(linkField, None) for rec in myRecords}
+      otherRecords = self.workflowLookup(
           table,
           {
               '$and': [
@@ -679,7 +682,7 @@ class WorkflowApi(object):
                   },
                   {
                       N._id: {
-                          '$nin': [doc.get(N._id, None) for doc in myDocs]
+                          '$nin': [rec.get(N._id, None) for rec in myRecords]
                       }
                   },
               ]
@@ -690,8 +693,8 @@ class WorkflowApi(object):
       otherTable = table
     else:
       # workflow config error
-      otherDocs = []
-    return (otherTable, otherDocs)
+      otherRecords = []
+    return (otherTable, otherRecords)
 
 # HELPERS READ WORKFLOW
 
@@ -702,18 +705,18 @@ class WorkflowApi(object):
           workflowResults[k] = v.format(**workflowResults) if k == N.desc else v
       result[attribute[N.name]] = workflowResults
 
-  def _computeWorkflow(self, msgs, table, myDoc, w, result):
+  def _computeWorkflow(self, msgs, table, myRecord, w, result):
     method = w.get(N.method, None)
     attribute = w.get(N.attribute, None)
 
-    otherDocs = self._selectDocsRead(msgs, table, myDoc, w)
+    otherRecords = self._selectRecordsRead(msgs, table, myRecord, w)
 
-    myWorkflowResults = globals()['_compute_{}'.format(method)](self, myDoc, otherDocs, w)
+    myWorkflowResults = globals()['_compute_{}'.format(method)](self, myRecord, otherRecords, w)
     self._applyReadWorkflow(myWorkflowResults, attribute, result)
 
 # HELPERS ADJUST WORKFLOW
 
-  def _getAffected(self, msgs, table, document, adjustedValues, w):
+  def _getAffected(self, msgs, table, record, adjustedValues, w):
     inspect = w.get(N.inspect, None)
     linkField = w.get(N.linkField, None)
     triggerFields = w.get(N.triggerFields, None)
@@ -721,26 +724,26 @@ class WorkflowApi(object):
     triggers = set(triggerFields)
     if inspect == N.master:
       triggers.add(linkField)
-    if any((document.get(triggerField, None) != adjustedValues.get(triggerField, None))
+    if any((record.get(triggerField, None) != adjustedValues.get(triggerField, None))
            for triggerField in triggers):
-      myDocs = [doc for doc in (document, adjustedValues)]
-      return self._selectDocsAdjust(msgs, table, myDocs, w)
+      myRecords = [rec for rec in (record, adjustedValues)]
+      return self._selectRecordsAdjust(msgs, table, myRecords, w)
     return (None, [])
 
   def _combineAffected(self, affecteds):
     allAffectedMap = {}
-    for (table, docs) in affecteds:
-      for doc in docs:
-        allAffectedMap.setdefault(table, {})[doc.get(N._id, None)] = doc
-    return {table: list(docMap.values()) for (table, docMap) in allAffectedMap.items()}
+    for (table, recs) in affecteds:
+      for rec in recs:
+        allAffectedMap.setdefault(table, {})[rec.get(N._id, None)] = rec
+    return {table: list(recMap.values()) for (table, recMap) in allAffectedMap.items()}
 
   def _applyAdjustWorkflow(self, msgs, allAffected):
     workflowEntries = []
-    for (table, docs) in allAffected.items():
-      for doc in docs:
-        docId = doc.get(N._id, None)
-        workflow = self.readWorkflow(msgs, table, doc, compute=True)
-        workflowEntries.append([table, docId, workflow])
+    for (table, recs) in allAffected.items():
+      for rec in recs:
+        recId = rec.get(N._id, None)
+        workflow = self.readWorkflow(msgs, table, rec, compute=True)
+        workflowEntries.append([table, recId, workflow])
     return workflowEntries
 
 # MISCELLANEOUS FUNCTIONS
@@ -753,7 +756,7 @@ class WorkflowApi(object):
         {N.mainType, N.subType},
         msgs,
     )
-    typeInfo = {doc[N._id]: doc for doc in types}
+    typeInfo = {rec[N._id]: rec for rec in types}
 
     packages = self.workflowLookup(
         N.package,
@@ -768,7 +771,7 @@ class WorkflowApi(object):
         {N.typeContribution},
         msgs,
     )
-    packageIds = [doc[N._id] for doc in packages]
+    packageIds = [rec[N._id] for rec in packages]
     activeFilter = {N.package: {'$in': packageIds}}
     criteria = self.workflowLookup(
         N.criteria,
@@ -779,13 +782,13 @@ class WorkflowApi(object):
     )
     typeCriteria = {}
     criteriaEntities = {}
-    criteriaIds = [doc[N._id] for doc in criteria]
-    for doc in criteria:
-      criteriaEntities[str(doc[N._id])] = doc
-      tps = doc.get(N.typeContribution, [])
+    criteriaIds = [rec[N._id] for rec in criteria]
+    for rec in criteria:
+      criteriaEntities[str(rec[N._id])] = rec
+      tps = rec.get(N.typeContribution, [])
       for tp in tps:
-        typeCriteria.setdefault(tp, set()).add(doc[N._id])
-    typeIds = {tp for doc in packages for tp in doc.get(N.typeContribution, [])}
+        typeCriteria.setdefault(tp, set()).add(rec[N._id])
+    typeIds = {tp for rec in packages for tp in rec.get(N.typeContribution, [])}
     result = {
         N.package: set(packageIds),
         N.type: typeIds,
@@ -796,25 +799,25 @@ class WorkflowApi(object):
     }
     return result
 
-  def _head(self, table, doc):
+  def _head(self, table, rec):
     MONGO = self.MONGO
     methodName = '_head_{}'.format(table)
     method = globals().get(methodName, None)
     if method:
-      return method(doc)
+      return method(rec)
     tableInfo = DM.get(table, {})
     title = tableInfo[N.title]
     fieldSpecs = tableInfo[N.fieldSpecs]
     fieldSpec = fieldSpecs.get(title, {})
     valType = fieldSpec[N.valType]
-    titleValue = doc.get(title, None)
+    titleValue = rec.get(title, None)
     noTitle = 'no {}'.format(title)
     if type(valType) is str:
       head = titleValue or noTitle
     else:
       relTable = valType[N.relTable]
-      relDocs = list(MONGO[relTable].find({N._id: titleValue}))
-      head = self._head(relTable, relDocs[0]) if relDocs else noTitle
+      relRecords = list(MONGO[relTable].find({N._id: titleValue}))
+      head = self._head(relTable, relRecords[0]) if relRecords else noTitle
     return head
 
 
@@ -841,22 +844,22 @@ def _simpleVal(valType, val):
   return result.rstrip('\n')
 
 
-def _head_user(doc):
-  name = doc.get(N.name, '')
-  org = doc.get(N.org, '')
+def _head_user(rec):
+  name = rec.get(N.name, '')
+  org = rec.get(N.org, '')
   if org:
     org = ' ({})'.format(org)
   if name:
     return name + org
-  firstName = doc.get(N.firstName, '')
-  lastName = doc.get(N.lastName, '')
+  firstName = rec.get(N.firstName, '')
+  lastName = rec.get(N.lastName, '')
   if firstName or lastName:
     return '{}{}{}{}'.format(firstName, ' ' if firstName and lastName else '', lastName, org)
-  email = doc.get(N.email, '')
+  email = rec.get(N.email, '')
   if email:
     return email + org
-  eppn = doc.get(N.eppn, '')
-  authority = doc.get(N.authority, '')
+  eppn = rec.get(N.eppn, '')
+  authority = rec.get(N.authority, '')
   if authority:
     authority = ' - {}'.format(authority)
   if eppn:
@@ -864,17 +867,17 @@ def _head_user(doc):
   return '!unidentified user!'
 
 
-def _head_country(doc):
+def _head_country(rec):
   return '{} = {}, {}a DARIAH member'.format(
-      doc.get(N.iso, ''),
-      doc.get(N.name, ''),
-      '' if doc.get(N.isMember, False) else 'not ',
+      rec.get(N.iso, ''),
+      rec.get(N.name, ''),
+      '' if rec.get(N.isMember, False) else 'not ',
   )
 
 
-def _head_typeContribution(doc):
-  mainType = doc.get(N.mainType, '')
-  subType = doc.get(N.subType, '')
+def _head_typeContribution(rec):
+  mainType = rec.get(N.mainType, '')
+  subType = rec.get(N.subType, '')
   sep = ' / ' if mainType and subType else ''
   return '{}{}{}'.format(
       mainType,
@@ -883,8 +886,8 @@ def _head_typeContribution(doc):
   )
 
 
-def _head_score(doc):
-  score = doc.get(N.score, NA)
-  level = doc.get(N.level, NA)
-  description = doc.get(N.description, '')
+def _head_score(rec):
+  score = rec.get(N.score, NA)
+  level = rec.get(N.level, NA)
+  description = rec.get(N.description, '')
   return '{} - {}'.format(score, level) if score or level else description

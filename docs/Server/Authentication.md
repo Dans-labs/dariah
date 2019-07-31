@@ -103,68 +103,12 @@ The attributes `authority` and `group`  contain the necessary information.
     `local` | the user has logged in on the development system. This kind of user should not be present in the production system!
 
 ??? explanation "`group` values"
-    group | comments
-    ----- | --------
-    `public` | unidentified users (the public). No right to edit anything. Can only list/read public information.
-    `auth` | authenticated user. Can add items and then modify/delete them, within limits. Can see DARIAH internal information (within limits). This is the default group for logged-in users.
-    `coord` | National coordinator. Can (de)select contributions and see cost fields. But only for contributions in his own country.
-    `office` | back office users. Can modify records created by others (within limits). Cannot do system-technical things.
-    `system` | system managers. Can modify system-technical records, within limits.
-    `root` | Complete rights. Still there are untouchable things, that would compromise the integrity of the system. Even root cannot modify those.
-    `nobody` | All powerful. You can also destroy the system. Fact: this group has no members.
-
-    ???+ note "pseudo groups"
-        Between `auth` and `coord` there are a few pseudo groups.
-        These groups rely on a relationship between the user and a record in question.
-        They are only in force if the user is authenticated.
-
-        group | comments
-        ----- | --------
-        our | the user is mentioned in specific fields of the record. Which fields? See `ourFields` in the yaml file for that table, e.g. [assessment.yaml]({{serverBase}}/models/tables/assessment.yaml)
-        edit | the user is mentioned in the `editors` field of the record 
-        own | the user is the creator of the record
+    See the
+    [permission model](../Concepts/Model.md#permission-model)
+    .
 
 ??? explanation "`statusLastLogin` values"
     statusLastLogin | comments
     --------------- | --------
     `Approved` | successful login attempt
     `Rejected` | unsuccessful login attempt
-
-??? explanation "assigning users to groups"
-    Once users are in a group, their permissions are known.
-    But there are also permissions to regulate who may assign groups to users.
-    These permissions derive from the groups as well,
-    with a few additional rules:
-
-    *   nobody can assign anybody to the group `nobody`;
-    *   a person can only add people to groups that have at most his/her own power;
-    *   a person can only assign groups to people that have less power than
-        him/herself.
-
-    Examples:
-
-    *   If you are `office`, you cannot promote yourself or anyone else to `system` or
-        `root`.
-    *   If you are `office`, you cannot demote another member of `office` to the group
-        `auth`.
-    *   You cannot demote/promote your peers, or the ones above you.
-    *   You can demote yourself, but not promote yourself.
-    *   You can demote people below you.
-    *   You can promote people below you, but only up to your own level.
-
-??? explanation "the `root` group"
-    A consequence of the promotion/demotion rules is
-    that if there is no user in the group `root`, nobody can be made
-    `root` from within the system.
-
-    When importing data into the system by means of
-    [load.sh]({{staticBase}}/tools/load.sh)
-    you can specify to make a specific
-    user `root`. Which user that is, is specified in
-    [config.yaml]({{staticBase}}/tools/config.yaml)
-    ,
-    see `rootUser`.
-
-    Once the root user is in place, (s)he can assign system admins and back office
-    people. Once those are in place, the daily governance of the system can take
-    place.

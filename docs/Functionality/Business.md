@@ -47,7 +47,7 @@ score, evidence must be given.
 
 ??? abstract "Packages, types, criteria"
     Contribution types and their associated assessment criteria
-    are represented by a *package* document.
+    are represented by a *package* record.
 
     ???+ abstract "What is a package?"
         A **package** is a fixed constellation of types and criteria;
@@ -385,7 +385,7 @@ In those cases, the assessment score is also visible.
         maybe triggered from one tab, without other tabs being aware of that.
 
         In such cases, it would be desirable to send push notifications to all browsers
-        that have that document open so that the user can refresh the page.
+        that have that record open so that the user can refresh the page.
 
         I know it can be done (
         [socket]({{socket}})
@@ -421,3 +421,7 @@ It could be that other approaches serve the goals equally well and prove far mor
         and the
         [Software Heritage Archive]({{sha}})
         .
+
+See also  the
+[Lessons](../About/Lessons.md#this-approach-alternative-approaches)
+.

@@ -44,7 +44,7 @@ class Controller(object):
   def mod(self, name):
     table = getq(N.table)
     action = getq(N.action)
-    return self.DB.modList(name, table, action)
+    return self.DB.modItem(name, table, action)
 
   def wf(self, name):
     reset = getq(N.reset)

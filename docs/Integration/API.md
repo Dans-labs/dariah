@@ -45,7 +45,7 @@ Per entity, the fields can be found under the key `values`.
 
 ### Example 1
 
-[view a collection]({{liveBase}}/api/db/list?table=contrib&complete=true)
+[view a table]({{liveBase}}/api/db/list?table=contrib&complete=true)
 
 ## view
 

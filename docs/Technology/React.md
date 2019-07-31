@@ -485,5 +485,6 @@ Several tricks are employed to make this a really useful library. See the
 However, precisely because of this
 repeated mounting and unmounting caused by routing events, the need arises for
 components to save their states. Especially the ones with a costly state. Here
-is another reason why local state becomes cumbersome. With Redux, this is not a
+is another reason why local state becomes cumbersome.
+With Redux, this is not a
 problem, because state is severed from components.

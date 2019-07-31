@@ -17,7 +17,7 @@ works.
 
 ## [contrib]({{appBase}}/tables/contrib.jsx)
 
-[data model]({{serverBase}}/models/tables/contrib.yaml)
+[data model]({{modelBase}}/tables/contrib.yaml)
 
 ??? abstract "mainAction"
     The status of the assessment/review process is translated into big, clear
@@ -42,7 +42,7 @@ works.
 
 ## [assessment]({{appBase}}/tables/assessment.jsx)
 
-[data model]({{serverBase}}/models/tables/assessment.yaml)
+[data model]({{modelBase}}/tables/assessment.yaml)
 
 ??? abstract "main, mainEdit"
     We move a number of fields from the normal record display to the action
@@ -99,7 +99,7 @@ works.
 
 ## [criteriaEntry]({{appBase}}/tables/contrib.jsx)
 
-[data model]({{serverBase}}/models/tables/criteriaEntry.yaml)
+[data model]({{modelBase}}/tables/criteriaEntry.yaml)
 
 ??? abstract "detail, detailEdit"
     These records are meant to be shown as detail records of an assessment.
@@ -111,7 +111,7 @@ works.
 
 ## [review]({{appBase}}/tables/contrib.jsx)
 
-[data model]({{serverBase}}/models/tables/review.yaml)
+[data model]({{modelBase}}/tables/review.yaml)
 
 ??? abstract "main, mainEdit"
     The biggest task for review templates is to show the reviews
@@ -133,7 +133,7 @@ works.
 
 ## [reviewEntry]({{appBase}}/tables/reviewEntry.jsx)
 
-[data model]({{serverBase}}/models/tables/reviewEntry.yaml)
+[data model]({{modelBase}}/tables/reviewEntry.yaml)
 
 ??? abstract "detail, detailEdit"
     These records are meant to be shown as detail records of a review.

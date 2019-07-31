@@ -272,8 +272,7 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                         'method': 'hasDifferent',
                                                         'myField': 'assessmentType',
                                                         'otherField': 'typeContribution',
-                                                        'otherTable': 'contrib',
-                                                        'value': None},
+                                                        'otherTable': 'contrib'},
                                                       { 'attribute': { 'desc': 'contribution has '
                                                                                'been selected by '
                                                                                'DARIAH',
@@ -298,7 +297,8 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                                        'name': 'score'},
                                                         'inspect': 'self',
                                                         'method': 'assessmentScore'},
-                                                      { 'attribute': { 'desc': 'is being reviewed',
+                                                      { 'attribute': { 'desc': 'has been submitted '
+                                                                               'for review',
                                                                        'except': [ 'submitted',
                                                                                    'reviewerE',
                                                                                    'reviewerF'],
@@ -618,7 +618,8 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                      'method': 'hasValue',
                                                      'otherField': 'selected',
                                                      'value': False},
-                                                   { 'attribute': { 'desc': 'is being reviewed',
+                                                   { 'attribute': { 'desc': 'has been submitted '
+                                                                            'for review',
                                                                     'except': ['selected'],
                                                                     'name': 'locked'},
                                                      'inspect': 'details',
@@ -932,8 +933,9 @@ model = { 'generic': {'noTitle': 'no title', 'systemFields': ['dateCreated', 'cr
                                                              'masterTable': 'assessment',
                                                              'otherTable': 'review',
                                                              'triggerFields': ['score']}],
-                                               'read': [ { 'attribute': { 'desc': 'is being '
-                                                                                  'reviewed',
+                                               'read': [ { 'attribute': { 'desc': 'has been '
+                                                                                  'submitted for '
+                                                                                  'review',
                                                                           'except': ['submitted'],
                                                                           'name': 'locked'},
                                                            'inspect': 'master',

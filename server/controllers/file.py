@@ -7,11 +7,11 @@ from models.compiled.names import N
 STATIC_ROOT = '../static/'
 
 origins = {
-    'tech': '../static/',
+    'tech': STATIC_ROOT,
 }
 
 
-def determine_origin(path):
+def determineOrigin(path):
   root = STATIC_ROOT
   for origin in origins:
     if path.startswith(origin):
@@ -27,11 +27,11 @@ class FileApi(object):
     pass
 
   def static(self, path):
-    (root, fpath) = determine_origin(path)
+    (root, fpath) = determineOrigin(path)
     return send_file(f'{root}/{fpath}')
 
   def json(self, path):
-    (root, fpath) = determine_origin(path)
+    (root, fpath) = determineOrigin(path)
     filepath = f'{root}/{fpath}'
     if os.path.exists(filepath):
       with open(filepath) as fh:

@@ -22,36 +22,6 @@ jsRe = re.compile('<body>(.*)</body>', re.S)
 
 
 def readBundleNames(regime):
-  """Cache busting
-
-  For production, the JS and CSS bundles for the browser
-  have names with a random hash in it, so that an update of
-  the app will trigger all clients to fetch a new version
-  of these bundles instead of relying on their cached versions.
-
-  The server generates the HTML index page that will load these bundles,
-  to we have to fiddle those hashes into the index template.
-
-  We have set up the client build script (webpack) in such a way
-  that the hashed file names are written to DYN_INFO_FILE.
-
-  There are three scenarios for running the DARIAH app:
-  (1) a production build served by a production webserver
-  (2) a production build served by the local flask webserver
-  (3) a develop build served by the webpack devserver
-
-  For cases 1 and 2 we need the hashed filenames, but for case 3 we do not.
-
-  In case (1) the build script for serving will not be run and REGIME will not be set
-  In case (2), use build script with argument "serve":
-    it will set the environment variable REGIME to "develop"
-  In case (3), use build script with argument "servehot":
-    it will set the environment variable REGIME to `hot`
-
-  The DYN_INFO_FILE will be created by the build script for the client with argument:
-    "prod" or "shipcode" : for cases (1) and (2)
-    `hot` : for case (3)
-  """
   if regime == N.hot:
     serverprint('STATIC INFO')
     css = CSS
@@ -113,25 +83,6 @@ class AuthApi(UserApi):
   def debugPrint(self, msg):
     if self.isDevel:
       serverprint(msg)
-
-  def required(self, f):  # decorator
-    unauth = PM[N.unauth]
-    unauthId = self.DB.idFromGroup[unauth]
-
-    def g(*args, **kwargs):
-      self.authenticate()
-      if self.userInfo.get(N.group, unauthId) == unauthId:
-        return {
-            N.data: [],
-            N.msgs: [{
-                N.kind: N.warning,
-                N.text: 'You need to be logged in to get this data'
-            }],
-            N.good: True
-        }
-      return f(*args, **kwargs)
-
-    return g
 
   def authenticate(self, login=False):
     unauth = PM[N.unauth]

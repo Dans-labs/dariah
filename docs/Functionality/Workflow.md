@@ -66,8 +66,8 @@ in many places.
 The principal functions exported are discussed here.
 
 ??? abstract "readWorkflow"
-    Given a document in some table, this function loads the workflow attributes for
-    that document (if any). The attributes are loaded from the workflow table. That
+    Given a record in some table, this function loads the workflow attributes for
+    that record (if any). The attributes are loaded from the workflow table. That
     table has records with fields `table`, `eId` and `attributes`, where `table` and
     `eId` specify exactly which the record in question is, and `attributes` is a
     dictionary of all workflow data for that record that is currently stored.
@@ -84,7 +84,7 @@ The principal functions exported are discussed here.
     [data model](../Concepts/Model.md)
     ,
     in the individual
-    [tables]({{serverBase}}/models/tables)
+    [tables]({{modelBase}}/tables)
     ,
     under the key
     `workflow/read`.
@@ -92,11 +92,11 @@ The principal functions exported are discussed here.
     There you find a sequence of instructions by which the system can compute
     workflow attributes for each record in a table.
 
-    All instructions specify a list of other documents to 
-    [inspect](#inspecting-other-documents)
+    All instructions specify a list of other records to 
+    [inspect](#inspecting-other-records)
     and a method to
     [compute](#computing-attributes)
-    a value from the inspected documents.
+    a value from the inspected records.
 
     ??? example "assessment submission"
         As an example, we show an instruction for a contribution record
@@ -104,7 +104,7 @@ The principal functions exported are discussed here.
         it delivers the workflow attribute `locked`.
 
         The
-        [contrib model]({{serverBase}}/models/tables/contrib.yaml)
+        [contrib model]({{modelBase}}/tables/contrib.yaml)
         specifies:
 
         ```yaml
@@ -136,7 +136,7 @@ The principal functions exported are discussed here.
         This is an instruction to look into the detail record(s) of the current record.
         Other possible values are:
         `master`, `self`, with obvious meanings.
-        [Inspecting other Documents](#inspecting-other-documents)
+        [Inspecting other records](#inspecting-other-records)
         below.
 
             method: hasValue
@@ -191,7 +191,7 @@ The principal functions exported are discussed here.
     ,
     in
     the individual
-    [tables]({{serverBase}}/models/tables)
+    [tables]({{modelBase}}/tables)
     ,
     under the key
     `workflow/adjust`.
@@ -201,14 +201,14 @@ The principal functions exported are discussed here.
     of the details. The system is not clever enough to generate these adjust rules
     itself. We have to do that.
 
-    For this, one can specify rules that define `triggerFields` for collections of
+    For this, one can specify rules that define `triggerFields` for sets of
     related records. When one of those trigger fields get changed, all specified
     related records will get their workflow attributes recomputed.
 
     ??? example "assessment submission"
         Let us look at the same example, but now at its `adjust` rule
         in the
-        [assessment table]({{serverBase}}/models/tables/assessment.yaml)
+        [assessment table]({{modelBase}}/tables/assessment.yaml)
 
         ```yaml
         adjust:
@@ -354,43 +354,43 @@ The principal functions exported are discussed here.
     resets since the web server was last started, and gives an overview of the
     recomputed workflow attributes.
 
-## Inspecting other documents
+## Inspecting other records
 
 Both `readWorkflow` and `adjustWorkflow` have instructions to look up related
-documents and then apply a computing method to all those documents.
+records and then apply a computing method to all those records.
 
-The target documents can be specified with these instructions:
+The target records can be specified with these instructions:
 
 ??? abstract "self"
     Don't look further, look at yourself. The information from which
-    workflow attributes are to be derived, is already present in the document
+    workflow attributes are to be derived, is already present in the record
     itself.
 
 ??? abstract "master"
-    Look at your master document. A document can have multiple masters,
+    Look at your master record. A record can have multiple masters,
     so you have to specify
 
     *   `linkField`: the field in yourself that points to the master,
-    *   `otherTable`: the table in which the master document resides.
+    *   `otherTable`: the table in which the master record resides.
 
 ??? abstract "grandmaster"
-    Look at the master of your master document.
+    Look at the master of your master record.
     You have to specify
 
     *   `interField`: the field in yourself that points to the intermediate master,
-    *   `interTable`: the table in which the intermediate master document resides,
+    *   `interTable`: the table in which the intermediate master record resides,
     *   `linkField`: the field in the intermediate master that points to the grandmaster,
-    *   `otherTable`: the table in which the grandmaster document resides.
+    *   `otherTable`: the table in which the grandmaster record resides.
 
 ??? abstract "details"
-    Look at your detail documents. A document can have multiple kinds of
+    Look at your detail records. A record can have multiple kinds of
     details, so you have to specify
 
     *   `otherTable`: the table that holds the details, and the
-    *   `linkField`: the field in the detail document that points to you.
+    *   `linkField`: the field in the detail record that points to you.
 
 ??? abstract "granddetails"
-    Look at details of your detail documents.
+    Look at details of your detail records.
     You have to specify
 
     *   `interTable`: the table that holds the intermediate details,
@@ -407,27 +407,27 @@ The target documents can be specified with these instructions:
 
 ## Computing attributes
 
-When the other documents have been found, it is time to extract information from
+When the other records have been found, it is time to extract information from
 them, in order to put it into workflow attributes. There is a limited set of
 functions you can call, they are all listed in
 [worklow.py]({{serverBase}}/controllers/workflow.py)
 and their names start
 with `_compute_`. Below we name them without this prefix.
 
-In the specifications we refer to the starting document(s) as *my document(s)* and to the
-reference documents as *other document(s)*.
+In the specifications we refer to the starting record(s) as *my record(s)* and to the
+reference records as *other record(s)*.
 
 ??? abstract "hasValue"
     Takes
 
-    * `otherField`: the name of a field in an other document whose value is to be retrieved;
+    * `otherField`: the name of a field in an other record whose value is to be retrieved;
     * `value`: a reference value.
 
     Returns `{'on': True }` if one of the retrieved values is equal to the reference value.
 
     ??? example "assessment checks whether contribution is selected"
         The
-        [assessment model]({{serverBase}}/models/tables/assessment.yaml)
+        [assessment model]({{modelBase}}/tables/assessment.yaml)
         specifies:
 
         ```yaml
@@ -442,7 +442,7 @@ reference documents as *other document(s)*.
             desc: contribution has been selected by DARIAH
         ```
 
-        In words: look up the `selected` field in a master `contrib` document, and if the
+        In words: look up the `selected` field in a master `contrib` record, and if the
         value there is `true`, add the `on: true` setting to the `frozen` attribute.
 
         If the client sees this attribute, it can put a message on the interface that 
@@ -451,14 +451,15 @@ reference documents as *other document(s)*.
 ??? abstract "hasComplete"
     Takes
 
-    *   `emptyFields`: a list of field names in the other document
+    *   `emptyFields`: a list of field names in the other record
         to be checked for emptiness.
 
-    Returns `{'on': True}` if all of the other docs have no empty field among the `emptyFields`.
+    Returns `{'on': True}` if all of the other records
+    have no empty field among the `emptyFields`.
 
     ??? example "review checks whether decision has been taken"
         The
-        [review model]({{serverBase}}/models/tables/review.yaml)
+        [review model]({{modelBase}}/tables/review.yaml)
         specifies:
 
         ```yaml
@@ -473,7 +474,7 @@ reference documents as *other document(s)*.
               - decision
         ```
 
-        In words: a review document inspects its own `decision` field to see if it is non-empty.
+        In words: a review record inspects its own `decision` field to see if it is non-empty.
         If so, it adds the `on: true` setting to the `completed` attribute.
 
         Note that a `completed.on` attribute prevents updates, but that in ghis case updates to the
@@ -485,15 +486,15 @@ reference documents as *other document(s)*.
 ??? abstract "hasInComplete"
     Takes
 
-    *   `emptyFields`: a list of field names in the other document
+    *   `emptyFields`: a list of field names in the other record
         to be checked for emptiness.
 
-    Returns `{'on': True, 'n': n }` if one of the other docs has an empty field
-    among the `emptyFields`. If so, `n` is the number of such docs.
+    Returns `{'on': True, 'n': n }` if one of the other records has an empty field
+    among the `emptyFields`. If so, `n` is the number of such records.
 
     ??? example "assessment checks whether some criteria have not yet been completely filled in"
         The
-        [assessment model]({{serverBase}}/models/tables/assessment.yaml)
+        [assessment model]({{modelBase}}/tables/assessment.yaml)
         specifies:
 
 
@@ -510,7 +511,7 @@ reference documents as *other document(s)*.
             desc: 'some criteria lack a score or evidence ({n}x)'
         ```
 
-        In words: a review document inspects its own `decision` field to see if it is non-empty.
+        In words: a review record inspects its own `decision` field to see if it is non-empty.
         If so, it adds the `on: true` setting to the `completed` attribute.
 
         Note that a `completed.on` attribute prevents updates, but that in ghis case updates to the
@@ -522,15 +523,15 @@ reference documents as *other document(s)*.
 ??? abstract "hasDifferent"
     Takes
 
-    * `otherField`: the name of a field in an other document whose value is to be retrieved;
-    * `myField`: the name of a field in my document whose value is to be retrieved; 
+    * `otherField`: the name of a field in an other record whose value is to be retrieved;
+    * `myField`: the name of a field in my record whose value is to be retrieved; 
 
-    Returns `{'on': True }` if a value from an other document is different from a value
-    from my document.
+    Returns `{'on': True }` if a value from an other record is different from a value
+    from my record.
 
     ??? example "assessment checks whether its contribution type agrees with that of its contribution"
         The
-        [assessment model]({{serverBase}}/models/tables/assessment.yaml)
+        [assessment model]({{modelBase}}/tables/assessment.yaml)
         specifies:
 
 
@@ -546,8 +547,8 @@ reference documents as *other document(s)*.
             desc: assessment type is different from contribution type
         ```
 
-        In words: an assessment document compares its own `assessmentType` with
-        the `typeContribution` of its contribution document.
+        In words: an assessment record compares its own `assessmentType` with
+        the `typeContribution` of its contribution record.
 
         If so, it adds the `on: true` setting to the `stalled` attribute.
 
@@ -560,7 +561,7 @@ reference documents as *other document(s)*.
 ??? abstract "getValues"
     Takes
 
-    * `otherFields`: a list of fields in an other document whose values are to be retrieved;
+    * `otherFields`: a list of fields in an other record whose values are to be retrieved;
 
     Returns
 
@@ -576,18 +577,18 @@ reference documents as *other document(s)*.
     where
 
     `value1a` and `value2a` are
-    values for the other fields found in the first other doc,
+    values for the other fields found in the first other record,
 
     and
 
     `value1a` and `value2a` are
-    values for the other fields found in the second other doc,
+    values for the other fields found in the second other record,
 
-    and so on for all other docs.
+    and so on for all other records.
 
     ??? example "assessment gathers the creators and decisions of its reviews"
         The
-        [assessment model]({{serverBase}}/models/tables/assessment.yaml)
+        [assessment model]({{modelBase}}/tables/assessment.yaml)
         specifies:
 
         ```yaml
@@ -603,7 +604,7 @@ reference documents as *other document(s)*.
             desc: reviews of this same assessment
         ```
 
-        In words: an assessment document looks into its associated review documents
+        In words: an assessment record looks into its associated review records
         and reads off their creators and decisions.
 
 ??? abstract "assessmentScore"
@@ -636,7 +637,7 @@ reference documents as *other document(s)*.
 
     ??? example "contrib gathers the assessment scores of its assessments"
         The
-        [contrib model]({{serverBase}}/models/tables/contrib.yaml)
+        [contrib model]({{modelBase}}/tables/contrib.yaml)
         specifies:
 
         ```yaml
@@ -649,7 +650,7 @@ reference documents as *other document(s)*.
             desc: assessment score
         ```
 
-        In words: a contrib document looks into its associated assessment documents
+        In words: a contrib record looks into its associated assessment records
         and computes their score details and stores the resulting dictionaries in the
         `score` workflow attribute.
 
@@ -661,7 +662,7 @@ reference documents as *other document(s)*.
 
         Here is a fragment of the contribution template that reads the workflow information
         (look at `w('score')`; `w()` is a function to read out workflow attributes for the 
-        document in question):
+        record in question):
 
         ```javascript
         if (approved) {
@@ -683,6 +684,64 @@ reference documents as *other document(s)*.
         They are passed as properties to the [ScoreBox](../Client/Components#scorebox)
         component, which produces a nicely rendered representation of the assessment score.
 
+## Hooks
+
+There are a few hard coded workflow functions that perform special actions.
+They will be hooked in from other parts of the server code, especially data access.
+
+??? abstract "getActiveItems()"
+    ```python
+    getActiveItems()
+    ```
+
+    ??? explanation "task"
+        Calculates the active package, and from there the active types and criteria,
+        given the current time. This is the backdrop for any assessment and review
+        action.
+
+??? abstract "detailInsert()"
+    ```python
+    detailInsert(msgs, table=None, masterRecord=None)
+    ```
+
+    ??? explanation "task"
+        Hard-coded instruction to add
+
+        *   `criteriaEntry` detail records after inserting an `assessment` record
+        *   `reviewEntry` detail records after inserting an `review` record
+
+        In both cases, some business logic is coded to get the right amount
+        of details and to prefill them with sensible values, and to
+        check for error conditions.
+
+    ??? details
+        It needs to deliver a dictionary of insertValues (field=value pairs) and a
+        dictionary of detail records, keyed by detail table name.
+        The values are lists of field=value dictionaries.
+        Before
+        [db](#db)
+        will proceed to insert them, the
+        detail records will get the id of the just inserted main record. This will be
+        used as masterId when the details get inserted.
+
+??? abstract "consolidateRecord()"
+    ```python
+    consolidateRecord(table, record, workflow, msgs)
+    ```
+
+    ??? explanation "task"
+        Hard-coded instruction to consolidate contribution records and all its
+        detail assessment, criteriaEntry, review, and reviewEntry records.
+
+        This happens only when a contribution is (de)selected by a national
+        coordinator and/or a backoffice person.
+
+        The relevant workflow attributes are taken into account and serialized.
+
+        A provenance trail is added to the consolidated record:
+        who (de)selected the contribution and the time of (de)selection and the
+        time of consolidation.
+
 ## Wiring
 
 Let us finish with an example, to show the intricate wiring of data that is
@@ -695,9 +754,9 @@ going on in the workflow system.
     their assessments and reviews, each with their detail records of criteria
     entries (in the self-assessment) and review entries (in the reviews).
 
-    ???+ abstract "documents"
+    ???+ abstract "records"
         The coloured squares are particular records in the contribution, assessment,
-        review, etc. collections. We only mention the fields that play a role in the
+        review, etc. tables. We only mention the fields that play a role in the
         workflow.
 
     ???+ abstract "workflow attributes"
