@@ -7,7 +7,7 @@ It requires logic at the client side and at the server side.
 
 ## Client
 For this we use the
-[React Router]({{reactRouter}})
+[React Router](../Technology/React.md#routing)
 .
 
 ??? abstract "Entry point"
@@ -65,30 +65,34 @@ like the DARIAH app, as visualized by the diagram above.
     path, and we cannot expect the server to know those paths. The best the server
     can do is to send the whole app again.
 
-### Special behaviour
+??? abstract "Special behaviour"
 
-There are a few exceptions, though:
+There are a few special patterns, though:
 
-#### Static ###
+??? abstract "Static files"
+    If the URL points to a static file, i.e. a file under
+    [`/static/`]({{staticBase}})
+    ,
+    the server
+    will respond with the file contents.
 
-If the URL points to a static file, i.e. a file under
-[`/static/`]({{staticBase}})
-,
-the server
-will respond with the file contents. Otherwise there was no way to serve the
-static JavaScript app in the first place.
+    Otherwise there was no way to serve the
+    static JavaScript app in the first place.
 
-#### Api ###
+??? abstract "Api requests"
+    If the URL points to `/api/`, the server will respond in a variety of ways,
+    depending on the rest of the URL.
 
-If the URL points to `/api/`, the server will respond in a variety of ways,
-depending on the rest of the URL. By means of these `/api/` URLs the client can
-ask for additional data services, from file system or database. The server side
-routing in
-[index.py]({{serverBase}}/index.py)
-maps these URLs to specific
-controllers that fetch and assemble the requested data.
+    By means of these `/api/` URLs the client can
+    ask for additional data services,
+    from file system or database.
 
-Not only the client app can access this
-[api](../Integration/API.md)
-,
-you can too.
+    The server side routing in
+    [index.py]({{serverBase}}/index.py)
+    maps these URLs to specific
+    controllers that fetch and assemble the requested data.
+
+    Not only the client app can access this
+    [api](../Integration/API.md)
+    ,
+    you can too.

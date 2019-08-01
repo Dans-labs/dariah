@@ -4,10 +4,10 @@
 
 what | where
 --- | ---
-source code GitHub repository | [{{repo}}]({{repo}})
-tech doc GitHub Pages | [{{docSite}}]({{docSite}})
-tech doc source | [{{docsBase}}]({{docsBase}})
-app live | [{{liveBase}}]({{liveBase}})
+source code GitHub repository | {{repo}}
+tech doc GitHub Pages | {{docSite}}
+tech doc source | {{docsBase}}
+app live | {{liveBase}}
 
 ## Python
 
@@ -17,7 +17,7 @@ This app needs
 version at least 3.6.3.
 
 ??? details "development"
-    Install it from [{{pythondl}}]({{pythondl}}).
+    Install it from {{pythondl}}.
 
     The list of Python dependencies to be `pip`-installed is in
     [requirements.txt]({{serverBase}}/config/requirements.txt)
@@ -36,7 +36,7 @@ version at least 3.6.3.
 ??? details "production"
     Python can be installed by means of the package manager.
 
-    ```
+    ```sh
     yum install rh-python36 rh-python36-python-pymongo rh-python36-mod_wsgi
     scl enable rh-python36 bash
     cp /opt/rh/httpd24/root/usr/lib64/httpd/modules/mod_rh-python36-wsgi.so modules
@@ -334,7 +334,7 @@ The build tool is
             so that after this you can deploy on the server by means
             of a single call of
 
-            ``sh
+            ```sh
             ./update.sh
             ```
 
@@ -407,8 +407,8 @@ The app itself gives access to documentation:
 
 what | where
 --- | --
-live | [{{docSite}}]({{docSite}})
-source | [{{docsBase}}]({{docsBase}})
+live | {{docSite}}
+source | {{docsBase}}
 
 not only for end users, but also
 for developers and app-designers.

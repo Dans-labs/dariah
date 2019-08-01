@@ -59,7 +59,9 @@ plumbing, hidden behind the walls and under the floors.
     orchestrate what happens at multiple slices of the state, all that is needed is
     in fact just an extra response of an other sub-reducer.
 
-## [alter]({{appBase}}/dux/alter.js)
+## alter
+
+See [alter]({{appBase}}/dux/alter.js).
 
 ???+ explanation
     A mechanism for switching between alternative representations of a component,
@@ -121,7 +123,9 @@ plumbing, hidden behind the walls and under the floors.
     `alterSection` and be shielded from updates in the components that belong to
     other `alterSections`.
 
-## [docs]({{appBase}}/dux/docs.js)
+## docs
+
+See [docs]({{appBase}}/dux/docs.js).
 
 ???+ explanation
     Manages Markdown documents. Fetches raw source from the server and stores it
@@ -148,7 +152,9 @@ plumbing, hidden behind the walls and under the floors.
         Check whether a component has new props in such a way that a new document should
         be fetched.
 
-## [filters]({{appBase}}/dux/filters.js)
+## filters
+
+See [filters]({{appBase}}/dux/filters.js).
 
 ???+ explanation
     Supports the display of filtered lists, where there is a bunch of filters and a
@@ -275,7 +281,9 @@ plumbing, hidden behind the walls and under the floors.
         Looks if all facets are checked, or all unchecked, of none of both. Used to
         steer the *collective* checkbox that governs all facets.
 
-## [forms]({{appBase}}/dux/forms.js)
+## forms
+
+See [forms]({{appBase}}/dux/forms.js).
 
 ???+ explanation
     The `forms` slice of the state is under control of the
@@ -300,7 +308,9 @@ plumbing, hidden behind the walls and under the floors.
         function to turn the keys into a set. So, if the set of keys is asked repeatedly
         without having been changed, exactly the same set object is being returned.
 
-## [grid]({{appBase}}/dux/grid.js)
+## grid
+
+See [grid]({{appBase}}/dux/grid.js).
 
 ???+ explanation
     This dux support grid views of tables, by managing sorting information of the
@@ -333,7 +343,9 @@ plumbing, hidden behind the walls and under the floors.
         This function actually applies a given sort order to a list of ids of items from
         a table.
 
-## [me]({{appBase}}/dux/me.js)
+## me
+
+See [me]({{appBase}}/dux/me.js).
 
 ???+ explanation
     Powers the login widget, top right on the screen, realized by the component
@@ -371,7 +383,9 @@ plumbing, hidden behind the walls and under the floors.
         [Login](Components.md#login)
         component is interested in it.
 
-## [notes]({{appBase}}/dux/notes.js)
+## notes
+
+See [notes]({{appBase}}/dux/notes.js).
 
 ???+ explanation
     Powers the notification widget, top right on the screen, realized by the
@@ -422,7 +436,9 @@ plumbing, hidden behind the walls and under the floors.
         component, the index of the last
         important notification message is also computed, and its kind.
 
-## [roots]({{appBase}}/dux/roots.js)
+## roots
+
+See [roots]({{appBase}}/dux/roots.js).
 
 ???+ explanation
     Top level management of the state: initialization and combination of all the
@@ -439,7 +455,9 @@ plumbing, hidden behind the walls and under the floors.
     Combines all slices of the state and combines all reducers that work their own
     slice of the state into the *root reducer*, that operates on the whole state.
 
-## [select]({{appBase}}/dux/select.js)
+## select
+
+See [select]({{appBase}}/dux/select.js).
 
 ???+ explanation
     Manages the UI-state of the
@@ -476,7 +494,9 @@ plumbing, hidden behind the walls and under the floors.
         Initializes the state for a specific select control. This is an initialization
         *per tag*.
 
-## [server]({{appBase}}/dux/server.js)
+## server
+
+See [server]({{appBase}}/dux/server.js).
 
 ???+ explanation
     Here all interaction with the server is managed. All activity that involves
@@ -531,7 +551,9 @@ plumbing, hidden behind the walls and under the floors.
     [notes](#notes)
     reducer, where they result in notifications.
 
-## [settings]({{appBase}}/dux/settings.js)
+## settings
+
+See [settings]({{appBase}}/dux/settings.js).
 
 ???+ explanation
     Cross cutting settings for the app are defined here. The `settings` slice of the
@@ -548,7 +570,9 @@ plumbing, hidden behind the walls and under the floors.
     ??? explanation "getSettings"
         Returns the `settings` slice of the state.
 
-## [tables]({{appBase}}/dux/tables.js)
+## tables
+
+See [tables]({{appBase}}/dux/tables.js).
 
 ???+ explanation
     Manages database data from the server. It keeps a normalized copy of the data.
@@ -675,7 +699,7 @@ plumbing, hidden behind the walls and under the floors.
         updated.
 
         But the
-        [lodash mergeWith]({{lodash}}/#mergewith)
+        [lodash mergeWith]({{lodash}}#mergewith)
         makes this a breeze.
 
         Unfortunately, this library does not always leave unchanged values untouched,
@@ -764,7 +788,9 @@ plumbing, hidden behind the walls and under the floors.
         [browserHistory]({{reactRouterTutorial}}/lessons/10-clean-urls)
         .
 
-## [win]({{appBase}}/dux/win.js)
+## win
+
+See [win]({{appBase}}/dux/win.js).
 
 ???+ explanation
     Reacts to window resizing by the user. It will deliver the new window size after
@@ -792,7 +818,9 @@ plumbing, hidden behind the walls and under the floors.
         Returns the `win` slice of the state, which is just the current width and height
         of the browser window.
 
-## [workflow]({{appBase}}/dux/workflow.js)
+## workflow
+
+See [workflow]({{appBase}}/dux/workflow.js).
 
 ???+ explanation
     A lot of the logic of showing lists, items, related items and fields is purely

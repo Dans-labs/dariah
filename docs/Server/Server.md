@@ -23,7 +23,9 @@ server side.
         bypasses the regular data access methods, and peeks straight into the 
         MongoDB data. 
 
-## [perm]({{serverBase}}/controllers/perm.py)
+## perm
+
+See [perm]({{serverBase}}/controllers/perm.py).
 
 Contains the methods to compute permissions for controllers, tables and fields.
 Here are the main methods.
@@ -118,7 +120,9 @@ Here are the main methods.
             If all or part of the fields are permitted,
             the set of permitted fields is returned.
 
-## [db]({{serverBase}}/controllers/db.py)
+## db
+
+See [db]({{serverBase}}/controllers/db.py).
 
 This is the data access module. It uses the
 [data model](../Concepts/Model.md)
@@ -338,7 +342,7 @@ the current user is not entitled to see.
             [assessment model]({{modelBase}}/tables/assessment.yaml)
             has
 
-            ```yaml
+            ```yaml hl_lines="12"
             details:
               criteriaEntry:
                 table: criteriaEntry
@@ -385,7 +389,9 @@ the current user is not entitled to see.
                 For those days, it keeps for each person that modified on that day the
                 last modification time.
 
-## [user]({{serverBase}}/controllers/user.py)
+## user
+
+See [user]({{serverBase}}/controllers/user.py).
 
 Contains the logic needed to maintain the user table.
 The `eppn` attribute is key to identify users.
@@ -418,7 +424,9 @@ It is the name by which they are identified by the DARIAH identity provider.
         Or, if there is already an entry for this user,
         that entry is updated with the new information gathered.
 
-## [auth]({{serverBase}}/controllers/auth.py)
+## auth
+
+See [auth]({{serverBase}}/controllers/auth.py).
 
 Contains the methods to authenticate users. Here all the logic about user
 sessions and session cookies is written down. It builds on the Flask web
@@ -517,7 +525,9 @@ And it (re)computes all workflow attributes of all records in the database from 
         Clears the info of the current user and if that user has been identified
         by the DARIAH identity provider, the corresponding session will be deleted.
 
-## [file]({{serverBase}}/controllers/file.py)
+## file
+
+See [file]({{serverBase}}/controllers/file.py).
 
 Contains the methods to get file data from the server.
 
@@ -554,13 +564,17 @@ Contains the methods to get file data from the server.
         Reads the file identified by `path` on the server and sends its contents,
         wrapped as JSON data over HTTP to the client.
 
-## [workflow]({{serverBase}}/controllers/workflow.py)
+## workflow
+
+See [workflow]({{serverBase}}/controllers/workflow.py).
 
 Implements the [workflow engine](../Functionality/Workflow.md) which
 takes care of various aspects of the business logic, just above the level
 of data fetching and permissions.
 
-## [info]({{serverBase}}/controllers/info.py)
+## info
+
+See [info]({{serverBase}}/controllers/info.py).
 
 This module is reponsible for an overview of the statistics
 of the contributions.
@@ -578,7 +592,9 @@ can (de)select contributions from this page.
       contributions from their own country.
       Backoffice users can modify any selection decision.
 
-## [utils]({{serverBase}}/controllers/utils.py)
+## utils
+
+See [utils]({{serverBase}}/controllers/utils.py).
 
 Low level stuff.
 

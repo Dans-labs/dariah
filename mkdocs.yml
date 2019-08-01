@@ -112,7 +112,7 @@ extra:
   iso8601: https://en.wikipedia.org/wiki/ISO_8601
   javascript: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
   leaflet: http://leafletjs.com
-  lodash: https://lodash.com/docs 
+  lodash: https://lodash.com/docs/4.17.15 
   markdownDoc: https://guides.github.com/features/mastering-markdown/
   mern: http://mern.io
   meteor: https://www.meteor.com
@@ -129,14 +129,15 @@ extra:
   pythondocs: https://docs.python.org/3/
   react: https://facebook.github.io/react/docs
   reactDocs: https://facebook.github.io/react/docs
-  reactRedux: https://github.com/reactjs/react-redux/blob/master
+  reactRedux: https://react-redux.js.org
   reactReduxRepo: https://github.com/reactjs/react-redux
   reactReselect: https://github.com/reactjs/reselect
   reactRouter: https://github.com/ReactTraining/react-router
+  reactRouterApi: https://reacttraining.com/react-router/web/guides/quick-start
   reactRouterTutorial: https://github.com/reactjs/react-router-tutorial/tree/master
   reactSelect: https://github.com/JedWatson/react-select
   remark: https://github.com/remarkjs/remark
-  redux: http://redux.js.org
+  redux: https://redux.js.org
   reduxFormBase: https://redux-form.com
   reduxFormIssues: https://github.com/erikras/redux-form/issues
   reduxFormV: 7.1.2

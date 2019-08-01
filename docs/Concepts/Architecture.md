@@ -23,7 +23,9 @@ components, especially if you use Redux in an *idiomatic* way.
 
 ![diag](../design/design.007.png)
 
-## [Components](../Client/Components.md) and [Dux](../Client/Dux.md)
+## Components
+
+See [Components](../Client/Components.md) and [Dux](../Client/Dux.md).
 
 In Redux, every component may obtain read access to the state, and has indirect
 write access to it by *dispatching* *actions*. The state is held in a *store*
@@ -72,7 +74,9 @@ also as *properties*, to dispatch actions. See also
 [connect](../Technology/React.md#connect)
 .
 
-## [Dux](../Client/Dux.md)
+## Dux
+
+See [Dux](../Client/Dux.md).
 
 We employ a glue between
 [components](../Client/Components.md)

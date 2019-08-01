@@ -3,7 +3,9 @@
 Lower level functions called by various reducers, selectors, helpers
 and components.
 
-## [datatypes]({{libBase}}/datatypes.js)
+## datatypes
+
+See [datatypes]({{libBase}}/datatypes.js).
 
 ???+ explanation
     Elementary operations on data that comes in basic types, such as strings,
@@ -56,7 +58,9 @@ and components.
     validation or is itself undefined. If a value does not pass validation, a simple
     string expressing the reason is returned.
 
-## [details]({{libBase}}/detail.js)
+## details
+
+See [details]({{libBase}}/detail.js).
 
 ???+ explanation
     These functions help by setting up lists of detail records for master records.
@@ -91,7 +95,9 @@ and components.
     ???+ example
         [ItemForm](Components.md#itemform)
 
-## [edit]({{libBase}}/edit.js)
+## edit
+
+See [edit]({{libBase}}/edit.js).
 
 ???+ explanation
     Helpers for presenting edit controls, such as a save button.
@@ -184,7 +190,9 @@ and components.
     ???+ example
         [ItemEdit](Components.md#itemedit)
 
-## [europe.geo]({{libBase}}/europe.geo.js)
+## europe.geo
+
+See [europe.geo]({{libBase}}/europe.geo.js).
 
 ???+ explanation
     Representing the European country borders.
@@ -199,7 +207,9 @@ and components.
         [Jupyter notebook]({{staticBase}}/tools/country_compose/countries.ipynb)
         shows where this data comes from and how it has been tweaked for this website.
 
-## [fields]({{libBase}}/fields.js)
+## fields
+
+See [fields]({{libBase}}/fields.js).
 
 ???+ explanation
     Functions to deal with field specifications.
@@ -272,7 +282,9 @@ and components.
         to pass an argument to
         [applyTemplate](#applytemplate)
 
-## [handle]({{libBase}}/handle.js)
+## handle
+
+See [handle]({{libBase}}/handle.js).
 
 ???+ explanation
     Construct event handle functions.
@@ -281,7 +293,7 @@ and components.
         It is tempting to pass callbacks to React components as arrow functions, like
         this:
 
-        ```javascript
+        ```javascript hl_lines="2"
         <MyComp
             onClick={event => handle(event)}
         />
@@ -301,7 +313,7 @@ and components.
         and cause the showing of hiding of individual list items? You could do it like
         this:
 
-        ```javascript
+        ```javascript hl_lines="1 5"
         const handleItem = item => event => handle(event, item)
 
         items.map(item =>
@@ -342,7 +354,9 @@ and components.
     Like `handle`, but now the `event.target.value` is passed the actionCreator as
     final argument.
 
-## [memo]({{libBase}}/memo.js)
+## memo
+
+See [memo]({{libBase}}/memo.js).
 
 ???+ explanation
     Our home-grown memoization function.
@@ -501,7 +515,9 @@ and components.
         seconds. It took me long to pinpoint the memoizer as the root cause of this
         particular slowness. The built-in profiler in Chrome showed it to me.
 
-## [templates]({{libBase}}/templates.js)
+## templates
+
+See [templates]({{libBase}}/templates.js).
 
 ???+ explanation
     This library contains templates that customize the presentation of records and
@@ -566,7 +582,9 @@ and components.
     So, whenever a `criteriaEntry` record is certainly incomplete, it will be opened
     in edit mode. If it is possibly complete, it will be opened in read-only mode.
 
-## [utils]({{libBase}}/utils.js)
+## utils
+
+See [utils]({{libBase}}/utils.js).
 
 ???+ explanation
     Lower level utility functions.
@@ -723,7 +741,9 @@ and components.
     When we write our components, we do not want to care about this, hence we wrap
     them as `withParams(Component)`.
 
-## [values]({{libBase}}/values.js)
+## values
+
+See [values]({{libBase}}/values.js).
 
 ???+ explanation
     This is a library of functions that produce formatted representations of values

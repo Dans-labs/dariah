@@ -60,7 +60,7 @@ on, we omit the types.
     `select` | **string** | sometimes a list is fetched as a whole, sometimes only *my own* records are displayed and yet other times only records that are the details of some master record must be shown; this property indicates which is which;
     `settings` | **object** | a slice of the state from [getSettings](Dux.md#settings); settings are pieces of custom information that are relevant to many components of the app;
     `table` | **string** | name of the table that the component must deal with;
-    `submitValues` | **function** | a callback that is used to save form values to the database; used for components that supply edit controls for form values: they can call `submitValues` after a change or upon loss of focus; it is basically the `handleSubmit` from Redux-From, with a specific first argument passed (`toDb`) that saves values to the database;
+    `submitValues` | **function** | a callback that is used to save form values to the database; used for components that supply edit controls for form values: they can call `submitValues` after a change or upon loss of focus; it is basically the `handleSubmit` from Redux-Form, with a specific first argument passed (`toDb`) that saves values to the database;
     `tables` | **object** | a slice of the state from [getTables](Dux.md#tables); all data that comes from database tables; organized by `table` name; for each table there is spec information and actual entity data;
     `win` | **{**`width` **number**`, height` **number**`}` | a slice of the state from [getWinDim](Dux.md#win); contains the physical dimensions of the window at any time.
     `workflow` | **object** | slice of the state that contains workflow information.
@@ -69,7 +69,9 @@ on, we omit the types.
 
 ## ==[roots]({{appBase}}/dux/roots.js)==
 
-### [main]({{appBase}}/main.jsx)
+### main
+
+See [main]({{appBase}}/main.jsx).
 
 connected via
 [roots](Dux.md#roots)
@@ -84,7 +86,9 @@ connected via
     component, that sets up the store in which the central state
     lives.
 
-### [Root]({{appBase}}/components/Root.jsx)
+### Root
+
+See [Root]({{appBase}}/components/Root.jsx).
 
 presents
 [roots](Dux.md#roots)
@@ -113,7 +117,9 @@ presents
 
 ## ==[settings]({{appBase}}/dux/settings.js)==
 
-### [Tooltip]({{appBase}}/components/Tooltip.jsx)
+### Tooltip
+
+See [Tooltip]({{appBase}}/components/Tooltip.jsx).
 
 (life cycle) connected via
 [settings](Dux.md#settings)
@@ -159,7 +165,9 @@ presents
 
     It will also shift the tooltip so that it does not extends beyond the page.
 
-### [TooltipSwitch]({{appBase}}/components/TooltipSwitch.jsx)
+### TooltipSwitch
+
+See [TooltipSwitch]({{appBase}}/components/TooltipSwitch.jsx).
 
 connected via
 [settings](Dux.md#settings)
@@ -176,7 +184,9 @@ connected via
 
 ## ==[workflow]({{appBase}}/dux/workflow.js)==
 
-### [ScoreBox]({{appBase}}/components/ScoreBox.jsx)
+### ScoreBox
+
+See [ScoreBox]({{appBase}}/components/ScoreBox.jsx).
 
 presents
 [workflow](Dux.md#workflow)
@@ -202,7 +212,9 @@ presents
     [assessment]({{appBase}}/tables/assessment.jsx)
     .
 
-### [WorkflowInfo]({{appBase}}/components/WorkflowInfo.jsx)
+### WorkflowInfo
+
+See [WorkflowInfo]({{appBase}}/components/WorkflowInfo.jsx).
 
 presents
 [workflow](Dux.md#workflow)
@@ -226,7 +238,9 @@ presents
 
 ## ==[me]({{appBase}}/dux/me.js)==
 
-### [Login]({{appBase}}/components/Login.jsx)
+### Login
+
+See [Login]({{appBase}}/components/Login.jsx).
 
 (life cycle) connected via
 [me](Dux.md#me)
@@ -240,7 +254,9 @@ presents
     The main task of Login is to fetch the current authentication status: is there
     an authenticated user, and if so, what is his/her name?
 
-### [SubApp]({{appBase}}/components/SubApp.jsx)
+### SubApp
+
+See [SubApp]({{appBase}}/components/SubApp.jsx).
 
 presents
 [win](Dux.md#win)
@@ -269,7 +285,9 @@ presents
 
 ## ==[win]({{appBase}}/dux/win.js)==
 
-### [App]({{appBase}}/components/App.jsx)
+### App
+
+See [App]({{appBase}}/components/App.jsx).
 
 connected via
 [win](Dux.md#win)
@@ -294,7 +312,9 @@ connected via
 
     It is only used to display the height and the width somewhere on the screen.
 
-### [Window]({{appBase}}/components/Window.jsx)
+### Window
+
+See [Window]({{appBase}}/components/Window.jsx).
 
 (life cycle) connected via
 [win](Dux.md#win)
@@ -311,7 +331,9 @@ connected via
 
 ## ==[docs]({{appBase}}/dux/docs.js)==
 
-### [Doc]({{appBase}}/components/Doc.jsx)
+### Doc
+
+See [Doc]({{appBase}}/components/Doc.jsx).
 
 presents
 [docs](Dux.md#docs)
@@ -333,7 +355,9 @@ presents
     [DocPdf](#docpdf)
     .
 
-### [DocHtml]({{appBase}}/components/DocHtml.jsx)
+### DocHtml
+
+See [DocHtml]({{appBase}}/components/DocHtml.jsx).
 
 presents
 [docs](Dux.md#docs)
@@ -350,7 +374,9 @@ presents
 ???+ abstract "Task"
     Displays an HTML document by linking to it in an IFRAME.
 
-### [DocMd]({{appBase}}/components/DocMd.jsx)
+### DocMd
+
+See [DocMd]({{appBase}}/components/DocMd.jsx).
 
 (life cycle) connected via
 [docs](Dux.md#docs)
@@ -379,7 +405,9 @@ presents
     A full link (with protocol `http`(`s`) is translated to a plain HTML `a`
     element, so clicking it will leave this application.
 
-### [DocPdf]({{appBase}}/components/DocPdf.jsx)
+### DocPdf
+
+See [DocPdf]({{appBase}}/components/DocPdf.jsx).
 
 presents
 [docs](Dux.md#docs)
@@ -405,7 +433,9 @@ presents
 
 ## ==[notes]({{appBase}}/dux/notes.js)==
 
-### [Notification]({{appBase}}/components/Notification.jsx)
+### Notification
+
+See [Notification]({{appBase}}/components/Notification.jsx).
 
 (life cycle) connected via
 [notes](Dux.md#notes)
@@ -445,7 +475,9 @@ presents
 
 ## ==[tables]({{appBase}}/dux/tables.js)==
 
-### [EditControl]({{appBase}}/components/EditControl.jsx)
+### EditControl
+
+See [EditControl]({{appBase}}/components/EditControl.jsx).
 
 ???+ abstract "Task"
     A component that shows the current edit status of a record. It is presented as a
@@ -461,7 +493,9 @@ presents
     [editControl]({{libBase}}/edit.js)
     .
 
-### [EditDelete]({{appBase}}/components/EditDelete.jsx)
+### EditDelete
+
+See [EditDelete]({{appBase}}/components/EditDelete.jsx).
 
 presentational
 
@@ -483,7 +517,9 @@ presentational
     dumb, it needs to be passed an `onClick` handler that will perform the delete
     action.
 
-### [EditHelp]({{appBase}}/components/EditHelp.jsx)
+### EditHelp
+
+See [EditHelp]({{appBase}}/components/EditHelp.jsx).
 
 ??? abstract "Props"
     [Standard props](#standard-props)
@@ -500,7 +536,9 @@ presentational
     Information panel below input fields and markdown fields, telling how to save
     and cancel, and showing the markdown constructs.
 
-### [EditInsert]({{appBase}}/components/EditInsert.jsx)
+### EditInsert
+
+See [EditInsert]({{appBase}}/components/EditInsert.jsx).
 
 ??? abstract "Props"
     [Standard props](#standard-props)
@@ -522,7 +560,9 @@ presentational
     component is rather dumb, it needs to be passed an `onInsert` handler that will
     perform the insert action.
 
-### [EditStatus]({{appBase}}/components/EditStatus.jsx)
+### EditStatus
+
+See [EditStatus]({{appBase}}/components/EditStatus.jsx).
 
 ???+ abstract "Task"
     A component that shows the current edit status of a record. It is presented as a
@@ -541,7 +581,9 @@ presentational
     [editControl]({{libBase}}/edit.js)
     .
 
-### [FieldEdit]({{appBase}}/components/FieldEdit.jsx)
+### FieldEdit
+
+See [FieldEdit]({{appBase}}/components/FieldEdit.jsx).
 
 connected via
 [tables](Dux.md#tables)
@@ -666,7 +708,9 @@ connected via
         where I had memoized the callbacks
         for adding and removing values to/from a sequence.
 
-### [FieldRead]({{appBase}}/components/FieldRead.jsx)
+### FieldRead
+
+See [FieldRead]({{appBase}}/components/FieldRead.jsx).
 
 connected via
 [tables](Dux.md#tables)
@@ -680,7 +724,9 @@ connected via
     Presents the value(s) of a read-only field, based on *initial values*. Note that
     value of type `textarea` will be rendered as formatted markdown.
 
-### [FieldSet]({{appBase}}/components/FieldSet.jsx)
+### FieldSet
+
+See [FieldSet]({{appBase}}/components/FieldSet.jsx).
 
 presents
 [tables](Dux.md#tables)
@@ -708,7 +754,9 @@ presents
     event, upon which it will change the value in the field to `setValue`, and save
     the form to the database.
 
-### [Input]({{appBase}}/components/Input.jsx)
+### Input
+
+See [Input]({{appBase}}/components/Input.jsx).
 
 presents
 [tables](Dux.md#tables)
@@ -734,7 +782,9 @@ presents
     [controlled component](../Technology/React.md#controlled-component)
     .
 
-### [InputMulti]({{appBase}}/components/InputMulti.jsx)
+### InputMulti
+
+See [InputMulti]({{appBase}}/components/InputMulti.jsx).
 
 presents
 [tables](Dux.md#tables)
@@ -781,7 +831,9 @@ presents
     [controlled component](../Technology/React.md#controlled-component)
     .
 
-### [Insert]({{appBase}}/components/Insert.jsx)
+### Insert
+
+See [Insert]({{appBase}}/components/Insert.jsx).
 
 (life cycle) connected via
 [tables](Dux.md#tables)
@@ -801,7 +853,9 @@ presents
     will navigate to the table in which the item has been inserted, and it will open
     the freshly created item.
 
-### [ItemAction]({{appBase}}/components/ItemAction.jsx)
+### ItemAction
+
+See [ItemAction]({{appBase}}/components/ItemAction.jsx).
 
 connected via
 [tables](Dux.md#tables)
@@ -847,7 +901,9 @@ connected via
     If yes, that
     template will be applied, if no, nothing will be rendered.
 
-### [ItemContainer]({{appBase}}/components/ItemContainer.jsx)
+### ItemContainer
+
+See [ItemContainer]({{appBase}}/components/ItemContainer.jsx).
 
 (life cycle) connected via
 [tables](Dux.md#tables)
@@ -861,7 +917,9 @@ connected via
     Container for a single record in a table. This component is responsible for
     fetching the item data from the database (if needed), but not form input.
 
-### [ItemDetails]({{appBase}}/components/ItemDetails.jsx)
+### ItemDetails
+
+See [ItemDetails]({{appBase}}/components/ItemDetails.jsx).
 
 connected via
 [tables](Dux.md#tables)
@@ -874,7 +932,9 @@ connected via
 ???+ abstract "Task"
     Presents a list of detail items of a master record.
 
-### [ItemEdit]({{appBase}}/components/ItemEdit.jsx)
+### ItemEdit
+
+See [ItemEdit]({{appBase}}/components/ItemEdit.jsx).
 
 connected via
 [tables](Dux.md#tables)
@@ -1014,7 +1074,9 @@ connected via
     it will be applied. If not, all fields will
     be displayed in a generic presentation.
 
-### [ItemForm]({{appBase}}/components/ItemForm.jsx)
+### ItemForm
+
+See [ItemForm]({{appBase}}/components/ItemForm.jsx).
 
 connected via
 [tables](Dux.md#tables)
@@ -1041,7 +1103,9 @@ connected via
     individual item full view, will use this component. Full view means: as a
     vertical table of field labels and field values.
 
-### [ItemRead]({{appBase}}/components/ItemRead.jsx)
+### ItemRead
+
+See [ItemRead]({{appBase}}/components/ItemRead.jsx).
 
 connected via
 [tables](Dux.md#tables)
@@ -1068,7 +1132,9 @@ connected via
     it will be
     applied. If not, all fields will be displayed in a generic presentation.
 
-### [ItemRow]({{appBase}}/components/ItemRow.jsx)
+### ItemRow
+
+See [ItemRow]({{appBase}}/components/ItemRow.jsx).
 
 connected via
 [tables](Dux.md#tables)
@@ -1094,7 +1160,9 @@ connected via
     [ListGrid](#listgrid)
     .
 
-### [ListContainer]({{appBase}}/components/ListContainer.jsx)
+### ListContainer
+
+See [ListContainer]({{appBase}}/components/ListContainer.jsx).
 
 (life cycle) connected via
 [tables](Dux.md#tables)
@@ -1115,7 +1183,9 @@ connected via
 
     The `eId` prop is the one that contains the item to navigate to.
 
-### [ListFilter]({{appBase}}/components/ListFilter.jsx)
+### ListFilter
+
+See [ListFilter]({{appBase}}/components/ListFilter.jsx).
 
 (life cycle) connected via
 [tables](Dux.md#tables)
@@ -1145,7 +1215,9 @@ and
     [Pane](#pane)
     s.
 
-### [ListGrid]({{appBase}}/components/ListGrid.jsx)
+### ListGrid
+
+See [ListGrid]({{appBase}}/components/ListGrid.jsx).
 
 connected via
 [tables](Dux.md#tables)
@@ -1180,7 +1252,9 @@ connected via
     Every grid remembers its sorting state in the grid slice of the state, where it
     is available under a key.
 
-### [ListPlain]({{appBase}}/components/ListPlain.jsx)
+### ListPlain
+
+See [ListPlain]({{appBase}}/components/ListPlain.jsx).
 
 (life cycle) connected via
 [tables](Dux.md#tables)
@@ -1205,7 +1279,9 @@ connected via
 
     If the user inserts a new item, the component will navigate to that item.
 
-### [ListStats]({{appBase}}/components/ListStats.jsx)
+### ListStats
+
+See [ListStats]({{appBase}}/components/ListStats.jsx).
 
 (life cycle) connected via
 [tables](Dux.md#tables)
@@ -1219,7 +1295,9 @@ connected via
     Displays aggregated management information about contributions, assessments and
     reviews.
 
-### [MarkdownArea]({{appBase}}/components/MarkdownArea.jsx)
+### MarkdownArea
+
+See [MarkdownArea]({{appBase}}/components/MarkdownArea.jsx).
 
 connected via
 [tables](Dux.md#tables)
@@ -1244,7 +1322,9 @@ connected via
     pleasure of the user. Note that in read-only view these values will be also
     rendered as formatted text.
 
-### [OpenCloseAll]({{appBase}}/components/OpenCloseAll.jsx)
+### OpenCloseAll
+
+See [OpenCloseAll]({{appBase}}/components/OpenCloseAll.jsx).
 
 ??? abstract "Props"
     [Standard props](#standard-props)
@@ -1272,7 +1352,9 @@ connected via
 
 ## ==[filters]({{appBase}}/dux/filters.js)==
 
-### [CheckboxI]({{appBase}}/components/CheckboxI.jsx)
+### CheckboxI
+
+See [CheckboxI]({{appBase}}/components/CheckboxI.jsx).
 
 (life cycle) connected via
 [filters](Dux.md#filters)
@@ -1297,11 +1379,13 @@ connected via
     associate checkboxes are checked.
 
     We have to resort to a
-    [DOM](../Technology/React.md#dom)
+    [DOM](../Technology/React.md#processing-concepts)
     manipulation after rendering to get the
     indeterminate state across.
 
-### [EUMap]({{appBase}}/components/EUMap.jsx)
+### EUMap
+
+See [EUMap]({{appBase}}/components/EUMap.jsx).
 
 (life cycle) connected via
 [filters](Dux.md#filters)
@@ -1347,7 +1431,9 @@ connected via
     certain threshold (`LEVEL_OFF`). For higher values we essentially take the
     square root.
 
-### [ByValue]({{appBase}}/components/ByValue.jsx)
+### ByValue
+
+See [ByValue]({{appBase}}/components/ByValue.jsx).
 
 connected via
 [filters](Dux.md#filters)
@@ -1380,7 +1466,9 @@ connected via
     check or uncheck all facets in one go. All values that occur are displayed, with
     statistics in the form *subtotal of total*.
 
-### [Facet]({{appBase}}/components/Facet.jsx)
+### Facet
+
+See [Facet]({{appBase}}/components/Facet.jsx).
 
 connected via
 [filters](Dux.md#filters)
@@ -1404,7 +1492,9 @@ connected via
     [controlled components](../Technology/React.md#controlled-component)
     here.
 
-### [Filter]({{appBase}}/components/Filter.jsx)
+### Filter
+
+See [Filter]({{appBase}}/components/Filter.jsx).
 
 connected via
 [filters](Dux.md#filters)
@@ -1441,7 +1531,9 @@ connected via
     contain information for all filters, each individual specialized filter is
     passed only the slice that is relevant to that one filter.
 
-### [Fulltext]({{appBase}}/components/Fulltext.jsx)
+### Fulltext
+
+See [Fulltext]({{appBase}}/components/Fulltext.jsx).
 
 connected via
 [filters](Dux.md#filters)
@@ -1463,7 +1555,9 @@ connected via
     [controlled components](../Technology/React.md#controlled-component)
     here.
 
-### [Stat]({{appBase}}/components/Stat.jsx)
+### Stat
+
+See [Stat]({{appBase}}/components/Stat.jsx).
 
 presents
 [filters](Dux.md#filters)
@@ -1488,7 +1582,9 @@ presents
 
 ## ==[select]({{appBase}}/dux/select.js)==
 
-### [RelSelect]({{appBase}}/components/RelSelect.jsx)
+### RelSelect
+
+See [RelSelect]({{appBase}}/components/RelSelect.jsx).
 
 presents
 [select](Dux.md#select)
@@ -1536,7 +1632,9 @@ presents
 
 ## ==[alter]({{appBase}}/dux/alter.js)==
 
-### [Expand]({{appBase}}/components/Expand.jsx)
+### Expand
+
+See [Expand]({{appBase}}/components/Expand.jsx).
 
 presents
 [alter](Dux.md#alter)
@@ -1597,7 +1695,28 @@ presents
 
 ## ==Miscellaneous==
 
-### [ErrorBoundary]({{appBase}}/components/ErrorBoundary.jsx)
+### Bool3
+
+See [Bool3]({{appBase}}/components/Bool3.jsx).
+
+(life cycle)
+
+??? abstract "Props"
+    `input` `meta` `submitValues`
+    (provided by Redux-From, because this component is wrapped in a
+    [Field]({{reduxFormBase}}/{{reduxFormV}}/docs/api/Field.md/)
+
+???+ abstract "Task"
+    Displays a 3-valued checkbox that represents `true`, `false` or `null`.
+
+    We have to resort to a
+    [DOM](../Technology/React.md#processing-concepts)
+    manipulation after rendering to get the
+    indeterminate state across.
+
+### ErrorBoundary
+
+See [ErrorBoundary]({{appBase}}/components/ErrorBoundary.jsx).
 
 ??? abstract "Task"
     Generic component, using new error handling functionality of React 16. We use it
@@ -1611,7 +1730,9 @@ presents
 
 ![diag](../design/design.010.png)
 
-### [NavLink]({{appBase}}/components/NavLink.jsx)
+### NavLink
+
+See [NavLink]({{appBase}}/components/NavLink.jsx).
 
 presents **none**
 
@@ -1633,7 +1754,9 @@ presents **none**
     link that can activate a component, and, when clicked, it will become
     highlighted.
 
-### [NotFound]({{appBase}}/components/NotFound.jsx)
+### NotFound
+
+See [NotFound]({{appBase}}/components/NotFound.jsx).
 
 presents **none**
 
@@ -1651,13 +1774,17 @@ presents **none**
     [main](#main)
     matches.
 
-### [Overview]({{appBase}}/components/Overview.jsx)
+### Overview
+
+See [Overview]({{appBase}}/components/Overview.jsx).
 
 ???+ abstract "Task"
     Under construction. Meant to become a customized dashboard for the back office
     functions.
 
-### [Static]({{appBase}}/components/Static.jsx)
+### Static
+
+See [Static]({{appBase}}/components/Static.jsx).
 
 presents **none**
 

@@ -10,7 +10,9 @@
  9
 10
 11
-12</pre></div></td><td class=code><div class=codehilite><pre><span></span><span class=nt>workflow</span><span class=p>:</span>
+12
+13
+14</pre></div></td><td class=code><div class=codehilite><pre><span></span><span class=nt>workflow</span><span class=p>:</span>
   <span class=nt>read</span><span class=p>:</span>
     <span class="p p-Indicator">-</span> <span class=nt>inspect</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">details</span>
       <span class=nt>method</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">hasValue</span>
@@ -21,45 +23,44 @@
       <span class=nt>value</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
       <span class=nt>attribute</span><span class=p>:</span>
         <span class=nt>name</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">locked</span>
-        <span class=nt>desc</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">being assessed</span>
-</pre></div> </td></tr></table> <p>Basically, this instructs the system to look at various other tables and records and fields, and if certain conditions are met the attribute <code>locked</code> is added to the workflow attributes. Note that part of the attribute is a description, which explains the reason why the attribute is set. The client may decide to show this reason on the user interface.</p> <p>Line by line:</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>inspect: details
-</pre></div> </td></tr></table> <p>This is an instruction to look into the detail record(s) of the current record. Other possible values are: <code>master</code>, <code>self</code>, with obvious meanings. <a href=#inspecting-other-records>Inspecting other records</a> below.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>method: hasValue
-</pre></div> </td></tr></table> <p>The name of the method by which the inspected value is taken and turned in either <code>True</code> or <code>False</code>. There is a fixed, limited supply of methods, which are hard-coded in the program, see <a href=#computing-attributes>Computing Attributes</a> below.</p> <p>Not all of the following parameters need to be present for all methods, and there are more possible parameters. The list of parameters is dependent on both the inspect method and the compute method.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1
-2
-3</pre></div></td><td class=code><div class=codehilite><pre><span></span>emptyFields:
-  - score
-  - evidence
-</pre></div> </td></tr></table> <p>a list of fields in the other table that will be checked for emptiness.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>linkField: contrib
-</pre></div> </td></tr></table> <p>This is the name of the field by which detail records point to their master.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>otherTable: assessment
-</pre></div> </td></tr></table> <p>This is the name of the other table (which can be the master table, the details table, or the own table, depending on the value of <code>inspect</code>).</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>otherField: submitted
-</pre></div> </td></tr></table> <p>The name of the field in the other table to look at.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>myField: null
-</pre></div> </td></tr></table> <p>The name of the field in the own table to look at.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>value: true
+        <span class=nt>except</span><span class=p>:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">selected</span>
+        <span class=nt>desc</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">has been submitted for review</span>
+</pre></div> </td></tr></table> <p>Basically, this instructs the system to look at various other tables and records and fields, and if certain conditions are met the attribute <code>locked</code> is added to the workflow attributes. Note that part of the attribute is a description, which explains the reason why the attribute is set. The client may decide to show this reason on the user interface.</p> <p>Line by line:</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>inspect: details
+</pre></div> </td></tr></table> <p>This is an instruction to look into the detail record(s) of the current record. Other possible values are: <code>master</code>, <code>self</code>, with obvious meanings. <a href=#inspecting-other-records>Inspecting other records</a> below.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1</pre></div></td><td class=code><div class=codehilite><pre><span></span> method: hasValue
+</pre></div> </td></tr></table> <p>The name of the method by which the inspected value is taken and turned in either <code>True</code> or <code>False</code>. There is a fixed, limited supply of methods, which are hard-coded in the program, see <a href=#computing-attributes>Computing Attributes</a> below.</p> <p>Not all of the following parameters need to be present for all methods, and there are more possible parameters. The list of parameters is dependent on both the inspect method and the compute method.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>linkField: contrib
+</pre></div> </td></tr></table> <p>This is the name of the field by which detail records point to their master.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>otherTable: assessment
+</pre></div> </td></tr></table> <p>This is the name of the other table (which can be the master table, the details table, or the own table, depending on the value of <code>inspect</code>).</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>otherField: submitted
+</pre></div> </td></tr></table> <p>The name of the field in the other table to look at.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>myField: null
+</pre></div> </td></tr></table> <p>The name of the field in the own table to look at.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1</pre></div></td><td class=code><div class=codehilite><pre><span></span>value: true
 </pre></div> </td></tr></table> <p>A reference value to compare the inspected value with.</p> </details> </details> <details class=abstract><summary>adjustWorkflow</summary><p>Whereas <code>readWorkflow</code> computes all relevant workflow for a given record in a given table, <code>adjustWorkflow</code> delivers a list of <em>other</em> records in other tables, that need new workflow attributes after a change in a given record, whether it be an insert, update or delete.</p> <p>The determination of these attributes is dictated by the <a href=../../Concepts/Model/ >data model</a> , in the individual <a href=https://github.com/Dans-labs/dariah/blob/master/server/models/tables>tables</a> , under the key <code>workflow/adjust</code>.</p> <p>Typically, when a record gets workflow attributes based on master or detail records, these attributes must be updated on any change in the master or in one of the details. The system is not clever enough to generate these adjust rules itself. We have to do that.</p> <p>For this, one can specify rules that define <code>triggerFields</code> for sets of related records. When one of those trigger fields get changed, all specified related records will get their workflow attributes recomputed.</p> <details class=example><summary>assessment submission</summary><p>Let us look at the same example, but now at its <code>adjust</code> rule in the <a href=https://github.com/Dans-labs/dariah/blob/master/server/models/tables/assessment.yaml>assessment table</a></p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
 2
 3
 4
 5
 6
-7</pre></div></td><td class=code><div class=codehilite><pre><span></span><span class=nt>adjust</span><span class=p>:</span>
+7
+8</pre></div></td><td class=code><div class=codehilite><pre><span></span><span class=nt>adjust</span><span class=p>:</span>
 <span class="p p-Indicator">-</span> <span class=nt>inspect</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">master</span>
   <span class=nt>linkField</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">contrib</span>
   <span class=nt>otherTable</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">contrib</span>
   <span class=nt>triggerFields</span><span class=p>:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">assessmentType</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">submitted</span>
-</pre></div> </td></tr></table> <p>It says that if an assessment record is changed, some other records are affected, namely its master record in the <code>contrib</code> table. But not all changes in the assessment trigger adjustments, only changes in one of the <code>triggerFields</code>, in this case obviously the field <code>submitted</code>.</p> <details class=explanation><summary>other trigger fields</summary><p>The other trigger field, <code>assessmentType</code> is mentioned because of an other workflow rule, which we have not mentioned here.</p> </details> <details class=note><summary>triggers also on <code>linkField</code></summary><p>The system adds the <code>linkField</code> silently to the <code>triggerField</code>, because if we, for whatever reason, reassigned this assessment to a different contribution, then that contribution has to know it!</p> </details> </details> </details> <details class=abstract><summary>enforceWorkflow</summary><p>Finally, the server has to know the consequences of the workflow attributes for behaviour. This is dictated in the generic <a href=../../Concepts/Model/ >data model</a> , under the key <code>workflow/prevent/</code><em>attribute</em> where <code>attribute</code> is a name such as <code>locked</code> or <code>incomplete</code>, or <code>frozen</code>.</p> <p>For each attribute there are optional constraints for the <code>update</code> and <code>delete</code> actions.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">reviewerF</span>
+</pre></div> </td></tr></table> <p>It says that if an assessment record is changed, some other records are affected, namely its master record in the <code>contrib</code> table.</p> <p>But not all changes in the assessment trigger adjustments, only changes in one of the <code>triggerFields</code>, in this case obviously the field <code>submitted</code>.</p> <details class=explanation><summary>other trigger fields</summary><p>The other trigger fields, <code>assessmentType</code> and <code>reviewerF</code> are mentioned because of other workflow rules that we have not mentioned here.</p> </details> <details class=note><summary>triggers also on <code>linkField</code></summary><p>The system adds the <code>linkField</code> silently to the <code>triggerField</code>, because if we, for whatever reason, reassigned this assessment to a different contribution, then that contribution has to know it!</p> </details> </details> </details> <details class=abstract><summary>enforceWorkflow</summary><p>Finally, the server has to know the consequences of the workflow attributes for behaviour. This is dictated in the generic <a href=../../Concepts/Model/ >data model</a> , under the key <code>workflow/prevent/</code><em>attribute</em> where <code>attribute</code> is a name such as <code>locked</code> or <code>incomplete</code>, or <code>frozen</code>.</p> <p>For each attribute there are optional constraints for the <code>update</code> and <code>delete</code> actions.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
 2
 3
 4</pre></div></td><td class=code><div class=codehilite><pre><span></span><span class=nt>prevent</span><span class=p>:</span>
   <span class=nt>locked</span><span class=p>:</span>
-    <span class=nt>delete</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-    <span class=nt>update</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-</pre></div> </td></tr></table> <p>means that it is forbidden to delete or update a record that carries the <code>locked</code> attribute.</p> <details class=hint><summary>relax update constraints</summary><p>We can relax update constraints in several ways:</p> <details class=abstract><summary>make an exception for some fields</summary><table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
+<span class=hll>    <span class=nt>delete</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span class=hll>    <span class=nt>update</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</span></pre></div> </td></tr></table> <p>means that it is forbidden to delete or update a record that carries the <code>locked</code> attribute.</p> <details class=hint><summary>relax update constraints</summary><p>We can relax update constraints in several ways:</p> <details class=abstract><summary>make an exception for some fields</summary><table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
 2
 3</pre></div></td><td class=code><div class=codehilite><pre><span></span><span class=nt>prevent</span><span class=p>:</span>
   <span class=nt>locked</span><span class=p>:</span>
-    <span class=nt>update</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">except</span>
-</pre></div> </td></tr></table> <p>means that updating is not allowed except for some fields for which has been made an exception.</p> <details class=explanation><summary>Where to define exception fields?</summary><p>The list of exceptions is defined in the workflow configuration of the table in question, e.g.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span> 1
+<span class=hll>    <span class=nt>update</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">except</span>
+</span></pre></div> </td></tr></table> <p>means that updating is not allowed except for some fields for which has been made an exception.</p> <details class=explanation><summary>Where to define exception fields?</summary><p>The list of exceptions is defined in the workflow configuration of the table in question, e.g.</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span> 1
  2
  3
  4
@@ -75,19 +76,19 @@
     <span class=nt>value</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
     <span class=nt>attribute</span><span class=p>:</span>
       <span class=nt>name</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">locked</span>
-      <span class=nt>except</span><span class=p>:</span>
-        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">submitted</span>
-        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">reviewerE</span>
-        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">reviewerF</span>
-      <span class=nt>desc</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">is being reviewed</span>
+<span class=hll>      <span class=nt>except</span><span class=p>:</span>
+</span><span class=hll>        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">submitted</span>
+</span><span class=hll>        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">reviewerE</span>
+</span><span class=hll>        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">reviewerF</span>
+</span>      <span class=nt>desc</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">is being reviewed</span>
 </pre></div> </td></tr></table> <p>In words, if an assessment has been submitted and is therefore locked, the submitted status and the reviewers can still be changed.</p> </details> </details> <details class=abstract><summary>prevent certain fields to change</summary><table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
 2
 3
 4</pre></div></td><td class=code><div class=codehilite><pre><span></span><span class=nt>prevent</span><span class=p>:</span>
   <span class=nt>locked</span><span class=p>:</span>
     <span class=nt>update</span><span class=p>:</span>
-      <span class=nt>submitted</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-</pre></div> </td></tr></table> <p>means that any update that changes the value of the field <code>submitted</code> is forbidden.</p> </details> <details class=abstract><summary>prevent certain fields to get a specific value</summary><p>Here we take a real example, under attribute <code>stalled</code> instead of <code>locked</code>:</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
+<span class=hll>      <span class=nt>submitted</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</span></pre></div> </td></tr></table> <p>means that any update that changes the value of the field <code>submitted</code> is forbidden.</p> </details> <details class=abstract><summary>prevent certain fields to get a specific value</summary><p>Here we take a real example, under attribute <code>stalled</code> instead of <code>locked</code>:</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
 2
 3
 4
@@ -95,8 +96,8 @@
   <span class=nt>stalled</span><span class=p>:</span>
     <span class=nt>update</span><span class=p>:</span>
       <span class=nt>submitted</span><span class=p>:</span>
-        <span class=nt>after</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-</pre></div> </td></tr></table> <p>This means that any update that leads to field <code>submitted</code> having value <code>true</code> is forbidden.</p> <details class=explanation><summary>Explanation</summary><p>Here we say that a stalled assessment cannot be submitted. For the sake of clarity, here is the rule that says when an assessment is <code>stalled</code>:</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span> 1
+<span class=hll>        <span class=nt>after</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</span></pre></div> </td></tr></table> <p>This means that any update that leads to field <code>submitted</code> having value <code>true</code> is forbidden.</p> <details class=explanation><summary>Explanation</summary><p>Here we have said that a stalled assessment cannot be submitted.</p> <details class=details><summary>Details</summary><p>For the sake of clarity, here is the rule that says when an assessment is <code>stalled</code>:</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span> 1
  2
  3
  4
@@ -119,7 +120,7 @@
         <span class=nt>workflow</span><span class=p>:</span>
           <span class=nt>stalled</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
           <span class=nt>stalledReason</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">assessment type is different from contribution type</span>
-</pre></div> </td></tr></table> <p>In words: if an assessment has an <code>assessmentType</code> field with a different value that the <code>contributionType</code> field of its master contribution, then the assessment counts as stalled.</p> </details> </details> </details> </details> <details class=abstract><summary>manageWorkflow</summary><p>When the web server loads, it makes sure that correct workflow information is stored in the workflow table. It does so by dropping the existing workflow table and recomputing all workflow information from scratch.</p> <p>A sysadmin can also reset the workflow from within the app. Then the workflow table will be cleared (not dropped), and all workflow info will be recomputed.</p> <p>The <a href=../../Client/Components/#workflowinfo>WorkflowInfo</a> component presents the previous resets since the web server was last started, and gives an overview of the recomputed workflow attributes.</p> </details> <h2 id=inspecting-other-records>Inspecting other records<a class=headerlink href=#inspecting-other-records title="Permanent link">&para;</a></h2> <p>Both <code>readWorkflow</code> and <code>adjustWorkflow</code> have instructions to look up related records and then apply a computing method to all those records.</p> <p>The target records can be specified with these instructions:</p> <details class=abstract><summary>self</summary><p>Don't look further, look at yourself. The information from which workflow attributes are to be derived, is already present in the record itself.</p> </details> <details class=abstract><summary>master</summary><p>Look at your master record. A record can have multiple masters, so you have to specify</p> <ul> <li><code>linkField</code>: the field in yourself that points to the master,</li> <li><code>otherTable</code>: the table in which the master record resides.</li> </ul> </details> <details class=abstract><summary>grandmaster</summary><p>Look at the master of your master record. You have to specify</p> <ul> <li><code>interField</code>: the field in yourself that points to the intermediate master,</li> <li><code>interTable</code>: the table in which the intermediate master record resides,</li> <li><code>linkField</code>: the field in the intermediate master that points to the grandmaster,</li> <li><code>otherTable</code>: the table in which the grandmaster record resides.</li> </ul> </details> <details class=abstract><summary>details</summary><p>Look at your detail records. A record can have multiple kinds of details, so you have to specify</p> <ul> <li><code>otherTable</code>: the table that holds the details, and the</li> <li><code>linkField</code>: the field in the detail record that points to you.</li> </ul> </details> <details class=abstract><summary>granddetails</summary><p>Look at details of your detail records. You have to specify</p> <ul> <li><code>interTable</code>: the table that holds the intermediate details,</li> <li><code>interField</code>: the field in the intermediate details that points to you,</li> <li><code>otherTable</code>: the table that holds the details of the details, and the</li> <li><code>linkField</code>: the field in the details of the details that points to the intermediate details.</li> </ul> </details> <details class=abstract><summary>siblings</summary><p>Look at records with the same master. You have to specify</p> <ul> <li><code>linkField</code>: the field in yourself and your siblings that points to the master</li> <li><code>otherTable</code>: the table in which your siblings reside</li> </ul> </details> <h2 id=computing-attributes>Computing attributes<a class=headerlink href=#computing-attributes title="Permanent link">&para;</a></h2> <p>When the other records have been found, it is time to extract information from them, in order to put it into workflow attributes. There is a limited set of functions you can call, they are all listed in <a href=https://github.com/Dans-labs/dariah/blob/master/server/controllers/workflow.py>worklow.py</a> and their names start with <code>_compute_</code>. Below we name them without this prefix.</p> <p>In the specifications we refer to the starting record(s) as <em>my record(s)</em> and to the reference records as <em>other record(s)</em>.</p> <details class=abstract><summary>hasValue</summary><p>Takes</p> <ul> <li><code>otherField</code>: the name of a field in an other record whose value is to be retrieved;</li> <li><code>value</code>: a reference value.</li> </ul> <p>Returns <code>{'on': True }</code> if one of the retrieved values is equal to the reference value.</p> <details class=example><summary>assessment checks whether contribution is selected</summary><p>The <a href=https://github.com/Dans-labs/dariah/blob/master/server/models/tables/assessment.yaml>assessment model</a> specifies:</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
+</pre></div> </td></tr></table> <p>In words: if an assessment has an <code>assessmentType</code> field with a different value than the <code>contributionType</code> field of its master contribution, then the assessment counts as stalled.</p> </details> </details> </details> </details> </details> <details class=abstract><summary>manageWorkflow</summary><p>When the web server loads, it makes sure that correct workflow information is stored in the workflow table. It does so by dropping the existing workflow table and recomputing all workflow information from scratch.</p> <p>A sysadmin can also reset the workflow from within the app. Then the workflow table will be cleared (not dropped), and all workflow info will be recomputed.</p> <p>The <a href=../../Client/Components/#workflowinfo>WorkflowInfo</a> component presents the previous resets since the web server was last started, and gives an overview of the recomputed workflow attributes.</p> </details> <h2 id=inspecting-other-records>Inspecting other records<a class=headerlink href=#inspecting-other-records title="Permanent link">&para;</a></h2> <p>Both <code>readWorkflow</code> and <code>adjustWorkflow</code> have instructions to look up related records and then apply a computing method to all those records.</p> <p>The target records can be specified with these instructions:</p> <details class=abstract><summary>self</summary><p>Don't look further, look at yourself. The information from which workflow attributes are to be derived, is already present in the record itself.</p> </details> <details class=abstract><summary>master</summary><p>Look at your master record. A record can have multiple masters, so you have to specify</p> <ul> <li><code>linkField</code>: the field in yourself that points to the master,</li> <li><code>otherTable</code>: the table in which the master record resides.</li> </ul> </details> <details class=abstract><summary>grandmaster</summary><p>Look at the master of your master record. You have to specify</p> <ul> <li><code>interField</code>: the field in yourself that points to the intermediate master,</li> <li><code>interTable</code>: the table in which the intermediate master record resides,</li> <li><code>linkField</code>: the field in the intermediate master that points to the grandmaster,</li> <li><code>otherTable</code>: the table in which the grandmaster record resides.</li> </ul> </details> <details class=abstract><summary>details</summary><p>Look at your detail records. A record can have multiple kinds of details, so you have to specify</p> <ul> <li><code>otherTable</code>: the table that holds the details, and the</li> <li><code>linkField</code>: the field in the detail record that points to you.</li> </ul> </details> <details class=abstract><summary>granddetails</summary><p>Look at details of your detail records. You have to specify</p> <ul> <li><code>interTable</code>: the table that holds the intermediate details,</li> <li><code>interField</code>: the field in the intermediate details that points to you,</li> <li><code>otherTable</code>: the table that holds the details of the details, and the</li> <li><code>linkField</code>: the field in the details of the details that points to the intermediate details.</li> </ul> </details> <details class=abstract><summary>siblings</summary><p>Look at records with the same master. You have to specify</p> <ul> <li><code>linkField</code>: the field in yourself and your siblings that points to the master</li> <li><code>otherTable</code>: the table in which your siblings reside</li> </ul> </details> <h2 id=computing-attributes>Computing attributes<a class=headerlink href=#computing-attributes title="Permanent link">&para;</a></h2> <p>When the other records have been found, it is time to extract information from them, in order to put it into workflow attributes. There is a limited set of functions you can call, they are all listed in <a href=https://github.com/Dans-labs/dariah/blob/master/server/controllers/workflow.py>worklow.py</a> and their names start with <code>_compute_</code>. Below we name them without this prefix.</p> <p>In the specifications we refer to the starting record(s) as <em>my record(s)</em> and to the reference records as <em>other record(s)</em>.</p> <details class=abstract><summary>hasValue</summary><p>Takes</p> <ul> <li><code>otherField</code>: the name of a field in an other record whose value is to be retrieved;</li> <li><code>value</code>: a reference value.</li> </ul> <p>Returns <code>{'on': True }</code> if one of the retrieved values is equal to the reference value.</p> <details class=example><summary>assessment checks whether contribution is selected</summary><p>The <a href=https://github.com/Dans-labs/dariah/blob/master/server/models/tables/assessment.yaml>assessment model</a> specifies:</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
 2
 3
 4
@@ -172,24 +173,56 @@
   <span class=nt>attribute</span><span class=p>:</span>
     <span class=nt>name</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">incomplete</span>
     <span class=nt>desc</span><span class=p>:</span> <span class=s>&#39;some</span><span class=nv> </span><span class=s>criteria</span><span class=nv> </span><span class=s>lack</span><span class=nv> </span><span class=s>a</span><span class=nv> </span><span class=s>score</span><span class=nv> </span><span class=s>or</span><span class=nv> </span><span class=s>evidence</span><span class=nv> </span><span class=s>({n}x)&#39;</span>
-</pre></div> </td></tr></table> <p>In words: a review record inspects its own <code>decision</code> field to see if it is non-empty. If so, it adds the <code>on: true</code> setting to the <code>completed</code> attribute.</p> <p>Note that a <code>completed.on</code> attribute prevents updates, but that in ghis case updates to the decision are still allowed.</p> <p>Other parts of the workflow and the permission system determine which people can change the decision.</p> </details> </details> <details class=abstract><summary>hasDifferent</summary><p>Takes</p> <ul> <li><code>otherField</code>: the name of a field in an other record whose value is to be retrieved;</li> <li><code>myField</code>: the name of a field in my record whose value is to be retrieved; </li> </ul> <p>Returns <code>{'on': True }</code> if a value from an other record is different from a value from my record.</p> <details class=example><summary>assessment checks whether its contribution type agrees with that of its contribution</summary><p>The <a href=https://github.com/Dans-labs/dariah/blob/master/server/models/tables/assessment.yaml>assessment model</a> specifies:</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class=code><div class=codehilite><pre><span></span><span class="p p-Indicator">-</span> <span class=nt>inspect</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">master</span>
-  <span class=nt>method</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">hasDifferent</span>
-  <span class=nt>linkField</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">contrib</span>
-  <span class=nt>otherTable</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">contrib</span>
-  <span class=nt>otherField</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">typeContribution</span>
-  <span class=nt>myField</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">assessmentType</span>
-  <span class=nt>attribute</span><span class=p>:</span>
-    <span class=nt>name</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">stalled</span>
-    <span class=nt>desc</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">assessment type is different from contribution type</span>
-</pre></div> </td></tr></table> <p>In words: an assessment record compares its own <code>assessmentType</code> with the <code>typeContribution</code> of its contribution record.</p> <p>If so, it adds the <code>on: true</code> setting to the <code>stalled</code> attribute.</p> <p>This assessment may contain important information, but its criteria no longer match the kind of conbtribution, so the worthwhile bits of the assessment have to be entered manually in a newly created assessment based on the current <code>typeContribution</code>.</p> </details> </details> <details class=abstract><summary>getValues</summary><p>Takes</p> <ul> <li><code>otherFields</code>: a list of fields in an other record whose values are to be retrieved;</li> </ul> <p>Returns</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
+</pre></div> </td></tr></table> <p>In words: a review record inspects its own <code>decision</code> field to see if it is non-empty. If so, it adds the <code>on: true</code> setting to the <code>completed</code> attribute.</p> <p>Note that a <code>completed.on</code> attribute prevents updates, but that in ghis case updates to the decision are still allowed.</p> <p>Other parts of the workflow and the permission system determine which people can change the decision.</p> </details> </details> <details class=abstract><summary>hasDifferent</summary><p>Takes</p> <ul> <li><code>otherField</code>: the name of a field in an other record whose value is to be retrieved;</li> <li><code>myField</code>: the name of a field in my record whose value is to be retrieved; </li> </ul> <p>Returns <code>{'on': True }</code> if a value from an other record is different from a value from my record.</p> <p>??? example "assessment checks whether its contribution type agrees with that of its contribution".</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class=code><div class=codehilite><pre><span></span>The
+[assessment model](https://github.com/Dans-labs/dariah/blob/master/server/models/tables/assessment.yaml)
+specifies:
+
+```yaml
+- inspect: master
+  method: hasDifferent
+  linkField: contrib
+  otherTable: contrib
+  otherField: typeContribution
+  myField: assessmentType
+  attribute:
+    name: stalled
+    desc: assessment type is different from contribution type
+```
+
+In words: an assessment record compares its own `assessmentType` with
+the `typeContribution` of its contribution record.
+
+If so, it adds the `on: true` setting to the `stalled` attribute.
+
+This assessment may contain important information, but its criteria no longer
+match the kind of conbtribution, so the worthwhile bits of the assessment
+have to be entered manually in a newly created assessment based on the
+current `typeContribution`.
+</pre></div> </td></tr></table> </details> <details class=abstract><summary>getValues</summary><p>Takes</p> <ul> <li><code>otherFields</code>: a list of fields in an other record whose values are to be retrieved;</li> </ul> <p>Returns</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>1
 2
 3
 4
@@ -232,7 +265,7 @@
   <span class=nt>attribute</span><span class=p>:</span>
     <span class=nt>name</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">score</span>
     <span class=nt>desc</span><span class=p>:</span> <span class="l l-Scalar l-Scalar-Plain">assessment score</span>
-</pre></div> </td></tr></table> <p>In words: a contrib record looks into its associated assessment records and computes their score details and stores the resulting dictionaries in the <code>score</code> workflow attribute.</p> </details> <details class=example><summary>How the score travels to the user interface</summary><p>The workflow engine takes care that the assessment score is computed on the server whenever there is a need to do that. The computed workflow attributes are delivered to the client whenever the client wants to render a contribution.</p> <p>Here is a fragment of the contribution template that reads the workflow information (look at <code>w('score')</code>; <code>w()</code> is a function to read out workflow attributes for the record in question):</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span> 1
+</pre></div> </td></tr></table> <p>In words: a contrib record looks into its associated assessment records and computes their score details and stores the resulting dictionaries in the <code>score</code> workflow attribute.</p> </details> <details class=example><summary>How the score travels to the user interface</summary><p>The workflow engine takes care that the assessment score is computed on the server whenever there is a need to do that.</p> <p>The computed workflow attributes are delivered to the client whenever the client wants to render a contribution.</p> <p>Here is a fragment of the contribution template that reads the workflow information (look at <code>w('score')</code>; <code>w()</code> is a function to read out workflow attributes for the record in question):</p> <table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span> 1
  2
  3
  4
@@ -244,8 +277,8 @@
 10
 11
 12</pre></div></td><td class=code><div class=codehilite><pre><span></span><span class=k>if</span> <span class=p>(</span><span class=nx>approved</span><span class=p>)</span> <span class=p>{</span>
-  <span class=kr>const</span> <span class=nx>scoreItems</span> <span class=o>=</span> <span class=p>(</span><span class=nx>w</span><span class=p>(</span><span class=s1>&#39;score&#39;</span><span class=p>)</span> <span class=o>||</span> <span class=nx>emptyO</span><span class=p>).</span><span class=nx>items</span> <span class=o>||</span> <span class=nx>emptyA</span>
-  <span class=kr>const</span> <span class=nx>score</span> <span class=o>=</span> <span class=nx>scoreItems</span><span class=p>.</span><span class=nx>length</span> <span class=o>?</span> <span class=nx>scoreItems</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>:</span> <span class=nx>emptyO</span>
+<span class=hll>  <span class=kr>const</span> <span class=nx>scoreItems</span> <span class=o>=</span> <span class=p>(</span><span class=nx>w</span><span class=p>(</span><span class=s1>&#39;score&#39;</span><span class=p>)</span> <span class=o>||</span> <span class=nx>emptyO</span><span class=p>).</span><span class=nx>items</span> <span class=o>||</span> <span class=nx>emptyA</span>
+</span>  <span class=kr>const</span> <span class=nx>score</span> <span class=o>=</span> <span class=nx>scoreItems</span><span class=p>.</span><span class=nx>length</span> <span class=o>?</span> <span class=nx>scoreItems</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>:</span> <span class=nx>emptyO</span>
   <span class=nx>resultApproved</span> <span class=o>=</span> <span class=p>(</span>
     <span class=o>&lt;&gt;</span>
       <span class=o>&lt;</span><span class=nx>ScoreBox</span> <span class=nx>score</span><span class=o>=</span><span class=p>{</span><span class=nx>score</span><span class=p>}</span> <span class=o>/&gt;</span>

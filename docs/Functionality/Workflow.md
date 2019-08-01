@@ -119,7 +119,9 @@ The principal functions exported are discussed here.
               value: true
               attribute:
                 name: locked
-                desc: being assessed
+                except:
+                  - selected
+                desc: has been submitted for review
         ```
 
         Basically, this instructs the system to look at various other tables and records
@@ -131,7 +133,9 @@ The principal functions exported are discussed here.
 
         Line by line:
 
-            inspect: details
+        ```
+        inspect: details
+        ```
 
         This is an instruction to look into the detail record(s) of the current record.
         Other possible values are:
@@ -139,11 +143,15 @@ The principal functions exported are discussed here.
         [Inspecting other records](#inspecting-other-records)
         below.
 
-            method: hasValue
+        ```
+         method: hasValue
+        ```
 
         The name of the method by which the inspected value is taken and turned in
-        either `True` or `False`. There is a fixed, limited supply of methods, which are
-        hard-coded in the program, see
+        either `True` or `False`.
+        There is a fixed, limited supply of methods,
+        which are hard-coded in the program,
+        see
         [Computing Attributes](#computing-attributes)
         below.
 
@@ -152,30 +160,35 @@ The principal functions exported are discussed here.
         The list of parameters is dependent on both the inspect method and the compute
         method.
 
-            emptyFields:
-              - score
-              - evidence
 
-        a list of fields in the other table that will be checked for emptiness.
-
-            linkField: contrib
+        ```
+        linkField: contrib
+        ```
 
         This is the name of the field by which detail records point to their master.
 
-            otherTable: assessment
+        ```
+        otherTable: assessment
+        ```
 
         This is the name of the other table (which can be the master table, the details
         table, or the own table, depending on the value of `inspect`).
 
-            otherField: submitted
+        ```
+        otherField: submitted
+        ```
 
         The name of the field in the other table to look at.
 
-            myField: null
+        ```
+        myField: null
+        ```
 
         The name of the field in the own table to look at.
 
-            value: true
+        ```
+        value: true
+        ```
 
         A reference value to compare the inspected value with.
 
@@ -218,16 +231,20 @@ The principal functions exported are discussed here.
           triggerFields:
             - assessmentType
             - submitted
+            - reviewerF
         ```
 
         It says that if an assessment record is changed, some other records are
-        affected, namely its master record in the `contrib` table. But not all changes
-        in the assessment trigger adjustments, only changes in one of the
-        `triggerFields`, in this case obviously the field `submitted`.
+        affected, namely its master record in the `contrib` table.
+
+        But not all changes in the assessment trigger adjustments,
+        only changes in one of the `triggerFields`,
+        in this case obviously the field `submitted`.
 
         ??? explanation "other trigger fields"
-            The other trigger field, `assessmentType` is mentioned because of an other
-            workflow rule, which we have not mentioned here.
+            The other trigger fields, `assessmentType` and `reviewerF`
+            are mentioned because of other
+            workflow rules that we have not mentioned here.
 
         ??? note "triggers also on `linkField`"
             The system adds
@@ -247,7 +264,7 @@ The principal functions exported are discussed here.
     For each attribute there are optional constraints for the `update` and `delete`
     actions.
 
-    ```yaml
+    ```yaml hl_lines="3 4"
     prevent:
       locked:
         delete: true
@@ -261,7 +278,7 @@ The principal functions exported are discussed here.
         We can relax update constraints in several ways:
 
         ??? abstract "make an exception for some fields"
-            ```yaml
+            ```yaml hl_lines="3"
             prevent:
               locked:
                 update: except
@@ -274,7 +291,7 @@ The principal functions exported are discussed here.
                 The list of exceptions is defined in the
                 workflow configuration of the table in question, e.g.
 
-                ```yaml
+                ```yaml hl_lines="7 8 9 10"
                   - inspect: self
                     method: hasValue
                     otherField: submitted
@@ -292,7 +309,7 @@ The principal functions exported are discussed here.
                 the submitted status and the reviewers can still be changed.
 
         ??? abstract "prevent certain fields to change"
-            ```yaml
+            ```yaml hl_lines="4"
             prevent:
               locked:
                 update:
@@ -306,7 +323,7 @@ The principal functions exported are discussed here.
             Here we take a real example, under attribute
             `stalled` instead of `locked`:
 
-            ```yaml
+            ```yaml hl_lines="5"
             prevent:
               stalled:
                 update:
@@ -318,27 +335,31 @@ The principal functions exported are discussed here.
             is forbidden.
 
             ??? explanation
-                Here we say that a stalled assessment cannot be submitted. For the sake of
-                clarity, here is the rule that says when an assessment is `stalled`:
+                Here we have said that a stalled assessment cannot be submitted.
 
-                ```yaml
-                  workflow:
-                    read:
-                      - inspect: master
-                        method: hasDifferent
-                        linkField: contrib
-                        otherTable: contrib
-                        otherField: typeContribution
-                        myField: assessmentType
-                        value: null
-                        workflow:
-                          stalled: true
-                          stalledReason: assessment type is different from contribution type
-                ```
+                ??? details
+                    For the sake of clarity,
+                    here is the rule that says when an assessment is `stalled`:
 
-                In words: if an assessment has an `assessmentType` field with a different value
-                that the `contributionType` field of its master contribution, then the
-                assessment counts as stalled.
+                    ```yaml
+                      workflow:
+                        read:
+                          - inspect: master
+                            method: hasDifferent
+                            linkField: contrib
+                            otherTable: contrib
+                            otherField: typeContribution
+                            myField: assessmentType
+                            value: null
+                            workflow:
+                              stalled: true
+                              stalledReason: assessment type is different from contribution type
+                    ```
+
+                    In words: if an assessment has an `assessmentType` field
+                    with a different value than the `contributionType` field
+                    of its master contribution,
+                    then the assessment counts as stalled.
 
 ??? abstract "manageWorkflow"
     When the web server loads, it makes sure that correct workflow information is
@@ -529,7 +550,9 @@ reference records as *other record(s)*.
     Returns `{'on': True }` if a value from an other record is different from a value
     from my record.
 
-    ??? example "assessment checks whether its contribution type agrees with that of its contribution"
+    ??? example "assessment checks whether its contribution type
+        agrees with that of its contribution".
+
         The
         [assessment model]({{modelBase}}/tables/assessment.yaml)
         specifies:
@@ -655,8 +678,10 @@ reference records as *other record(s)*.
         `score` workflow attribute.
 
     ??? example "How the score travels to the user interface"
-        The workflow engine takes care that the assessment score is computed on the server whenever
+        The workflow engine takes care that the assessment score
+        is computed on the server whenever
         there is a need to do that.
+
         The computed workflow attributes are delivered to the client whenever the client
         wants to render a contribution.
 
@@ -664,7 +689,7 @@ reference records as *other record(s)*.
         (look at `w('score')`; `w()` is a function to read out workflow attributes for the 
         record in question):
 
-        ```javascript
+        ```javascript hl_lines="2"
         if (approved) {
           const scoreItems = (w('score') || emptyO).items || emptyA
           const score = scoreItems.length ? scoreItems[0] : emptyO

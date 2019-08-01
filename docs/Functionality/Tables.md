@@ -15,7 +15,9 @@ works.
     [template organization](../Client/Templates.md#template-organization)
     .
 
-## [contrib]({{appBase}}/tables/contrib.jsx)
+## contrib
+
+See [contrib]({{appBase}}/tables/contrib.jsx).
 
 [data model]({{modelBase}}/tables/contrib.yaml)
 
@@ -40,7 +42,9 @@ works.
 
     Furthermore, a link to the contribution record itself is inncluded.
 
-## [assessment]({{appBase}}/tables/assessment.jsx)
+## assessment
+
+See [assessment]({{appBase}}/tables/assessment.jsx).
 
 [data model]({{modelBase}}/tables/assessment.yaml)
 
@@ -97,7 +101,9 @@ works.
     Care must be taken whether this is the only assessment or 
     an additional assessment.
 
-## [criteriaEntry]({{appBase}}/tables/contrib.jsx)
+## criteriaEntry
+
+See [criteriaEntry]({{appBase}}/tables/contrib.jsx).
 
 [data model]({{modelBase}}/tables/criteriaEntry.yaml)
 
@@ -109,7 +115,9 @@ works.
     The display of the rows is such that completed entries are clearly differentiated
     from incomplete ones.
 
-## [review]({{appBase}}/tables/contrib.jsx)
+## review
+
+See [review]({{appBase}}/tables/contrib.jsx).
 
 [data model]({{modelBase}}/tables/review.yaml)
 
@@ -131,7 +139,9 @@ works.
     a control to add a review. Care must be taken whether this is a primary or 
     secondary review.
 
-## [reviewEntry]({{appBase}}/tables/reviewEntry.jsx)
+## reviewEntry
+
+See [reviewEntry]({{appBase}}/tables/reviewEntry.jsx).
 
 [data model]({{modelBase}}/tables/reviewEntry.yaml)
 

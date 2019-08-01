@@ -13,7 +13,9 @@
 
 ## Formalisms
 
-### [YAML]({{yaml}})
+### YAML
+
+See [YAML]({{yaml}}).
 
 A simple plain-text way to convey structured data. What
 [Markdown](#markdown)
@@ -36,7 +38,9 @@ to text, YAML is to XML-JSON. In this app we use YAML for configuration details.
             .
             No extra coding is needed.
 
-### [Markdown]({{markdownDoc}})
+### Markdown
+
+See [Markdown]({{markdownDoc}}).
 
 A simple plain-text way to write formatted text. See it as a shortcut to writing
 HTML. It is handy for writing documentation without being distracted by too many
@@ -64,7 +68,9 @@ HTML.
         [text fields](../Client/Components.md#markdownarea)
         in this app support markdown.
 
-### [JavaScript]({{javascript}})
+### JavaScript
+
+See [JavaScript]({{javascript}}).
 
 The principal scripting language for web applications. It has evolved into a
 performant language with a beautiful syntax, capable of running on the server
@@ -77,7 +83,9 @@ and in websites.
     [reducing](../Technology/React.md#redux)
     .
 
-### [JSX]({{reactDocs}}/introducing-JSX.html)
+### JSX
+
+See [JSX]({{reactDocs}}/introducing-JSX.html).
 
 This is also JavaScript, but with a thin layer of syntactic sugar, by which you
 can present your code as a collection of
@@ -108,7 +116,9 @@ can present your code as a collection of
     [memoization](../Client/Lib.md#memo)
     .
 
-### [Python]({{pythondocs}})
+### Python
+
+See [Python]({{pythondocs}}).
 
 A general purpose scripting language with excellent data processing facilities.
 
@@ -131,7 +141,9 @@ A general purpose scripting language with excellent data processing facilities.
     does the heavy lifting and tends to
     become uglier and uglier.
 
-### [CSS]({{css}})
+### CSS
+
+See [CSS]({{css}}).
 
 Styling the app has nightmarish overtones, because the concerns of style often
 cut right across the concerns of the components. There are several ways to
@@ -180,7 +192,9 @@ CSS.
     [vars.css]({{cssBase}}/vars.css)
     .
 
-### [Shell]({{bash}})
+### Shell
+
+See [Shell]({{bash}}).
 
 The shell is the interpreter of system level commands.
 
@@ -197,7 +211,9 @@ The shell is the interpreter of system level commands.
     it just the name of a task, and the script executes that task with all the
     sophistication needed.
 
-### [HTML]({{html}})
+### HTML
+
+See [HTML]({{html}}).
 
 The core language of the web.
 
@@ -209,7 +225,7 @@ The core language of the web.
 
     When the browser encounters HTML material, it parses it and stores it in its
     memory in a certain standard representation: the
-    [DOM](../Technology/React.md#dom)
+    [DOM](../Technology/React.md#processing-concepts)
     .
 
     But our server does not send HTML any more to the browser, except for a very
@@ -223,7 +239,9 @@ The core language of the web.
     JavaScript code builds and manipulates the DOM directly, without generating any
     formal HTML.
 
-### [JSON]({{javascript}}/Global_Objects/JSON)
+### JSON
+
+See [JSON]({{javascript}}/Global_Objects/JSON).
 
 A format to serialize JavaScript objects.
 

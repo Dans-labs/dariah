@@ -260,6 +260,20 @@ Here we describe the keys in the table models.
                     The `country` field in the
                     [contrib table]({{modelBase}}/tables/contrib.yaml)
                     has `isMember: true`.
+                    ```yaml hl_lines="9 10"
+                    country:
+                      perm:
+                        list:   public
+                        read:   public
+                        update: edit
+                      label: Country
+                      valType:
+                        relTable: country
+                        select:
+                          isMember: true
+                        allowNew: false
+                      multiple: false
+                    ```
 
                     So when we choose a country for a contribution,
                     we will be presented with a
@@ -270,9 +284,20 @@ Here we describe the keys in the table models.
                     [assessment table]({{modelBase}}/tables/assessment.yaml)
                     points to the user table, but it has a `select` condition:
 
-                    ```yaml
-                    authority:
-                    - $ne: legacy
+                    ```yaml hl_lines="9 10"
+                    reviewerE:
+                      perm:
+                        list: auth
+                        read: auth
+                        update: office
+                      label: Reviewer (1)
+                      valType:
+                        select:
+                          authority:
+                            $ne: legacy
+                        relTable: user
+                        allowNew: email
+                      multiple: false
                     ```
 
                     That means, only users for which
@@ -354,15 +379,22 @@ Here we describe the keys in the table models.
                     In
                     the `valType` for this field we see the following specification:
 
-                    ```yaml
-                    valType:
-                      relTable: typeContribution
-                      allowNew: false
-                      inactive:
-                        attributes:
-                          className: inactive
-                          title: this value does not belong to the current package
-                        disabled: true
+                    ```yaml hl_lines="10 11 12 13 14"
+                    typeContribution:
+                      perm:
+                        list:   public
+                        read:   public
+                        update: edit
+                      label: Type
+                      valType:
+                        relTable: typeContribution
+                        allowNew: false
+                        inactive:
+                          attributes:
+                            className: inactive
+                            title: this value does not belong to the current package
+                          disabled: true
+                      multiple: false
                     ```
 
                     This is the rendered HTML for this value:
@@ -373,6 +405,7 @@ Here we describe the keys in the table models.
                         class="tag disabled inactive"
                     >Tools and Software</a>
                     ```
+
         ??? note "Listing related records"
             When we need to show a related record as a single value,
             we use its *title* field.
@@ -452,25 +485,30 @@ Here we describe the keys in the table models.
             [country model]({{modelBase}}/tables/country.yaml)
             lays out its columns as follows:
 
-            ```yaml
+            ```yaml hl_lines="3 4 5 8 9 10 13 14 15 18 19 20 21 24 25 26 27"
             iso:
+              ...
               grid:
                 width: 2em
                 grow: 0
             name:
+              ...
               grid:
                 width: 10em
                 grow: 1
             isMember:
+              ...
               grid:
                 width: 4em
                 grow: 0
             latitude:
+              ...
               grid:
                 width: 4em
                 grow: 0.5
                 shrink: 0
             longitude:
+              ...
               grid:
                 width: 4em
                 grow: 0.5
@@ -491,9 +529,19 @@ Here we describe the keys in the table models.
             [country table]({{modelBase}}/tables/country.yaml)
             is subjected to the `isoCountry()` validation function:
 
-            ```yaml
+            ```yaml hl_lines="8"
             iso:
+              perm:
+                list:   public
+                read:   public
+                update: office
+              label: ISO(2)
+              valType: text
               valid: isoCountry
+              multiple: false
+              grid:
+                width: 2em
+                grow: 0
             ```
 
             This function can be found in
@@ -504,228 +552,237 @@ Here we describe the keys in the table models.
             The server carries out extensive, non-customizable validation
             as well, in order to protect the integrity of the database.
 
-    ??? abstract "details"
-        Specification of detail records: where are they and how are they connected
-        to their masters?
+??? abstract "details"
+    Specification of detail records: where are they and how are they connected
+    to their masters?
 
-        ??? explanation "master-detail"
-            A record may have *detail records* associated with it.
-            We call such a record a *master record* with respect to its details.
+    ??? explanation "master-detail"
+        A record may have *detail records* associated with it.
+        We call such a record a *master record* with respect to its details.
 
-            Details are records, usually in another table,
-            having a field that points to their master record
-            by means of an `_id` value.
+        Details are records, usually in another table,
+        having a field that points to their master record
+        by means of an `_id` value.
 
-        ??? explanation "multiple kinds of details"
-            A master record may have multiple kinds of detail records,
-            i.e. detail records from several distinct tables.
-            It is also possible to specify multiple kinds from
-            one and the same originating table.
+    ??? explanation "multiple kinds of details"
+        A master record may have multiple kinds of detail records,
+        i.e. detail records from several distinct tables.
+        It is also possible to specify multiple kinds from
+        one and the same originating table.
 
-            To each kind of detail, a name is given,
-            often this name is the same as the name of table in which the details
-            are found.
+        To each kind of detail, a name is given,
+        often this name is the same as the name of table in which the details
+        are found.
 
-        ??? explanation "Detail display"
-            When a master record is presented in full view, all of its fields are expanded
-            with their values.
-            Below that there are lists of head lines of detail records,
-            sorted by their kind.
+    ??? explanation "Detail display"
+        When a master record is presented in full view, all of its fields are expanded
+        with their values.
 
-        ??? details "detailOrder"
-            The order in which details are displayed below their master record
-            is given in the key `detailOrder`.
+        Below that there are lists of head lines of detail records,
+        sorted by their kind.
 
-        ??? details "details"
-            A list of specifications for each kind of detail.
-            
-            These specifications consist of:
+    The detail specifications consist of:
 
-            ??? details "table"
-                The name of the originating table.
+    ??? details "table"
+        The name of the originating table.
 
-            ??? details "linkField"
-                The name of the field in the originating table that links to the
-                master record.
+    ??? details "linkField"
+        The name of the field in the originating table that links to the
+        master record.
 
-            ??? details "mode"
-                The display mode of the detal records:
+    ??? details "mode"
+        The display mode of the detal records:
 
-                name | meaning
-                --- | ---
-                `list` | plain list of record head lines
-                `grid` | table of full records in grid view
+        name | meaning
+        --- | ---
+        `list` | plain list of record head lines
+        `grid` | table of full records in grid view
 
-            ??? details "filtered"
-                Whether the detais of this kind should have filter controls.
-                If yes, the filters are taken from the specification
-                of the originating table.
+    ??? details "filtered"
+        Whether the detais of this kind should have filter controls.
+        If yes, the filters are taken from the specification
+        of the originating table.
 
-            ??? details "expand"
-                (*optional, default:* `false`)
+    ??? details "expand"
+        (*optional, default:* `false`)
 
-                If this is true,
-                all detail records of this kind will be immediately expanded.
-                Normally, detail records are presented as head lines initially.
+        If this is true,
+        all detail records of this kind will be immediately expanded.
+        Normally, detail records are presented as head lines initially.
 
-            ??? details "border"
-                (*optional, default:* `read: true, edit: true`)
+    ??? details "border"
+        (*optional, default:* `read: true, edit: true`)
 
-                Whether to put a border around each individual detail record of this kind.
-                This feature must be specified for the read-only presentation
-                and the editable presentation separately,
-                by means of the keys `read` and `edit`.
+        Whether to put a border around each individual detail record of this kind.
+        This feature must be specified for the read-only presentation
+        and the editable presentation separately,
+        by means of the keys `read` and `edit`.
 
-                ??? example "criteriaEntry"
-                    The criteriaEntry details of an
-                    [assessment record]({{modelBase}}/tables/assessment.yaml)
-                    will be displayed without borders,
-                    thereby strengthening the impression that they constitute
-                    a single form.
+        ??? example "criteriaEntry"
+            The criteriaEntry details of an
+            [assessment record]({{modelBase}}/tables/assessment.yaml)
+            will be displayed without borders,
+            thereby strengthening the impression that they constitute
+            a single form.
 
-                    ```yaml
-                    details:
-                      criteriaEntry:
-                        table: criteriaEntry
-                        linkField: assessment
-                        expand: own
-                        mode: list
-                        border: {
-                          read: false,
-                          edit: false,
-                        }
-                        filtered: true
-                        cascade: true
-                        fixed: true
-                    ```
+            ```yaml hl_lines="7 8 9 10"
+            details:
+              criteriaEntry:
+                table: criteriaEntry
+                linkField: assessment
+                expand: own
+                mode: list
+                border: {
+                  read: false,
+                  edit: false,
+                }
+                filtered: true
+                cascade: true
+                fixed: true
+            ```
 
-            ??? details "cascade"
-                (*optional, default:* `false`)
+    ??? details "cascade"
+        (*optional, default:* `false`)
 
-                When the master record is deleted,
-                its details have a dangling reference to a non-existing master record.
-                In some cases it is desirable to delete the detail records as well.
+        When the master record is deleted,
+        its details have a dangling reference to a non-existing master record.
+        In some cases it is desirable to delete the detail records as well.
 
-                If `cascade: true`,
-                the detail records of this kind will be deleted together with
-                the master record.
+        If `cascade: true`,
+        the detail records of this kind will be deleted together with
+        the master record.
 
-                ??? example "criteriaEntry"
-                    In the 
-                    [assessment model]({{modelBase}}/tables/assessment.yaml)
-                    it is stated that criteriaEntry records are deleted with their
-                    master record.
+        ??? example "criteriaEntry"
+            In the 
+            [assessment model]({{modelBase}}/tables/assessment.yaml)
+            it is stated that criteriaEntry records are deleted with their
+            master record.
 
-                    ```yaml
-                    criteriaEntry:
-                      table: criteriaEntry
-                      linkField: assessment
-                      cascade: true
-                    ```
+            ```yaml hl_lines="12"
+            details:
+              criteriaEntry:
+                table: criteriaEntry
+                linkField: assessment
+                expand: own
+                mode: list
+                border: {
+                  read: false,
+                  edit: false,
+                }
+                filtered: true
+                cascade: true
+                fixed: true
+            ```
 
-                ??? example "criteria"
-                    In the 
-                    [package model]({{modelBase}}/tables/package.yaml)
-                    it is stated that criteria records are *not* deleted with their
-                    master record.
-
-                    ```yaml
-                    details:
-                      criteria:
-                        table: criteria
-                        linkField: package
-                        mode: list
-                        filtered: true
-                    ```
-
-            ??? details "fixed"
-                (*optional, default:* `false`)
-
-                Whether the list of details of this kind is fixed.
-
-                Details of a kind are fixed, if, after having been created, no
-                details may be added or removed.
-                Individual details may still be modified.
-
-                ??? example  "Assessments and criteria entries"
-                    Once an `assessment` record for a contribution has been created,
-                    a special
-                    [workflow](../Functionality/Workflow.md)
-                    takes care to lookup the list of criteria that
-                    apply to this contribution, based on its `typeContribution` field.
-
-                    ??? details "read from package"
-                        This mapping is read from the `criteria` detail records
-                        of the currently active `package` records).
-
-                    For each criterion a `criteriaEntry` detail record is
-                    added to the master `assessment` record.
-
-                    After that, the list of `criteriaEntries`
-                    for this `assessment` record may not change anymore.
-                    But the user is still be able to fill out the `criteriaEntry` records.
-
-                    This is accomplished by `fixed: true` in
-
-                    ```yaml
-                    criteriaEntry:
-                      table: criteriaEntry
-                      linkField: assessment
-                      expand: own
-                      mode: list
-                      border: {
-                        read: false,
-                        edit: false,
-                      }
-                      filtered: true
-                      cascade: true
-                      fixed: true
-                    ```
-
-                    See the
-                    [assessment model]({{modelBase}}/tables/assessment.yaml)
-                    .
-
-    ??? abstract "needMaster"
-        *optional: default:* `false`.
-
-        Some tables act as containers for detail records exclusively,
-        and it makes no sense to create a detail record if there is no
-        master record to point to.
-
-        If that is the case, specify `needMaster: true`, otherwise, leave it out.
-
-        ??? details "Presentation"
-            If `needMaster: true`, there will be no plus button (insert item)
-            when the records are displayed as a main list.
-            Only when they are displayed as a list of
-            details to some master record, the plus button will appear.
-
-        ??? example "Assessment"
-            Assessments can only be created as detail of a `contribution`.
+        ??? example "criteria"
+            In the 
+            [package model]({{modelBase}}/tables/package.yaml)
+            it is stated that criteria records are *not* deleted with their
+            master record, bacause there is no `cascade: true`.
 
             ```yaml
-            needMaster: true
+            details:
+              criteria:
+                table: criteria
+                linkField: package
+                mode: list
+                filtered: true
+            ```
+
+    ??? details "fixed"
+        (*optional, default:* `false`)
+
+        Whether the list of details of this kind is fixed.
+
+        Details of a kind are fixed, if, after having been created, no
+        details may be added or removed.
+        Individual details may still be modified.
+
+        ??? example  "Assessments and criteria entries"
+            Once an `assessment` record for a contribution has been created,
+            a special
+            [workflow](../Functionality/Workflow.md)
+            takes care to lookup the list of criteria that
+            apply to this contribution, based on its `typeContribution` field.
+
+            ??? details "read from package"
+                This mapping is read from the `criteria` detail records
+                of the currently active `package` records).
+
+            For each criterion a `criteriaEntry` detail record is
+            added to the master `assessment` record.
+
+            After that, the list of `criteriaEntries`
+            for this `assessment` record may not change anymore.
+            But the user is still be able to fill out the `criteriaEntry` records.
+
+            This is accomplished by `fixed: true` in
+
+            ```yaml hl_lines="13"
+            details:
+              criteriaEntry:
+                table: criteriaEntry
+                linkField: assessment
+                expand: own
+                mode: list
+                border: {
+                  read: false,
+                  edit: false,
+                }
+                filtered: true
+                cascade: true
+                fixed: true
             ```
 
             See the
             [assessment model]({{modelBase}}/tables/assessment.yaml)
             .
 
-        ??? example "Package"
-            Packages can be seen as details of `typeContribution`,
-            in the sense that for each contribution type,
-            there is a list of packages to tell
-            when that contribution type was valid and
-            which criteria were associated with it.
+??? details "detailOrder"
+    The order in which details are displayed below their master record
+    is given in the key `detailOrder`.
 
-            Yet a package record makes sense on its own.
 
-            When you create it, you do not have to
-            select a contribution type first.
+??? abstract "needMaster"
+    *optional: default:* `false`.
 
-            Rather, you create a package, and in its
-            `typeContribution` field you select a number of contribution types.
+    Some tables act as containers for detail records exclusively,
+    and it makes no sense to create a detail record if there is no
+    master record to point to.
+
+    If that is the case, specify `needMaster: true`, otherwise, leave it out.
+
+    ??? details "Presentation"
+        If `needMaster: true`, there will be no plus button (insert item)
+        when the records are displayed as a main list.
+        Only when they are displayed as a list of
+        details to some master record, the plus button will appear.
+
+    ??? example "Assessment"
+        Assessments can only be created as detail of a `contribution`.
+
+        ```yaml hl_lines="1"
+        needMaster: true
+        ```
+
+        See the
+        [assessment model]({{modelBase}}/tables/assessment.yaml)
+        .
+
+    ??? example "Package"
+        Packages can be seen as details of `typeContribution`,
+        in the sense that for each contribution type,
+        there is a list of packages to tell
+        when that contribution type was valid and
+        which criteria were associated with it.
+
+        Yet a package record makes sense on its own.
+
+        When you create it, you do not have to
+        select a contribution type first.
+
+        Rather, you create a package, and in its
+        `typeContribution` field you select a number of contribution types.
 
 ??? abstract "filters"
     A list of filters by which to constrain the set of records to be displayed.
@@ -753,7 +810,7 @@ Here we describe the keys in the table models.
         Hence,
         if we want to filter on actual scores, we say
 
-        ```yaml
+        ```yaml hl_lines="3"
         filters:
           - field: score
             relField: score
@@ -1251,9 +1308,7 @@ of the
         Especially the replacement of
 
         ```javascript
-        {
-          name
-        }
+        { name }
         ```
 
         by

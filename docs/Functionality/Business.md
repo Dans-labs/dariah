@@ -27,23 +27,48 @@ and stakeholders. We focus on the scenarios that are supported.
     (✗✗) a **double** ✗: 
     unsure if it will ever be be impemented.
 
+## Business content
+
+All information regarding the assessment and review of contributions,
+is in so-called back-office tables: *packages*, *criteria*, *types*.
+
+??? abstract "Source of business rules"
+    The business tables have been compiled under guidance of the HaS project
+    by Lisa de Leeuw.
+
+    Dirk Roorda has entered them into a big
+    [back office configuration file]({{staticBase}}/tools/backoffice.yaml)
+    which will be read by an import script and transported into the MongoDB
+    database.
+
 ## Contributions
 
 A contribution is a piece of work in Digital Humanities, delivered by a person
 or institute, and potentially relevant to the European DARIAH research
-infrastructure. The national members of DARIAH may add such a contribution to
-their agreed budget of in-kind contributions to DARIAH as a whole. This makes it
-necessary to assess contributions against a set of well-defined criteria.
+infrastructure.
+
+??? abstract "Selection by National Coordinators"
+    The National Coordinators of DARIAH may add such a contribution to
+    their agreed budget of in-kind contributions to DARIAH as a whole.
+
+    This makes it necessary to assess contributions
+    against a set of well-defined criteria.
 
 ## Assessment scenario
 
 Contributions may represent diverse efforts such as consultancy, workshops,
-software development, and hosting services. This asks for a diversification of
-contribution types and associated criteria. Moreover, types and criteria may
-change over time, but during an assessment and review cycle they should be
-fixed. The assessor of a contribution (from now on called *applicant*) needs to
-state how that contribution scores for each relevant criterion, and for each
-score, evidence must be given.
+software development, and hosting services.
+
+??? abstract "Diversification and time dependency"
+    This asks for a diversification of contribution types and associated criteria.
+
+    The assessor of a contribution (from now on called *applicant*) needs to
+    state how that contribution scores for each relevant criterion, and for each
+    score, evidence must be given.
+
+    Moreover, types and criteria may change over time,
+    but during an assessment and review cycle they should be
+    fixed.
 
 ??? abstract "Packages, types, criteria"
     Contribution types and their associated assessment criteria
@@ -115,7 +140,9 @@ score, evidence must be given.
 ### Assessments
 
 Applicants with write-access to a contribution can add a self-assessment to a
-contribution. A self assessment is a record in the **assessment** table, and
+contribution.
+
+A self assessment is a record in the **assessment** table, and
 consists of a few metadata fields.
 
 ??? abstract "Criteria and criteria entry records"
@@ -175,7 +202,9 @@ consists of a few metadata fields.
 ## Review scenario
 
 After a contributor has filled out an assessment, (s)he can submit it for
-review. The office will select two reviewers, and they will get access to the
+review.
+
+The office will select two reviewers, and they will get access to the
 self-assessment.
 
 Upon asking for review, the assessment and the contribution will be locked.
@@ -220,9 +249,11 @@ Upon asking for review, the assessment and the contribution will be locked.
 The National Coordinator of a country can select contributions from his/her country
 as in-kind contribution of his country to DARIAH for a specific year.
 
-Ideally, only contributions that have been well-reviewed will be selected,
-but the app also supports the selection of contributions in whatever stage of the
-assessment/review process.
+??? caution "Selection may overrule"
+    Ideally, only contributions that have been well-reviewed will be selected.
+
+    But the app also supports the selection of contributions in whatever stage of the
+    assessment/review process.
 
 ??? explanation "Selection states"
     The national coordinator can *select* or *deselect* a contribution.
@@ -269,27 +300,39 @@ A consolidated contribution record
 contains the information of the contribution, its assessments (if any), and its
 reviews (if any).
 
-*Consolidated* means that all links to related records have been
-replaced by the concrete values found in those records at that time.
-Consolidated records do not contain fields that point to other records, only
-concrete text/number/datetime values.
+??? explanation "What is consolidated?"
+    It means that all links to related records have been
+    replaced by the concrete values found in those records at that time.
+
+    Consolidated records do not contain fields that point to other records, only
+    concrete text/number/datetime values.
 
 ??? abstract "Storage"
     Consolidated contributions are stored in the database as complex documents
     in the `contribConsolidated` collection.
 
     The image below shows how this tree ends up in the client, on the application
-    state. It is shown by the console of the web page, in development mode. You can
-    see how this tree is a mini database of records and related records, hanging
-    together with simple identifiers of the form `"ddd"` where `d` is a digit.
+    state.
+
+    It is shown by the console of the web page, in development mode.
+
+    You can see how this tree is a mini database of records and related records,
+    hanging together with simple identifiers
+    of the form `"ddd"` where `d` is a digit.
 
     ![diag](../design/design.013.png)
 
 ??? explanation "PDF generation"
     It is not completely trivial to distil a nice, well-readable document out of
-    this. What we need is a consolidation *template*, that grabs the relevant data
-    from this mini-database. From that template, we can produce first HTML and then
-    PDF. Rather than a single template, we should make templates for each of the
+    this.
+
+    What we need is a consolidation *template*, that grabs the relevant data
+    from this mini-database.
+
+    From that template, we can produce first HTML and then
+    PDF.
+
+    Rather than a single template, we should make templates for each of the
     tables involved.
 
     (✗) Consolidated records will be stored as PDF and viewable from within the
@@ -298,6 +341,7 @@ concrete text/number/datetime values.
 
 ??? caution "Selection of contribs in unfinished scenarios"
     Selection may take place even if assessments and reviews have not been completed.
+
     After selection, no work on self-assessments and no review work can take place anymore.
 
     Consolidation will grab the information in assessments and reviews as they have proceeded
@@ -328,13 +372,16 @@ has gone on in the following form:
 ## Management information
 
 The app compiles management information of a statistical nature, both to the
-public and authenticated users. The quantity of information given is dependent
-on user rights.
+public and authenticated users.
 
-The public can see contributions, but not assessments and reviews, except the
-ones that are finalized with outcome "accept".
+??? caution "Access rights"
+    The quantity of information given is dependent
+    on user rights.
 
-In those cases, the assessment score is also visible.
+    The public can see contributions, but not assessments and reviews, except the
+    ones that are finalized with outcome "accept".
+
+    In those cases, the assessment score is also visible.
 
 ??? abstract "National coordinators"
     NCs can (se)select contributions from this overview, but only the ones that
@@ -398,30 +445,32 @@ In those cases, the assessment score is also visible.
 
 This app has become super flexible, but also super complicated.
 
-We strongly advice to not develop this app further, but to simplify the requirements and to 
-reimplement the app, if needed.
+??? caution "Consider to call it a day"
+    We strongly advice to not develop this app further,
+    but to simplify the requirements and to 
+    reimplement the app, if needed.
 
-Also, think again whether the whole assessment/review process is
-best served by an app that codes all details of the business logic.
+    Also, think again whether the whole assessment/review process is
+    best served by an app that codes all details of the business logic.
 
-It could be that other approaches serve the goals equally well and prove far more effective.
+    It could be that other approaches serve the goals equally well and prove far more effective.
 
-???+ example "GitHub as contribution tool"
-    *   Define a document format for contribution metadata and for outcomes of the
-        review and selection proces.
-    *   Add a contribution metadata document to the GitHub repository of a contribution.
-    *   Use GitHub issues for assessing, reviewing and selecting contributions,
-        and store the outcomes in a document in the same repository.
-    *   Use the GitHub API to query repositories that contain contributions and
-        obtain their status.
-    *   Even if contributions that are not stored in GitHub repositories,
-        it is very easy to create a repo for them.
-    *   For long term preservation, rely on generic services such as
-        [Zenodo]({{zenodo}})
-        and the
-        [Software Heritage Archive]({{sha}})
-        .
+    ???+ example "GitHub as contribution tool"
+        *   Define a document format for contribution metadata and for outcomes of the
+            review and selection proces.
+        *   Add a contribution metadata document to the GitHub repository of a contribution.
+        *   Use GitHub issues for assessing, reviewing and selecting contributions,
+            and store the outcomes in a document in the same repository.
+        *   Use the GitHub API to query repositories that contain contributions and
+            obtain their status.
+        *   Even if contributions that are not stored in GitHub repositories,
+            it is very easy to create a repo for them.
+        *   For long term preservation, rely on generic services such as
+            [Zenodo]({{zenodo}})
+            and the
+            [Software Heritage Archive]({{sha}})
+            .
 
-See also  the
-[Lessons](../About/Lessons.md#this-approach-alternative-approaches)
-.
+    See also  the
+    [Lessons](../About/Lessons.md#this-approach-alternative-approaches)
+    .
