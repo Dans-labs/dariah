@@ -141,6 +141,15 @@ const makeV = memoize((tables, table, eId) => {
   }
 }, emptyO)
 
+const makeCons = memoize((tables, table, eId) => {
+  const {
+    [table]: {
+      entities: { [eId]: { consolidated = emptyA } = emptyO },
+    } = emptyO,
+  } = tables
+  return consolidated
+}, emptyO)
+
 const makeInsertS = memoize((settings, tables, table, eId) => {
   const {
     [table]: {
@@ -402,12 +411,13 @@ export const applyTemplate = ({
   const l = makeL(tables, table)
   const e = makeE(tables, table, values)
   const v = makeV(tables, table, eId)
+  const cons = makeCons(tables, table, eId)
   const w = makeW(tables, table, eId)
   const s = makeS(settings, tables, table, values, kind)
   const f = makeF(settings, tables, table, eId, values, kind)
   const o = isOwner(me, v)
 
-  return template({ settings, tables, at, l, e, v, w, s, f, o, me, linkMe })
+  return template({ settings, tables, at, l, e, v, cons, w, s, f, o, me, linkMe })
 }
 
 export const applyEditTemplate = ({
@@ -443,6 +453,7 @@ export const applyEditTemplate = ({
   const l = makeL(tables, table)
   const e = makeEditE(tables, table, fieldInfo)
   const v = makeV(tables, table, eId)
+  const cons = makeCons(tables, table, eId)
   const w = makeW(tables, table, eId)
   const s = makeEditS(settings, tables, table, fieldInfo)
   const f = makeEditF(settings, tables, table, eId, fieldInfo)
@@ -466,6 +477,7 @@ export const applyEditTemplate = ({
     l,
     e,
     v,
+    cons,
     w,
     s,
     f,

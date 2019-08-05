@@ -73,6 +73,10 @@ generic:
     - creator
     - modified
   noTitle: no title
+  consolidation:
+    field: consolidated
+    noValue: not stated
+    defaultType: text
 
 permissions:
   unauth: public
@@ -243,9 +247,11 @@ names:
   - Approved
   - before
   - bool
+  - bool3
   - cn
   - complete
   - consolidated
+  - content
   - criteriaEntities
   - criteriaIds
 #  - crossref
@@ -269,8 +275,6 @@ names:
   - id
   - info
   - insertValues
-  - interField
-  - interTable
   - isMemberOf
   - isPristine
   - kind

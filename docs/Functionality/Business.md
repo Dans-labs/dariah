@@ -309,7 +309,7 @@ reviews (if any).
 
 ??? abstract "Storage"
     Consolidated contributions are stored in the database as complex documents
-    in the `contribConsolidated` collection.
+    in the `contrib_consolidated` collection.
 
     The image below shows how this tree ends up in the client, on the application
     state.
@@ -335,8 +335,9 @@ reviews (if any).
     Rather than a single template, we should make templates for each of the
     tables involved.
 
-    (✗) Consolidated records will be stored as PDF and viewable from within the
-    app. What needs to be done here, is to write templates that select the desired
+    (✗) PDF reports based on consolidated records can be generated on the fly
+    but will not be stored. 
+    What needs to be done here, is to write templates that select the desired
     information from the tree of consolidated documents.
 
 ??? caution "Selection of contribs in unfinished scenarios"

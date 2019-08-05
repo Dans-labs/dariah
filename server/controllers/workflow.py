@@ -1,9 +1,10 @@
 from collections import OrderedDict
-from controllers.utils import now, mongoFields, mongoRows, serverprint, pp
+from controllers.utils import filterModified, now, mongoFields, mongoRows, serverprint, pp
 from models.compiled.model import model as M
 from models.compiled.names import N
 
 DM = M[N.tables]
+DMG = M[N.generic]
 WM = M[N.workflow]
 
 NA = 'N/A'
@@ -432,56 +433,112 @@ class WorkflowApi(object):
       }
     return (good, data)
 
+  def findConsolidated(self, table, record, perm):
+    if table != N.contrib:
+      return []
+
+    consolidation = DMG[N.consolidation]
+    consField = consolidation[N.field]
+    consTable = '{}_{}'.format(table, consField)
+
+    rId = record[N._id]
+    rowFilter = {N.contrib: rId}
+
+    allFields = {N._id, N.consolidated, N.selected, N.content}
+    metaFields = allFields - {N.content}
+
+    fieldFilter = (
+        mongoFields(allFields)
+        if N.update in perm and perm[N.update] else
+        mongoFields(metaFields)
+    )
+    records = list(self.MONGO[consTable].find(
+        rowFilter,
+        fieldFilter,
+    ))
+    return records
+
   def consolidateRecord(
       self,
       table,
-      record,
+      oldRecord,
+      newRecord,
       workflow,
       msgs,
   ):
-    MONGO = self.MONGO
-    if table == N.review:
-      if record.get(N.decision, None):
-        consMaterial = {}
-        consMap = {}
-        self._consolidate(table, [record], msgs, consMaterial, consMap)
-        MONGO['{}_{}'.format(table, N.consolidated)].insert_one(consMaterial)
-        return (True, consMaterial)
-    return (True, None)
+    good = True
 
-  def _consolidate(self, table, records, msgs, consMaterial, consMap):
+    if table != N.contrib:
+      return (True, None)
+
+    oldSelected = oldRecord.get(N.selected, None)
+    newSelected = newRecord.get(N.selected, None)
+    if oldSelected == newSelected or newSelected is None:
+      return (True, None)
+
+    (good, consRecords) = self._consolidate(table, [newRecord], msgs)
+
+    consolidation = DMG[N.consolidation]
+    consField = consolidation[N.field]
+    if good:
+      finalRecord = {
+          consField: newRecord.get(N.modified, ['?? on ??'])[-1],
+          N.selected: newRecord.get(N.selected, None),
+          N.content: consRecords[0],
+          N.contrib: newRecord[N._id],
+      }
+      self.MONGO['{}_{}'.format(table, consField)].insert_one(finalRecord)
+    return (True, finalRecord)
+
+  def _consolidate(self, table, records, msgs):
+    consolidation = DMG[N.consolidation]
+    noValue = consolidation[N.noValue]
     MONGO = self.MONGO
     tableInfo = DM.get(table, {})
     fieldOrder = tableInfo[N.fieldOrder]
     fieldSpecs = tableInfo[N.fieldSpecs]
     detailOrder = tableInfo.get(N.detailOrder, None)
     details = tableInfo.get(N.details, None)
-    recRefs = []
-    fmt = '{:>03}'
+    msgs = []
+    consRecords = []
+    good = True
+
     for record in records:
-      consRecord = {}
-      eId = record.get(N._id, None)
-      recRef = consMap.setdefault(table, {}).get(eId, None)
-      done = True
-      if recRef is None:
-        recRef = len(consMap[table])
-        consMap[table][eId] = recRef
-        done = False
-      recRefs.append((table, fmt.format(recRef), self._head(table, record)))
-      if done:
-        continue
-      consMaterial.setdefault(table, {})[fmt.format(recRef)] = consRecord
+      consRecord = []
       for field in fieldOrder:
-        if field not in record:
-          consRecord[field] = None
-          continue
         fieldSpec = fieldSpecs[field]
+        label = fieldSpec[N.label]
+        if field not in record:
+          consRecord.append((label, (noValue, N.text)))
+          continue
         valType = fieldSpec[N.valType]
         multiple = fieldSpec[N.multiple]
         recVal = record[field]
+        if field == N.modified:
+          recVal = filterModified(recVal or [], tillNow=True)
         if type(valType) is str:
-          consRecord[field] = recVal
+          consValType = valType
+          if valType in {N.number, N.datetime}:
+            consValType = N.text
+            recVal = str(recVal)
+          elif valType in {N.bool, N.bool3}:
+            consValType = N.text
+            recVal = (
+                noValue
+                if recVal is None else
+                'yes'
+                if recVal else
+                'no'
+            )
+
+          recValTyped = (
+              [(r, consValType) for r in recVal]
+              if multiple else
+              (recVal, consValType)
+          )
+          consRecord.append((label, recValTyped))
         else:
+          consValType = N.text
           relTable = valType[N.relTable]
           relTableInfo = DM.get(relTable, {})
           relSort = relTableInfo[N.sort]
@@ -493,16 +550,22 @@ class WorkflowApi(object):
               }).sort(relSort)
           )
           if len(relatedRecords) == 0:
-            consRecord[field] = None
+            noValueTyped = [] if multiple else (noValue, N.text)
+            consRecord.append((label, noValueTyped))
           else:
-            theseRecordRefs = self._consolidate(
-                relTable,
-                relatedRecords,
-                msgs,
-                consMaterial,
-                consMap,
-            )
-            consRecord[field] = theseRecordRefs if multiple else theseRecordRefs[0]
+            theseHeads = []
+            for relatedRecord in relatedRecords:
+              thisHead = self._head(relTable, relatedRecord)
+              thisHeadTyped = (
+                  thisHead if type(thisHead) is tuple or type(thisHead) is list
+                  else
+                  (thisHead, N.text)
+              )
+              theseHeads.append(thisHeadTyped)
+            consRecord.append((
+                label,
+                theseHeads if multiple else theseHeads[0],
+            ))
       if detailOrder and details:
         for detail in detailOrder:
           detailSpec = details[detail]
@@ -511,16 +574,14 @@ class WorkflowApi(object):
           detailTableInfo = DM.get(detailTable, {})
           detailSort = detailTableInfo[N.sort]
           detailRecords = list(MONGO[detailTable].find({linkField: record[N._id]}).sort(detailSort))
-          consRecord.setdefault(N.details, []).append(
-              (detail, self._consolidate(
-                  detailTable,
-                  detailRecords,
-                  msgs,
-                  consMaterial,
-                  consMap,
-              ))
-          )
-    return recRefs
+          (thisGood, detailConsRecords) = self._consolidate(detailTable, detailRecords, msgs)
+          if thisGood:
+            consRecord.append((detail, detailConsRecords))
+          else:
+            good = False
+
+      consRecords.append(consRecord)
+    return (good, consRecords)
 
 # SELECTOR FUNCTIONS
 
@@ -884,6 +945,19 @@ def _head_typeContribution(rec):
       sep,
       subType,
   )
+
+
+def _head_criteria(rec):
+  fieldSpecs = DM[N.criteria][N.fieldSpecs]
+  criterionLabel = fieldSpecs[N.criterion][N.label]
+  remarksLabel = fieldSpecs[N.remarks][N.label]
+  criterion = rec.get(N.criterion, NA)
+  remarks = rec.get(N.remarks, [])
+  remarksTyped = [(r, N.text) for r in remarks]
+  return [
+      (criterionLabel, (criterion, N.text)),
+      (remarksLabel, remarksTyped),
+  ]
 
 
 def _head_score(rec):

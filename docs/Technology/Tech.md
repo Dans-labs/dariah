@@ -39,7 +39,7 @@ with an ✗.
     *   [✗ Visual Studio Code]({{vsc}}) IDE by Microsoft
     *   [✗ Webstorm]({{webstorm}}) commercial IDE
 
-    ???+ abstract "Linnters and formatters
+    ???+ abstract "Linters and formatters
         *   [remark]({{remark}}) linter and formatter for markdown
         *   [flake8]({{flake8}}) code linter for Python
         *   [yapf]({{yapf}}) code formatter for Python

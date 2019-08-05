@@ -587,11 +587,11 @@ class DbAccess(object):
       }, )
       return False
     theRowFilter = andRows(rowFilter, {N._id: oid(eId)})
-    records = list(MONGO[table].find(theRowFilter))
-    if len(records) != 1:
+    myRecords = list(MONGO[table].find(theRowFilter))
+    if len(myRecords) != 1:
       msgs.append({N.kind: N.error, N.text: 'Unidentified item to delete'}, )
       return False
-    record = records[0]
+    record = myRecords[0]
     (mayDelete, dummyR, dummyF) = Perm.allow(
         table,
         N.delete,
@@ -692,7 +692,14 @@ class DbAccess(object):
 
     return not self._hasErrors(msgs)
 
-  def _updateItem(self, controller, table, newData, rowFilter, fieldSet, records, msgs, workflow):
+  def _updateItem(
+      self,
+      controller,
+      table,
+      newData,
+      rowFilter, fieldSet,
+      records, msgs, workflow,
+  ):
     MONGO = self.MONGO
     WF = self.WF
     Perm = self.Perm
@@ -704,11 +711,11 @@ class DbAccess(object):
       })
       return
     theRowFilter = andRows(rowFilter, {N._id: oid(eId)})
-    records = list(MONGO[table].find(theRowFilter))
-    if len(records) != 1:
+    myRecords = list(MONGO[table].find(theRowFilter))
+    if len(myRecords) != 1:
       msgs.append({N.kind: N.error, N.text: 'Unidentified item to update'}, )
       return
-    record = records[0]
+    record = myRecords[0]
     (mayUpdate, dummyR, fieldSetU) = Perm.allow(
         table,
         N.update,
@@ -801,30 +808,31 @@ class DbAccess(object):
     )
 
     # update the permission information (this changes if the user has updated a field
-    # that has "set" permission only: after that, it is readonly
+    # that has <set> permission only: after that, it is readonly
 
     newPerm = self._getPerm(table, newRecord, msgs)
     # update the workflow information
     myWorkflow = WF.readWorkflow(msgs, table, newRecord, compute=True)
     workflow.extend(WF.adjustWorkflow(msgs, table, record, newRecord))
 
-    recordInfo = {
-        N.values: updateSaveValues,
-        N.newValues: newValues,
-        N.perm: newPerm,
-        N.diags: validationDiags,
-        N.workflow: myWorkflow,
-    }
-
     # see whether the record should be consolidated
     (consGood, consRecord) = WF.consolidateRecord(
         table,
+        record,
         newRecord,
         myWorkflow,
         msgs,
     )
-    if consGood and consRecord:
-      records.append(('{}_{}'.format(table, N.consolidated), consRecord))
+    consolidated = consRecord if consGood and consRecord else None
+
+    recordInfo = {
+        N.values: updateSaveValues,
+        N.newValues: newValues,
+        N.perm: newPerm,
+        N.consolidated: consolidated,
+        N.diags: validationDiags,
+        N.workflow: myWorkflow,
+    }
 
     # if we happen to modify a user record,
     # we add group info to the information
@@ -839,7 +847,14 @@ class DbAccess(object):
 
     records.append(recordInfo)
 
-  def _findRecord(self, table, rowFilter, fieldSet, failData, failText, msgs, multiple=False):
+  def _findRecord(
+      self,
+      table,
+      rowFilter, fieldSet,
+      failData, failText,
+      msgs,
+      multiple=False,
+  ):
     MONGO = self.MONGO
     WF = self.WF
     Perm = self.Perm
@@ -863,6 +878,7 @@ class DbAccess(object):
         if not mayRead:
           continue
         perm = self._getPerm(table, record, msgs)
+        cons = WF.findConsolidated(table, record, perm)
         workflow = WF.readWorkflow(
             msgs,
             table,
@@ -873,8 +889,9 @@ class DbAccess(object):
                        for (f, v) in record.items()
                        if f != N.creator or f in fieldSet},
             N.perm: perm,
+            N.consolidated: cons,
             N.fields: mongoFields(fieldSet),
-            N.workflow: workflow
+            N.workflow: workflow,
         })
       return data
     else:
@@ -889,6 +906,7 @@ class DbAccess(object):
       if not mayRead:
         return failData
       perm = self._getPerm(table, record, msgs)
+      cons = WF.findConsolidated(table, record, perm)
       workflow = WF.readWorkflow(
           msgs,
           table,
@@ -899,6 +917,7 @@ class DbAccess(object):
                      for (f, v) in record.items()
                      if f != N.creator or f in fieldSet},
           N.perm: perm,
+          N.consolidated: cons,
           N.fields: mongoFields(fieldSet),
           N.workflow: workflow
       }

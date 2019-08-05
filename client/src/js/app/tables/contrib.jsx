@@ -16,7 +16,7 @@ const templates = {
       { tables, v, w, me },
     )
   },
-  mainAction({ tables, v, w, fs, m }) {
+  mainAction({ tables, v, cons, w, fs, m }) {
     const decision = finalDecision(w('reviewers'), w('reviews'))
     const { dId } = decisions(tables.decision)
     const approved = decision === dId['good']
@@ -48,6 +48,18 @@ const templates = {
           {`This contribution is locked because ${frozenDesc}.`}
         </div>
     ) : null
+    const consolidatedCopies = cons.map(consRecord => {
+      const { consolidated, selected, _id } = consRecord
+      const kind = selected ? 'good' : 'error'
+      return (
+        <div
+          key={_id}
+          className={`label large workflow ${kind}`}
+        >
+          {`consolidated: ${consolidated}.`}
+        </div>
+      )
+    })
     const decideYes = (
       <>
         {
@@ -127,6 +139,7 @@ const templates = {
         <>
             {resultApproved}
             {resultSelected}
+            {consolidatedCopies}
         </>
     )
   },

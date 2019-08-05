@@ -897,7 +897,7 @@ of the
 
     ??? details "National coordinators"
         DARIAH users that coordinate the DARIAH outputs
-        for an enntire member country.
+        for an entire member country.
 
         They can (de)select contributions and see their cost fields
         but only for contributions in the countries they coordinate.
@@ -1044,7 +1044,7 @@ of the
         It requires that the user acting on the item is either the owner or
         is more powerful than the owner of the record.
 
-        This is onnly applicable to the `group` field in the `user` table.
+        This is only applicable to the `group` field in the `user` table.
 
         In this way it is enforced that lower power users can not affect
         what higher power users can do.

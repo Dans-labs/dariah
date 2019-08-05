@@ -208,49 +208,47 @@ const flows = {
     const { records = emptyA, workflow, uid } = data
     let newState = state
     for (const record of records) {
-      if (Array.isArray(record)) {
-        const [consTable, consRecord] = record
-        const { _id } = consRecord
-        newState = updateAuto(newState, [consTable], {
-          [_id]: { $set: consRecord },
+      const {
+        values,
+        values: { _id },
+        newValues,
+        perm,
+        consolidated,
+        workflow: ownWorkflow,
+      } = record
+      const fieldUpdates = {}
+      Object.entries(values).forEach(([key, value]) => {
+        fieldUpdates[key] = { $set: value }
+      })
+      newState = updateAuto(
+        newState,
+        [table, 'entities', _id, 'values'],
+        fieldUpdates,
+      )
+      newState = changeOur(newState, table, values, uid)
+      newState = updateAuto(newState, [table, 'entities', _id, 'perm'], {
+        $set: perm,
+      })
+      newState = updateAuto(newState, [table, 'entities', _id, 'workflow'], {
+        $set: ownWorkflow,
+      })
+      if (consolidated) {
+        newState = updateAuto(newState, [table, 'entities', _id, 'consolidated'], {
+          $push: [consolidated],
         })
-      } else {
-        const {
-          values,
-          values: { _id },
-          newValues,
-          perm,
-          workflow: ownWorkflow,
-        } = record
-        const fieldUpdates = {}
-        Object.entries(values).forEach(([key, value]) => {
-          fieldUpdates[key] = { $set: value }
-        })
-        newState = updateAuto(
-          newState,
-          [table, 'entities', _id, 'values'],
-          fieldUpdates,
-        )
-        newState = changeOur(newState, table, values, uid)
-        newState = updateAuto(newState, [table, 'entities', _id, 'perm'], {
-          $set: perm,
-        })
-        newState = updateAuto(newState, [table, 'entities', _id, 'workflow'], {
-          $set: ownWorkflow,
-        })
-        if (newValues != null) {
-          for (const { _id, rep, repName, relTable, field } of newValues) {
-            newState = update(newState, {
-              [table]: { valueLists: { [field]: { $push: [_id] } } },
-            })
-            newState = updateItemWithFields(
-              newState,
-              relTable,
-              _id,
-              ['_id', repName],
-              { _id, [repName]: rep },
-            )
-          }
+      }
+      if (newValues != null) {
+        for (const { _id, rep, repName, relTable, field } of newValues) {
+          newState = update(newState, {
+            [table]: { valueLists: { [field]: { $push: [_id] } } },
+          })
+          newState = updateItemWithFields(
+            newState,
+            relTable,
+            _id,
+            ['_id', repName],
+            { _id, [repName]: rep },
+          )
         }
       }
       newState = updateWorkflow(newState, workflow)

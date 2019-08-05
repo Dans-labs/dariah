@@ -40,7 +40,7 @@ See [contrib]({{appBase}}/tables/contrib.jsx).
     A minimal amount of information is presented, but an url to the origin of
     the contribution is included.
 
-    Furthermore, a link to the contribution record itself is inncluded.
+    Furthermore, a link to the contribution record itself is included.
 
 ## assessment
 

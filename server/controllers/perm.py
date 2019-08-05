@@ -138,7 +138,7 @@ class PermApi(object):
 
     for field in fields:
       permF = fields[field].get(N.perm, {}).get(action, None)
-      permFset = fields[field].get(N.perm, {}).get('set', None)
+      permFset = fields[field].get(N.perm, {}).get(N.set, None)
       if permF is None and permFset is None:
         continue
       setOnly = False

@@ -706,7 +706,7 @@ reference records as *other record(s)*.
 
         If there are multiple assessments, the score is taken from the first one.
         If there is a score, it consists of a dictionary with relevant score quantities.
-        They are passed as properties to the [ScoreBox](../Client/Components#scorebox)
+        They are passed as properties to the [ScoreBox](../Client/Components.md#scorebox)
         component, which produces a nicely rendered representation of the assessment score.
 
 ## Hooks

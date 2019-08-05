@@ -72,10 +72,10 @@ def fillInSelect(select):
       fillInSelect(value)
 
 
-def filterModified(modified):
+def filterModified(modified, tillNow=False):
   logicM = _decomposeM(modified)
   chunks = _perDay(logicM)
-  thinned = _thinM(chunks)
+  thinned = _thinM(chunks, tillNow)
   return _composeM(thinned)
 
 
@@ -103,9 +103,10 @@ def _perDay(modified):
   return [chunks[date] for date in sorted(chunks)]
 
 
-def _thinM(chunks):
+def _thinM(chunks, tillNow):
   modified = []
-  for chunk in chunks[0:-1]:
+  chunksToTrim = chunks if tillNow else chunks[0:-1]
+  for chunk in chunksToTrim:
     people = {}
     for m in chunk:
       people.setdefault(m[0], []).append(m[1])
@@ -114,9 +115,9 @@ def _thinM(chunks):
       thinned.append((p, sorted(dates)[-1]))
     for m in sorted(thinned, key=lambda x: x[1]):
       modified.append((m, 1))
-  if len(chunks):
+  if not tillNow and len(chunks):
     for m in chunks[-1]:
-      modified.append((m, 2))
+      modified.append((m, 1 if tillNow else 2))
   return modified
 
 

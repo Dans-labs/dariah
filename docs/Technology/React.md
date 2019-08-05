@@ -537,7 +537,7 @@ The opposite of merging data into the state is selecting data from the state.
 
         If such a selector is called repeatedly with the same arguments,
         it will fetch the computed result from its cache
-        the second time it is called annd then onwards.
+        the second time it is called and then onwards.
 
         We use this library only to implement a function that
         [combines selectors](../Client/Lib.md#utils)
