@@ -444,7 +444,7 @@ class WorkflowApi(object):
     rId = record[N._id]
     rowFilter = {N.contrib: rId}
 
-    allFields = {N._id, N.consolidated, N.selected, N.content}
+    allFields = {N._id, N.consolidated, N.selected, N.contrib, N.title, N.content}
     metaFields = allFields - {N.content}
 
     fieldFilter = (
@@ -464,6 +464,7 @@ class WorkflowApi(object):
       oldRecord,
       newRecord,
       workflow,
+      perm,
       msgs,
   ):
     good = True
@@ -471,26 +472,40 @@ class WorkflowApi(object):
     if table != N.contrib:
       return (True, None)
 
+    hasConsolidated = self.findConsolidated(table, newRecord, perm)
     oldSelected = oldRecord.get(N.selected, None)
     newSelected = newRecord.get(N.selected, None)
-    if oldSelected == newSelected or newSelected is None:
+    if (
+        newSelected is None
+        or
+        (
+            oldSelected == newSelected
+            and
+            hasConsolidated
+        )
+    ):
       return (True, None)
 
-    (good, consRecords) = self._consolidate(table, [newRecord], msgs)
-
+    MONGO = self.MONGO
     consolidation = DMG[N.consolidation]
     consField = consolidation[N.field]
+
+    consTable = '{}_{}'.format(table, consField)
+
+    (good, consRecords) = self._consolidate(table, [newRecord], workflow, msgs)
+
     if good:
       finalRecord = {
           consField: newRecord.get(N.modified, ['?? on ??'])[-1],
           N.selected: newRecord.get(N.selected, None),
-          N.content: consRecords[0],
+          N.content: consRecords[0]["content"],
           N.contrib: newRecord[N._id],
+          N.title: newRecord[N.title],
       }
-      self.MONGO['{}_{}'.format(table, consField)].insert_one(finalRecord)
+      MONGO[consTable].insert_one(finalRecord)
     return (True, finalRecord)
 
-  def _consolidate(self, table, records, msgs):
+  def _consolidate(self, table, records, workflow, msgs):
     consolidation = DMG[N.consolidation]
     noValue = consolidation[N.noValue]
     MONGO = self.MONGO
@@ -504,12 +519,18 @@ class WorkflowApi(object):
     good = True
 
     for record in records:
-      consRecord = []
+      consContent = []
+      consRecord = {N.content: consContent}
       for field in fieldOrder:
         fieldSpec = fieldSpecs[field]
         label = fieldSpec[N.label]
         if field not in record:
-          consRecord.append((label, (noValue, N.text)))
+          consContent.append(
+              {
+                  N.field: label,
+                  N.data: {N.value: noValue, N.type: N.text},
+              }
+          )
           continue
         valType = fieldSpec[N.valType]
         multiple = fieldSpec[N.multiple]
@@ -532,11 +553,16 @@ class WorkflowApi(object):
             )
 
           recValTyped = (
-              [(r, consValType) for r in recVal]
+              [{N.value: r, N.type: consValType} for r in recVal]
               if multiple else
-              (recVal, consValType)
+              {N.value: recVal, N.type: consValType}
           )
-          consRecord.append((label, recValTyped))
+          consContent.append(
+              {
+                  N.field: label,
+                  N.data: recValTyped,
+              }
+          )
         else:
           consValType = N.text
           relTable = valType[N.relTable]
@@ -550,22 +576,94 @@ class WorkflowApi(object):
               }).sort(relSort)
           )
           if len(relatedRecords) == 0:
-            noValueTyped = [] if multiple else (noValue, N.text)
-            consRecord.append((label, noValueTyped))
+            noValueTyped = [] if multiple else {N.value: noValue, N.type: N.text}
+            consContent.append({
+                N.field: label,
+                N.data: noValueTyped,
+            })
           else:
             theseHeads = []
+            isRecord = False
             for relatedRecord in relatedRecords:
               thisHead = self._head(relTable, relatedRecord)
+              if type(thisHead) is tuple or type(thisHead) is list:
+                isRecord = True
               thisHeadTyped = (
-                  thisHead if type(thisHead) is tuple or type(thisHead) is list
-                  else
-                  (thisHead, N.text)
+                  thisHead
+                  if isRecord else
+                  {N.value: thisHead, N.type: N.text}
               )
               theseHeads.append(thisHeadTyped)
-            consRecord.append((
-                label,
-                theseHeads if multiple else theseHeads[0],
-            ))
+            keyName = N.content if isRecord else N.data
+            consContent.append({
+                N.field: label,
+                keyName: theseHeads if multiple else theseHeads[0],
+            })
+      if table in {N.contrib, N.assessment, N.review}:
+        if workflow is None:
+          workflow = self.readWorkflow(msgs, table, record, compute=False)
+      if table == N.contrib:
+        if N.frozen in workflow:
+          consContent.append({
+              N.field: N.status,
+              N.data: {
+                  N.value: workflow[N.frozen].get(N.desc, noValue),
+                  N.type: N.text,
+              },
+          })
+      elif table == N.assessment:
+        if N.score in workflow:
+          scoreAttribute = workflow[N.score]
+          scoreItems = scoreAttribute[N.items]
+          scoreItem = scoreItems[0] if scoreItems else {}
+          consContent.append({
+              N.field: scoreAttribute[N.desc],
+              N.data: {
+                  N.value: scoreItem,
+                  N.type: N.object,
+              },
+          })
+        if N.stalled in workflow:
+          consContent.append({
+              N.field: N.status,
+              N.data: {
+                  N.value: workflow[N.stalled].get(N.desc, noValue),
+                  N.type: N.text,
+              },
+          })
+        if N.locked in workflow:
+          consContent.append({
+              N.field: N.status,
+              N.data: {
+                  N.value: workflow[N.locked].get(N.desc, noValue),
+                  N.type: N.text,
+              },
+          })
+        if N.incomplete in workflow:
+          consContent.append({
+              N.field: N.status,
+              N.data: {
+                  N.value: workflow[N.incomplete].get(N.desc, noValue),
+                  N.type: N.text,
+              },
+          })
+      elif table == N.review:
+        if N.completed in workflow:
+          consContent.append({
+              N.field: N.status,
+              N.data: {
+                  N.value: workflow[N.completed].get(N.desc, noValue),
+                  N.type: N.text,
+              },
+          })
+        if N.incomplete in workflow:
+          consContent.append({
+              N.field: N.status,
+              N.data: {
+                  N.value: workflow[N.incomplete].get(N.desc, noValue),
+                  N.type: N.text,
+              },
+          })
       if detailOrder and details:
         for detail in detailOrder:
           detailSpec = details[detail]
@@ -574,9 +672,14 @@ class WorkflowApi(object):
           detailTableInfo = DM.get(detailTable, {})
           detailSort = detailTableInfo[N.sort]
           detailRecords = list(MONGO[detailTable].find({linkField: record[N._id]}).sort(detailSort))
-          (thisGood, detailConsRecords) = self._consolidate(detailTable, detailRecords, msgs)
+          (thisGood, detailConsRecords) = self._consolidate(
+              detailTable, detailRecords, None, msgs,
+          )
           if thisGood:
-            consRecord.append((detail, detailConsRecords))
+            consContent.append({
+                N.details: detail,
+                N.data: detailConsRecords,
+            })
           else:
             good = False
 
@@ -953,10 +1056,16 @@ def _head_criteria(rec):
   remarksLabel = fieldSpecs[N.remarks][N.label]
   criterion = rec.get(N.criterion, NA)
   remarks = rec.get(N.remarks, [])
-  remarksTyped = [(r, N.text) for r in remarks]
+  remarksTyped = [{N.value: r, N.type: N.text} for r in remarks]
   return [
-      (criterionLabel, (criterion, N.text)),
-      (remarksLabel, remarksTyped),
+      {
+          N.field: criterionLabel,
+          N.data: {N.value: criterion, N.type: N.text},
+      },
+      {
+          N.field: remarksLabel,
+          N.data: remarksTyped,
+      },
   ]
 
 

@@ -83,7 +83,6 @@ and for each purpose we have a kind of template.
         *   related records
         *   detail records
         *   insert buttons
-        *   consolidated records
     *   the determination of:
         *   edit modes.
 
@@ -241,14 +240,6 @@ and for each purpose we have a kind of template.
             **action** parts you can have them. However, in the **action** part, you do not
             have `save` and `reset` buttons. This part is meant for action buttons, which
             change a field to a predefined value and save it immediately.
-
-    ??? explanation "`consolidated`"
-        **For presenting consolidated records.**
-
-        ??? note "for template writers:"
-            These templates are passed `s`,
-            which is a special version of the `v` function.
-            `s` resolves all links to related values by the values pointed to.
 
 ## Applying templates
 

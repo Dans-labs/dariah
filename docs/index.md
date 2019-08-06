@@ -152,6 +152,7 @@ Dirk Roorda
 [DANS]({{dans}})
 <mailto:dirk.roorda@dans.knaw.nl>
 
+*   2019-08-06
 *   2019-07-29
 *   2019-03-04
 *   2017-12-14

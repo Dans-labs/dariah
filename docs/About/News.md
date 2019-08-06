@@ -1,5 +1,12 @@
 # News
 
+## 2019-07-06 ###
+
+*   Consolidation is implemented: upon (de)selection of a contribution,
+    a consolidated document is made and stored in the database.
+    This record can be viewed by authorized people.
+*   Overhaul of documentation. 
+
 ## 2019-05-03 ###
 
 The overview page lead to a server error in some circumstances.

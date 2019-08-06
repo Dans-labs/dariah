@@ -821,6 +821,7 @@ class DbAccess(object):
         record,
         newRecord,
         myWorkflow,
+        newPerm,
         msgs,
     )
     consolidated = consRecord if consGood and consRecord else None

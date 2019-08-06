@@ -197,19 +197,6 @@ const templates = {
       )
     },
   },
-  consolidated: {
-    trail({ s }) {
-      // consolidated assessment within a trail record
-      return (
-        <>
-          <div>{s('title')}</div>
-          <div>
-            {s('vcc', ', ')} {s.year}
-          </div>
-        </>
-      )
-    },
-  },
 }
 
 Object.assign(templates, {

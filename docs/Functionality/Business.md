@@ -291,7 +291,9 @@ as in-kind contribution of his country to DARIAH for a specific year.
     including their criteria entry records and review entry records
     get `frozen`.
 
-    (✗) Moreover, the contribution will be consolidated and a pdf report
+    Moreover, the contribution will be consolidated,
+    displayable on the interface,
+    (✗) and a pdf report
     can be generated from the consolidated record on demand.
 
 ### Consolidation
@@ -316,10 +318,6 @@ reviews (if any).
 
     It is shown by the console of the web page, in development mode.
 
-    You can see how this tree is a mini database of records and related records,
-    hanging together with simple identifiers
-    of the form `"ddd"` where `d` is a digit.
-
     ![diag](../design/design.013.png)
 
 ??? explanation "PDF generation"
@@ -337,8 +335,15 @@ reviews (if any).
 
     (✗) PDF reports based on consolidated records can be generated on the fly
     but will not be stored. 
-    What needs to be done here, is to write templates that select the desired
-    information from the tree of consolidated documents.
+
+    Consolidated contributions can be shown on the interface,
+    by means of a very basic function that wraps it into HTML.
+
+    From there they can be saved as PDF if the user exports the webpage to PDF,
+    using  browser  funnctionality.
+
+    (✗) There should be a button that calls a HTMP2PDF converter and downloads the
+    result to the user.
 
 ??? caution "Selection of contribs in unfinished scenarios"
     Selection may take place even if assessments and reviews have not been completed.
@@ -366,7 +371,7 @@ has gone on in the following form:
         *   (✗✗) by reviewers: comments and suggestions for modification
         *   (✗✗) by the applicant: to state an objection
 
-??? explanation "(✗) consolidated contribution"
+??? explanation "consolidated contribution"
     A snapshot of the contribution, assessments and reviews at the moment
     of (de)selection.
 

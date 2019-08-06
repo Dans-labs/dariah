@@ -592,6 +592,26 @@ can (de)select contributions from this page.
       contributions from their own country.
       Backoffice users can modify any selection decision.
 
+## cons
+
+See [cons]({{serverBase}}/controllers/cons.py).
+
+This module is reponsible for showing consolidated records in such a way
+that  they can easily be saved as PDF from the browser.
+
+??? note "Permissions"
+      It does manage access to data, and takes care that every user can access
+      the data under the proper conditions.
+      
+      It will show metadata only to people without update
+      rights to the contribution.
+
+      Other people are not allowed to see all fields of the contributions,
+      and because a consolidated record contains all information of a contribution
+      and its assessments and reviews, this is only for people that 
+      authored/edited the contribution and people in a powerful role, such as
+      `office`, `system`, and `root`.
+
 ## utils
 
 See [utils]({{serverBase}}/controllers/utils.py).

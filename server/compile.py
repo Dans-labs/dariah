@@ -10,6 +10,7 @@ from keyword import iskeyword
 from controllers.utils import serverprint
 
 controllers = 'controllers'
+xcontrollers = {'info', 'cons'}
 modelSource = 'models/model.yaml'
 tableSource = 'models/tables'
 compiled = 'models/compiled'
@@ -118,7 +119,7 @@ def checkNames(names, extraNames):
     Nnames = collections.Counter()
     for path in glob('{}/*.py'.format(controllers)):
         fName = os.path.splitext(os.path.basename(path))[0]
-        if fName == 'info':
+        if fName in xcontrollers:
           continue
         with open(path) as ph:
             for (i, line) in enumerate(ph):

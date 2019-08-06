@@ -7,6 +7,7 @@ from flask import (
 from controllers.utils import dbjson
 from controllers.db import DbAccess
 from controllers.info import getInfo, selectContrib
+from controllers.cons import getCons
 from controllers.file import FileApi
 from controllers.controller import Controller
 from controllers.auth import AuthApi
@@ -50,6 +51,12 @@ def factory():
           render_template('info.html', userInfo=Auth.userInfo, **data)
       )
     return render_template('index.html', css=Auth.CSS, js=Auth.JS)
+
+  @app.route('/cons/<path:contribId>')
+  def serveCons(contribId):
+    Auth.authenticate()
+    data = getCons(contribId, Auth.userInfo)
+    return render_template('cons.html', css=Auth.CSS, js=Auth.JS, **data)
 
   @app.route('/api/json/<path:doc>')
   def serveApiJson(doc):

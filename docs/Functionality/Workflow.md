@@ -749,6 +749,19 @@ They will be hooked in from other parts of the server code, especially data acce
         detail records will get the id of the just inserted main record. This will be
         used as masterId when the details get inserted.
 
+??? abstract "findConsolidated()"
+    ```python
+    findConsolidated(table, record, perm)
+    ```
+
+    ??? explanation "task"
+        Find consolidated records of the live `record` in `table`
+        and return them as a list of records (json-like).
+
+    ??? caution "Permissions"
+        Users  that have update rights for `record` will see the full
+        consolidated record, others see the metadata only. 
+
 ??? abstract "consolidateRecord()"
     ```python
     consolidateRecord(table, record, workflow, msgs)

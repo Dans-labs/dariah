@@ -288,6 +288,7 @@ names:
   - newValues
   - number
   - o
+  - object
   - 'on'
   - ourIds
   - records
@@ -298,6 +299,7 @@ names:
   - self
   - siblings
   - sn
+  - status
   - text
   - typeCriteria
   - typeInfo

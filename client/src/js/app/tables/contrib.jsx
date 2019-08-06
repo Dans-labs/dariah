@@ -49,17 +49,42 @@ const templates = {
         </div>
     ) : null
     const consolidatedCopies = cons.map(consRecord => {
-      const { consolidated, selected, _id } = consRecord
+      const { consolidated, selected, contrib, _id } = consRecord
       const kind = selected ? 'good' : 'error'
       return (
         <div
           key={_id}
           className={`label large workflow ${kind}`}
         >
-          {`consolidated: ${consolidated}.`}
+          {
+            m('title') ? (
+              <a
+                target={'_blank'}
+                href={`/cons/${contrib}/${_id}`}
+              >
+                {`consolidated: ${consolidated}.`}
+              </a>
+            ) : `consolidated: ${consolidated}.`
+          }
         </div>
       )
     })
+    const consolidate = cons.length ? consolidatedCopies : (
+      m('title') ? (
+        <>
+          {
+            fs('selected', v('selected'), h => (
+              <span
+                className={'button large workflow info'}
+                onClick={h}
+              >
+                  {'consolidate now'}
+              </span>
+            ))
+          }
+        </>
+      ) : null
+    )
     const decideYes = (
       <>
         {
@@ -139,7 +164,7 @@ const templates = {
         <>
             {resultApproved}
             {resultSelected}
-            {consolidatedCopies}
+            {consolidate}
         </>
     )
   },
