@@ -6,7 +6,7 @@ from controllers.utils import oid
 
 TOOL_PROD = 'https://dariah-beta.dans.knaw.nl'
 TOOL_DEV = 'http://127.0.0.1:8080'
-TOOL = TOOL_DEV
+TOOL = TOOL_PROD
 MONGO = None
 COORD = 'coord'
 POWER = {'office', 'system', 'root'}
