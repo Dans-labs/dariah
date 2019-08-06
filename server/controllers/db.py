@@ -816,6 +816,8 @@ class DbAccess(object):
     workflow.extend(WF.adjustWorkflow(msgs, table, record, newRecord))
 
     # see whether the record should be consolidated
+
+    newRecord[N.modified] = modified
     (consGood, consRecord) = WF.consolidateRecord(
         table,
         record,
