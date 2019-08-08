@@ -70,7 +70,10 @@ def _compute_assessmentScore(wf, myRecord, otherRecords, w):
   MONGO = wf.MONGO
   if not myRecord:
     return {}
-  scoreData = list(MONGO[N.score].find({}, {N._id: True, N.criteria: True, N.score: True}))
+  scoreData = list(MONGO[N.score].find(
+      {N.criteria: {'$exists': True}},
+      {N._id: True, N.criteria: True, N.score: True}
+  ))
   scoreMapping = {s[N._id]: s[N.score] for s in scoreData if N.score in s}
   maxScoreByCrit = {}
   for s in scoreData:
@@ -87,7 +90,8 @@ def _compute_assessmentScore(wf, myRecord, otherRecords, w):
       continue
     myCriteriaData = list(
         MONGO[N.criteriaEntry].find({
-            N.assessment: aId
+            N.assessment: aId,
+            N.criteria: {'$exists': True},
         }, {
             N._id: True,
             N.criteria: True,
