@@ -247,7 +247,6 @@ const makeInsertF = memoize((settings, tables, table, eId) => {
         settings={settings}
         tables={tables}
         table={table}
-        eId={eId}
         field={field}
         relField={relField}
         myValues={value}
@@ -257,7 +256,7 @@ const makeInsertF = memoize((settings, tables, table, eId) => {
 }, emptyO)
 
 const makeF = memoize(
-  (settings, tables, table, eId, values = emptyO, kind) =>
+  (settings, tables, table, values = emptyO, kind) =>
     kind === 'consolidated'
       ? null
       : (field, relField) => (
@@ -265,7 +264,6 @@ const makeF = memoize(
             settings={settings}
             tables={tables}
             table={table}
-            eId={eId}
             field={field}
             relField={relField}
             myValues={values[field]}
@@ -275,7 +273,7 @@ const makeF = memoize(
 )
 
 const makeEditF = memoize(
-  (settings, tables, table, eId, fieldInfo = emptyO) => (field, relField) => {
+  (settings, tables, table, fieldInfo = emptyO) => (field, relField) => {
     const {
       [field]: { fragment: { myValues } = emptyO } = emptyO,
     } = fieldInfo
@@ -284,7 +282,6 @@ const makeEditF = memoize(
         settings={settings}
         tables={tables}
         table={table}
-        eId={eId}
         field={field}
         relField={relField}
         myValues={myValues}
@@ -325,7 +322,6 @@ const makeEditFE = memoize(
         settings={settings}
         tables={tables}
         table={table}
-        eId={eId}
         field={field}
         myValues={myValues}
       />
@@ -414,7 +410,7 @@ export const applyTemplate = ({
   const cons = makeCons(tables, table, eId)
   const w = makeW(tables, table, eId)
   const s = makeS(settings, tables, table, values, kind)
-  const f = makeF(settings, tables, table, eId, values, kind)
+  const f = makeF(settings, tables, table, values, kind)
   const o = isOwner(me, v)
 
   return template({ settings, tables, at, l, e, v, cons, w, s, f, o, me, linkMe })
@@ -456,7 +452,7 @@ export const applyEditTemplate = ({
   const cons = makeCons(tables, table, eId)
   const w = makeW(tables, table, eId)
   const s = makeEditS(settings, tables, table, fieldInfo)
-  const f = makeEditF(settings, tables, table, eId, fieldInfo)
+  const f = makeEditF(settings, tables, table, fieldInfo)
   const fe = makeEditFE(
     settings,
     tables,

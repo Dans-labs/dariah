@@ -30,6 +30,20 @@ testUsers:
     mayLogin: true
     authority: local
     group: auth
+  - eppn: bart
+    email: bart@test.eu
+    firstName: Bart
+    lastName: Ehrenfest
+    mayLogin: true
+    authority: local
+    group: auth
+  - eppn: rachel
+    email: rachel@test.eu
+    firstName: Rachel
+    lastName: Goldilocks
+    mayLogin: true
+    authority: local
+    group: auth
   - eppn: gertjan
     email: gertjan@test.eu
     firstName: Gert-Jan

@@ -665,12 +665,18 @@ export const repr = memoize(
         },
       },
     } = tables
-    const relValues = multiple
-      ? value.map(val => tables[relTable].entities[val].values[relField])
-      : tables[relTable].entities[value].values[relField]
+    const { [relTable]: { entities: relEntities } = emptyO } = tables
+    const relValues = relEntities
+      ? multiple
+        ? value.map(val => relEntities[val].values[relField])
+        : relEntities[value].values[relField]
+      : multiple
+        ? emptyA
+        : emptyS
 
+    const space = ' '
     const theRelSep =
-      multiple && relMultiple && sep != null && relSep == null ? ' ' : relSep
+      multiple && relMultiple && sep != null && relSep == null ? space : relSep
     const rep = multiple
       ? relValues.map(relValue =>
           reprHead(
@@ -695,7 +701,7 @@ export const repr = memoize(
           relSep,
         )
 
-    return multiple && sep != null ? rep.join(sep) : rep
+    return multiple ? rep.join(sep || space) : rep
   },
   emptyO,
 )

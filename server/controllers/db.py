@@ -934,15 +934,15 @@ class DbAccess(object):
       # we make a shallow copy (intentionally)
       theFieldFilter = {x: y for (x, y) in fieldFilter.items()}
       theFieldFilter[N.creator] = True
-      records = list(MONGO[table].find(theRowFilter, theFieldFilter))
-      lRec = len(records)
+      theRecords = list(MONGO[table].find(theRowFilter, theFieldFilter))
+      lRec = len(theRecords)
       if lRec == 0:
         msgs.append({
             N.kind: N.error,
             N.text: 'Could not find back record {} in table {}'.format(eId, table),
         })
         continue
-      record = records[0]
+      record = theRecords[0]
       perm = self._getPerm(table, record, msgs)
       myWorkflow = WF.readWorkflow(
           msgs,

@@ -13,7 +13,7 @@ import FieldRead from 'FieldRead'
 import ItemForm from 'ItemForm'
 import Tooltip from 'Tooltip'
 
-const putFieldFragments = (tables, eId, fieldFragments, widthStyles) =>
+const putFieldFragments = (tables, fieldFragments, widthStyles) =>
   fieldFragments.map(
     ({ field, fragment: { editable, table, myValues } }, i) => {
       const widthStyle = widthStyles[i]
@@ -27,7 +27,6 @@ const putFieldFragments = (tables, eId, fieldFragments, widthStyles) =>
             field={field}
             tables={tables}
             table={table}
-            eId={eId}
             myValues={myValues}
           />
         </div>
@@ -37,7 +36,6 @@ const putFieldFragments = (tables, eId, fieldFragments, widthStyles) =>
 
 const putDetailFragments = (
   table,
-  eId,
   detailFragments,
   widthStyles,
   nFields,
@@ -109,10 +107,9 @@ const ItemRow = ({
               <EditStatus form={`${table}-${eId}`} active={false} />
             ) : null}
           </div>
-          {putFieldFragments(tables, eId, fieldFragments, widthStyles)}
+          {putFieldFragments(tables, fieldFragments, widthStyles)}
           {putDetailFragments(
             table,
-            eId,
             detailFragments,
             widthStyles,
             nFields,

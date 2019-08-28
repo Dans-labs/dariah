@@ -502,7 +502,7 @@ class WorkflowApi(object):
       finalRecord = {
           consField: newRecord.get(N.modified, ['?? on ??'])[-1],
           N.selected: newRecord.get(N.selected, None),
-          N.content: consRecords[0]["content"],
+          N.content: consRecords[0][N.content],
           N.contrib: newRecord[N._id],
           N.title: newRecord[N.title],
       }

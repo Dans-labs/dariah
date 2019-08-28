@@ -115,7 +115,7 @@ fieldSpecs:
   criteria:
     perm:
       list:   auth
-      read:   edit
+      read:   auth
       update: nobody
     label: criterion
     valType:
@@ -126,7 +126,7 @@ fieldSpecs:
   criteriaEntry:
     perm:
       list:   auth
-      read:   edit
+      read:   auth
       update: nobody
     label: Assessor entry
     valType:

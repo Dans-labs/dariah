@@ -6,6 +6,7 @@ import { emptyS, emptyA, emptyO } from 'utils'
 import { applyTemplate } from 'templates'
 
 import { repr } from 'tables'
+import { compileActive } from 'workflow'
 
 import Input from 'Input'
 import Bool3 from 'Bool3'
@@ -38,7 +39,6 @@ const valuePrepare = memoize(
     me,
     tables,
     table,
-    eId,
     valType,
     relField,
     activeItems,
@@ -60,25 +60,27 @@ const valuePrepare = memoize(
     let elem = 'span'
     if (typeof valType === 'object') {
       const { relTable } = valType
-      const relRecord = tables[relTable].entities[value]
-      const linkMe = `/data/${relTable}/list/${value}`
-      if (value != null) {
-        const templateApplied = applyTemplate({
-          settings,
-          me,
-          tables,
-          table: relTable,
-          eId: value,
-          kind: 'related',
-          relTable: table,
-          values: (relRecord || emptyO).values,
-          linkMe,
-        })
-        if (templateApplied) {
-          return [templateApplied]
-        }
-      }
+      const { [relTable]: { entities: relEntities } = emptyO } = tables
+      const { [value]: relRecord = emptyO } = relEntities
+      const { values = emptyO } = relRecord
       if (relField == null) {
+        const linkMe = `/data/${relTable}/list/${value}`
+        if (value != null) {
+          const templateApplied = applyTemplate({
+            settings,
+            me,
+            tables,
+            table: relTable,
+            eId: value,
+            kind: 'related',
+            relTable: table,
+            values,
+            linkMe,
+          })
+          if (templateApplied) {
+            return [templateApplied]
+          }
+        }
         classNames.push('tag')
         link.href = linkMe
         elem = 'a'
@@ -95,12 +97,11 @@ const valuePrepare = memoize(
           me,
           tables,
           table: relTable,
-          eId,
           valType: relValType,
           activeItems,
           inactive,
         })
-        const relValues = relRecord.values[relField]
+        const { [relField]: relValues } = values
         const xReps = relMultiple
           ? (relValues || emptyA)
               .map((relValue, i) => relPrepare(relValue, rep[i]))
@@ -160,21 +161,19 @@ export const wrappedRepr = memoize(
     me,
     tables,
     table,
-    eId,
     field,
-    valType,
-    multiple,
     relField,
-    activeItems,
-    inactive,
     values,
   }) => {
+    const { [table]: { fieldSpecs } } = tables
+    const { [field]: { valType, multiple } } = fieldSpecs
+    const { inactive = null } = typeof valType === 'object' ? valType : emptyO
+    const activeItems = inactive ? compileActive(tables, field) : null
     const prepare = valuePrepare({
       settings,
       me,
       tables,
       table,
-      eId,
       valType,
       relField,
       activeItems,

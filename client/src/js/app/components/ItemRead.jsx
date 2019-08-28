@@ -45,7 +45,6 @@ const ItemRead = ({
                 field={field}
                 tables={tables}
                 table={relTable}
-                eId={eId}
                 myValues={myValues}
               />,
               field,

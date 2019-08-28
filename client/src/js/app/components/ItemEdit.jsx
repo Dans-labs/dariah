@@ -96,7 +96,6 @@ const ItemEdit = ({
                         field={field}
                         tables={tables}
                         table={table}
-                        eId={eId}
                         myValues={myValues}
                       />
                     ),

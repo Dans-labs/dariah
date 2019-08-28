@@ -2,8 +2,8 @@
 # https://dans-labs.github.io/dariah/Content.html
 
 # ARGS:
-# -(obligatory) production | development
-# -(optional) -r
+#   (obligatory) production | development
+#   (optional) -r
 
 # if -r is present, no data conversion will be done,
 # In this case the role 'root' will be assigned to
@@ -55,7 +55,7 @@ genericComma = re.compile(
     '[ \t]*[\n+,;][ \t\n]*'
 )  # split on newlines or commas (with surrounding white space)
 
-STRIP_NUM = re.compile('^[0-9]\s*\.?\s+')
+STRIP_NUM = re.compile(r'^[0-9]\s*\.?\s+')
 
 
 def stripNum(v):
@@ -911,10 +911,12 @@ INSR = documents to be inserted, avoiding overwriting
             for (r, row) in enumerate(self.rawData[mt]):
                 for (f, field) in enumerate(self.rawFields[mt]):
                     val = row[field]
-                    val = [] if val is None else val if type(val
-                                                             ) is list else [
-                                                                 val
-                                                             ]
+                    val = (
+                        []
+                        if val is None else
+                        val if type(val) is list else
+                        [val]
+                    )
                     val = '|'.join(val)
                     worksheet.write(r + 1, f, val)
         workbook.close()
