@@ -70,8 +70,10 @@ workflow:
       linkField: assessment
       otherTable: review
       otherFields:
+        - _id
         - creator
         - decision
+        - dateDecided
       attribute:
         name: reviews
         desc: reviews of this same assessment

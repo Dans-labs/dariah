@@ -17,7 +17,7 @@ workflow:
         - comments
       equalField: criteriaEntry
       attribute:
-        name: reviews
+        name: reviewComments
         desc: entries by other reviewers
     - inspect: master
       method: hasComplete
@@ -106,7 +106,7 @@ fieldOrder:
 fieldSpecs:
   seq:
     perm:
-      list:   auth
+      list:   edit
       read:   edit
       update: nobody
     label: Criterion number
@@ -136,7 +136,7 @@ fieldSpecs:
     multiple: false
   review:
     perm:
-      list:   auth
+      list:   edit
       read:   edit
       update: nobody
     label: review
@@ -148,7 +148,7 @@ fieldSpecs:
   assessment:
     perm:
       list:   auth
-      read:   edit
+      read:   auth
       update: nobody
     label: assessment
     valType:
@@ -158,7 +158,7 @@ fieldSpecs:
     multiple: false
   comments:
     perm:
-      list:   auth
+      list:   edit
       read:   edit
       update: edit
     label: Reviewer comments

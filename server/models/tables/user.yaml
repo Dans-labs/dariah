@@ -35,8 +35,8 @@ fieldOrder:
 fieldSpecs: 
   eppn:
     perm:
-      list:   own
-      read:   own
+      list:   public
+      read:   public
       update: office
     label: Eppn
     valType: text

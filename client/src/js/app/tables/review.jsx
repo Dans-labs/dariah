@@ -102,8 +102,11 @@ const templates = {
           {['E', 'F'].map(reviewType => {
             const isMy = myType && reviewType === myType
             const dLabel = reviewType === 'E' ? 'advice' : 'decision'
+            const eLabel = 'advice'
             const dLabelMade = reviewType === 'E' ? 'given' : 'made'
             const decision = theseDecisions[reviewType]
+            const decisionE = theseDecisions['E']
+            const mayDecide = reviewType == 'E' || decisionE
             const acro = decision ? dAcro[decision] : 'info'
             const decisionRep = decision ? dPart[acro] : `No ${dLabel} yet`
             const dTakenDate = decision
@@ -154,7 +157,7 @@ const templates = {
                           ))
                         : null}
                     </div>
-                  ) : (
+                  ) : mayDecide ? (
                     <div>
                       {`${dLabel}: `}
                       {!frozen ?
@@ -170,6 +173,13 @@ const templates = {
                             ))}
                           </Fragment>
                       )) : null}
+                    </div>
+                  ) : (
+                    <div className={'label large workflow warning'}>
+                      {`You cannot state your ${dLabel} yet because
+                        the ${eLabel} of the 
+                        ${reviewerRole['E']} is not yet in.
+                      `}
                     </div>
                   )
                 ) : (
@@ -202,13 +212,13 @@ const templates = {
       const myType = isReviewerType(me._id, v('reviewerE'), v('reviewerF'))
       const mine = myReview(me, w)
       const mineLink = `/data/review/mylist/${mine}`
-      let otherDecided = true
+      let expertDecided = true
       if (myType === 'F') {
         const { items: otherReviews = emptyA } = w('reviews') || emptyO
-        otherDecided = false
+        expertDecided = false
         for (const { creator, decision } of otherReviews) {
           if (creator === v('reviewerE') && decision) {
-            otherDecided = true
+            expertDecided = true
           }
         }
       }
@@ -225,12 +235,14 @@ const templates = {
                 {`Continue reviewing`}
               </a>
             ) : v('submitted') ? (
-              otherDecided ? (
-                <span className={`button large workflow info`} onClick={onInsert}>
+              expertDecided ? (
+                <span className={'button large workflow info'} onClick={onInsert}>
                   {`Start review`}
                 </span>
               ) : (
-                <span className={'label large workflow warning'}>{}</span>
+                <span className={'button large workflow warning'} onClick={onInsert}>
+                  {`Start review but do not decide yet`}
+                </span>
               )
             ) : (
               <span className={'label large workflow warning'}>

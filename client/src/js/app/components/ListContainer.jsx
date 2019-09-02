@@ -24,6 +24,7 @@ class ListContainer extends Component {
         [[table, select, complete]],
       )
     ) {
+      console.warn(`need data: ${table} ${select} ${complete}`)
       return <div />
     }
     const { [table]: tableData } = tables

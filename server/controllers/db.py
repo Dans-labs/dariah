@@ -38,9 +38,10 @@ def _theseFields(table, fieldSet):
   fieldSpecs = tableInfo[N.fieldSpecs]
   return (
       [f for f in fieldOrder if f in fieldSet],
-      {x: y
-       for (x, y) in fieldSpecs.items()
-       if x in fieldSet},
+      # {x: y
+      #  for (x, y) in fieldSpecs.items()
+      #  if x in fieldSet},
+      fieldSpecs,
       mongoFields(fieldSet),
   )
 

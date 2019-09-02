@@ -360,12 +360,13 @@ export const needTable = (tables, table, select = ALLIDS, complete) => {
   if (!hasTableKey(tables, table, 'fieldSpecs')) {
     return true
   }
-  const { [table]: { fieldSpecs = emptyO } = emptyO } = tables
+  const { [table]: { fieldSpecs = emptyO, fields = emptyO } = emptyO } = tables
   const relTables = Array.from(
     new Set(
       Object.entries(fieldSpecs)
         .filter(
           entry =>
+            fields[entry[0]] &&
             typeof entry[1].valType === 'object' &&
             entry[1].valType.relTable != null,
         )

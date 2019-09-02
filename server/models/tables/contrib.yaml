@@ -42,8 +42,10 @@ workflow:
       linkField: contrib
       otherTable: review
       otherFields:
+        - _id
         - creator
         - decision
+        - dateDecided
       attribute:
         name: reviews
         desc: reviews of this contribution
@@ -175,7 +177,7 @@ fieldSpecs:
     multiple: false
   costTotal:
     perm:
-      list:   auth
+      list:   coord
       read:   coord
       update: edit
     label: cost (total)
@@ -183,7 +185,7 @@ fieldSpecs:
     multiple: false
   costDescription:
     perm:
-      list:   edit
+      list:   coord
       read:   coord
       update: edit
     label: cost (description)

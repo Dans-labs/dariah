@@ -20,6 +20,7 @@ const templates = {
       const thisReviewer = getItem(w('reviewers'))
       const { reviewerE, reviewerF } = thisReviewer
       const myType = isReviewerType(me._id, reviewerE, reviewerF)
+      const thisType = isReviewerType(v('creator'), reviewerE, reviewerF)
       return (
         <div className={`review entryRead ${statusClass}`}>
           <div className={'criteria entry'}>
@@ -42,7 +43,7 @@ const templates = {
             />
           </div>
           {assessment(f)}
-          {putReviewAll(myType, thisReviewer, true, {
+          {putReviewAll(thisType, myType, thisReviewer, false, {
             tables,
             settings,
             l,
@@ -54,11 +55,12 @@ const templates = {
     },
   },
   detailEdit: {
-    review({ tables, settings, l, e, w, me, s, f, fe, editButton }) {
+    review({ tables, settings, l, e, v, w, me, s, f, fe, editButton }) {
       const statusClass = e('comments') ? 'incomplete' : 'complete'
       const thisReviewer = getItem(w('reviewers'))
       const { reviewerE, reviewerF } = thisReviewer
       const myType = isReviewerType(me._id, reviewerE, reviewerF)
+      const thisType = isReviewerType(v('creator'), reviewerE, reviewerF)
       return (
         <div className={`review entryEdit ${statusClass}`}>
           <div className={'criteria entry'}>
@@ -72,7 +74,7 @@ const templates = {
             </div>
           </div>
           {assessment(f)}
-          {putReviewAll(myType, thisReviewer, true, {
+          {putReviewAll(thisType, myType, thisReviewer, true, {
             tables,
             settings,
             l,
@@ -86,6 +88,7 @@ const templates = {
 }
 
 const putReviewAll = (
+  thisType,
   myType,
   thisReviewer,
   editable,
@@ -118,7 +121,7 @@ const putReviewAll = (
               } (${reviewerRole[reviewType]})`}
             </div>
             <div className={'review comments'}>
-              {putReviewReviewer(reviewType, isMy, thisReviewer, editable, {
+              {putReviewReviewer(reviewType, isMy, thisType, thisReviewer, editable, {
                 theF,
                 w,
               })}
@@ -133,18 +136,25 @@ const putReviewAll = (
 const putReviewReviewer = (
   reviewType,
   isMy,
+  thisType,
   thisReviewer,
   editable,
   { theF, w },
 ) => {
   if (isMy) {
     return (
-      <Tooltip tip={'Enter review comments'} at={'top'}>
-        {theF('comments')}
-      </Tooltip>
+      editable ? (
+        <Tooltip tip={'Enter review comments'} at={'top'}>
+          {theF('comments')}
+        </Tooltip>
+      ) : theF('comments')
     )
-  } else {
-    const otherEntries = getItem(w('reviews'), true).filter(
+  }
+  else {
+    if (reviewType == thisType) {
+      return theF('comments')
+    }
+    const otherEntries = getItem(w('reviewComments'), true).filter(
       ({ creator }) => creator === thisReviewer[`reviewer${reviewType}`],
     )
     return otherEntries.map(({ comments }, i) => (

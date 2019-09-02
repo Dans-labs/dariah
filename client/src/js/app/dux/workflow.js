@@ -187,8 +187,8 @@ export const getItem = (workflowData, multiple = false) => {
   return multiple ? items : items.length == 0 ? emptyO : items[0]
 }
 
-export const isReviewerType = (creator, rE, rF) =>
-  creator === rE ? 'E' : creator === rF ? 'F' : null
+export const isReviewerType = (user, rE, rF) =>
+  user === rE ? 'E' : user === rF ? 'F' : null
 
 export const reviewerRole = {
   E: 'first reviewer (expert)',

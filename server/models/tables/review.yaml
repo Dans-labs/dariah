@@ -26,6 +26,7 @@ workflow:
       otherTable: review
       otherFields:
         - _id
+        - creator
         - decision
         - dateDecided
       attribute:
@@ -162,8 +163,8 @@ fieldSpecs:
     multiple: false
   contrib:
     perm:
-      list:   public
-      read:   public
+      list:   auth
+      read:   auth
       update: nobody
     label: Contribution
     valType:
@@ -184,8 +185,8 @@ fieldSpecs:
     multiple: false
   remarks:
     perm:
-      list:   auth
-      read:   auth
+      list:   edit
+      read:   edit
       update: edit
     label: General remarks
     valType: textarea

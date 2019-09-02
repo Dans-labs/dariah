@@ -87,44 +87,44 @@ class AuthApi(UserApi):
   def authenticate(self, login=False):
     unauth = PM[N.unauth]
     unauthId = self.DB.idFromGroup[unauth]
+    unauthUser = {N.group: unauthId, N.groupRep: unauth}
     auth = PM[N.auth]
     authId = self.DB.idFromGroup[auth]
-    self.userInfo = None
-    eppn = self._get_session()
-    if eppn is not None:
-      userInfo = self.getUser(eppn)
-      if userInfo is not None:
-        self.userInfo = userInfo
-    if self.userInfo is None:
-      self._checkLogin(force=login)
-      if self.userInfo is not None:
-        self.userInfo = self.storeUpdate(self.userInfo)
-        if self.userInfo is not None:
-          if self.userInfo.get(N.mayLogin, False):
-            self._create_session()
-          else:
-            self.userInfo = None
-    if self.userInfo is None:
-      self._delete_session
 
-    if self.userInfo is None:
-      self.userInfo = {N.group: unauthId, N.groupRep: unauth}
-    else:
-      eppn = self.userInfo.get(N.eppn, None)
-      if eppn is None:
-        self.userInfo[N.group] = unauthId
-        self.userInfo[N.groupRep] = unauth
-      else:
+    # if login=False we only want the current user information
+    # if login=True we want to log the user in
+
+    # check for a session and if so, get the eppn and fill in the userinfo
+
+    if login:
+      self._delete_session
+      self._checkLogin(unauthUser, force=login)
+      if (
+          self.userInfo is not None
+          and
+          self.userInfo.get(N.group) != unauthId
+      ):
         if (self.userInfo.get(N.group, None) is None or self.userInfo.get(N.authority, None)):
           if self.userInfo.get(N.group, None) is None:
             self.userInfo[N.group] = authId
           if self.userInfo.get(N.authority, None) is None:
             authority = N.local if self.isDevel else N.DARIAH
             self.userInfo[N.authority] = authority
-          self.storeUpdate(self.userInfo)
         group = self.userInfo[N.group]
         groupRep = self.DB.groupFromId[group]
         self.userInfo[N.groupRep] = groupRep
+        self.userInfo = self.storeUpdate(self.userInfo)
+        if self.userInfo.get(N.mayLogin, False):
+          self._create_session()
+        else:
+          self.userInfo = unauthUser
+    else:
+      eppn = self._get_session()
+      if not eppn:
+        self.userInfo = unauthUser
+      else:
+        self.userInfo = self.getUser(eppn) or unauthUser
+
 
   def deauthenticate(self):
     unauth = PM[N.unauth]
@@ -141,7 +141,7 @@ class AuthApi(UserApi):
   def _get_session(self):
     return session.get(N.eppn, None)
 
-  def _checkLogin(self, force=False):
+  def _checkLogin(self, unauthUser, force=False):
     env = request.environ
     if force and self.isDevel:
       testUsers = self.getTestUsers()
@@ -167,7 +167,7 @@ class AuthApi(UserApi):
       else:
         parts = eppn.split('@', 1)
         if len(parts) == 1:
-          self.userInfo = None
+          self.userInfo = unauthUser
         else:
           (name, domain) = parts
           self.userInfo = {
@@ -199,4 +199,4 @@ class AuthApi(UserApi):
           attributes[N.rel] = utf8FromLatin1(env[N.affiliation])
         self.userInfo.update(attributes)
       else:
-        self.userInfo = None
+        self.userInfo = unauthUser

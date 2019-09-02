@@ -42,7 +42,8 @@ class ListPlain extends Component {
   gotoItem = eId => {
     const { props: { table, alterSection, history, location: { pathname }, dispatch } } = this
     const { base, controller, eId: origEid } = getUrlParts(pathname)
-    const xBase = `${base}/${table}/${controller}`
+    const xController = (controller == 'ourlist') ? 'mylist' : controller
+    const xBase = `${base}/${table}/${xController}`
     if (origEid !== eId) {
       history.push(`/${xBase}/${eId}/`)
     }
