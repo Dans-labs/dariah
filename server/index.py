@@ -7,6 +7,7 @@ from flask import (
 from controllers.utils import dbjson
 from controllers.db import DbAccess
 from controllers.info import getInfo, selectContrib
+from controllers.review import getReview, modReview
 from controllers.cons import getCons
 from controllers.file import FileApi
 from controllers.controller import Controller
@@ -27,6 +28,10 @@ def factory():
       ourcountry.tsv
   '''.strip().split())
 
+  reviewPages = set('''
+      my
+  '''.strip().split())
+
   @app.route('/static/<path:filepath>')
   def serveStatic(filepath):
     return File.static(filepath)
@@ -42,6 +47,7 @@ def factory():
   @app.route('/info/<string:verb>')
   def serveInfo(verb):
     Auth.authenticate()
+    DB.addGroupInfo(Auth.userInfo)
     if verb in infoPages:
       asTsv = verb.endswith('.tsv')
       data = getInfo(verb, Auth.userInfo, asTsv)
@@ -49,6 +55,17 @@ def factory():
           data
           if asTsv else
           render_template('info.html', userInfo=Auth.userInfo, **data)
+      )
+    return render_template('index.html', css=Auth.CSS, js=Auth.JS)
+
+  @app.route('/review/<string:verb>')
+  def serveReview(verb):
+    Auth.authenticate()
+    DB.addGroupInfo(Auth.userInfo)
+    if verb in reviewPages:
+      data = getReview(verb, Auth.userInfo)
+      return (
+          render_template('review.html', userInfo=Auth.userInfo, **data)
       )
     return render_template('index.html', css=Auth.CSS, js=Auth.JS)
 
@@ -75,6 +92,11 @@ def factory():
   def selectC():
     Auth.authenticate()
     return dbjson(selectContrib(Auth.userInfo))
+
+  @app.route('/api/db/reviewmod', methods=['GET', 'POST'])
+  def reviewMod():
+    Auth.authenticate()
+    return dbjson(modReview(Auth.userInfo))
 
   @app.route('/api/db/<path:verb>', methods=['GET', 'POST'])
   def serveApiDb(verb):

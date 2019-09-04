@@ -1,96 +1,10 @@
 import json
 from flask import request, make_response
-from pymongo import MongoClient
 from controllers.utils import oid
+from controllers.common import Database, User, Contrib
 
 PAGE = '/info/ourcountry'
 PAGEX = '/info/ourcountry.tsv'
-ALL = 'ALL'
-MONGO = None
-COUNTRIES = None
-SCORE_MAPPING = None
-MAX_SCORE_BY_CRIT = None
-CRITERIA_ENTRIES = {}
-
-COUNTRY = {
-    ALL: {
-        'iso': ALL,
-        'name': 'DARIAH',
-        'isMember': True,
-    },
-}
-COUNTRI = {ALL: ALL}
-YEAR = {}
-VCC = {}
-TYPE = {}
-DECISION = {}
-
-DECISION_ACCEPT = 'Accept'
-DECISION_REJECT = 'Reject'
-
-COORD = 'coord'
-ALLOWED = {COORD, 'office', 'system', 'root', 'nobody'}
-POWER = ALLOWED - {COORD}
-
-ASSESSED_STATUS = (
-    (-1600, 'no', 'a-none'),
-    (-800, 'started', 'a-started'),
-    (-400, 'self', 'a-self'),
-    (-200, 'in review', 'a-inreview'),
-    (-64000, 'rejected', 'a-rejected'),
-    (0, 'accepted', 'a-accepted'),
-)
-ASSESSED_LABELS = dict((c[0], c[1]) for c in ASSESSED_STATUS)
-ASSESSED_CLASS = dict((c[0], c[2]) for c in ASSESSED_STATUS)
-ASSESSED_DEFAULT = ASSESSED_STATUS[0][0]
-ASSESSED_ACCEPTED_CLASS = ASSESSED_STATUS[-1][2]
-
-
-def genConstants(contribId):
-  global CONTRIB_COLSPECS
-  global CONTRIB_COLS
-  global CONTRIB_COLSET
-  global CONTRIB_TYPES
-  global CONTRIB_LABELS
-  global CONTRIB_SORT_DEFAULT
-  global GROUP_COLS
-  global ALL_GROUPS
-  global ALL_GROUPSET
-
-  CONTRIB_COLSPECS = (
-      ('country', str),
-      ('vcc', str, 'VCC'),
-      ('year', int),
-      ('type', str),
-      ('cost', int, 'cost (€)'),
-      ('assessed', tuple),
-      ('selected', bool),
-      ('title', str),
-  )
-  if contribId != ALL:
-    CONTRIB_COLSPECS = CONTRIB_COLSPECS[1:]
-
-  CONTRIB_COLS = [c[0] for c in CONTRIB_COLSPECS]
-  CONTRIB_COLSET = {c[0] for c in CONTRIB_COLSPECS}
-  CONTRIB_TYPES = dict((c[0], c[1]) for c in CONTRIB_COLSPECS)
-  CONTRIB_LABELS = dict((c[0], c[2] if len(c) > 2 else c[0]) for c in CONTRIB_COLSPECS)
-  CONTRIB_SORT_DEFAULT = CONTRIB_COLS[-1]
-
-  GROUP_COLS = '''
-    country
-    vcc
-    year
-    type
-    assessed
-    selected
-  '''.strip().split()
-
-  if contribId != ALL:
-    GROUP_COLS = GROUP_COLS[1:]
-
-  ALL_GROUPS = [dict(col=c, label=CONTRIB_LABELS[c]) for c in GROUP_COLS]
-  ALL_GROUPSET = set(GROUP_COLS)
-
 
 COL_PLURAL = dict(country='countries', )
 
@@ -105,64 +19,13 @@ def colRep(col, n):
   return f'{n} {itemRep}'
 
 
-def dbAccess():
-  clientm = MongoClient()
-  global MONGO
-  global COUNTRIES
-  global SCORE_MAPPING
-  global MAX_SCORE_BY_CRIT
-  global CRITERIA_ENTRIES
-
-  MONGO = clientm.dariah
-
-  countries = []
-  for rec in MONGO.country.find():
-    if rec['isMember']:
-      COUNTRY[rec['_id']] = {
-          'iso': rec['iso'],
-          'name': rec['name'],
-          'isMember': rec['isMember'],
-      }
-      COUNTRI[rec['iso']] = rec['_id']
-  for (recId, rec) in COUNTRY.items():
-    if recId is not None:
-      countries.append((f'{rec["name"]} ({rec["iso"]})', rec['iso'], recId, rec['iso'] == ALL))
-  COUNTRIES = sorted(countries, key=lambda c: '' if c[1] == ALL else c[0])
-  for rec in MONGO.year.find():
-    YEAR[rec['_id']] = rec['rep']
-  for rec in MONGO.vcc.find():
-    VCC[rec['_id']] = rec['rep']
-  for rec in MONGO.typeContribution.find():
-    mainType = rec.get('mainType', '')
-    subType = rec.get('subType', '')
-    sep = ' / ' if mainType and subType else ''
-    TYPE[rec['_id']] = f'{rec["mainType"]}{sep}{rec["subType"]}'
-  for rec in MONGO.decision.find():
-    DECISION[rec['_id']] = rec['rep']
-
-  scoreData = list(MONGO.score.find())
-
-  for rec in MONGO.criteriaEntry.find():
-    aId = rec.get('assessment', None)
-    if aId is not None:
-      CRITERIA_ENTRIES.setdefault(aId, []).append(rec)
-
-  SCORE_MAPPING = {s['_id']: s['score'] for s in scoreData if 'score' in s}
-  MAX_SCORE_BY_CRIT = {}
-
-  for s in scoreData:
-    crit = s['criteria']
-    score = s.get('score', 0)
-    prevMax = MAX_SCORE_BY_CRIT.setdefault(crit, None)
-    if prevMax is None or score > prevMax:
-      MAX_SCORE_BY_CRIT[crit] = score
-
-
-def computeScore(aRecord):
+def computeScore(db, aRecord):
   aId = aRecord['_id']
-  myCriteriaData = CRITERIA_ENTRIES.get(aId, [])
+  myCriteriaData = db.CRITERIA_ENTRIES.get(aId, [])
   myCriteriaEntries = [(
-      cd['criteria'], SCORE_MAPPING.get(cd.get('score', None), 0), MAX_SCORE_BY_CRIT[cd['criteria']]
+      cd['criteria'],
+      db.SCORE_MAPPING.get(cd.get('score', None), 0),
+      db.MAX_SCORE_BY_CRIT[cd['criteria']]
   ) for cd in myCriteriaData]
 
   relevantCriteriaEntries = [x for x in myCriteriaEntries if x[1] >= 0]
@@ -173,9 +36,9 @@ def computeScore(aRecord):
 
 
 def selectContrib(userInfo):
-  userGroup = userInfo.get('groupRep', 'public')
-  myCountryId = userInfo.get('country', None)
-  if userGroup not in ALLOWED:
+  db = Database()
+  U = User(db, userInfo)
+  if U.group not in db.ALLOWED:
     return {
         'good': False,
         'kind': 'error',
@@ -189,7 +52,7 @@ def selectContrib(userInfo):
         'msg': 'No contribution specified',
     }
   contribId = oid(contribId)
-  contribs = list(MONGO.contrib.find({'_id': contribId}))
+  contribs = list(db.MONGO.contrib.find({'_id': contribId}))
   if len(contribs) == 0:
     return {
         'good': False,
@@ -198,14 +61,14 @@ def selectContrib(userInfo):
     }
   contrib = contribs[0]
   countryId = contrib.get('country', None)
-  if userGroup == COORD:
+  if U.group == db.COORD:
     if countryId is None:
       return {
           'good': False,
           'kind': 'error',
           'msg': 'Contribution is not asscoiated with a country',
       }
-    elif countryId != myCountryId:
+    elif countryId != U.countryId:
       return {
           'good':
               False,
@@ -230,7 +93,7 @@ def selectContrib(userInfo):
       }
 
   value = request.get_json().get('select', None)
-  MONGO.contrib.update_one(
+  db.MONGO.contrib.update_one(
       {
           '_id': contribId
       },
@@ -244,19 +107,20 @@ def selectContrib(userInfo):
 
 
 def getInfo(verb, userInfo, asTsv):
-  dbAccess()
+  db = Database()
+  U = User(db, userInfo)
   if verb.startswith('ourcountry'):
     sortCol = request.args.get('sortcol', '')
     reverse = request.args.get('reverse', '')
     country = request.args.get('country', '')
     groups = request.args.get('groups', '')
-    return getOurcountry(userInfo, country, groups, sortCol, reverse, asTsv)
+    return getOurcountry(db, U, country, groups, sortCol, reverse, asTsv)
   return {}
 
 
-def ourCountryHeaders(country, groups, sortCol, reverse, editable, asTsv, groupOrder=None):
+def ourCountryHeaders(C, country, groups, sortCol, reverse, editable, asTsv, groupOrder=None):
   if groupOrder is None:
-    groupOrder = CONTRIB_COLS
+    groupOrder = C.CONTRIB_COLS
   headers = '' if asTsv else '<tr>'
   if not asTsv:
     dirClass = 'desc' if reverse else 'asc'
@@ -277,7 +141,7 @@ def ourCountryHeaders(country, groups, sortCol, reverse, editable, asTsv, groupO
         nextReverse = False
         icon = ''
       reverseRep = -1 if nextReverse else 1
-    label = CONTRIB_LABELS[col]
+    label = C.CONTRIB_LABELS[col]
     colControl = (
         label
         if asTsv else
@@ -307,12 +171,12 @@ def rmGroup(groups, g):
   return ','.join(h for h in groups if h != g)
 
 
-def contribKey(col, individual=False):
-  colType = CONTRIB_TYPES[col]
+def contribKey(db, C, col, individual=False):
+  colType = C.CONTRIB_TYPES[col]
 
   def makeKey(contrib):
     if col == 'assessed':
-      return contrib.get(col, (ASSESSED_DEFAULT, None))
+      return contrib.get(col, (db.ASSESSED_DEFAULT, None))
     value = contrib.get(col, None)
     if value is None:
       return '' if colType is str else 0
@@ -336,37 +200,27 @@ def contribKey(col, individual=False):
   return makeKeyInd if individual else makeKey
 
 
-def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
-  userGroup = userInfo.get('groupRep', 'public')
-  myCountryId = userInfo.get('country', None)
+def getOurcountry(db, U, country, groups, rawSortCol, rawReverse, asTsv):
   if country:
-    countryId = COUNTRI.get(country, None)
+    countryId = db.COUNTRI.get(country, None)
   else:
-    countryId = myCountryId
-  myCountryInfo = COUNTRY.get(myCountryId, {})
-  myCountry = (
-      f'{myCountryInfo.get("name", "unknown")} ({myCountryInfo.get("iso", "")})'
-      if myCountryInfo else
-      None
-  )
-  myCountryStr = myCountryInfo.get('iso', 'unknown')
-  userStr = f'{userGroup}-from-{myCountryStr}'
+    countryId = U.countryId
   chosenCountry = None
 
-  genConstants(countryId)
-  if countryId is not None and countryId != ALL:
+  C = Contrib(db, countryId)
+  if countryId is not None and countryId != db.ALL:
     groups = rmGroup(groups.split(','), 'country')
   groupsChosen = [] if not groups else groups.split(',')
   groupSet = set(groupsChosen)
   groupStr = ('-by-' if groupSet else '') + '-'.join(sorted(groupSet))
 
-  sortCol = CONTRIB_SORT_DEFAULT if rawSortCol not in CONTRIB_COLSET else rawSortCol
+  sortCol = C.CONTRIB_SORT_DEFAULT if rawSortCol not in C.CONTRIB_COLSET else rawSortCol
   reverse = False if rawReverse not in {'-1', '1'} else rawReverse == '-1'
 
   material = ''
   if not asTsv:
     material = '<h3>Country selection</h3><p class="countries">'
-    for (name, iso, cid, isFake) in COUNTRIES:
+    for (name, iso, cid, isFake) in db.COUNTRIES:
       extraClass = ' fake' if isFake else ''
       material += (
           f'''
@@ -388,7 +242,7 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
   <p>{msg}</p>
 </div>'''
   else:
-    countryInfo = COUNTRY.get(countryId, None)
+    countryInfo = db.COUNTRY.get(countryId, None)
     if countryInfo is None:
       msg = f'I do not know which country this is: {countryId}'
       if not asTsv:
@@ -410,8 +264,8 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
 </div>'''
       else:
         chosenCountry = f'{name} ({iso})'
-        groupsAvailable = sorted(ALL_GROUPSET - set(groupsChosen))
-        groupOrder = groupsChosen + [g for g in CONTRIB_COLS if g not in groupSet]
+        groupsAvailable = sorted(C.ALL_GROUPSET - set(groupsChosen))
+        groupOrder = groupsChosen + [g for g in C.CONTRIB_COLS if g not in groupSet]
         if not asTsv:
           availableReps = ' '.join((
               f'<a class="g-add" href="'
@@ -439,14 +293,17 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
               )
           )
           editable = (
-              userGroup in POWER
-              or (userGroup == COORD and myCountryId is not None and countryId == myCountryId)
+              U.group in db.POWER
+              or (U.group == db.COORD and U.countryId is not None and countryId == U.countryId)
           )
           rArgs = (
               f'?country={iso}&sortcol={rawSortCol}&reverse={rawReverse}&groups={groups}'
           )
         headerLine = ourCountryHeaders(
-            country, groups, sortCol, reverse, not asTsv and editable, asTsv, groupOrder=groupOrder
+            C,
+            country, groups, sortCol, reverse,
+            not asTsv and editable, asTsv,
+            groupOrder=groupOrder
         )
         if not asTsv:
           material += f'''
@@ -473,21 +330,21 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
 
         contribs = {}
         contribSelection = {}
-        countrySelector = ({} if countryId == ALL else {'country': countryId})
-        for rec in MONGO.contrib.find(countrySelector):
+        countrySelector = ({} if countryId == db.ALL else {'country': countryId})
+        for rec in db.MONGO.contrib.find(countrySelector):
           contribId = rec.get('_id', None)
           countryId = rec.get('country', None)
-          if countryId in COUNTRY:
-            countryInfo = COUNTRY[countryId]
+          if countryId in db.COUNTRY:
+            countryInfo = db.COUNTRY[countryId]
             countryRep = f'{countryInfo["name"]} ({countryInfo["iso"]})' if countryInfo else None
           else:
             countryRep = None
           vccs = rec.get('vcc', [])
-          vccRep = ' + '.join(VCC[v] for v in vccs)
+          vccRep = ' + '.join(db.VCC[v] for v in vccs)
           year = rec.get('year', None)
-          yearRep = None if year is None else YEAR.get(year, None)
+          yearRep = None if year is None else db.YEAR.get(year, None)
           typ = rec.get('typeContribution', None)
-          typeRep = None if typ is None else TYPE.get(typ, None)
+          typeRep = None if typ is None else db.TYPE.get(typ, None)
           contribSelected = rec.get('selected', None)
 
           contribs[contribId] = {
@@ -499,7 +356,7 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
               'type': typeRep,
               'title': rec.get('title', None),
               'cost': rec.get('costTotal', None),
-              'assessed': (ASSESSED_DEFAULT, None),
+              'assessed': (db.ASSESSED_DEFAULT, None),
               'selected': contribSelected,
           }
           contribSelection[str(contribId)] = contribSelected
@@ -507,14 +364,14 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
         assessmentStatus = {}
         assessments = {}
         finalReviewers = {}
-        for rec in MONGO.assessment.find({'contrib': {'$in': list(contribs.keys())}}):
+        for rec in db.MONGO.assessment.find({'contrib': {'$in': list(contribs.keys())}}):
           aId = rec['_id']
           assessments[aId] = rec
           reviewerF = rec.get('reviewerF', None)
           if reviewerF is not None:
             finalReviewers[aId] = reviewerF
         reviews = {}
-        for rec in MONGO.review.find({'assessment': {'$in': list(assessments.keys())}}):
+        for rec in db.MONGO.review.find({'assessment': {'$in': list(assessments.keys())}}):
           reviews[rec['_id']] = rec
         for rRecord in reviews.values():
           aId = rRecord['assessment']
@@ -522,11 +379,11 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
           thisStatus = None
           if reviewer == finalReviewers.get(aId, None):
             decision = rRecord.get('decision', None)
-            if DECISION.get(decision, None) == DECISION_REJECT:
+            if db.DECISION.get(decision, None) == db.DECISION_REJECT:
               thisStatus = 4
-            elif DECISION.get(decision, None) == DECISION_ACCEPT:
+            elif db.DECISION.get(decision, None) == db.DECISION_ACCEPT:
               thisStatus = 5
-              assessmentScore[aId] = computeScore(assessments[aId])
+              assessmentScore[aId] = computeScore(db, assessments[aId])
           assessmentStatus[aId] = 3 if thisStatus is None else thisStatus
         for (aId, aRecord) in assessments.items():
           if aId in assessmentStatus:
@@ -534,18 +391,20 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
           else:
             aIndex = 2 if aRecord.get('submitted', False) else 1
           contribId = aRecord['contrib']
-          assessed = ASSESSED_STATUS[aIndex][0]
+          assessed = db.ASSESSED_STATUS[aIndex][0]
           score = assessmentScore[aId] if aId in assessmentScore else None
           contribs[contribId]['assessed'] = (assessed, score)
         (thisMaterial, groupRel) = groupList(
+            db,
+            C,
             contribs.values(),
             groupsChosen,
             sortCol,
             reverse,
             not asTsv and editable,
             full,
-            userGroup,
-            myCountry,
+            U.group,
+            U.countryLong,
             chosenCountry,
             asTsv
         )
@@ -564,12 +423,12 @@ def getOurcountry(userInfo, country, groups, rawSortCol, rawReverse, asTsv):
             material += f'''
 <script>
 var contribSelection = {json.dumps(contribSelection)}
-var allGroups = {json.dumps(ALL_GROUPS)}
+var allGroups = {json.dumps(C.ALL_GROUPS)}
 </script>
 '''
 
   if asTsv:
-    fileName = f'dariah-{country or "all-countries"}{groupStr}-for-{userStr}'
+    fileName = f'dariah-{country or "all-countries"}{groupStr}-for-{U.accessRep}'
     headers = {
         'Expires': '0',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -582,11 +441,14 @@ var allGroups = {json.dumps(ALL_GROUPS)}
   else:
     data = {
         'material': material,
+        'user': U.identityRep,
     }
   return data
 
 
 def groupList(
+    db,
+    C,
     contribs,
     groups,
     sortCol,
@@ -599,10 +461,12 @@ def groupList(
     asTsv,
 ):
   if len(groups) == 0:
-    groupedList = sorted(contribs, key=contribKey(sortCol), reverse=reverse)
+    groupedList = sorted(contribs, key=contribKey(db, C, sortCol), reverse=reverse)
     return (
         '\n'.join(
             formatContrib(
+                db,
+                C,
                 contrib,
                 editable,
                 None,
@@ -621,7 +485,7 @@ def groupList(
 
   groupLen = len(groups)
   groupSet = set(groups)
-  groupOrder = groups + [g for g in CONTRIB_COLS if g not in groupSet]
+  groupOrder = groups + [g for g in C.CONTRIB_COLS if g not in groupSet]
 
   groupedList = {}
 
@@ -659,7 +523,7 @@ def groupList(
               }
               for d in gList
           ),
-          key=contribKey(sortCol),
+          key=contribKey(db, C, sortCol),
           reverse=reverse,
       ):
         nRecords += 1
@@ -667,6 +531,8 @@ def groupList(
         cost += rec.get('cost', 0) or 0
         material.append(
             formatContrib(
+                db,
+                C,
                 rec,
                 editable,
                 thisGroupId,
@@ -682,7 +548,7 @@ def groupList(
       newGroup = groups[depth]
       for groupValue in sorted(
           gList.keys(),
-          key=contribKey(newGroup, individual=True),
+          key=contribKey(db, C, newGroup, individual=True),
           reverse=reverse,
       ):
         nGroups += 1
@@ -706,11 +572,13 @@ def groupList(
     groupValuesT['title'] = colRep('contribution', nRecords)
     groupValuesT['_cn'] = groupValues.get('country', None)
     if depth == 0:
-      for g in GROUP_COLS + ['title']:
+      for g in C.GROUP_COLS + ['title']:
         label = selectedCountry if g == 'country' else 'all'
         controls = expandAcontrols(g) if g in groups or g == 'title' else ''
         groupValuesT[g] = label if asTsv else f'{label} {controls}'
     material[headIndex] = formatContrib(
+        db,
+        C,
         groupValuesT,
         False,
         parentGroupId,
@@ -780,18 +648,20 @@ def subHeadClass(col, groupSet, subHead, allHead):
   return f' {theClass}' if theClass else ''
 
 
-def disclose(values, colName, userGroup, myCountry, recCountry):
+def disclose(db, values, colName, userGroup, myCountry, recCountry):
   disclosed = (
       colName != 'cost'
       or
-      userGroup in POWER
-      or (userGroup == COORD and myCountry is not None and recCountry == myCountry)
+      userGroup in db.POWER
+      or (userGroup == db.COORD and myCountry is not None and recCountry == myCountry)
   )
   value = values[colName] if disclosed else 'undisclosed'
   return value
 
 
 def formatContrib(
+    db,
+    C,
     contrib,
     editable,
     groupId,
@@ -810,7 +680,7 @@ def formatContrib(
     hide=False,
 ):
   if groupOrder is None:
-    groupOrder = CONTRIB_COLS
+    groupOrder = C.CONTRIB_COLS
   contribId = contrib.get('_id', None)
   if allHead:
     selected = contrib.get('selected', '')
@@ -834,13 +704,15 @@ def formatContrib(
         ''
     )
 
-    (assessedCode, assessedScore) = contrib.get('assessed', (ASSESSED_DEFAULT, None))
+    (assessedCode, assessedScore) = contrib.get('assessed', (db.ASSESSED_DEFAULT, None))
     assessedLabel = ((
-        ASSESSED_LABELS.get(assessedCode, '??')
+        db.ASSESSED_LABELS.get(assessedCode, '??')
         if assessedScore is None else f'score {assessedScore}%'
     ) if 'assessed' in contrib else '')
     assessedClass = (
-        ASSESSED_CLASS.get(assessedCode, ASSESSED_ACCEPTED_CLASS) if 'assessed' in contrib else ''
+        db.ASSESSED_CLASS.get(assessedCode, db.ASSESSED_ACCEPTED_CLASS)
+        if 'assessed' in contrib else
+        ''
     )
   rawTitle = contrib.get('title', '')
   title = (
@@ -889,13 +761,13 @@ def formatContrib(
       classes['selected'] += ' editable'
   if asTsv:
     columns = '\t'.join((
-        f'{disclose(values, col, userGroup, myCountry, recCountry)}'
+        f'{disclose(db, values, col, userGroup, myCountry, recCountry)}'
     ) for col in groupOrder)
   else:
     columns = '\n'.join((
         f'<td class="{classes[col]}'
         f'{subHeadClass(col, groupSet, subHead, allHead)}'
-        f'">{disclose(values, col, userGroup, myCountry, recCountry)}</td>'
+        f'">{disclose(db, values, col, userGroup, myCountry, recCountry)}</td>'
     ) for col in groupOrder)
   if not asTsv:
     hideRep = ' hide' if hide else ''

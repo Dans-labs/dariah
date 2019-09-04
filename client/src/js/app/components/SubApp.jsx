@@ -146,11 +146,12 @@ const navBarItems = [
         button: true,
       },
       {
-        path: '/data/review/mylist',
+        path: '/review/my',
         name: 'My reviews',
         forWhom: 'auth',
         hint: 'my reviews',
         button: true,
+        target: '_self',
       },
     ],
   },
