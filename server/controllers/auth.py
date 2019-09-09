@@ -110,9 +110,9 @@ class AuthApi(UserApi):
           if self.userInfo.get(N.authority, None) is None:
             authority = N.local if self.isDevel else N.DARIAH
             self.userInfo[N.authority] = authority
-        group = self.userInfo[N.group]
-        groupRep = self.DB.groupFromId[group]
-        self.userInfo[N.groupRep] = groupRep
+        # group = self.userInfo[N.group]
+        # groupRep = self.DB.groupFromId[group]
+        # self.userInfo[N.groupRep] = groupRep
         self.userInfo = self.storeUpdate(self.userInfo)
         if self.userInfo.get(N.mayLogin, False):
           self._create_session()
