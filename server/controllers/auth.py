@@ -98,7 +98,7 @@ class AuthApi(UserApi):
 
     if login:
       self._delete_session
-      self._checkLogin(unauthUser, force=login)
+      self._checkLogin(unauthUser)
       if (
           self.userInfo is not None
           and
@@ -125,7 +125,6 @@ class AuthApi(UserApi):
       else:
         self.userInfo = self.getUser(eppn) or unauthUser
 
-
   def deauthenticate(self):
     unauth = PM[N.unauth]
     unauthId = self.DB.idFromGroup[unauth]
@@ -141,9 +140,9 @@ class AuthApi(UserApi):
   def _get_session(self):
     return session.get(N.eppn, None)
 
-  def _checkLogin(self, unauthUser, force=False):
+  def _checkLogin(self, unauthUser):
     env = request.environ
-    if force and self.isDevel:
+    if self.isDevel:
       testUsers = self.getTestUsers()
 
       MAX_ITER = 3
@@ -179,11 +178,9 @@ class AuthApi(UserApi):
       sKey = 'Shib-Session-ID'
       authenticated = sKey in env and env[sKey]
       if authenticated:
-        self.userInfo = {
-            N.eppn: utf8FromLatin1(env[N.eppn]),
-            N.email: utf8FromLatin1(env[N.mail]),
-            N.authority: N.DARIAH,
-        }
+        eppn = utf8FromLatin1(env[N.eppn])
+        email = utf8FromLatin1(env[N.mail])
+        self.userInfo = self.getUser(eppn, email=email)
         attributes = {}
         if N.o in env:
           attributes[N.org] = utf8FromLatin1(env[N.o])

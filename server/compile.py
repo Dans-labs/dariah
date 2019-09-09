@@ -10,7 +10,7 @@ from keyword import iskeyword
 from controllers.utils import serverprint
 
 controllers = 'controllers'
-xcontrollers = {'info', 'cons'}
+xcontrollers = {'cons', 'info', 'review', 'common'}
 modelSource = 'models/model.yaml'
 tableSource = 'models/tables'
 compiled = 'models/compiled'

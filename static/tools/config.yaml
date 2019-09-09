@@ -83,6 +83,7 @@ testUsers:
 rootUser:
   development: dirk
   production: DirkRoorda@dariah.eu
+  role: root
 
 CREATOR:
   eppn: HaSProject

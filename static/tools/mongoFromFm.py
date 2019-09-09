@@ -31,13 +31,15 @@ def makeUserRoot():
         config = yaml.load(ch)
     client = MongoClient()
     db = client.dariah
-    rootEppn = config['rootUser'][runMode]
+    rootData = config['rootUser']
+    rootEppn = rootData[runMode]
+    rootRep = rootData['role']
     permRoot = db.permissionGroup.find({
-        'rep': 'root'
+        'rep': rootRep
     }, {
         '_id': True
     })[0]['_id']
-    db.user.update_one({'eppn': rootEppn}, {'$set': {'group': permRoot}})
+    db.user.update_one({'eppn': rootEppn}, {'$set': {'group': permRoot, 'groupRep': rootRep}})
 
 
 def info(x):
