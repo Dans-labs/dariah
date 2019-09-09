@@ -104,3 +104,28 @@ div.error-boundary {
 	padding-right: calc(var(--radius) * 1.2);
 }
 
+.a-none {
+    color: #444444;
+    background-color: #dddddd;
+}
+.a-started {
+    color: #ffffff;
+    background-color: #ff8800;
+}
+.a-self {
+    color: #ffffff;
+    background-color: #eebb00;
+}
+.a-inreview {
+    color: #444444;
+    background-color: #eeee00;
+}
+.a-rejected {
+    color: #ffffff;
+    background-color: #ff0000;
+}
+.a-accepted {
+    color: #000000;
+    background-color: #88ff88;
+}
+

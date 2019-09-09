@@ -102,31 +102,6 @@ td.c-title {
 td.c-assessed {
    font-weight: bold;
 } 
-td.c-assessed.a-none {
-    color: #444444;
-    background-color: #dddddd;
-}
-td.c-assessed.a-started {
-    color: #ffffff;
-    background-color: #ff8800;
-}
-td.c-assessed.a-self {
-    color: #ffffff;
-    background-color: #eebb00;
-}
-td.c-assessed.a-inreview {
-    color: #444444;
-    background-color: #eeee00;
-}
-td.c-assessed.a-rejected {
-    color: #ffffff;
-    background-color: #ff0000;
-}
-td.c-assessed.a-accepted {
-    color: #000000;
-    background-color: #88ff88;
-}
-
 .c-focus {
     color: #ffffff;
     font-size: medium;

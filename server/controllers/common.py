@@ -7,7 +7,6 @@ class Database(object):
   COUNTRIES = None
   SCORE_MAPPING = None
   MAX_SCORE_BY_CRIT = None
-  CRITERIA_ENTRIES = {}
 
   COUNTRY = {
       ALL: {
@@ -20,11 +19,13 @@ class Database(object):
   YEAR = {}
   VCC = {}
   TYPE = {}
+  CRITERIA = {}
   DECISION = {}
 
   DECISION_ACCEPT = 'Accept'
   DECISION_REJECT = 'Reject'
 
+  AUTH = 'auth'
   COORD = 'coord'
   ALLOWED = {COORD, 'office', 'system', 'root', 'nobody'}
   POWER = ALLOWED - {COORD}
@@ -74,15 +75,16 @@ class Database(object):
       subType = rec.get('subType', '')
       sep = ' / ' if mainType and subType else ''
       self.TYPE[rec['_id']] = f'{rec["mainType"]}{sep}{rec["subType"]}'
+
+    for rec in self.MONGO.criteria.find():
+      cId = rec.get('_id', None)
+      if cId is not None:
+        self.CRITERIA[cId] = rec
+
     for rec in self.MONGO.decision.find():
       self.DECISION[rec['_id']] = rec['rep']
 
     scoreData = list(self.MONGO.score.find())
-
-    for rec in self.MONGO.criteriaEntry.find():
-      aId = rec.get('assessment', None)
-      if aId is not None:
-        self.CRITERIA_ENTRIES.setdefault(aId, []).append(rec)
 
     self.SCORE_MAPPING = {s['_id']: s['score'] for s in scoreData if 'score' in s}
     self.MAX_SCORE_BY_CRIT = {}
@@ -94,9 +96,60 @@ class Database(object):
       if prevMax is None or score > prevMax:
         self.MAX_SCORE_BY_CRIT[crit] = score
 
+  def computeScore(self, aRecord):
+    aId = aRecord['_id']
+    myCriteriaData = self.CRITERIA_ENTRIES.get(aId, [])
+    myCriteriaEntries = [(
+        cd['criteria'],
+        self.SCORE_MAPPING.get(cd.get('score', None), 0),
+        self.MAX_SCORE_BY_CRIT[cd['criteria']]
+    ) for cd in myCriteriaData]
+
+    relevantCriteriaEntries = [x for x in myCriteriaEntries if x[1] >= 0]
+    relevantMax = sum(x[2] for x in relevantCriteriaEntries)
+    relevantScore = sum(x[1] for x in relevantCriteriaEntries)
+    overall = 0 if relevantMax == 0 else (round(relevantScore * 100 / relevantMax))
+    return overall
+
+  def computeStatus(self, assessment):
+    aId = assessment['_id']
+    reviewerF = assessment.get('reviewerF', None)
+    reviews = self.REVIEWS.get(aId, [])
+    aStatus = None
+    for review in reviews:
+      reviewer = review['creator']
+      if reviewer == reviewerF:
+        decision = review.get('decision', None)
+        if self.DECISION.get(decision, None) == self.DECISION_REJECT:
+          aStatus = 4
+        elif self.DECISION.get(decision, None) == self.DECISION_ACCEPT:
+          aStatus = 5
+        else:
+          aStatus = 3
+      else:
+        if aStatus is None:
+          aStatus = 3
+    if aStatus is None:
+      aStatus = 2 if assessment.get('submitted', False) else 1
+    return aStatus
+
+  def wrapStatus(self, aCode, aScore, compact=True):
+    baseLabel = self.ASSESSED_LABELS.get(aCode, '??')
+    aClass = self.ASSESSED_CLASS.get(aCode, self.ASSESSED_ACCEPTED_CLASS)
+    if compact:
+      aLabel = (
+          baseLabel
+          if aScore is None else
+          f'score {aScore}%'
+      )
+    else:
+      aLabel = f'{aScore}% - {baseLabel}'
+    return (aLabel, aClass)
+
 
 class User(object):
   def __init__(self, db, userInfo):
+    self.uid = userInfo.get('_id', '')
     self.name = userInfo.get('name', '')
     if not self.name:
       firstName = userInfo.get('firstName', '')
@@ -124,7 +177,6 @@ class User(object):
 
     self.group = userInfo.get('groupRep', 'public')
     self.groupDesc = userInfo.get('groupDesc', 'public')
-    print(userInfo)
 
     self.identityRep = (
         f'{self.name}{self.orgRep}'

@@ -5,7 +5,7 @@ client = MongoClient()
 db = client.dariah
 
 
-def test():
+def test1():
   results = db.reviewEntry.aggregate([
       {
           '$lookup': {
@@ -35,6 +35,32 @@ def test():
     seq = result['seq']
     comments = '\n\t'.join(result['comments'])
     print(f'{seq}: {comments}')
+
+
+def test2():
+  results = db.assessment.aggregate([
+      {
+          '$match': {
+              'title': 'assessment of SHEBANQ',
+          },
+      },
+      {
+          '$lookup': {
+              'from': 'review',
+              'localField': '_id',
+              'foreignField': 'assessment',
+              'as': 'reviews',
+          },
+      },
+  ])
+
+  for result in results:
+    title = result['title']
+    print(f'A: {title}')
+    reviews = result['reviews']
+    for review in reviews:
+      title = review['title']
+      print(f'R: {title}')
 
 
 ourFields = [
@@ -115,12 +141,13 @@ def makeOurFilter(self, ourFields):
     return (rowFilter, aggregate)
 
 
-# test()
+# test1()
+test2()
 
-(rowFilter, aggregate) = makeOurFilter(Me, ourFields)
+# (rowFilter, aggregate) = makeOurFilter(Me, ourFields)
 
-print('ROWFILTER')
-print(rowFilter)
+# print('ROWFILTER')
+# print(rowFilter)
 
-print('AGGREGATE')
-print(aggregate)
+# print('AGGREGATE')
+# print(aggregate)

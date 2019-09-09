@@ -19,22 +19,6 @@ def colRep(col, n):
   return f'{n} {itemRep}'
 
 
-def computeScore(db, aRecord):
-  aId = aRecord['_id']
-  myCriteriaData = db.CRITERIA_ENTRIES.get(aId, [])
-  myCriteriaEntries = [(
-      cd['criteria'],
-      db.SCORE_MAPPING.get(cd.get('score', None), 0),
-      db.MAX_SCORE_BY_CRIT[cd['criteria']]
-  ) for cd in myCriteriaData]
-
-  relevantCriteriaEntries = [x for x in myCriteriaEntries if x[1] >= 0]
-  relevantMax = sum(x[2] for x in relevantCriteriaEntries)
-  relevantScore = sum(x[1] for x in relevantCriteriaEntries)
-  overall = 0 if relevantMax == 0 else (round(relevantScore * 100 / relevantMax))
-  return overall
-
-
 def selectContrib(userInfo):
   db = Database()
   U = User(db, userInfo)
@@ -106,9 +90,27 @@ def selectContrib(userInfo):
   }
 
 
+def getCriteriaEntries(db):
+  setattr(db, 'CRITERIA_ENTRIES', {})
+  for rec in db.MONGO.criteriaEntry.find():
+    aId = rec.get('assessment', None)
+    if aId is not None:
+      db.CRITERIA_ENTRIES.setdefault(aId, []).append(rec)
+
+
+def getReviews(db):
+  setattr(db, 'REVIEWS', {})
+
+  for rec in db.MONGO.review.find({}):
+    aId = rec.get('assessment', None)
+    db.REVIEWS.setdefault(aId, []).append(rec)
+
+
 def getInfo(verb, userInfo, asTsv):
   db = Database()
   U = User(db, userInfo)
+  getCriteriaEntries(db)
+  getReviews(db)
   if verb.startswith('ourcountry'):
     sortCol = request.args.get('sortcol', '')
     reverse = request.args.get('reverse', '')
@@ -363,35 +365,15 @@ def getOurcountry(db, U, country, groups, rawSortCol, rawReverse, asTsv):
         assessmentScore = {}
         assessmentStatus = {}
         assessments = {}
-        finalReviewers = {}
         for rec in db.MONGO.assessment.find({'contrib': {'$in': list(contribs.keys())}}):
           aId = rec['_id']
           assessments[aId] = rec
-          reviewerF = rec.get('reviewerF', None)
-          if reviewerF is not None:
-            finalReviewers[aId] = reviewerF
-        reviews = {}
-        for rec in db.MONGO.review.find({'assessment': {'$in': list(assessments.keys())}}):
-          reviews[rec['_id']] = rec
-        for rRecord in reviews.values():
-          aId = rRecord['assessment']
-          reviewer = rRecord['creator']
-          thisStatus = None
-          if reviewer == finalReviewers.get(aId, None):
-            decision = rRecord.get('decision', None)
-            if db.DECISION.get(decision, None) == db.DECISION_REJECT:
-              thisStatus = 4
-            elif db.DECISION.get(decision, None) == db.DECISION_ACCEPT:
-              thisStatus = 5
-              assessmentScore[aId] = computeScore(db, assessments[aId])
-          assessmentStatus[aId] = 3 if thisStatus is None else thisStatus
-        for (aId, aRecord) in assessments.items():
-          if aId in assessmentStatus:
-            aIndex = assessmentStatus[aId]
-          else:
-            aIndex = 2 if aRecord.get('submitted', False) else 1
-          contribId = aRecord['contrib']
-          assessed = db.ASSESSED_STATUS[aIndex][0]
+          status = db.computeStatus(rec)
+          assessmentStatus[aId] = status
+          if status == 5:
+            assessmentScore[aId] = db.computeScore(rec)
+          contribId = rec['contrib']
+          assessed = db.ASSESSED_STATUS[status][0]
           score = assessmentScore[aId] if aId in assessmentScore else None
           contribs[contribId]['assessed'] = (assessed, score)
         (thisMaterial, groupRel) = groupList(
@@ -705,14 +687,10 @@ def formatContrib(
     )
 
     (assessedCode, assessedScore) = contrib.get('assessed', (db.ASSESSED_DEFAULT, None))
-    assessedLabel = ((
-        db.ASSESSED_LABELS.get(assessedCode, '??')
-        if assessedScore is None else f'score {assessedScore}%'
-    ) if 'assessed' in contrib else '')
-    assessedClass = (
-        db.ASSESSED_CLASS.get(assessedCode, db.ASSESSED_ACCEPTED_CLASS)
+    (assessedLabel, assessedClass) = (
+        db.wrapStatus(assessedCode, assessedScore)
         if 'assessed' in contrib else
-        ''
+        ('', '')
     )
   rawTitle = contrib.get('title', '')
   title = (
