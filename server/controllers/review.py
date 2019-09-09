@@ -207,16 +207,39 @@ def wrapAssessment(db, U, record):
 
 
 def wrapAssessmentHead(db, U, record):
+  cRecord = record.get('contribDetail', [{}])[0]
   aScore = db.computeScore(record)
   aStatus = db.computeStatus(record)
+  cSelected = db.computeSelected(record)
+  cLabel = (
+      'no decision'
+      if cSelected is None else
+      'selected'
+      if cSelected else
+      'not selected'
+  )
+  cClass = (
+      'c-undecided'
+      if cSelected is None else
+      'c-selected'
+      if cSelected else
+      'c-rejected'
+  )
   aCode = db.ASSESSED_STATUS[aStatus][0]
   (aLabel, aClass) = db.wrapStatus(aCode, aScore, compact=False)
-  title = record.get('title', '')
+  title = cRecord.get('title', record.get('title', '??'))
+  cId = cRecord.get('_id', None)
+  linkedTitle = (
+      f'<a href="/data/contrib/list/{cId}">{title}</a>'
+      if cId else
+      title
+  )
   countryId = record.get('contribDetail', [{}])[0].get('country', None)
   iso = db.COUNTRY.get(countryId, {}).get('iso', 'unknown country')
   return f'''
 <span class="assessment-head">
-<span class="{aClass}">{aLabel}</span> {title} ({iso})
+<span class="{cClass}">{cLabel}</span>
+<span class="{aClass}">{aLabel}</span> {linkedTitle} ({iso})
 </span>
   '''
 

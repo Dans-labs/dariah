@@ -128,4 +128,14 @@ div.error-boundary {
     color: #000000;
     background-color: #88ff88;
 }
+.c-undecided {
+}
+.c-rejected {
+    color: #000000;
+    background-color: #ff8888;
+}
+.c-selected {
+    color: #000000;
+    background-color: #00ffff;
+}
 

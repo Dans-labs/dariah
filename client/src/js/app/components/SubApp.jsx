@@ -146,9 +146,17 @@ const navBarItems = [
         button: true,
       },
       {
-        path: '/review/my',
+        path: '/data/review/mylist',
         name: 'My reviews',
         forWhom: 'auth',
+        hint: 'my reviews',
+        button: true,
+        target: '_self',
+      },
+      {
+        path: '/review/my',
+        name: 'My reviews (experimental)',
+        forWhom: 'office',
         hint: 'my reviews',
         button: true,
         target: '_self',

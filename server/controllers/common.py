@@ -133,6 +133,10 @@ class Database(object):
       aStatus = 2 if assessment.get('submitted', False) else 1
     return aStatus
 
+  def computeSelected(self, assessment):
+    cSelected = assessment.get('contribDetail', [{}])[0].get('selected', None)
+    return cSelected
+
   def wrapStatus(self, aCode, aScore, compact=True):
     baseLabel = self.ASSESSED_LABELS.get(aCode, '??')
     aClass = self.ASSESSED_CLASS.get(aCode, self.ASSESSED_ACCEPTED_CLASS)
