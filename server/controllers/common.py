@@ -90,7 +90,9 @@ class Database(object):
     self.MAX_SCORE_BY_CRIT = {}
 
     for s in scoreData:
-      crit = s['criteria']
+      crit = s.get('criteria', None)
+      if crit is None:
+        continue
       score = s.get('score', 0)
       prevMax = self.MAX_SCORE_BY_CRIT.setdefault(crit, None)
       if prevMax is None or score > prevMax:
