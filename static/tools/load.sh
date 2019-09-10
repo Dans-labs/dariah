@@ -43,6 +43,9 @@ echo "UPDATE.SH: rh-python36 enabled"
 if [ "$1" == "-r" ]; then
     cd static/tools
     python3 mongoFromFm.py production -r
+elif [ "$1" == "-R" ]; then
+    cd static/tools
+    python3 mongoFromFm.py production -R
 else
     if [ $ON_CLARIN ]; then
         service httpd stop
