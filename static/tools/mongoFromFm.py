@@ -23,23 +23,38 @@ from hashlib import md5
 
 runMode = sys.argv[1] if len(sys.argv) > 1 else None
 makeRoot = len(sys.argv) > 2 and sys.argv[2] == '-r'
+makeRootOnly = len(sys.argv) > 2 and sys.argv[2] == '-R'
 isDevel = runMode == 'development'
 
 
-def makeUserRoot():
+def makeUserRoot(only=False):
     with open('./config.yaml') as ch:
         config = yaml.load(ch)
     client = MongoClient()
     db = client.dariah
     rootData = config['rootUser']
     rootEppn = rootData[runMode]
-    rootRep = rootData['role']
+    rootRep = rootData['rootRole']
+    fallbackRep = rootData['fallbackRole']
     permRoot = db.permissionGroup.find({
         'rep': rootRep
     }, {
         '_id': True
     })[0]['_id']
-    db.user.update_one({'eppn': rootEppn}, {'$set': {'group': permRoot, 'groupRep': rootRep}})
+    permFallback = db.permissionGroup.find({
+        'rep': fallbackRep
+    }, {
+        '_id': True
+    })[0]['_id']
+    if only:
+      db.user.update_many(
+          {'group': permRoot},
+          {'$set': {'group': permFallback, 'groupRep': fallbackRep}},
+      )
+    db.user.update_one(
+        {'eppn': rootEppn},
+        {'$set': {'group': permRoot, 'groupRep': rootRep}},
+    )
 
 
 def info(x):
@@ -1001,7 +1016,7 @@ INSR = documents to be inserted, avoiding overwriting
             self.exportXlsx()
 
 
-if makeRoot:
-    makeUserRoot()
+if makeRoot or makeRootOnly:
+    makeUserRoot(only=makeRootOnly)
 else:
     FMConvert().run()

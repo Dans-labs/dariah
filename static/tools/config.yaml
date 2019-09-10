@@ -83,7 +83,8 @@ testUsers:
 rootUser:
   development: dirk
   production: DirkRoorda@dariah.eu
-  role: root
+  rootRole: root
+  fallbackRole: office
 
 CREATOR:
   eppn: HaSProject

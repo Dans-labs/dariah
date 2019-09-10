@@ -1219,6 +1219,9 @@ of the
         that if there is no user in the group `root`, nobody can be made
         `root` from within the system.
 
+        Likewise, if a user is root, nobody can take away his/her root status,
+        except him/herself.
+
         When importing data into the system by means of
         [load.sh]({{staticBase}}/tools/load.sh)
         you can specify to make a specific
@@ -1226,6 +1229,22 @@ of the
         [config.yaml]({{staticBase}}/tools/config.yaml)
         ,
         see `rootUser`.
+
+        The command is
+
+        ```sh
+        ./load.sh -r
+        ```
+
+        to be executed in the home directory on the server.
+
+        Alternatively, issuing
+
+        ```sh
+        ./load.sh -R
+        ```
+
+        will also convert all *other* root users on the system to *office* users.
 
         Once the root user is in place, (s)he can assign system admins and back office
         people. Once those are in place, the daily governance of the system can take
