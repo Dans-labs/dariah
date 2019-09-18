@@ -107,7 +107,7 @@ def factory():
   @app.route('/slogout')
   def serveSlogout():
     Auth.deauthenticate()
-    redirect('/Shibboleth.sso/Logout')
+    return redirect('/Shibboleth.sso/Logout')
 
   @app.route('/login')
   def serveLogin():

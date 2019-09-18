@@ -83,12 +83,26 @@ class ListContainer extends Component {
   componentDidMount() {
     const { props: { tables, table, select, mode, dispatch } } = this
     const complete = mode === 'grid'
-    fetchTable(tables, table, select, complete, dispatch)
+    if (
+      needTables(
+        tables,
+        [[table, select, complete]],
+      )
+    ) {
+      fetchTable(tables, table, select, complete, dispatch)
+    }
   }
   componentDidUpdate() {
     const { props: { tables, table, select, mode, dispatch } } = this
     const complete = mode === 'grid'
-    fetchTable(tables, table, select, complete, dispatch)
+    if (
+      needTables(
+        tables,
+        [[table, select, complete]],
+      )
+    ) {
+      fetchTable(tables, table, select, complete, dispatch)
+    }
   }
 }
 
