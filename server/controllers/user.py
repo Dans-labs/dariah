@@ -1,62 +1,50 @@
-from datetime import datetime
+class User(object):
+  def __init__(self, db, userInfo):
+    self.uid = userInfo.get('_id', '')
+    self.name = userInfo.get('name', '')
+    if not self.name:
+      firstName = userInfo.get('firstName', '')
+      lastName = userInfo.get('lastName', '')
+      self.name = (
+          firstName +
+          (' ' if firstName and lastName else '') +
+          lastName
+      )
+    self.org = userInfo.get('org', '')
+    self.orgRep = f' ({self.org})' if self.org else ''
+    self.email = userInfo.get('email', '')
+    self.authority = userInfo.get('authority', '')
+    self.authorityRep = f' - {self.authority}' if self.authority else ''
+    self.eppn = userInfo.get('eppn', '')
 
-from models.compiled.model import model as M
-from models.compiled.names import N
+    self.countryId = userInfo.get('country', None)
+    self.countryInfo = db.COUNTRY.get(self.countryId, {})
+    self.countryLong = (
+        f'{self.countryInfo.get("name", "unknown")} ({self.countryInfo.get("iso", "")})'
+        if self.countryInfo else
+        None
+    )
+    self.countryShort = self.countryInfo.get('iso', 'unknown')
 
-PM = M[N.permissions]
+    self.group = userInfo.get('groupRep', 'public')
+    self.groupDesc = userInfo.get('groupDesc', 'public')
+
+    self.identityRep = (
+        f'{self.name}{self.orgRep}'
+        if self.name else
+        f'{self.email}{self.orgRep}'
+        if self.email else
+        f'{self.eppn}{self.authorityRep}'
+        if self.eppn else
+        'unidentified user!'
+    ) + ' from ' + (
+        self.countryShort
+    ) + f' ({self.groupDesc})'
+
+    self.accessRep = (
+        f'({self.groupDesc}' +
+        (f'-{self.countryShort}' if self.group == db.COORD else '') +
+        ')'
+    )
 
 
-class UserApi(object):
-
-  def __init__(self, DB):
-    self.DB = DB
-
-  def getUser(self, eppn, email=None):
-    return self.DB.userFind(eppn, email, authority=N.local if self.isDevel else N.DARIAH)
-
-  def getTestUsers(self):
-    testUsers = {}
-    records = self.DB.userLocal()
-    for r in records:
-      if N.eppn in r:
-        testUsers[r[N.eppn]] = r
-    return testUsers
-
-  def storeUpdate(self, newUserInfo):
-    eppn = newUserInfo.get(N.eppn, None)
-    email = newUserInfo.get(N.email, None)
-    record = self.getUser(eppn, email=email)
-    if not record:
-      record = self._store(newUserInfo)
-    else:
-      record = self._update(record, newUserInfo)
-    return record
-
-  def deliver(self):
-    self.DB.addGroupInfo(self.userInfo)
-    return {N.data: self.userInfo, N.msgs: [], N.good: True}
-
-  def _store(self, newUserInfo):
-    now = datetime.utcnow()
-    record = {}
-    record.update(newUserInfo)
-    record.update({
-        N.dateCreated: now,
-        N.dateLastLogin: now,
-        N.statusLastLogin: N.Approved,
-        N.mayLogin: True,
-    })
-    self.DB.userAdd(record)
-    return record
-
-  def _update(self, userInfo, newUserInfo):
-    now = datetime.utcnow()
-    userInfo.update(newUserInfo)
-    userInfo.update({
-        N.dateLastLogin: now,
-        N.statusLastLogin: N.Approved if userInfo.get(N.mayLogin, False) else N.Rejected,
-    })
-    self.DB.userMod(userInfo)
-    if N._id in userInfo:
-      del userInfo[N._id]
-    return userInfo

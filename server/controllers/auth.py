@@ -1,199 +1,244 @@
 import os
-import re
+from datetime import datetime
+
 from flask import request, session
-from controllers.user import UserApi
-from controllers.utils import utf8FromLatin1, serverprint
-from models.compiled.model import model as M
-from models.compiled.names import N
+from controllers.utils import utf8FromLatin1
 
-PM = M[N.permissions]
+SECRET_FILE = '/opt/web-apps/dariah_jwt.secret'
 
-CSS = '<link href="/static/dist/main.css" rel="stylesheet">'
-JS = '''
-  <script type="text/javascript" src="/static/dist/vendor.js"></script>
-  <script type="text/javascript" src="/static/dist/app.js"></script>
-  <script type="text/javascript" src="/static/dist/main.js"></script>
-'''
-
-DYN_INFO_FILE = '../static/dist/bundle.html'
-
-cssRe = re.compile('<link [^>]*>', re.S)
-jsRe = re.compile('<body>(.*)</body>', re.S)
+AUTH = 'auth'
+AUTH_DESC = 'authenticated user'
+UNAUTH = 'public'
+UNAUTH_DESC = 'user, not logged in'
+COORD = 'coord'
+COORD_DESC = 'national coordinator'
 
 
-def readBundleNames(regime):
-  if regime == N.hot:
-    serverprint('STATIC INFO')
-    css = CSS
-    js = JS
-  else:
-    if not os.path.exists(DYN_INFO_FILE):
-      serverprint(f'CANNOT READ {DYN_INFO_FILE}. Falling back to static info ...')
-      css = CSS
-      js = JS
-    else:
-      serverprint(f'DYNAMIC INFO from {DYN_INFO_FILE}')
-      with open(DYN_INFO_FILE) as dh:
-        html = dh.read()
-      html = html.replace('src="', 'src="/static/dist/')
-      html = html.replace('href="', 'href="/static/dist/')
-      match = cssRe.search(html)
-      css = match.group(0)
-      match = jsRe.search(html)
-      js = match.group(1).strip().replace('</script><script', '</script>\n<script')
-  return (css, js)
+class Auth(object):
 
-
-class AuthApi(UserApi):
-
-  def __init__(self, DB, app, secret_file):
-    super().__init__(DB)
-    self.app = app
+  def __init__(self, app, MONGO, values):
+    self.values = values
+    self.MONGO = MONGO
 
     # determine production or devel
-    regime = os.environ.get(N.REGIME, None)
-    self.isDevel = regime in {N.devel, N.hot}
-
-    # read the code to import the generated CSS and Javascripts when in production
-
-    (self.CSS, self.JS) = readBundleNames(regime)
+    regime = os.environ.get('REGIME', None)
+    self.isDevel = regime == 'devel'
+    self.authority = 'local' if self.isDevel else 'dariah'
 
     # read secret from the system
     self.secret = ''
-    with open(secret_file) as fh:
+    with open(SECRET_FILE) as fh:
       app.secret_key = fh.read()
 
-    # wrap the app to enable session middleware
+    self.authId = values.permissionGroupInv.get(AUTH, None)
+    self.authUser = {'group': self.authId, 'groupRep': AUTH, 'groupDesc': AUTH_DESC}
+    self.unauthId = values.permissionGroupInv.get(UNAUTH, None)
+    self.unauthUser = {'group': self.unauthId, 'groupRep': UNAUTH, 'groupDesc': UNAUTH_DESC}
+    self.clearUser()
 
-    # session_opts = {
-    #     'session.key': 'dariah.session.id',
-    #     'session.auto': True,
-    #     'session.use_cookies': True,
-    #     'session.type': 'memory',
-    #     'session.cookie_expires': True,
-    #     'session.data_serializer': 'json',
-    #     'session.encrypt_key': self.secret,
-    #     'session.httponly': True,
-    #     'session.timeout': 3600 * 24,  # 1 day
-    #     'session.validate_key': 'xxx',
-    #     'session.secure': not self.isDevel,
-    # }
-    # self._session_key = 'dariah.session'
+  def clearUser(self):
+    self.userInfo = {}
+    self.userInfo.update(self.unauthUser)
 
-  def debugPrint(self, msg):
-    if self.isDevel:
-      serverprint(msg)
-
-  def authenticate(self, login=False):
-    unauth = PM[N.unauth]
-    unauthId = self.DB.idFromGroup[unauth]
-    unauthUser = {N.group: unauthId, N.groupRep: unauth}
-    auth = PM[N.auth]
-    authId = self.DB.idFromGroup[auth]
-
-    # if login=False we only want the current user information
-    # if login=True we want to log the user in
-
-    # check for a session and if so, get the eppn and fill in the userinfo
-
-    if login:
-      self._delete_session
-      self._checkLogin(unauthUser)
-      if (
-          self.userInfo is not None
-          and
-          self.userInfo.get(N.group) != unauthId
-      ):
-        if (self.userInfo.get(N.group, None) is None or self.userInfo.get(N.authority, None)):
-          if self.userInfo.get(N.group, None) is None:
-            self.userInfo[N.group] = authId
-          if self.userInfo.get(N.authority, None) is None:
-            authority = N.local if self.isDevel else N.DARIAH
-            self.userInfo[N.authority] = authority
-        # group = self.userInfo[N.group]
-        # groupRep = self.DB.groupFromId[group]
-        # self.userInfo[N.groupRep] = groupRep
-        self.userInfo = self.storeUpdate(self.userInfo)
-        if self.userInfo.get(N.mayLogin, False):
-          self._create_session()
-        else:
-          self.userInfo = unauthUser
+  def getUser(self, eppn, email=None):
+    # this is called to get extra information for an authenticated user from the database
+    # but the database may still say that the user may not login
+    user = [
+        record
+        for record in self.values.user.values()
+        if (
+            record.get('authority', None) == self.authority
+            and
+            (
+                (eppn is not None and record.get('eppn', None) == eppn)
+                or
+                (
+                    eppn is None and
+                    email is not None and
+                    record.get('eppn', None) is None and
+                    record.get('email', None) == email
+                )
+            )
+        )
+    ]
+    self.userInfo = {
+        'eppn': eppn,
+        'authority': self.authority,
+    }
+    if email:
+      self.userInfo['email'] = email
+    if len(user) == 1:
+      self.userInfo.update(user[0])
+    if not self.userInfo.get('mayLogin', True):
+      # this checks whether mayLogin is explicitly set to False
+      self.clearUser()
     else:
-      eppn = self._get_session()
-      if not eppn:
-        self.userInfo = unauthUser
-      else:
-        self.userInfo = self.getUser(eppn) or unauthUser
+      if 'group' not in self.userInfo:
+        self.userInfo['group'] = self.authId
+        self.userInfo['groupRep'] = AUTH
 
-  def deauthenticate(self):
-    unauth = PM[N.unauth]
-    unauthId = self.DB.idFromGroup[unauth]
-    self.userInfo = {N.group: unauthId, N.groupRep: unauth}
-    self._delete_session()
+  def storeUser(self):
+    # only called when there is an eppn
+    # yet we check and do nothing if there is not an eppn
+    eppn = self.userInfo.get('eppn', None)
+    if not eppn:
+      return
 
-  def _create_session(self):
-    session[N.eppn] = self.userInfo[N.eppn]
+    now = datetime.utcnow()
+    self.userInfo.update({
+        'dateCreated': now,
+        'dateLastLogin': now,
+        'statusLastLogin': 'Approved',
+        'mayLogin': True,
+    })
+    if '_id' in self.userInfo:
+      record = {}
+      record.update(self.userInfo)
+      if 'isPristine' in record:
+        del record['isPristine']
+      criterion = {'_id': record['_id']}
+      del record['_id']
+      self.MONGO.user.update_one(
+          criterion,
+          {
+              '$set': record,
+              '$unset': {
+                  'isPristine': ''
+              }
+          },
+      )
+    else:
+      result = self.MONGO.user.insert_one(record)
+      _id = result.inserted_id
+      self.userInfo['_id'] = _id
 
-  def _delete_session(self):
-    session.pop(N.eppn, None)
+  def presentUser(self):
+    self.authenticate()
+    name = self.userInfo.get('name', '')
+    if not name:
+      firstName = self.userInfo.get('firstName', '')
+      lastName = self.userInfo.get('lastName', '')
+      name = (
+          firstName +
+          (' ' if firstName and lastName else '') +
+          lastName
+      )
+    org = self.userInfo.get('org', '')
+    orgRep = f' ({org})' if org else ''
+    email = self.userInfo.get('email', '')
+    authority = self.userInfo.get('authority', '')
+    authorityRep = f' - {authority}' if authority else ''
+    eppn = self.userInfo.get('eppn', '')
 
-  def _get_session(self):
-    return session.get(N.eppn, None)
+    countryId = self.userInfo.get('country', None)
+    countryInfo = self.values.country.get(countryId, {})
+    countryLong = (
+        f'{countryInfo.get("name", "unknown")} ({countryInfo.get("iso", "")})'
+        if countryInfo else
+        None
+    )
+    countryShort = countryInfo.get('iso', 'unknown')
 
-  def _checkLogin(self, unauthUser):
+    group = self.userInfo.get('groupRep', UNAUTH)
+    groupDesc = self.userInfo.get('groupDesc', UNAUTH)
+
+    identityRep = (
+        f'{name}{orgRep}'
+        if name else
+        f'{email}{orgRep}'
+        if email else
+        f'{eppn}{authorityRep}'
+        if eppn else
+        'unidentified user!'
+    ) + ' from ' + (
+        countryLong
+    ) + f' ({groupDesc})'
+
+    accessRep = (
+        f'({groupDesc}' +
+        (f'-{countryShort}' if group == COORD else '') +
+        ')'
+    )
+    return (identityRep, accessRep)
+
+  def checkLogin(self):
     env = request.environ
+    self.clearUser()
     if self.isDevel:
-      testUsers = self.getTestUsers()
+      testUsers = {
+          record['eppn']: record
+          for record in self.values.user.values()
+          if 'eppn' in record and record.get('authority', None) == 'local'
+      }
 
-      MAX_ITER = 3
-      i = 0
-      stop = False
-      while not stop and i < MAX_ITER:
-        try:
-          eppn = input('{}|email address: '.format('|'.join(testUsers)))
-          if eppn is not None:
-            eppn = eppn.split('\n', 1)[0]
-            stop = True
-        except Exception as err:
-          serverprint('Low level error: {}'.format(err))
-          if eppn:
-            stop = True
-          else:
-            serverprint('Try again')
+      try:
+        answer = input('{}|email address: '.format('|'.join(testUsers)))
+        if answer is not None:
+          answer = answer.split('\n', 1)[0]
+      except Exception as err:
+        print('Low level error: {}'.format(err))
 
-      if eppn in testUsers:
-        self.userInfo = testUsers[eppn]
+      if answer in testUsers:
+        self.getUser(answer)
       else:
-        parts = eppn.split('@', 1)
+        parts = answer.split('@', 1)
         if len(parts) == 1:
-          self.userInfo = unauthUser
+          self.clearUser()
         else:
           (name, domain) = parts
-          self.userInfo = {
-              N.eppn: '{}@local.host'.format(name),
-              N.email: eppn,
-              N.authority: N.local,
-          }
+          eppn = f'{name}@local.host'
+          self.getUser(eppn, email=answer)
     else:
       sKey = 'Shib-Session-ID'
       authenticated = sKey in env and env[sKey]
       if authenticated:
-        eppn = utf8FromLatin1(env[N.eppn])
-        email = utf8FromLatin1(env[N.mail])
-        self.userInfo = self.getUser(eppn, email=email)
+        eppn = utf8FromLatin1(env['eppn'])
+        email = utf8FromLatin1(env['mail'])
+        self.getUser(eppn, email=email)
+        if self.userInfo.get('group', None) == self.unauthId:
+          # the user us refused because the database says (s)he may not login
+          self.clearUser()
+          return
+
+        if 'group' not in self.userInfo:
+          # new users do not have yet group information
+          self.userInfo.update(self.authUser)
         attributes = {}
-        if N.o in env:
-          attributes[N.org] = utf8FromLatin1(env[N.o])
-        if N.cn in env:
-          attributes[N.name] = utf8FromLatin1(env[N.cn])
-        if N.givenName in env:
-          attributes[N.firstName] = utf8FromLatin1(env[N.givenName])
-        if N.sn in env:
-          attributes[N.lastName] = utf8FromLatin1(env[N.sn])
-        if N.isMemberOf in env:
-          attributes[N.membership] = utf8FromLatin1(env[N.isMemberOf])
-        if N.affiliation in env:
-          attributes[N.rel] = utf8FromLatin1(env[N.affiliation])
+        if 'o' in env:
+          attributes['org'] = utf8FromLatin1(env['o'])
+        if 'cn' in env:
+          attributes['name'] = utf8FromLatin1(env['cn'])
+        if 'givenName' in env:
+          attributes['firstName'] = utf8FromLatin1(env['givenName'])
+        if 'sn' in env:
+          attributes['lastName'] = utf8FromLatin1(env['sn'])
+        if 'isMemberOf' in env:
+          attributes['membership'] = utf8FromLatin1(env['isMemberOf'])
+        if 'affiliation' in env:
+          attributes['rel'] = utf8FromLatin1(env['affiliation'])
         self.userInfo.update(attributes)
       else:
-        self.userInfo = unauthUser
+        self.userInfo.update(self.unauthUser)
+
+  def authenticate(self, login=False):
+
+    # if login=True we want to log the user in
+    # if login=False we only want the current user information
+
+    if login:
+      session.pop('eppn', None)
+      self.checkLogin()
+      if self.userInfo.get('group', self.unauthId) != self.unauthId:
+        # in this case there is an eppn
+        self.storeUser()
+        session['eppn'] = self.userInfo['eppn']
+    else:
+      eppn = session.get('eppn', None)
+      if eppn:
+        self.getUser(eppn)
+      else:
+        self.clearUser()
+
+  def deauthenticate(self):
+    self.clearUser()
+    session.pop('eppn', None)

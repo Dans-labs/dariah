@@ -40,12 +40,37 @@ div.error-boundary {
 	padding: 0.3rem;
 }
 
+div.headline {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+	width: 100%;
+  background-color: var(--headline-back);
+  border: 1pt solid var(--headline-border);
+  border-radius: 0.2rem;
+  padding: 0.2rem;
+  margin: 0.3rem;
+}
+
 .user {
+  flex: 0 1 auto;
 	font-size: small;
 	font-weight: normal;
 	background-color: var(--user-back);
 	color: var(--user-fore);
 	border: 2px dotted var(--user-border);
+	border-radius: 0.4rem;
+	padding: 0.2rem;
+}
+
+.access {
+  flex: 0 1 auto;
+	font-size: small;
+	font-weight: normal;
+	background-color: var(--access-back);
+	color: var(--access-fore);
+	border: 2px dotted var(--access-border);
 	border-radius: 0.4rem;
 	padding: 0.2rem;
 }

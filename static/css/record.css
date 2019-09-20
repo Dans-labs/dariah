@@ -1,0 +1,51 @@
+.record {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+  background-color: var(--record-back);
+  border: 1pt solid var(--record-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-left: 1rem;
+}
+.record-row {
+	width: 100%;
+	display: inline-flex;
+	margin-bottom: 0.1rem;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: flex-start;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+}
+.record-label {
+	flex: 0 0 10rem;
+	font-weight: bold;
+}
+.record-value {
+  flex: 1 1 calc(100% - 10rem);
+	display: inline-flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: flex-start;
+  background-color: var(--value-back);
+}
+.tag {
+  flex: 0 1 auto;
+  color: var(--tag-fore);
+  background-color: var(--tag-back);
+  border: 1pt solid var(--tag-border);
+  border-radius: 0.2rem;
+  padding: 0.1rem 0.2rem;
+  margin: 0.1rem 0.3rem;
+}
+.tag.inactive {
+  color: var(--tag-inactive-fore);
+  background-color: var(--tag-inactive-back);
+  border-color: var(--tag-inactive-border);
+}
