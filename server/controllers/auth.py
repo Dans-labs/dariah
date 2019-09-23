@@ -146,6 +146,7 @@ class Auth(object):
         eppn = utf8FromLatin1(env['eppn'])
         email = utf8FromLatin1(env['mail'])
         self.getUser(eppn, email=email)
+        print('XXX', eppn, email, self.userInfo)
         if self.userInfo.get('group', None) == self.unauthId:
           # the user us refused because the database says (s)he may not login
           self.clearUser()
