@@ -5,6 +5,10 @@ from controllers.utils import now
 from controllers.html import HtmlElements as H
 
 
+UNAUTH = 'public'
+COORD = 'coord'
+
+
 def labelDiv(label):
   return H.div(
       f'{label}:',
@@ -111,6 +115,94 @@ class Values(object):
         ]
         if multiple else
         valTable.get(rawValue, {})
+    )
+
+  def credentials(self, userInfo):
+    if userInfo.get('groupRep', UNAUTH) == UNAUTH:
+      return ('You are not logged in', 'access to public items only')
+    name = userInfo.get('name', '')
+    if not name:
+      firstName = userInfo.get('firstName', '')
+      lastName = userInfo.get('lastName', '')
+      name = (
+          firstName +
+          (' ' if firstName and lastName else '') +
+          lastName
+      )
+    org = userInfo.get('org', '')
+    orgRep = f' ({org})' if org else ''
+    email = userInfo.get('email', '')
+    authority = userInfo.get('authority', '')
+    authorityRep = f' - {authority}' if authority else ''
+    eppn = userInfo.get('eppn', '')
+
+    countryId = userInfo.get('country', None)
+    countryInfo = self.country.get(countryId, {})
+    countryLong = (
+        f'{countryInfo.get("name", "unknown")} ({countryInfo.get("iso", "")})'
+        if countryInfo else
+        'unkown country'
+    )
+
+    groupDesc = userInfo.get('groupDesc', UNAUTH)
+
+    identityRep = (
+        f'{name}{orgRep}'
+        if name else
+        f'{email}{orgRep}'
+        if email else
+        f'{eppn}{authorityRep}'
+        if eppn else
+        'unidentified user!'
+    ) + ' from ' + (
+        countryLong
+    )
+
+    return (identityRep, groupDesc)
+
+  def wrapUser(self, userInfo):
+    (identityRep, accessRep) = self.credentials(userInfo)
+    access = userInfo.get('groupRep', UNAUTH)
+    login = (
+        H.a(
+            'log in',
+            '/login',
+            cls='button small loginout'
+        )
+        if access == UNAUTH else
+        ''
+    )
+    logout = (
+        []
+        if access == UNAUTH else
+        [
+            H.a(
+                'log out',
+                '/logout',
+                cls='button small loginout'
+            ),
+            H.a(
+                'log out from DARIAH',
+                '/slogout',
+                cls='button small loginout',
+                title='you need to restart your browser for this to take effect',
+            ),
+        ]
+    )
+    return H.div(
+        [
+            H.div(
+                identityRep,
+                cls='user',
+            ),
+            H.div(
+                accessRep,
+                cls='access',
+            ),
+            login,
+            *logout,
+        ],
+        cls='headline',
     )
 
   def wrapContactPersonName(self, record, action='read'):

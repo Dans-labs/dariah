@@ -62,6 +62,7 @@ div.headline {
 	border: 2px dotted var(--user-border);
 	border-radius: 0.4rem;
 	padding: 0.2rem;
+  margin: 0.1rem 1rem 0.1rem 0.1rem;
 }
 
 .access {
@@ -73,6 +74,11 @@ div.headline {
 	border: 2px dotted var(--access-border);
 	border-radius: 0.4rem;
 	padding: 0.2rem;
+  margin: 0.1rem 2rem 0.1rem 1rem;
+}
+
+.loginout {
+  margin: 0.1rem 1rem;
 }
 
 .button {

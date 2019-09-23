@@ -112,55 +112,6 @@ class Auth(object):
       _id = result.inserted_id
       self.userInfo['_id'] = _id
 
-  def presentUser(self):
-    self.authenticate()
-    name = self.userInfo.get('name', '')
-    if not name:
-      firstName = self.userInfo.get('firstName', '')
-      lastName = self.userInfo.get('lastName', '')
-      name = (
-          firstName +
-          (' ' if firstName and lastName else '') +
-          lastName
-      )
-    org = self.userInfo.get('org', '')
-    orgRep = f' ({org})' if org else ''
-    email = self.userInfo.get('email', '')
-    authority = self.userInfo.get('authority', '')
-    authorityRep = f' - {authority}' if authority else ''
-    eppn = self.userInfo.get('eppn', '')
-
-    countryId = self.userInfo.get('country', None)
-    countryInfo = self.values.country.get(countryId, {})
-    countryLong = (
-        f'{countryInfo.get("name", "unknown")} ({countryInfo.get("iso", "")})'
-        if countryInfo else
-        None
-    )
-    countryShort = countryInfo.get('iso', 'unknown')
-
-    group = self.userInfo.get('groupRep', UNAUTH)
-    groupDesc = self.userInfo.get('groupDesc', UNAUTH)
-
-    identityRep = (
-        f'{name}{orgRep}'
-        if name else
-        f'{email}{orgRep}'
-        if email else
-        f'{eppn}{authorityRep}'
-        if eppn else
-        'unidentified user!'
-    ) + ' from ' + (
-        countryLong
-    ) + f' ({groupDesc})'
-
-    accessRep = (
-        f'({groupDesc}' +
-        (f'-{countryShort}' if group == COORD else '') +
-        ')'
-    )
-    return (identityRep, accessRep)
-
   def checkLogin(self):
     env = request.environ
     self.clearUser()

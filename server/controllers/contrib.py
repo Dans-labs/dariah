@@ -7,9 +7,10 @@ class Contrib(object):
     self.MONGO = MONGO
     self.values = values
 
-  def list(self):
+  def list(self, userInfo):
     MONGO = self.MONGO
     records = titleSort(MONGO['contrib'].find())
+    self.userInfo = userInfo
 
     return H.div(
         (
@@ -21,8 +22,10 @@ class Contrib(object):
         )
     )
 
-  def item(self, oid, asJson=False):
+  def item(self, userInfo, oid, asJson=False):
     MONGO = self.MONGO
+    self.userInfo = userInfo
+
     records = list(MONGO['contrib'].find({'_id': oid}))
     record = (
         records[0]

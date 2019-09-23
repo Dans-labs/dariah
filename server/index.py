@@ -37,17 +37,30 @@ def factory():
   @app.route('/index')
   @app.route('/index.html')
   def serveIndex():
-    return render_template('index.html', material="hello world")
+    auth.authenticate()
+    userLine = values.wrapUser(auth.userInfo)
+    dashboard = 'top level'
+    return render_template(
+        'index.html',
+        userLine=userLine,
+        material=dashboard,
+    )
 
   @app.route('/contrib/list')
   def serveContribList():
-    contribList = contrib.list()
-    (user, access) = auth.presentUser()
-    return render_template('index.html', user=user, access=access, material=contribList)
+    auth.authenticate()
+    userLine = values.wrapUser(auth.userInfo)
+    contribList = contrib.list(auth.userInfo)
+    return render_template(
+        'index.html',
+        userLine=userLine,
+        material=contribList,
+    )
 
   @app.route('/contrib/item/<string:oid>')
   def serveContribItem(oid):
-    return contrib.item(ObjectId(oid))
+    auth.authenticate()
+    return contrib.item(auth.userInfo, ObjectId(oid))
 
   @app.route('/slogout')
   def serveSlogout():
@@ -57,16 +70,33 @@ def factory():
   @app.route('/login')
   def serveLogin():
     auth.authenticate(login=True)
-    return render_template('index.html')
+    return redirect('/')
+    userLine = values.wrapUser(auth.userInfo)
+    return render_template(
+        'index.html',
+        userLine=userLine,
+        material="hello world",
+    )
 
   @app.route('/logout')
   def serveLogout():
     auth.deauthenticate()
-    return render_template('index.html')
+    userLine = values.wrapUser(auth.userInfo)
+    return render_template(
+        'index.html',
+        userLine=userLine,
+        material="hello world",
+    )
 
   @app.route('/<path:anything>')
   def client(anything=None):
-    return render_template('index.html', material="fall-back")
+    auth.authenticate()
+    userLine = values.wrapUser(auth.userInfo)
+    return render_template(
+        'index.html',
+        userLine=userLine,
+        material="fall-back",
+    )
 
   return app
 
