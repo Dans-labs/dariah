@@ -24,7 +24,7 @@ class Auth(object):
     # determine production or devel
     regime = os.environ.get('REGIME', None)
     self.isDevel = regime == 'devel'
-    self.authority = 'local' if self.isDevel else 'dariah'
+    self.authority = 'local' if self.isDevel else 'DARIAH'
 
     # read secret from the system
     self.secret = ''
