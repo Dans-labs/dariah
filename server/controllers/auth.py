@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from flask import request, session
-from controllers.utils import utf8FromLatin1
+from controllers.utils import utf8FromLatin1, serverprint
 
 SECRET_FILE = '/opt/web-apps/dariah_jwt.secret'
 
@@ -146,7 +146,7 @@ class Auth(object):
         eppn = utf8FromLatin1(env['eppn'])
         email = utf8FromLatin1(env['mail'])
         self.getUser(eppn, email=email)
-        print('XXX', eppn, email, self.userInfo)
+        serverprint(f'XXX {eppn}, {email}, {self.userInfo}')
         if self.userInfo.get('group', None) == self.unauthId:
           # the user us refused because the database says (s)he may not login
           self.clearUser()

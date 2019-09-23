@@ -1,3 +1,5 @@
+import sys
+
 from datetime import datetime as dt
 from flask.json import JSONEncoder
 from bson.objectid import ObjectId
@@ -25,3 +27,8 @@ def now():
 
 def titleSort(records):
   return sorted(records, key=lambda r: r['title'] or '')
+
+
+def serverprint(msg):
+  sys.stdout.write(msg)
+  sys.stdout.flush()
