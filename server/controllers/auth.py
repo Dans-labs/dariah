@@ -61,6 +61,8 @@ class Auth(object):
             )
         )
     ]
+    serverprint(f'XXX users={self.values.user.values()}')
+    serverprint(f'XXX user={user}')
     self.userInfo = {
         'eppn': eppn,
         'authority': self.authority,
@@ -142,6 +144,7 @@ class Auth(object):
     else:
       sKey = 'Shib-Session-ID'
       authenticated = sKey in env and env[sKey]
+      serverprint(f'XXX authenticated={authenticated}')
       if authenticated:
         eppn = utf8FromLatin1(env['eppn'])
         email = utf8FromLatin1(env['mail'])
