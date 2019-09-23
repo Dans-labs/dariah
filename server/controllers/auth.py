@@ -2,17 +2,9 @@ import os
 from datetime import datetime
 
 from flask import request, session
-from bson.objectid import ObjectId
-from controllers.utils import utf8FromLatin1, serverprint
+from controllers.utils import utf8FromLatin1
 
 SECRET_FILE = '/opt/web-apps/dariah_jwt.secret'
-
-AUTH = 'auth'
-AUTH_DESC = 'authenticated user'
-UNAUTH = 'public'
-UNAUTH_DESC = 'user, not logged in'
-COORD = 'coord'
-COORD_DESC = 'national coordinator'
 
 
 class Auth(object):
@@ -31,10 +23,12 @@ class Auth(object):
     with open(SECRET_FILE) as fh:
       app.secret_key = fh.read()
 
+    AUTH = values.names.auth
+    UNAUTH = values.names.public
     self.authId = values.permissionGroupInv.get(AUTH, None)
-    self.authUser = {'group': self.authId, 'groupRep': AUTH, 'groupDesc': AUTH_DESC}
+    self.authUser = {'group': self.authId, 'groupRep': AUTH}
     self.unauthId = values.permissionGroupInv.get(UNAUTH, None)
-    self.unauthUser = {'group': self.unauthId, 'groupRep': UNAUTH, 'groupDesc': UNAUTH_DESC}
+    self.unauthUser = {'group': self.unauthId, 'groupRep': UNAUTH}
     self.clearUser()
 
   def clearUser(self):
@@ -62,10 +56,6 @@ class Auth(object):
             )
         )
     ]
-    dirk = self.values.user[ObjectId('5954278db5dbf50809d461e7')]
-    serverprint(f'XXX dirk={dirk}')
-    serverprint(f'XXX {self.authority}')
-    serverprint(f'XXX user={user}')
     self.userInfo = {
         'eppn': eppn,
         'authority': self.authority,
@@ -78,6 +68,7 @@ class Auth(object):
       # this checks whether mayLogin is explicitly set to False
       self.clearUser()
     else:
+      AUTH = self.values.names.auth
       if 'group' not in self.userInfo:
         self.userInfo['group'] = self.authId
         self.userInfo['groupRep'] = AUTH
@@ -147,12 +138,10 @@ class Auth(object):
     else:
       sKey = 'Shib-Session-ID'
       authenticated = sKey in env and env[sKey]
-      serverprint(f'XXX authenticated={authenticated}')
       if authenticated:
         eppn = utf8FromLatin1(env['eppn'])
         email = utf8FromLatin1(env['mail'])
         self.getUser(eppn, email=email)
-        serverprint(f'XXX {eppn}, {email}, {self.userInfo}')
         if self.userInfo.get('group', None) == self.unauthId:
           # the user us refused because the database says (s)he may not login
           self.clearUser()

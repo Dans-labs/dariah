@@ -6,7 +6,6 @@ from controllers.html import HtmlElements as H
 
 
 UNAUTH = 'public'
-COORD = 'coord'
 
 
 def labelDiv(label):
@@ -24,8 +23,10 @@ def valueRODiv(value):
 
 
 class Values(object):
-  def __init__(self, MONGO):
+  def __init__(self, MONGO, Config, Names):
     self.MONGO = MONGO
+    self.names = Names
+    self.config = Config
 
   def collect(self):
     MONGO = self.MONGO
@@ -118,8 +119,13 @@ class Values(object):
     )
 
   def credentials(self, userInfo):
-    if userInfo.get('groupRep', UNAUTH) == UNAUTH:
-      return ('You are not logged in', 'access to public items only')
+    UNAUTH = self.names.public
+    group = userInfo.get('groupRep', UNAUTH)
+    groupDesc = self.config.groups.get(group, 'unknown group')
+
+    if group == UNAUTH:
+      return ('Guest', groupDesc)
+
     name = userInfo.get('name', '')
     if not name:
       firstName = userInfo.get('firstName', '')
@@ -144,8 +150,6 @@ class Values(object):
         'unkown country'
     )
 
-    groupDesc = userInfo.get('groupDesc', UNAUTH)
-
     identityRep = (
         f'{name}{orgRep}'
         if name else
@@ -161,6 +165,7 @@ class Values(object):
     return (identityRep, groupDesc)
 
   def wrapUser(self, userInfo):
+    UNAUTH = self.names.public
     (identityRep, accessRep) = self.credentials(userInfo)
     access = userInfo.get('groupRep', UNAUTH)
     login = (

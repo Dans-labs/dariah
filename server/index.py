@@ -13,10 +13,11 @@ from bson.objectid import ObjectId
 from controllers.values import Values
 from controllers.auth import Auth
 from controllers.contrib import Contrib
+from controllers.names import Config, Names
 
 STATIC_ROOT = os.path.abspath('../static/')
 MONGO = MongoClient().dariah
-values = Values(MONGO)
+values = Values(MONGO, Config, Names)
 values.collect()
 
 
