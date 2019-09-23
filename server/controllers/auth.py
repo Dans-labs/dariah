@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 from flask import request, session
+from bson.objectid import ObjectId
 from controllers.utils import utf8FromLatin1, serverprint
 
 SECRET_FILE = '/opt/web-apps/dariah_jwt.secret'
@@ -61,7 +62,9 @@ class Auth(object):
             )
         )
     ]
-    serverprint(f'XXX users={self.values.user.values()}')
+    dirk = self.values.user[ObjectId('5954278db5dbf50809d461e7')]
+    serverprint(f'XXX dirk={dirk}')
+    serverprint(f'XXX {self.authority}')
     serverprint(f'XXX user={user}')
     self.userInfo = {
         'eppn': eppn,
