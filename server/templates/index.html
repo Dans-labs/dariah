@@ -29,13 +29,22 @@
       <meta name="theme-color" content="#ffffff">
       <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
       <link rel="stylesheet" href="/static/css/vars.css"/>
+      <link rel="stylesheet" href="/static/css/page.css"/>
       <link rel="stylesheet" href="/static/css/common.css"/>
       <link rel="stylesheet" href="/static/css/record.css"/>
     </head>
     <body>
-        <div id="body"/>
-          {{userLine|safe}}
-        {{material|safe}}
+      <div id="topbar">
+        {{userLine|safe}}
+      </div>
+      <div id="rest">
+        <div id="sidebar">
+          {{sidebar|safe}}
+        </div>
+        <div id="material">
+          {{material|safe}}
+        </div>
+      </div>
   <script type="text/javascript" src="/static/js/jquery.js"></script>
   <script type="text/javascript" src="/static/js/index.js"></script>
     </body>

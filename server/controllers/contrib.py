@@ -1,5 +1,6 @@
 from controllers.utils import dbjson, titleSort
 from controllers.html import HtmlElements as H
+from controllers.perm import permRecord
 
 
 class Contrib(object):
@@ -7,10 +8,11 @@ class Contrib(object):
     self.MONGO = MONGO
     self.values = values
 
-  def list(self, userInfo):
+  def list(self, auth):
+    U = auth.userInfo
     MONGO = self.MONGO
     records = titleSort(MONGO['contrib'].find())
-    self.userInfo = userInfo
+    self.U = U
 
     return H.div(
         (
@@ -22,9 +24,10 @@ class Contrib(object):
         )
     )
 
-  def item(self, userInfo, oid, asJson=False):
+  def item(self, auth, oid, asJson=False):
+    U = auth.userInfo
     MONGO = self.MONGO
-    self.userInfo = userInfo
+    self.U = U
 
     records = list(MONGO['contrib'].find({'_id': oid}))
     record = (
@@ -35,27 +38,44 @@ class Contrib(object):
     return dbjson(record) if asJson else self.wrap(record)
 
   def wrap(self, record):
+    U = self.U
     V = self.values
+    P = permRecord(
+        U,
+        record,
+        country=record.get('country', None),
+    )
     return (
         H.div(
             [
-                V.wrapYear(record),
-                V.wrapCountry(record),
-                V.wrapSelected(record),
-                V.wrapVccs(record),
-                V.wrapTypeContribution(record),
-                V.wrapDescription(record),
-                V.wrapCostTotal(record),
-                V.wrapCostDescription(record),
-                V.wrapContactPersonName(record),
-                V.wrapContactPersonEmail(record),
-                V.wrapUrlContribution(record),
-                V.wrapUrlAcademic(record),
-                V.wrapTadirahObjects(record),
-                V.wrapTadirahActivities(record),
-                V.wrapTadirahTechniques(record),
-                V.wrapDisciplines(record),
-                V.wrapKeywords(record),
+                V.wrapYear(U, P, record),
+                V.wrapCountry(U, P, record),
+                V.wrapSelected(U, P, record),
+                V.wrapVccs(U, P, record),
+                V.wrapTypeContribution(U, P, record),
+                V.wrapDescription(U, P, record),
+                V.wrapCostTotal(U, P, record),
+                V.wrapCostDescription(U, P, record),
+                V.wrapContactPersonName(U, P, record),
+                V.wrapContactPersonEmail(U, P, record, require=dict(read='auth')),
+                V.wrapUrlContribution(U, P, record),
+                V.wrapUrlAcademic(U, P, record),
+                V.wrapTadirahObjects(U, P, record),
+                V.wrapTadirahActivities(U, P, record),
+                V.wrapTadirahTechniques(U, P, record),
+                V.wrapDisciplines(U, P, record),
+                V.wrapKeywords(U, P, record),
+                H.details(
+                    'Provenance',
+                    H.div(
+                        [
+                            V.wrapAuthor(U, P, record),
+                            V.wrapEditors(U, P, record),
+                            V.wrapDateCreated(U, P, record),
+                            V.wrapModified(U, P, record),
+                        ]
+                    ),
+                ),
             ],
             cls='record',
         )

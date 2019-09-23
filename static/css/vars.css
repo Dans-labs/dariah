@@ -1,5 +1,6 @@
 /* prettier-ignore */
 :root {
+
     /* COLORS */
     --headline-back:                   hsla(  0,   0%,  80%, 0.8);
     --headline-border:                 hsla(  0,   0%,  60%, 0.5);
@@ -223,11 +224,6 @@
 
     /* SIZES */
 
-    --logo-height:                     3rem;
-
-    --subapp-top:                      calc(0rem - var(--topbar-bottom));
-    --subapp-height:                   calc(100vh - var(--topbar-height) + var(--topbar-bottom));
-
-    --topbar-height:                   2rem;
-    --topbar-bottom:                   calc(var(--topbar-height) - var(--logo-height));
+    --sidebar-width:                   8rem;
+    --topbar-height:                   3rem;
 }

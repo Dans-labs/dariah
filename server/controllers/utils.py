@@ -5,6 +5,11 @@ from flask.json import JSONEncoder
 from bson.objectid import ObjectId
 
 
+ISO_DTP = '%Y-%m-%dT%H:%M:%S.%f'
+ISO_DT = '%Y-%m-%dT%H:%M:%S'
+ISO_D = '%Y-%m-%d'
+
+
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
       if isinstance(obj, dt):
@@ -32,3 +37,18 @@ def titleSort(records):
 def serverprint(msg):
   sys.stdout.write(msg)
   sys.stdout.flush()
+
+
+def dtm(isostr):
+  isostr = isostr.rstrip('Z')
+  try:
+    date = dt.strptime(isostr, ISO_DTP)
+  except Exception:
+    try:
+      date = dt.strptime(isostr, ISO_DT)
+    except Exception:
+      try:
+        date = dt.strptime(isostr, ISO_D)
+      except Exception as err:
+        return ('{}'.format(err), isostr)
+  return ('', date)

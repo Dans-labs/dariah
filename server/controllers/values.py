@@ -1,11 +1,9 @@
 from itertools import chain
 from markdown import markdown
 
-from controllers.utils import now
+from controllers.utils import now, dtm
 from controllers.html import HtmlElements as H
-
-
-UNAUTH = 'public'
+from controllers.perm import getPerms
 
 
 def labelDiv(label):
@@ -118,31 +116,27 @@ class Values(object):
         valTable.get(rawValue, {})
     )
 
-  def credentials(self, userInfo):
-    UNAUTH = self.names.public
-    group = userInfo.get('groupRep', UNAUTH)
-    groupDesc = self.config.groups.get(group, 'unknown group')
-
-    if group == UNAUTH:
-      return ('Guest', groupDesc)
-
-    name = userInfo.get('name', '')
+  def identity(self, U, record):
+    name = record.get('name', '')
     if not name:
-      firstName = userInfo.get('firstName', '')
-      lastName = userInfo.get('lastName', '')
+      firstName = record.get('firstName', '')
+      lastName = record.get('lastName', '')
       name = (
           firstName +
           (' ' if firstName and lastName else '') +
           lastName
       )
-    org = userInfo.get('org', '')
+    UNAUTH = self.names.public
+    group = U.get('groupRep', UNAUTH)
+    isAuth = group != UNAUTH
+    org = record.get('org', '')
     orgRep = f' ({org})' if org else ''
-    email = userInfo.get('email', '')
-    authority = userInfo.get('authority', '')
+    email = record.get('email', '') if isAuth else ''
+    authority = record.get('authority', '') if isAuth else ''
     authorityRep = f' - {authority}' if authority else ''
-    eppn = userInfo.get('eppn', '')
+    eppn = record.get('eppn', '') if isAuth else ''
 
-    countryId = userInfo.get('country', None)
+    countryId = record.get('country', None)
     countryInfo = self.country.get(countryId, {})
     countryLong = (
         f'{countryInfo.get("name", "unknown")} ({countryInfo.get("iso", "")})'
@@ -161,13 +155,25 @@ class Values(object):
     ) + ' from ' + (
         countryLong
     )
+    return identityRep
+
+  def credentials(self, U):
+    UNAUTH = self.names.public
+    group = U.get('groupRep', UNAUTH)
+    groupDesc = self.config.groups.get(group, 'unknown group')
+
+    if group == UNAUTH:
+      return ('Guest', groupDesc)
+
+    identityRep = self.identity(U, U)
 
     return (identityRep, groupDesc)
 
-  def wrapUser(self, userInfo):
+  def wrapCurrentUser(self, auth):
+    U = auth.userInfo
     UNAUTH = self.names.public
-    (identityRep, accessRep) = self.credentials(userInfo)
-    access = userInfo.get('groupRep', UNAUTH)
+    (identityRep, accessRep) = self.credentials(U)
+    access = U.get('groupRep', UNAUTH)
     login = (
         H.a(
             'log in',
@@ -210,7 +216,25 @@ class Values(object):
         cls='headline',
     )
 
-  def wrapContactPersonName(self, record, action='read'):
+  def wrapNav(self, auth):
+    return '\n'.join([
+        H.a('Home', '/'),
+        H.a('Contributions', '/contrib/list'),
+    ])
+
+  def wrapAuthor(self, U, P, record, require=None):
+    label = 'Creator'
+    value = self.relfield(record, 'creator', relTable='user')
+    rep = H.div(
+        self.identity(U, value),
+        cls='tag',
+    )
+    return H.div(
+        [labelDiv(label), valueRODiv(rep)],
+        cls='record-row',
+    )
+
+  def wrapContactPersonName(self, U, P, record, require=None):
     label = 'Contact person'
     value = record.get('contactPersonName', None)
     rep = value or 'not given'
@@ -219,16 +243,26 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapContactPersonEmail(self, record, action='read'):
+  def wrapContactPersonEmail(self, U, P, record, require=None):
+    (mayRead, mayEdit) = getPerms(U, P, record, require)
+    if not mayRead and not mayEdit:
+      return ''
+
     label = 'Contact email'
     value = record.get('contactPersonEmail', None)
-    rep = value or 'not given'
+    if not mayEdit:
+      rep = value or 'not given'
+      return H.div(
+          [labelDiv(label), valueRODiv(rep)],
+          cls='record-row',
+      )
+    rep = value or ''
     return H.div(
         [labelDiv(label), valueRODiv(rep)],
         cls='record-row',
     )
 
-  def wrapCostTotal(self, record, action='read'):
+  def wrapCostTotal(self, U, P, record, require=None):
     label = 'Cost (total)'
     value = record.get('costTotal', None)
     rep = f'€ {value}' or '??'
@@ -237,7 +271,7 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapCostDescription(self, record, action='read'):
+  def wrapCostDescription(self, U, P, record, require=None):
     label = 'cost (description)'
     value = record.get('costDescription', None)
     rep = H.div(markdown(value or '??'))
@@ -246,7 +280,7 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapCountry(self, record, action='read'):
+  def wrapCountry(self, U, P, record, require=None):
     label = 'Country'
     value = self.relfield(record, 'country')
     rep = H.div(
@@ -259,7 +293,16 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapDescription(self, record, action='read'):
+  def wrapDateCreated(self, U, P, record, require=None):
+    label = 'Created on'
+    value = record.get('dateCreated', None)
+    rep = f'{dtm(value.isoformat())[1]}' or '??'
+    return H.div(
+        [labelDiv(label), valueRODiv(rep)],
+        cls='record-row',
+    )
+
+  def wrapDescription(self, U, P, record, require=None):
     label = 'Description'
     value = record.get('description', None)
     rep = H.div(markdown(value or '??'))
@@ -268,67 +311,7 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapSelected(self, record, action='read'):
-    label = 'Selected by National Coordinator'
-    value = record.get('selected', None)
-    rep = (
-        'No decision'
-        if value is None else
-        'Yes'
-        if value else
-        'No'
-    )
-    return H.div(
-        [labelDiv(label), valueRODiv(rep)],
-        cls='record-row',
-    )
-
-  def wrapTadirahObjects(self, record, action='read'):
-    label = 'Object(s)'
-    values = self.relfield(record, 'tadirahObject', multiple=True)
-    rep = [
-        H.div(
-            value.get('rep', '??'),
-            cls='tag',
-        )
-        for value in values
-    ]
-    return H.div(
-        [labelDiv(label), valueRODiv(rep)],
-        cls='record-row',
-    )
-
-  def wrapTadirahActivities(self, record, action='read'):
-    label = 'Activity(ies)'
-    values = self.relfield(record, 'tadirahActivity', multiple=True)
-    rep = [
-        H.div(
-            value.get('rep', '??'),
-            cls='tag',
-        )
-        for value in values
-    ]
-    return H.div(
-        [labelDiv(label), valueRODiv(rep)],
-        cls='record-row',
-    )
-
-  def wrapTadirahTechniques(self, record, action='read'):
-    label = 'Technique(s)'
-    values = self.relfield(record, 'tadirahTechnique', multiple=True)
-    rep = [
-        H.div(
-            value.get('rep', '??'),
-            cls='tag',
-        )
-        for value in values
-    ]
-    return H.div(
-        [labelDiv(label), valueRODiv(rep)],
-        cls='record-row',
-    )
-
-  def wrapDisciplines(self, record, action='read'):
+  def wrapDisciplines(self, U, P, record, require=None):
     label = 'Disciplines'
     values = self.relfield(record, 'discipline', multiple=True)
     rep = [
@@ -343,7 +326,22 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapKeywords(self, record, action='read'):
+  def wrapEditors(self, U, P, record, require=None):
+    label = 'Editor(s)'
+    values = self.relfield(record, 'editors', relTable='user', multiple=True)
+    rep = [
+        H.div(
+            self.identity(U, value),
+            cls='tag',
+        )
+        for value in values
+    ]
+    return H.div(
+        [labelDiv(label), valueRODiv(rep)],
+        cls='record-row',
+    )
+
+  def wrapKeywords(self, U, P, record, require=None):
     label = 'Keywords'
     values = self.relfield(record, 'keyword', multiple=True)
     rep = [
@@ -358,7 +356,76 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapTypeContribution(self, record, action='read'):
+  def wrapModified(self, U, P, record, require=None):
+    label = 'Modified'
+    value = record.get('modified', [])
+    rep = H.br().join(value)
+    return H.div(
+        [labelDiv(label), valueRODiv(rep)],
+        cls='record-row',
+    )
+
+  def wrapSelected(self, U, P, record, require=None):
+    label = 'Selected by National Coordinator'
+    value = record.get('selected', None)
+    rep = (
+        'No decision'
+        if value is None else
+        'Yes'
+        if value else
+        'No'
+    )
+    return H.div(
+        [labelDiv(label), valueRODiv(rep)],
+        cls='record-row',
+    )
+
+  def wrapTadirahObjects(self, U, P, record, require=None):
+    label = 'Object(s)'
+    values = self.relfield(record, 'tadirahObject', multiple=True)
+    rep = [
+        H.div(
+            value.get('rep', '??'),
+            cls='tag',
+        )
+        for value in values
+    ]
+    return H.div(
+        [labelDiv(label), valueRODiv(rep)],
+        cls='record-row',
+    )
+
+  def wrapTadirahActivities(self, U, P, record, require=None):
+    label = 'Activity(ies)'
+    values = self.relfield(record, 'tadirahActivity', multiple=True)
+    rep = [
+        H.div(
+            value.get('rep', '??'),
+            cls='tag',
+        )
+        for value in values
+    ]
+    return H.div(
+        [labelDiv(label), valueRODiv(rep)],
+        cls='record-row',
+    )
+
+  def wrapTadirahTechniques(self, U, P, record, require=None):
+    label = 'Technique(s)'
+    values = self.relfield(record, 'tadirahTechnique', multiple=True)
+    rep = [
+        H.div(
+            value.get('rep', '??'),
+            cls='tag',
+        )
+        for value in values
+    ]
+    return H.div(
+        [labelDiv(label), valueRODiv(rep)],
+        cls='record-row',
+    )
+
+  def wrapTypeContribution(self, U, P, record, require=None):
     label = 'Type'
     rawValue = record.get('typeContribution', None)
     value = self.relfield(record, 'typeContribution')
@@ -377,7 +444,7 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapUrlAcademic(self, record, action='read'):
+  def wrapUrlAcademic(self, U, P, record, require=None):
     label = 'Academic url'
     value = record.get('urlAcademic', [])
     rep = (
@@ -393,7 +460,7 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapUrlContribution(self, record, action='read'):
+  def wrapUrlContribution(self, U, P, record, require=None):
     label = 'Contribution url'
     value = record.get('urlContribution', [])
     rep = (
@@ -409,7 +476,7 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapVccs(self, record, action='read'):
+  def wrapVccs(self, U, P, record, require=None):
     label = 'VCC(s)'
     values = self.relfield(record, 'vcc', multiple=True)
     rep = [
@@ -424,7 +491,7 @@ class Values(object):
         cls='record-row',
     )
 
-  def wrapYear(self, record, action='read'):
+  def wrapYear(self, U, P, record, require=None):
     label = 'Year'
     value = self.relfield(record, 'year')
     rep = H.div(

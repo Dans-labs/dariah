@@ -39,29 +39,33 @@ def factory():
   @app.route('/index.html')
   def serveIndex():
     auth.authenticate()
-    userLine = values.wrapUser(auth.userInfo)
-    dashboard = 'top level'
+    userLine = values.wrapCurrentUser(auth)
+    sidebar = values.wrapNav(auth)
+    home = 'home'
     return render_template(
         'index.html',
         userLine=userLine,
-        material=dashboard,
+        sidebar=sidebar,
+        material=home,
     )
 
   @app.route('/contrib/list')
   def serveContribList():
     auth.authenticate()
-    userLine = values.wrapUser(auth.userInfo)
-    contribList = contrib.list(auth.userInfo)
+    userLine = values.wrapCurrentUser(auth)
+    sidebar = values.wrapNav(auth)
+    contribList = contrib.list(auth)
     return render_template(
         'index.html',
         userLine=userLine,
+        sidebar=sidebar,
         material=contribList,
     )
 
   @app.route('/contrib/item/<string:oid>')
   def serveContribItem(oid):
     auth.authenticate()
-    return contrib.item(auth.userInfo, ObjectId(oid))
+    return contrib.item(auth, ObjectId(oid))
 
   @app.route('/slogout')
   def serveSlogout():
@@ -72,30 +76,21 @@ def factory():
   def serveLogin():
     auth.authenticate(login=True)
     return redirect('/')
-    userLine = values.wrapUser(auth.userInfo)
-    return render_template(
-        'index.html',
-        userLine=userLine,
-        material="hello world",
-    )
 
   @app.route('/logout')
   def serveLogout():
     auth.deauthenticate()
-    userLine = values.wrapUser(auth.userInfo)
-    return render_template(
-        'index.html',
-        userLine=userLine,
-        material="hello world",
-    )
+    return redirect('/')
 
   @app.route('/<path:anything>')
   def client(anything=None):
     auth.authenticate()
-    userLine = values.wrapUser(auth.userInfo)
+    userLine = values.wrapCurrentUser(auth)
+    sidebar = values.wrapNav(auth)
     return render_template(
         'index.html',
         userLine=userLine,
+        sidebar=sidebar,
         material="fall-back",
     )
 

@@ -13,8 +13,6 @@ groups:
 names:
   - public
   - auth
-  - our
-  - edit
   - own
   - coord
   - office

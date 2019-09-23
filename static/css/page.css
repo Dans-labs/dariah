@@ -1,0 +1,64 @@
+*, *:before, *:after {
+  -webkit-box-sizing: border-box; 
+  -moz-box-sizing: border-box; 
+  box-sizing: border-box;
+}
+
+html {
+	height: 100vh;
+	width: 100vw;
+	margin: 0rem !important;
+	padding: 0rem !important;
+}
+body {
+	height: 100vh;
+	width: 100vw;
+	margin: 0rem !important;
+	padding: 0rem !important;
+  display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+}
+
+#topbar {
+	width: 100vw;
+  height: var(--topbar-height);
+	flex: 0 0 auto;
+	margin: 0em;
+	padding: 0em;
+}
+
+#rest {
+	100vw;
+  height: calc(100vh - var(--topbar-height));
+	flex: 0 1 auto;
+  display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+	margin: 0em;
+	padding: 0em;
+}
+
+#sidebar {
+  flex: 0 0 auto;
+  width: var(--sidebar-width);
+	height: calc(100vh - var(--topbar-height));
+  overflow: auto;
+  display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+	margin: 0em;
+	padding: 0.5rem;
+}
+
+#material {
+  flex: 0 0 auto;
+  width: calc(100vw - var(--sidebar-width));
+	height: calc(100vh - var(--topbar-height));
+  overflow: auto;
+	margin: 0em;
+	padding: 0.5rem;
+}
