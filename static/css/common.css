@@ -84,6 +84,12 @@ div.headline {
 	cursor: default;
 	background-color: var(--action-disabled-back);
 }
+.button.active {
+	cursor: default;
+	color: var(--action-active-fore);
+	background-color: var(--action-active-back);
+	border-color: var(--action-active-border);
+}
 .button.large,
 .label.large {
 	--size: medium;
@@ -97,6 +103,12 @@ div.headline {
 	padding-bottom: calc(var(--radius) * 0.4);
 	padding-left: calc(var(--radius) * 1.2);
 	padding-right: calc(var(--radius) * 1.2);
+}
+.button.large.nav {
+  margin: 0.5rem 0.1rem;
+}
+.button.large.field {
+  margin: 0.5rem;
 }
 .button.medium,
 .label.medium {
@@ -112,6 +124,12 @@ div.headline {
 	padding-left: calc(var(--radius) * 1.2);
 	padding-right: calc(var(--radius) * 1.2);
 }
+.button.medium.nav {
+  margin: 0.4rem 0.1rem;
+}
+.button.medium.field {
+  margin: 0.3rem;
+}
 .button.small,
 .label.small {
 	--size: small;
@@ -125,6 +143,12 @@ div.headline {
 	padding-bottom: calc(var(--radius) * 0.4);
 	padding-left: calc(var(--radius) * 1.2);
 	padding-right: calc(var(--radius) * 1.2);
+}
+.button.small.nav {
+  margin: 0.3rem 0.1rem;
+}
+.button.small.field {
+  margin: 0.2rem;
 }
 
 .a-none {

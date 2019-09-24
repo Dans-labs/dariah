@@ -30,10 +30,6 @@ def now():
   return dt.utcnow()
 
 
-def titleSort(records):
-  return sorted(records, key=lambda r: r['title'] or '')
-
-
 def serverprint(msg):
   sys.stdout.write(msg)
   sys.stdout.flush()

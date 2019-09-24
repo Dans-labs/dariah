@@ -16,6 +16,9 @@ def checkPerm(
 
   group = perm['group']
 
+  if require == N.nobody:
+    return False
+
   if require == N.auth:
     return group != N.public
 
@@ -59,7 +62,7 @@ def getPerms(U, P, record, require):
 def permRecord(U, record, country=None):
   uid = U.get('_id', None)
   group = U.get('groupRep', N.public)
-  uCountry = U.get(country)
+  uCountry = U.get('country', None)
   refCountry = country or record.get(country, None)
 
   return {

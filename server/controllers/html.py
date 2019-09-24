@@ -37,3 +37,26 @@ class HtmlElements(object):
   {material}
 </div>
 '''
+
+  @staticmethod
+  def span(material, **atts):
+    if material is None:
+      material = ''
+    elif type(material) is not str:
+      material = ''.join(material)
+    return f'''
+<span{attStr(atts)}>
+  {material}
+</span>
+'''
+
+  @staticmethod
+  def icon(icon, **atts):
+    iconClass = f' fa fa-{icon}'
+    if atts and 'cls' in atts:
+      atts['cls'] += iconClass
+    elif atts:
+      atts['cls'] = iconClass
+    else:
+      atts = dict(cls=iconClass)
+    return f'''<span{attStr(atts)}/>'''

@@ -8,23 +8,23 @@ from flask import (
 )
 
 from pymongo import MongoClient
-from bson.objectid import ObjectId
 
-from controllers.values import Values
+from controllers.db import Db
 from controllers.auth import Auth
-from controllers.contrib import Contrib
 from controllers.names import Config, Names
+from controllers.wrap.sidebar import Sidebar
+from controllers.wrap.user import User
+from controllers.wrap.contrib import Contrib
 
 STATIC_ROOT = os.path.abspath('../static/')
-MONGO = MongoClient().dariah
-values = Values(MONGO, Config, Names)
-values.collect()
+mongo = MongoClient().dariah
+db = Db(mongo, Config, Names)
+db.collect()
 
 
 def factory():
   app = Flask(__name__, static_url_path='/xxx')
-  auth = Auth(app, MONGO, values)
-  contrib = Contrib(MONGO, values)
+  auth = Auth(app, mongo, db)
 
   @app.route('/static/<path:filepath>')
   def serveStatic(filepath):
@@ -39,8 +39,8 @@ def factory():
   @app.route('/index.html')
   def serveIndex():
     auth.authenticate()
-    userLine = values.wrapCurrentUser(auth)
-    sidebar = values.wrapNav(auth)
+    userLine = User(db, auth).wrap()
+    sidebar = Sidebar(db, auth, '/').wrap()
     home = 'home'
     return render_template(
         'index.html',
@@ -52,9 +52,9 @@ def factory():
   @app.route('/contrib/list')
   def serveContribList():
     auth.authenticate()
-    userLine = values.wrapCurrentUser(auth)
-    sidebar = values.wrapNav(auth)
-    contribList = contrib.list(auth)
+    userLine = User(db, auth).wrap()
+    sidebar = Sidebar(db, auth, '/contrib/list').wrap()
+    contribList = Contrib(db, auth, mongo).list()
     return render_template(
         'index.html',
         userLine=userLine,
@@ -62,10 +62,46 @@ def factory():
         material=contribList,
     )
 
-  @app.route('/contrib/item/<string:oid>')
-  def serveContribItem(oid):
+  @app.route('/contrib/mylist')
+  def serveContribMyList():
     auth.authenticate()
-    return contrib.item(auth, ObjectId(oid))
+    userLine = User(db, auth).wrap()
+    sidebar = Sidebar(db, auth, '/contrib/mylist').wrap()
+    contribList = Contrib(db, auth, mongo).mylist()
+    return render_template(
+        'index.html',
+        userLine=userLine,
+        sidebar=sidebar,
+        material=contribList,
+    )
+
+  @app.route('/contrib/ourlist')
+  def serveContribOurList():
+    auth.authenticate()
+    userLine = User(db, auth).wrap()
+    sidebar = Sidebar(db, auth, '/contrib/ourlist').wrap()
+    contribList = Contrib(db, auth, mongo).ourlist()
+    return render_template(
+        'index.html',
+        userLine=userLine,
+        sidebar=sidebar,
+        material=contribList,
+    )
+
+  @app.route('/contrib/item/<string:eid>/save/<string:field>')
+  def serveContribFieldSave(eid, field):
+    auth.authenticate()
+    return Contrib(db, auth, mongo).fieldAction(eid, field, 'save')
+
+  @app.route('/contrib/item/<string:eid>/edit/<string:field>')
+  def serveContribFieldEdit(eid, field):
+    auth.authenticate()
+    return Contrib(db, auth, mongo).fieldAction(eid, field, 'edit')
+
+  @app.route('/contrib/item/<string:eid>')
+  def serveContribItem(eid):
+    auth.authenticate()
+    return Contrib(db, auth, mongo).item(eid)
 
   @app.route('/slogout')
   def serveSlogout():
@@ -85,8 +121,8 @@ def factory():
   @app.route('/<path:anything>')
   def client(anything=None):
     auth.authenticate()
-    userLine = values.wrapCurrentUser(auth)
-    sidebar = values.wrapNav(auth)
+    userLine = User(db, auth).wrap()
+    sidebar = Sidebar(db, auth, anything).wrap()
     return render_template(
         'index.html',
         userLine=userLine,

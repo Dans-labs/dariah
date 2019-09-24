@@ -31,9 +31,12 @@
 	display: inline-flex;
 	flex-flow: row wrap;
 	justify-content: flex-start;
-	align-items: stretch;
+	align-items: flex-start;
 	align-content: flex-start;
   background-color: var(--value-back);
+}
+.record-value.edit {
+  background-color: var(--value-edit-back);
 }
 .tag {
   flex: 0 1 auto;

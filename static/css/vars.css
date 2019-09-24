@@ -169,8 +169,8 @@
 
     --topbar-back:                     hsla( 30,  30%,  80%, 0.4);
 
-    --value-back:                      hsla(120, 100%, 100%, 1  );
-    --value-edit-back:                 hsla(  0,   0%,  95%, 1  );
+    --value-edit-back:                 hsla(120, 100%, 100%, 1  );
+    --value-back:                      hsla(  0,   0%,  95%, 1  );
     --value-border:                    hsla(120,  40%,  90%, 1  );
 
     --warning-fore-o:                  hsla( 30, 100%,  30%, 1  );
@@ -224,6 +224,6 @@
 
     /* SIZES */
 
-    --sidebar-width:                   8rem;
+    --sidebar-width:                   10rem;
     --topbar-height:                   3rem;
 }
