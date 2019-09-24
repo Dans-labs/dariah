@@ -185,4 +185,35 @@ div.headline {
     color: #000000;
     background-color: #00ffff;
 }
+input {
+	color: var(--action-fore);
+	background-color: var(--action-back);
+	border: 0;
+	padding: 0.2rem;
+}
+input[type='text'],
+textarea {
+	color: var(--edit-text-fore);
+	background-color: var(--edit-text-back);
+	outline: 2px inset var(--edit-text-border);
+	border: 0;
+	font-size: large;
+	font-family: monospace;
+}
+input[type='text'] {
+	width: calc(100% - 1rem);
+	margin: 0.3rem 0.3rem;
+}
+textarea {
+	width: calc(100% - 1rem);
+	height: 10rem;
+	margin: 0.3rem 0.3rem;
+}
+input[type='text']:focus,
+textarea:focus {
+	color: var(--edit-focus-text);
+	background-color: var(--edit-focus-back);
+	outline: 4px inset var(--edit-focus-border);
+	border: 0;
+}
 

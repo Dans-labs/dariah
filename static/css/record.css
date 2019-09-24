@@ -27,15 +27,20 @@
 	font-weight: bold;
 }
 .record-value {
-  flex: 1 1 calc(100% - 10rem);
+  flex: 1 1 calc(100%);
 	display: inline-flex;
 	flex-flow: row wrap;
-	justify-content: flex-start;
+	justify-content: stretch;
 	align-items: flex-start;
 	align-content: flex-start;
   background-color: var(--value-back);
 }
-.record-value.edit {
+.record-value .value {
+  flex: 1 1 auto;
+	display: inline-flex;
+	flex-flow: row wrap;
+}
+.record-value.edit, .record-value.value.edit {
   background-color: var(--value-edit-back);
 }
 .tag {

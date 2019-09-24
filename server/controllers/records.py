@@ -23,15 +23,9 @@ def valueRODiv(value, mayEdit, **atts):
       if mayEdit else
       ''
   )
-  rep = H.div(value)
+  rep = H.div(value, cls="value")
 
-  return H.div(
-      [
-          button,
-          rep,
-      ],
-      cls='record-value',
-  )
+  return [button, rep]
 
 
 def valueEdDiv(value, **atts):
@@ -41,13 +35,5 @@ def valueEdDiv(value, **atts):
       action='save',
       **atts,
   )
-  rep = (
-      H.div(value)
-  )
-  return H.div(
-      [
-          button,
-          rep,
-      ],
-      cls='record-value edit',
-  )
+  rep = H.div(value, cls="value")
+  return [button, rep]

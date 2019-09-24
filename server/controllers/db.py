@@ -1,4 +1,5 @@
 from itertools import chain
+from bson.objectid import ObjectId
 
 from controllers.utils import now
 
@@ -81,6 +82,19 @@ class Db(object):
         continue
       for tp in record.get('typeContribution', []):
         self.typeCriteria.setdefault(tp, set()).add(_id)
+
+  def getItem(self, table, eid):
+    mongo = self.mongo
+
+    records = list(
+        mongo[table].find({'_id': ObjectId(eid)})
+    )
+    record = (
+        records[0]
+        if len(records) else
+        {}
+    )
+    return record
 
   def getField(
       self,

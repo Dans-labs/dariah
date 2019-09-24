@@ -19,3 +19,4 @@ names:
   - system
   - root
   - nobody
+  - isPristine

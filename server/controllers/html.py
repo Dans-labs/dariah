@@ -39,6 +39,21 @@ class HtmlElements(object):
 '''
 
   @staticmethod
+  def icon(icon, **atts):
+    iconClass = f' fa fa-{icon}'
+    if atts and 'cls' in atts:
+      atts['cls'] += iconClass
+    elif atts:
+      atts['cls'] = iconClass
+    else:
+      atts = dict(cls=iconClass)
+    return f'''<span{attStr(atts)}/>'''
+
+  @staticmethod
+  def input(material, **atts):
+    return f'''<input value="{material}"{attStr(atts)}/>'''
+
+  @staticmethod
   def span(material, **atts):
     if material is None:
       material = ''
@@ -49,14 +64,3 @@ class HtmlElements(object):
   {material}
 </span>
 '''
-
-  @staticmethod
-  def icon(icon, **atts):
-    iconClass = f' fa fa-{icon}'
-    if atts and 'cls' in atts:
-      atts['cls'] += iconClass
-    elif atts:
-      atts['cls'] = iconClass
-    else:
-      atts = dict(cls=iconClass)
-    return f'''<span{attStr(atts)}/>'''

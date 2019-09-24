@@ -1,3 +1,5 @@
+from bson.objectid import ObjectId
+from flask import request
 from controllers.perm import permRecord, getPerms
 from controllers.records import labelDiv, valueRODiv, valueEdDiv
 from controllers.html import HtmlElements as H
@@ -47,15 +49,41 @@ class Component(object):
         country=record.get('country', None),
     )
 
-  def getPerms(self, require):
+  def getPerms(self, field):
     record = self.record
     U = self.auth.userInfo
     P = self.perm
+    require = getattr(self, 'require', {}).get(field, {})
 
     return getPerms(U, P, record, require)
 
-  def fieldWrap(self, field, label, rep, action, require):
-    (mayRead, mayEdit) = self.getPerms(require)
+  def fieldAction(self, table, eid, field, action):
+    db = self.db
+    mongo = self.mongo
+    N = self.names
+
+    record = db.getItem(table, eid)
+    self.record = record
+    self.permRecord()
+    method = getattr(self, f'wrap_{field}')
+    if action == 'save':
+      data = request.get_json()
+      (mayRead, mayEdit) = self.getPerms(field)
+      if mayEdit:
+        mongo[table].update_one(
+            {'_id': ObjectId(eid)},
+            {
+                '$set': {field: data},
+                '$unset': {N.isPristine: ''},
+            },
+        )
+        record[field] = data
+        if N.isPristine in record:
+          del record[N.isPristine]
+    return method(action=action)
+
+  def fieldWrap(self, field, label, rep, action):
+    (mayRead, mayEdit) = self.getPerms(field)
     if not mayRead:
       return ''
 
@@ -77,14 +105,22 @@ class Component(object):
         if asEdit and mayEdit else
         valueRODiv(rep, mayEdit, **atts)
     )
+    editClass = (
+        ' edit'
+        if asEdit and mayEdit else
+        ''
+    )
     if asEdit or asSave:
-      return rep
+      return ''.join(rep)
 
     return (
         H.div(
             [
                 labelDiv(label),
-                rep,
+                H.div(
+                    rep,
+                    cls=f'record-value {editClass}',
+                ),
             ],
             cls='record-row',
         )

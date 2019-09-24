@@ -1,4 +1,3 @@
-from bson.objectid import ObjectId
 from markdown import markdown
 
 from controllers.wrap.component import Component
@@ -12,6 +11,16 @@ class Contrib(Component):
   def __init__(self, db, auth, mongo):
     super().__init__(db, auth, mongo=mongo)
     self.table = 'contrib'
+    self.require = dict(
+        selected=dict(edit=N.coord),
+        costTotal=dict(read=N.coord),
+        costDescription=dict(read=N.coord),
+        contactPersonEmail=dict(read=N.auth),
+        creator=dict(edit=N.nobody),
+        editors=dict(read=N.auth),
+        dateCreated=dict(edit=N.nobody),
+        modified=dict(read=N.auth, edit=N.nobody),
+    )
 
   def list(self):
     mongo = self.mongo
@@ -70,33 +79,12 @@ class Contrib(Component):
     )
 
   def item(self, eid, asJson=False):
-    mongo = self.mongo
+    db = self.db
 
-    records = list(
-        mongo['contrib'].find({'_id': ObjectId(eid)})
-    )
-    record = (
-        records[0]
-        if len(records) else
-        {}
-    )
+    table = 'contrib'
+    record = db.getItem(table, eid)
+
     return dbjson(record) if asJson else self.wrap(record)
-
-  def fieldAction(self, eid, field, action):
-    mongo = self.mongo
-
-    records = list(
-        mongo['contrib'].find({'_id': ObjectId(eid)})
-    )
-    record = (
-        records[0]
-        if len(records) else
-        {}
-    )
-    self.record = record
-    self.permRecord()
-    method = getattr(self, f'wrap_{field}')
-    return method(action=action)
 
   def wrap(self, record):
     self.record = record
@@ -106,60 +94,32 @@ class Contrib(Component):
     return (
         H.div(
             [
-                self.wrap_year(
-                ),
-                self.wrap_country(
-                ),
-                self.wrap_selected(
-                    require=dict(edit=N.coord)
-                ),
-                self.wrap_vcc(
-                ),
-                self.wrap_typeContribution(
-                ),
-                self.wrap_description(
-                ),
-                self.wrap_costTotal(
-                    require=dict(read=N.coord)
-                ),
-                self.wrap_costDescription(
-                    require=dict(read=N.coord)
-                ),
-                self.wrap_contactPersonName(
-                ),
-                self.wrap_contactPersonEmail(
-                    require=dict(read=N.auth)
-                ),
-                self.wrap_urlContribution(
-                ),
-                self.wrap_urlAcademic(
-                ),
-                self.wrap_tadirahObject(
-                ),
-                self.wrap_tadirahActivity(
-                ),
-                self.wrap_tadirahTechnique(
-                ),
-                self.wrap_discipline(
-                ),
-                self.wrap_keyword(
-                ),
+                self.wrap_title(),
+                self.wrap_year(),
+                self.wrap_country(),
+                self.wrap_selected(),
+                self.wrap_vcc(),
+                self.wrap_typeContribution(),
+                self.wrap_description(),
+                self.wrap_costTotal(),
+                self.wrap_costDescription(),
+                self.wrap_contactPersonName(),
+                self.wrap_contactPersonEmail(),
+                self.wrap_urlContribution(),
+                self.wrap_urlAcademic(),
+                self.wrap_tadirahObject(),
+                self.wrap_tadirahActivity(),
+                self.wrap_tadirahTechnique(),
+                self.wrap_discipline(),
+                self.wrap_keyword(),
                 H.details(
                     'Provenance',
                     H.div(
                         [
-                            self.wrap_creator(
-                                require=dict(edit=N.nobody)
-                            ),
-                            self.wrap_editors(
-                                require=dict(read=N.auth)
-                            ),
-                            self.wrap_dateCreated(
-                                require=dict(edit=N.nobody)
-                            ),
-                            self.wrap_modified(
-                                require=dict(read=N.auth, edit=N.nobody)
-                            ),
+                            self.wrap_creator(),
+                            self.wrap_editors(),
+                            self.wrap_dateCreated(),
+                            self.wrap_modified(),
                         ]
                     ),
                 ),
@@ -168,7 +128,7 @@ class Contrib(Component):
         )
     )
 
-  def wrap_creator(self, action=None, require=None):
+  def wrap_creator(self, action=None):
     record = self.record
     db = self.db
     auth = self.auth
@@ -180,36 +140,36 @@ class Contrib(Component):
         auth.identity(value),
         cls='tag',
     )
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_contactPersonName(self, action=None, require=None):
+  def wrap_contactPersonName(self, action=None):
     record = self.record
 
     field = 'contactPersonName'
     label = 'Contact person'
     value = record.get(field, None)
     rep = value or ('' if action == 'edit' else '??')
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_contactPersonEmail(self, action=None, require=None):
+  def wrap_contactPersonEmail(self, action=None):
     record = self.record
 
     field = 'contactPersonEmail'
     label = 'Contact email'
     value = record.get('contactPersonEmail', '')
     rep = value or ('' if action == 'edit' else '??')
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_costDescription(self, action=None, require=None):
+  def wrap_costDescription(self, action=None):
     record = self.record
 
     field = 'costDescription'
     label = 'cost (description)'
     value = record.get(field, None)
     rep = (value or '') if action == 'edit' else H.div(markdown(value or '??'))
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_costTotal(self, action=None, require=None):
+  def wrap_costTotal(self, action=None):
     record = self.record
 
     field = 'costTotal'
@@ -217,9 +177,9 @@ class Contrib(Component):
     value = record.get(field, None)
     asEdit = action == 'edit'
     rep = ('' if asEdit else '€ ') + (str(value) or ('' if asEdit else '??'))
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_country(self, action=None, require=None):
+  def wrap_country(self, action=None):
     record = self.record
     db = self.db
 
@@ -231,27 +191,27 @@ class Contrib(Component):
         title=str(value.get('name', '??')),
         cls='tag',
     )
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_dateCreated(self, action=None, require=None):
+  def wrap_dateCreated(self, action=None):
     record = self.record
 
     field = 'dateCreated'
     label = 'Created on'
     value = record.get(field, None)
     rep = f'{dtm(value.isoformat())[1]}' or ('' if action == 'edit' else '??')
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_description(self, action=None, require=None):
+  def wrap_description(self, action=None):
     record = self.record
 
     field = 'description'
     label = 'Description'
     value = record.get(field, None)
     rep = (value or '') if action == 'edit' else H.div(markdown(value or '??'))
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_discipline(self, action=None, require=None):
+  def wrap_discipline(self, action=None):
     record = self.record
     db = self.db
 
@@ -265,9 +225,9 @@ class Contrib(Component):
         )
         for value in values
     ]
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_editors(self, action=None, require=None):
+  def wrap_editors(self, action=None):
     record = self.record
     db = self.db
     auth = self.auth
@@ -282,9 +242,9 @@ class Contrib(Component):
         )
         for value in values
     ]
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_keyword(self, action=None, require=None):
+  def wrap_keyword(self, action=None):
     record = self.record
     db = self.db
 
@@ -298,18 +258,18 @@ class Contrib(Component):
         )
         for value in values
     ]
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_modified(self, action=None, require=None):
+  def wrap_modified(self, action=None):
     record = self.record
 
     field = 'modified'
     label = 'Modified'
     value = record.get(field, [])
     rep = '\n'.join(value)
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_selected(self, action=None, require=None):
+  def wrap_selected(self, action=None):
     record = self.record
 
     field = 'selected'
@@ -332,9 +292,9 @@ class Contrib(Component):
             'No'
         )
     )
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_tadirahObject(self, action=None, require=None):
+  def wrap_tadirahObject(self, action=None):
     record = self.record
     db = self.db
 
@@ -348,9 +308,9 @@ class Contrib(Component):
         )
         for value in values
     ]
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_tadirahActivity(self, action=None, require=None):
+  def wrap_tadirahActivity(self, action=None):
     record = self.record
     db = self.db
 
@@ -364,9 +324,9 @@ class Contrib(Component):
         )
         for value in values
     ]
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_tadirahTechnique(self, action=None, require=None):
+  def wrap_tadirahTechnique(self, action=None):
     record = self.record
     db = self.db
 
@@ -380,9 +340,23 @@ class Contrib(Component):
         )
         for value in values
     ]
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_typeContribution(self, action=None, require=None):
+  def wrap_title(self, action=None):
+    record = self.record
+
+    field = 'title'
+    label = 'Title'
+    value = record.get(field, None)
+    rep = value or ('' if action == 'edit' else '??')
+    rep = (
+        H.input(value, type='text')
+        if action == 'edit' else
+        value or '??'
+    )
+    return self.fieldWrap(field, label, rep, action)
+
+  def wrap_typeContribution(self, action=None):
     record = self.record
     db = self.db
 
@@ -400,9 +374,9 @@ class Contrib(Component):
         title=explanation,
         cls=f'tag{inactive}',
     )
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_urlAcademic(self, action=None, require=None):
+  def wrap_urlAcademic(self, action=None):
     record = self.record
 
     field = 'urlAcademic'
@@ -427,9 +401,9 @@ class Contrib(Component):
             '??'
         )
     )
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_urlContribution(self, action=None, require=None):
+  def wrap_urlContribution(self, action=None):
     record = self.record
 
     field = 'urlContribution'
@@ -454,9 +428,9 @@ class Contrib(Component):
             '??'
         )
     )
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_vcc(self, action=None, require=None):
+  def wrap_vcc(self, action=None):
     record = self.record
     db = self.db
 
@@ -470,9 +444,9 @@ class Contrib(Component):
         )
         for value in values
     ]
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
 
-  def wrap_year(self, action=None, require=None):
+  def wrap_year(self, action=None):
     record = self.record
     db = self.db
 
@@ -483,4 +457,4 @@ class Contrib(Component):
         str(value.get('rep', '??')),
         cls='tag',
     )
-    return self.fieldWrap(field, label, rep, action, require)
+    return self.fieldWrap(field, label, rep, action)
