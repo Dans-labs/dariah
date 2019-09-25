@@ -91,14 +91,17 @@ def factory():
   @app.route('/contrib/item/<string:eid>/save/<string:field>', methods=['GET', 'POST'])
   def serveContribFieldSave(eid, field):
     auth.authenticate()
-    table = 'contrib'
-    return Contrib(db, auth, mongo).fieldAction(table, eid, field, 'save')
+    return Contrib(db, auth, mongo).fieldAction(eid, field, 'save')
 
   @app.route('/contrib/item/<string:eid>/edit/<string:field>')
   def serveContribFieldEdit(eid, field):
     auth.authenticate()
-    table = 'contrib'
-    return Contrib(db, auth, mongo).fieldAction(table, eid, field, 'edit')
+    return Contrib(db, auth, mongo).fieldAction(eid, field, 'edit')
+
+  @app.route('/contrib/item/<string:eid>/view/<string:field>')
+  def serveContribFieldView(eid, field):
+    auth.authenticate()
+    return Contrib(db, auth, mongo).fieldAction(eid, field, 'view')
 
   @app.route('/contrib/item/<string:eid>')
   def serveContribItem(eid):

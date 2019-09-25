@@ -12,11 +12,7 @@ class Sidebar(Component):
     active = path == self.path
 
     navClass = 'button small nav' + (' active' if active else '')
-    rep = (
-        H.div(label, cls=navClass)
-        if active else
-        H.a(label, path, cls=navClass)
-    )
+    rep = H.a(label, path, cls=navClass)
     entries.append(rep)
 
   def wrap(self):

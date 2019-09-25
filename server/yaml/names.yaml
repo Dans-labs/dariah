@@ -11,12 +11,13 @@ groups:
   nobody: nobody
 
 names:
-  - public
   - auth
-  - own
   - coord
-  - office
-  - system
-  - root
-  - nobody
   - isPristine
+  - modified
+  - office
+  - nobody
+  - own
+  - public
+  - root
+  - system

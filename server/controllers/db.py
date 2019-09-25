@@ -1,7 +1,7 @@
 from itertools import chain
 from bson.objectid import ObjectId
 
-from controllers.utils import now
+from controllers.utils import now, filterModified
 
 
 class Db(object):
@@ -104,7 +104,7 @@ class Db(object):
       multiple=False,
   ):
     relTable = relTable or fieldName
-    rawValue = record.get(fieldName, [] if multiple else None)
+    rawValue = record.get(fieldName, None) or ([] if multiple else None)
     valTable = getattr(self, relTable, {})
     return (
         [
@@ -113,4 +113,37 @@ class Db(object):
         ]
         if multiple else
         valTable.get(rawValue, {})
+    )
+
+  def saveField(
+      self,
+      table,
+      eid,
+      field,
+      data,
+      actor,
+      modified,
+  ):
+    mongo = self.mongo
+    N = self.names
+
+    newModified = filterModified(
+        (modified or []) + [f'{actor} on {now()}']
+    )
+    update = {
+        field: data,
+        N.modified: newModified,
+    }
+    delete = {N.isPristine: ''}
+
+    mongo[table].update_one(
+        {'_id': ObjectId(eid)},
+        {
+            '$set': update,
+            '$unset': delete,
+        },
+    )
+    return (
+        update,
+        set(delete.keys()),
     )
