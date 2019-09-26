@@ -1,17 +1,3 @@
-from base64 import b64encode, b64decode
-import json
-
-test = '"<she"banq>"'
-
-
-def bencode(s):
-  return b64encode(json.dumps(s).encode()).decode()
-
-
-def bdecode(s):
-  return json.loads(b64decode(s.encode()).decode())
-
-
 def htmlEscape(val):
   return '' if val is None else (
       str(val)
@@ -97,7 +83,7 @@ class HtmlElements(object):
   def input(material, **atts):
     content = materialStr(material)
     return HtmlElement('input').wrap(
-        '', value=htmlEscape(content), orig=bencode(content), **atts,
+        '', value=htmlEscape(content), **atts,
     )
 
   @staticmethod
@@ -111,4 +97,4 @@ class HtmlElements(object):
   @staticmethod
   def textarea(material, **atts):
     content = materialStr(material)
-    return HtmlElement('textarea').wrap(content, orig=bencode(content), **atts)
+    return HtmlElement('textarea').wrap(content, **atts)

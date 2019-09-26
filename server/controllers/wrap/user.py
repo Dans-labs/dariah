@@ -1,8 +1,8 @@
-from controllers.wrap.component import Component
+from controllers.wrap.table import Table
 from controllers.html import HtmlElements as H
 
 
-class User(Component):
+class User(Table):
   def __init__(self, db, auth):
     super().__init__(db, auth)
 

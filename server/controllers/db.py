@@ -56,7 +56,7 @@ class Db(object):
     mongo = self.mongo
 
     present = now()
-    self.packageActive = {
+    packageActive = {
         record['_id']
         for record in mongo.package.find(
             {
@@ -65,20 +65,28 @@ class Db(object):
             },
         )
     }
-    self.typeActive = set(chain.from_iterable(
+    for record in self.package.values():
+      record['active'] = record['_id'] in packageActive
+
+    typeActive = set(chain.from_iterable(
         record.get('typeContribution', [])
         for (_id, record) in self.package.items()
-        if _id in self.packageActive
+        if _id in packageActive
     ))
+    for record in self.typeContribution.values():
+      record['active'] = record['_id'] in typeActive
 
-    self.criteriaActive = {
+    criteriaActive = {
         _id
         for (_id, record) in self.criteria.items()
-        if record['package'] in self.packageActive
+        if record['package'] in packageActive
     }
+    for record in self.criteria.values():
+      record['active'] = record['_id'] in criteriaActive
+
     self.typeCriteria = {}
     for (_id, record) in self.criteria.items():
-      if _id not in self.criteriaActive:
+      if _id not in criteriaActive:
         continue
       for tp in record.get('typeContribution', []):
         self.typeCriteria.setdefault(tp, set()).add(_id)
@@ -100,8 +108,8 @@ class Db(object):
       self,
       record,
       fieldName,
+      multiple,
       relTable=None,
-      multiple=False,
   ):
     relTable = relTable or fieldName
     rawValue = record.get(fieldName, None) or ([] if multiple else None)

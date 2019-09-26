@@ -1,8 +1,8 @@
-from controllers.wrap.component import Component
+from controllers.wrap.table import Table
 from controllers.html import HtmlElements as H
 
 
-class Sidebar(Component):
+class Sidebar(Table):
   def __init__(self, db, auth, path):
     super().__init__(db, auth, path=path)
     self.entries = []

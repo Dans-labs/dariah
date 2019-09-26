@@ -1,15 +1,16 @@
+import yaml
 from flask import request
 from controllers.perm import permRecord, getPerms
-from controllers.records import titleSort, labelDiv, valueRODiv, valueEdDiv
+from controllers.field import Field, NUMERIC
 from controllers.html import HtmlElements as H, htmlEscape as he
-from controllers.utils import dtm, dbjson
+from controllers.utils import dbjson
 
 
-class Field(object):
-  pass
+def titleSort(records):
+  return sorted(records, key=lambda r: (r.get('title', '') or '').lower())
 
 
-class Component(object):
+class Table(object):
   def __init__(self, db, auth, **kwargs):
     self.db = db
     self.names = db.names
@@ -25,6 +26,32 @@ class Component(object):
     self.group = U.get('groupRep', N.public)
     self.countryId = U.get('country', None)
     self.country = db.country.get(self.countryId, {})
+    self.multiple = {'editors'}
+    self.provenance = yaml.load('''
+creator:
+  label: Creator
+  type: user
+  perm:
+    edit: nobody
+dateCreated:
+  label: Created on
+  type: datetime
+  perm:
+    edit: nobody
+editors:
+  label: Editor(s)
+  type: user
+  multiple: true
+  perm:
+    read: auth
+modified:
+  label: modified
+  type: string
+  multiple: true
+  perm:
+    read: auth
+    edit: nobody
+    ''')
 
   def list(self):
     mongo = self.mongo
@@ -110,7 +137,7 @@ class Component(object):
         ''
     )
 
-  def permRecord(self):
+  def studyRecord(self):
     record = self.record
 
     self.perm = permRecord(
@@ -119,11 +146,16 @@ class Component(object):
         country=record.get('country', None),
     )
 
-  def getPerms(self, field):
-    record = self.record
+  def permissions(self, field):
+    fieldSpecs = self.fields
+    provSpecs = self.provenance
+
+    fieldSpec = fieldSpecs.get(field, provSpecs.get(field, {}))
+    require = fieldSpec.get('perm', {})
+
     U = self.auth.userInfo
     P = self.perm
-    require = getattr(self, 'require', {}).get(field, {})
+    record = self.record
 
     return getPerms(U, P, record, require)
 
@@ -134,12 +166,23 @@ class Component(object):
 
     record = db.getItem(table, eid)
     self.record = record
-    self.permRecord()
-    method = getattr(self, f'wrap_{field}')
+    self.studyRecord()
     if action == 'save':
-      (mayRead, mayEdit) = self.getPerms(field)
+      (mayRead, mayEdit) = self.permissions(field)
       if mayEdit:
+        fieldSpecs = self.fields
+        provSpecs = self.provenance
+
+        fieldSpec = fieldSpecs.get(field, provSpecs.get(field, {}))
+        tp = fieldSpec.get('type', None)
+        multiple = fieldSpec.get('multiple', False)
         data = request.get_json()
+        if tp in NUMERIC:
+          if multiple:
+            data = [int(d) for d in data]
+          else:
+            data = int(data)
+        print(f'tp={tp} data={data}  of type {type(data)}')
         actor = self.eppn
         modified = record.get(N.modified, None)
         (updates, deletions) = db.saveField(
@@ -150,119 +193,57 @@ class Component(object):
             actor,
             modified,
         )
+        print('after save:', updates, deletions)
         record.update(updates)
         for f in deletions:
           if f in record:
             del record[f]
-    return method(action=action)
+    return self.wrapField(field, action=action)
 
-  def fieldWrap(self, field, label, rep, action, withRefresh=False):
-    table = self.table
-
-    (mayRead, mayEdit) = self.getPerms(field)
+  def wrapField(self, field, action=None):
+    (mayRead, mayEdit) = self.permissions(field)
     if not mayRead:
       return ''
 
-    atts = (
-        dict(
-            table=table,
-            eid=str(self.record['_id']),
-            field=field,
-        )
+    auth = self.auth
+    db = self.db
+    N = self.names
+    table = self.table
+    record = self.record
+    fieldSpecs = self.fields
+    provSpecs = self.provenance
+
+    fieldSpec = fieldSpecs.get(field, provSpecs.get(field, {}))
+
+    eid = str(self.record['_id'])
+    label = fieldSpec.get('label', field)
+    tp = fieldSpec.get('type', False)
+    multiple = fieldSpec.get('multiple', False)
+    value = record.get(field, None)
+    withRefresh = field == N.modified
+
+    return (
+        Field(db, auth, table, eid, field, mayEdit, label, tp, multiple, value).
+        wrap(action, withRefresh)
     )
 
-    asView = action == 'view'
-    asEdit = action == 'edit'
-    asSave = action == 'save'
+  def wrap(self, record):
+    table = self.table
 
-    rep = (
-        valueEdDiv(rep, **atts)
-        if asEdit and mayEdit else
-        valueRODiv(rep, mayEdit, withRefresh=withRefresh, **atts)
-    )
-    editClass = (
-        ' edit'
-        if asEdit and mayEdit else
-        ''
-    )
-    if asEdit or asSave or asView:
-      return ''.join(rep)
+    self.record = record
+    self.studyRecord()
 
     return (
         H.div(
-            [
-                labelDiv(label),
+            [self.wrapField(field) for field in self.fields]
+            +
+            [H.details(
+                'Provenance',
                 H.div(
-                    rep,
-                    cls=f'record-value {editClass}',
+                    [self.wrapField(field) for field in self.provenance]
                 ),
-            ],
-            cls='record-row',
+                itemkey=f'{table}/{record["_id"]}/prov',
+            )],
+            cls='record',
         )
-    )
-
-  def wrap_creator(self, action=None):
-    record = self.record
-    db = self.db
-    auth = self.auth
-
-    field = 'creator'
-    label = 'Creator'
-    value = db.getField(record, field, relTable='user')
-    rep = H.div(
-        he(auth.identity(value)),
-        cls='tag',
-    )
-    return self.fieldWrap(field, label, rep, action)
-
-  def wrap_dateCreated(self, action=None):
-    record = self.record
-
-    field = 'dateCreated'
-    label = 'Created on'
-    value = record.get(field, None)
-    rep = he(f'{dtm(value.isoformat())[1]}' or ('' if action == 'edit' else '??'))
-    return self.fieldWrap(field, label, rep, action)
-
-  def wrap_editors(self, action=None):
-    record = self.record
-    db = self.db
-    auth = self.auth
-
-    field = 'editors'
-    label = 'Editor(s)'
-    values = db.getField(record, field, relTable='user', multiple=True)
-    rep = [
-        H.div(
-            he(auth.identity(value)),
-            cls='tag',
-        )
-        for value in values
-    ]
-    return self.fieldWrap(field, label, rep, action)
-
-  def wrap_modified(self, action=None):
-    record = self.record
-
-    field = 'modified'
-    label = 'Modified'
-    value = record.get(field, [])
-    rep = H.br().join(he(v) for v in value)
-    return self.fieldWrap(field, label, rep, action, withRefresh=True)
-
-  def wrapProvenance(self):
-    table = self.table
-    record = self.record
-
-    return H.details(
-        'Provenance',
-        H.div(
-            [
-                self.wrap_creator(),
-                self.wrap_editors(),
-                self.wrap_dateCreated(),
-                self.wrap_modified(),
-            ]
-        ),
-        itemkey=f'{table}/{record["_id"]}/prov',
     )

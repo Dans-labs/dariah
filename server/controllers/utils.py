@@ -1,5 +1,6 @@
 import sys
-
+import json
+from base64 import b64encode, b64decode
 from datetime import datetime as dt
 from flask.json import JSONEncoder
 from bson.objectid import ObjectId
@@ -24,6 +25,14 @@ dbjson = CustomJSONEncoder().encode
 
 def utf8FromLatin1(s):
   return str(bytes(s, encoding='latin1'), encoding='utf8')
+
+
+def bencode(s):
+  return b64encode(json.dumps(s).encode()).decode()
+
+
+def bdecode(s):
+  return json.loads(b64decode(s.encode()).decode())
 
 
 def now():
