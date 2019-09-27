@@ -10,6 +10,36 @@ ISO_DTP = '%Y-%m-%dT%H:%M:%S.%f'
 ISO_DT = '%Y-%m-%dT%H:%M:%S'
 ISO_D = '%Y-%m-%d'
 
+E = ''
+BLANK = ' '
+COMMA = ','
+COLON = ':'
+DOT = '.'
+PIPE = '|'
+T = 'T'
+Z = 'Z'
+AT = '@'
+EURO = '€'
+ONE = '1'
+SLASH = '/'
+LOW = '_'
+AMP = '&'
+LT = '<'
+APOS = "'"
+QUOT = '"'
+DOLLAR = '$'
+
+NL = '\n'
+
+WHYPHEN = ' - '
+ELLIPS = '...'
+ON = ' on '
+
+LATIN1 = 'latin1'
+UTF8 = 'utf8'
+
+ITER = '__iter__'
+
 
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
@@ -24,15 +54,21 @@ dbjson = CustomJSONEncoder().encode
 
 
 def utf8FromLatin1(s):
-  return str(bytes(s, encoding='latin1'), encoding='utf8')
+  return str(bytes(s, encoding=LATIN1), encoding=UTF8)
 
 
 def bencode(s):
-  return b64encode(json.dumps(s).encode()).decode()
+  return (
+      b64encode(
+          json.dumps(s, separators=(COMMA, COLON)).encode()
+      ).decode()
+  )
 
 
 def bdecode(s):
-  return json.loads(b64decode(s.encode()).decode())
+  return json.loads(
+      b64decode(s.encode()).decode()
+  )
 
 
 def now():
@@ -45,7 +81,7 @@ def serverprint(msg):
 
 
 def dtm(isostr):
-  isostr = isostr.rstrip('Z')
+  isostr = isostr.rstrip(Z)
   try:
     date = dt.strptime(isostr, ISO_DTP)
   except Exception:
@@ -55,8 +91,22 @@ def dtm(isostr):
       try:
         date = dt.strptime(isostr, ISO_D)
       except Exception as err:
-        return ('{}'.format(err), isostr)
-  return ('', date)
+        return (str(err), isostr)
+  return (E, date)
+
+
+def asIterable(value):
+  return value if hasattr(value, ITER) else [value]
+
+
+def asString(value):
+  return (
+      E
+      if value is None else
+      E.join(value)
+      if hasattr(value, ITER) else
+      value
+  )
 
 
 def filterModified(modified):
@@ -67,20 +117,20 @@ def filterModified(modified):
 
 
 def _decomposeM(modified):
-  splits = [m.rsplit(' on ', 1) for m in modified]
-  return [(m[0], dtm(m[1].replace(' ', 'T'))[1]) for m in splits]
+  splits = [m.rsplit(ON, 1) for m in modified]
+  return [(m[0], dtm(m[1].replace(BLANK, T))[1]) for m in splits]
 
 
 def _trimM(mdt, trim):
   return (
-      str(mdt).split(' ')[0]
+      str(mdt).split(BLANK)[0]
       if trim == 1 else
-      str(mdt).split('.')[0]
+      str(mdt).split(DOT)[0]
   )
 
 
 def _composeM(modified):
-  return [f'{m[0]} on {_trimM(m[1], trim)}' for (m, trim) in reversed(modified)]
+  return [f'{m[0]}{ON}{_trimM(m[1], trim)}' for (m, trim) in reversed(modified)]
 
 
 def _perDay(modified):

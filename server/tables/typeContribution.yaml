@@ -1,0 +1,13 @@
+mainType:
+  label: Main type
+  perm:
+    update: office
+subType:
+  label: Subtype
+  perm:
+    update: office
+explanation:
+  type: text
+  multiple: true
+  perm:
+    update: office

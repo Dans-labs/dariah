@@ -1,0 +1,20 @@
+level:
+  perm:
+    update: office
+score:
+  type: number
+  perm:
+    update: office
+description:
+  perm:
+    update: office
+criteria:
+  type: criteria
+  perm:
+    update: office
+  label: Criterion
+remarks:
+  type: text
+  multiple: true
+  perm:
+    update: office

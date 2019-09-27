@@ -1,0 +1,5 @@
+set: '$set'
+unset: '$unset'
+lte: '$lte'
+gte: '$gte'
+OR: '$or'

@@ -9,134 +9,203 @@ from flask import (
 
 from pymongo import MongoClient
 
+from controllers.config import Config as C, Tables as T, Names as N
 from controllers.db import Db
 from controllers.auth import Auth
-from controllers.names import Config, Names
-from controllers.wrap.sidebar import Sidebar
-from controllers.wrap.user import User
-from controllers.wrap.contrib import Contrib
+from controllers.sidebar import Sidebar
+from controllers.user import User
+from controllers.table import Table
 
-STATIC_ROOT = os.path.abspath('../static/')
+STATIC_ROOT = os.path.abspath(C.html[N.staticRoot])
+
+START = C.html[N.urls][N.home][N.url]
+INDEX = C.html[N.indexPage]
+LANDING = C.html[N.landing]
+DUMMY = C.html[N.urls][N.dummy][N.url]
+SHIB_LOGOUT = C.html[N.urls][N.shibLogout][N.url]
+
+NO_PAGE = C.html[N.messages][N.noPage]
+NO_TABLE = C.html[N.messages][N.noTable]
+
+KINDS = C.table[N.kinds]
+USER_TABLES = set(KINDS[N.user])
+VALUE_TABLES = set(KINDS[N.value])
+
 mongo = MongoClient().dariah
-db = Db(mongo, Config, Names)
+db = Db(mongo)
 db.collect()
 
 
 def factory():
-  app = Flask(__name__, static_url_path='/xxx')
-  auth = Auth(app, mongo, db)
+  app = Flask(__name__, static_url_path=DUMMY)
+  auth = Auth(app, db)
 
-  @app.route('/static/<path:filepath>')
+  @app.route(
+      f"""/{N.static}/<path:filepath>"""
+  )
   def serveStatic(filepath):
-    return send_file(f'{STATIC_ROOT}/{filepath}')
+    path = f"""{STATIC_ROOT}/{filepath}"""
 
-  @app.route('/favicons/<path:filepath>')
+    return send_file(path)
+
+  @app.route(f"""/{N.favicons}/<path:filepath>""")
   def serveFavicons(filepath):
-    return send_file(f'{STATIC_ROOT}/favicons/{filepath}')
+    path = f"""{STATIC_ROOT}/{N.favicons})/{filepath}"""
 
-  @app.route('/')
-  @app.route('/index')
-  @app.route('/index.html')
+    return send_file(path)
+
+  @app.route(START)
+  @app.route(f"""/{N.index}""")
+  @app.route(f"""/{INDEX}""")
   def serveIndex():
+    path = START
+
     auth.authenticate()
     userLine = User(db, auth).wrap()
-    sidebar = Sidebar(db, auth, '/').wrap()
-    home = 'home'
+    sidebar = Sidebar(db, auth, path).wrap()
     return render_template(
-        'index.html',
+        INDEX,
         userLine=userLine,
         sidebar=sidebar,
-        material=home,
+        material=LANDING,
     )
 
-  @app.route('/contrib/list')
-  def serveContribList():
+  @app.route(
+      f"""/<string:table>/{N.list}"""
+  )
+  def serveTableList(table):
+    path = f"""/{table}/{N.list}"""
+
     auth.authenticate()
     userLine = User(db, auth).wrap()
-    sidebar = Sidebar(db, auth, '/contrib/list').wrap()
-    contribList = Contrib(db, auth, mongo).list()
-    return render_template(
-        'index.html',
-        userLine=userLine,
-        sidebar=sidebar,
-        material=contribList,
-    )
+    sidebar = Sidebar(db, auth, path).wrap()
+    if table in T.all:
+      tableList = Table(db, auth, table).list()
+      return render_template(
+          INDEX,
+          userLine=userLine,
+          sidebar=sidebar,
+          material=tableList,
+      )
+    return notFound(path)
 
-  @app.route('/contrib/mylist')
-  def serveContribMyList():
+  @app.route(
+      f"""/<string:table>/{N.mylist}"""
+  )
+  def serveTableMyList(table):
+    path = f"""/{table}/{N.mylist}"""
+
     auth.authenticate()
     userLine = User(db, auth).wrap()
-    sidebar = Sidebar(db, auth, '/contrib/mylist').wrap()
-    contribList = Contrib(db, auth, mongo).mylist()
-    return render_template(
-        'index.html',
-        userLine=userLine,
-        sidebar=sidebar,
-        material=contribList,
-    )
+    sidebar = Sidebar(db, auth, path).wrap()
+    if table in T.all:
+      tableList = Table(db, auth, table).mylist()
+      return render_template(
+          INDEX,
+          userLine=userLine,
+          sidebar=sidebar,
+          material=tableList,
+      )
+    return notFound(path)
 
-  @app.route('/contrib/ourlist')
-  def serveContribOurList():
+  @app.route(
+      f"""/<string:table>/{N.ourlist}"""
+  )
+  def serveTableOurList(table):
+    path = f"""/{table}/{N.ourlist}"""
+
     auth.authenticate()
     userLine = User(db, auth).wrap()
-    sidebar = Sidebar(db, auth, '/contrib/ourlist').wrap()
-    contribList = Contrib(db, auth, mongo).ourlist()
-    return render_template(
-        'index.html',
-        userLine=userLine,
-        sidebar=sidebar,
-        material=contribList,
-    )
+    sidebar = Sidebar(db, auth, path).wrap()
+    if table in T.all:
+      tableList = Table(db, auth, table).ourlist()
+      return render_template(
+          INDEX,
+          userLine=userLine,
+          sidebar=sidebar,
+          material=tableList,
+      )
+    return notFound(path)
 
-  @app.route('/contrib/item/<string:eid>/save/<string:field>', methods=['GET', 'POST'])
-  def serveContribFieldSave(eid, field):
+  @app.route(
+      f"""/<string:table>/{N.item}/<string:eid>/{N.save}/<string:field>""",
+      methods=[N.GET, N.POST],
+  )
+  def serveTableFieldSave(table, eid, field):
     auth.authenticate()
-    return Contrib(db, auth, mongo).fieldAction(eid, field, 'save')
+    if table in T.all:
+      return Table(db, auth, table).fieldAction(eid, field, N.save)
+    return noTable(table)
 
-  @app.route('/contrib/item/<string:eid>/edit/<string:field>')
-  def serveContribFieldEdit(eid, field):
+  @app.route(
+      f"""/<string:table>/{N.item}/<string:eid>/{N.edit}/<string:field>"""
+  )
+  def serveTableFieldEdit(table, eid, field):
     auth.authenticate()
-    return Contrib(db, auth, mongo).fieldAction(eid, field, 'edit')
+    if table in T.all:
+      return Table(db, auth, table).fieldAction(eid, field, N.edit)
+    return noTable(table)
 
-  @app.route('/contrib/item/<string:eid>/view/<string:field>')
-  def serveContribFieldView(eid, field):
+  @app.route(
+      f"""/<string:table>/{N.item}/<string:eid>/{N.view}/<string:field>"""
+  )
+  def serveTableFieldView(table, eid, field):
     auth.authenticate()
-    return Contrib(db, auth, mongo).fieldAction(eid, field, 'view')
+    if table in T.all:
+      return Table(db, auth, table).fieldAction(eid, field, N.view)
+    return noTable(table)
 
-  @app.route('/contrib/item/<string:eid>')
-  def serveContribItem(eid):
+  @app.route(
+      f"""/<string:table>/{N.item}/<string:eid>"""
+  )
+  def serveTableItem(table, eid):
     auth.authenticate()
-    return Contrib(db, auth, mongo).item(eid)
+    if table in T.all:
+      return Table(db, auth, table).item(eid)
+    return noTable(table)
 
-  @app.route('/slogout')
+  @app.route(
+      f"""/{N.slogout}"""
+  )
   def serveSlogout():
     auth.deauthenticate()
-    return redirect('/Shibboleth.sso/Logout')
+    return redirect(SHIB_LOGOUT)
 
-  @app.route('/login')
+  @app.route(
+      f"""/{N.login}"""
+  )
   def serveLogin():
     auth.authenticate(login=True)
-    return redirect('/')
+    return redirect(START)
 
-  @app.route('/logout')
+  @app.route(
+      f"""/{N.logout}"""
+  )
   def serveLogout():
     auth.deauthenticate()
-    return redirect('/')
+    return redirect(START)
 
-  @app.route('/<path:anything>')
-  def client(anything=None):
+  @app.route(
+      f"""/<path:anything>"""
+  )
+  def notFound(anything=None):
+    path = anything
+
     auth.authenticate()
     userLine = User(db, auth).wrap()
     sidebar = Sidebar(db, auth, anything).wrap()
     return render_template(
-        'index.html',
+        INDEX,
         userLine=userLine,
         sidebar=sidebar,
-        material="fall-back",
+        material=f"""{NO_PAGE} {path}""",
     )
+
+  def noTable(table):
+    return f"""{NO_TABLE} {table}"""
 
   return app
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   app = factory()

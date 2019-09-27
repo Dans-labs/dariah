@@ -1,51 +1,39 @@
 from markdown import markdown
 
+from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H, htmlEscape as he
-from controllers.utils import dtm, bencode
+from controllers.utils import dtm, bencode, E, BLANK, WHYPHEN, AT, EURO, ONE
 
 
-FORMATS_SCALAR = set('''
-    text
-    string
-    email
-    url
-    number
-    money
-    datetime
-    bool3
-)
-'''.strip().split())
+TABLES = C.table
 
-FORMATS_SPECIAL = set('''
-    user
-    country
-    typeContribution
-'''.strip().split())
-
-FORMATS = FORMATS_SCALAR | FORMATS_SPECIAL
+SCALAR_TYPES = TABLES[N.scalarTypes]
 
 WIDGET_FROM_TYPE = dict(
-    text=('text', None),
-    string=('input', 'text'),
-    email=('input', 'email'),
-    url=('input', 'url'),
-    number=('input', 'number'),
-    money=('input', 'number'),
-    bool3=('input', 'checkbox'),
-    datetime=('input', 'text'),
+    text=(N.text, None),
+    string=(N.input, N.text),
+    email=(N.input, N.email),
+    url=(N.input, N.url),
+    int=(N.input, N.number),
+    decimal=(N.input, N.number),
+    money=(N.input, N.number),
+    bool=(N.input, N.checkbox),
+    bool3=(N.input, N.checkbox),
+    datetime=(N.input, N.text),
 )
-WIDGET_RELATED = ('related', None)
+WIDGET_RELATED = (N.related, None)
 
-NUMERIC = set('''
-    number
-    money
-'''.strip().split())
+NUMERIC = TABLES[N.numericTypes]
+
+REFRESH = C.html[N.messages][N.refresh]
+QQ = C.html[N.unknown][N.generic]
+ZERO = C.html[N.unknown][N.number]
 
 
 def labelDiv(label):
   return H.div(
-      f'{label}:',
-      cls='record-label',
+      f"""{label}:""",
+      cls="record-label",
   )
 
 
@@ -73,12 +61,12 @@ class Field(object):
     self.withRefresh = withRefresh
     mayEdit = self.mayEdit
 
-    asEdit = mayEdit and action == 'edit'
-    editClass = ' edit' if asEdit else ''
+    asEdit = mayEdit and action == N.edit
+    editClass = " edit" if asEdit else E
     rep = self.valueEdDiv() if asEdit else self.valueRODiv()
 
     if action is not None:
-      return ''.join(rep)
+      return E.join(rep)
 
     return (
         H.div(
@@ -86,31 +74,31 @@ class Field(object):
                 labelDiv(self.label),
                 H.div(
                     rep,
-                    cls=f'record-value {editClass}',
+                    cls=f"record-value {editClass}",
                 ),
             ],
-            cls='record-row',
+            cls="record-row",
         )
     )
 
   def valueRODiv(self):
     button = (
         H.icon(
-            'pencil',
-            cls='button small field',
-            action='edit',
+            N.pencil,
+            cls="button small field",
+            action=N.edit,
             **self.atts,
         )
         if self.mayEdit else
         H.icon(
-            'refresh',
-            cls='button small field',
-            action='view',
-            title='refresh modification history',
+            N.refresh,
+            cls="button small field",
+            action=N.view,
+            title=REFRESH,
             **self.atts,
         )
         if self.withRefresh else
-        ''
+        E
     )
     rep = self.getValueRO()
 
@@ -122,9 +110,9 @@ class Field(object):
     value = self.value
 
     button = H.icon(
-        'eye',
-        cls='button small field',
-        action='save',
+        N.eye,
+        cls="button small field",
+        action=N.save,
         **self.atts,
     )
     rep = self.getValueEd()
@@ -137,9 +125,14 @@ class Field(object):
         if tp in NUMERIC else
         value
     )
+    atts = dict(
+        orig=bencode(origStr),
+    )
+    if multiple:
+      atts[N.multiple] = True
     widget = H.div(
         rep,
-        orig=bencode(origStr),
+        **atts,
         cls="value",
     )
     return [button, widget]
@@ -148,7 +141,7 @@ class Field(object):
     tp = self.tp
     multiple = self.multiple
     value = self.value
-    cls = 'values' if tp in FORMATS_SCALAR else 'tags'
+    cls = "values" if tp in SCALAR_TYPES else "tags"
 
     rep = (
         H.div(
@@ -161,7 +154,7 @@ class Field(object):
         if multiple else
         H.div(
             self.formatRO(value),
-            cls='value',
+            cls="value",
         )
     )
 
@@ -178,9 +171,9 @@ class Field(object):
         H.div(
             [
                 self.formatEd(wName, wType, val)
-                for val in value or []
+                for val in (value or []) + [E]
             ],
-            cls='values',
+            cls="values",
         )
         if multiple else
         self.formatEd(wName, wType, value)
@@ -191,100 +184,116 @@ class Field(object):
   def formatRO(self, v):
     tp = self.tp
 
-    if tp == 'text':
-      return H.div(markdown(v or '??'))
+    if tp == N.text:
+      return H.div(markdown(v or QQ))
 
-    if tp == 'string':
-      return H.span(he(v or '??'))
+    if tp == N.string:
+      return H.span(he(v or QQ))
 
-    if tp == 'email':
-      val = he(v or '??')
-      return H.a(val, f'mailto:{val}') if '@' in v else val
+    if tp == N.email:
+      val = he(v or QQ)
+      return H.a(val, f"""{N.mailto}:{val}""") if AT in v else val
 
-    if tp == 'url':
-      raw = v or ''
-      val = he(raw or '??')
-      isWww = raw.startswith('www.')
-      isLink = isWww or raw.startswith('http://') or raw.startswith('https://')
+    if tp == N.url:
+      raw = v or E
+      val = he(raw or QQ)
+      isWww = raw.startswith(f"""{N.www}.""")
+      isLink = (
+          isWww or
+          raw.startswith(f"""{N.http}://""") or
+          raw.startswith(f"""{N.https}://""")
+      )
       if isWww:
-        raw = f'https://{raw}'
+        raw = f"""{N.https}://{raw}"""
       return H.a(val, raw) if isLink else val
 
-    if tp == 'number':
-      return H.span(he(v or '0'))
+    if tp == N.int or tp == N.decimal:
+      return H.span(he(v or ZERO))
 
-    if tp == 'money':
-      return H.span('€ ' + he(v or '0'))
+    if tp == N.money:
+      return H.span(EURO + BLANK + he(v or ZERO))
 
-    if tp == 'bool3':
+    if tp == N.bool:
+      atts = dict(readonly=True)
+      if v:
+        atts[N.checked] = True
+      return H.input(E, type=N.checkbox, **atts)
+
+    if tp == N.bool3:
       return H.span(
-          '??'
+          QQ
           if v is None else
-          'Yes'
+          N.Yes
           if v else
-          'No'
+          N.No
       )
 
-    if tp == 'datetime':
-      return H.span(he(f'{dtm(v.isoformat())[1]}') if v else '??')
+    if tp == N.datetime:
+      return H.span(he(f"""{dtm(v.isoformat())[1]}""") if v else QQ)
 
-    if tp == 'user':
+    if tp == N.user:
       record = self.db.user.get(v, {})
       return H.span(
           he(self.auth.identity(record)),
-          cls='tag',
+          cls="tag",
       )
 
-    if tp == 'country':
+    if tp == N.country:
       record = self.db.country.get(v, {})
       return H.span(
-          str(record.get('iso', '??')),
-          title=str(record.get('name', '??')),
-          cls='tag',
+          str(record.get(N.iso, QQ)),
+          title=str(record.get(N.name, QQ)),
+          cls="tag",
       )
 
-    if tp == 'typeContribution':
-      print(v)
+    if tp == N.typeContribution:
       record = self.db.typeContribution.get(v, {})
-      mainType = record.get('mainType', '')
-      subType = record.get('subType', '')
-      sep = ' - ' if mainType and subType else ''
-      explanation = record.get('explanation', '')
-      active = record.get('active', False)
-      inactive = '' if active else ' inactive'
+      mainType = record.get(N.mainType, E)
+      subType = record.get(N.subType, E)
+      sep = WHYPHEN if mainType and subType else E
+      explanation = record.get(N.explanation, E)
+      active = record.get(N.active, False)
+      inactive = E if active else " inactive"
       return H.span(
-          f'{mainType}{sep}{subType}',
+          f"""{mainType}{sep}{subType}""",
           title=explanation,
-          cls=f'tag{inactive}',
+          cls=f"tag{inactive}",
       )
 
     else:
       record = getattr(self.db, tp).get(v, {})
       return H.span(
-          str(record.get('rep', '??')),
-          cls='tag',
+          str(record.get(N.rep, QQ)),
+          cls="tag",
       )
 
   def formatEd(self, wName, wType, v):
-    if wName == 'input':
-      if wType == 'checkbox':
+    if wName == N.input:
+      atts = {}
+      passV = v
+      if wType == N.checkbox:
         atts = dict(checked=True) if v else {}
-        passV = '1'
+        passV = ONE
       elif wType in NUMERIC:
         atts = dict(step=1)
-        passV = v if type(v) is str else str(int(round(v)))
-      else:
-        atts = {}
-        passV = v
+        passV = (
+            v
+            if type(v) is str else
+            str(v)
+            if wType == N.decimal else
+            str(int(round(v)))
+        )
+      elif wType == N.url:
+        atts = dict(pattern=f"""{N.http}s?://.+\\..+""")
 
     return H.input(self.trimEd(passV), **atts, type=wType, hasvalue=True)
 
-    if wName == 'text':
+    if wName == N.text:
       return H.textarea(self.trimEd(v), hasvalue=True)
 
-    if wName == 'related':
+    if wName == N.related:
       return self.formatRO(v)
 
   def trimEd(self, v):
     tp = self.tp
-    return v or (0 if tp in NUMERIC else ''),
+    return v or (0 if tp in NUMERIC else E),

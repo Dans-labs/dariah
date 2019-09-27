@@ -1,41 +1,36 @@
+from controllers.config import Names as N
+from controllers.utils import asString, E, AMP, LT, APOS, QUOT, DOLLAR
+
+CLASS = 'CLASS'
+
+
 def htmlEscape(val):
-  return '' if val is None else (
+  return E if val is None else (
       str(val)
-      .replace('&', '&amp;')
-      .replace('<', '&lt;')
-      .replace("'", '&apos;')
-      .replace('"', '&quot;')
-      .replace('$', '<span>$</span>')
+      .replace(AMP, f"""&{N.amp};""")
+      .replace(LT, f"""&{N.lt};""")
+      .replace(APOS, f"""&{N.apos};""")
+      .replace(QUOT, f"""&{N.quot};""")
+      .replace(DOLLAR, f"""<{N.span}>{DOLLAR}</{N.span}>""")
   )
 
 
 def atNormal(k):
-  return 'class' if k == 'cls' else k
+  return CLASS if k == N.cls else k
 
 
 def attStr(atts, addClass=None):
     if addClass:
-      if atts and 'cls' in atts:
-        atts['cls'] += addClass
+      if atts and N.cls in atts:
+        atts[N.cls] += addClass
       elif atts:
-        atts['cls'] = addClass
+        atts[N.cls] = addClass
       else:
         atts = dict(cls=addClass)
-    return ''.join(
-        f' {atNormal(k)}' + ('' if v is True else f'="{v}"')
+    return E.join(
+        f""" {atNormal(k)}""" + (E if v is True else f'="{v}"')
         for (k, v) in atts.items()
     )
-
-
-def materialStr(material):
-  tp = type(material)
-  return (
-      ''
-      if material is None else
-      material
-      if tp is str or tp is int else
-      ''.join(material)
-  )
 
 
 class HtmlElement(object):
@@ -44,57 +39,57 @@ class HtmlElement(object):
 
   def wrap(self, material, addClass=None, **atts):
     name = self.name
-    content = materialStr(material)
+    content = asString(material)
     attributes = attStr(atts, addClass=addClass)
     return (
-        f'''<{name}{attributes}>{content}</{name}>'''
+        f"""<{name}{attributes}>{content}</{name}>"""
         if content else
-        f'''<{name}{attributes}/>'''
+        f"""<{name}{attributes}/>"""
     )
 
 
 class HtmlElements(object):
   @staticmethod
   def a(material, href, **atts):
-    return HtmlElement('a').wrap(material, href=href, **atts)
+    return HtmlElement(N.a).wrap(material, href=href, **atts)
 
   @staticmethod
   def br():
-    return HtmlElement('br').wrap('')
+    return HtmlElement(N.br).wrap(E)
 
   @staticmethod
   def details(summary, material, **atts):
-    content = materialStr(material)
-    return HtmlElement('details').wrap(
-        HtmlElement('summary').wrap(summary) + content,
+    content = asString(material)
+    return HtmlElement(N.details).wrap(
+        HtmlElement(N.summary).wrap(summary) + content,
         **atts
     )
 
   @staticmethod
   def div(material, **atts):
-    return HtmlElement('div').wrap(material, **atts)
+    return HtmlElement(N.div).wrap(material, **atts)
 
   @staticmethod
   def icon(icon, **atts):
-    iconClass = f' fa fa-{icon}'
-    return HtmlElement('span').wrap('', addClass=iconClass, **atts)
+    iconClass = f" fa fa-{icon}"
+    return HtmlElement(N.span).wrap(E, addClass=iconClass, **atts)
 
   @staticmethod
   def input(material, **atts):
-    content = materialStr(material)
-    return HtmlElement('input').wrap(
-        '', value=htmlEscape(content), **atts,
+    content = asString(material)
+    return HtmlElement(N.input).wrap(
+        E, value=htmlEscape(content), **atts,
     )
 
   @staticmethod
   def p(material, **atts):
-    return HtmlElement('p').wrap(material, **atts)
+    return HtmlElement(N.p).wrap(material, **atts)
 
   @staticmethod
   def span(material, **atts):
-    return HtmlElement('span').wrap(material, **atts)
+    return HtmlElement(N.span).wrap(material, **atts)
 
   @staticmethod
   def textarea(material, **atts):
-    content = materialStr(material)
-    return HtmlElement('textarea').wrap(content, **atts)
+    content = asString(material)
+    return HtmlElement(N.textarea).wrap(content, **atts)

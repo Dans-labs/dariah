@@ -1,0 +1,15 @@
+default:
+  read: public
+  edit: edit
+
+names:
+  - nobody
+  - public
+  - auth
+  - our
+  - edit
+  - own
+  - coord
+  - office
+  - system
+  - root

@@ -1,10 +1,13 @@
 import os
 import sys
 
+from controllers.utils import E, SLASH, DOT
+
+
 dir = os.path.dirname(__file__)
-targetDir = '{}{}'.format(dir, '/' if dir else '')
+targetDir = f"""{dir}{SLASH if dir else E}"""
 os.chdir(targetDir)
-sys.path.append('.')
+sys.path.append(DOT)
 
 from index import factory  # noqa
 

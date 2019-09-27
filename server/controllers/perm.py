@@ -1,4 +1,20 @@
-from controllers.names import Names as N
+from itertools import chain
+
+from controllers.utils import asIterable
+from controllers.config import Config as C, Names as N
+
+
+DEFAULT_PERM = C.perm[N.default]
+NOBODY = N.nobody
+UNAUTH = N.public
+AUTH = N.auth
+OUR = N.our
+EDIT = N.edit
+OWN = N.own
+COORD = N.coord
+OFFICE = N.office
+SYSTEM = N.system
+ROOT = N.root
 
 
 def checkPerm(
@@ -8,50 +24,70 @@ def checkPerm(
     country=None,
     perm=None,
 ):
-  if require == N.public:
+  if require == UNAUTH:
     return True
 
   if perm is None:
     perm = permRecord(U, record, country=country)
 
-  group = perm['group']
+  group = perm[N.group]
 
-  if require == N.nobody:
+  if require == NOBODY:
     return False
 
-  if require == N.auth:
-    return group != N.public
+  if require == AUTH:
+    return group != UNAUTH
 
-  if require == N.office:
-    return group in {N.office, N.system, N.root}
+  if require == OFFICE:
+    return group in {OFFICE, SYSTEM, ROOT}
 
-  if require == N.system:
-    return group in {N.system, N.root}
+  if require == SYSTEM:
+    return group in {SYSTEM, ROOT}
 
-  if require == N.root:
-    return group == N.root
+  if require == ROOT:
+    return group == ROOT
 
-  if require == N.own:
-    return group != N.public and perm['isOwn']
+  if require == EDIT:
+    return group != UNAUTH and perm[N.isEdit]
 
-  if require == N.coord:
+  if require == OWN:
+    return group != UNAUTH and perm[N.isOwn]
+
+  if require == COORD:
     return (
-        group == N.coord and perm['sameCountry']
+        group == COORD and perm[N.sameCountry]
         or
-        group in {N.office, N.system, N.root}
+        group in {OFFICE, SYSTEM, ROOT}
     )
+
+
+def authenticated(U):
+  group = U.get(N.groupRep, UNAUTH)
+  return group != UNAUTH
+
+
+def coordinator(U):
+  group = U.get(N.groupRep, UNAUTH)
+  return group == COORD
+
+  return group in {OFFICE, SYSTEM, ROOT}
+
+
+def superuser(U):
+  group = U.get(N.groupRep, UNAUTH)
+  return group in {OFFICE, SYSTEM, ROOT}
 
 
 def getPerms(U, P, record, require):
   readRequire = (
-      N.public
-      if require is None or 'read' not in require else
-      require['read']
+      DEFAULT_PERM[N.read]
+      if require is None or N.read not in require else
+      require[N.read]
   )
   editRequire = (
-      N.own
-      if require is None or 'edit' not in require else
-      require['edit']
+      DEFAULT_PERM[N.edit]
+      if require is None or N.edit not in require else
+      require[N.edit]
   )
   return (
       checkPerm(U, record, readRequire, perm=P),
@@ -59,25 +95,49 @@ def getPerms(U, P, record, require):
   )
 
 
-def permRecord(U, record, country=None):
-  uid = U.get('_id', None)
-  group = U.get('groupRep', N.public)
-  uCountry = U.get('country', None)
+def permRecord(U, record, country=None, ourFields=[]):
+  uid = U.get(N._id, None)
+  group = U.get(N.groupRep, UNAUTH)
+  uCountry = U.get(N.country, None)
   refCountry = country or record.get(country, None)
+  ourValues = set(chain.from_iterable(
+      asIterable(record.get(field, []))
+      for field in ourFields
+  ))
 
   return {
-      'group': group,
-      'isOwn': (
-          group != N.public
+      N.group: group,
+      N.isOwn: (
+          group != UNAUTH
           and
           uid is not None
           and (
-              uid == record.get('creator', None)
-              or
-              uid in record.get('editors', set())
+              uid == record.get(N.creator, None)
           )
       ),
-      'sameCountry': (
+      N.isEdit: (
+          group != UNAUTH
+          and
+          uid is not None
+          and (
+              uid == record.get(N.creator, None)
+              or
+              uid in record.get(N.editors, set())
+          )
+      ),
+      N.isOur: (
+          group != UNAUTH
+          and
+          uid is not None
+          and (
+              uid == record.get(N.creator, None)
+              or
+              uid in record.get(N.editors, set())
+              or
+              uid in ourValues
+          )
+      ),
+      N.sameCountry: (
           refCountry is not None
           and
           refCountry == uCountry

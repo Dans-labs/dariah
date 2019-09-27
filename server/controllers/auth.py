@@ -2,33 +2,42 @@ import os
 from datetime import datetime
 
 from flask import request, session
-from controllers.utils import utf8FromLatin1
+from controllers.utils import (
+    utf8FromLatin1, E, BLANK, PIPE, NL, AT, WHYPHEN
+)
+from controllers.config import Config as C, Names as N
+from controllers.perm import superuser, coordinator, authenticated, AUTH, UNAUTH
+from controllers.db import M_SET, M_UNSET
 
-SECRET_FILE = '/opt/web-apps/dariah_jwt.secret'
+SECRET_FILE = C.base[N.secretFile]
+SHIB_KEY = C.base[N.shibKey]
+ATTRIBUTES = C.base[N.attributes]
+
+UNKNOWN_COUNTRY = C.html[N.unknown][N.country]
+UNKNOWN_USER = C.html[N.unknown][N.user]
+UNKNOWN_GROUP = C.html[N.unknown][N.group]
 
 
 class Auth(object):
 
-  def __init__(self, app, mongo, db):
+  def __init__(self, app, db):
     self.db = db
-    self.mongo = mongo
+    self.mongo = db.mongo
 
     # determine production or devel
-    regime = os.environ.get('REGIME', None)
-    self.isDevel = regime == 'devel'
-    self.authority = 'local' if self.isDevel else 'DARIAH'
+    regime = os.environ.get(N.REGIME, None)
+    self.isDevel = regime == N.devel
+    self.authority = N.local if self.isDevel else N.DARIAH
 
     # read secret from the system
-    self.secret = ''
+    self.secret = E
     with open(SECRET_FILE) as fh:
       app.secret_key = fh.read()
 
-    AUTH = db.names.auth
-    UNAUTH = db.names.public
     self.authId = db.permissionGroupInv.get(AUTH, None)
-    self.authUser = {'group': self.authId, 'groupRep': AUTH}
+    self.authUser = {N.group: self.authId, N.groupRep: AUTH}
     self.unauthId = db.permissionGroupInv.get(UNAUTH, None)
-    self.unauthUser = {'group': self.unauthId, 'groupRep': UNAUTH}
+    self.unauthUser = {N.group: self.unauthId, N.groupRep: UNAUTH}
     self.userInfo = {}
 
   def clearUser(self):
@@ -48,37 +57,36 @@ class Auth(object):
         record
         for record in db.user.values()
         if (
-            record.get('authority', None) == authority
+            record.get(N.authority, None) == authority
             and
             (
-                (eppn is not None and record.get('eppn', None) == eppn)
+                (eppn is not None and record.get(N.eppn, None) == eppn)
                 or
                 (
                     eppn is None and
                     email is not None and
-                    record.get('eppn', None) is None and
-                    record.get('email', None) == email
+                    record.get(N.eppn, None) is None and
+                    record.get(N.email, None) == email
                 )
             )
         )
     ]
     U.clear()
     U.update({
-        'eppn': eppn,
-        'authority': authority,
+        N.eppn: eppn,
+        N.authority: authority,
     })
     if email:
-      U['email'] = email
+      U[N.email] = email
     if len(user) == 1:
       U.update(user[0])
-    if not U.get('mayLogin', True):
+    if not U.get(N.mayLogin, True):
       # this checks whether mayLogin is explicitly set to False
       self.clearUser()
     else:
-      AUTH = db.names.auth
-      if 'group' not in U:
-        U['group'] = authId
-        U['groupRep'] = AUTH
+      if N.group not in U:
+        U[N.group] = authId
+        U[N.groupRep] = AUTH
 
   def storeUser(self):
     # only called when there is an eppn
@@ -86,37 +94,37 @@ class Auth(object):
     U = self.userInfo
     mongo = self.mongo
 
-    eppn = U.get('eppn', None)
+    eppn = U.get(N.eppn, None)
     if not eppn:
       return
 
     now = datetime.utcnow()
     U.update({
-        'dateCreated': now,
-        'dateLastLogin': now,
-        'statusLastLogin': 'Approved',
-        'mayLogin': True,
+        N.dateCreated: now,
+        N.dateLastLogin: now,
+        N.statusLastLogin: N.Approved,
+        N.mayLogin: True,
     })
-    if '_id' in U:
+    if N._id in U:
       record = {}
       record.update(U)
-      if 'isPristine' in record:
-        del record['isPristine']
-      criterion = {'_id': record['_id']}
-      del record['_id']
+      if N.isPristine in record:
+        del record[N.isPristine]
+      criterion = {N._id: record[N._id]}
+      del record[N._id]
       mongo.user.update_one(
           criterion,
           {
-              '$set': record,
-              '$unset': {
-                  'isPristine': ''
+              M_SET: record,
+              M_UNSET: {
+                  N.isPristine: E
               }
           },
       )
     else:
       result = mongo.user.insert_one(record)
       _id = result.inserted_id
-      U['_id'] = _id
+      U[N._id] = _id
 
   def checkLogin(self):
     db = self.db
@@ -130,57 +138,47 @@ class Auth(object):
     self.clearUser()
     if isDevel:
       testUsers = {
-          record['eppn']: record
+          record[N.eppn]: record
           for record in db.user.values()
-          if 'eppn' in record and record.get('authority', None) == 'local'
+          if N.eppn in record and record.get(N.authority, None) == N.local
       }
 
       try:
-        answer = input('{}|email address: '.format('|'.join(testUsers)))
+        answer = input("""{}|email address: """.format(PIPE.join(testUsers)))
         if answer is not None:
-          answer = answer.split('\n', 1)[0]
+          answer = answer.split(NL, 1)[0]
       except Exception as err:
-        print('Low level error: {}'.format(err))
+        print("""Low level error: {}""".format(err))
 
       if answer in testUsers:
         self.getUser(answer)
       else:
-        parts = answer.split('@', 1)
+        parts = answer.split(AT, 1)
         if len(parts) == 1:
           self.clearUser()
         else:
           (name, domain) = parts
-          eppn = f'{name}@local.host'
+          eppn = f"""{name}@local.host"""
           self.getUser(eppn, email=answer)
     else:
-      sKey = 'Shib-Session-ID'
-      authenticated = sKey in env and env[sKey]
+      authenticated = SHIB_KEY in env and env[SHIB_KEY]
       if authenticated:
-        eppn = utf8FromLatin1(env['eppn'])
-        email = utf8FromLatin1(env['mail'])
+        eppn = utf8FromLatin1(env[N.eppn])
+        email = utf8FromLatin1(env[N.mail])
         self.getUser(eppn, email=email)
-        if U.get('group', None) == unauthId:
+        if U.get(N.group, None) == unauthId:
           # the user us refused because the database says (s)he may not login
           self.clearUser()
           return
 
-        if 'group' not in U:
+        if N.group not in U:
           # new users do not have yet group information
           U.update(authUser)
-        attributes = {}
-        if 'o' in env:
-          attributes['org'] = utf8FromLatin1(env['o'])
-        if 'cn' in env:
-          attributes['name'] = utf8FromLatin1(env['cn'])
-        if 'givenName' in env:
-          attributes['firstName'] = utf8FromLatin1(env['givenName'])
-        if 'sn' in env:
-          attributes['lastName'] = utf8FromLatin1(env['sn'])
-        if 'isMemberOf' in env:
-          attributes['membership'] = utf8FromLatin1(env['isMemberOf'])
-        if 'affiliation' in env:
-          attributes['rel'] = utf8FromLatin1(env['affiliation'])
-        U.update(attributes)
+        U.update({
+            toolKey: utf8FromLatin1(env[envKey])
+            for (envKey, toolKey) in ATTRIBUTES.items()
+            if envKey in env
+        })
       else:
         U.update(unauthUser)
 
@@ -188,42 +186,42 @@ class Auth(object):
     db = self.db
     U = self.userInfo
 
-    name = record.get('name', '')
+    name = record.get(N.name, E)
     if not name:
-      firstName = record.get('firstName', '')
-      lastName = record.get('lastName', '')
+      firstName = record.get(N.firstName, E)
+      lastName = record.get(N.lastName, E)
       name = (
           firstName +
-          (' ' if firstName and lastName else '') +
+          (BLANK if firstName and lastName else E) +
           lastName
       )
-    UNAUTH = db.names.public
-    group = U.get('groupRep', UNAUTH)
+    group = U.get(N.groupRep, UNAUTH)
     isAuth = group != UNAUTH
-    org = record.get('org', '')
-    orgRep = f' ({org})' if org else ''
-    email = record.get('email', '') if isAuth else ''
-    authority = record.get('authority', '') if isAuth else ''
-    authorityRep = f' - {authority}' if authority else ''
-    eppn = record.get('eppn', '') if isAuth else ''
+    org = record.get(N.org, E)
+    orgRep = f""" ({org})""" if org else E
+    email = record.get(N.email, E) if isAuth else E
+    authority = record.get(N.authority, E) if isAuth else E
+    authorityRep = f"""{WHYPHEN}{authority}""" if authority else E
+    eppn = record.get(N.eppn, E) if isAuth else E
 
-    countryId = record.get('country', None)
+    countryId = record.get(N.country, None)
     countryInfo = db.country.get(countryId, {})
     countryLong = (
-        f'{countryInfo.get("name", "unknown")} ({countryInfo.get("iso", "")})'
+        f"""{countryInfo.get(N.name, N.unknown)}"""
+        f""" ({countryInfo.get(N.iso, E)})"""
         if countryInfo else
-        'unkown country'
+        UNKNOWN_COUNTRY
     )
 
     identityRep = (
-        f'{name}{orgRep}'
+        f"""{name}{orgRep}"""
         if name else
-        f'{email}{orgRep}'
+        f"""{email}{orgRep}"""
         if email else
-        f'{eppn}{authorityRep}'
+        f"""{eppn}{authorityRep}"""
         if eppn else
-        'unidentified user!'
-    ) + ' from ' + (
+        UNKNOWN_USER
+    ) + """ from """ + (
         countryLong
     )
     return identityRep
@@ -232,12 +230,11 @@ class Auth(object):
     db = self.db
     U = self.userInfo
 
-    UNAUTH = db.names.public
-    group = U.get('groupRep', UNAUTH)
-    groupDesc = db.config.groups.get(group, 'unknown group')
+    group = U.get(N.groupRep, UNAUTH)
+    groupDesc = db.permissionGroupDesc.get(group, UNKNOWN_GROUP)
 
     if group == UNAUTH:
-      return ('Guest', groupDesc)
+      return (N.Guest, groupDesc)
 
     identityRep = self.identity(U)
 
@@ -251,14 +248,14 @@ class Auth(object):
     # if login=False we only want the current user information
 
     if login:
-      session.pop('eppn', None)
+      session.pop(N.eppn, None)
       self.checkLogin()
-      if U.get('group', unauthId) != unauthId:
+      if U.get(N.group, unauthId) != unauthId:
         # in this case there is an eppn
         self.storeUser()
-        session['eppn'] = U['eppn']
+        session[N.eppn] = U[N.eppn]
     else:
-      eppn = session.get('eppn', None)
+      eppn = session.get(N.eppn, None)
       if eppn:
         self.getUser(eppn)
       else:
@@ -266,4 +263,27 @@ class Auth(object):
 
   def deauthenticate(self):
     self.clearUser()
-    session.pop('eppn', None)
+    session.pop(N.eppn, None)
+
+  def authenticated(self):
+    U = self.userInfo
+    return authenticated(U)
+
+  def coordinator(self):
+    U = self.userInfo
+    return (
+        self.country()
+        if coordinator(U) else
+        {}
+    )
+
+  def superuser(self):
+    U = self.userInfo
+    return superuser(U)
+
+  def country(self):
+    db = self.db
+    U = self.userInfo
+
+    countryId = U.get(N.country, None)
+    return db.country.get(countryId, {})

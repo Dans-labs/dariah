@@ -1,0 +1,20 @@
+iso:
+  label: ISO(2)
+  perm:
+    edit: office
+name:
+  perm:
+    edit: office
+isMember:
+  label: Is DARIAH member
+  type: bool
+  perm:
+    edit: office
+latitude:
+  type: decimal
+  perm:
+    edit: office
+longitude:
+  type: decimal
+  perm:
+    edit: office

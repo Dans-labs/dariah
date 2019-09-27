@@ -1,21 +1,8 @@
-import yaml
-
-from controllers.wrap.table import Table
-
-
-class Contrib(Table):
-  def __init__(self, db, auth, mongo):
-    super().__init__(db, auth, mongo=mongo)
-    self.table = 'contrib'
-    self.fields = yaml.load('''
 title:
   label: Title
-  type: string
 year:
-  label: Year
   type: year
 country:
-  label: Country
   type: country
 selected:
   label: Selected by National Coordinator
@@ -30,7 +17,6 @@ typeContribution:
   label: Type
   type: typeContribution
 description:
-  label: Description
   type: text
 costTotal:
   label: Cost (total)
@@ -44,7 +30,6 @@ costDescription:
     read: coord
 contactPersonName:
   label: Contact person
-  type: string
 contactPersonEmail:
   label: Contact email
   type: email
@@ -79,4 +64,3 @@ keyword:
   label: Keywords
   type: keyword
   multiple: true
-    ''')

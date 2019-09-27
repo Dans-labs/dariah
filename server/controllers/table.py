@@ -1,57 +1,43 @@
-import yaml
 from flask import request
-from controllers.perm import permRecord, getPerms
-from controllers.field import Field, NUMERIC
+from controllers.config import Config as C, Names as N, Tables as T
+from controllers.perm import permRecord, getPerms, UNAUTH
+from controllers.field import Field, QQ
 from controllers.html import HtmlElements as H, htmlEscape as he
-from controllers.utils import dbjson
+from controllers.utils import dbjson, E, ELLIPS
+
+NUMERIC = C.table[N.numericTypes]
+DEFAULT_TYPE = C.table[N.defaultType]
+VALUE_TABLES = set(C.table[N.kinds][N.value])
+VALUE_SPECS = C.table[N.value]
+PROV_SPECS = C.table[N.prov]
+PROV = C.html[N.provLabel]
+M_OR = C.mongo[N.OR]
 
 
 def titleSort(records):
-  return sorted(records, key=lambda r: (r.get('title', '') or '').lower())
+  return sorted(records, key=lambda r: (r.get(N.title, E) or E).lower())
 
 
 class Table(object):
-  def __init__(self, db, auth, **kwargs):
+  def __init__(self, db, auth, table):
     self.db = db
-    self.names = db.names
-    self.config = db.config
     self.auth = auth
-    for (k, v) in kwargs.items():
-      setattr(self, k, v)
+    self.table = table
+    self.mongo = db.mongo
+    self.val = VALUE_SPECS
+    self.prov = PROV_SPECS
+    self.fields = getattr(
+        T, table,
+        VALUE_SPECS if self.table in VALUE_TABLES else {}
+    )
 
-    N = self.names
     U = auth.userInfo
-    self.uid = U.get('_id', None)
-    self.eppn = U.get('eppn', None)
-    self.group = U.get('groupRep', N.public)
-    self.countryId = U.get('country', None)
+    self.uid = U.get(N._id, None)
+    self.eppn = U.get(N.eppn, None)
+    self.group = U.get(N.groupRep, UNAUTH)
+    self.countryId = U.get(N.country, None)
     self.country = db.country.get(self.countryId, {})
-    self.multiple = {'editors'}
-    self.provenance = yaml.load('''
-creator:
-  label: Creator
-  type: user
-  perm:
-    edit: nobody
-dateCreated:
-  label: Created on
-  type: datetime
-  perm:
-    edit: nobody
-editors:
-  label: Editor(s)
-  type: user
-  multiple: true
-  perm:
-    read: auth
-modified:
-  label: modified
-  type: string
-  multiple: true
-  perm:
-    read: auth
-    edit: nobody
-    ''')
+    self.multiple = {N.editors}
 
   def list(self):
     mongo = self.mongo
@@ -62,9 +48,12 @@ modified:
     return H.div(
         (
             H.details(
-                he(record.get('title', None) or '??'),
-                H.div('...', fetchurl=f'/{table}/item/{record["_id"]}'),
-                itemkey=f'{table}/{record["_id"]}',
+                he(record.get(N.title, None) or QQ),
+                H.div(
+                    ELLIPS,
+                    fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
+                ),
+                itemkey=f"""{table}/{record[N._id]}""",
             )
             for record in records
         )
@@ -76,9 +65,9 @@ modified:
     table = self.table
 
     crit = {
-        '$or': [
-            {'creator': uid},
-            {'editors': uid},
+        M_OR: [
+            {N.creator: uid},
+            {N.editors: uid},
         ],
     }
     records = titleSort(mongo[table].find(crit))
@@ -86,9 +75,12 @@ modified:
     return H.div(
         (
             H.details(
-                he(record.get('title', None) or '??'),
-                H.div('...', fetchurl=f'/{table}/item/{record["_id"]}'),
-                itemkey=f'{table}/{record["_id"]}',
+                he(record.get(N.title, None) or QQ),
+                H.div(
+                    ELLIPS,
+                    fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
+                ),
+                itemkey=f"""{table}/{record[N._id]}""",
             )
             for record in records
         )
@@ -100,16 +92,19 @@ modified:
     countryId = self.countryId
 
     crit = {
-        'country': countryId,
+        N.country: countryId,
     }
     records = titleSort(mongo[table].find(crit))
 
     return H.div(
         (
             H.details(
-                he(record.get('title', None) or '??'),
-                H.div('...', fetchurl=f'/{table}/item/{record["_id"]}'),
-                itemkey=f'{table}/{record["_id"]}',
+                he(record.get(N.title, None) or QQ),
+                H.div(
+                    ELLIPS,
+                    fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
+                ),
+                itemkey=f"""{table}/{record[N._id]}""",
             )
             for record in records
         )
@@ -122,36 +117,21 @@ modified:
 
     return dbjson(record) if asJson else self.wrap(record)
 
-  def authenticated(self):
-    N = self.names
-    group = self.group
-    return group != N.public
-
-  def coordinator(self):
-    N = self.names
-    group = self.group
-    country = self.country
-    return (
-        country.get('iso', '')
-        if group == N.coord and country else
-        ''
-    )
-
   def studyRecord(self):
     record = self.record
 
     self.perm = permRecord(
         self.auth.userInfo,
         record,
-        country=record.get('country', None),
+        country=record.get(N.country, None),
     )
 
   def permissions(self, field):
     fieldSpecs = self.fields
-    provSpecs = self.provenance
+    provSpecs = self.prov
 
     fieldSpec = fieldSpecs.get(field, provSpecs.get(field, {}))
-    require = fieldSpec.get('perm', {})
+    require = fieldSpec.get(N.perm, {})
 
     U = self.auth.userInfo
     P = self.perm
@@ -161,28 +141,31 @@ modified:
 
   def fieldAction(self, eid, field, action):
     db = self.db
-    N = self.names
     table = self.table
 
     record = db.getItem(table, eid)
     self.record = record
     self.studyRecord()
-    if action == 'save':
+    if action == N.save:
       (mayRead, mayEdit) = self.permissions(field)
       if mayEdit:
         fieldSpecs = self.fields
-        provSpecs = self.provenance
+        provSpecs = self.prov
 
         fieldSpec = fieldSpecs.get(field, provSpecs.get(field, {}))
-        tp = fieldSpec.get('type', None)
-        multiple = fieldSpec.get('multiple', False)
+        tp = fieldSpec.get(N.type, DEFAULT_TYPE)
+        multiple = fieldSpec.get(N.multiple, False)
         data = request.get_json()
         if tp in NUMERIC:
+          conversion = float if tp == N.decimal else int
           if multiple:
-            data = [int(d) for d in data]
+            data = [
+                conversion(d)
+                for d in data
+            ]
           else:
-            data = int(data)
-        print(f'tp={tp} data={data}  of type {type(data)}')
+            data = conversion(data)
+
         actor = self.eppn
         modified = record.get(N.modified, None)
         (updates, deletions) = db.saveField(
@@ -193,7 +176,6 @@ modified:
             actor,
             modified,
         )
-        print('after save:', updates, deletions)
         record.update(updates)
         for f in deletions:
           if f in record:
@@ -203,22 +185,21 @@ modified:
   def wrapField(self, field, action=None):
     (mayRead, mayEdit) = self.permissions(field)
     if not mayRead:
-      return ''
+      return E
 
     auth = self.auth
     db = self.db
-    N = self.names
     table = self.table
     record = self.record
     fieldSpecs = self.fields
-    provSpecs = self.provenance
+    provSpecs = self.prov
 
     fieldSpec = fieldSpecs.get(field, provSpecs.get(field, {}))
 
-    eid = str(self.record['_id'])
-    label = fieldSpec.get('label', field)
-    tp = fieldSpec.get('type', False)
-    multiple = fieldSpec.get('multiple', False)
+    eid = str(self.record[N._id])
+    label = fieldSpec.get(N.label, field.capitalize())
+    tp = fieldSpec.get(N.type, DEFAULT_TYPE)
+    multiple = fieldSpec.get(N.multiple, False)
     value = record.get(field, None)
     withRefresh = field == N.modified
 
@@ -238,12 +219,12 @@ modified:
             [self.wrapField(field) for field in self.fields]
             +
             [H.details(
-                'Provenance',
+                PROV,
                 H.div(
-                    [self.wrapField(field) for field in self.provenance]
+                    [self.wrapField(field) for field in self.prov]
                 ),
-                itemkey=f'{table}/{record["_id"]}/prov',
+                itemkey=f"""{table}/{record[N._id]}/{N.prov}""",
             )],
-            cls='record',
+            cls="record",
         )
     )

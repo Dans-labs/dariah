@@ -1,0 +1,94 @@
+staticRoot: ../static/
+provLabel: 'Provenance'
+indexPage: index.html
+
+messages:
+  noPage: Page not found
+  noTable: No table
+  refresh: refresh modification history
+
+unknown:
+  generic: '??'
+  number: '0'
+  country: unknown country
+  user: unidentified user
+  group: unknown group
+
+fontAwesome:
+  - eye
+  - pencil
+  - refresh
+
+landing: >-
+  Welcome to the DARIAH contribution tool
+
+request:
+  - GET
+  - POST
+
+urls:
+  home:
+    text: Home
+    url: /
+  login:
+    text: log in
+    url: /login
+  logout:
+    text: log out
+    url: /logout
+  slogout:
+    text: log out from DARIAH
+    url: /slogout
+    title: you need to restart your browser for this to take effect
+  shibLogout:
+    url: /Shibboleth.sso/Logout
+  dummy:
+    url: /xxx
+
+urlParts:
+  - http
+  - https
+  - www
+  - index
+  - static
+  - favicons
+  - list
+  - mailto
+  - mylist
+  - ourlist
+  - item
+  - save
+  - edit
+  - view
+
+elements:
+  - a
+  - br
+  - checkbox
+  - details
+  - div
+  - input
+  - p
+  - span
+  - summary
+  - textarea
+
+attributeNames:
+  - checked
+  - cls
+  - type
+  - value
+
+entities:
+  - amp
+  - lt
+  - apos
+  - quot
+
+values:
+  - Approved
+
+
+names:
+  - html
+  - from

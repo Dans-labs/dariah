@@ -1,0 +1,80 @@
+kinds:
+  main: contrib
+  items:
+    contrib: [contribution, contributions]
+    country: [country, countries]
+    score: [score point, score points]
+  user:
+    - contrib
+    - assessment
+    - review
+  value:
+    - country
+    - criteria
+    - decision
+    - discipline
+    - keyword
+    - package
+    - permissionGroup
+    - score
+    - tadirahActivity
+    - tadirahObject
+    - tadirahTechnique
+    - typeContribution
+    - user
+    - vcc
+    - year
+
+defaultType: string
+
+scalarTypes:
+  - text
+  - string
+  - email
+  - url
+  - int
+  - decimal
+  - money
+  - datetime
+  - bool
+  - bool3
+numericTypes:
+  - int
+  - decimal
+  - money
+
+prov:
+  creator:
+    label: Creator
+    type: user
+    perm:
+      edit: nobody
+  dateCreated:
+    label: Created on
+    type: datetime
+    perm:
+      edit: nobody
+  editors:
+    label: Editor(s)
+    type: user
+    multiple: true
+    perm:
+      read: auth
+  modified:
+    label: modified
+    multiple: true
+    perm:
+      read: auth
+      edit: nobody
+
+value:
+  rep:
+    label: representation
+    perm:
+      edit: office
+
+names:
+  - _id
+  - active
+  - isPristine
+  - authority
