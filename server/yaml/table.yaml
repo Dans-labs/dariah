@@ -1,14 +1,18 @@
 kinds:
-  main: contrib
+  mainTable: contrib
   items:
     contrib: [contribution, contributions]
     country: [country, countries]
+    criteria: [criterion, criteria]
     score: [score point, score points]
-  user:
+    tadirahActivity: [TADIRAH Activity, TADIRAH Activities]
+    tadirahObject: [TADIRAH Object, TADIRAH Objects]
+    tadirahTechnique: [TADIRAH Technique, TADIRAH Techniques]
+  userTables:
     - contrib
     - assessment
     - review
-  value:
+  valueTables:
     - country
     - criteria
     - decision
@@ -78,3 +82,4 @@ names:
   - active
   - isPristine
   - authority
+  - sorted

@@ -23,6 +23,41 @@ table {
 td {
     vertical-align: top;
 }
+.error {
+	color: var(--error-fore);
+	background-color: var(--error-back);
+}
+.error-o {
+	color: var(--error-fore-o) ! important;
+}
+.warning {
+	color: var(--warning-fore);
+	background-color: var(--warning-back);
+}
+.warning-o {
+	color: var(--warning-fore-o) ! important;
+}
+.good {
+	color: var(--good-fore);
+	background-color: var(--good-back);
+}
+.good-o {
+	color: var(--good-fore-o) ! important;
+}
+.info {
+	color: var(--info-fore);
+	background-color: var(--info-back);
+}
+.info-o {
+	color: var(--info-fore-o) ! important;
+}
+.special {
+	color: var(--special-fore);
+	background-color: var(--special-back);
+}
+.special-o {
+	color: var(--special-fore-o) ! important;
+}
 div.error-boundary {
 	font-size: medium;
 	font-weight: normal;
@@ -73,6 +108,14 @@ div.headline {
   margin: 0.1rem 1rem;
 }
 
+details.nav {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.delete {
+  float: right;
+}
 .button {
 	color: var(--action-fore);
 	cursor: pointer;
@@ -84,11 +127,13 @@ div.headline {
 	cursor: default;
 	background-color: var(--action-disabled-back);
 }
-.button.active {
-	cursor: default;
+.button.active, .nav.active {
 	color: var(--action-active-fore);
 	background-color: var(--action-active-back);
 	border-color: var(--action-active-border);
+}
+.button.active {
+	cursor: default;
 }
 .button.large,
 .label.large {
@@ -192,6 +237,8 @@ input {
 	padding: 0.2rem;
 }
 input[type='text'],
+input[type='url'],
+input[type='email'],
 textarea {
 	color: var(--edit-text-fore);
 	background-color: var(--edit-text-back);
@@ -201,6 +248,8 @@ textarea {
 	font-family: monospace;
 }
 input[type='text'] {
+input[type='url'],
+input[type='email'],
 	width: calc(100% - 1rem);
 	margin: 0.3rem 0.3rem;
 }
@@ -210,10 +259,24 @@ textarea {
 	margin: 0.3rem 0.3rem;
 }
 input[type='text']:focus,
+input[type='url']:focus,
+input[type='email']:focus,
 textarea:focus {
 	color: var(--edit-focus-text);
 	background-color: var(--edit-focus-back);
 	outline: 4px inset var(--edit-focus-border);
 	border: 0;
+}
+input[type='text']:valid,
+input[type='url']:valid,
+input[type='email']:valid {
+  color: var(--good-fore-o);
+  background-color: var(--good-back);
+}
+input[type='text']:invalid,
+input[type='url']:invalid,
+input[type='email']:invalid {
+  color: var(--error-fore-o);
+  background-color: var(--error-back);
 }
 

@@ -35,12 +35,27 @@
 	align-content: flex-start;
   background-color: var(--value-back);
 }
+.record-value .values,
+.record-value .tags {
+  flex: 1 1 auto;
+	display: inline-flex;
+	justify-content: flex-start;
+	align-items: flex-start;
+	align-content: flex-start;
+}
+.record-value .values {
+	flex-flow: column nowrap;
+}
+.record-value .tags {
+	flex-flow: row wrap;
+}
 .record-value .value {
   flex: 1 1 auto;
 	display: inline-flex;
 	flex-flow: row wrap;
 }
-.record-value.edit, .record-value.value.edit {
+.record-value.edit,
+.record-value .value.edit {
   background-color: var(--value-edit-back);
 }
 .tag {

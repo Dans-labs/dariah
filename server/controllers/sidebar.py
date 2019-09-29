@@ -1,21 +1,9 @@
 from controllers.config import Config as C, Names as N, Tables as T
 from controllers.html import HtmlElements as H
 from controllers.utils import E
+from controllers.table import Table
 
 HOME = C.html[N.urls][N.home]
-
-KINDS = C.table[N.kinds]
-MAIN_TABLE = KINDS[N.main]
-USER_TABLES = set(KINDS[N.user])
-ITEM_NAMES = KINDS[N.items]
-
-ALL_TABLES = T.all
-
-SORTED_TABLES = (
-    [MAIN_TABLE] +
-    sorted(USER_TABLES - {MAIN_TABLE}) +
-    sorted(ALL_TABLES - USER_TABLES - {MAIN_TABLE})
-)
 
 
 class Sidebar(object):
@@ -25,49 +13,77 @@ class Sidebar(object):
     self.path = path
     self.entries = []
 
-  def addCaption(self, label, path):
-    entries = self.entries
-    active = path == self.path.startswith(path)
-    navClass = "label medium" + (" active" if active else E)
-    rep = H.div(label, cls=navClass)
-    entries.append(rep)
+  def makeCaption(self, label, path, entries, open=False):
+    active = self.path.startswith(path)
+    navClass = " active" if active else E
+    atts = dict(cls=f"nav {navClass}")
+    if open:
+      atts['open'] = True
+    return H.details(label, entries, **atts)
 
-  def addEntry(self, label, path):
-    entries = self.entries
+  def makeEntry(self, label, path):
     active = path == self.path
 
     navClass = "button small nav" + (" active" if active else E)
-    rep = H.a(label, path, cls=navClass)
-    entries.append(rep)
+    return H.a(label, path, cls=navClass)
 
   def tableEntry(self, table):
+    db = self.db
     auth = self.auth
 
-    itemPlural = ITEM_NAMES.get(table, [table, f'{table}s'])[1]
+    tableObj = Table(db, auth, table)
+    isMain = tableObj.isMain
+    isUser = tableObj.isUser
+    isValue = tableObj.isValue
+    itemPlural = tableObj.itemLabels[1]
 
     isAuth = auth.authenticated()
     isSuperUser = auth.superuser()
     country = auth.country()
-    isUserTable = table in USER_TABLES
 
-    if isUserTable or isSuperUser:
-      self.addCaption(table, f'/{table}')
-    if isUserTable:
+    entries = []
+
+    if isUser:
       if isAuth:
-        self.addEntry(f'My {itemPlural}', f'/{table}/{N.mylist}')
+        entries.append(
+            self.makeEntry(
+                f"""My {itemPlural}""",
+                f"""/{table}/{N.mylist}"""
+            )
+        )
 
       if country:
         iso = country.get(N.iso, None)
         if iso:
-          self.addEntry(f'{itemPlural} from {iso}', f'/{table}/{N.ourlist}')
+          entries.append(
+              self.makeEntry(
+                  f"""{itemPlural} from {iso}""",
+                  f"""/{table}/{N.ourlist}"""
+              )
+          )
 
-    if isUserTable or isSuperUser:
-      self.addEntry(f'All {itemPlural}', f'/{table}/list')
+    if isUser or isSuperUser:
+      prefix = '' if isValue else """All """
+      entries.append(
+          self.makeEntry(
+              f"""{prefix}{itemPlural}""",
+              f"""/{table}/list"""
+          )
+      )
+
+    if isUser and isAuth:
+      entries = [
+          self.makeCaption(table, f'/{table}', entries, open=isMain)
+      ]
+    self.entries.extend(entries)
 
   def wrap(self):
-    self.addEntry(HOME[N.text], HOME[N.url])
+    entries = self.entries
+    entries.append(
+        self.makeEntry(HOME[N.text], HOME[N.url])
+    )
 
-    for table in SORTED_TABLES:
+    for table in T.sorted:
       self.tableEntry(table)
 
     return E.join(self.entries)

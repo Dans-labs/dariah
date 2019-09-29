@@ -1,10 +1,8 @@
 from itertools import chain
 from bson.objectid import ObjectId
 
-from controllers.config import Config as C, Names as N
+from controllers.config import Config as C, Names as N, Tables as T
 from controllers.utils import now, filterModified, E, ON
-
-VALUE_TABLES = set(C.table[N.kinds][N.value])
 
 M_SET = C.mongo[N.set]
 M_UNSET = C.mongo[N.unset]
@@ -20,7 +18,7 @@ class Db(object):
   def collect(self):
     mongo = self.mongo
 
-    for table in VALUE_TABLES:
+    for table in T.valueTables:
       setattr(
           self,
           table,
@@ -54,13 +52,13 @@ class Db(object):
   def collectActiveItems(self):
     mongo = self.mongo
 
-    present = now()
+    justNow = now()
     packageActive = {
         record[N._id]
         for record in mongo.package.find(
             {
-                N.startDate: {M_LTE: present},
-                N.endDate: {M_GTE: present},
+                N.startDate: {M_LTE: justNow},
+                N.endDate: {M_GTE: justNow},
             },
         )
     }
@@ -89,6 +87,11 @@ class Db(object):
         continue
       for tp in record.get(N.typeContribution, []):
         self.typeCriteria.setdefault(tp, set()).add(_id)
+
+  def delItem(self, table, eid):
+    mongo = self.mongo
+
+    mongo[table].delete_one({N._id: ObjectId(eid)})
 
   def getItem(self, table, eid):
     mongo = self.mongo
@@ -133,8 +136,9 @@ class Db(object):
   ):
     mongo = self.mongo
 
+    justNow = now()
     newModified = filterModified(
-        (modified or []) + [f"""{actor}{ON}{now()}"""]
+        (modified or []) + [f"""{actor}{ON}{justNow}"""]
     )
     update = {
         field: data,

@@ -75,11 +75,27 @@ names |= tables
 for n in names:
   setattr(Names, n, n)
 
-tableInfo = Config.table[Names.kinds]
+N = Names
+
+tableInfo = Config.table[N.kinds]
+mainTable = tableInfo[N.mainTable]
+userTables = set(tableInfo[N.userTables])
+valueTables = set(tableInfo[N.valueTables])
 
 tables = (
     tables |
-    set(tableInfo[Names.user]) |
-    set(tableInfo[Names.value])
+    userTables |
+    valueTables
 )
+sortedTables = (
+    [mainTable] +
+    sorted(userTables - {mainTable}) +
+    sorted(tables - userTables - {mainTable})
+)
+
 setattr(Tables, ALL, tables)
+setattr(Tables, N.mainTable, mainTable)
+setattr(Tables, N.userTables, userTables)
+setattr(Tables, N.valueTables, valueTables)
+setattr(Tables, N.sorted, sortedTables)
+setattr(Tables, N.items, tableInfo[N.items])

@@ -27,9 +27,6 @@ SHIB_LOGOUT = C.html[N.urls][N.shibLogout][N.url]
 NO_PAGE = C.html[N.messages][N.noPage]
 NO_TABLE = C.html[N.messages][N.noTable]
 
-KINDS = C.table[N.kinds]
-USER_TABLES = set(KINDS[N.user])
-VALUE_TABLES = set(KINDS[N.value])
 
 mongo = MongoClient().dariah
 db = Db(mongo)
@@ -90,16 +87,59 @@ def factory():
     return notFound(path)
 
   @app.route(
+      f"""/<string:table>/{N.insert}"""
+  )
+  def serveTableInsert(table):
+    path = f"""/{table}/{N.insert}"""
+
+    auth.authenticate()
+    if table in T.all:
+      eid = Table(db, auth, table).insert()
+      newPath = (
+          f"""/{table}/{N.mylist}/new/{eid}"""
+          if eid else
+          f"""/{table}/{N.mylist}"""
+      )
+      return redirect(newPath)
+    return notFound(path)
+
+  @app.route(
+      f"""/<string:table>/{N.delete}/<string:eid>"""
+  )
+  def serveTableDeleteItem(table, eid):
+    path = f"""{table}/{N.delete}/{eid}"""
+
+    auth.authenticate()
+    if table in T.all:
+      Table(db, auth, table).delete(eid)
+      newPath = (
+          f"""/{table}/{N.mylist}"""
+      )
+      return redirect(newPath)
+    return notFound(path)
+
+  @app.route(
+      f"""/<string:table>/{N.mylist}/new/<string:eid>"""
+  )
+  def serveTableMyListOpen(table, eid):
+    return serveTableMyList(table, eid)
+
+  @app.route(
       f"""/<string:table>/{N.mylist}"""
   )
-  def serveTableMyList(table):
+  def serveTableMyListPlain(table):
+    return serveTableMyList(table, None)
+
+  def serveTableMyList(table, eid):
     path = f"""/{table}/{N.mylist}"""
+    if eid:
+      path += f"""/new/{eid}"""
 
     auth.authenticate()
     userLine = User(db, auth).wrap()
     sidebar = Sidebar(db, auth, path).wrap()
     if table in T.all:
-      tableList = Table(db, auth, table).mylist()
+      tableList = Table(db, auth, table).mylist(eid)
       return render_template(
           INDEX,
           userLine=userLine,
@@ -188,12 +228,13 @@ def factory():
   @app.route(
       f"""/<path:anything>"""
   )
-  def notFound(anything=None):
-    path = anything
+  def serveNotFound(anything=None):
+    return notFound(anything)
 
+  def notFound(path):
     auth.authenticate()
     userLine = User(db, auth).wrap()
-    sidebar = Sidebar(db, auth, anything).wrap()
+    sidebar = Sidebar(db, auth, path).wrap()
     return render_template(
         INDEX,
         userLine=userLine,

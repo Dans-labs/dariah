@@ -1,6 +1,7 @@
 default:
   read: public
   edit: edit
+  delete: edit
 
 names:
   - nobody

@@ -5,9 +5,9 @@ from controllers.html import HtmlElements as H, htmlEscape as he
 from controllers.utils import dtm, bencode, E, BLANK, WHYPHEN, AT, EURO, ONE
 
 
-TABLES = C.table
+tableConfig = C.table
 
-SCALAR_TYPES = TABLES[N.scalarTypes]
+SCALAR_TYPES = tableConfig[N.scalarTypes]
 
 WIDGET_FROM_TYPE = dict(
     text=(N.text, None),
@@ -23,7 +23,7 @@ WIDGET_FROM_TYPE = dict(
 )
 WIDGET_RELATED = (N.related, None)
 
-NUMERIC = TABLES[N.numericTypes]
+NUMERIC = tableConfig[N.numericTypes]
 
 REFRESH = C.html[N.messages][N.refresh]
 QQ = C.html[N.unknown][N.generic]
@@ -35,6 +35,33 @@ def labelDiv(label):
       f"""{label}:""",
       cls="record-label",
   )
+
+
+def getTitle(db, auth, table, isUser, isValue, record):
+  if isUser:
+    return he(record.get(N.title, None)) or QQ
+
+  if table == N.user:
+    return he(auth.identity(record))
+
+  if table == N.country:
+    return he(record.get(N.iso, None)) or QQ
+
+  if table == N.typeContribution:
+    mainType = record.get(N.mainType, E)
+    subType = record.get(N.subType, E)
+    sep = WHYPHEN if mainType and subType else E
+    return he(f"""{mainType}{sep}{subType}""")
+
+  if table == N.criteria:
+    return he(record.get(N.criterion, None)) or QQ
+
+  if table == N.score:
+    score = he(record.get(N.score, None)) or QQ
+    level = he(record.get(N.level, None)) or QQ
+    return f"""{score} - {level}"""
+
+  return he(record.get(N.rep, record.get(N.title, None))) or QQ
 
 
 class Field(object):
@@ -192,7 +219,7 @@ class Field(object):
 
     if tp == N.email:
       val = he(v or QQ)
-      return H.a(val, f"""{N.mailto}:{val}""") if AT in v else val
+      return H.a(val, f"""{N.mailto}:{val}""") if AT in val else val
 
     if tp == N.url:
       raw = v or E
@@ -260,12 +287,27 @@ class Field(object):
           cls=f"tag{inactive}",
       )
 
-    else:
-      record = getattr(self.db, tp).get(v, {})
+    if tp == N.criteria:
+      record = self.db.criteria.get(v, {})
       return H.span(
-          str(record.get(N.rep, QQ)),
+          str(record.get(N.criterion, QQ)),
           cls="tag",
       )
+
+    if tp == N.score:
+      record = self.db.score.get(v, {})
+      score = str(record.get(N.score, QQ))
+      level = record.get(N.score, QQ)
+      return H.span(
+          f"""{score} - {level}""",
+          cls="tag",
+      )
+
+    record = getattr(self.db, tp).get(v, {})
+    return H.span(
+        str(record.get(N.rep, record.get(N.title, QQ))),
+        cls="tag",
+    )
 
   def formatEd(self, wName, wType, v):
     if wName == N.input:
@@ -286,7 +328,7 @@ class Field(object):
       elif wType == N.url:
         atts = dict(pattern=f"""{N.http}s?://.+\\..+""")
 
-    return H.input(self.trimEd(passV), **atts, type=wType, hasvalue=True)
+      return H.input(self.trimEd(passV), **atts, type=wType, hasvalue=True)
 
     if wName == N.text:
       return H.textarea(self.trimEd(v), hasvalue=True)

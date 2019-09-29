@@ -3,6 +3,7 @@ provLabel: 'Provenance'
 indexPage: index.html
 
 messages:
+  forbidden: Forbidden
   noPage: Page not found
   noTable: No table
   refresh: refresh modification history
@@ -17,7 +18,9 @@ unknown:
 fontAwesome:
   - eye
   - pencil
+  - plus
   - refresh
+  - trash
 
 landing: >-
   Welcome to the DARIAH contribution tool
@@ -52,6 +55,7 @@ urlParts:
   - index
   - static
   - favicons
+  - insert
   - list
   - mailto
   - mylist

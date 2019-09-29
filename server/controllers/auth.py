@@ -8,6 +8,7 @@ from controllers.utils import (
 from controllers.config import Config as C, Names as N
 from controllers.perm import superuser, coordinator, authenticated, AUTH, UNAUTH
 from controllers.db import M_SET, M_UNSET
+from controllers.utils import now
 
 SECRET_FILE = C.base[N.secretFile]
 SHIB_KEY = C.base[N.shibKey]
@@ -98,10 +99,10 @@ class Auth(object):
     if not eppn:
       return
 
-    now = datetime.utcnow()
+    justNow = now()
     U.update({
-        N.dateCreated: now,
-        N.dateLastLogin: now,
+        N.dateCreated: justNow,
+        N.dateLastLogin: justNow,
         N.statusLastLogin: N.Approved,
         N.mayLogin: True,
     })
