@@ -127,7 +127,10 @@ details.nav {
 	cursor: default;
 	background-color: var(--action-disabled-back);
 }
-.button.active, .nav.active {
+.button.active,
+.nav.active,
+.trival .label
+{
 	color: var(--action-active-fore);
 	background-color: var(--action-active-back);
 	border-color: var(--action-active-border);

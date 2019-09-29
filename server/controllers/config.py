@@ -72,7 +72,7 @@ for tableFile in files:
   names |= getNames(specs)
 names |= tables
 
-for n in names:
+for n in sorted(names):
   setattr(Names, n, n)
 
 N = Names

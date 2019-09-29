@@ -15,11 +15,18 @@ unknown:
   user: unidentified user
   group: unknown group
 
+constants:
+  y: 'Yes'
+  n: 'No'
+
 fontAwesome:
+  - check
   - eye
+  - minus
   - pencil
   - plus
   - refresh
+  - times
   - trash
 
 landing: >-
@@ -91,7 +98,6 @@ entities:
 
 values:
   - Approved
-
 
 names:
   - html

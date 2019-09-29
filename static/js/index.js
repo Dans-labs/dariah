@@ -1,5 +1,8 @@
 /*eslint-env jquery*/
 
+const SAVE = true
+const BLUR = true
+
 const fetch = (url, destElem, data) => {
   if (data == null) {
     $.ajax({
@@ -10,6 +13,7 @@ const fetch = (url, destElem, data) => {
       success: html => {
         destElem.html(html)
         activateActions(destElem)
+        activateWidgets(destElem)
         openCloseItems(destElem)
       },
     })
@@ -25,6 +29,7 @@ const fetch = (url, destElem, data) => {
       success: html => {
         destElem.html(html)
         activateActions(destElem)
+        activateWidgets(destElem)
         openCloseItems(destElem)
       },
     })
@@ -93,14 +98,20 @@ const edit = (table, eid, field, valueEl, parent) => {
   fetch(url, parent)
 }
 
+const readVal = elem => {
+  const value = elem.prop('value')
+  return (elem.attr('type') == 'checkbox')
+    ? elem.prop('checked') ? value : ''
+    : value
+}
 const save = (table, eid, field, valueEl, parent) => {
   const origValue = atob(valueEl.attr('orig'))
   const multiple = valueEl.attr('multiple')
   const valueCarrier = valueEl.find('[value]')
   const givenValue = multiple
-    ? $.makeArray(valueCarrier.map((i, el) => $(el).prop('value')))
+    ? $.makeArray(valueCarrier.map((i, el) => readVal($(el))))
       .filter(v => v !== '')
-    : valueCarrier.prop('value')
+    : readVal(valueCarrier)
   console.log({ valueCarrier })
   const newValue = JSON.stringify(givenValue)
   console.log('valueEl', valueEl)
@@ -115,18 +126,35 @@ const save = (table, eid, field, valueEl, parent) => {
     fetch(url, parent)
   }
   else {
-    const debug = false
-    if (debug) {
-      Console.log('Saving: suppress')
-      const url = makeFieldUrl(table, eid, field, 'view')
-      fetch(url, parent)
-    }
-    else {
+    if (SAVE) {
       Console.log('Saving: send to database')
       const url = makeFieldUrl(table, eid, field, 'save')
       fetch(url, parent, newValue)
     }
+    else {
+      Console.log('Saving: suppress')
+      const url = makeFieldUrl(table, eid, field, 'view')
+      fetch(url, parent)
+    }
   }
+}
+
+const activateWidgets = destElem => {
+  const targets = destElem ? destElem.find('.trival') : $('.trival')
+  targets.each((i, elem) => {
+    const el = $(elem)
+    const options = el.find('.button, .label')
+    const activate = () => {
+      el.find('.button').off('click').click(e => {
+        options.addClass('button')
+        options.removeClass('label')
+        const me = $(e.target)
+        me.addClass('label')
+        activate()
+      })
+    }
+    activate()
+  })
 }
 
 const activateActions = destElem => {
@@ -160,9 +188,13 @@ const activateActions = destElem => {
     el.off('click').click(() => {
       saveOrEdit(table, eid, field, valueEl, parent)
     })
-    focusEl.off('blur').blur(() => {
-      saveOrEdit(table, eid, field, valueEl, parent)
-    })
+    if (BLUR) {
+      if (focusEl.attr('type') != 'checkbox') {
+        focusEl.off('blur').blur(() => {
+          saveOrEdit(table, eid, field, valueEl, parent)
+        })
+      }
+    }
   })
 }
 
@@ -173,5 +205,6 @@ const activateActions = destElem => {
 $(() => {
   activateFetch()
   activateActions()
+  activateWidgets()
   openCloseItems()
 })

@@ -18,7 +18,7 @@ WIDGET_FROM_TYPE = dict(
     decimal=(N.input, N.number),
     money=(N.input, N.number),
     bool=(N.input, N.checkbox),
-    bool3=(N.input, N.checkbox),
+    bool3=(N.bool3, None),
     datetime=(N.input, N.text),
 )
 WIDGET_RELATED = (N.related, None)
@@ -28,6 +28,8 @@ NUMERIC = tableConfig[N.numericTypes]
 REFRESH = C.html[N.messages][N.refresh]
 QQ = C.html[N.unknown][N.generic]
 ZERO = C.html[N.unknown][N.number]
+YES = C.html[N.constants][N.y]
+NO = C.html[N.constants][N.n]
 
 
 def labelDiv(label):
@@ -131,6 +133,12 @@ class Field(object):
 
     return [button, rep]
 
+  def formatOrig(self, v):
+    tp = self.tp
+    if tp == 'bool':
+      return ONE if v else E
+    return str(v)
+
   def valueEdDiv(self):
     tp = self.tp
     multiple = self.multiple
@@ -143,11 +151,12 @@ class Field(object):
         **self.atts,
     )
     rep = self.getValueEd()
+    origFmt = self.formatOrig
     origStr = (
         (
-            [str(val) for val in value]
+            [origFmt(val) for val in value]
             if multiple else
-            str(value)
+            origFmt(value)
         )
         if tp in NUMERIC else
         value
@@ -241,18 +250,15 @@ class Field(object):
       return H.span(EURO + BLANK + he(v or ZERO))
 
     if tp == N.bool:
-      atts = dict(readonly=True)
-      if v:
-        atts[N.checked] = True
-      return H.input(E, type=N.checkbox, **atts)
+      return H.span(YES if v else NO)
 
     if tp == N.bool3:
       return H.span(
           QQ
           if v is None else
-          N.Yes
+          YES
           if v else
-          N.No
+          NO
       )
 
     if tp == N.datetime:
@@ -328,14 +334,44 @@ class Field(object):
       elif wType == N.url:
         atts = dict(pattern=f"""{N.http}s?://.+\\..+""")
 
-      return H.input(self.trimEd(passV), **atts, type=wType, hasvalue=True)
+      return H.input(self.trimEd(passV), **atts, type=wType)
 
     if wName == N.text:
-      return H.textarea(self.trimEd(v), hasvalue=True)
+      return H.textarea(self.trimEd(v))
 
     if wName == N.related:
       return self.formatRO(v)
 
+    if wName == N.bool3:
+      return H.div(
+          [
+              H.icon(
+                  triIcon(val),
+                  cls=f"{triActive(val, v)} medium field",
+              )
+              for val in (False, None, True)
+          ],
+          cls="trival",
+      )
+
   def trimEd(self, v):
     tp = self.tp
     return v or (0 if tp in NUMERIC else E),
+
+
+def triIcon(v):
+  return (
+      N.minus
+      if v is None else
+      N.check
+      if v else
+      N.times
+  )
+
+
+def triActive(val, v):
+  return (
+      "button"
+      if v is not val else
+      "label"
+  )
