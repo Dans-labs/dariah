@@ -1,7 +1,7 @@
 import os
 import yaml
 
-from controllers.utils import E, LOW
+from controllers.utils import E, LOW, HYPHEN
 
 CONFIG_EXT = '.yaml'
 CONFIG_DIR = 'yaml'
@@ -11,7 +11,7 @@ ALL = 'all'
 
 
 def isName(val):
-    return val.replace(LOW, E).isalnum()
+    return val.replace(LOW, E).replace(HYPHEN, E).isalnum()
 
 
 def getNames(val, doString=True):
@@ -33,6 +33,10 @@ def getNames(val, doString=True):
       names |= getNames(v, doString=False)
     return names
   return set()
+
+
+def setName(val):
+  return (val.replace(HYPHEN, LOW), val)
 
 
 class Config(object):
@@ -58,24 +62,39 @@ for configFile in files:
   setattr(Config, section, settings)
   names |= getNames(settings)
 
+for n in names:
+  setattr(Names, *setName(n))
+
+namesDone = names
+names = set()
+
+N = Names
+C = Config
+
+tableConfig = C.table
+SCALAR_TYPES = set(tableConfig[N.scalarTypes])
+
 with os.scandir(TABLE_DIR) as sd:
   files = tuple(e.name for e in sd if e.is_file() and e.name.endswith(CONFIG_EXT))
 
 tables = set()
+reference = {}
 
 for tableFile in files:
   table = os.path.splitext(tableFile)[0]
   with open(f"""{TABLE_DIR}/{table}{CONFIG_EXT}""") as fh:
     specs = yaml.load(fh)
+    for (field, fieldSpecs) in specs.items():
+      fieldType = fieldSpecs.get(N.type, None)
+      if fieldType not in SCALAR_TYPES:
+        reference.setdefault(fieldType, set()).add((table, field))
   setattr(Tables, table, specs)
   tables.add(table)
   names |= getNames(specs)
 names |= tables
 
-for n in sorted(names):
-  setattr(Names, n, n)
-
-N = Names
+for n in names - namesDone:
+  setattr(Names, *setName(n))
 
 tableInfo = Config.table[N.kinds]
 mainTable = tableInfo[N.mainTable]
@@ -99,3 +118,4 @@ setattr(Tables, N.userTables, userTables)
 setattr(Tables, N.valueTables, valueTables)
 setattr(Tables, N.sorted, sortedTables)
 setattr(Tables, N.items, tableInfo[N.items])
+setattr(Tables, N.reference, reference)

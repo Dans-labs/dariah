@@ -42,11 +42,11 @@ def labelDiv(label):
 
 
 def getTitle(
-    db, auth, table, isUser, isValue, record, markup=False, asEdit=False, active=None,
+    db, auth, table, isUserTable, record, markup=False, asEdit=False, active=None,
 ):
   titleText = ''
 
-  if isUser:
+  if isUserTable:
     titleText = he(record.get(N.title, None)) or QQ
 
   elif table in SPECIAL_TYPES:
@@ -88,10 +88,10 @@ def getTitle(
         if eid == active:
           atts['cls'] = "tag active"
 
-    if isUser:
+    if isUserTable:
       pass
 
-    elif not isUser and table in SPECIAL_TYPES:
+    elif not isUserTable and table in SPECIAL_TYPES:
       if table == N.country:
         atts['title'] = record.get(N.name, QQ)
 
@@ -134,7 +134,7 @@ class Field(object):
     auth = self.auth
     tp = self.tp
     return getTitle(
-        db, auth, tp, False, True, record, markup=markup, asEdit=asEdit, active=active,
+        db, auth, tp, False, record, markup=markup, asEdit=asEdit, active=active,
     )
 
   def wrap(self, action, withRefresh):

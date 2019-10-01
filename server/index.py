@@ -30,7 +30,6 @@ NO_TABLE = C.html[N.messages][N.noTable]
 
 mongo = MongoClient().dariah
 db = Db(mongo)
-db.collect()
 
 
 def factory():
@@ -68,16 +67,25 @@ def factory():
     )
 
   @app.route(
+      f"""/<string:table>/{N.list}/new/<string:eid>"""
+  )
+  def serveTableListOpen(table, eid):
+    return serveTableList(table, eid)
+
+  @app.route(
       f"""/<string:table>/{N.list}"""
   )
-  def serveTableList(table):
+  def serveTableListPlain(table):
+    return serveTableList(table, None)
+
+  def serveTableList(table, eid):
     path = f"""/{table}/{N.list}"""
 
     auth.authenticate()
     userLine = User(db, auth).wrap()
     sidebar = Sidebar(db, auth, path).wrap()
     if table in T.all:
-      tableList = Table(db, auth, table).list()
+      tableList = Table(db, auth, table).list(eid)
       return render_template(
           INDEX,
           userLine=userLine,
@@ -95,10 +103,11 @@ def factory():
     auth.authenticate()
     if table in T.all:
       eid = Table(db, auth, table).insert()
+      newUrlPart = N.mylist if table in T.userTables else N.list
       newPath = (
-          f"""/{table}/{N.mylist}/new/{eid}"""
+          f"""/{table}/{newUrlPart}/new/{eid}"""
           if eid else
-          f"""/{table}/{N.mylist}"""
+          f"""/{table}/{newUrlPart}"""
       )
       return redirect(newPath)
     return notFound(path)
@@ -112,8 +121,9 @@ def factory():
     auth.authenticate()
     if table in T.all:
       Table(db, auth, table).delete(eid)
+      newUrlPart = N.mylist if table in T.userTables else N.list
       newPath = (
-          f"""/{table}/{N.mylist}"""
+          f"""/{table}/{newUrlPart}"""
       )
       return redirect(newPath)
     return notFound(path)

@@ -32,9 +32,9 @@ class Sidebar(object):
     auth = self.auth
 
     tableObj = Table(db, auth, table)
-    isMain = tableObj.isMain
-    isUser = tableObj.isUser
-    isValue = tableObj.isValue
+    isMainTable = tableObj.isMainTable
+    isUserTable = tableObj.isUserTable
+    isValueTable = tableObj.isValueTable
     itemPlural = tableObj.itemLabels[1]
 
     isAuth = auth.authenticated()
@@ -43,7 +43,7 @@ class Sidebar(object):
 
     entries = []
 
-    if isUser:
+    if isUserTable:
       if isAuth:
         entries.append(
             self.makeEntry(
@@ -62,8 +62,8 @@ class Sidebar(object):
               )
           )
 
-    if isUser or isSuperUser:
-      prefix = '' if isValue else """All """
+    if isUserTable or isSuperUser:
+      prefix = '' if isValueTable else """All """
       entries.append(
           self.makeEntry(
               f"""{prefix}{itemPlural}""",
@@ -71,9 +71,9 @@ class Sidebar(object):
           )
       )
 
-    if isUser and isAuth:
+    if isUserTable and isAuth:
       entries = [
-          self.makeCaption(table, f'/{table}', entries, open=isMain)
+          self.makeCaption(table, f'/{table}', entries, open=isMainTable)
       ]
     self.entries.extend(entries)
 

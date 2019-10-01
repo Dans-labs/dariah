@@ -72,3 +72,6 @@
   background-color: var(--tag-inactive-back);
   border-color: var(--tag-inactive-border);
 }
+.delete {
+  float: right;
+}

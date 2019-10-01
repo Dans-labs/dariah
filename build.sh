@@ -15,6 +15,9 @@ if [[ "$1" == "mongo" ]]; then
 elif [[ "$1" == "serve" ]]; then
 	cd server
     export REGIME=devel FLASK_APP=index:factory FLASK_ENV=development FLASK_RUN_PORT=8001; python3 -m flask run
+elif [[ "$1" == "serveprod" ]]; then
+	cd server
+    export REGIME=devel FLASK_APP=index:factory FLASK_RUN_PORT=8001; python3 -m flask run
 elif [[ "$1" == "cloc" ]]; then
     codestats
 else
@@ -26,5 +29,6 @@ else
 #    echo "python      : activate the version of python used for dariah"
     echo "mongo       : development - start mongo db daemon"
     echo "serve       : development - start webserver"
+    echo "serveprod   : development - start webserver, but not in development mode"
     echo "cloc        : development - start webserver"
 fi

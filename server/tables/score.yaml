@@ -1,20 +1,20 @@
 level:
   perm:
-    update: office
+    edit: office
 score:
   type: int
   perm:
-    update: office
+    edit: office
 description:
   perm:
-    update: office
+    edit: office
 criteria:
+  label: Criterion
   type: criteria
   perm:
-    update: office
-  label: Criterion
+    edit: office
 remarks:
   type: markdown
   multiple: true
   perm:
-    update: office
+    edit: office

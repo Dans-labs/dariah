@@ -4,6 +4,8 @@ from bson.objectid import ObjectId
 from controllers.config import Config as C, Names as N, Tables as T
 from controllers.utils import now, filterModified, E, ON
 
+CREATOR = C.base[N.creator]
+
 M_SET = C.mongo[N.set]
 M_UNSET = C.mongo[N.unset]
 M_LTE = C.mongo[N.lte]
@@ -14,6 +16,16 @@ M_OR = C.mongo[N.OR]
 class Db(object):
   def __init__(self, mongo):
     self.mongo = mongo
+
+    print('BEGIN COLLECTING ...')
+    self.collect()
+    print('END   COLLECTING ...')
+
+    self.creatorId = [
+        record[N._id]
+        for record in self.user.values()
+        if record.get(N.eppn, None) == CREATOR
+    ][0]
 
   def collect(self):
     mongo = self.mongo
@@ -88,10 +100,29 @@ class Db(object):
       for tp in record.get(N.typeContribution, []):
         self.typeCriteria.setdefault(tp, set()).add(_id)
 
-  def delItem(self, table, eid):
+  def recollect(self, table):
+    collectNeeded = table in T.valueTables
+    if collectNeeded:
+      print('BEGIN RECOLLECTING ...')
+      self.collect()
+      print('END   RECOLLECTING ...')
+
+  def getList(self, table, titleSort, my=None, our=None):
     mongo = self.mongo
 
-    mongo[table].delete_one({N._id: ObjectId(eid)})
+    crit = {}
+    if my:
+      crit.update({
+          M_OR: [
+              {N.creator: my},
+              {N.editors: my},
+          ],
+      })
+    if our:
+      crit.update({
+          N.country: our,
+      })
+    return sorted(mongo[table].find(crit), key=titleSort)
 
   def getItem(self, table, eid):
     mongo = self.mongo
@@ -121,7 +152,42 @@ class Db(object):
         records
     )
 
-  def saveField(
+  def insertItem(self, table, uid, eppn):
+    mongo = self.mongo
+
+    justNow = now()
+    result = mongo[table].insert_one({
+        N.dateCreated: justNow,
+        N.creator: uid,
+        N.modified: ['{} on {}'.format(eppn, justNow)],
+    })
+    self.recollect(table)
+    return result.inserted_id
+
+  def insertUser(self, record):
+    mongo = self.mongo
+    creatorId = self.creatorId
+
+    justNow = now()
+    record.update({
+        N.dateLastLogin: justNow,
+        N.statusLastLogin: N.Approved,
+        N.mayLogin: True,
+        N.creator: creatorId,
+        N.dateCreated: justNow,
+        N.modified: ['{} on {}'.format(CREATOR, justNow)],
+    })
+    result = mongo.user.insert_one(record)
+    self.recollect(N.user)
+    return result.inserted_id
+
+  def delItem(self, table, eid):
+    mongo = self.mongo
+
+    mongo[table].delete_one({N._id: ObjectId(eid)})
+    self.recollect(table)
+
+  def updateField(
       self,
       table,
       eid,
@@ -149,7 +215,45 @@ class Db(object):
             M_UNSET: delete,
         },
     )
+    print(f'before recollect {table}')
+    self.recollect(table)
     return (
         update,
         set(delete.keys()),
     )
+
+  def updateUser(self, record):
+    mongo = self.mongo
+
+    if N.isPristine in record:
+      del record[N.isPristine]
+    criterion = {N._id: record[N._id]}
+    updates = {
+        k: v
+        for (k, v) in record.items()
+        if k != N._id
+    }
+    mongo.user.update_one(
+        criterion,
+        {
+            M_SET: updates,
+            M_UNSET: {
+                N.isPristine: E
+            }
+        },
+    )
+    self.recollect(N.user)
+
+  def dependencies(self, table, record):
+    mongo = self.mongo
+
+    eid = record.get(N._id, None)
+    if eid is None:
+      return True
+
+    referenceSpecs = T.reference.get(table, set())
+    nDependent = 0
+    for (referringTable, referringField) in referenceSpecs:
+       nDependent += mongo[referringTable].count({referringField: eid})
+
+    return nDependent

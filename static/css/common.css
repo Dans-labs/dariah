@@ -113,9 +113,6 @@ details.nav {
   flex-flow: column nowrap;
 }
 
-.delete {
-  float: right;
-}
 .button {
 	color: var(--action-fore);
 	cursor: pointer;
@@ -161,7 +158,8 @@ details.nav {
   margin: 0.5rem;
 }
 .button.medium,
-.label.medium {
+.label.medium
+{
 	--size: medium;
 	--radius: 0.4rem;
 	--border: 1px;

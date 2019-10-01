@@ -1,18 +1,18 @@
 package:
   type: package
   perm:
-    update: office
+    edit: office
 typeContribution:
   label: Type
   type: typeContribution
   multiple: true
   perm:
-    update: office
+    edit: office
 criterion:
   perm:
-    update: office
+    edit: office
 remarks:
   type: markdown
   multiple: true
   perm:
-    update: office
+    edit: office

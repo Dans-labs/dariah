@@ -1,14 +1,11 @@
 import os
-from datetime import datetime
 
 from flask import request, session
 from controllers.utils import (
     utf8FromLatin1, E, BLANK, PIPE, NL, AT, WHYPHEN
 )
 from controllers.config import Config as C, Names as N
-from controllers.perm import superuser, coordinator, authenticated, AUTH, UNAUTH
-from controllers.db import M_SET, M_UNSET
-from controllers.utils import now
+from controllers.perm import sysadmin, superuser, coordinator, authenticated, AUTH, UNAUTH
 
 SECRET_FILE = C.base[N.secretFile]
 SHIB_KEY = C.base[N.shibKey]
@@ -23,7 +20,6 @@ class Auth(object):
 
   def __init__(self, app, db):
     self.db = db
-    self.mongo = db.mongo
 
     # determine production or devel
     regime = os.environ.get(N.REGIME, None)
@@ -89,44 +85,6 @@ class Auth(object):
         U[N.group] = authId
         U[N.groupRep] = AUTH
 
-  def storeUser(self):
-    # only called when there is an eppn
-    # yet we check and do nothing if there is not an eppn
-    U = self.userInfo
-    mongo = self.mongo
-
-    eppn = U.get(N.eppn, None)
-    if not eppn:
-      return
-
-    justNow = now()
-    U.update({
-        N.dateCreated: justNow,
-        N.dateLastLogin: justNow,
-        N.statusLastLogin: N.Approved,
-        N.mayLogin: True,
-    })
-    if N._id in U:
-      record = {}
-      record.update(U)
-      if N.isPristine in record:
-        del record[N.isPristine]
-      criterion = {N._id: record[N._id]}
-      del record[N._id]
-      mongo.user.update_one(
-          criterion,
-          {
-              M_SET: record,
-              M_UNSET: {
-                  N.isPristine: E
-              }
-          },
-      )
-    else:
-      result = mongo.user.insert_one(record)
-      _id = result.inserted_id
-      U[N._id] = _id
-
   def checkLogin(self):
     db = self.db
     U = self.userInfo
@@ -175,11 +133,20 @@ class Auth(object):
         if N.group not in U:
           # new users do not have yet group information
           U.update(authUser)
-        U.update({
-            toolKey: utf8FromLatin1(env[envKey])
+
+        # process the attributes provided by the identity server
+        # they may have been changed after the last login
+        attributes = {
+            toolKey: utf8FromLatin1(env.get(envKey, ''))
             for (envKey, toolKey) in ATTRIBUTES.items()
             if envKey in env
-        })
+        }
+        U.update(attributes)
+        if N._id in U:
+          db.updateUser(U)
+        else:
+          _id = db.insertUser(U)
+          U[N._id] = _id
       else:
         U.update(unauthUser)
 
@@ -253,7 +220,6 @@ class Auth(object):
       self.checkLogin()
       if U.get(N.group, unauthId) != unauthId:
         # in this case there is an eppn
-        self.storeUser()
         session[N.eppn] = U[N.eppn]
     else:
       eppn = session.get(N.eppn, None)
@@ -281,6 +247,10 @@ class Auth(object):
   def superuser(self):
     U = self.userInfo
     return superuser(U)
+
+  def sysadmin(self):
+    U = self.userInfo
+    return sysadmin(U)
 
   def country(self):
     db = self.db

@@ -6,7 +6,7 @@ from controllers.config import Config as C, Names as N, Tables as T
 from controllers.perm import permRecord, getPerms, UNAUTH
 from controllers.field import Field, getTitle
 from controllers.html import HtmlElements as H
-from controllers.utils import dbjson, now, E, ELLIPS
+from controllers.utils import dbjson, E, ELLIPS
 
 tableConfig = C.table
 SCALAR_TYPES = set(tableConfig[N.scalarTypes])
@@ -15,9 +15,16 @@ DEFAULT_TYPE = tableConfig[N.defaultType]
 VALUE_SPECS = tableConfig[N.value]
 PROV_SPECS = tableConfig[N.prov]
 PROV = C.html[N.provLabel]
-M_OR = C.mongo[N.OR]
 
 FORBIDDEN = C.html[N.messages][N.forbidden]
+
+
+def forceOpen(theEid, openEid):
+  return (
+      dict(forceopen='1')
+      if openEid and str(theEid) == openEid else
+      dict()
+  )
 
 
 class Table(object):
@@ -25,15 +32,14 @@ class Table(object):
     self.db = db
     self.auth = auth
     self.table = table
-    self.mongo = db.mongo
-    self.isMain = table == T.mainTable
-    self.isUser = table in T.userTables
-    self.isValue = table in T.valueTables
+    self.isMainTable = table == T.mainTable
+    self.isUserTable = table in T.userTables
+    self.isValueTable = table in T.valueTables
     self.itemLabels = T.items.get(table, [table, f'{table}s'])
     self.prov = PROV_SPECS
     self.fields = getattr(
         T, table,
-        VALUE_SPECS if self.isValue else {}
+        VALUE_SPECS if self.isValueTable else {}
     )
     U = auth.userInfo
     self.uid = U.get(N._id, None)
@@ -43,70 +49,71 @@ class Table(object):
     self.country = db.country.get(self.countryId, {})
     self.multiple = {N.editors}
 
-  def free(self):
-    record = self.record
+    def titleSortkey(r):
+      return self.title(r).lower()
+
+    self.titleSortkey = titleSortkey
+
+  def dependencies(self):
+    db = self.db
     table = self.table
+    record = self.record
 
-    eid = record.get(N._id, None)
-    if eid is None:
-      return True
-
-    mongo = self.mongo
-
-    for userTable in T.userTables - {table}:
-      eids = {
-          r.get(N._id, None)
-          for r in mongo[userTable].find({table: eid}, {N._id: True})
-      }
-      if eids:
-        return False
-    return True
+    return db.dependencies(table, record)
 
   def mayDelete(self):
-    isUser = self.isUser
-    if not isUser:
-      return False
-
     auth = self.auth
-    if not auth.authenticated:
+
+    if not auth.authenticated():
       return False
 
-    self.studyRecord()
-    P = self.perm
-    if P[N.isEdit] or auth.superuser():
-      return self.free()
+    isSuperuser = auth.superuser()
+    isUserTable = self.isUserTable
+
+    if not isSuperuser:
+      if isUserTable:
+        self.studyRecord()
+        P = self.perm
+        if not P[N.isEdit]:
+          return False
+      else:
+        return False
+
+    return True
 
   def mayInsert(self):
     auth = self.auth
-    isUser = self.isUser
+    isUserTable = self.isUserTable
+    isSuperuser = auth.superuser()
+
     return (
         auth.authenticated()
-        and (isUser or auth.superuser)
+        and (isUserTable or isSuperuser)
     )
 
   def mayList(self):
     auth = self.auth
-    isUser = self.isUser
+    isUserTable = self.isUserTable
     return (
-        isUser
+        isUserTable
         or
         auth.authenticated()
     )
 
   def mayMyList(self):
     auth = self.auth
-    isUser = self.isUser
+    isUserTable = self.isUserTable
     return (
-        isUser
+        isUserTable
         and
         auth.authenticated()
     )
 
   def mayOurList(self):
     auth = self.auth
-    isUser = self.isUser
+    isUserTable = self.isUserTable
     return (
-        isUser
+        isUserTable
         and
         auth.authenticated()
     )
@@ -115,58 +122,19 @@ class Table(object):
     db = self.db
     auth = self.auth
     table = self.table
-    isUser = self.isUser
-    isValue = self.isValue
-    return getTitle(db, auth, table, isUser, isValue, record)
-
-  def titleSort(self, records):
-    def titleSortkey(r):
-      return self.title(r).lower()
-
-    return sorted(
-        records,
-        key=titleSortkey,
-    )
-
-  def list(self):
-    if not self.mayList():
-      return FORBIDDEN
-
-    mongo = self.mongo
-    table = self.table
-
-    records = self.titleSort(mongo[table].find())
-
-    return H.div(
-        (
-            H.details(
-                self.title(record),
-                H.div(
-                    ELLIPS,
-                    fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
-                ),
-                itemkey=f"""{table}/{record[N._id]}""",
-            )
-            for record in records
-        )
-    )
+    isUserTable = self.isUserTable
+    return getTitle(db, auth, table, isUserTable, record)
 
   def insert(self):
+    db = self.db
     if not self.mayInsert():
       return ()
 
-    mongo = self.mongo
     uid = self.uid
     eppn = self.eppn
     table = self.table
 
-    justNow = now()
-    result = mongo[table].insert_one({
-        N.dateCreated: justNow,
-        N.creator: uid,
-        N.modified: ['{} on {}'.format(eppn, justNow)],
-    })
-    return str(result.inserted_id)
+    return db.insertItem(table, uid, eppn)
 
   def insertButton(self):
     if not self.mayInsert():
@@ -186,21 +154,55 @@ class Table(object):
         ),
     )
 
-  def mylist(self, openEid):
-    if not self.mayMyList():
+  def delete(self, eid):
+    db = self.db
+    table = self.table
+    record = db.getItem(table, eid)
+    if not record:
+      return
+
+    self.record = record
+    if not self.mayDelete() or self.dependencies():
+      return
+
+    db.delItem(table, eid)
+
+  def deleteButton(self):
+    if not self.mayDelete():
+      return E
+    nDeps = self.dependencies()
+    if nDeps:
+      plural = '' if nDeps == 1 else 's'
+      return H.span(
+          H.icon(
+              N.puzzle_piece,
+              cls="label medium warning-o delete",
+              title=f"""Cannot delete because of {nDeps} dependent record{plural}"""
+          )
+      )
+
+    record = self.record
+    table = self.table
+    itemSingle = self.itemLabels[0]
+
+    return H.a(
+        H.icon(
+            N.trash,
+            cls="button medium error-o delete",
+        ),
+        href=f"""/{table}/{N.delete}/{record[N._id]}""",
+        title=f"""Delete this {itemSingle}"""
+    )
+
+  def list(self, openEid):
+    if not self.mayList():
       return FORBIDDEN
 
-    mongo = self.mongo
-    uid = self.uid
+    db = self.db
     table = self.table
+    titleSortkey = self.titleSortkey
 
-    crit = {
-        M_OR: [
-            {N.creator: uid},
-            {N.editors: uid},
-        ],
-    }
-    records = self.titleSort(mongo[table].find(crit))
+    records = db.getList(table, titleSortkey)
 
     return H.div(
         chain.from_iterable((
@@ -213,11 +215,36 @@ class Table(object):
                         fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
                     ),
                     itemkey=f"""{table}/{record[N._id]}""",
-                    **(
-                        dict(forceopen='1')
-                        if openEid and str(record[N._id]) == openEid else
-                        dict()
-                    )
+                    **forceOpen(record[N._id], openEid),
+                )
+                for record in records
+            ),
+        ))
+    )
+
+  def mylist(self, openEid):
+    if not self.mayMyList():
+      return FORBIDDEN
+
+    db = self.db
+    table = self.table
+    titleSortkey = self.titleSortkey
+    uid = self.uid
+
+    records = db.getList(table, titleSortkey, my=uid)
+
+    return H.div(
+        chain.from_iterable((
+            self.insertButton(),
+            (
+                H.details(
+                    self.title(record),
+                    H.div(
+                        ELLIPS,
+                        fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
+                    ),
+                    itemkey=f"""{table}/{record[N._id]}""",
+                    **forceOpen(record[N._id], openEid),
                 )
                 for record in records
             ),
@@ -228,14 +255,12 @@ class Table(object):
     if not self.mayOurList():
       return FORBIDDEN
 
-    mongo = self.mongo
+    db = self.db
     table = self.table
+    titleSortkey = self.titleSortkey
     countryId = self.countryId
 
-    crit = {
-        N.country: countryId,
-    }
-    records = self.titleSort(mongo[table].find(crit))
+    records = db.getList(table, titleSortkey, our=countryId)
 
     return H.div(
         (
@@ -315,7 +340,7 @@ class Table(object):
 
         actor = self.eppn
         modified = record.get(N.modified, None)
-        (updates, deletions) = db.saveField(
+        (updates, deletions) = db.updateField(
             table,
             eid,
             field,
@@ -353,36 +378,6 @@ class Table(object):
     return (
         Field(db, auth, table, eid, field, mayEdit, label, tp, multiple, value).
         wrap(action, withRefresh)
-    )
-
-  def delete(self, eid):
-    db = self.db
-    table = self.table
-    record = db.getItem(table, eid)
-    if not record:
-      return
-
-    self.record = record
-    if not self.mayDelete():
-      return
-
-    db.delItem(table, eid)
-
-  def deleteButton(self):
-    if not self.mayDelete():
-      return E
-
-    record = self.record
-    table = self.table
-    itemSingle = self.itemLabels[0]
-
-    return H.a(
-        H.icon(
-            N.trash,
-            cls="button medium error-o delete",
-        ),
-        href=f"""/{table}/{N.delete}/{record[N._id]}""",
-        title=f"""Delete this {itemSingle}"""
     )
 
   def wrap(self, record):

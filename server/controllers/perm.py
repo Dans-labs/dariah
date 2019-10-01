@@ -78,6 +78,11 @@ def superuser(U):
   return group in {OFFICE, SYSTEM, ROOT}
 
 
+def sysadmin(U):
+  group = U.get(N.groupRep, UNAUTH)
+  return group in {SYSTEM, ROOT}
+
+
 def getPerms(U, P, record, require):
   readRequire = (
       DEFAULT_PERM[N.read]

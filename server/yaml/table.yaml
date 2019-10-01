@@ -12,6 +12,8 @@ kinds:
     - contrib
     - assessment
     - review
+    - criteriaEntry
+    - reviewEntry
   valueTables:
     - country
     - criteria
@@ -104,17 +106,22 @@ prov:
     perm:
       read: auth
       edit: nobody
+  isPristine:
+    label: Unchanged legacy
+    perm:
+      read: auth
+      edit: nobody
 
 value:
   rep:
-    label: representation
+    label: Representation
     perm:
       edit: office
 
 names:
   - _id
   - active
-  - bool
-  - isPristine
   - authority
+  - bool
+  - reference
   - sorted

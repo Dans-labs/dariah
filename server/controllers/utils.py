@@ -34,6 +34,7 @@ DOLLAR = '$'
 
 NL = '\n'
 
+HYPHEN = '-'
 WHYPHEN = ' - '
 ELLIPS = '...'
 ON = ' on '

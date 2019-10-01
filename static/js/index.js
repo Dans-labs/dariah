@@ -2,7 +2,7 @@
 
 const SAVE = true
 const DEBUG = true
-const BLUR = false
+const BLUR = true
 
 const widgets = {
   text: {

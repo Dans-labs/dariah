@@ -1,5 +1,5 @@
 iso:
-  label: ISO(2)
+  label: ISO(2-letter)
   perm:
     edit: office
 name:
