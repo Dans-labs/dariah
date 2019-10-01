@@ -21,7 +21,7 @@
     --action-link-back:                hsla(210, 100%,  90%, 1  );
     --action-active-fore:              hsla(210, 100%,  40%, 1  );
     --action-active-back:              hsla(060,  80%,  90%, 0.8);
-    --action-active-border:            hsla(060, 100%,  50%, 0.5);
+    --action-active-border:            hsla(060, 100%,  40%, 1.0);
 
     --assessment-quoted-fore:          hsla( 60, 100%,  10%, 1  );
     --assessment-quoted-back:          hsla( 60, 100%,  90%, 1  );

@@ -19,7 +19,7 @@ typeContribution:
   perm:
     update: office
 remarks:
-  type: text
+  type: markdown
   multiple: true
   perm:
     update: office

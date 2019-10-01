@@ -7,7 +7,7 @@ name:
     edit: office
 isMember:
   label: Is DARIAH member
-  type: bool
+  type: bool2
   perm:
     edit: office
 latitude:

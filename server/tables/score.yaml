@@ -14,7 +14,7 @@ criteria:
     update: office
   label: Criterion
 remarks:
-  type: text
+  type: markdown
   multiple: true
   perm:
     update: office

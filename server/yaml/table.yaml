@@ -29,23 +29,57 @@ kinds:
     - vcc
     - year
 
-defaultType: string
+defaultType: text
 
 scalarTypes:
   - text
-  - string
   - email
   - url
   - int
   - decimal
   - money
   - datetime
-  - bool
+  - bool2
   - bool3
+  - markdown
+specialTypes:
+  - user
+  - country
+  - typeContribution
+  - criteria
+  - score
 numericTypes:
   - int
   - decimal
   - money
+textTypes:
+  - text
+  - email
+  - url
+boolTypes:
+  bool2:
+    true: check
+    false: times
+  bool3:
+    true: check
+    false: times
+    null: minus
+widgetTypes:
+  text:
+    - text
+    - email
+    - url
+    - int
+    - decimal
+    - money
+    - datetime
+  bool:
+    - bool2
+    - bool3
+  markdown:
+    - markdown
+  related:
+    - related
 
 prov:
   creator:
@@ -80,6 +114,7 @@ value:
 names:
   - _id
   - active
+  - bool
   - isPristine
   - authority
   - sorted

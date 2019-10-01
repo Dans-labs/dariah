@@ -106,23 +106,19 @@ class Db(object):
     )
     return record
 
-  def getField(
+  def getValueRecords(
       self,
-      record,
-      fieldName,
-      multiple,
-      relTable=None,
+      relTable,
   ):
-    relTable = relTable or fieldName
-    rawValue = record.get(fieldName, None) or ([] if multiple else None)
-    valTable = getattr(self, relTable, {})
-    return (
-        [
-            valTable.get(rawVal, {})
-            for rawVal in rawValue
-        ]
-        if multiple else
-        valTable.get(rawValue, {})
+    records = getattr(self, relTable, {}).values()
+    return list(
+        (
+            r
+            for r in records
+            if r.get(N.isMember, False)
+        )
+        if relTable == N.country else
+        records
     )
 
   def saveField(

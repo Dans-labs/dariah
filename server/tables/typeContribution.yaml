@@ -7,7 +7,7 @@ subType:
   perm:
     update: office
 explanation:
-  type: text
+  type: markdown
   multiple: true
   perm:
     update: office

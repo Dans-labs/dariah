@@ -36,7 +36,7 @@ membership:
     edit: office
 mayLogin:
   label: Login allowed
-  type: bool
+  type: bool2
   perm:
     read: own
     edit: office

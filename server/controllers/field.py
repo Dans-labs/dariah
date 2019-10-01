@@ -1,35 +1,37 @@
+from itertools import chain
 from markdown import markdown
 
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H, htmlEscape as he
-from controllers.utils import dtm, bencode, E, BLANK, WHYPHEN, AT, EURO, ONE
+from controllers.utils import (
+    dtm, bencode,
+    E, BLANK, WHYPHEN, AT, EURO
+)
 
 
 tableConfig = C.table
 
-SCALAR_TYPES = tableConfig[N.scalarTypes]
+SCALAR_TYPES = set(tableConfig[N.scalarTypes])
+SPECIAL_TYPES = set(tableConfig[N.specialTypes])
+NUMERIC_TYPES = set(tableConfig[N.numericTypes])
+TEXT_TYPES = set(tableConfig[N.textTypes])
+BOOLEAN_TYPES = tableConfig[N.boolTypes]
+WIDGET_TYPES = tableConfig[N.widgetTypes]
 
-WIDGET_FROM_TYPE = dict(
-    text=(N.text, None),
-    string=(N.input, N.text),
-    email=(N.input, N.email),
-    url=(N.input, N.url),
-    int=(N.input, N.number),
-    decimal=(N.input, N.number),
-    money=(N.input, N.number),
-    bool=(N.input, N.checkbox),
-    bool3=(N.bool3, None),
-    datetime=(N.input, N.text),
-)
-WIDGET_RELATED = (N.related, None)
+WIDGET_FROM_TYPE = {
+    tp: w
+    for (w, tp) in chain.from_iterable(
+        ((w, tp) for tp in tps)
+        for (w, tps) in WIDGET_TYPES.items()
+    )
+}
 
-NUMERIC = tableConfig[N.numericTypes]
+WIDGET_RELATED = N.related
+
 
 REFRESH = C.html[N.messages][N.refresh]
 QQ = C.html[N.unknown][N.generic]
 ZERO = C.html[N.unknown][N.number]
-YES = C.html[N.constants][N.y]
-NO = C.html[N.constants][N.n]
 
 
 def labelDiv(label):
@@ -39,31 +41,72 @@ def labelDiv(label):
   )
 
 
-def getTitle(db, auth, table, isUser, isValue, record):
+def getTitle(
+    db, auth, table, isUser, isValue, record, markup=False, asEdit=False, active=None,
+):
+  titleText = ''
+
   if isUser:
-    return he(record.get(N.title, None)) or QQ
+    titleText = he(record.get(N.title, None)) or QQ
 
-  if table == N.user:
-    return he(auth.identity(record))
+  elif table in SPECIAL_TYPES:
+    if table == N.user:
+      titleText = he(auth.identity(record))
 
-  if table == N.country:
-    return he(record.get(N.iso, None)) or QQ
+    elif table == N.country:
+      titleText = he(record.get(N.iso, None)) or QQ
 
-  if table == N.typeContribution:
-    mainType = record.get(N.mainType, E)
-    subType = record.get(N.subType, E)
-    sep = WHYPHEN if mainType and subType else E
-    return he(f"""{mainType}{sep}{subType}""")
+    elif table == N.typeContribution:
+      mainType = record.get(N.mainType, E)
+      subType = record.get(N.subType, E)
+      sep = WHYPHEN if mainType and subType else E
+      titleText = he(f"""{mainType}{sep}{subType}""")
 
-  if table == N.criteria:
-    return he(record.get(N.criterion, None)) or QQ
+    elif table == N.criteria:
+      titleText = he(record.get(N.criterion, None)) or QQ
 
-  if table == N.score:
-    score = he(record.get(N.score, None)) or QQ
-    level = he(record.get(N.level, None)) or QQ
-    return f"""{score} - {level}"""
+    elif table == N.score:
+      score = he(record.get(N.score, None)) or QQ
+      level = he(record.get(N.level, None)) or QQ
+      titleText = f"""{score} - {level}"""
 
-  return he(record.get(N.rep, record.get(N.title, None))) or QQ
+  else:
+    titleText = he(record.get(N.rep, record.get(N.title, None))) or QQ
+
+  if markup:
+    eid = record.get(N._id, None)
+    atts = dict(
+        cls=(
+            f'{"label" if active == eid else "button"} medium field'
+            if asEdit else
+            "tag"
+        ),
+    )
+    if asEdit:
+      if eid is not None:
+        atts['eid'] = str(eid)
+        if eid == active:
+          atts['cls'] = "tag active"
+
+    if isUser:
+      pass
+
+    elif not isUser and table in SPECIAL_TYPES:
+      if table == N.country:
+        atts['title'] = record.get(N.name, QQ)
+
+      elif table == N.typeContribution:
+        atts['title'] = record.get(N.explanation, E)
+
+    titleFormatted = H.span(
+        titleText,
+        **atts,
+    )
+
+    return (titleText, titleFormatted)
+
+  else:
+    return titleText
 
 
 class Field(object):
@@ -84,6 +127,14 @@ class Field(object):
             eid=self.eid,
             field=self.field,
         )
+    )
+
+  def title(self, record, markup=False, asEdit=False, active=None):
+    db = self.db
+    auth = self.auth
+    tp = self.tp
+    return getTitle(
+        db, auth, tp, False, True, record, markup=markup, asEdit=asEdit, active=active,
     )
 
   def wrap(self, action, withRefresh):
@@ -135,14 +186,18 @@ class Field(object):
 
   def formatOrig(self, v):
     tp = self.tp
-    if tp == 'bool':
-      return ONE if v else E
+    if tp in BOOLEAN_TYPES:
+      return v
+    if tp not in SCALAR_TYPES:
+      return v if v is None else str(v)
     return str(v)
 
   def valueEdDiv(self):
     tp = self.tp
     multiple = self.multiple
     value = self.value
+    wType = WIDGET_FROM_TYPE.get(tp, WIDGET_RELATED)
+    self.collapseMultiple = tp not in SCALAR_TYPES
 
     button = H.icon(
         N.eye,
@@ -153,16 +208,13 @@ class Field(object):
     rep = self.getValueEd()
     origFmt = self.formatOrig
     origStr = (
-        (
-            [origFmt(val) for val in value]
-            if multiple else
-            origFmt(value)
-        )
-        if tp in NUMERIC else
-        value
+        [origFmt(val) for val in value]
+        if multiple else
+        origFmt(value)
     )
     atts = dict(
         orig=bencode(origStr),
+        wtype=wType,
     )
     if multiple:
       atts[N.multiple] = True
@@ -197,181 +249,167 @@ class Field(object):
     return rep
 
   def getValueEd(self):
-    tp = self.tp
     multiple = self.multiple
+    collapseMultiple = self.collapseMultiple
     value = self.value
-
-    (wName, wType) = WIDGET_FROM_TYPE.get(tp, WIDGET_RELATED)
 
     widget = (
         H.div(
             [
-                self.formatEd(wName, wType, val)
+                self.formatEd(val)
                 for val in (value or []) + [E]
             ],
             cls="values",
         )
-        if multiple else
-        self.formatEd(wName, wType, value)
+        if multiple and not collapseMultiple else
+        self.formatEd(value)
     )
 
     return widget
 
+  # DISPLAY READONLY VALUES
+
   def formatRO(self, v):
     tp = self.tp
+    if tp in SCALAR_TYPES:
+      method = getattr(self, f'display_{tp}')
+      return method(v)
+    return self.displayRelated(v)
 
-    if tp == N.text:
-      return H.div(markdown(v or QQ))
+  def display_markdown(self, v):
+    return H.div(markdown(v or QQ))
 
-    if tp == N.string:
-      return H.span(he(v or QQ))
+  def display_text(self, v):
+    return H.span(he(v or QQ))
 
-    if tp == N.email:
-      val = he(v or QQ)
-      return H.a(val, f"""{N.mailto}:{val}""") if AT in val else val
+  def display_email(self, v):
+    val = he(v or QQ)
+    return H.a(val, f"""{N.mailto}:{val}""") if AT in val else val
 
-    if tp == N.url:
-      raw = v or E
-      val = he(raw or QQ)
-      isWww = raw.startswith(f"""{N.www}.""")
-      isLink = (
-          isWww or
-          raw.startswith(f"""{N.http}://""") or
-          raw.startswith(f"""{N.https}://""")
-      )
-      if isWww:
-        raw = f"""{N.https}://{raw}"""
-      return H.a(val, raw) if isLink else val
+  def display_url(self, v):
+    raw = v or E
+    val = he(raw or QQ)
+    isWww = raw.startswith(f"""{N.www}.""")
+    isLink = (
+        isWww or
+        raw.startswith(f"""{N.http}://""") or
+        raw.startswith(f"""{N.https}://""")
+    )
+    if isWww:
+      raw = f"""{N.https}://{raw}"""
+    return H.a(val, raw) if isLink else val
 
-    if tp == N.int or tp == N.decimal:
-      return H.span(he(v or ZERO))
+  def display_int(self, v):
+    return H.span(he(v or ZERO))
 
-    if tp == N.money:
-      return H.span(EURO + BLANK + he(v or ZERO))
+  def display_decimal(self, v):
+    return H.span(he(v or ZERO))
 
-    if tp == N.bool:
-      return H.span(YES if v else NO)
+  def display_money(self, v):
+    return H.span(EURO + BLANK + he(v or ZERO))
 
-    if tp == N.bool3:
-      return H.span(
-          QQ
-          if v is None else
-          YES
-          if v else
-          NO
-      )
-
-    if tp == N.datetime:
-      return H.span(he(f"""{dtm(v.isoformat())[1]}""") if v else QQ)
-
-    if tp == N.user:
-      record = self.db.user.get(v, {})
-      return H.span(
-          he(self.auth.identity(record)),
-          cls="tag",
-      )
-
-    if tp == N.country:
-      record = self.db.country.get(v, {})
-      return H.span(
-          str(record.get(N.iso, QQ)),
-          title=str(record.get(N.name, QQ)),
-          cls="tag",
-      )
-
-    if tp == N.typeContribution:
-      record = self.db.typeContribution.get(v, {})
-      mainType = record.get(N.mainType, E)
-      subType = record.get(N.subType, E)
-      sep = WHYPHEN if mainType and subType else E
-      explanation = record.get(N.explanation, E)
-      active = record.get(N.active, False)
-      inactive = E if active else " inactive"
-      return H.span(
-          f"""{mainType}{sep}{subType}""",
-          title=explanation,
-          cls=f"tag{inactive}",
-      )
-
-    if tp == N.criteria:
-      record = self.db.criteria.get(v, {})
-      return H.span(
-          str(record.get(N.criterion, QQ)),
-          cls="tag",
-      )
-
-    if tp == N.score:
-      record = self.db.score.get(v, {})
-      score = str(record.get(N.score, QQ))
-      level = record.get(N.score, QQ)
-      return H.span(
-          f"""{score} - {level}""",
-          cls="tag",
-      )
-
-    record = getattr(self.db, tp).get(v, {})
-    return H.span(
-        str(record.get(N.rep, record.get(N.title, QQ))),
-        cls="tag",
+  def display_bool2(self, v):
+    values = BOOLEAN_TYPES[N.bool2]
+    return H.icon(
+        values.get(v, values[False]),
+        cls="label medium field",
     )
 
-  def formatEd(self, wName, wType, v):
-    if wName == N.input:
-      atts = {}
-      passV = v
-      if wType == N.checkbox:
-        atts = dict(checked=True) if v else {}
-        passV = ONE
-      elif wType in NUMERIC:
-        atts = dict(step=1)
-        passV = (
-            v
-            if type(v) is str else
-            str(v)
-            if wType == N.decimal else
-            str(int(round(v)))
-        )
-      elif wType == N.url:
-        atts = dict(pattern=f"""{N.http}s?://.+\\..+""")
+  def display_bool3(self, v):
+    values = BOOLEAN_TYPES[N.bool3]
+    return H.icon(
+        values.get(v, values[None]),
+        cls="label medium field",
+    )
 
-      return H.input(self.trimEd(passV), **atts, type=wType)
+  def display_datetime(self, v):
+    return H.span(he(f"""{dtm(v.isoformat())[1]}""") if v else QQ)
 
-    if wName == N.text:
-      return H.textarea(self.trimEd(v))
-
-    if wName == N.related:
-      return self.formatRO(v)
-
-    if wName == N.bool3:
-      return H.div(
-          [
-              H.icon(
-                  triIcon(val),
-                  cls=f"{triActive(val, v)} medium field",
-              )
-              for val in (False, None, True)
-          ],
-          cls="trival",
-      )
-
-  def trimEd(self, v):
+  def displayRelated(self, v):
     tp = self.tp
-    return v or (0 if tp in NUMERIC else E),
+
+    record = getattr(self.db, tp).get(v, {})
+    return self.title(record, markup=True)[1]
+
+  # WIDGETS FOR EDITING VALUES
+
+  def formatEd(self, v):
+    tp = self.tp
+    wType = WIDGET_FROM_TYPE.get(tp, WIDGET_RELATED)
+    method = getattr(self, f'widget_{wType}')
+    return method(v)
+
+  def widget_text(self, v):
+    tp = self.tp
+    atts = {}
+    passV = v
+    if tp in NUMERIC_TYPES:
+      atts = dict(step=1)
+      passV = (
+          v
+          if type(v) is str else
+          str(v)
+          if tp == N.decimal else
+          str(int(round(v)))
+      ) or 0
+    elif tp in TEXT_TYPES:
+      if tp == N.url:
+        atts = dict(pattern=f"""{N.http}s?://.+\\..+""")
+      passV = v or E
+
+    return H.input(
+        passV,
+        **atts,
+        type=tp,
+        wvalue=N.text,
+    )
+
+  def widget_markdown(self, v):
+    passV = v or E
+    return H.textarea(
+        passV,
+        wvalue=N.markdown,
+    )
+
+  def widget_bool(self, v):
+    tp = self.tp
+
+    refDefault = False if tp == N.bool2 else None
+    values = BOOLEAN_TYPES[tp]
+    refV = values.get(v, values[refDefault])
+    return H.div(
+        [
+            H.icon(
+                values[w],
+                cls=f"{boolActive(values[w], refV)} medium field",
+            )
+            for w in values
+        ],
+        wvalue=N.bool,
+    )
+
+  def widget_related(self, v):
+    db = self.db
+    tp = self.tp
+
+    return H.div(
+        [
+            formatted
+            for (text, formatted) in sorted(
+                (
+                    self.title(record, markup=True, asEdit=True, active=v)
+                    for record in [{}] + db.getValueRecords(tp)
+                ),
+                key=lambda x: x[0].lower()
+            )
+        ],
+        wvalue=N.related,
+    )
 
 
-def triIcon(v):
+def boolActive(v, w):
   return (
-      N.minus
-      if v is None else
-      N.check
-      if v else
-      N.times
-  )
-
-
-def triActive(val, v):
-  return (
+      "label active"
+      if v is w else
       "button"
-      if v is not val else
-      "label"
   )

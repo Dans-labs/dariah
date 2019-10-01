@@ -1,7 +1,64 @@
 /*eslint-env jquery*/
 
 const SAVE = true
-const BLUR = true
+const DEBUG = true
+const BLUR = false
+
+const widgets = {
+  text: {
+    activate() {},
+    read(elem) {
+      return elem.prop('value')
+    },
+  },
+  markdown: {
+    activate() {},
+    read(elem) {
+      return elem.prop('value')
+    },
+  },
+  bool: {
+    activate(table, eid, field, parent, valueEl, targets) {
+      targets.each((i, elem) => {
+        const el = $(elem)
+        const options = el.find('.button, .label')
+        el.find('.button').off('click').click(e => {
+          options.removeClass('active')
+          const me = $(e.target)
+          me.addClass('active')
+          save(table, eid, field, valueEl, parent)
+        })
+      })
+    },
+    read(elem) {
+      const el = elem.find('.active')
+      return el.hasClass('fa-check')
+        ? true
+        : el.hasClass('fa-times')
+        ? false
+        : null
+    },
+  },
+  related: {
+    activate(table, eid, field, parent, valueEl, targets) {
+      targets.each((i, elem) => {
+        const el = $(elem)
+        const options = el.find('.button, .tag')
+        el.find('.button').off('click').click(e => {
+          options.removeClass('active')
+          const me = $(e.target)
+          me.addClass('active')
+          save(table, eid, field, valueEl, parent)
+        })
+      })
+    },
+    read(elem) {
+      const el = elem.find('.active')
+      return (el && el.attr('eid')) || null
+    },
+    collapseMultiple: true,
+  },
+}
 
 const fetch = (url, destElem, data) => {
   if (data == null) {
@@ -13,7 +70,6 @@ const fetch = (url, destElem, data) => {
       success: html => {
         destElem.html(html)
         activateActions(destElem)
-        activateWidgets(destElem)
         openCloseItems(destElem)
       },
     })
@@ -29,7 +85,6 @@ const fetch = (url, destElem, data) => {
       success: html => {
         destElem.html(html)
         activateActions(destElem)
-        activateWidgets(destElem)
         openCloseItems(destElem)
       },
     })
@@ -98,63 +153,54 @@ const edit = (table, eid, field, valueEl, parent) => {
   fetch(url, parent)
 }
 
-const readVal = elem => {
-  const value = elem.prop('value')
-  return (elem.attr('type') == 'checkbox')
-    ? elem.prop('checked') ? value : ''
-    : value
-}
 const save = (table, eid, field, valueEl, parent) => {
   const origValue = atob(valueEl.attr('orig'))
   const multiple = valueEl.attr('multiple')
-  const valueCarrier = valueEl.find('[value]')
-  const givenValue = multiple
-    ? $.makeArray(valueCarrier.map((i, el) => readVal($(el))))
+  const valueCarrier = valueEl.find('[wvalue]')
+  const wType = valueEl.attr('wtype')
+  const { [wType]: { read, collapseMultiple } } = widgets
+  const givenValue = multiple && !collapseMultiple
+    ? $.makeArray(valueCarrier.map((i, el) => read($(el))))
       .filter(v => v !== '')
-    : readVal(valueCarrier)
-  console.log({ valueCarrier })
+    : read(valueCarrier)
   const newValue = JSON.stringify(givenValue)
-  console.log('valueEl', valueEl)
-  console.log('multiple', multiple)
-  console.log('given', givenValue)
-  console.log('orig:', origValue)
-  console.log('new:', newValue)
-  console.log('equal?', origValue == newValue)
-  if (newValue == origValue) {
-    Console.log('Saving: no change')
-    const url = makeFieldUrl(table, eid, field, 'view')
-    fetch(url, parent)
+  const dirty = origValue != newValue
+
+  if (DEBUG) {
+    Console.log('SAVE:', {
+      valueEl,
+      multiple,
+      wType,
+      origValue,
+      givenValue,
+      newValue,
+      dirty,
+    })
   }
-  else {
+  if (dirty) {
     if (SAVE) {
-      Console.log('Saving: send to database')
+      if (DEBUG) {
+        Console.log(`Dirty value in widget ${wType}: save to database`)
+      }
       const url = makeFieldUrl(table, eid, field, 'save')
       fetch(url, parent, newValue)
     }
     else {
-      Console.log('Saving: suppress')
+      if (DEBUG) {
+        Console.log('Dirty value: suppress saving to database')
+        Console.log(`Dirty value in widget ${wType}: suppress saving`)
+      }
       const url = makeFieldUrl(table, eid, field, 'view')
       fetch(url, parent)
     }
   }
-}
-
-const activateWidgets = destElem => {
-  const targets = destElem ? destElem.find('.trival') : $('.trival')
-  targets.each((i, elem) => {
-    const el = $(elem)
-    const options = el.find('.button, .label')
-    const activate = () => {
-      el.find('.button').off('click').click(e => {
-        options.addClass('button')
-        options.removeClass('label')
-        const me = $(e.target)
-        me.addClass('label')
-        activate()
-      })
+  else {
+    if (DEBUG) {
+      Console.log(`Clean value in widget ${wType}: no save action`)
     }
-    activate()
-  })
+    const url = makeFieldUrl(table, eid, field, 'view')
+    fetch(url, parent)
+  }
 }
 
 const activateActions = destElem => {
@@ -189,11 +235,13 @@ const activateActions = destElem => {
       saveOrEdit(table, eid, field, valueEl, parent)
     })
     if (BLUR) {
-      if (focusEl.attr('type') != 'checkbox') {
-        focusEl.off('blur').blur(() => {
-          saveOrEdit(table, eid, field, valueEl, parent)
-        })
-      }
+      focusEl.off('blur').blur(() => {
+        saveOrEdit(table, eid, field, valueEl, parent)
+      })
+    }
+    for (const widget of Object.values(widgets)) {
+      const widgetTargets = valueEl.find('[wvalue]')
+      widget.activate(table, eid, field, parent, valueEl, widgetTargets)
     }
   })
 }
@@ -205,6 +253,5 @@ const activateActions = destElem => {
 $(() => {
   activateFetch()
   activateActions()
-  activateWidgets()
   openCloseItems()
 })

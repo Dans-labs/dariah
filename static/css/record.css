@@ -49,7 +49,7 @@
 .record-value .tags {
 	flex-flow: row wrap;
 }
-.record-value .value {
+[wvalue] {
   flex: 1 1 auto;
 	display: inline-flex;
 	flex-flow: row wrap;

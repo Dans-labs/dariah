@@ -1,5 +1,6 @@
 from itertools import chain
 from flask import request
+from bson.objectid import ObjectId
 
 from controllers.config import Config as C, Names as N, Tables as T
 from controllers.perm import permRecord, getPerms, UNAUTH
@@ -7,10 +8,12 @@ from controllers.field import Field, getTitle
 from controllers.html import HtmlElements as H
 from controllers.utils import dbjson, now, E, ELLIPS
 
-NUMERIC = C.table[N.numericTypes]
-DEFAULT_TYPE = C.table[N.defaultType]
-VALUE_SPECS = C.table[N.value]
-PROV_SPECS = C.table[N.prov]
+tableConfig = C.table
+SCALAR_TYPES = set(tableConfig[N.scalarTypes])
+NUMERIC_TYPES = set(tableConfig[N.numericTypes])
+DEFAULT_TYPE = tableConfig[N.defaultType]
+VALUE_SPECS = tableConfig[N.value]
+PROV_SPECS = tableConfig[N.prov]
 PROV = C.html[N.provLabel]
 M_OR = C.mongo[N.OR]
 
@@ -294,8 +297,14 @@ class Table(object):
         tp = fieldSpec.get(N.type, DEFAULT_TYPE)
         multiple = fieldSpec.get(N.multiple, False)
         data = request.get_json()
-        if tp in NUMERIC:
-          conversion = float if tp == N.decimal else int
+        conversion = (
+            (float if tp == N.decimal else int)
+            if tp in NUMERIC_TYPES else
+            ObjectId
+            if tp not in SCALAR_TYPES else
+            None
+        )
+        if conversion is not None:
           if multiple:
             data = [
                 conversion(d)

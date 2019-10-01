@@ -17,7 +17,7 @@ typeContribution:
   label: Type
   type: typeContribution
 description:
-  type: text
+  type: markdown
 costTotal:
   label: Cost (total)
   type: money
@@ -25,7 +25,7 @@ costTotal:
     read: coord
 costDescription:
   label: Cost (description)
-  type: text
+  type: markdown
   perm:
     read: coord
 contactPersonName:
