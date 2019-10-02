@@ -2,8 +2,10 @@ from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
 from controllers.utils import E
 
+CW = C.web
 
-URLS = C.html[N.urls]
+
+URLS = CW.urls
 LOGIN = URLS[N.login]
 LOGOUT = URLS[N.logout]
 SLOGOUT = URLS[N.slogout]

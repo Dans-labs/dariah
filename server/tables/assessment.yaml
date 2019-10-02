@@ -21,7 +21,7 @@ remarks:
     read: auth
 submitted:
   label: Submitted for review
-  type: bool
+  type: bool2
   perm:
     read: auth
 dateSubmitted:

@@ -2,18 +2,25 @@ import os
 
 from flask import request, session
 from controllers.utils import (
-    utf8FromLatin1, E, BLANK, PIPE, NL, AT, WHYPHEN
+    serverprint, utf8FromLatin1, E, BLANK, PIPE, NL, AT, WHYPHEN
 )
 from controllers.config import Config as C, Names as N
-from controllers.perm import sysadmin, superuser, coordinator, authenticated, AUTH, UNAUTH
+from controllers.perm import (
+    sysadmin, superuser, coordinator, authenticated, AUTH, UNAUTH
+)
 
-SECRET_FILE = C.base[N.secretFile]
-SHIB_KEY = C.base[N.shibKey]
-ATTRIBUTES = C.base[N.attributes]
+CB = C.base
+CW = C.web
 
-UNKNOWN_COUNTRY = C.html[N.unknown][N.country]
-UNKNOWN_USER = C.html[N.unknown][N.user]
-UNKNOWN_GROUP = C.html[N.unknown][N.group]
+
+SECRET_FILE = CB.secretFile
+SHIB_KEY = CB.shibKey
+ATTRIBUTES = CB.attributes
+
+UNKNOWN = CW.unknown
+UNKNOWN_COUNTRY = UNKNOWN[N.country]
+UNKNOWN_USER = UNKNOWN[N.user]
+UNKNOWN_GROUP = UNKNOWN[N.group]
 
 
 class Auth(object):
@@ -35,22 +42,22 @@ class Auth(object):
     self.authUser = {N.group: self.authId, N.groupRep: AUTH}
     self.unauthId = db.permissionGroupInv.get(UNAUTH, None)
     self.unauthUser = {N.group: self.unauthId, N.groupRep: UNAUTH}
-    self.userInfo = {}
+    self.user = {}
 
   def clearUser(self):
-    U = self.userInfo
-    U.clear()
-    U.update(self.unauthUser)
+    user = self.user
+    user.clear()
+    user.update(self.unauthUser)
 
   def getUser(self, eppn, email=None):
     # this is called to get extra information for an authenticated user from the database
     # but the database may still say that the user may not login
-    U = self.userInfo
+    user = self.user
     db = self.db
     authority = self.authority
     authId = self.authId
 
-    user = [
+    userFound = [
         record
         for record in db.user.values()
         if (
@@ -68,26 +75,26 @@ class Auth(object):
             )
         )
     ]
-    U.clear()
-    U.update({
+    user.clear()
+    user.update({
         N.eppn: eppn,
         N.authority: authority,
     })
     if email:
-      U[N.email] = email
-    if len(user) == 1:
-      U.update(user[0])
-    if not U.get(N.mayLogin, True):
+      user[N.email] = email
+    if len(userFound) == 1:
+      user.update(userFound[0])
+    if not user.get(N.mayLogin, True):
       # this checks whether mayLogin is explicitly set to False
       self.clearUser()
     else:
-      if N.group not in U:
-        U[N.group] = authId
-        U[N.groupRep] = AUTH
+      if N.group not in user:
+        user[N.group] = authId
+        user[N.groupRep] = AUTH
 
   def checkLogin(self):
     db = self.db
-    U = self.userInfo
+    user = self.user
     isDevel = self.isDevel
     authUser = self.authUser
     unauthUser = self.unauthUser
@@ -107,7 +114,7 @@ class Auth(object):
         if answer is not None:
           answer = answer.split(NL, 1)[0]
       except Exception as err:
-        print("""Low level error: {}""".format(err))
+        serverprint("""Low level error: {}""".format(err))
 
       if answer in testUsers:
         self.getUser(answer)
@@ -125,14 +132,14 @@ class Auth(object):
         eppn = utf8FromLatin1(env[N.eppn])
         email = utf8FromLatin1(env[N.mail])
         self.getUser(eppn, email=email)
-        if U.get(N.group, None) == unauthId:
+        if user.get(N.group, None) == unauthId:
           # the user us refused because the database says (s)he may not login
           self.clearUser()
           return
 
-        if N.group not in U:
+        if N.group not in user:
           # new users do not have yet group information
-          U.update(authUser)
+          user.update(authUser)
 
         # process the attributes provided by the identity server
         # they may have been changed after the last login
@@ -141,18 +148,18 @@ class Auth(object):
             for (envKey, toolKey) in ATTRIBUTES.items()
             if envKey in env
         }
-        U.update(attributes)
-        if N._id in U:
-          db.updateUser(U)
+        user.update(attributes)
+        if N._id in user:
+          db.updateUser(user)
         else:
-          _id = db.insertUser(U)
-          U[N._id] = _id
+          _id = db.insertUser(user)
+          user[N._id] = _id
       else:
-        U.update(unauthUser)
+        user.update(unauthUser)
 
   def identity(self, record):
     db = self.db
-    U = self.userInfo
+    user = self.user
 
     name = record.get(N.name, E)
     if not name:
@@ -163,7 +170,7 @@ class Auth(object):
           (BLANK if firstName and lastName else E) +
           lastName
       )
-    group = U.get(N.groupRep, UNAUTH)
+    group = user.get(N.groupRep, UNAUTH)
     isAuth = group != UNAUTH
     org = record.get(N.org, E)
     orgRep = f""" ({org})""" if org else E
@@ -196,20 +203,20 @@ class Auth(object):
 
   def credentials(self):
     db = self.db
-    U = self.userInfo
+    user = self.user
 
-    group = U.get(N.groupRep, UNAUTH)
+    group = user.get(N.groupRep, UNAUTH)
     groupDesc = db.permissionGroupDesc.get(group, UNKNOWN_GROUP)
 
     if group == UNAUTH:
       return (N.Guest, groupDesc)
 
-    identityRep = self.identity(U)
+    identityRep = self.identity(user)
 
     return (identityRep, groupDesc)
 
   def authenticate(self, login=False):
-    U = self.userInfo
+    user = self.user
     unauthId = self.unauthId
 
     # if login=True we want to log the user in
@@ -218,9 +225,9 @@ class Auth(object):
     if login:
       session.pop(N.eppn, None)
       self.checkLogin()
-      if U.get(N.group, unauthId) != unauthId:
+      if user.get(N.group, unauthId) != unauthId:
         # in this case there is an eppn
-        session[N.eppn] = U[N.eppn]
+        session[N.eppn] = user[N.eppn]
     else:
       eppn = session.get(N.eppn, None)
       if eppn:
@@ -233,28 +240,28 @@ class Auth(object):
     session.pop(N.eppn, None)
 
   def authenticated(self):
-    U = self.userInfo
-    return authenticated(U)
+    user = self.user
+    return authenticated(user)
 
   def coordinator(self):
-    U = self.userInfo
+    user = self.user
     return (
         self.country()
-        if coordinator(U) else
+        if coordinator(user) else
         {}
     )
 
   def superuser(self):
-    U = self.userInfo
-    return superuser(U)
+    user = self.user
+    return superuser(user)
 
   def sysadmin(self):
-    U = self.userInfo
-    return sysadmin(U)
+    user = self.user
+    return sysadmin(user)
 
   def country(self):
     db = self.db
-    U = self.userInfo
+    user = self.user
 
-    countryId = U.get(N.country, None)
+    countryId = user.get(N.country, None)
     return db.country.get(countryId, {})

@@ -1,7 +1,7 @@
 import os
 import yaml
 
-from controllers.utils import E, LOW, HYPHEN
+from controllers.utils import serverprint, E, LOW, HYPHEN
 
 CONFIG_EXT = '.yaml'
 CONFIG_DIR = 'yaml'
@@ -10,112 +10,150 @@ TABLE_DIR = 'tables'
 ALL = 'all'
 
 
-def isName(val):
-    return val.replace(LOW, E).replace(HYPHEN, E).isalnum()
+class Base(object):
+  pass
 
 
-def getNames(val, doString=True):
-  if type(val) is str:
-    return {val} if doString and isName(val) else set()
-  elif type(val) is list:
-    names = set()
-    for v in val:
-      if type(v) is str and isName(v):
-        names.add(v)
-      elif type(v) is dict:
-        names |= getNames(v, doString=False)
-    return names
-  elif type(val) is dict:
-    names = set()
-    for (k, v) in val.items():
-      if type(k) is str and isName(k):
-        names.add(k)
-      names |= getNames(v, doString=False)
-    return names
-  return set()
+class Mongo(object):
+  pass
 
 
-def setName(val):
-  return (val.replace(HYPHEN, LOW), val)
+class Perm(object):
+  pass
+
+
+class Table(object):
+  @classmethod
+  def showReferences(cls):
+    reference = cls.reference
+    serverprint('\nREFERENCE FIELD DEPENDENCIES')
+    for (dep, tables) in sorted(reference.items()):
+      serverprint(dep)
+      for (table, fields) in tables.items():
+        serverprint(f'\t{table:<20}: {", ".join(fields)}')
+
+
+class Web(object):
+  pass
 
 
 class Config(object):
   pass
 
 
-class Tables(object):
-  pass
-
-
 class Names(object):
-  pass
+  @staticmethod
+  def isName(val):
+      return val.replace(LOW, E).replace(HYPHEN, E).isalnum()
+
+  @staticmethod
+  def getNames(val, doString=True):
+    if type(val) is str:
+      return {val} if doString and Names.isName(val) else set()
+    elif type(val) is list:
+      names = set()
+      for v in val:
+        if type(v) is str and Names.isName(v):
+          names.add(v)
+        elif type(v) is dict:
+          names |= Names.getNames(v, doString=False)
+      return names
+    elif type(val) is dict:
+      names = set()
+      for (k, v) in val.items():
+        if type(k) is str and Names.isName(k):
+          names.add(k)
+        names |= Names.getNames(v, doString=False)
+      return names
+    return set()
+
+  @classmethod
+  def setName(cls, name):
+    nameRep = name.replace(HYPHEN, LOW)
+    if not hasattr(cls, nameRep):
+      setattr(cls, nameRep, name)
+
+  @classmethod
+  def addNames(cls, settings):
+    for name in cls.getNames(settings):
+      N.setName(name)
+
+  @classmethod
+  def showNames(cls):
+    serverprint('\nNAMES')
+    for (k, v) in sorted(cls.__dict__.items()):
+      serverprint(f'\t{k:<20} = {v}')
 
 
-names = set()
+N = Names
+C = Config
+
+NAMES = 'names'
+
 
 with os.scandir(CONFIG_DIR) as sd:
   files = tuple(e.name for e in sd if e.is_file() and e.name.endswith(CONFIG_EXT))
 for configFile in files:
   section = os.path.splitext(configFile)[0]
+  className = section.capitalize()
+  classObj = globals()[className]
+  setattr(Config, section, classObj)
+
   with open(f"""{CONFIG_DIR}/{section}{CONFIG_EXT}""") as fh:
     settings = yaml.load(fh)
-  setattr(Config, section, settings)
-  names |= getNames(settings)
 
-for n in names:
-  setattr(Names, *setName(n))
+  for (subsection, subsettings) in settings.items():
+    if subsection != NAMES:
+      setattr(classObj, subsection, subsettings)
 
-namesDone = names
-names = set()
+  N.addNames(settings)
 
-N = Names
-C = Config
 
-tableConfig = C.table
-SCALAR_TYPES = set(tableConfig[N.scalarTypes])
+CT = C.table
 
 with os.scandir(TABLE_DIR) as sd:
   files = tuple(e.name for e in sd if e.is_file() and e.name.endswith(CONFIG_EXT))
 
 tables = set()
-reference = {}
 
-for tableFile in files:
-  table = os.path.splitext(tableFile)[0]
-  with open(f"""{TABLE_DIR}/{table}{CONFIG_EXT}""") as fh:
-    specs = yaml.load(fh)
-    for (field, fieldSpecs) in specs.items():
-      fieldType = fieldSpecs.get(N.type, None)
-      if fieldType not in SCALAR_TYPES:
-        reference.setdefault(fieldType, set()).add((table, field))
-  setattr(Tables, table, specs)
-  tables.add(table)
-  names |= getNames(specs)
-names |= tables
-
-for n in names - namesDone:
-  setattr(Names, *setName(n))
-
-tableInfo = Config.table[N.kinds]
-mainTable = tableInfo[N.mainTable]
-userTables = set(tableInfo[N.userTables])
-valueTables = set(tableInfo[N.valueTables])
+MAIN_TABLE = CT.mainTable
+USER_TABLES = set(CT.userTables)
+VALUE_TABLES = set(CT.valueTables)
+SCALAR_TYPES = set(CT.scalarTypes)
+PROV_SPECS = CT.prov
+VALUE_SPECS = CT.value
 
 tables = (
     tables |
-    userTables |
-    valueTables
+    USER_TABLES |
+    VALUE_TABLES
 )
 sortedTables = (
-    [mainTable] +
-    sorted(userTables - {mainTable}) +
-    sorted(tables - userTables - {mainTable})
+    [MAIN_TABLE] +
+    sorted(USER_TABLES - {MAIN_TABLE}) +
+    sorted(tables - USER_TABLES - {MAIN_TABLE})
 )
 
-setattr(Tables, ALL, tables)
-setattr(Tables, N.mainTable, mainTable)
-setattr(Tables, N.userTables, userTables)
-setattr(Tables, N.valueTables, valueTables)
-setattr(Tables, N.sorted, sortedTables)
-setattr(Tables, N.items, tableInfo[N.items])
-setattr(Tables, N.reference, reference)
+reference = {}
+
+for table in tables:
+  specs = {}
+  tableFile = f"""{TABLE_DIR}/{table}{CONFIG_EXT}"""
+  if os.path.exists(tableFile):
+    with open(tableFile) as fh:
+      specs.update(yaml.load(fh))
+  else:
+    specs.update(VALUE_SPECS)
+  specs.update(PROV_SPECS)
+  for (field, fieldSpecs) in specs.items():
+    fieldType = fieldSpecs.get(N.type, None)
+    if fieldType and fieldType not in SCALAR_TYPES:
+      reference.setdefault(fieldType, {}).setdefault(table, set()).add(field)
+  setattr(Table, table, specs)
+  tables.add(table)
+
+  N.addNames(specs)
+
+setattr(Table, ALL, tables)
+setattr(Table, N.sorted, sortedTables)
+setattr(Table, N.reference, reference)

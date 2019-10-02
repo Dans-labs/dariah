@@ -1,7 +1,7 @@
 from controllers.config import Names as N
 from controllers.utils import asString, E, AMP, LT, APOS, QUOT, DOLLAR
 
-CLASS = 'CLASS'
+CLASS = 'class'
 
 
 def htmlEscape(val):

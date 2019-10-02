@@ -2,21 +2,29 @@ from itertools import chain
 from flask import request
 from bson.objectid import ObjectId
 
-from controllers.config import Config as C, Names as N, Tables as T
+from controllers.config import Config as C, Names as N
 from controllers.perm import permRecord, getPerms, UNAUTH
 from controllers.field import Field, getTitle
 from controllers.html import HtmlElements as H
-from controllers.utils import dbjson, E, ELLIPS
+from controllers.utils import (
+    getStrAsFloat, getStrAsInt, getStrAsDatetime, dbjson, E, ELLIPS
+)
 
-tableConfig = C.table
-SCALAR_TYPES = set(tableConfig[N.scalarTypes])
-NUMERIC_TYPES = set(tableConfig[N.numericTypes])
-DEFAULT_TYPE = tableConfig[N.defaultType]
-VALUE_SPECS = tableConfig[N.value]
-PROV_SPECS = tableConfig[N.prov]
-PROV = C.html[N.provLabel]
+CT = C.table
+CW = C.web
 
-FORBIDDEN = C.html[N.messages][N.forbidden]
+
+MAIN_TABLE = CT.mainTable
+USER_TABLES = set(CT.userTables)
+VALUE_TABLES = set(CT.valueTables)
+SCALAR_TYPES = set(CT.scalarTypes)
+ITEMS = CT.items
+NUMERIC_TYPES = set(CT.numericTypes)
+DEFAULT_TYPE = CT.defaultType
+PROV_SPECS = CT.prov
+
+PROV = CW.provLabel
+FORBIDDEN = CW.messages[N.forbidden]
 
 
 def forceOpen(theEid, openEid):
@@ -32,20 +40,17 @@ class Table(object):
     self.db = db
     self.auth = auth
     self.table = table
-    self.isMainTable = table == T.mainTable
-    self.isUserTable = table in T.userTables
-    self.isValueTable = table in T.valueTables
-    self.itemLabels = T.items.get(table, [table, f'{table}s'])
+    self.isMainTable = table == MAIN_TABLE
+    self.isUserTable = table in USER_TABLES
+    self.isValueTable = table in VALUE_TABLES
+    self.itemLabels = ITEMS.get(table, [table, f'{table}s'])
     self.prov = PROV_SPECS
-    self.fields = getattr(
-        T, table,
-        VALUE_SPECS if self.isValueTable else {}
-    )
-    U = auth.userInfo
-    self.uid = U.get(N._id, None)
-    self.eppn = U.get(N.eppn, None)
-    self.group = U.get(N.groupRep, UNAUTH)
-    self.countryId = U.get(N.country, None)
+    self.fields = getattr(CT, table, {})
+    user = auth.user
+    self.uid = user.get(N._id, None)
+    self.eppn = user.get(N.eppn, None)
+    self.group = user.get(N.groupRep, UNAUTH)
+    self.countryId = user.get(N.country, None)
     self.country = db.country.get(self.countryId, {})
     self.multiple = {N.editors}
 
@@ -73,8 +78,8 @@ class Table(object):
     if not isSuperuser:
       if isUserTable:
         self.studyRecord()
-        P = self.perm
-        if not P[N.isEdit]:
+        perm = self.perm
+        if not perm[N.isEdit]:
           return False
       else:
         return False
@@ -174,11 +179,17 @@ class Table(object):
     if nDeps:
       plural = '' if nDeps == 1 else 's'
       return H.span(
-          H.icon(
-              N.puzzle_piece,
-              cls="label medium warning-o delete",
-              title=f"""Cannot delete because of {nDeps} dependent record{plural}"""
-          )
+          [
+              H.icon(
+                  N.puzzle_piece,
+                  cls="label medium warning-o delete",
+                  title=f"""Cannot delete because of {nDeps} dependent record{plural}"""
+              ),
+              H.span(
+                  f"""{nDeps} dependent record{plural}""",
+                  cls="label small warning-o delete",
+              ),
+          ]
       )
 
     record = self.record
@@ -287,23 +298,67 @@ class Table(object):
     record = self.record
 
     self.perm = permRecord(
-        self.auth.userInfo,
+        self.auth.user,
         record,
         country=record.get(N.country, None),
     )
 
   def permissions(self, field):
     fieldSpecs = self.fields
-    provSpecs = self.prov
 
-    fieldSpec = fieldSpecs.get(field, provSpecs.get(field, {}))
+    fieldSpec = fieldSpecs.get(field, {})
     require = fieldSpec.get(N.perm, {})
 
-    U = self.auth.userInfo
-    P = self.perm
+    user = self.auth.user
+    perm = self.perm
     record = self.record
 
-    return getPerms(U, P, record, require)
+    return getPerms(user, perm, record, require)
+
+  def fieldSave(self, eid, field, data):
+    db = self.db
+    table = self.table
+
+    (mayRead, mayEdit) = self.permissions(field)
+    if mayEdit:
+      record = self.record
+      fieldSpecs = self.fields
+
+      fieldSpec = fieldSpecs.get(field, {})
+      tp = fieldSpec.get(N.type, DEFAULT_TYPE)
+      multiple = fieldSpec.get(N.multiple, False)
+      conversion = (
+          (getStrAsFloat if tp == N.decimal else getStrAsInt)
+          if tp in NUMERIC_TYPES else
+          ObjectId
+          if tp not in SCALAR_TYPES else
+          getStrAsDatetime
+          if tp == N.datetime else
+          None
+      )
+      if conversion is not None:
+        if multiple:
+          data = [
+              conversion(d)
+              for d in data or []
+          ]
+        else:
+          data = conversion(data)
+
+      actor = self.eppn
+      modified = record.get(N.modified, None)
+      (updates, deletions) = db.updateField(
+          table,
+          eid,
+          field,
+          data,
+          actor,
+          modified,
+      )
+      record.update(updates)
+      for f in deletions:
+        if f in record:
+          del record[f]
 
   def fieldAction(self, eid, field, action):
     db = self.db
@@ -312,46 +367,9 @@ class Table(object):
     record = db.getItem(table, eid)
     self.record = record
     self.studyRecord()
-    if action == N.save:
-      (mayRead, mayEdit) = self.permissions(field)
-      if mayEdit:
-        fieldSpecs = self.fields
-        provSpecs = self.prov
-
-        fieldSpec = fieldSpecs.get(field, provSpecs.get(field, {}))
-        tp = fieldSpec.get(N.type, DEFAULT_TYPE)
-        multiple = fieldSpec.get(N.multiple, False)
-        data = request.get_json()
-        conversion = (
-            (float if tp == N.decimal else int)
-            if tp in NUMERIC_TYPES else
-            ObjectId
-            if tp not in SCALAR_TYPES else
-            None
-        )
-        if conversion is not None:
-          if multiple:
-            data = [
-                conversion(d)
-                for d in data
-            ]
-          else:
-            data = conversion(data)
-
-        actor = self.eppn
-        modified = record.get(N.modified, None)
-        (updates, deletions) = db.updateField(
-            table,
-            eid,
-            field,
-            data,
-            actor,
-            modified,
-        )
-        record.update(updates)
-        for f in deletions:
-          if f in record:
-            del record[f]
+    data = request.get_json()
+    if data is not None and N.save in data:
+      self.fieldSave(eid, field, data[N.save])
     return self.wrapField(field, action=action)
 
   def wrapField(self, field, action=None):
@@ -364,9 +382,8 @@ class Table(object):
     table = self.table
     record = self.record
     fieldSpecs = self.fields
-    provSpecs = self.prov
 
-    fieldSpec = fieldSpecs.get(field, provSpecs.get(field, {}))
+    fieldSpec = fieldSpecs.get(field, {})
 
     eid = str(self.record[N._id])
     label = fieldSpec.get(N.label, field.capitalize())
@@ -382,6 +399,7 @@ class Table(object):
 
   def wrap(self, record):
     table = self.table
+    provSpecs = self.prov
 
     self.record = record
     self.studyRecord()
@@ -397,7 +415,7 @@ class Table(object):
             [H.details(
                 PROV,
                 H.div(
-                    [self.wrapField(field) for field in self.prov]
+                    [self.wrapField(field) for field in provSpecs]
                 ),
                 itemkey=f"""{table}/{record[N._id]}/{N.prov}""",
             )],

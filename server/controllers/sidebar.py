@@ -1,9 +1,15 @@
-from controllers.config import Config as C, Names as N, Tables as T
+from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
 from controllers.utils import E
 from controllers.table import Table
 
-HOME = C.html[N.urls][N.home]
+CT = C.table
+CW = C.web
+
+
+SORTED_TABLES = CT.sorted
+
+HOME = CW.urls[N.home]
 
 
 class Sidebar(object):
@@ -83,7 +89,7 @@ class Sidebar(object):
         self.makeEntry(HOME[N.text], HOME[N.url])
     )
 
-    for table in T.sorted:
+    for table in SORTED_TABLES:
       self.tableEntry(table)
 
     return E.join(self.entries)

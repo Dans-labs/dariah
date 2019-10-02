@@ -1,25 +1,32 @@
 from itertools import chain
 from bson.objectid import ObjectId
 
-from controllers.config import Config as C, Names as N, Tables as T
-from controllers.utils import now, filterModified, E, ON
+from controllers.config import Config as C, Names as N
+from controllers.utils import serverprint, now, filterModified, E, ON
 
-CREATOR = C.base[N.creator]
+CB = C.base
+CM = C.mongo
+CT = C.table
 
-M_SET = C.mongo[N.set]
-M_UNSET = C.mongo[N.unset]
-M_LTE = C.mongo[N.lte]
-M_GTE = C.mongo[N.gte]
-M_OR = C.mongo[N.OR]
+
+CREATOR = CB.creator
+
+M_SET = CM.set
+M_UNSET = CM.unset
+M_LTE = CM.lte
+M_GTE = CM.gte
+M_OR = CM.OR
+
+ACTIVE_TABLES = set(CT.activeTables)
+VALUE_TABLES = set(CT.valueTables)
+REFERENCE_SPECS = CT.reference
 
 
 class Db(object):
   def __init__(self, mongo):
     self.mongo = mongo
 
-    print('BEGIN COLLECTING ...')
     self.collect()
-    print('END   COLLECTING ...')
 
     self.creatorId = [
         record[N._id]
@@ -27,41 +34,52 @@ class Db(object):
         if record.get(N.eppn, None) == CREATOR
     ][0]
 
-  def collect(self):
+  def collect(self, table=None):
+    if table is not None and table not in VALUE_TABLES:
+      return
+
     mongo = self.mongo
 
-    for table in T.valueTables:
+    for valueTable in (
+        {table} if table else VALUE_TABLES
+    ):
       setattr(
           self,
-          table,
+          valueTable,
           {
               record[N._id]: record
-              for record in mongo[table].find()
+              for record in mongo[valueTable].find()
           },
       )
-    for table in {
-        N.permissionGroup
-    }:
-      setattr(
-          self,
-          f"""{table}Inv""",
-          {
-              record[N.rep]: record[N._id]
-              for record in mongo[table].find()
-          },
-      )
-      setattr(
-          self,
-          f"""{table}Desc""",
-          {
-              record[N.rep]: record[N.description]
-              for record in mongo[table].find()
-          },
-      )
+      if valueTable == N.permissionGroup:
+        setattr(
+            self,
+            f"""{valueTable}Inv""",
+            {
+                record[N.rep]: record[N._id]
+                for record in mongo[valueTable].find()
+            },
+        )
+        setattr(
+            self,
+            f"""{valueTable}Desc""",
+            {
+                record[N.rep]: record[N.description]
+                for record in mongo[valueTable].find()
+            },
+        )
+      serverprint(f'COLLECTED {valueTable}')
 
-    self.collectActiveItems()
+    self.collectActiveItems(table=None)
 
-  def collectActiveItems(self):
+  def collectActiveItems(self, table=None):
+    if (
+        table is not None
+        and
+        table not in ACTIVE_TABLES
+    ):
+      return
+
     mongo = self.mongo
 
     justNow = now()
@@ -100,12 +118,7 @@ class Db(object):
       for tp in record.get(N.typeContribution, []):
         self.typeCriteria.setdefault(tp, set()).add(_id)
 
-  def recollect(self, table):
-    collectNeeded = table in T.valueTables
-    if collectNeeded:
-      print('BEGIN RECOLLECTING ...')
-      self.collect()
-      print('END   RECOLLECTING ...')
+    serverprint(f'UPDATED {", ".join(ACTIVE_TABLES)}')
 
   def getList(self, table, titleSort, my=None, our=None):
     mongo = self.mongo
@@ -161,7 +174,7 @@ class Db(object):
         N.creator: uid,
         N.modified: ['{} on {}'.format(eppn, justNow)],
     })
-    self.recollect(table)
+    self.collect(table)
     return result.inserted_id
 
   def insertUser(self, record):
@@ -178,14 +191,14 @@ class Db(object):
         N.modified: ['{} on {}'.format(CREATOR, justNow)],
     })
     result = mongo.user.insert_one(record)
-    self.recollect(N.user)
+    self.collect(N.user)
     return result.inserted_id
 
   def delItem(self, table, eid):
     mongo = self.mongo
 
     mongo[table].delete_one({N._id: ObjectId(eid)})
-    self.recollect(table)
+    self.collect(table)
 
   def updateField(
       self,
@@ -215,8 +228,7 @@ class Db(object):
             M_UNSET: delete,
         },
     )
-    print(f'before recollect {table}')
-    self.recollect(table)
+    self.collect(table)
     return (
         update,
         set(delete.keys()),
@@ -242,7 +254,7 @@ class Db(object):
             }
         },
     )
-    self.recollect(N.user)
+    self.collect(N.user)
 
   def dependencies(self, table, record):
     mongo = self.mongo
@@ -251,9 +263,25 @@ class Db(object):
     if eid is None:
       return True
 
-    referenceSpecs = T.reference.get(table, set())
+    referenceSpecs = REFERENCE_SPECS.get(table, set())
     nDependent = 0
-    for (referringTable, referringField) in referenceSpecs:
-       nDependent += mongo[referringTable].count({referringField: eid})
+    for (referringTable, referringFields) in referenceSpecs.items():
+      if not len(referringFields):
+        continue
+      fields = list(referringFields)
+      crit = (
+          {
+              fields[0]: eid,
+          }
+          if len(fields) == 1 else
+          {
+              M_OR: [
+                  {field: eid}
+                  for field in fields
+              ],
+          }
+      )
+
+      nDependent += mongo[referringTable].count(crit)
 
     return nDependent

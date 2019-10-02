@@ -4,19 +4,25 @@ from markdown import markdown
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H, htmlEscape as he
 from controllers.utils import (
-    dtm, bencode,
+    bencode,
+    getNumberAsStr, getDatetimeAsStr,
     E, BLANK, WHYPHEN, AT, EURO
 )
 
+CT = C.table
+CW = C.web
 
-tableConfig = C.table
 
-SCALAR_TYPES = set(tableConfig[N.scalarTypes])
-SPECIAL_TYPES = set(tableConfig[N.specialTypes])
-NUMERIC_TYPES = set(tableConfig[N.numericTypes])
-TEXT_TYPES = set(tableConfig[N.textTypes])
-BOOLEAN_TYPES = tableConfig[N.boolTypes]
-WIDGET_TYPES = tableConfig[N.widgetTypes]
+SCALAR_TYPES = set(CT.scalarTypes)
+SPECIAL_TYPES = set(CT.specialTypes)
+NUMERIC_TYPES = set(CT.numericTypes)
+TEXT_TYPES = set(CT.textTypes)
+BOOLEAN_TYPES = CT.boolTypes
+WIDGET_TYPES = CT.widgetTypes
+
+REFRESH = CW.messages[N.refresh]
+QQ = CW.unknown[N.generic]
+ZERO = CW.unknown[N.number]
 
 WIDGET_FROM_TYPE = {
     tp: w
@@ -27,11 +33,6 @@ WIDGET_FROM_TYPE = {
 }
 
 WIDGET_RELATED = N.related
-
-
-REFRESH = C.html[N.messages][N.refresh]
-QQ = C.html[N.unknown][N.generic]
-ZERO = C.html[N.unknown][N.number]
 
 
 def labelDiv(label):
@@ -202,13 +203,16 @@ class Field(object):
     button = H.icon(
         N.eye,
         cls="button small field",
-        action=N.save,
+        action=N.view,
         **self.atts,
     )
     rep = self.getValueEd()
     origFmt = self.formatOrig
     origStr = (
-        [origFmt(val) for val in value]
+        [
+            origFmt(val)
+            for val in value or []
+        ]
         if multiple else
         origFmt(value)
     )
@@ -284,7 +288,11 @@ class Field(object):
 
   def display_email(self, v):
     val = he(v or QQ)
-    return H.a(val, f"""{N.mailto}:{val}""") if AT in val else val
+    return (
+        H.a(val, f"""{N.mailto}:{val}""")
+        if AT in val else
+        H.span(val, cls="error")
+    )
 
   def display_url(self, v):
     raw = v or E
@@ -297,7 +305,11 @@ class Field(object):
     )
     if isWww:
       raw = f"""{N.https}://{raw}"""
-    return H.a(val, raw) if isLink else val
+    return (
+        H.a(val, raw)
+        if isLink else
+        H.span(val, cls="error")
+    )
 
   def display_int(self, v):
     return H.span(he(v or ZERO))
@@ -323,7 +335,7 @@ class Field(object):
     )
 
   def display_datetime(self, v):
-    return H.span(he(f"""{dtm(v.isoformat())[1]}""") if v else QQ)
+    return H.span(he(v or QQ))
 
   def displayRelated(self, v):
     tp = self.tp
@@ -343,24 +355,28 @@ class Field(object):
     tp = self.tp
     atts = {}
     passV = v
+    wtp = tp
     if tp in NUMERIC_TYPES:
+      wtp = 'number'
       atts = dict(step=1)
       passV = (
           v
           if type(v) is str else
           str(v)
           if tp == N.decimal else
-          str(int(round(v)))
+          getNumberAsStr(v)
       ) or 0
     elif tp in TEXT_TYPES:
       if tp == N.url:
         atts = dict(pattern=f"""{N.http}s?://.+\\..+""")
       passV = v or E
+    elif tp == N.datetime:
+      passV = getDatetimeAsStr(v)
 
     return H.input(
         passV,
         **atts,
-        type=tp,
+        type=wtp,
         wvalue=N.text,
     )
 

@@ -9,32 +9,49 @@ from flask import (
 
 from pymongo import MongoClient
 
-from controllers.config import Config as C, Tables as T, Names as N
+from controllers.config import Config as C, Names as N
 from controllers.db import Db
 from controllers.auth import Auth
 from controllers.sidebar import Sidebar
 from controllers.user import User
 from controllers.table import Table
 
-STATIC_ROOT = os.path.abspath(C.html[N.staticRoot])
+CT = C.table
+CW = C.web
 
-START = C.html[N.urls][N.home][N.url]
-INDEX = C.html[N.indexPage]
-LANDING = C.html[N.landing]
-DUMMY = C.html[N.urls][N.dummy][N.url]
-SHIB_LOGOUT = C.html[N.urls][N.shibLogout][N.url]
 
-NO_PAGE = C.html[N.messages][N.noPage]
-NO_TABLE = C.html[N.messages][N.noTable]
+STATIC_ROOT = os.path.abspath(CW.staticRoot)
+
+ALL_TABLES = CT.all
+USER_TABLES = set(CT.userTables)
+
+URLS = CW.urls
+MESSAGES = CW.messages
+
+INDEX = CW.indexPage
+LANDING = CW.landing
+
+START = URLS[N.home][N.url]
+DUMMY = URLS[N.dummy][N.url]
+SHIB_LOGOUT = URLS[N.shibLogout][N.url]
+NO_PAGE = MESSAGES[N.noPage]
+NO_TABLE = MESSAGES[N.noTable]
 
 
 mongo = MongoClient().dariah
 db = Db(mongo)
 
+DEBUG = False
+
+# N.showNames()
+
 
 def factory():
   app = Flask(__name__, static_url_path=DUMMY)
   auth = Auth(app, db)
+  if DEBUG and auth.isDevel:
+    CT.showReferences()
+    N.showNames()
 
   @app.route(
       f"""/{N.static}/<path:filepath>"""
@@ -84,7 +101,7 @@ def factory():
     auth.authenticate()
     userLine = User(db, auth).wrap()
     sidebar = Sidebar(db, auth, path).wrap()
-    if table in T.all:
+    if table in ALL_TABLES:
       tableList = Table(db, auth, table).list(eid)
       return render_template(
           INDEX,
@@ -101,9 +118,9 @@ def factory():
     path = f"""/{table}/{N.insert}"""
 
     auth.authenticate()
-    if table in T.all:
+    if table in ALL_TABLES:
       eid = Table(db, auth, table).insert()
-      newUrlPart = N.mylist if table in T.userTables else N.list
+      newUrlPart = N.mylist if table in USER_TABLES else N.list
       newPath = (
           f"""/{table}/{newUrlPart}/new/{eid}"""
           if eid else
@@ -119,9 +136,9 @@ def factory():
     path = f"""{table}/{N.delete}/{eid}"""
 
     auth.authenticate()
-    if table in T.all:
+    if table in ALL_TABLES:
       Table(db, auth, table).delete(eid)
-      newUrlPart = N.mylist if table in T.userTables else N.list
+      newUrlPart = N.mylist if table in USER_TABLES else N.list
       newPath = (
           f"""/{table}/{newUrlPart}"""
       )
@@ -148,7 +165,7 @@ def factory():
     auth.authenticate()
     userLine = User(db, auth).wrap()
     sidebar = Sidebar(db, auth, path).wrap()
-    if table in T.all:
+    if table in ALL_TABLES:
       tableList = Table(db, auth, table).mylist(eid)
       return render_template(
           INDEX,
@@ -167,7 +184,7 @@ def factory():
     auth.authenticate()
     userLine = User(db, auth).wrap()
     sidebar = Sidebar(db, auth, path).wrap()
-    if table in T.all:
+    if table in ALL_TABLES:
       tableList = Table(db, auth, table).ourlist()
       return render_template(
           INDEX,
@@ -178,30 +195,22 @@ def factory():
     return notFound(path)
 
   @app.route(
-      f"""/<string:table>/{N.item}/<string:eid>/{N.save}/<string:field>""",
+      f"""/<string:table>/{N.item}/<string:eid>/{N.edit}/<string:field>""",
       methods=[N.GET, N.POST],
-  )
-  def serveTableFieldSave(table, eid, field):
-    auth.authenticate()
-    if table in T.all:
-      return Table(db, auth, table).fieldAction(eid, field, N.save)
-    return noTable(table)
-
-  @app.route(
-      f"""/<string:table>/{N.item}/<string:eid>/{N.edit}/<string:field>"""
   )
   def serveTableFieldEdit(table, eid, field):
     auth.authenticate()
-    if table in T.all:
+    if table in ALL_TABLES:
       return Table(db, auth, table).fieldAction(eid, field, N.edit)
     return noTable(table)
 
   @app.route(
-      f"""/<string:table>/{N.item}/<string:eid>/{N.view}/<string:field>"""
+      f"""/<string:table>/{N.item}/<string:eid>/{N.view}/<string:field>""",
+      methods=[N.GET, N.POST],
   )
   def serveTableFieldView(table, eid, field):
     auth.authenticate()
-    if table in T.all:
+    if table in ALL_TABLES:
       return Table(db, auth, table).fieldAction(eid, field, N.view)
     return noTable(table)
 
@@ -210,7 +219,7 @@ def factory():
   )
   def serveTableItem(table, eid):
     auth.authenticate()
-    if table in T.all:
+    if table in ALL_TABLES:
       return Table(db, auth, table).item(eid)
     return noTable(table)
 

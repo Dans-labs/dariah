@@ -21,6 +21,7 @@ Z = 'Z'
 AT = '@'
 EURO = '€'
 MINONE = '-1'
+ZERO = '0'
 ONE = '1'
 TWO = '2'
 THREE = '3'
@@ -41,6 +42,8 @@ ON = ' on '
 
 LATIN1 = 'latin1'
 UTF8 = 'utf8'
+
+EMPTY_DATE = '1900-01-01T00:00:00Z'
 
 ITER = '__iter__'
 
@@ -75,12 +78,57 @@ def bdecode(s):
   )
 
 
+def getNumberAsStr(v):
+  if v is None:
+    return ZERO
+  try:
+    rep = int(round(v))
+  except Exception:
+    rep = v
+  return str(rep)
+
+
+def getDatetimeAsStr(v):
+  if v is None:
+    return EMPTY_DATE
+  if type(v) is str:
+    return v
+  return v.isoformat()
+
+
+def getStrAsInt(v):
+  if v is None:
+    return 0
+  try:
+    rep = int(v)
+  except Exception:
+    rep = str(v)
+  return rep
+
+
+def getStrAsFloat(v):
+  if v is None:
+    return float(0)
+  try:
+    rep = float(v)
+  except Exception:
+    rep = str(v)
+  return rep
+
+
+def getStrAsDatetime(v):
+  (error, rep) = dtm(v or EMPTY_DATE)
+  if error:
+    rep = dtm(EMPTY_DATE)[1]
+  return rep
+
+
 def now():
   return dt.utcnow()
 
 
 def serverprint(msg):
-  sys.stdout.write(msg)
+  sys.stdout.write(f'{msg}\n')
   sys.stdout.flush()
 
 

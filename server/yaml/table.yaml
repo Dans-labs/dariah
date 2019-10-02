@@ -1,35 +1,42 @@
-kinds:
-  mainTable: contrib
-  items:
-    contrib: [contribution, contributions]
-    country: [country, countries]
-    criteria: [criterion, criteria]
-    score: [score point, score points]
-    tadirahActivity: [TADIRAH Activity, TADIRAH Activities]
-    tadirahObject: [TADIRAH Object, TADIRAH Objects]
-    tadirahTechnique: [TADIRAH Technique, TADIRAH Techniques]
-  userTables:
-    - contrib
-    - assessment
-    - review
-    - criteriaEntry
-    - reviewEntry
-  valueTables:
-    - country
-    - criteria
-    - decision
-    - discipline
-    - keyword
-    - package
-    - permissionGroup
-    - score
-    - tadirahActivity
-    - tadirahObject
-    - tadirahTechnique
-    - typeContribution
-    - user
-    - vcc
-    - year
+mainTable: contrib
+
+userTables:
+  - contrib
+  - assessment
+  - review
+  - criteriaEntry
+  - reviewEntry
+
+valueTables:
+  - country
+  - criteria
+  - decision
+  - discipline
+  - keyword
+  - package
+  - permissionGroup
+  - score
+  - tadirahActivity
+  - tadirahObject
+  - tadirahTechnique
+  - typeContribution
+  - user
+  - vcc
+  - year
+
+activeTables:
+  - criteria
+  - package
+  - typeContribution
+
+items:
+  contrib: [contribution, contributions]
+  country: [country, countries]
+  criteria: [criterion, criteria]
+  score: [score point, score points]
+  tadirahActivity: [TADIRAH Activity, TADIRAH Activities]
+  tadirahObject: [TADIRAH Object, TADIRAH Objects]
+  tadirahTechnique: [TADIRAH Technique, TADIRAH Techniques]
 
 defaultType: text
 
@@ -44,28 +51,33 @@ scalarTypes:
   - bool2
   - bool3
   - markdown
+
 specialTypes:
   - user
   - country
   - typeContribution
   - criteria
   - score
+
 numericTypes:
   - int
   - decimal
   - money
+
 textTypes:
   - text
   - email
   - url
+
 boolTypes:
   bool2:
     true: check
     false: times
   bool3:
     true: check
-    false: times
     null: minus
+    false: times
+
 widgetTypes:
   text:
     - text

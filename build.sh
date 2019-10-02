@@ -18,7 +18,7 @@ elif [[ "$1" == "serve" ]]; then
 elif [[ "$1" == "serveprod" ]]; then
 	cd server
     export REGIME=devel FLASK_APP=index:factory FLASK_RUN_PORT=8001; python3 -m flask run
-elif [[ "$1" == "cloc" ]]; then
+elif [[ "$1" == "stats" ]]; then
     codestats
 else
     if [[ "$1" != "help" && "$1" != "--help" && "$1" != "" ]]; then
@@ -30,5 +30,5 @@ else
     echo "mongo       : development - start mongo db daemon"
     echo "serve       : development - start webserver"
     echo "serveprod   : development - start webserver, but not in development mode"
-    echo "cloc        : development - start webserver"
+    echo "stats       : reporting - collect codebase statistics"
 fi

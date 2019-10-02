@@ -3,8 +3,10 @@ from itertools import chain
 from controllers.utils import asIterable
 from controllers.config import Config as C, Names as N
 
+CP = C.perm
 
-DEFAULT_PERM = C.perm[N.default]
+
+DEFAULT_PERM = CP.default
 NOBODY = N.nobody
 UNAUTH = N.public
 AUTH = N.auth
@@ -18,7 +20,7 @@ ROOT = N.root
 
 
 def checkPerm(
-    U,
+    user,
     record,
     require,
     country=None,
@@ -28,7 +30,7 @@ def checkPerm(
     return True
 
   if perm is None:
-    perm = permRecord(U, record, country=country)
+    perm = permRecord(user, record, country=country)
 
   group = perm[N.group]
 
@@ -61,29 +63,29 @@ def checkPerm(
     )
 
 
-def authenticated(U):
-  group = U.get(N.groupRep, UNAUTH)
+def authenticated(user):
+  group = user.get(N.groupRep, UNAUTH)
   return group != UNAUTH
 
 
-def coordinator(U):
-  group = U.get(N.groupRep, UNAUTH)
+def coordinator(user):
+  group = user.get(N.groupRep, UNAUTH)
   return group == COORD
 
   return group in {OFFICE, SYSTEM, ROOT}
 
 
-def superuser(U):
-  group = U.get(N.groupRep, UNAUTH)
+def superuser(user):
+  group = user.get(N.groupRep, UNAUTH)
   return group in {OFFICE, SYSTEM, ROOT}
 
 
-def sysadmin(U):
-  group = U.get(N.groupRep, UNAUTH)
+def sysadmin(user):
+  group = user.get(N.groupRep, UNAUTH)
   return group in {SYSTEM, ROOT}
 
 
-def getPerms(U, P, record, require):
+def getPerms(user, perm, record, require):
   readRequire = (
       DEFAULT_PERM[N.read]
       if require is None or N.read not in require else
@@ -95,15 +97,15 @@ def getPerms(U, P, record, require):
       require[N.edit]
   )
   return (
-      checkPerm(U, record, readRequire, perm=P),
-      checkPerm(U, record, editRequire, perm=P),
+      checkPerm(user, record, readRequire, perm=perm),
+      checkPerm(user, record, editRequire, perm=perm),
   )
 
 
-def permRecord(U, record, country=None, ourFields=[]):
-  uid = U.get(N._id, None)
-  group = U.get(N.groupRep, UNAUTH)
-  uCountry = U.get(N.country, None)
+def permRecord(user, record, country=None, ourFields=[]):
+  uid = user.get(N._id, None)
+  group = user.get(N.groupRep, UNAUTH)
+  uCountry = user.get(N.country, None)
   refCountry = country or record.get(country, None)
   ourValues = set(chain.from_iterable(
       asIterable(record.get(field, []))

@@ -1,7 +1,7 @@
 /*eslint-env jquery*/
 
 const SAVE = true
-const DEBUG = true
+const DEBUG = false
 const BLUR = true
 
 const widgets = {
@@ -26,7 +26,7 @@ const widgets = {
           options.removeClass('active')
           const me = $(e.target)
           me.addClass('active')
-          save(table, eid, field, valueEl, parent)
+          edit(table, eid, field, valueEl, parent)
         })
       })
     },
@@ -48,7 +48,7 @@ const widgets = {
           options.removeClass('active')
           const me = $(e.target)
           me.addClass('active')
-          save(table, eid, field, valueEl, parent)
+          edit(table, eid, field, valueEl, parent)
         })
       })
     },
@@ -61,7 +61,7 @@ const widgets = {
 }
 
 const fetch = (url, destElem, data) => {
-  if (data == null) {
+  if (data === undefined) {
     $.ajax({
       type: 'GET',
       url,
@@ -81,7 +81,7 @@ const fetch = (url, destElem, data) => {
       url,
       data,
       processData: false,
-      contentType: false,
+      contentType: true,
       success: html => {
         destElem.html(html)
         activateActions(destElem)
@@ -142,19 +142,27 @@ const Console = console
 const makeFieldUrl = (table, eid, field, action) =>
   `/${table}/item/${eid}/${action}/${field}`
 
+const collectEvents = {}
+
 const view = (table, eid, field, valueEl, parent) => {
+  const saveValue = save(table, eid, field, valueEl, parent)
   const url = makeFieldUrl(table, eid, field, 'view')
-  Console.log(`Viewing: ${url}`)
-  fetch(url, parent)
+  fetch(url, parent, saveValue)
 }
 
 const edit = (table, eid, field, valueEl, parent) => {
+  const saveValue = save(table, eid, field, valueEl, parent)
   const url = makeFieldUrl(table, eid, field, 'edit')
-  fetch(url, parent)
+  fetch(url, parent, saveValue)
 }
 
-const save = (table, eid, field, valueEl, parent) => {
-  const origValue = atob(valueEl.attr('orig'))
+const save = (table, eid, field, valueEl) => {
+  let saveValue
+  const origAttValue = valueEl.attr('orig')
+  if (origAttValue === undefined) {
+    return saveValue
+  }
+  const origValue = atob(origAttValue)
   const multiple = valueEl.attr('multiple')
   const valueCarrier = valueEl.find('[wvalue]')
   const wType = valueEl.attr('wtype')
@@ -182,25 +190,20 @@ const save = (table, eid, field, valueEl, parent) => {
       if (DEBUG) {
         Console.log(`Dirty value in widget ${wType}: save to database`)
       }
-      const url = makeFieldUrl(table, eid, field, 'save')
-      fetch(url, parent, newValue)
+      saveValue = JSON.stringify({ save: givenValue })
     }
     else {
       if (DEBUG) {
-        Console.log('Dirty value: suppress saving to database')
         Console.log(`Dirty value in widget ${wType}: suppress saving`)
       }
-      const url = makeFieldUrl(table, eid, field, 'view')
-      fetch(url, parent)
     }
   }
   else {
     if (DEBUG) {
       Console.log(`Clean value in widget ${wType}: no save action`)
     }
-    const url = makeFieldUrl(table, eid, field, 'view')
-    fetch(url, parent)
   }
+  return saveValue
 }
 
 const activateActions = destElem => {
@@ -214,32 +217,47 @@ const activateActions = destElem => {
     const parent = $(elem.closest('div'))
     const valueEl = parent.find('[orig]')
     const focusEl = parent.find('input,textarea')
-    const focusElFirst = focusEl.get(0)
+    const focusElFirst = $(focusEl.get(0))
     if (focusElFirst) {
       focusElFirst.focus()
+      focusElFirst.val(focusElFirst.val())
     }
-    let saveOrEdit
-    if (action == 'save') {
-      parent.addClass('edit')
-      saveOrEdit = save
-    }
-    else if (action == 'edit') {
+
+    if (action == 'edit') {
       parent.removeClass('edit')
-      saveOrEdit = edit
     }
     else if (action == 'view') {
-      parent.removeClass('edit')
-      saveOrEdit = view
+      parent.addClass('edit')
     }
+    const actionFunc = (action == 'edit') ? edit : view
+
+    focusEl.off('mousedown').mousedown(() => {
+      const eventKey = `${table}:${eid}.${field}`
+      collectEvents[eventKey] = true
+    })
+    el.off('mousedown').mousedown(() => {
+      const eventKey = `${table}:${eid}.${field}`
+      collectEvents[eventKey] = true
+    })
     el.off('click').click(() => {
-      saveOrEdit(table, eid, field, valueEl, parent)
+      const eventKey = `${table}:${eid}.${field}`
+      actionFunc(table, eid, field, valueEl, parent)
+      collectEvents[eventKey] = false
     })
     if (BLUR) {
       focusEl.off('blur').blur(() => {
-        saveOrEdit(table, eid, field, valueEl, parent)
+        const eventKey = `${table}:${eid}.${field}`
+        if (collectEvents[eventKey]) {
+          collectEvents[eventKey] = false
+        }
+        else {
+          edit(table, eid, field, valueEl, parent)
+        }
       })
     }
-    for (const widget of Object.values(widgets)) {
+    const wType = valueEl.attr('wtype')
+    const { [wType]: widget } = widgets
+    if (widget) {
       const widgetTargets = valueEl.find('[wvalue]')
       widget.activate(table, eid, field, parent, valueEl, widgetTargets)
     }
