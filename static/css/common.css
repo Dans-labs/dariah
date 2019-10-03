@@ -251,11 +251,7 @@ input {
 	border: 0;
 	padding: 0.2rem;
 }
-input[type='text'],
-input[type='number'],
-input[type='datetime'],
-input[type='url'],
-input[type='email'],
+input,
 textarea
 {
 	color: var(--edit-text-fore);
@@ -265,11 +261,7 @@ textarea
 	font-size: large;
 	font-family: monospace;
 }
-input[type='text'],
-input[type='number'],
-input[type='datetime'],
-input[type='url'],
-input[type='email']
+input
 {
 	width: calc(100% - 1rem);
 	margin: 0.3rem 0.3rem;
@@ -280,11 +272,7 @@ textarea
 	height: 10rem;
 	margin: 0.3rem 0.3rem;
 }
-input[type='text']:focus,
-input[type='number']:focus,
-input[type='datetime']:focus,
-input[type='url']:focus,
-input[type='email']:focus,
+input:focus,
 textarea:focus
 {
 	color: var(--edit-focus-text);
@@ -292,20 +280,24 @@ textarea:focus
 	outline: 4px inset var(--edit-focus-border);
 	border: 0;
 }
-input[type='text']:valid,
-input[type='number']:valid,
-input[type='datetime']:valid,
-input[type='url']:valid,
-input[type='email']:valid
+input:valid+span:after {
+  position: absolute;
+  content: '✓';
+  padding-left: 1rem;
+  color: var(--good-fore-o);
+}
+input:valid
 {
   color: var(--good-fore-o);
   background-color: var(--good-back);
 }
-input[type='text']:invalid,
-input[type='number']:invalid,
-input[type='datetime']:invalid,
-input[type='url']:invalid,
-input[type='email']:invalid
+input:invalid+span:after {
+  position: absolute;
+  content: attr(valmsg);
+  padding-left: 1rem;
+  color: var(--error-fore-o);
+}
+input:invalid
 {
   color: var(--error-fore-o);
   background-color: var(--error-back);

@@ -1,8 +1,8 @@
 /*eslint-env jquery*/
 
 const SAVE = true
-const DEBUG = false
-const BLUR = true
+const DEBUG = true
+const BLUR = false
 
 const widgets = {
   text: {
@@ -156,15 +156,14 @@ const edit = (table, eid, field, valueEl, parent) => {
   fetch(url, parent, saveValue)
 }
 
-const save = (table, eid, field, valueEl) => {
-  let saveValue
+const getDynValues = valueEl => {
   const origAttValue = valueEl.attr('orig')
   if (origAttValue === undefined) {
-    return saveValue
+    return {}
   }
   const origValue = atob(origAttValue)
   const multiple = valueEl.attr('multiple')
-  const valueCarrier = valueEl.find('[wvalue]')
+  const valueCarrier = valueEl.find('.wvalue')
   const wType = valueEl.attr('wtype')
   const { [wType]: { read, collapseMultiple } } = widgets
   const givenValue = multiple && !collapseMultiple
@@ -173,37 +172,25 @@ const save = (table, eid, field, valueEl) => {
     : read(valueCarrier)
   const newValue = JSON.stringify(givenValue)
   const dirty = origValue != newValue
+  return { origValue, givenValue, newValue, dirty }
+}
+
+const save = (table, eid, field, valueEl) => {
+  const { origValue, givenValue, newValue, dirty } = getDynValues(valueEl)
+  if (origValue === undefined) {
+    return undefined
+  }
 
   if (DEBUG) {
-    Console.log('SAVE:', {
-      valueEl,
-      multiple,
-      wType,
-      origValue,
-      givenValue,
-      newValue,
-      dirty,
-    })
+    const wType = valueEl.attr('wtype')
+    const dirtyRep = dirty ? 'dirty' : 'clean'
+    const actionRep = dirty ? (SAVE ? 'saving' : 'suppress saving') : 'no save'
+    Console.log(
+      `WIDGET ${wType}: ${dirtyRep} => ${actionRep}`,
+      { valueEl, origValue, newValue }
+    )
   }
-  if (dirty) {
-    if (SAVE) {
-      if (DEBUG) {
-        Console.log(`Dirty value in widget ${wType}: save to database`)
-      }
-      saveValue = JSON.stringify({ save: givenValue })
-    }
-    else {
-      if (DEBUG) {
-        Console.log(`Dirty value in widget ${wType}: suppress saving`)
-      }
-    }
-  }
-  else {
-    if (DEBUG) {
-      Console.log(`Clean value in widget ${wType}: no save action`)
-    }
-  }
-  return saveValue
+  return (dirty && SAVE) ? JSON.stringify({ save: givenValue }) : undefined
 }
 
 const activateActions = destElem => {
@@ -223,12 +210,14 @@ const activateActions = destElem => {
       focusElFirst.val(focusElFirst.val())
     }
 
+    /*
     if (action == 'edit') {
       parent.removeClass('edit')
     }
     else if (action == 'view') {
       parent.addClass('edit')
     }
+    */
     const actionFunc = (action == 'edit') ? edit : view
 
     focusEl.off('mousedown').mousedown(() => {
@@ -244,6 +233,15 @@ const activateActions = destElem => {
       actionFunc(table, eid, field, valueEl, parent)
       collectEvents[eventKey] = false
     })
+    focusEl.off('keyup').keyup(() => {
+      const { dirty } = getDynValues(valueEl)
+      if (dirty) {
+        valueEl.addClass('dirty')
+      }
+      else {
+        valueEl.removeClass('dirty')
+      }
+    })
     if (BLUR) {
       focusEl.off('blur').blur(() => {
         const eventKey = `${table}:${eid}.${field}`
@@ -258,7 +256,7 @@ const activateActions = destElem => {
     const wType = valueEl.attr('wtype')
     const { [wType]: widget } = widgets
     if (widget) {
-      const widgetTargets = valueEl.find('[wvalue]')
+      const widgetTargets = valueEl.find('.wvalue')
       widget.activate(table, eid, field, parent, valueEl, widgetTargets)
     }
   })

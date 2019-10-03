@@ -1,14 +1,14 @@
 from itertools import chain
 from flask import request
-from bson.objectid import ObjectId
 
 from controllers.config import Config as C, Names as N
 from controllers.perm import permRecord, getPerms, UNAUTH
-from controllers.field import Field, getTitle
-from controllers.html import HtmlElements as H
-from controllers.utils import (
-    getStrAsFloat, getStrAsInt, getStrAsDatetime, dbjson, E, ELLIPS
-)
+from controllers.field import Field
+from controllers.html import HtmlElements as H, htmlEscape as he
+from controllers.utils import dbjson, cap1, E, ELLIPS
+
+from controllers.types import Types
+
 
 CT = C.table
 CW = C.web
@@ -17,14 +17,13 @@ CW = C.web
 MAIN_TABLE = CT.mainTable
 USER_TABLES = set(CT.userTables)
 VALUE_TABLES = set(CT.valueTables)
-SCALAR_TYPES = set(CT.scalarTypes)
 ITEMS = CT.items
-NUMERIC_TYPES = set(CT.numericTypes)
 DEFAULT_TYPE = CT.defaultType
 PROV_SPECS = CT.prov
 
 PROV = CW.provLabel
 FORBIDDEN = CW.messages[N.forbidden]
+QQ = CW.unknown[N.generic]
 
 
 def forceOpen(theEid, openEid):
@@ -128,7 +127,15 @@ class Table(object):
     auth = self.auth
     table = self.table
     isUserTable = self.isUserTable
-    return getTitle(db, auth, table, isUserTable, record)
+
+    if isUserTable:
+      return he(record.get(N.title, QQ))
+
+    typeClass = getattr(Types, table)
+    titleStr = typeClass.titleStr(db, auth, record)
+    titleHint = typeClass.titleHint(record)
+
+    return typeClass.title(record, titleStr, titleHint)
 
   def insert(self):
     db = self.db
@@ -327,13 +334,11 @@ class Table(object):
       fieldSpec = fieldSpecs.get(field, {})
       tp = fieldSpec.get(N.type, DEFAULT_TYPE)
       multiple = fieldSpec.get(N.multiple, False)
+
+      tpClass = getattr(Types, tp, None)
       conversion = (
-          (getStrAsFloat if tp == N.decimal else getStrAsInt)
-          if tp in NUMERIC_TYPES else
-          ObjectId
-          if tp not in SCALAR_TYPES else
-          getStrAsDatetime
-          if tp == N.datetime else
+          tpClass.fromStr
+          if tpClass else
           None
       )
       if conversion is not None:
@@ -386,7 +391,7 @@ class Table(object):
     fieldSpec = fieldSpecs.get(field, {})
 
     eid = str(self.record[N._id])
-    label = fieldSpec.get(N.label, field.capitalize())
+    label = fieldSpec.get(N.label, cap1(field))
     tp = fieldSpec.get(N.type, DEFAULT_TYPE)
     multiple = fieldSpec.get(N.multiple, False)
     value = record.get(field, None)
@@ -410,7 +415,11 @@ class Table(object):
         H.div(
             [deleteButton]
             +
-            [self.wrapField(field) for field in self.fields]
+            [
+                self.wrapField(field)
+                for field in self.fields
+                if field not in provSpecs
+            ]
             +
             [H.details(
                 PROV,

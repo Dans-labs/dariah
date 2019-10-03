@@ -21,7 +21,6 @@ Z = 'Z'
 AT = '@'
 EURO = '€'
 MINONE = '-1'
-ZERO = '0'
 ONE = '1'
 TWO = '2'
 THREE = '3'
@@ -35,6 +34,7 @@ DOLLAR = '$'
 
 NL = '\n'
 
+MIN = '-'
 HYPHEN = '-'
 WHYPHEN = ' - '
 ELLIPS = '...'
@@ -78,9 +78,17 @@ def bdecode(s):
   )
 
 
+def cap1(string):
+  return (
+      E
+      if not string else
+      string[0].upper() + string[1:]
+  )
+
+
 def getNumberAsStr(v):
   if v is None:
-    return ZERO
+    return '0'
   try:
     rep = int(round(v))
   except Exception:

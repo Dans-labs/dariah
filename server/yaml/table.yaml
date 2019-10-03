@@ -52,23 +52,6 @@ scalarTypes:
   - bool3
   - markdown
 
-specialTypes:
-  - user
-  - country
-  - typeContribution
-  - criteria
-  - score
-
-numericTypes:
-  - int
-  - decimal
-  - money
-
-textTypes:
-  - text
-  - email
-  - url
-
 boolTypes:
   bool2:
     true: check
@@ -77,23 +60,6 @@ boolTypes:
     true: check
     null: minus
     false: times
-
-widgetTypes:
-  text:
-    - text
-    - email
-    - url
-    - int
-    - decimal
-    - money
-    - datetime
-  bool:
-    - bool2
-    - bool3
-  markdown:
-    - markdown
-  related:
-    - related
 
 prov:
   creator:
@@ -135,5 +101,6 @@ names:
   - active
   - authority
   - bool
+  - pattern
   - reference
   - sorted

@@ -1,3 +1,8 @@
+.dirty {
+	color: var(--edit-dirty-fore);
+	background-color: var(--edit-dirty-back);
+	outline: 4px dashed var(--edit-dirty-border);
+}
 .record {
 	display: flex;
 	flex-flow: column nowrap;
@@ -17,10 +22,8 @@
 	justify-content: flex-start;
 	align-items: stretch;
 	align-content: flex-start;
-  margin-top: 0.1rem;
-  margin-bottom: 0.1rem;
-  padding-top: 0.1rem;
-  padding-bottom: 0.1rem;
+  margin-top: 0.0rem;
+  margin-bottom: 0.0rem;
 }
 .record-label {
 	flex: 0 0 10rem;
@@ -33,7 +36,10 @@
 	justify-content: stretch;
 	align-items: flex-start;
 	align-content: flex-start;
+  padding-top: 0.2em;
+  padding-bottom: 0.1rem;
   background-color: var(--value-back);
+  border: 1pt solid var(--value-border);
 }
 .record-value .values,
 .record-value .tags {
@@ -49,10 +55,14 @@
 .record-value .tags {
 	flex-flow: row wrap;
 }
-[wvalue] {
+.wvalue {
   flex: 1 1 auto;
 	display: inline-flex;
 	flex-flow: row wrap;
+}
+.record-value .value[wtype="markdown"]
+{
+	width: 100%;
 }
 .record-value.edit,
 .record-value .value.edit {

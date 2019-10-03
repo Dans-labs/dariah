@@ -7,6 +7,12 @@ messages:
   noPage: Page not found
   noTable: No table
   refresh: refresh modification history
+  url: http(s)://letters.domain
+  email: name@letters.domain
+  int: only digits
+  decimal: only digits and one floating point/comma
+  money: only digits and one floating point/comma
+  datetime: yyyy-mm-dd hh-mm-ss (you may leave out trailing parts)
 
 unknown:
   generic: '??'
@@ -71,6 +77,7 @@ urlParts:
   - item
   - edit
   - view
+  - org
 
 elements:
   - a

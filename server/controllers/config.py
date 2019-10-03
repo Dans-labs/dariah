@@ -1,7 +1,7 @@
 import os
 import yaml
 
-from controllers.utils import serverprint, E, LOW, HYPHEN
+from controllers.utils import serverprint, cap1, E, LOW, HYPHEN
 
 CONFIG_EXT = '.yaml'
 CONFIG_DIR = 'yaml'
@@ -95,7 +95,7 @@ with os.scandir(CONFIG_DIR) as sd:
   files = tuple(e.name for e in sd if e.is_file() and e.name.endswith(CONFIG_EXT))
 for configFile in files:
   section = os.path.splitext(configFile)[0]
-  className = section.capitalize()
+  className = cap1(section)
   classObj = globals()[className]
   setattr(Config, section, classObj)
 
