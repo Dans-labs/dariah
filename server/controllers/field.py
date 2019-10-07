@@ -1,11 +1,13 @@
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import E
+from controllers.utils import E, cap1
 from controllers.types import Types
 
 CT = C.table
 CW = C.web
 
+
+DEFAULT_TYPE = CT.defaultType
 
 REFRESH = CW.messages[N.refresh]
 QQ = CW.unknown[N.generic]
@@ -20,17 +22,25 @@ def labelDiv(label):
 
 
 class Field(object):
-  def __init__(self, db, auth, table, eid, field, mayEdit, label, tp, multiple, value):
-    self.db = db
-    self.auth = auth
-    self.table = table
-    self.eid = eid
+  def __init__(self, recordObj, field, mayEdit):
+    self.recordObj = recordObj
+    self.db = recordObj.db
+    self.auth = recordObj.auth
+    self.table = recordObj.table
     self.field = field
     self.mayEdit = mayEdit
-    self.label = label
-    self.tp = tp
-    self.multiple = multiple
-    self.value = value
+
+    record = recordObj.record
+    self.eid = record.get(N._id, None)
+    self.value = record.get(field, None)
+
+    tableObj = recordObj.tableObj
+    fieldSpecs = tableObj.fields
+    fieldSpec = fieldSpecs.get(field, {})
+    self.label = fieldSpec.get(N.label, cap1(field))
+    self.tp = fieldSpec.get(N.type, DEFAULT_TYPE)
+    self.multiple = fieldSpec.get(N.multiple, False)
+
     self.atts = (
         dict(
             table=self.table,
@@ -38,6 +48,8 @@ class Field(object):
             field=self.field,
         )
     )
+
+    tp = self.tp
     tpClass = getattr(Types, tp)
     self.tpClass = tpClass
     self.widgetType = tpClass.widgetType

@@ -118,7 +118,7 @@ def cleanNumber(strVal, isInt):
     )
 
 
-class Base(object):
+class TypeBase(object):
   widgetType = None
   pattern = None
   rawType = None
@@ -179,7 +179,7 @@ class Base(object):
     return [widgetElem, validationElem]
 
 
-class Text(Base):
+class Text(TypeBase):
   widgetType = N.text
 
 
@@ -241,7 +241,7 @@ class Email(Text):
     return H.a(val, val)
 
 
-class Numeric(Base):
+class Numeric(TypeBase):
   widgetType = N.text
   rawType = None
 
@@ -276,7 +276,7 @@ class Money(Decimal):
     )
 
 
-class Datetime(Base):
+class Datetime(TypeBase):
   rawType = dt
   widgetType = N.text
   pattern = DATETIME_PATTERN
@@ -346,7 +346,7 @@ class Datetime(Base):
     return cls.normalize(val.isoformat())
 
 
-class Markdown(Base):
+class Markdown(TypeBase):
   widgetType = N.markdown
 
   @classmethod
@@ -373,7 +373,7 @@ class Markdown(Base):
     )
 
 
-class Bool(Base):
+class Bool(TypeBase):
   widgetType = N.bool
 
   @classmethod
@@ -436,7 +436,7 @@ class Bool3(Bool):
   pass
 
 
-class Related(Base):
+class Related(TypeBase):
   widgetType = N.related
   needsField = True
 

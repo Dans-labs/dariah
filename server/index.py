@@ -201,7 +201,7 @@ def factory():
   def serveTableFieldEdit(table, eid, field):
     auth.authenticate()
     if table in ALL_TABLES:
-      return Table(db, auth, table).fieldAction(eid, field, N.edit)
+      return Table(db, auth, table).record(eid).fieldAction(field, N.edit)
     return noTable(table)
 
   @app.route(
@@ -211,7 +211,7 @@ def factory():
   def serveTableFieldView(table, eid, field):
     auth.authenticate()
     if table in ALL_TABLES:
-      return Table(db, auth, table).fieldAction(eid, field, N.view)
+      return Table(db, auth, table).record(eid).fieldAction(field, N.view)
     return noTable(table)
 
   @app.route(
@@ -220,7 +220,7 @@ def factory():
   def serveTableItem(table, eid):
     auth.authenticate()
     if table in ALL_TABLES:
-      return Table(db, auth, table).item(eid)
+      return Table(db, auth, table).record(eid).item()
     return noTable(table)
 
   @app.route(

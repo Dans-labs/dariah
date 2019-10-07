@@ -10,11 +10,19 @@ TABLE_DIR = 'tables'
 ALL = 'all'
 
 
+class Config(object):
+  pass
+
+
 class Base(object):
   pass
 
 
 class Mongo(object):
+  pass
+
+
+class Web(object):
   pass
 
 
@@ -31,14 +39,6 @@ class Table(object):
       serverprint(dep)
       for (table, fields) in tables.items():
         serverprint(f'\t{table:<20}: {", ".join(fields)}')
-
-
-class Web(object):
-  pass
-
-
-class Config(object):
-  pass
 
 
 class Names(object):
