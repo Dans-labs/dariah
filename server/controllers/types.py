@@ -176,7 +176,7 @@ class TypeBase(object):
         if validationMsg else
         E
     )
-    return [widgetElem, validationElem]
+    return E.join([widgetElem, validationElem])
 
 
 class Text(TypeBase):
@@ -469,8 +469,55 @@ class Related(TypeBase):
     return val if val is None else str(val)
 
   @classmethod
-  def widget(cls, val, db, auth):
+  def widget(cls, val, multiple, db, auth):
+    if multiple and val is None:
+      val = []
     return H.div(
+        [
+            H.div(
+                [
+                    formatted
+                    for (text, formatted) in (
+                        sorted(
+                            (
+                                cls.title(
+                                    record,
+                                    cls.titleStr(db, auth, record),
+                                    cls.titleHint(record),
+                                    markup=True, asEdit=True, active=val,
+                                )
+                                for record in db.getValueRecords(cls.name)
+                                if record.get(N._id, None) in val
+                            ),
+                            key=lambda x: x[0].lower()
+                        )
+                    )
+                ],
+                cls='active'
+            ),
+            H.div(
+                [
+                    formatted
+                    for (text, formatted) in (
+                        sorted(
+                            (
+                                cls.title(
+                                    record,
+                                    cls.titleStr(db, auth, record),
+                                    cls.titleHint(record),
+                                    markup=True, asEdit=True, active=val,
+                                )
+                                for record in db.getValueRecords(cls.name)
+                                if record.get(N._id, None) not in val
+                            ),
+                            key=lambda x: x[0].lower()
+                        )
+                    )
+                ],
+                cls='inactive'
+            )
+        ]
+        if multiple else
         [
             formatted
             for (text, formatted) in (

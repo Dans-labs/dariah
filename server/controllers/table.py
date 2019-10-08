@@ -1,7 +1,7 @@
 from itertools import chain
 
 from controllers.config import Config as C, Names as N
-from controllers.perm import permRecord, getPerms, UNAUTH
+from controllers.perm import UNAUTH
 from controllers.record import Record
 from controllers.html import HtmlElements as H, htmlEscape as he
 from controllers.utils import E, ELLIPS
@@ -25,14 +25,6 @@ FORBIDDEN = CW.messages[N.forbidden]
 QQ = CW.unknown[N.generic]
 
 
-def forceOpen(theEid, openEid):
-  return (
-      dict(forceopen='1')
-      if openEid and str(theEid) == openEid else
-      dict()
-  )
-
-
 class Table(object):
   def __init__(self, db, auth, table):
     self.db = db
@@ -54,6 +46,14 @@ class Table(object):
     self.country = db.country.get(self.countryId, {})
     self.multiple = {N.editors}
 
+    isUserTable = self.isUserTable
+    isSuperuser = auth.superuser()
+
+    self.mayInsert = (
+        auth.authenticated()
+        and (isUserTable or isSuperuser)
+    )
+
     def titleSortkey(r):
       return self.title(r).lower()
 
@@ -62,61 +62,83 @@ class Table(object):
   def record(self, eid):
     return Record(self, eid=eid)
 
-  def mayDelete(self):
-    auth = self.auth
+  def insert(self):
+    mayInsert = self.mayInsert
+    if not mayInsert:
+      return None
 
-    if not auth.authenticated():
-      return False
+    db = self.db
+    uid = self.uid
+    eppn = self.eppn
+    table = self.table
 
-    isSuperuser = auth.superuser()
-    isUserTable = self.isUserTable
+    return db.insertItem(table, uid, eppn)
 
-    if not isSuperuser:
-      if isUserTable:
-        self.studyRecord()
-        perm = self.perm
-        if not perm[N.isEdit]:
-          return False
-      else:
-        return False
+  def wrap(self, openEid, action=None):
+    if not self.mayList(action=action):
+      return FORBIDDEN
 
-    return True
+    db = self.db
+    table = self.table
+    uid = self.uid
+    countryId = self.countryId
+    titleSortkey = self.titleSortkey
 
-  def mayInsert(self):
-    auth = self.auth
-    isUserTable = self.isUserTable
-    isSuperuser = auth.superuser()
-
-    return (
-        auth.authenticated()
-        and (isUserTable or isSuperuser)
+    params = (
+        dict(my=uid)
+        if action == N.mylist else
+        dict(our=countryId)
+        if action == N.ourlist else
+        {}
     )
 
-  def mayList(self):
-    auth = self.auth
-    isUserTable = self.isUserTable
-    return (
-        isUserTable
-        or
-        auth.authenticated()
+    records = db.getList(table, titleSortkey, **params)
+
+    return H.div(
+        chain.from_iterable((
+            self.insertButton(),
+            (
+                H.details(
+                    self.title(record),
+                    H.div(
+                        ELLIPS,
+                        fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
+                    ),
+                    itemkey=f"""{table}/{record[N._id]}""",
+                    **forceOpen(record[N._id], openEid),
+                )
+                for record in records
+            ),
+        ))
     )
 
-  def mayMyList(self):
-    auth = self.auth
-    isUserTable = self.isUserTable
+  def insertButton(self):
+    mayInsert = self.mayInsert
+
+    if not mayInsert:
+      return E
+
+    table = self.table
+    itemSingle = self.itemLabels[0]
+
     return (
-        isUserTable
-        and
-        auth.authenticated()
+        H.a(
+            H.icon(
+                N.plus,
+                cls="button medium",
+            ),
+            href=f"""/{table}/{N.insert}""",
+            title=f"""New {itemSingle}"""
+        ),
     )
 
-  def mayOurList(self):
+  def mayList(self, action=None):
     auth = self.auth
     isUserTable = self.isUserTable
     return (
-        isUserTable
-        and
-        auth.authenticated()
+        (isUserTable or auth.authenticated())
+        if action is None else
+        (isUserTable and auth.authenticated())
     )
 
   def title(self, record):
@@ -133,167 +155,10 @@ class Table(object):
 
     return typeClass.title(record, titleStr, titleHint)
 
-  def insert(self):
-    db = self.db
-    if not self.mayInsert():
-      return ()
 
-    uid = self.uid
-    eppn = self.eppn
-    table = self.table
-
-    return db.insertItem(table, uid, eppn)
-
-  def insertButton(self):
-    if not self.mayInsert():
-      return ()
-
-    table = self.table
-    itemSingle = self.itemLabels[0]
-
-    return (
-        H.a(
-            H.icon(
-                N.plus,
-                cls="button medium",
-            ),
-            href=f"""/{table}/{N.insert}""",
-            title=f"""New {itemSingle}"""
-        ),
-    )
-
-  def deleteButton(self):
-    if not self.mayDelete():
-      return E
-    nDeps = self.dependencies()
-    if nDeps:
-      plural = '' if nDeps == 1 else 's'
-      return H.span(
-          [
-              H.icon(
-                  N.puzzle_piece,
-                  cls="label medium warning-o delete",
-                  title=f"""Cannot delete because of {nDeps} dependent record{plural}"""
-              ),
-              H.span(
-                  f"""{nDeps} dependent record{plural}""",
-                  cls="label small warning-o delete",
-              ),
-          ]
-      )
-
-    record = self.record
-    table = self.table
-    itemSingle = self.itemLabels[0]
-
-    return H.a(
-        H.icon(
-            N.trash,
-            cls="button medium error-o delete",
-        ),
-        href=f"""/{table}/{N.delete}/{record[N._id]}""",
-        title=f"""Delete this {itemSingle}"""
-    )
-
-  def list(self, openEid):
-    if not self.mayList():
-      return FORBIDDEN
-
-    db = self.db
-    table = self.table
-    titleSortkey = self.titleSortkey
-
-    records = db.getList(table, titleSortkey)
-
-    return H.div(
-        chain.from_iterable((
-            self.insertButton(),
-            (
-                H.details(
-                    self.title(record),
-                    H.div(
-                        ELLIPS,
-                        fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
-                    ),
-                    itemkey=f"""{table}/{record[N._id]}""",
-                    **forceOpen(record[N._id], openEid),
-                )
-                for record in records
-            ),
-        ))
-    )
-
-  def mylist(self, openEid):
-    if not self.mayMyList():
-      return FORBIDDEN
-
-    db = self.db
-    table = self.table
-    titleSortkey = self.titleSortkey
-    uid = self.uid
-
-    records = db.getList(table, titleSortkey, my=uid)
-
-    return H.div(
-        chain.from_iterable((
-            self.insertButton(),
-            (
-                H.details(
-                    self.title(record),
-                    H.div(
-                        ELLIPS,
-                        fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
-                    ),
-                    itemkey=f"""{table}/{record[N._id]}""",
-                    **forceOpen(record[N._id], openEid),
-                )
-                for record in records
-            ),
-        ))
-    )
-
-  def ourlist(self):
-    if not self.mayOurList():
-      return FORBIDDEN
-
-    db = self.db
-    table = self.table
-    titleSortkey = self.titleSortkey
-    countryId = self.countryId
-
-    records = db.getList(table, titleSortkey, our=countryId)
-
-    return H.div(
-        (
-            H.details(
-                self.title(record),
-                H.div(
-                    ELLIPS,
-                    fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
-                ),
-                itemkey=f"""{table}/{record[N._id]}""",
-            )
-            for record in records
-        )
-    )
-
-  def studyRecord(self):
-    record = self.record
-
-    self.perm = permRecord(
-        self.auth.user,
-        record,
-        country=record.get(N.country, None),
-    )
-
-  def permissions(self, field):
-    fieldSpecs = self.fields
-
-    fieldSpec = fieldSpecs.get(field, {})
-    require = fieldSpec.get(N.perm, {})
-
-    user = self.auth.user
-    perm = self.perm
-    record = self.record
-
-    return getPerms(user, perm, record, require)
+def forceOpen(theEid, openEid):
+  return (
+      dict(forceopen='1')
+      if openEid and str(theEid) == openEid else
+      dict()
+  )

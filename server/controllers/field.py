@@ -1,7 +1,10 @@
+from flask import request
+
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
 from controllers.utils import E, cap1
 from controllers.types import Types
+from controllers.perm import getPerms
 
 CT = C.table
 CW = C.web
@@ -22,55 +25,135 @@ def labelDiv(label):
 
 
 class Field(object):
-  def __init__(self, recordObj, field, mayEdit):
-    self.recordObj = recordObj
-    self.db = recordObj.db
-    self.auth = recordObj.auth
-    self.table = recordObj.table
-    self.field = field
-    self.mayEdit = mayEdit
+  inheritProps = (
+      'db', 'auth', 'eppn', 'table', 'record', 'eid', 'perm',
+  )
 
-    record = recordObj.record
-    self.eid = record.get(N._id, None)
+  def __init__(self, recordObj, field):
+    for prop in Field.inheritProps:
+      setattr(self, prop, getattr(recordObj, prop, None))
+
+    self.parent = recordObj
+
+    self.field = field
+    self.withRefresh = field == N.modified
+
+    fieldSpecs = recordObj.fields
+    fieldSpec = fieldSpecs.get(field, {})
+
+    record = self.record
     self.value = record.get(field, None)
 
-    tableObj = recordObj.tableObj
-    fieldSpecs = tableObj.fields
-    fieldSpec = fieldSpecs.get(field, {})
+    require = fieldSpec.get(N.perm, {})
+    self.require = require
+
     self.label = fieldSpec.get(N.label, cap1(field))
     self.tp = fieldSpec.get(N.type, DEFAULT_TYPE)
     self.multiple = fieldSpec.get(N.multiple, False)
 
-    self.atts = (
-        dict(
-            table=self.table,
-            eid=self.eid,
-            field=self.field,
-        )
-    )
-
+    perm = self.perm
+    table = self.table
+    eid = self.eid
     tp = self.tp
+
     tpClass = getattr(Types, tp)
     self.tpClass = tpClass
     self.widgetType = tpClass.widgetType
 
-  def wrap(self, action, withRefresh):
-    self.withRefresh = withRefresh
+    (self.mayRead, self.mayEdit) = getPerms(perm, require)
+
+    self.atts = (
+        dict(
+            table=table,
+            eid=eid,
+            field=field,
+        )
+    )
+
+  def save(self, data):
+    db = self.db
+    eppn = self.eppn
+    table = self.table
+    eid = self.eid
+    field = self.field
     mayEdit = self.mayEdit
 
-    asEdit = mayEdit and action == N.edit
-    editClass = " edit" if asEdit else E
-    rep = self.valueEdDiv() if asEdit else self.valueRODiv()
+    if mayEdit:
+      record = self.record
+
+      multiple = self.multiple
+      tpClass = self.tpClass
+      conversion = (
+          tpClass.fromStr
+          if tpClass else
+          None
+      )
+      if conversion is not None:
+        if multiple:
+          data = [
+              conversion(d)
+              for d in data or []
+          ]
+        else:
+          data = conversion(data)
+
+      modified = record.get(N.modified, None)
+      (updates, deletions) = db.updateField(
+          table,
+          eid,
+          field,
+          data,
+          eppn,
+          modified,
+      )
+      self.update(updates, deletions)
+
+  def update(self, updates, deletions):
+    parent = self.parent
+    record = self.record
+    field = self.field
+    require = self.require
+
+    record.update(updates)
+    for f in deletions:
+      if f in record:
+        del record[f]
+    self.value = record.get(field, None)
+
+    parent.setPerm()
+    self.perm = parent.perm
+    perm = self.perm
+
+    (self.mayRead, self.mayEdit) = getPerms(perm, require)
+
+  def wrap(self, action=None):
+    mayRead = self.mayRead
+
+    if not mayRead:
+      return E
+
+    mayEdit = self.mayEdit
+    editable = mayEdit and action == N.edit
 
     if action is not None:
-      return E.join(rep)
+      data = request.get_json()
+      if data is not None and N.save in data:
+        self.save(data[N.save])
+
+    widget = self.wrapWidget(editable)
+
+    if action is not None:
+      return E.join(widget)
+
+    label = self.label
+    editClass = " edit" if editable else E
 
     return (
         H.div(
             [
-                labelDiv(self.label),
+                labelDiv(label),
                 H.div(
-                    rep,
+                    widget,
                     cls=f"record-value {editClass}",
                 ),
             ],
@@ -78,109 +161,80 @@ class Field(object):
         )
     )
 
-  def valueRODiv(self):
+  def wrapWidget(self, editable):
+    atts = self.atts
+    mayEdit = self.mayEdit
+    withRefresh = self.withRefresh
+
     button = (
         H.icon(
-            N.pencil,
-            cls="button small field",
-            action=N.edit,
-            **self.atts,
-        )
-        if self.mayEdit else
-        H.icon(
-            N.refresh,
+            N.eye,
             cls="button small field",
             action=N.view,
-            title=REFRESH,
-            **self.atts,
+            **atts,
         )
-        if self.withRefresh else
-        E
-    )
-    rep = self.getValueRO()
-
-    return [button, rep]
-
-  def valueEdDiv(self):
-    tp = self.tp
-    multiple = self.multiple
-    value = self.value
-    widgetType = self.widgetType
-
-    button = H.icon(
-        N.eye,
-        cls="button small field",
-        action=N.view,
-        **self.atts,
-    )
-    rep = self.getValueEd()
-
-    origStr = Types.toOrig(value, tp, multiple)
-
-    atts = dict(
-        orig=origStr,
-        wtype=widgetType,
-    )
-    if multiple:
-      atts[N.multiple] = True
-    widget = H.div(
-        rep,
-        **atts,
-        cls="value",
-    )
-    return [button, widget]
-
-  def getValueRO(self):
-    multiple = self.multiple
-    widgetType = self.widgetType
-    value = self.value
-    cls = "tags" if widgetType == N.related else "values"
-
-    display = (
-        H.div(
-            [
-                self.formatVal(val)
-                for val in value or []
-            ],
-            cls=cls,
-        )
-        if multiple else
-        H.div(
-            self.formatVal(value),
-            cls="value",
+        if editable else
+        (
+            H.icon(
+                N.pencil,
+                cls="button small field",
+                action=N.edit,
+                **atts,
+            )
+            if mayEdit else
+            H.icon(
+                N.refresh,
+                cls="button small field",
+                action=N.view,
+                title=REFRESH,
+                **atts,
+            )
+            if withRefresh else
+            E
         )
     )
 
-    return display
+    return [button, self.wrapValue(editable)]
 
-  def getValueEd(self):
-    multiple = self.multiple
-    widgetType = self.widgetType
-    value = self.value
-
-    collapseMultiple = widgetType == N.related
-
-    widget = (
-        H.div(
-            [
-                self.formatVal(val, editable=True)
-                for val in (value or []) + [E]
-            ],
-            cls="values",
-        )
-        if multiple and not collapseMultiple else
-        self.formatVal(value, editable=True)
-    )
-
-    return widget
-
-  # TOP LEVEL
-
-  def formatVal(self, v, editable=False):
+  def wrapValue(self, editable):
     db = self.db
     auth = self.auth
     tpClass = self.tpClass
+    value = self.value
+    tp = self.tp
+    multiple = self.multiple
+    widgetType = self.widgetType
 
-    args = [db, auth] if tpClass.needsField else []
+    cls = "tags" if widgetType == N.related else "values"
+    collapseMultiple = widgetType == N.related
+
+    args = []
+    if collapseMultiple and editable:
+      args.append(multiple)
+    if tpClass.needsField:
+      args.extend([db, auth])
     method = tpClass.widget if editable else tpClass.toDisplay
-    return method(v, *args)
+    atts = dict(wtype=widgetType)
+
+    if editable:
+      origStr = Types.toOrig(value, tp, multiple)
+      atts[N.orig] = origStr
+    if multiple:
+      atts[N.multiple] = True
+
+    return (
+        H.div(
+            [
+                method(val, *args)
+                for val in (value or []) + ([E] if editable else [])
+            ],
+            **atts,
+            cls=cls,
+        )
+        if multiple and not (editable and collapseMultiple) else
+        H.div(
+            method(value, *args),
+            **atts,
+            cls="value",
+        )
+    )

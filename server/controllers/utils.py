@@ -156,7 +156,7 @@ def dtm(isostr):
 
 
 def asIterable(value):
-  return value if hasattr(value, ITER) else [value]
+  return value if type(value) is not str and hasattr(value, ITER) else [value]
 
 
 def asString(value):
@@ -164,7 +164,7 @@ def asString(value):
       E
       if value is None else
       E.join(value)
-      if hasattr(value, ITER) else
+      if type(value) is not str and hasattr(value, ITER) else
       value
   )
 

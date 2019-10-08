@@ -20,17 +20,11 @@ ROOT = N.root
 
 
 def checkPerm(
-    user,
-    record,
     require,
-    country=None,
-    perm=None,
+    perm,
 ):
   if require == UNAUTH:
     return True
-
-  if perm is None:
-    perm = permRecord(user, record, country=country)
 
   group = perm[N.group]
 
@@ -85,7 +79,7 @@ def sysadmin(user):
   return group in {SYSTEM, ROOT}
 
 
-def getPerms(user, perm, record, require):
+def getPerms(perm, require):
   readRequire = (
       DEFAULT_PERM[N.read]
       if require is None or N.read not in require else
@@ -97,8 +91,8 @@ def getPerms(user, perm, record, require):
       require[N.edit]
   )
   return (
-      checkPerm(user, record, readRequire, perm=perm),
-      checkPerm(user, record, editRequire, perm=perm),
+      checkPerm(readRequire, perm),
+      checkPerm(editRequire, perm),
   )
 
 
