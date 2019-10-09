@@ -113,6 +113,11 @@ details.nav {
   flex-flow: column nowrap;
 }
 
+input.wfilter[type=text] {
+  width: 10rem;
+	color: var(--tag-var-fore);
+	background-color: var(--tag-var-back);
+}
 .button {
 	color: var(--action-fore);
 	cursor: pointer;
@@ -120,10 +125,16 @@ details.nav {
 	border-color: var(--action-border);
 	/*white-space: nowrap;*/
 }
+.button.wfilter {
+	color: var(--tag-var-fore);
+	background-color: var(--value-edit-back);
+  border: 0;
+}
 .button.disabled {
 	cursor: default;
 	background-color: var(--action-disabled-back);
 }
+.button.field.active,
 .button.active,
 .nav.active,
 .label.active,
@@ -134,7 +145,11 @@ details.nav {
 	border-color: var(--action-active-border);
   border-width: 0.2em;
 }
-.button.active {
+.button.field {
+	color: var(--tag-var-fore);
+	background-color: var(--tag-var-back);
+}
+.label.active {
 	cursor: default;
 }
 .button.large,
@@ -279,6 +294,12 @@ textarea:focus
 	background-color: var(--edit-focus-back);
 	outline: 4px inset var(--edit-focus-border);
 	border: 0;
+}
+input.wfilter:valid+span:after {
+  content: '';
+}
+input.wfilter:invalid+span:after {
+  content: '';
 }
 input:valid+span:after {
   position: absolute;

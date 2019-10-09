@@ -146,9 +146,9 @@
     --special-fore:                    hsla(120,  00%,  50%, 1  );
     --special-back:                    hsla(120, 100%,  95%, 0.5);
 
-    --tag-fore:                        hsla(240,  50%,  30%, 1  );
-    --tag-back:                        hsla(210, 100%,  98%, 1  );
-    --tag-border:                      hsla(210, 100%,  50%, 0.5);
+    --tag-fore:                        hsla(  0,   0%,   0%, 1  );
+    --tag-back:                        hsla(  0,   0%,  90%, 0.8);
+    --tag-border:                      hsla(  0,   0%,  60%, 0.5);
     --tag-var-fore:                    hsla(  0,  50%,  50%, 1  );
     --tag-var-back:                    hsla(210, 100%,  95%, 1  );
     --tag-link-fore:                   hsla(210,  50%,  30%, 1  );

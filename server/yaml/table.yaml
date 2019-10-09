@@ -101,6 +101,7 @@ names:
   - active
   - authority
   - bool
+  - eid
   - orig
   - pattern
   - reference

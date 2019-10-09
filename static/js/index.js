@@ -24,7 +24,7 @@ const widgets = {
         const options = el.find('.button, .label')
         el.find('.button').off('click').click(e => {
           options.removeClass('active')
-          const me = $(e.target)
+          const me = $(e.currentTarget)
           me.addClass('active')
           edit(table, eid, field, valueEl, parent)
         })
@@ -41,14 +41,42 @@ const widgets = {
   },
   related: {
     activate(table, eid, field, parent, valueEl, targets) {
+      const filterKey = `${table}/${eid}/${field}/filter`
+      const multiple = valueEl.attr('multiple')
       targets.each((i, elem) => {
         const el = $(elem)
-        const options = el.find('.button, .tag')
+        const options = el.find('.button.field, .label.field')
         el.find('.button').off('click').click(e => {
-          options.removeClass('active')
-          const me = $(e.target)
-          me.addClass('active')
+          const me = $(e.currentTarget)
+          if (multiple) {
+            if (me.hasClass('active')) {
+              me.removeClass('active')
+            }
+            else {
+              me.addClass('active')
+            }
+          }
+          else {
+            options.removeClass('active')
+            me.addClass('active')
+          }
           edit(table, eid, field, valueEl, parent)
+        })
+        const filterControl = el.find('input.wfilter')
+        const filterOff = el.find('.button.wfilter')
+        const prevFilter = localStorage.getItem(filterKey) || ''
+        filterControl.val(prevFilter)
+        filterTags(options, prevFilter, filterOff)
+        filterControl.off('keyup').on('keyup', () => {
+          const curFilter = filterControl.val()
+          localStorage.setItem(filterKey, curFilter)
+          filterTags(options, curFilter, filterOff)
+        })
+        filterOff.off('click').click(() => {
+          const newFilter = ''
+          filterControl.val(newFilter)
+          localStorage.setItem(filterKey, newFilter)
+          filterTags(options, newFilter, filterOff)
         })
       })
     },
@@ -56,8 +84,32 @@ const widgets = {
       const el = elem.find('.active')
       return (el && el.attr('eid')) || null
     },
+    readMultiple(elem) {
+      return $.makeArray(elem.find('.active').map((i, el) => $(el).attr('eid')))
+    },
     collapseMultiple: true,
   },
+}
+
+const filterTags = (options, pattern, off) => {
+  if (pattern) {
+    const pat = pattern.toLowerCase()
+    options.each((i, elem) => {
+      const el = $(elem)
+      const lab = el.attr('lab')
+      if (lab.indexOf(pat) == -1) {
+        el.hide()
+      }
+      else {
+        el.show()
+      }
+    })
+    off.show()
+  }
+  else {
+    options.show()
+    off.hide()
+  }
 }
 
 const fetch = (url, destElem, data) => {
@@ -165,10 +217,12 @@ const getDynValues = valueEl => {
   const multiple = valueEl.attr('multiple')
   const valueCarrier = valueEl.find('.wvalue')
   const wType = valueEl.attr('wtype')
-  const { [wType]: { read, collapseMultiple } } = widgets
-  const givenValue = multiple && !collapseMultiple
-    ? $.makeArray(valueCarrier.map((i, el) => read($(el))))
-      .filter(v => v !== '')
+  const { [wType]: { read, readMultiple } } = widgets
+  const givenValue = multiple
+    ? readMultiple
+      ? readMultiple(valueCarrier)
+      : $.makeArray(valueCarrier.map((i, el) => read($(el))))
+        .filter(v => v !== '')
     : read(valueCarrier)
   const newValue = JSON.stringify(givenValue)
   const dirty = origValue != newValue
@@ -210,14 +264,12 @@ const activateActions = destElem => {
       focusElFirst.val(focusElFirst.val())
     }
 
-    /*
     if (action == 'edit') {
       parent.removeClass('edit')
     }
     else if (action == 'view') {
       parent.addClass('edit')
     }
-    */
     const actionFunc = (action == 'edit') ? edit : view
 
     focusEl.off('mousedown').mousedown(() => {

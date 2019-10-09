@@ -6,7 +6,7 @@ from bson.objectid import ObjectId
 
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H, htmlEscape as he
-from controllers.utils import bencode, now, cap1, E, DOT, MIN, EURO, WHYPHEN
+from controllers.utils import bencode, now, cap1, E, DOT, MIN, EURO, WHYPHEN, NBSP
 
 
 CT = C.table
@@ -93,29 +93,6 @@ toOrig:
     - Boolean values
     - string values
 """
-
-
-def cleanNumber(strVal, isInt):
-    normalVal = str(strVal).strip()
-    normalVal = stripNonnumeric.sub(E, normalVal)
-    isNegative = normalVal.startswith(MIN)
-    normalVal = normalVal.replace(MIN, E)
-    if isNegative:
-      normalVal = f'{MIN}{normalVal}'
-    if isInt:
-      normalVal = stripFraction.sub(E, normalVal)
-      normalVal = stripDecimal.sub(E, normalVal)
-    normalVal = stripLeading.sub(E, normalVal)
-    if not isInt:
-      parts = decimalSep.split(normalVal)
-      if len(parts) > 2:
-        parts = parts[0:2]
-      normalVal = DOT.join(parts)
-    return normalVal or (
-        ZERO
-        if isInt else
-        f"""{ZERO}{DOT}{ZERO}"""
-    )
 
 
 class TypeBase(object):
@@ -391,7 +368,7 @@ class Bool(TypeBase):
 
     return H.icon(
         values.get(val, values[noneValue]),
-        cls="label medium field",
+        cls="label medium",
     )
 
   @classmethod
@@ -419,7 +396,7 @@ class Bool(TypeBase):
                         "button"
                     )
                     +
-                    " medium field"
+                    " medium"
                 ),
             )
             for w in values
@@ -470,63 +447,35 @@ class Related(TypeBase):
 
   @classmethod
   def widget(cls, val, multiple, db, auth):
-    if multiple and val is None:
-      val = []
+    filterControl = [
+        H.input(
+            E,
+            type=N.text,
+            placeholder=MESSAGES.get(N.filter, E),
+            cls="wfilter",
+        ),
+        H.icon(
+            N.times,
+            cls="button small wfilter",
+            title="clear filter",
+        )
+    ]
     return H.div(
-        [
-            H.div(
-                [
-                    formatted
-                    for (text, formatted) in (
-                        sorted(
-                            (
-                                cls.title(
-                                    record,
-                                    cls.titleStr(db, auth, record),
-                                    cls.titleHint(record),
-                                    markup=True, asEdit=True, active=val,
-                                )
-                                for record in db.getValueRecords(cls.name)
-                                if record.get(N._id, None) in val
-                            ),
-                            key=lambda x: x[0].lower()
-                        )
-                    )
-                ],
-                cls='active'
-            ),
-            H.div(
-                [
-                    formatted
-                    for (text, formatted) in (
-                        sorted(
-                            (
-                                cls.title(
-                                    record,
-                                    cls.titleStr(db, auth, record),
-                                    cls.titleHint(record),
-                                    markup=True, asEdit=True, active=val,
-                                )
-                                for record in db.getValueRecords(cls.name)
-                                if record.get(N._id, None) not in val
-                            ),
-                            key=lambda x: x[0].lower()
-                        )
-                    )
-                ],
-                cls='inactive'
-            )
-        ]
-        if multiple else
+        filterControl
+        +
         [
             formatted
             for (text, formatted) in (
-                [cls.title(
-                    {},
-                    cls.titleStr(db, auth, {}),
-                    cls.titleHint({}),
-                    markup=True, asEdit=True, active=val,
-                )]
+                (
+                    []
+                    if multiple else
+                    [cls.title(
+                        {},
+                        cls.titleStr(db, auth, {}),
+                        cls.titleHint({}),
+                        markup=True, asEdit=True, active=val,
+                    )]
+                )
                 +
                 sorted(
                     (
@@ -534,7 +483,7 @@ class Related(TypeBase):
                             record,
                             cls.titleStr(db, auth, record),
                             cls.titleHint(record),
-                            markup=True, asEdit=True, active=val,
+                            markup=True, asEdit=True, multiple=multiple, active=val,
                         )
                         for record in db.getValueRecords(cls.name)
                     ),
@@ -554,28 +503,49 @@ class Related(TypeBase):
     return None
 
   @classmethod
-  def title(cls, record, titleStr, titleHint, markup=False, asEdit=False, active=None):
+  def title(
+      cls, record,
+      titleStr, titleHint,
+      markup=False, asEdit=False, multiple=False, active=None,
+  ):
 
     if markup:
       eid = record.get(N._id, None)
-      atts = dict(
-          cls=(
-              f'{"label" if active == eid else "button"} medium field'
-              if asEdit else
-              "tag"
-          ),
+      isActive = (
+          eid in active or []
+          if multiple else
+          eid is not None and eid == active
       )
-      if asEdit:
-        if eid is not None:
-          atts['eid'] = str(eid)
-          if eid == active:
-            atts['cls'] = "tag active"
+      baseCls = (
+          (
+              "button " if multiple or not isActive else "label "
+          )
+          if asEdit else
+          "tag "
+      )
+      activeCls = "active " if isActive else ""
+      cls = f"{baseCls}{activeCls}medium field"
+      atts = dict(cls=cls)
+      if asEdit and eid is not None:
+        atts[N.eid] = str(eid)
 
       if titleHint:
         atts['title'] = titleHint
 
+      titleIcon = (
+          (NBSP + H.icon(
+              N.times if isActive else N.plus,
+          ))
+          if multiple else
+          E
+      )
+
       titleFormatted = H.span(
-          titleStr,
+          [
+              titleStr,
+              titleIcon,
+          ],
+          lab=titleStr.lower(),
           **atts,
       )
 
@@ -611,7 +581,7 @@ class TypeContribution(Related):
 
   @classmethod
   def titleHint(cls, record):
-    return record.get(N.explanation, E)
+    return E.join(record.get(N.explanation, []))
 
 
 class Criteria(Related):
@@ -679,6 +649,29 @@ class Types(object):
         cls.make(tp)
       else:
         cls.register(typeClass, tp)
+
+
+def cleanNumber(strVal, isInt):
+    normalVal = str(strVal).strip()
+    normalVal = stripNonnumeric.sub(E, normalVal)
+    isNegative = normalVal.startswith(MIN)
+    normalVal = normalVal.replace(MIN, E)
+    if isNegative:
+      normalVal = f'{MIN}{normalVal}'
+    if isInt:
+      normalVal = stripFraction.sub(E, normalVal)
+      normalVal = stripDecimal.sub(E, normalVal)
+    normalVal = stripLeading.sub(E, normalVal)
+    if not isInt:
+      parts = decimalSep.split(normalVal)
+      if len(parts) > 2:
+        parts = parts[0:2]
+      normalVal = DOT.join(parts)
+    return normalVal or (
+        ZERO
+        if isInt else
+        f"""{ZERO}{DOT}{ZERO}"""
+    )
 
 
 Types.defineAll()

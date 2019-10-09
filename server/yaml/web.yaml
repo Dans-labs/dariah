@@ -13,6 +13,7 @@ messages:
   decimal: only digits and one floating point/comma
   money: only digits and one floating point/comma
   datetime: yyyy-mm-dd hh-mm-ss (you may leave out trailing parts)
+  filter: type to filter
 
 unknown:
   generic: '??'

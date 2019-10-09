@@ -154,7 +154,7 @@ class Field(object):
                 labelDiv(label),
                 H.div(
                     widget,
-                    cls=f"record-value {editClass}",
+                    cls=f"record-value{editClass}",
                 ),
             ],
             cls="record-row",
@@ -169,7 +169,7 @@ class Field(object):
     button = (
         H.icon(
             N.eye,
-            cls="button small field",
+            cls="button small",
             action=N.view,
             **atts,
         )
@@ -177,14 +177,14 @@ class Field(object):
         (
             H.icon(
                 N.pencil,
-                cls="button small field",
+                cls="button small",
                 action=N.edit,
                 **atts,
             )
             if mayEdit else
             H.icon(
                 N.refresh,
-                cls="button small field",
+                cls="button small",
                 action=N.view,
                 title=REFRESH,
                 **atts,

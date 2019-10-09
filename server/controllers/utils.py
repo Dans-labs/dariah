@@ -40,6 +40,8 @@ WHYPHEN = ' - '
 ELLIPS = '...'
 ON = ' on '
 
+NBSP = '&#xa'
+
 LATIN1 = 'latin1'
 UTF8 = 'utf8'
 
