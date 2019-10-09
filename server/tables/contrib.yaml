@@ -60,7 +60,9 @@ discipline:
   label: Disciplines
   type: discipline
   multiple: true
+  extensible: true
 keyword:
   label: Keywords
   type: keyword
   multiple: true
+  extensible: true

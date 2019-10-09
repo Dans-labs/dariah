@@ -15,7 +15,7 @@ PROV = CW.provLabel
 
 class Record(object):
   inheritProps = (
-      'db', 'auth', 'eppn', 'table', 'fields', 'prov', 'isUserTable', 'itemLabels',
+      'db', 'auth', 'uid', 'eppn', 'table', 'fields', 'prov', 'isUserTable', 'itemLabels',
   )
 
   def __init__(self, tableObj, record=None, eid=None):

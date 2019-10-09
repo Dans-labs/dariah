@@ -75,6 +75,7 @@ class Table(object):
     return db.insertItem(table, uid, eppn)
 
   def wrap(self, openEid, action=None):
+    print(self.table, action)
     if not self.mayList(action=action):
       return FORBIDDEN
 
@@ -137,7 +138,7 @@ class Table(object):
     isUserTable = self.isUserTable
     return (
         (isUserTable or auth.authenticated())
-        if action is None else
+        if action is N.list else
         (isUserTable and auth.authenticated())
     )
 

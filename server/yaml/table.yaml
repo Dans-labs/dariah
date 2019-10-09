@@ -4,6 +4,8 @@ userTables:
   - contrib
   - assessment
   - review
+
+userEntryTables:
   - criteriaEntry
   - reviewEntry
 

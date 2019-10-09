@@ -130,6 +130,11 @@ input.wfilter[type=text] {
 	background-color: var(--value-edit-back);
   border: 0;
 }
+.button.add {
+	color: var(--action-fore);
+	background-color: var(--value-edit-back);
+  border: 0;
+}
 .button.disabled {
 	cursor: default;
 	background-color: var(--action-disabled-back);

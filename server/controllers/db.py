@@ -165,7 +165,7 @@ class Db(object):
         records
     )
 
-  def insertItem(self, table, uid, eppn):
+  def insertItem(self, table, uid, eppn, **fields):
     mongo = self.mongo
 
     justNow = now()
@@ -173,6 +173,7 @@ class Db(object):
         N.dateCreated: justNow,
         N.creator: uid,
         N.modified: ['{} on {}'.format(eppn, justNow)],
+        **fields,
     })
     self.collect(table)
     return result.inserted_id

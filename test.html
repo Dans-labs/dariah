@@ -3,18 +3,13 @@
       <meta charset="utf-8"/>
     </head>
     <body>
-      <input type="text" value="aap"/>
-      <a action="focus" href="#">focus</a>
-      <a action="blur" href="#">blur</a>
+      <p multiple>aap</p>
   <script type="text/javascript" src="static/js/jquery.js"></script>
   <script type="text/javascript">
 $(() => {
-  $('[action=focus]').click(() => {
-    var target = $('input')
-    target.focus()
-    target.val(target.val())
-  })
-  $('[action=blur]').click(() => {$('input').blur()})
+  const el = $('p')
+  const multipl = el.attr('multiple')
+  console.warn({ multipl })
 })
   </script>
     </body>

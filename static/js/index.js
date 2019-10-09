@@ -43,6 +43,7 @@ const widgets = {
     activate(table, eid, field, parent, valueEl, targets) {
       const filterKey = `${table}/${eid}/${field}/filter`
       const multiple = valueEl.attr('multiple')
+      const extensible = valueEl.attr('extensible')
       targets.each((i, elem) => {
         const el = $(elem)
         const options = el.find('.button.field, .label.field')
@@ -64,19 +65,26 @@ const widgets = {
         })
         const filterControl = el.find('input.wfilter')
         const filterOff = el.find('.button.wfilter')
+        const filterAdd = el.find('.button.add')
         const prevFilter = localStorage.getItem(filterKey) || ''
         filterControl.val(prevFilter)
-        filterTags(options, prevFilter, filterOff)
+        filterTags(options, prevFilter, filterOff, filterAdd, extensible)
         filterControl.off('keyup').on('keyup', () => {
           const curFilter = filterControl.val()
           localStorage.setItem(filterKey, curFilter)
-          filterTags(options, curFilter, filterOff)
+          filterTags(options, curFilter, filterOff, filterAdd, extensible)
         })
         filterOff.off('click').click(() => {
           const newFilter = ''
           filterControl.val(newFilter)
           localStorage.setItem(filterKey, newFilter)
-          filterTags(options, newFilter, filterOff)
+          filterTags(options, newFilter, filterOff, filterAdd, extensible)
+        })
+        filterAdd.off('click').click(() => {
+          const newTag = filterControl.val()
+          if (extensible && newTag) {
+            edit(table, eid, field, valueEl, parent, newTag)
+          }
         })
       })
     },
@@ -91,9 +99,10 @@ const widgets = {
   },
 }
 
-const filterTags = (options, pattern, off) => {
+const filterTags = (options, pattern, off, add, extensible) => {
   if (pattern) {
     const pat = pattern.toLowerCase()
+    let remaining = 0
     options.each((i, elem) => {
       const el = $(elem)
       const lab = el.attr('lab')
@@ -102,9 +111,21 @@ const filterTags = (options, pattern, off) => {
       }
       else {
         el.show()
+        remaining++
       }
     })
     off.show()
+    if (extensible) {
+      if (remaining) {
+        add.hide()
+      }
+      else {
+        add.show()
+      }
+    }
+    else {
+      add.hide()
+    }
   }
   else {
     options.show()
@@ -197,40 +218,46 @@ const makeFieldUrl = (table, eid, field, action) =>
 const collectEvents = {}
 
 const view = (table, eid, field, valueEl, parent) => {
-  const saveValue = save(table, eid, field, valueEl, parent)
+  const saveValue = save(table, eid, field, valueEl)
   const url = makeFieldUrl(table, eid, field, 'view')
   fetch(url, parent, saveValue)
 }
 
-const edit = (table, eid, field, valueEl, parent) => {
-  const saveValue = save(table, eid, field, valueEl, parent)
+const edit = (table, eid, field, valueEl, parent, newTag) => {
+  const saveValue = save(table, eid, field, valueEl, newTag)
   const url = makeFieldUrl(table, eid, field, 'edit')
   fetch(url, parent, saveValue)
 }
 
-const getDynValues = valueEl => {
+const getDynValues = (valueEl, newTag) => {
   const origAttValue = valueEl.attr('orig')
   if (origAttValue === undefined) {
     return {}
   }
   const origValue = atob(origAttValue)
   const multiple = valueEl.attr('multiple')
+  const extensible = valueEl.attr('extensible')
   const valueCarrier = valueEl.find('.wvalue')
   const wType = valueEl.attr('wtype')
   const { [wType]: { read, readMultiple } } = widgets
-  const givenValue = multiple
+  const givenValuePre = multiple
     ? readMultiple
       ? readMultiple(valueCarrier)
       : $.makeArray(valueCarrier.map((i, el) => read($(el))))
         .filter(v => v !== '')
     : read(valueCarrier)
+  const givenValue = (extensible && newTag)
+    ? multiple
+      ? [...givenValuePre, [newTag]]
+      : [newTag]
+    : givenValuePre
   const newValue = JSON.stringify(givenValue)
   const dirty = origValue != newValue
   return { origValue, givenValue, newValue, dirty }
 }
 
-const save = (table, eid, field, valueEl) => {
-  const { origValue, givenValue, newValue, dirty } = getDynValues(valueEl)
+const save = (table, eid, field, valueEl, newTag) => {
+  const { origValue, givenValue, newValue, dirty } = getDynValues(valueEl, newTag)
   if (origValue === undefined) {
     return undefined
   }

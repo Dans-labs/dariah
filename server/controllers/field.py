@@ -2,7 +2,7 @@ from flask import request
 
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import E, cap1
+from controllers.utils import E, ONE, cap1
 from controllers.types import Types
 from controllers.perm import getPerms
 
@@ -26,7 +26,7 @@ def labelDiv(label):
 
 class Field(object):
   inheritProps = (
-      'db', 'auth', 'eppn', 'table', 'record', 'eid', 'perm',
+      'db', 'auth', 'uid', 'eppn', 'table', 'record', 'eid', 'perm',
   )
 
   def __init__(self, recordObj, field):
@@ -50,6 +50,7 @@ class Field(object):
     self.label = fieldSpec.get(N.label, cap1(field))
     self.tp = fieldSpec.get(N.type, DEFAULT_TYPE)
     self.multiple = fieldSpec.get(N.multiple, False)
+    self.extensible = fieldSpec.get(N.extensible, False)
 
     perm = self.perm
     table = self.table
@@ -72,11 +73,13 @@ class Field(object):
 
   def save(self, data):
     db = self.db
+    uid = self.uid
     eppn = self.eppn
     table = self.table
     eid = self.eid
     field = self.field
     mayEdit = self.mayEdit
+    extensible = self.extensible
 
     if mayEdit:
       record = self.record
@@ -88,14 +91,20 @@ class Field(object):
           if tpClass else
           None
       )
+      args = (
+          dict(db=db, uid=uid, eppn=eppn, extensible=True)
+          if extensible else
+          {}
+      )
+
       if conversion is not None:
         if multiple:
           data = [
-              conversion(d)
+              conversion(d, **args)
               for d in data or []
           ]
         else:
-          data = conversion(data)
+          data = conversion(data, **args)
 
       modified = record.get(N.modified, None)
       (updates, deletions) = db.updateField(
@@ -203,6 +212,7 @@ class Field(object):
     value = self.value
     tp = self.tp
     multiple = self.multiple
+    extensible = self.extensible
     widgetType = self.widgetType
 
     cls = "tags" if widgetType == N.related else "values"
@@ -211,6 +221,7 @@ class Field(object):
     args = []
     if collapseMultiple and editable:
       args.append(multiple)
+      args.append(extensible)
     if tpClass.needsField:
       args.extend([db, auth])
     method = tpClass.widget if editable else tpClass.toDisplay
@@ -220,7 +231,9 @@ class Field(object):
       origStr = Types.toOrig(value, tp, multiple)
       atts[N.orig] = origStr
     if multiple:
-      atts[N.multiple] = True
+      atts[N.multiple] = ONE
+    if extensible:
+      atts[N.extensible] = ONE
 
     return (
         H.div(

@@ -118,6 +118,7 @@ tables = set()
 
 MAIN_TABLE = CT.mainTable
 USER_TABLES = set(CT.userTables)
+USER_ENTRY_TABLES = set(CT.userEntryTables)
 VALUE_TABLES = set(CT.valueTables)
 SCALAR_TYPES = set(CT.scalarTypes)
 PROV_SPECS = CT.prov
@@ -126,6 +127,7 @@ VALUE_SPECS = CT.value
 tables = (
     tables |
     USER_TABLES |
+    USER_ENTRY_TABLES |
     VALUE_TABLES
 )
 sortedTables = (

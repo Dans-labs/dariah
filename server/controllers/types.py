@@ -162,8 +162,11 @@ class Text(TypeBase):
 
 class Url(Text):
   pattern = (
-      f"""{N.http}s?://"""
-      """[A-Za-z0-9_-]+\\.[A-Za-z0-9_.-]+"""
+      f"""^{N.http}s?://"""
+      """[A-Za-z0-9%_-]+\\.[A-Za-z0-9%_.-]+"""
+      """([/][^&?=]*)?"""
+      """([?&].*)?"""
+      """$"""
   )
 
   @classmethod
@@ -191,8 +194,7 @@ class Url(Text):
 
 class Email(Text):
   pattern = (
-      f"""{N.mailto}:"""
-      """[A-Za-z0-9][A-Za-z0-9_.-]*@[A-Za-z0-9_-]+\\.[A-Za-z0-9_.-]+"""
+      """^[A-Za-z0-9][A-Za-z0-9_.-]*@[A-Za-z0-9_-]+\\.[A-Za-z0-9_.-]+$"""
   )
 
   @classmethod
@@ -200,13 +202,6 @@ class Email(Text):
     normalVal = str(strVal).strip()
     if not normalVal:
       return E
-    if not urlStart.match(normalVal):
-      match = urlTrim.match(normalVal)
-      if match and len(match.group(1)) > 3:
-        normalVal = urlTrim.sub('', normalVal)
-      normalVal = f"""{N.https}://{normalVal}"""
-    if DOT not in normalVal:
-      normalVal += f"""{DOT}{N.org}"""
     return normalVal
 
   @classmethod
@@ -422,9 +417,15 @@ class Related(TypeBase):
     return strVal
 
   @classmethod
-  def fromStr(cls, editVal):
+  def fromStr(cls, editVal, db=None, uid=None, eppn=None, extensible=False):
     if not editVal:
       return None
+    if type(editVal) is list:
+      if extensible and editVal:
+        table = cls.name
+        return db.insertItem(table, uid, eppn, rep=editVal[0])
+      else:
+        return None
     return ObjectId(editVal)
 
   @classmethod
@@ -446,7 +447,7 @@ class Related(TypeBase):
     return val if val is None else str(val)
 
   @classmethod
-  def widget(cls, val, multiple, db, auth):
+  def widget(cls, val, multiple, extensible, db, auth):
     filterControl = [
         H.input(
             E,
@@ -454,6 +455,11 @@ class Related(TypeBase):
             placeholder=MESSAGES.get(N.filter, E),
             cls="wfilter",
         ),
+        H.icon(
+            N.plus,
+            cls="button small add",
+            title="add value",
+        ) if extensible else E,
         H.icon(
             N.times,
             cls="button small wfilter",
@@ -512,7 +518,7 @@ class Related(TypeBase):
     if markup:
       eid = record.get(N._id, None)
       isActive = (
-          eid in active or []
+          eid in (active or [])
           if multiple else
           eid is not None and eid == active
       )
