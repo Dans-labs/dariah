@@ -92,9 +92,26 @@ elements:
   - summary
   - textarea
 
+emptyElements:
+  - area
+  - base
+  - br
+  - col
+  - embed
+  - hr
+  - img
+  - input
+  - link
+  - meta
+  - param
+  - source
+  - track
+  - wbr
+
 attributeNames:
   - checked
   - cls
+  - href
   - type
   - value
 
@@ -107,7 +124,17 @@ entities:
 values:
   - Approved
 
+options:
+  assessed:
+    label: 'assessed'
+    table: assessment
+  reviewed:
+    label: 'reviewed'
+    table: review
+
 names:
   - html
   - from
   - save
+  - option
+  - select

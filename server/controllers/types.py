@@ -17,7 +17,7 @@ BOOLEAN_TYPES = CT.boolTypes
 VALUE_TABLES = CT.valueTables
 
 QQ = CW.unknown[N.generic]
-ZERO = CW.unknown[N.number]
+QN = CW.unknown[N.number]
 MESSAGES = CW.messages
 
 
@@ -502,7 +502,7 @@ class Related(TypeBase):
 
   @classmethod
   def titleStr(cls, db, auth, record):
-    return he(record.get(N.rep, record.get(N.title, None))) or QQ
+    return he(record.get(N.rep, None) or record.get(N.title, None) or QQ)
 
   @classmethod
   def titleHint(cls, record):
@@ -574,34 +574,40 @@ class Country(Related):
 
   @classmethod
   def titleHint(cls, record):
-    return record.get(N.name, QQ)
+    return record.get(N.name, None) or QQ
 
 
 class TypeContribution(Related):
   @classmethod
   def titleStr(cls, db, auth, record):
-    mainType = record.get(N.mainType, E)
-    subType = record.get(N.subType, E)
+    mainType = record.get(N.mainType, None) or E
+    subType = record.get(N.subType, None) or E
     sep = WHYPHEN if mainType and subType else E
     return he(f"""{mainType}{sep}{subType}""")
 
   @classmethod
   def titleHint(cls, record):
-    return E.join(record.get(N.explanation, []))
+    return E.join(record.get(N.explanation, None) or [])
 
 
 class Criteria(Related):
   @classmethod
   def titleStr(cls, db, auth, record):
-    return he(record.get(N.criterion, None)) or QQ
+    return he(record.get(N.criterion, None) or QQ)
 
 
 class Score(Related):
   @classmethod
   def titleStr(cls, db, auth, record):
-    score = he(record.get(N.score, None)) or QQ
-    level = he(record.get(N.level, None)) or QQ
+    score = he(record.get(N.score, None) or QQ)
+    level = he(record.get(N.level, None) or QQ)
     return f"""{score} - {level}"""
+
+
+class Contrib(Related):
+  @classmethod
+  def titleStr(cls, db, auth, record):
+    return he(record.get(N.title, None) or QQ)
 
 
 class Types(object):
@@ -674,9 +680,9 @@ def cleanNumber(strVal, isInt):
         parts = parts[0:2]
       normalVal = DOT.join(parts)
     return normalVal or (
-        ZERO
+        QN
         if isInt else
-        f"""{ZERO}{DOT}{ZERO}"""
+        f"""{QN}{DOT}{QN}"""
     )
 
 

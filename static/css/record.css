@@ -85,3 +85,13 @@
 .delete {
   float: right;
 }
+.stats
+{
+  font-size: small;
+  font-weight: bold;
+  color: var(--stats-value-fore);
+  background-color: var(--stats-value-back);
+  padding: 0.2rem;
+  margin: 0.2rem;
+  border-radius: 0.2rem;
+}

@@ -161,29 +161,29 @@ class Auth(object):
     db = self.db
     user = self.user
 
-    name = record.get(N.name, E)
+    name = record.get(N.name, None) or E
     if not name:
-      firstName = record.get(N.firstName, E)
-      lastName = record.get(N.lastName, E)
+      firstName = record.get(N.firstName, None) or E
+      lastName = record.get(N.lastName, None) or E
       name = (
           firstName +
           (BLANK if firstName and lastName else E) +
           lastName
       )
-    group = user.get(N.groupRep, UNAUTH)
+    group = user.get(N.groupRep, None) or UNAUTH
     isAuth = group != UNAUTH
-    org = record.get(N.org, E)
+    org = record.get(N.org, None) or E
     orgRep = f""" ({org})""" if org else E
-    email = record.get(N.email, E) if isAuth else E
-    authority = record.get(N.authority, E) if isAuth else E
+    email = (record.get(N.email, None) or E) if isAuth else E
+    authority = (record.get(N.authority, None) or E) if isAuth else E
     authorityRep = f"""{WHYPHEN}{authority}""" if authority else E
-    eppn = record.get(N.eppn, E) if isAuth else E
+    eppn = (record.get(N.eppn, None) or E) if isAuth else E
 
     countryId = record.get(N.country, None)
     countryInfo = db.country.get(countryId, {})
     countryLong = (
-        f"""{countryInfo.get(N.name, N.unknown)}"""
-        f""" ({countryInfo.get(N.iso, E)})"""
+        f"""{countryInfo.get(N.name, None) or N.unknown}"""
+        f""" ({countryInfo.get(N.iso, None) or E})"""
         if countryInfo else
         UNKNOWN_COUNTRY
     )
@@ -205,8 +205,8 @@ class Auth(object):
     db = self.db
     user = self.user
 
-    group = user.get(N.groupRep, UNAUTH)
-    groupDesc = db.permissionGroupDesc.get(group, UNKNOWN_GROUP)
+    group = user.get(N.groupRep, None) or UNAUTH
+    groupDesc = db.permissionGroupDesc.get(group, None) or UNKNOWN_GROUP
 
     if group == UNAUTH:
       return (N.Guest, groupDesc)
@@ -225,7 +225,7 @@ class Auth(object):
     if login:
       session.pop(N.eppn, None)
       self.checkLogin()
-      if user.get(N.group, unauthId) != unauthId:
+      if (user.get(N.group, None) or unauthId) != unauthId:
         # in this case there is an eppn
         session[N.eppn] = user[N.eppn]
     else:

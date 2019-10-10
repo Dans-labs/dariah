@@ -13,8 +13,6 @@ CW = C.web
 DEFAULT_TYPE = CT.defaultType
 
 REFRESH = CW.messages[N.refresh]
-QQ = CW.unknown[N.generic]
-ZERO = CW.unknown[N.number]
 
 
 def labelDiv(label):

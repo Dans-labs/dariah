@@ -142,6 +142,7 @@ const fetch = (url, destElem, data) => {
       contentType: false,
       success: html => {
         destElem.html(html)
+        activateFetch(destElem)
         activateActions(destElem)
         openCloseItems(destElem)
       },
@@ -157,6 +158,7 @@ const fetch = (url, destElem, data) => {
       contentType: true,
       success: html => {
         destElem.html(html)
+        activateFetch(destElem)
         activateActions(destElem)
         openCloseItems(destElem)
       },
@@ -164,8 +166,9 @@ const fetch = (url, destElem, data) => {
   }
 }
 
-const activateFetch = () => {
-  $('[fetchurl]').each((i, elem) => {
+const activateFetch = destElem => {
+  const targets = destElem ? destElem.find('[fetchurl]') : $('[fetchurl]')
+  targets.each((i, elem) => {
     const parent = elem.closest('details')
     const el = $(elem)
     $(parent).on('toggle', () => {
@@ -340,13 +343,81 @@ const activateActions = destElem => {
     }
   })
 }
+const applyOptions = (destElem, optionElements, init) => {
+  const options = {}
+  optionElements.each((i, elem) => {
+    const el = $(elem)
+    const option = el.attr('id')
+    const value = elOption(el)
+    if (init) {
+      elOption(el, value)
+    }
+    options[option] = value
+  })
+  const optionRep = Object.entries(options)
+    .map(([op, v]) => `${op}=${v}`)
+    .join('&')
+  const links = destElem.find('a[hrefpre]')
+  links.each((i, elem) => {
+    const el = $(elem)
+    const urlPrefix = el.attr('hrefpre')
+    const url = `${urlPrefix}${optionRep ? '?' : ''}${optionRep}`
+    el.attr('href', url)
+  })
+  if (!init) {
+    const activeLink = destElem.find('a.active')
+    if (activeLink.length) {
+      const activeUrl = activeLink.attr('href')
+      window.location.href = activeUrl
+    }
+  }
+}
+
+const elOption = (el, value) => {
+  if (value === undefined) {
+    return el.attr('trival') || '0'
+  }
+  else {
+    el.attr('trival', value || '0')
+    if (value == '1') {
+      el.prop('checked', true)
+      el.prop('indeterminate', false)
+    }
+    else if (value == '-1') {
+      el.prop('checked', false)
+      el.prop('indeterminate', false)
+    }
+    else {
+      el.prop('indeterminate', true)
+    }
+  }
+}
+
+const nextOption = val =>
+  (val == '1') ? '0' : (val == '-1') ? '1' : '-1'
+
+const activateOptions = destElem => {
+  const optionElements = destElem.find('input.option')
+  optionElements.each((i, elem) => {
+    const el = $(elem)
+    el.off('click').click(() => {
+      const prevValue = elOption(el)
+      const newValue = nextOption(prevValue)
+      elOption(el, newValue)
+      applyOptions(destElem, optionElements)
+    })
+  })
+  applyOptions(destElem, optionElements, true)
+}
 
 /* main
  *
  */
 
 $(() => {
+  const contribHeading = $('details[itemkey=contrib]')
   activateFetch()
   activateActions()
+  activateOptions(contribHeading)
   openCloseItems()
 })

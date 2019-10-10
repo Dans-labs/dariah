@@ -2,11 +2,12 @@ from itertools import chain
 from bson.objectid import ObjectId
 
 from controllers.config import Config as C, Names as N
-from controllers.utils import serverprint, now, filterModified, E, ON
+from controllers.utils import serverprint, now, filterModified, E, ON, ONE, MINONE
 
 CB = C.base
 CM = C.mongo
 CT = C.table
+CW = C.web
 
 
 CREATOR = CB.creator
@@ -20,6 +21,8 @@ M_OR = CM.OR
 ACTIVE_TABLES = set(CT.activeTables)
 VALUE_TABLES = set(CT.valueTables)
 REFERENCE_SPECS = CT.reference
+
+OPTIONS = CW.options
 
 
 class Db(object):
@@ -96,7 +99,7 @@ class Db(object):
       record[N.active] = record[N._id] in packageActive
 
     typeActive = set(chain.from_iterable(
-        record.get(N.typeContribution, [])
+        record.get(N.typeContribution, None) or []
         for (_id, record) in self.package.items()
         if _id in packageActive
     ))
@@ -115,12 +118,38 @@ class Db(object):
     for (_id, record) in self.criteria.items():
       if _id not in criteriaActive:
         continue
-      for tp in record.get(N.typeContribution, []):
+      for tp in record.get(N.typeContribution, None) or []:
         self.typeCriteria.setdefault(tp, set()).add(_id)
 
     serverprint(f'UPDATED {", ".join(ACTIVE_TABLES)}')
 
-  def getList(self, table, titleSort, my=None, our=None):
+  def makeCrit(self, mainTable, conditions):
+    mongo = self.mongo
+
+    activeOptions = {
+        OPTIONS.get(cond, {}).get(N.table, None): crit == ONE
+        for (cond, crit) in conditions.items()
+        if crit in {ONE, MINONE}
+    }
+    if None in activeOptions:
+      del activeOptions[None]
+
+    criterium = {}
+    for (table, crit) in activeOptions.items():
+      eids = {
+          record[mainTable]
+          for record in mongo[table].find(
+              {mainTable: {'$exists': True}},
+              {mainTable: True},
+          )
+      }
+      if crit in criterium:
+        criterium[crit] |= eids
+      else:
+        criterium[crit] = eids
+    return criterium
+
+  def getList(self, table, titleSort, my=None, our=None, select=False, **conditions):
     mongo = self.mongo
 
     crit = {}
@@ -135,7 +164,16 @@ class Db(object):
       crit.update({
           N.country: our,
       })
-    return sorted(mongo[table].find(crit), key=titleSort)
+
+    records = mongo[table].find(crit)
+    if select:
+      criterium = self.makeCrit(table, conditions)
+      records = (
+          record
+          for record in records
+          if satisfies(record, criterium)
+      )
+    return sorted(records, key=titleSort)
 
   def getItem(self, table, eid):
     mongo = self.mongo
@@ -150,6 +188,13 @@ class Db(object):
     )
     return record
 
+  def getDetails(self, table, eid, masterField):
+    mongo = self.mongo
+
+    return list(
+        mongo[table].find({masterField: eid}, {masterField: False})
+    )
+
   def getValueRecords(
       self,
       relTable,
@@ -159,7 +204,7 @@ class Db(object):
         (
             r
             for r in records
-            if r.get(N.isMember, False)
+            if r.get(N.isMember, None) or False
         )
         if relTable == N.country else
         records
@@ -286,3 +331,15 @@ class Db(object):
       nDependent += mongo[referringTable].count(crit)
 
     return nDependent
+
+
+def satisfies(record, criterium):
+  eid = record.get(N._id, None)
+  for (crit, eids) in criterium.items():
+    if (
+        crit and eid not in eids
+        or
+        not crit and eid in eids
+    ):
+      return False
+  return True

@@ -1,5 +1,9 @@
-from controllers.config import Names as N
+from controllers.config import Config as C, Names as N
 from controllers.utils import asString, E, AMP, LT, APOS, QUOT, DOLLAR
+
+CW = C.web
+
+EMPTY_ELEMENTS = set(CW.emptyElements)
 
 CLASS = 'class'
 
@@ -42,9 +46,9 @@ class HtmlElement(object):
     content = asString(material)
     attributes = attStr(atts, addClass=addClass)
     return (
+        f"""<{name}{attributes}>"""
+        if name in EMPTY_ELEMENTS else
         f"""<{name}{attributes}>{content}</{name}>"""
-        if content else
-        f"""<{name}{attributes}/>"""
     )
 
 
@@ -72,6 +76,8 @@ class HtmlElements(object):
   @staticmethod
   def icon(icon, **atts):
     iconClass = f" fa fa-{icon}"
+    if N.href in atts:
+      return HtmlElement(N.a).wrap(E, addClass=iconClass, **atts)
     return HtmlElement(N.span).wrap(E, addClass=iconClass, **atts)
 
   @staticmethod
@@ -79,6 +85,16 @@ class HtmlElements(object):
     content = asString(material)
     return HtmlElement(N.input).wrap(
         E, value=htmlEscape(content), **atts,
+    )
+
+  @staticmethod
+  def checkbox(var, **atts):
+    return HtmlElement(N.input).wrap(
+        E,
+        type=N.checkbox,
+        id=var,
+        addClass=N.option,
+        **atts,
     )
 
   @staticmethod

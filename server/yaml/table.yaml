@@ -31,10 +31,25 @@ activeTables:
   - package
   - typeContribution
 
+details:
+  contrib: 
+    - assessment
+  assessment:
+    - review
+
+masters:
+  assessment: 
+    - contrib
+  review:
+    - contrib
+    - assessment
+
 items:
   contrib: [contribution, contributions]
   country: [country, countries]
   criteria: [criterion, criteria]
+  criteriaEntry: [criteria entry, criteria entries]
+  reviewEntry: [review entry, review entries]
   score: [score point, score points]
   tadirahActivity: [TADIRAH Activity, TADIRAH Activities]
   tadirahObject: [TADIRAH Object, TADIRAH Objects]

@@ -271,7 +271,7 @@ input {
 	border: 0;
 	padding: 0.2rem;
 }
-input,
+input[type=text],
 textarea
 {
 	color: var(--edit-text-fore);
@@ -281,7 +281,7 @@ textarea
 	font-size: large;
 	font-family: monospace;
 }
-input
+input[type=text]
 {
 	width: calc(100% - 1rem);
 	margin: 0.3rem 0.3rem;
@@ -292,7 +292,7 @@ textarea
 	height: 10rem;
 	margin: 0.3rem 0.3rem;
 }
-input:focus,
+input[type=text]:focus,
 textarea:focus
 {
 	color: var(--edit-focus-text);
@@ -306,26 +306,37 @@ input.wfilter:valid+span:after {
 input.wfilter:invalid+span:after {
   content: '';
 }
-input:valid+span:after {
+input[type=text]:valid+span:after {
   position: absolute;
   content: '✓';
   padding-left: 1rem;
   color: var(--good-fore-o);
 }
-input:valid
+input[type=text]:valid
 {
   color: var(--good-fore-o);
   background-color: var(--good-back);
 }
-input:invalid+span:after {
+input[type=text]:invalid+span:after {
   position: absolute;
   content: attr(valmsg);
   padding-left: 1rem;
   color: var(--error-fore-o);
 }
-input:invalid
+input[type=text]:invalid
 {
   color: var(--error-fore-o);
   background-color: var(--error-back);
+}
+span.option
+{
+  color: var(--user-fore);
+  font-size: small;
+}
+.ruleabove
+{
+  margin-top: 0.5em;
+  padding-top: 0.5em;
+  border-top: 0.2em solid var(--dim-back);
 }
 

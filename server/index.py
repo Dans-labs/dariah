@@ -147,7 +147,7 @@ def factory():
     path = f"""{table}/{N.delete}/{eid}"""
     auth.authenticate()
     if table in ALL_TABLES:
-      Table(db, auth, table).record(eid).delete()
+      Table(db, auth, table).record(eid=eid).delete()
       newUrlPart = N.mylist if table in USER_TABLES else N.list
       newPath = (
           f"""/{table}/{newUrlPart}"""
@@ -159,7 +159,7 @@ def factory():
   def serveRecord(table, eid):
     auth.authenticate()
     if table in ALL_TABLES:
-      return Table(db, auth, table).record(eid).wrap()
+      return Table(db, auth, table).record(eid=eid, details=True).wrap()
     return noTable(table)
 
   # FIELD VIEWS AND EDITS
@@ -175,7 +175,7 @@ def factory():
   def serveField(table, eid, field, action=None):
     auth.authenticate()
     if table in ALL_TABLES:
-      return Table(db, auth, table).record(eid).field(field).wrap(action=action)
+      return Table(db, auth, table).record(eid=eid).field(field).wrap(action=action)
     return noTable(table)
 
   # LOGIN / LOGOUT

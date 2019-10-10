@@ -34,8 +34,10 @@ def checkPerm(
   if require == AUTH:
     return group != UNAUTH
 
+  isSuper = group in {OFFICE, SYSTEM, ROOT}
+
   if require == OFFICE:
-    return group in {OFFICE, SYSTEM, ROOT}
+    return isSuper
 
   if require == SYSTEM:
     return group in {SYSTEM, ROOT}
@@ -44,38 +46,38 @@ def checkPerm(
     return group == ROOT
 
   if require == EDIT:
-    return group != UNAUTH and perm[N.isEdit]
+    return group != UNAUTH and (perm[N.isEdit] or isSuper)
 
   if require == OWN:
-    return group != UNAUTH and perm[N.isOwn]
+    return group != UNAUTH and (perm[N.isOwn] or isSuper)
 
   if require == COORD:
     return (
         group == COORD and perm[N.sameCountry]
         or
-        group in {OFFICE, SYSTEM, ROOT}
+        isSuper
     )
 
 
 def authenticated(user):
-  group = user.get(N.groupRep, UNAUTH)
+  group = user.get(N.groupRep, None) or UNAUTH
   return group != UNAUTH
 
 
 def coordinator(user):
-  group = user.get(N.groupRep, UNAUTH)
+  group = user.get(N.groupRep, None) or UNAUTH
   return group == COORD
 
   return group in {OFFICE, SYSTEM, ROOT}
 
 
 def superuser(user):
-  group = user.get(N.groupRep, UNAUTH)
+  group = user.get(N.groupRep, None) or UNAUTH
   return group in {OFFICE, SYSTEM, ROOT}
 
 
 def sysadmin(user):
-  group = user.get(N.groupRep, UNAUTH)
+  group = user.get(N.groupRep, None) or UNAUTH
   return group in {SYSTEM, ROOT}
 
 
@@ -98,11 +100,11 @@ def getPerms(perm, require):
 
 def permRecord(user, record, country=None, ourFields=[]):
   uid = user.get(N._id, None)
-  group = user.get(N.groupRep, UNAUTH)
+  group = user.get(N.groupRep, None) or UNAUTH
   uCountry = user.get(N.country, None)
   refCountry = country or record.get(country, None)
   ourValues = set(chain.from_iterable(
-      asIterable(record.get(field, []))
+      asIterable(record.get(field, None) or [])
       for field in ourFields
   ))
 
@@ -123,7 +125,7 @@ def permRecord(user, record, country=None, ourFields=[]):
           and (
               uid == record.get(N.creator, None)
               or
-              uid in record.get(N.editors, set())
+              uid in (record.get(N.editors, None) or set())
           )
       ),
       N.isOur: (
@@ -133,7 +135,7 @@ def permRecord(user, record, country=None, ourFields=[]):
           and (
               uid == record.get(N.creator, None)
               or
-              uid in record.get(N.editors, set())
+              uid in (record.get(N.editors, None) or set())
               or
               uid in ourValues
           )
