@@ -62,11 +62,11 @@ class HtmlElements(object):
     return HtmlElement(N.br).wrap(E)
 
   @staticmethod
-  def details(summary, material, **atts):
+  def details(summary, material, itemkey, **atts):
     content = asString(material)
     return HtmlElement(N.details).wrap(
         HtmlElement(N.summary).wrap(summary) + content,
-        **atts
+        itemkey=itemkey, **atts
     )
 
   @staticmethod

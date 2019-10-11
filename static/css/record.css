@@ -25,6 +25,13 @@
   margin-top: 0.0rem;
   margin-bottom: 0.0rem;
 }
+.record-details {
+  background-color: var(--record-details-back);
+  border: 1pt solid var(--record-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-left: 1rem;
+}
 .record-label {
 	flex: 0 0 10rem;
 	font-weight: bold;

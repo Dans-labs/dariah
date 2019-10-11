@@ -15,8 +15,9 @@ from controllers.auth import Auth
 from controllers.sidebar import Sidebar
 from controllers.user import User
 from controllers.table import Table
+from controllers.types import Types
 
-CT = C.table
+CT = C.tables
 CW = C.web
 
 
@@ -51,6 +52,8 @@ GP = dict(methods=[N.GET, N.POST])
 def factory():
   app = Flask(__name__, static_url_path=DUMMY)
   auth = Auth(app, db)
+  control = dict(db=db, auth=auth, types=Types(db, auth))
+
   if DEBUG and auth.isDevel:
     CT.showReferences()
     N.showNames()
@@ -73,8 +76,8 @@ def factory():
   def serveIndex():
     path = START
     auth.authenticate()
-    userLine = User(db, auth).wrap()
-    sidebar = Sidebar(db, auth, path).wrap()
+    userLine = User(control).wrap()
+    sidebar = Sidebar(control, path).wrap()
     return render_template(
         INDEX,
         userLine=userLine,
@@ -84,12 +87,12 @@ def factory():
 
   # INSERT RECORD IN TABLE
 
-  @app.route(f"""/<string:table>/{N.insert}""")
+  @app.route(f"""/api/<string:table>/{N.insert}""")
   def serveTableInsert(table):
-    path = f"""/{table}/{N.insert}"""
-    auth.authenticate()
     if table in ALL_TABLES:
-      eid = Table(db, auth, table).insert()
+      path = f"""/api/{table}/{N.insert}"""
+      auth.authenticate()
+      eid = Table(control, table).insert()
       newUrlPart = N.mylist if table in USER_TABLES else N.list
       newPath = (
           f"""/{table}/{newUrlPart}/{eid}"""
@@ -126,12 +129,12 @@ def factory():
     return serveTable(table, None, action=N.ourlist)
 
   def serveTable(table, eid, action=None):
-    path = f"""/{table}/{action}"""
-    auth.authenticate()
-    userLine = User(db, auth).wrap()
-    sidebar = Sidebar(db, auth, path).wrap()
     if table in ALL_TABLES:
-      tableList = Table(db, auth, table).wrap(eid, action=action)
+      path = f"""/{table}/{action}"""
+      auth.authenticate()
+      userLine = User(control).wrap()
+      sidebar = Sidebar(control, path).wrap()
+      tableList = Table(control, table).wrap(eid, action=action)
       return render_template(
           INDEX,
           userLine=userLine,
@@ -142,12 +145,12 @@ def factory():
 
   # RECORD VIEW / DELETE
 
-  @app.route(f"""/<string:table>/{N.delete}/<string:eid>""")
+  @app.route(f"""/api/<string:table>/{N.delete}/<string:eid>""")
   def serveRecordDelete(table, eid):
-    path = f"""{table}/{N.delete}/{eid}"""
-    auth.authenticate()
     if table in ALL_TABLES:
-      Table(db, auth, table).record(eid=eid).delete()
+      path = f"""/api/{table}/{N.delete}/{eid}"""
+      auth.authenticate()
+      Table(control, table).record(eid=eid).delete()
       newUrlPart = N.mylist if table in USER_TABLES else N.list
       newPath = (
           f"""/{table}/{newUrlPart}"""
@@ -155,27 +158,43 @@ def factory():
       return redirect(newPath)
     return notFound(path)
 
-  @app.route(f"""/<string:table>/{N.item}/<string:eid>""")
+  @app.route(f"""/api/<string:table>/{N.item}/<string:eid>""")
   def serveRecord(table, eid):
-    auth.authenticate()
     if table in ALL_TABLES:
-      return Table(db, auth, table).record(eid=eid, details=True).wrap()
+      auth.authenticate()
+      return Table(control, table).record(eid=eid, details=True).wrap()
+    return noTable(table)
+
+  @app.route(f"""/<string:table>/{N.item}/<string:eid>""")
+  def serveRecordPage(table, eid):
+    if table in ALL_TABLES:
+      path = f"""/{table}/{N.item}/{eid}"""
+      auth.authenticate()
+      userLine = User(control).wrap()
+      sidebar = Sidebar(control, path).wrap()
+      record = Table(control, table).record(eid=eid, details=True).wrap()
+      return render_template(
+          INDEX,
+          userLine=userLine,
+          sidebar=sidebar,
+          material=record,
+      )
     return noTable(table)
 
   # FIELD VIEWS AND EDITS
 
-  @app.route(f"""/<string:table>/{N.item}/<string:eid>/{N.edit}/<string:field>""", **GP)
+  @app.route(f"""/api/<string:table>/{N.item}/<string:eid>/{N.edit}/<string:field>""", **GP)
   def serveFieldEdit(table, eid, field):
     return serveField(table, eid, field, action=N.edit)
 
-  @app.route(f"""/<string:table>/{N.item}/<string:eid>/{N.view}/<string:field>""", **GP)
+  @app.route(f"""/api/<string:table>/{N.item}/<string:eid>/{N.view}/<string:field>""", **GP)
   def serveFieldView(table, eid, field):
     return serveField(table, eid, field, action=N.view)
 
   def serveField(table, eid, field, action=None):
     auth.authenticate()
     if table in ALL_TABLES:
-      return Table(db, auth, table).record(eid=eid).field(field).wrap(action=action)
+      return Table(control, table).record(eid=eid).field(field).wrap(action=action)
     return noTable(table)
 
   # LOGIN / LOGOUT
@@ -203,8 +222,8 @@ def factory():
 
   def notFound(path):
     auth.authenticate()
-    userLine = User(db, auth).wrap()
-    sidebar = Sidebar(db, auth, path).wrap()
+    userLine = User(control).wrap()
+    sidebar = Sidebar(control, path).wrap()
     return render_template(
         INDEX,
         userLine=userLine,

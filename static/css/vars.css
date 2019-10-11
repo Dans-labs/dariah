@@ -23,9 +23,9 @@
     --action-active-back:              hsla(060,  80%,  90%, 0.8);
     --action-active-border:            hsla(060, 100%,  40%, 1.0);
 
-    --assessment-quoted-fore:          hsla( 60, 100%,  10%, 1  );
-    --assessment-quoted-back:          hsla( 60, 100%,  90%, 1  );
-    --assessment-quoted-border:        hsla( 60, 100%,  35%, 0.5);
+    --assessment-quoted-fore:          hsla(180,  35%,  10%, 1  );
+    --assessment-quoted-back:          hsla(180,  35%,  92%, 1  );
+    --assessment-quoted-border:        hsla(180,  35%,  35%, 0.5);
 
     --entry-complete-back:             hsla(120, 100%, 100%, 1  );
     --entry-complete-border:           hsla(120, 100%,  50%, 0.5);
@@ -85,6 +85,8 @@
     --record-edit-back:                hsla(  0,   0%,  80%, 0.8);
     --record-edit-border:              hsla(  0,   0%,  80%, 0.5);
     --record-border-no:                hsla(  0,   0%,   0%, 0  );
+
+    --record-details-back:             hsla(  0,   0%,  95%, 0.8);
 
     --resize-fore:                     hsla(  0,   0%,  50%, 0.1);
 

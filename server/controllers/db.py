@@ -2,11 +2,14 @@ from itertools import chain
 from bson.objectid import ObjectId
 
 from controllers.config import Config as C, Names as N
-from controllers.utils import serverprint, now, filterModified, E, ON, ONE, MINONE
+from controllers.utils import (
+    serverprint, now, filterModified, isIterable,
+    E, ON, ONE, MINONE
+)
 
 CB = C.base
 CM = C.mongo
-CT = C.table
+CT = C.tables
 CW = C.web
 
 
@@ -17,6 +20,7 @@ M_UNSET = CM.unset
 M_LTE = CM.lte
 M_GTE = CM.gte
 M_OR = CM.OR
+M_IN = CM.IN
 
 ACTIVE_TABLES = set(CT.activeTables)
 VALUE_TABLES = set(CT.valueTables)
@@ -116,8 +120,6 @@ class Db(object):
 
     self.typeCriteria = {}
     for (_id, record) in self.criteria.items():
-      if _id not in criteriaActive:
-        continue
       for tp in record.get(N.typeContribution, None) or []:
         self.typeCriteria.setdefault(tp, set()).add(_id)
 
@@ -188,11 +190,18 @@ class Db(object):
     )
     return record
 
-  def getDetails(self, table, eid, masterField):
+  def getDetails(self, table, masterField, eids, stripMasterField):
     mongo = self.mongo
 
+    crit = {
+        masterField:
+        {M_IN: list(eids)}
+        if isIterable(eids) else
+        eids
+    }
+    proj = {masterField: False} if stripMasterField else None
     return list(
-        mongo[table].find({masterField: eid}, {masterField: False})
+        mongo[table].find(crit, proj)
     )
 
   def getValueRecords(
@@ -309,7 +318,7 @@ class Db(object):
     if eid is None:
       return True
 
-    referenceSpecs = REFERENCE_SPECS.get(table, set())
+    referenceSpecs = REFERENCE_SPECS.get(table, {})
     nDependent = 0
     for (referringTable, referringFields) in referenceSpecs.items():
       if not len(referringFields):

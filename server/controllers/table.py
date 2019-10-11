@@ -5,13 +5,11 @@ from flask import request
 from controllers.config import Config as C, Names as N
 from controllers.perm import UNAUTH
 from controllers.record import Record
-from controllers.html import HtmlElements as H, htmlEscape as he
+from controllers.html import HtmlElements as H
 from controllers.utils import E, ELLIPS, NBSP
 
-from controllers.types import Types
 
-
-CT = C.table
+CT = C.tables
 CW = C.web
 
 
@@ -30,20 +28,25 @@ QN = CW.unknown[N.number]
 
 
 class Table(object):
-  def __init__(self, db, auth, table):
-    self.db = db
-    self.auth = auth
+  def __init__(self, control, table):
+    self.control = control
+    self.db = control[N.db]
+    self.auth = control[N.auth]
+    self.types = control[N.types]
+
+    db = self.db
+    auth = self.auth
+    user = auth.user
+
     self.table = table
     self.isMainTable = table == MAIN_TABLE
     self.isUserTable = table in USER_TABLES
     self.isUserEntryTable = table in USER_ENTRY_TABLES
     self.isValueTable = table in VALUE_TABLES
-    if self.isValueTable:
-      self.typeClass = getattr(Types, table)
     self.itemLabels = ITEMS.get(table, [table, f'{table}s'])
     self.prov = PROV_SPECS
     self.fields = getattr(CT, table, {})
-    user = auth.user
+
     self.uid = user.get(N._id, None)
     self.eppn = user.get(N.eppn, None)
     self.group = user.get(N.groupRep, None) or UNAUTH
@@ -123,9 +126,9 @@ class Table(object):
                     self.title(record),
                     H.div(
                         ELLIPS,
-                        fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
+                        fetchurl=f"""/api/{table}/{N.item}/{record[N._id]}""",
                     ),
-                    itemkey=f"""{table}/{record[N._id]}""",
+                    f"""{table}/{record[N._id]}""",
                     **forceOpen(record[N._id], openEid),
                 )
                 for record in records
@@ -145,7 +148,7 @@ class Table(object):
     return H.icon(
         N.plus,
         cls="button medium",
-        href=f"""/{table}/{N.insert}""",
+        href=f"""/api/{table}/{N.insert}""",
         title=f"""New {itemSingle}"""
     )
 
@@ -163,22 +166,7 @@ class Table(object):
     )
 
   def title(self, record):
-    db = self.db
-    auth = self.auth
-    isUserTable = self.isUserTable
-    isUserEntryTable = self.isUserEntryTable
-
-    if isUserTable:
-      return H.span(he(record.get(N.title, None) or QQ))
-
-    if isUserEntryTable:
-      return H.span(he(record.get(N.seq, None) or QN))
-
-    typeClass = self.typeClass
-    titleStr = typeClass.titleStr(db, auth, record)
-    titleHint = typeClass.titleHint(record)
-
-    return H.span(typeClass.title(record, titleStr, titleHint))
+    return Record.titleRaw(self, record)
 
 
 def forceOpen(theEid, openEid):

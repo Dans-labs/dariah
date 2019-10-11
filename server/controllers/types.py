@@ -6,15 +6,20 @@ from bson.objectid import ObjectId
 
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H, htmlEscape as he
-from controllers.utils import bencode, now, cap1, E, DOT, MIN, EURO, WHYPHEN, NBSP
+from controllers.utils import (
+    serverprint, bencode, now, cap1,
+    E, DOT, MIN, EURO, WHYPHEN, NBSP,
+)
 
 
-CT = C.table
+CT = C.tables
 CW = C.web
 
 SCALAR_TYPES = set(CT.scalarTypes)
 BOOLEAN_TYPES = CT.boolTypes
 VALUE_TABLES = CT.valueTables
+USER_TABLES = CT.userTables
+USER_ENTRY_TABLES = CT.userEntryTables
 
 QQ = CW.unknown[N.generic]
 QN = CW.unknown[N.number]
@@ -99,51 +104,46 @@ class TypeBase(object):
   widgetType = None
   pattern = None
   rawType = None
-  needsField = False
+  needsDb = False
+  needsAuth = False
 
-  @classmethod
-  def normalize(cls, strVal):
+  def normalize(self, strVal):
     return str(strVal).strip()
 
-  @classmethod
-  def fromStr(cls, editVal):
+  def fromStr(self, editVal):
     if not editVal:
       return None
-    val = cls.normalize(editVal)
-    cast = cls.rawType
+    val = self.normalize(editVal)
+    cast = self.rawType
     return val if cast is None else cast(val)
 
-  @classmethod
-  def toDisplay(cls, val):
+  def toDisplay(self, val):
     return H.span(
         QQ
         if val is None else
-        he(cls.normalize(str(val)))
+        he(self.normalize(str(val)))
     )
 
-  @classmethod
-  def toEdit(cls, val):
+  def toEdit(self, val):
     return (
         E
         if val is None else
-        cls.normalize(str(val))
+        self.normalize(str(val))
     )
 
-  @classmethod
-  def toOrig(cls, val):
+  def toOrig(self, val):
     if val is None:
       return None
     return str(val)
 
-  @classmethod
-  def widget(cls, val):
+  def widget(self, val):
     atts = {}
-    if cls.pattern:
-      atts['pattern'] = cls.pattern
-    validationMsg = Types.validationMsg(cls.name)
+    if self.pattern:
+      atts['pattern'] = self.pattern
+    validationMsg = Types.validationMsg(self.name)
 
     widgetElem = H.input(
-        cls.toEdit(val),
+        self.toEdit(val),
         type=N.text,
         cls="wvalue",
         **atts,
@@ -169,7 +169,6 @@ class Url(Text):
       """$"""
   )
 
-  @classmethod
   def normalize(cls, strVal):
     normalVal = str(strVal).strip()
     if not normalVal:
@@ -183,12 +182,11 @@ class Url(Text):
       normalVal += f"""{DOT}{N.org}"""
     return normalVal
 
-  @classmethod
-  def toDisplay(cls, val):
+  def toDisplay(self, val):
     if val is None:
       return H.span(QQ)
 
-    val = he(cls.normalize(str(val)))
+    val = he(self.normalize(str(val)))
     return H.a(val, val)
 
 
@@ -197,19 +195,17 @@ class Email(Text):
       """^[A-Za-z0-9][A-Za-z0-9_.-]*@[A-Za-z0-9_-]+\\.[A-Za-z0-9_.-]+$"""
   )
 
-  @classmethod
-  def normalize(cls, strVal):
+  def normalize(self, strVal):
     normalVal = str(strVal).strip()
     if not normalVal:
       return E
     return normalVal
 
-  @classmethod
-  def toDisplay(cls, val):
+  def toDisplay(self, val):
     if val is None:
       return H.span(QQ)
 
-    val = he(cls.normalize(str(val)))
+    val = he(self.normalize(str(val)))
     return H.a(val, val)
 
 
@@ -217,9 +213,8 @@ class Numeric(TypeBase):
   widgetType = N.text
   rawType = None
 
-  @classmethod
-  def normalize(cls, strVal):
-    return cleanNumber(strVal, cls.rawType is int)
+  def normalize(self, strVal):
+    return cleanNumber(strVal, self.rawType is int)
 
 
 class Int(Numeric):
@@ -239,12 +234,11 @@ class Decimal(Numeric):
 
 class Money(Decimal):
 
-  @classmethod
-  def toDisplay(cls, val):
+  def toDisplay(self, val):
     return H.span(
         QQ
         if val is None else
-        f"""{EURO} {cls.normalize(str(val))}"""
+        f"""{EURO} {self.normalize(str(val))}"""
     )
 
 
@@ -253,8 +247,7 @@ class Datetime(TypeBase):
   widgetType = N.text
   pattern = DATETIME_PATTERN
 
-  @classmethod
-  def partition(cls, strVal):
+  def partition(self, strVal):
     normalVal = dtTrim.sub('', strVal)
     if not normalVal:
       return None
@@ -278,67 +271,57 @@ class Datetime(TypeBase):
       normalParts = DEFAULT_DATE
     return normalParts
 
-  @classmethod
-  def normalize(cls, strVal):
-    normalParts = cls.partition(strVal)
+  def normalize(self, strVal):
+    normalParts = self.partition(strVal)
     if normalParts is None:
       return E
     return DATETIME_FORMAT.format(*normalParts)
 
-  @classmethod
-  def fromStr(cls, editVal):
+  def fromStr(self, editVal):
     if not editVal:
       return None
-    normalParts = cls.partition(editVal)
+    normalParts = self.partition(editVal)
     if normalParts is None:
       return None
-    cast = cls.rawType
+    cast = self.rawType
     return cast(*normalParts)
 
-  @classmethod
-  def toDisplay(cls, val):
+  def toDisplay(self, val):
     return H.span(
         QQ
         if val is None else
-        cls.normalize(val.isoformat())
+        self.normalize(val.isoformat())
     )
 
-  @classmethod
-  def toEdit(cls, val):
+  def toEdit(self, val):
     return (
         E
         if val is None else
-        cls.normalize(val.isoformat())
+        self.normalize(val.isoformat())
     )
 
-  @classmethod
-  def toOrig(cls, val):
+  def toOrig(self, val):
     if val is None:
       return None
-    return cls.normalize(val.isoformat())
+    return self.normalize(val.isoformat())
 
 
 class Markdown(TypeBase):
   widgetType = N.markdown
 
-  @classmethod
-  def normalize(cls, strVal):
+  def normalize(self, strVal):
     return strVal.strip()
 
-  @classmethod
-  def fromStr(cls, editVal):
-    return cls.normalize(editVal)
+  def fromStr(self, editVal):
+    return self.normalize(editVal)
 
-  @classmethod
-  def toDisplay(cls, val):
+  def toDisplay(self, val):
     return H.div(markdown(val or QQ))
 
-  @classmethod
-  def toEdit(cls, val):
+  def toEdit(self, val):
     return val
 
-  @classmethod
-  def widget(cls, val):
+  def widget(self, val):
     return H.textarea(
         val or E,
         cls="wvalue",
@@ -348,17 +331,14 @@ class Markdown(TypeBase):
 class Bool(TypeBase):
   widgetType = N.bool
 
-  @classmethod
-  def normalize(cls, strVal):
+  def normalize(self, strVal):
     return strVal
 
-  @classmethod
-  def fromStr(cls, editVal):
+  def fromStr(self, editVal):
     return editVal
 
-  @classmethod
-  def toDisplay(cls, val):
-    values = BOOLEAN_TYPES[cls.name]
+  def toDisplay(self, val):
+    values = BOOLEAN_TYPES[self.name]
     noneValue = False if len(values) == 2 else None
 
     return H.icon(
@@ -366,17 +346,14 @@ class Bool(TypeBase):
         cls="label medium",
     )
 
-  @classmethod
-  def toEdit(cls, val):
+  def toEdit(self, val):
     return val
 
-  @classmethod
-  def toOrig(cls, val):
+  def toOrig(self, val):
     return val
 
-  @classmethod
-  def widget(cls, val):
-    values = BOOLEAN_TYPES[cls.name]
+  def widget(self, val):
+    values = BOOLEAN_TYPES[self.name]
     noneValue = False if len(values) == 2 else None
     refV = values.get(val, values[noneValue])
 
@@ -409,45 +386,123 @@ class Bool3(Bool):
 
 
 class Related(TypeBase):
-  widgetType = N.related
-  needsField = True
+  needsDb = True
 
-  @classmethod
-  def normalize(cls, strVal):
+  def __init__(self, db):
+    self.db = db
+
+  def normalize(self, strVal):
     return strVal
 
-  @classmethod
-  def fromStr(cls, editVal, db=None, uid=None, eppn=None, extensible=False):
+  def toDisplay(self, val):
+    return self.title(eid=val, markup=True)[1]
+
+  def titleStr(self, record):
+    return he(record.get(N.title, None) or record.get(N.rep, None) or QQ)
+
+  def titleHint(self, record):
+    return None
+
+  def title(
+      self,
+      record=None, eid=None,
+      markup=False, active=None,
+  ):
+    if record is None and eid is None:
+      return QQ
+
+    if record is None:
+      db = self.db
+      table = self.name
+      record = db.getItem(table, eid)
+
+    titleStr = self.titleStr(record)
+    titleHint = self.titleHint(record)
+
+    if markup:
+      if eid is None:
+        eid = record.get(N._id, None)
+
+      atts = dict(cls=f"tag medium field")
+      if titleHint:
+        atts['title'] = titleHint
+
+      href = f'/{table}/item/{eid}'
+      titleFormatted = H.a(titleStr, href, target=N._blank, **atts)
+      return (titleStr, titleFormatted)
+    else:
+      return titleStr
+
+
+class Master(Related):
+  widgetType = N.master
+
+  def __init__(self, db):
+    self.db = db
+
+
+class CriteriaEntry(Master):
+  def __init__(self, db):
+    super().__init__(db)
+
+  def titleStr(self, record):
+    types = self.types
+
+    seq = he(record.get(N.seq, None) or QN)
+    eid = record.get(N.criteria, None)
+    title = (
+        QQ
+        if eid is None else
+        types.criteria.title(eid=eid)
+    )
+    return f"""{seq}. {title}"""
+
+
+class ReviewEntry(Master):
+  def __init__(self, db):
+    super().__init__(db)
+
+  def titleStr(self, record):
+    types = self.types
+
+    seq = he(record.get(N.seq, None) or QN)
+    eid = record.get(N.criteria, None)
+    title = (
+        QQ
+        if eid is None else
+        types.criteria.title(eid=eid)
+    )
+    return f"""{seq}. {title}"""
+
+
+class Value(Related):
+  widgetType = N.related
+
+  def __init__(self, db):
+    self.db = db
+
+  def fromStr(self, editVal, uid=None, eppn=None, extensible=False):
     if not editVal:
       return None
     if type(editVal) is list:
       if extensible and editVal:
-        table = cls.name
+        db = self.db
+        table = self.name
         return db.insertItem(table, uid, eppn, rep=editVal[0])
       else:
         return None
     return ObjectId(editVal)
 
-  @classmethod
-  def toDisplay(cls, val, db, auth):
-    record = getattr(db, cls.name).get(val, {})
-    return cls.title(
-        record,
-        cls.titleStr(db, auth, record),
-        cls.titleHint(record),
-        markup=True,
-    )[1]
-
-  @classmethod
-  def toEdit(cls, val):
+  def toEdit(self, val):
     return val
 
-  @classmethod
-  def toOrig(cls, val):
+  def toOrig(self, val):
     return val if val is None else str(val)
 
-  @classmethod
-  def widget(cls, val, multiple, extensible, db, auth):
+  def widget(self, val, multiple, extensible):
+    db = self.db
+    table = self.name
+
     filterControl = [
         H.input(
             E,
@@ -475,23 +530,19 @@ class Related(TypeBase):
                 (
                     []
                     if multiple else
-                    [cls.title(
-                        {},
-                        cls.titleStr(db, auth, {}),
-                        cls.titleHint({}),
+                    [self.title(
+                        record={},
                         markup=True, asEdit=True, active=val,
                     )]
                 )
                 +
                 sorted(
                     (
-                        cls.title(
-                            record,
-                            cls.titleStr(db, auth, record),
-                            cls.titleHint(record),
+                        self.title(
+                            record=record,
                             markup=True, asEdit=True, multiple=multiple, active=val,
                         )
-                        for record in db.getValueRecords(cls.name)
+                        for record in db.getValueRecords(table)
                     ),
                     key=lambda x: x[0].lower()
                 )
@@ -500,23 +551,26 @@ class Related(TypeBase):
         cls="wvalue",
     )
 
-  @classmethod
-  def titleStr(cls, db, auth, record):
-    return he(record.get(N.rep, None) or record.get(N.title, None) or QQ)
-
-  @classmethod
-  def titleHint(cls, record):
-    return None
-
-  @classmethod
   def title(
-      cls, record,
-      titleStr, titleHint,
+      self,
+      eid=None, record=None,
       markup=False, asEdit=False, multiple=False, active=None,
   ):
+    if record is None and eid is None:
+      return QQ
+
+    if record is None:
+      db = self.db
+      table = self.name
+      record = db.getItem(table, eid)
+
+    titleStr = self.titleStr(record)
+    titleHint = self.titleHint(record)
 
     if markup:
-      eid = record.get(N._id, None)
+      if eid is None:
+        eid = record.get(N._id, None)
+
       isActive = (
           eid in (active or [])
           if multiple else
@@ -529,9 +583,8 @@ class Related(TypeBase):
           if asEdit else
           "tag "
       )
-      activeCls = "active " if isActive else ""
-      cls = f"{baseCls}{activeCls}medium field"
-      atts = dict(cls=cls)
+      activeCls = "active " if isActive else E
+      atts = dict(cls=f"{baseCls}{activeCls}medium field")
       if asEdit and eid is not None:
         atts[N.eid] = str(eid)
 
@@ -554,84 +607,110 @@ class Related(TypeBase):
           lab=titleStr.lower(),
           **atts,
       )
-
       return (titleStr, titleFormatted)
-
     else:
       return titleStr
 
 
-class User(Related):
-  @classmethod
-  def titleStr(cls, db, auth, record):
+class User(Value):
+  needsAuth = True
+
+  def __init__(self, db, auth):
+    super().__init__(db)
+    self.auth = auth
+
+  def titleStr(self, record):
+    auth = self.auth
+
     return he(auth.identity(record))
 
 
-class Country(Related):
-  @classmethod
-  def titleStr(cls, db, auth, record):
+class Country(Value):
+  def __init__(self, db):
+    super().__init__(db)
+
+  def titleStr(self, record):
     return he(record.get(N.iso, None)) or QQ
 
-  @classmethod
-  def titleHint(cls, record):
+  def titleHint(self, record):
     return record.get(N.name, None) or QQ
 
 
-class TypeContribution(Related):
-  @classmethod
-  def titleStr(cls, db, auth, record):
+class TypeContribution(Value):
+  def __init__(self, db):
+    super().__init__(db)
+
+  def titleStr(self, record):
     mainType = record.get(N.mainType, None) or E
     subType = record.get(N.subType, None) or E
     sep = WHYPHEN if mainType and subType else E
     return he(f"""{mainType}{sep}{subType}""")
 
-  @classmethod
-  def titleHint(cls, record):
+  def titleHint(self, record):
     return E.join(record.get(N.explanation, None) or [])
 
 
-class Criteria(Related):
-  @classmethod
-  def titleStr(cls, db, auth, record):
+class Criteria(Value):
+  def __init__(self, db):
+    super().__init__(db)
+
+  def titleStr(self, record):
     return he(record.get(N.criterion, None) or QQ)
 
 
-class Score(Related):
-  @classmethod
-  def titleStr(cls, db, auth, record):
+class Score(Value):
+  def __init__(self, db):
+    super().__init__(db)
+
+  def titleStr(self, record):
     score = he(record.get(N.score, None) or QQ)
     level = he(record.get(N.level, None) or QQ)
     return f"""{score} - {level}"""
 
 
-class Contrib(Related):
-  @classmethod
-  def titleStr(cls, db, auth, record):
-    return he(record.get(N.title, None) or QQ)
-
-
 class Types(object):
-  @classmethod
-  def make(cls, tp):
-    """make a class with a dynamic name
+  def __init__(self, db, auth):
+    self.db = db
+    self.auth = auth
+    self.defineAll()
+
+  def make(self, tp, Base=None, TypeClass=None):
+    """make an object in class with a dynamic name and register it
 
     tp: the name of the class
+    Base: the class on which the class is based
 
-    The class will be based on the Related class defined earlier
+    If TypeClass is given, do not make a new class but use TypeClass.
+
+    Once the class is created, an object of this class
+    is constructed, with given attributes.
+
+    This object is registered.
     """
 
-    TpClass = type(tp, (Related,), {})
-    cls.register(TpClass, tp)
+    db = self.db
+    auth = self.auth
 
-  @classmethod
-  def register(cls, typeClass, tp):
-    setattr(typeClass, N.name, tp)
-    setattr(cls, tp, typeClass)
+    if TypeClass is None:
+      TypeClass = type(tp, (Base,), {})
 
-  @staticmethod
-  def toOrig(val, tp, multiple):
-    typeClass = getattr(Types, tp)
-    method = typeClass.toOrig
+    atts = []
+    if TypeClass.needsDb:
+      atts.append(db)
+    if TypeClass.needsAuth:
+      atts.append(auth)
+
+    typeObj = TypeClass(*atts)
+    self.register(typeObj, tp)
+
+  def register(self, typeObj, tp):
+    setattr(typeObj, N.name, tp)
+    setattr(typeObj, N.types, self)
+    setattr(self, tp, typeObj)
+
+  def toOrig(self, val, tp, multiple):
+    typeObj = getattr(self, tp)
+    method = typeObj.toOrig
     origStr = (
         [
             method(v)
@@ -646,21 +725,31 @@ class Types(object):
   def validationMsg(tp):
     return MESSAGES.get(tp, None)
 
-  @classmethod
-  def defineAll(cls):
-    for tp in SCALAR_TYPES:
-      typeName = cap1(tp)
-      typeClass = globals().get(typeName, None)
-      if typeClass:
-        cls.register(typeClass, tp)
+  def defineAll(self):
+    done = set()
 
-    for tp in VALUE_TABLES:
+    for tp in SCALAR_TYPES:
+      if tp in done:
+        serverprint(f"""Duplicate type (scalar): {tp}""")
+        continue
+      done.add(tp)
+
       typeName = cap1(tp)
-      typeClass = globals().get(typeName, None)
-      if not typeClass:
-        cls.make(tp)
+      TypeClass = globals()[typeName]
+      self.make(tp, TypeClass=TypeClass)
+
+    for tp in VALUE_TABLES + USER_TABLES + USER_ENTRY_TABLES:
+      if tp in done:
+        serverprint(f"""Duplicate type (value): {tp}""")
+        continue
+      done.add(tp)
+
+      typeName = cap1(tp)
+      TypeClass = globals().get(typeName, None)
+      if not TypeClass:
+        self.make(tp, Base=Value if tp in VALUE_TABLES else Master)
       else:
-        cls.register(typeClass, tp)
+        self.make(tp, TypeClass=TypeClass)
 
 
 def cleanNumber(strVal, isInt):
@@ -684,6 +773,3 @@ def cleanNumber(strVal, isInt):
         if isInt else
         f"""{QN}{DOT}{QN}"""
     )
-
-
-Types.defineAll()

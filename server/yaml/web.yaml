@@ -123,6 +123,7 @@ entities:
 
 values:
   - Approved
+  - _blank
 
 options:
   assessed:

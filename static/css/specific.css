@@ -1,0 +1,24 @@
+details.criterion
+{
+	margin-left: 1rem;
+  color: var(--assessment-quoted-fore);
+  background-color: var(--assessment-quoted-back);
+	border: 2px solid var(--assessment-quoted-border);
+	border-radius: 0.2rem;
+	padding: 0.2rem;
+}
+
+details.criterion .comments
+{
+	font-size: small;
+	margin-left: 1rem;
+	margin-right: 1rem;
+}
+
+.assessment-head {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  margin-left: 1rem;
+  font-size: large;
+  font-weight: bold;
+}

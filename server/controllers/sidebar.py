@@ -2,10 +2,10 @@ from flask import request
 
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import E
+from controllers.utils import E, Q, AMP, ZERO
 from controllers.table import Table
 
-CT = C.table
+CT = C.tables
 CW = C.web
 
 
@@ -16,9 +16,10 @@ OPTIONS = CW.options
 
 
 class Sidebar(object):
-  def __init__(self, db, auth, path):
-    self.db = db
-    self.auth = auth
+  def __init__(self, control, path):
+    self.control = control
+    self.db = control[N.db]
+    self.auth = control[N.auth]
     self.path = path
     self.entries = []
     self.mainEntries = []
@@ -28,6 +29,10 @@ class Sidebar(object):
     self.userEntryPaths = []
     self.valueEntries = []
     self.valuePaths = []
+    self.options = {
+        option: request.args.get(option, ZERO)
+        for option in OPTIONS.keys()
+    }
 
   def makeCaption(self, label, path, entries, rule=False):
     if not entries:
@@ -35,43 +40,56 @@ class Sidebar(object):
 
     refPath = self.path
     active = (
-        refPath.startswith(path)
+        refPath.startswith(f'/{path}/')
         if type(path) is str else
-        any(refPath.startswith(p) for p in path)
+        any(refPath.startswith(f'/{p}/') for p in path)
     )
     navClass = " active" if active else E
-    atts = dict(cls=f"nav {navClass}", itemkey=label)
+    atts = dict(
+        cls=f"nav {navClass}",
+    )
+    itemkey = path if type(path) is str else label
     if rule:
       atts['addClass'] = " ruleabove"
-    return H.details(label, entries, **atts)
+    return H.details(label, entries, itemkey, **atts)
 
-  def makeEntry(self, label, path, options=None):
+  def makeEntry(self, label, path, withOptions=False):
+    options = self.options
     active = path == self.path
 
     navClass = "button small nav" + (" active" if active else E)
-    return (
-        H.a(label, path, cls=navClass)
-        if options is None else
-        H.a(label, E, hrefpre=path, cls=navClass)
-    )
 
-  def makeOptions(self, options):
+    optionsRep = (
+        AMP.join(
+            f'{name}={value}'
+            for (name, value) in options.items()
+        )
+        if withOptions else
+        E
+    )
+    if optionsRep:
+      optionsRep = Q + optionsRep
+
+    return H.a(label, path + optionsRep, hrefbase=path, cls=navClass)
+
+  def makeOptions(self):
+    options = self.options
     return [
         H.span(
             [
-                H.checkbox(option, trival=request.args.get(option, '0')),
-                OPTIONS[option][N.label],
+                H.checkbox(name, trival=value),
+                OPTIONS[name][N.label],
             ],
             cls=N.option,
         )
-        for option in options
+        for (name, value) in options.items()
     ]
 
   def tableEntry(self, table):
-    db = self.db
+    control = self.control
     auth = self.auth
 
-    tableObj = Table(db, auth, table)
+    tableObj = Table(control, table)
     isMainTable = tableObj.isMainTable
     isUserTable = tableObj.isUserTable
     isUserEntryTable = tableObj.isUserEntryTable
@@ -83,18 +101,16 @@ class Sidebar(object):
     isSysAdmin = auth.sysadmin()
     country = auth.country()
 
-    options = list(OPTIONS.keys())
-
     if isMainTable:
       entries = []
-      entries.extend(self.makeOptions(options))
+      entries.extend(self.makeOptions())
 
       if isAuth:
         entries.append(
             self.makeEntry(
                 f"""my {itemPlural}""",
                 f"""/{table}/{N.mylist}""",
-                options=options,
+                withOptions=True,
             )
         )
 
@@ -105,7 +121,7 @@ class Sidebar(object):
               self.makeEntry(
                   f"""{iso} {itemPlural}""",
                   f"""/{table}/{N.ourlist}""",
-                  options=options,
+                  withOptions=True,
               )
           )
 
@@ -113,14 +129,13 @@ class Sidebar(object):
           self.makeEntry(
               f"""all {itemPlural}""",
               f"""/{table}/list""",
-              options=options,
+              withOptions=True,
           )
       )
 
-      if isAuth:
-        entries = [
-            self.makeCaption(table, f'/{table}/', entries)
-        ]
+      entries = [
+          self.makeCaption("""Contributions""", table, entries)
+      ]
 
       self.mainEntries.extend(entries)
       return
@@ -133,7 +148,7 @@ class Sidebar(object):
                 f"""/{table}/list""",
             )
         )
-        self.userPaths.append(f'/{table}/')
+        self.userPaths.append(table)
       return
 
     if isUserEntryTable:
@@ -144,7 +159,7 @@ class Sidebar(object):
                 f"""/{table}/list""",
             )
         )
-        self.userPaths.append(f'/{table}/')
+        self.userPaths.append(table)
 
     if isValueTable:
       if isSuperUser:
@@ -154,7 +169,7 @@ class Sidebar(object):
                 f"""/{table}/list""",
             )
         )
-        self.valuePaths.append(f'/{table}/')
+        self.valuePaths.append(table)
       return
 
   def wrap(self):
@@ -170,14 +185,14 @@ class Sidebar(object):
         E.join(self.mainEntries)
         +
         self.makeCaption(
-            'User tables',
+            'User content',
             self.userPaths,
             self.userEntries,
             rule=True,
         )
         +
         self.makeCaption(
-            'Value tables',
+            'Office content',
             self.valuePaths,
             self.valueEntries,
             rule=True,

@@ -30,7 +30,7 @@ class Perm(object):
   pass
 
 
-class Table(object):
+class Tables(object):
   @classmethod
   def showReferences(cls):
     reference = cls.reference
@@ -109,7 +109,13 @@ for configFile in files:
   N.addNames(settings)
 
 
-CT = C.table
+CT = C.tables
+
+masters = {}
+for (master, details) in CT.details.items():
+  for detail in details:
+    masters.setdefault(detail, set()).add(master)
+setattr(CT, 'masters', masters)
 
 with os.scandir(TABLE_DIR) as sd:
   files = tuple(e.name for e in sd if e.is_file() and e.name.endswith(CONFIG_EXT))
@@ -151,11 +157,11 @@ for table in tables:
     fieldType = fieldSpecs.get(N.type, None)
     if fieldType and fieldType not in SCALAR_TYPES:
       reference.setdefault(fieldType, {}).setdefault(table, set()).add(field)
-  setattr(Table, table, specs)
+  setattr(Tables, table, specs)
   tables.add(table)
 
   N.addNames(specs)
 
-setattr(Table, ALL, tables)
-setattr(Table, N.sorted, sortedTables)
-setattr(Table, N.reference, reference)
+setattr(Tables, ALL, tables)
+setattr(Tables, N.sorted, sortedTables)
+setattr(Tables, N.reference, reference)

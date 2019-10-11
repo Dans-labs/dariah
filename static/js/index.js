@@ -1,8 +1,8 @@
 /*eslint-env jquery*/
 
 const SAVE = true
-const DEBUG = true
-const BLUR = false
+const DEBUG = false
+const BLUR = true
 
 const widgets = {
   text: {
@@ -216,7 +216,7 @@ const openCloseItems = destElem => {
 const Console = console
 
 const makeFieldUrl = (table, eid, field, action) =>
-  `/${table}/item/${eid}/${action}/${field}`
+  `/api/${table}/item/${eid}/${action}/${field}`
 
 const collectEvents = {}
 
@@ -357,10 +357,10 @@ const applyOptions = (destElem, optionElements, init) => {
   const optionRep = Object.entries(options)
     .map(([op, v]) => `${op}=${v}`)
     .join('&')
-  const links = destElem.find('a[hrefpre]')
+  const links = destElem.find('a[hrefbase]')
   links.each((i, elem) => {
     const el = $(elem)
-    const urlPrefix = el.attr('hrefpre')
+    const urlPrefix = el.attr('hrefbase')
     const url = `${urlPrefix}${optionRep ? '?' : ''}${optionRep}`
     el.attr('href', url)
   })

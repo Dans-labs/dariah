@@ -11,6 +11,12 @@ attributes:
   isMemberOf: membership
   affiliation: rel
 
+objects:
+  - control
+  - db
+  - auth
+  - types
+
 names:
   - DARIAH
   - devel
@@ -24,6 +30,7 @@ names:
   - isPristine
   - local
   - mail
+  - master
   - modified
   - name
   - No

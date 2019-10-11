@@ -32,17 +32,26 @@ activeTables:
   - typeContribution
 
 details:
+  assessment:
+    - criteriaEntry
+    - review
+    - reviewEntry
   contrib: 
     - assessment
-  assessment:
     - review
-
-masters:
-  assessment: 
-    - contrib
+  criteria:
+    - score
+    - criteriaEntry
+    - reviewEntry
+  criteriaEntry:
+    - reviewEntry
+  package:
+    - criteria
   review:
-    - contrib
-    - assessment
+    - reviewEntry
+  typeContribution:
+    - criteria
+    - package
 
 items:
   contrib: [contribution, contributions]

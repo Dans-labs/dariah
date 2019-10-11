@@ -3,10 +3,9 @@ from flask import request
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
 from controllers.utils import E, ONE, cap1
-from controllers.types import Types
 from controllers.perm import getPerms
 
-CT = C.table
+CT = C.tables
 CW = C.web
 
 
@@ -24,16 +23,19 @@ def labelDiv(label):
 
 class Field(object):
   inheritProps = (
-      'db', 'auth', 'uid', 'eppn', 'table', 'record', 'eid', 'perm',
+      N.db, N.auth, N.types,
+      'uid', 'eppn',
+      'table', 'record', 'eid', 'perm',
   )
 
-  def __init__(self, recordObj, field):
+  def __init__(self, recordObj, field, asMaster=False):
     for prop in Field.inheritProps:
       setattr(self, prop, getattr(recordObj, prop, None))
 
     self.parent = recordObj
 
     self.field = field
+    self.asMaster = asMaster
     self.withRefresh = field == N.modified
 
     fieldSpecs = recordObj.fields
@@ -54,12 +56,15 @@ class Field(object):
     table = self.table
     eid = self.eid
     tp = self.tp
+    types = self.types
 
-    tpClass = getattr(Types, tp)
-    self.tpClass = tpClass
-    self.widgetType = tpClass.widgetType
+    fieldTypeClass = getattr(types, tp)
+    self.fieldTypeClass = fieldTypeClass
+    self.widgetType = fieldTypeClass.widgetType
 
     (self.mayRead, self.mayEdit) = getPerms(perm, require)
+    if asMaster:
+      self.mayEdit = False
 
     self.atts = (
         dict(
@@ -83,10 +88,10 @@ class Field(object):
       record = self.record
 
       multiple = self.multiple
-      tpClass = self.tpClass
+      fieldTypeClass = self.fieldTypeClass
       conversion = (
-          tpClass.fromStr
-          if tpClass else
+          fieldTypeClass.fromStr
+          if fieldTypeClass else
           None
       )
       args = (
@@ -139,10 +144,11 @@ class Field(object):
     if not mayRead:
       return E
 
+    asMaster = self.asMaster
     mayEdit = self.mayEdit
-    editable = mayEdit and action == N.edit
+    editable = mayEdit and action == N.edit and not asMaster
 
-    if action is not None:
+    if action is not None and not asMaster:
       data = request.get_json()
       if data is not None and N.save in data:
         self.save(data[N.save])
@@ -204,11 +210,10 @@ class Field(object):
     return [button, self.wrapValue(editable)]
 
   def wrapValue(self, editable):
-    db = self.db
-    auth = self.auth
-    tpClass = self.tpClass
+    fieldTypeClass = self.fieldTypeClass
     value = self.value
     tp = self.tp
+    types = self.types
     multiple = self.multiple
     extensible = self.extensible
     widgetType = self.widgetType
@@ -220,13 +225,11 @@ class Field(object):
     if collapseMultiple and editable:
       args.append(multiple)
       args.append(extensible)
-    if tpClass.needsField:
-      args.extend([db, auth])
-    method = tpClass.widget if editable else tpClass.toDisplay
+    method = fieldTypeClass.widget if editable else fieldTypeClass.toDisplay
     atts = dict(wtype=widgetType)
 
     if editable:
-      origStr = Types.toOrig(value, tp, multiple)
+      origStr = types.toOrig(value, tp, multiple)
       atts[N.orig] = origStr
     if multiple:
       atts[N.multiple] = ONE

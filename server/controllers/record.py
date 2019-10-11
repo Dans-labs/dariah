@@ -1,11 +1,12 @@
 from controllers.config import Config as C, Names as N
 from controllers.perm import permRecord
 from controllers.utils import E, ELLIPS
-from controllers.html import HtmlElements as H, htmlEscape as he
+from controllers.html import HtmlElements as H
 from controllers.field import Field
+from controllers.details import makeDetails
 
 
-CT = C.table
+CT = C.tables
 CW = C.web
 
 
@@ -20,19 +21,19 @@ QN = CW.unknown[N.number]
 
 class Record(object):
   inheritProps = (
-      'db', 'auth',
+      N.control, N.db, N.auth, N.types,
       'uid', 'eppn',
-      'typeClass',
       'table', 'fields', 'prov',
       'isUserTable', 'isUserEntryTable',
       'itemLabels',
   )
 
-  def __init__(self, tableCls, tableObj, record=None, eid=None, details=False):
+  def __init__(self, Table, tableObj, record=None, eid=None, details=False):
     for prop in Record.inheritProps:
       setattr(self, prop, getattr(tableObj, prop, None))
 
-    self.parentCls = tableCls
+    self.doDetails = details
+    self.Table = Table
     self.parent = tableObj
 
     db = self.db
@@ -65,26 +66,6 @@ class Record(object):
         db.dependencies(table, record) if mayDelete else None
     )
 
-    self.details = {}
-
-    if not details:
-      return
-
-    eid = self.eid
-    tableCls = self.parentCls
-
-    detailTables = DETAILS.get(table, [])
-    for detailTable in detailTables:
-      detailTableObj = tableCls(db, auth, detailTable)
-      detailRecords = db.getDetails(detailTable, eid, table)
-      self.details[detailTable] = (
-          detailTableObj,
-          tuple(
-              detailTableObj.record(record=detailRecord, details=False)
-              for detailRecord in detailRecords
-          ),
-      )
-
   def setPerm(self):
     auth = self.auth
     record = self.record
@@ -95,8 +76,8 @@ class Record(object):
         country=record.get(N.country, None),
     )
 
-  def field(self, fieldName):
-    return Field(self, fieldName)
+  def field(self, fieldName, asMaster=False):
+    return Field(self, fieldName, asMaster=asMaster)
 
   def delete(self):
     mayDelete = self.mayDelete
@@ -122,13 +103,12 @@ class Record(object):
           self.title(),
           H.div(
               ELLIPS,
-              fetchurl=f"""/{table}/{N.item}/{record[N._id]}""",
+              fetchurl=f"""/api/{table}/{N.item}/{record[N._id]}""",
           ),
-          itemkey=f"""{table}/{record[N._id]}""",
+          f"""{table}/{record[N._id]}""",
       )
 
-    details = self.details
-    myMasters = set(MASTERS.get(table, []))
+    myMasters = MASTERS.get(table, [])
 
     deleteButton = self.deleteButton()
 
@@ -137,9 +117,9 @@ class Record(object):
             [deleteButton]
             +
             [
-                self.field(field).wrap()
+                self.field(field, asMaster=field in myMasters).wrap()
                 for field in fieldSpecs
-                if field not in provSpecs and field not in myMasters
+                if field not in provSpecs
             ]
             +
             [H.details(
@@ -150,31 +130,13 @@ class Record(object):
                         for field in provSpecs
                     ]
                 ),
-                itemkey=f"""{table}/{record[N._id]}/{N.prov}""",
+                f"""{table}/{record[N._id]}/{N.prov}""",
             )],
             cls="record",
         )
     )
 
-    detailReps = []
-    for (detailTable, (detailTableObj, detailRecords)) in details.items():
-      nRecords = len(detailRecords)
-      (itemSingular, itemPlural) = detailTableObj.itemLabels
-      itemLabel = itemSingular if nRecords == 1 else itemPlural
-
-      nRep = H.div(f"""{nRecords} {itemLabel}""", cls="stats")
-      detailReps.append(
-          H.div(
-              [nRep]
-              +
-              [
-                  detailRecord.wrap(collapsed=True)
-                  for detailRecord in detailRecords
-              ]
-          )
-      )
-
-    return main + E.join(detailReps)
+    return main + makeDetails(self).wrap()
 
   def deleteButton(self):
     mayDelete = self.mayDelete
@@ -207,26 +169,20 @@ class Record(object):
         H.icon(
             N.trash,
             cls="button medium error-o delete",
-            href=f"""/{table}/{N.delete}/{record[N._id]}""",
+            href=f"""/api/{table}/{N.delete}/{record[N._id]}""",
             title=f"""Delete this {itemSingle}"""
         ),
     )
 
   def title(self):
-    db = self.db
-    auth = self.auth
     record = self.record
-    isUserTable = self.isUserTable
-    isUserEntryTable = self.isUserEntryTable
+    return Record.titleRaw(self, record)
 
-    if isUserTable:
-      return H.span(he(record.get(N.title, None) or QQ))
+  @staticmethod
+  def titleRaw(obj, record):
+    table = obj.table
+    control = obj.control
+    types = control[N.types]
+    typesObj = getattr(types, table)
 
-    if isUserEntryTable:
-      return H.span(he(record.get(N.seq, None) or QN))
-
-    typeClass = self.typeClass
-    titleStr = typeClass.titleStr(db, auth, record)
-    titleHint = typeClass.titleHint(record)
-
-    return H.span(typeClass.title(record, titleStr, titleHint))
+    return H.span(typesObj.title(record=record))

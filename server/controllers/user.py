@@ -12,9 +12,9 @@ SLOGOUT = URLS[N.slogout]
 
 
 class User(object):
-  def __init__(self, db, auth):
-    self.db = db
-    self.auth = auth
+  def __init__(self, control):
+    self.db = control[N.db]
+    self.auth = control[N.auth]
 
   def wrap(self):
     auth = self.auth

@@ -21,6 +21,7 @@ Z = 'Z'
 AT = '@'
 EURO = '€'
 MINONE = '-1'
+ZERO = '0'
 ONE = '1'
 TWO = '2'
 THREE = '3'
@@ -31,6 +32,7 @@ LT = '<'
 APOS = "'"
 QUOT = '"'
 DOLLAR = '$'
+Q = '?'
 
 NL = '\n'
 
@@ -157,8 +159,12 @@ def dtm(isostr):
   return (E, date)
 
 
+def isIterable(value):
+  return type(value) is not str and hasattr(value, ITER)
+
+
 def asIterable(value):
-  return value if type(value) is not str and hasattr(value, ITER) else [value]
+  return value if isIterable(value) else [value]
 
 
 def asString(value):
@@ -166,7 +172,7 @@ def asString(value):
       E
       if value is None else
       E.join(value)
-      if type(value) is not str and hasattr(value, ITER) else
+      if isIterable(value) else
       value
   )
 
