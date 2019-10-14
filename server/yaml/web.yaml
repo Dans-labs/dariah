@@ -6,6 +6,7 @@ messages:
   forbidden: Forbidden
   noPage: Page not found
   noTable: No table
+  refreshCrit: refresh criteria overview
   refresh: refresh modification history
   url: http(s)://letters.domain
   email: name@letters.domain
@@ -14,6 +15,12 @@ messages:
   money: only digits and one floating point/comma
   datetime: yyyy-mm-dd hh-mm-ss (you may leave out trailing parts)
   filter: type to filter
+  wrongCriterionForType: >-
+    N.B. This criterion is not relevant for this type of contribution.
+    Consider copying your entr(ies) to an other criterion and then deleting this one.
+  legacyCriterion: >-
+    This is a legacy criterion.
+  scoreLegend: Score legend
 
 unknown:
   generic: '??'
@@ -84,8 +91,11 @@ elements:
   - a
   - br
   - checkbox
+  - dd
   - details
   - div
+  - dl
+  - dt
   - input
   - p
   - span
@@ -133,7 +143,10 @@ options:
     label: 'reviewed'
     table: review
 
+filterThreshold: 10
+
 names:
+  - actual
   - html
   - from
   - save

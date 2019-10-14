@@ -1,5 +1,14 @@
+details.assessment
+{
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  margin-left: 1rem;
+  font-size: large;
+}
 details.criterion
 {
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
 	margin-left: 1rem;
   color: var(--assessment-quoted-fore);
   background-color: var(--assessment-quoted-back);
@@ -16,9 +25,5 @@ details.criterion .comments
 }
 
 .assessment-head {
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  margin-left: 1rem;
-  font-size: large;
   font-weight: bold;
 }

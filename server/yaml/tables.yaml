@@ -26,7 +26,7 @@ valueTables:
   - vcc
   - year
 
-activeTables:
+actualTables:
   - criteria
   - package
   - typeContribution
@@ -49,9 +49,6 @@ details:
     - criteria
   review:
     - reviewEntry
-  typeContribution:
-    - criteria
-    - package
 
 items:
   contrib: [contribution, contributions]
@@ -127,6 +124,7 @@ names:
   - active
   - authority
   - bool
+  - constrained
   - eid
   - orig
   - pattern

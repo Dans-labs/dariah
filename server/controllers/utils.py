@@ -42,7 +42,7 @@ WHYPHEN = ' - '
 ELLIPS = '...'
 ON = ' on '
 
-NBSP = '&#xa'
+NBSP = '&#xa;'
 
 LATIN1 = 'latin1'
 UTF8 = 'utf8'
@@ -88,51 +88,6 @@ def cap1(string):
       if not string else
       string[0].upper() + string[1:]
   )
-
-
-def getNumberAsStr(v):
-  if v is None:
-    return '0'
-  try:
-    rep = int(round(v))
-  except Exception:
-    rep = v
-  return str(rep)
-
-
-def getDatetimeAsStr(v):
-  if v is None:
-    return EMPTY_DATE
-  if type(v) is str:
-    return v
-  return v.isoformat()
-
-
-def getStrAsInt(v):
-  if v is None:
-    return 0
-  try:
-    rep = int(v)
-  except Exception:
-    rep = str(v)
-  return rep
-
-
-def getStrAsFloat(v):
-  if v is None:
-    return float(0)
-  try:
-    rep = float(v)
-  except Exception:
-    rep = str(v)
-  return rep
-
-
-def getStrAsDatetime(v):
-  (error, rep) = dtm(v or EMPTY_DATE)
-  if error:
-    rep = dtm(EMPTY_DATE)[1]
-  return rep
 
 
 def now():

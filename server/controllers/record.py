@@ -3,7 +3,8 @@ from controllers.perm import permRecord
 from controllers.utils import E, ELLIPS
 from controllers.html import HtmlElements as H
 from controllers.field import Field
-from controllers.details import makeDetails
+from controllers.details import Details
+from controllers.contrib import Contrib
 
 
 CT = C.tables
@@ -13,10 +14,18 @@ CW = C.web
 DEFAULT_TYPE = CT.defaultType
 DETAILS = CT.details
 MASTERS = CT.masters
+ACTUAL_TABLES = set(CT.actualTables)
 
 PROV = CW.provLabel
 QQ = CW.unknown[N.generic]
 QN = CW.unknown[N.number]
+
+
+def makeDetails(obj):
+  table = obj.table
+  if table == N.contrib:
+    return Contrib(obj)
+  return Details(obj)
 
 
 class Record(object):
@@ -76,8 +85,8 @@ class Record(object):
         country=record.get(N.country, None),
     )
 
-  def field(self, fieldName, asMaster=False):
-    return Field(self, fieldName, asMaster=asMaster)
+  def field(self, fieldName, **kwargs):
+    return Field(self, fieldName, **kwargs)
 
   def delete(self):
     mayDelete = self.mayDelete
@@ -182,7 +191,11 @@ class Record(object):
   def titleRaw(obj, record):
     table = obj.table
     control = obj.control
+
     types = control[N.types]
     typesObj = getattr(types, table)
 
-    return H.span(typesObj.title(record=record))
+    isActual = table not in ACTUAL_TABLES or record.get(N.actual, False)
+    atts = {} if isActual else dict(cls="inactual")
+
+    return H.span(typesObj.title(record=record), **atts)

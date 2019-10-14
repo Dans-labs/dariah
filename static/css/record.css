@@ -84,10 +84,11 @@
   padding: 0.1rem 0.2rem;
   margin: 0.1rem 0.3rem;
 }
-.tag.inactive {
-  color: var(--tag-inactive-fore);
-  background-color: var(--tag-inactive-back);
-  border-color: var(--tag-inactive-border);
+.inactual {
+  color: var(--tag-inactual-fore) !important;
+  background-color: var(--tag-inactual-back) !important;
+  border-color: var(--tag-inactual-border) !important;
+  border-radius: 0.2rem;
 }
 .delete {
   float: right;

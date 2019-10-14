@@ -162,6 +162,25 @@ for table in tables:
 
   N.addNames(specs)
 
+constrainedPre = {}
+for table in VALUE_TABLES:
+  fieldSpecs = getattr(Tables, table)
+  for (field, fieldSpecs) in fieldSpecs.items():
+    tp = fieldSpecs.get(N.type, None)
+    if tp in VALUE_TABLES and tp == field:
+      constrainedPre[table] = field
+
+constrained = {}
+for table in tables:
+  fieldSpecs = getattr(Tables, table)
+  fields = set(fieldSpecs)
+  for (ctable, mfield) in constrainedPre.items():
+    if ctable in fields and mfield in fields:
+      ctp = fieldSpecs[ctable].get(N.type, None)
+      if ctp == ctable:
+        constrained[ctable] = mfield
+
 setattr(Tables, ALL, tables)
 setattr(Tables, N.sorted, sortedTables)
 setattr(Tables, N.reference, reference)
+setattr(Tables, N.constrained, constrained)

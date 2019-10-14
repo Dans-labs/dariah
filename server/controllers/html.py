@@ -62,6 +62,10 @@ class HtmlElements(object):
     return HtmlElement(N.br).wrap(E)
 
   @staticmethod
+  def dd(material, **atts):
+    return HtmlElement(N.dd).wrap(material, **atts)
+
+  @staticmethod
   def details(summary, material, itemkey, **atts):
     content = asString(material)
     return HtmlElement(N.details).wrap(
@@ -72,6 +76,20 @@ class HtmlElements(object):
   @staticmethod
   def div(material, **atts):
     return HtmlElement(N.div).wrap(material, **atts)
+
+  @staticmethod
+  def dl(items, **atts):
+    return HtmlElement(N.dl).wrap(
+        [
+            HtmlElement(N.dt).wrap(item[0]) + HtmlElement(N.dd).wrap(item[1])
+            for item in items
+        ],
+        **atts,
+    )
+
+  @staticmethod
+  def dt(material, **atts):
+    return HtmlElement(N.dt).wrap(material, **atts)
 
   @staticmethod
   def icon(icon, **atts):

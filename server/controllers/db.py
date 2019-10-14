@@ -22,7 +22,7 @@ M_GTE = CM.gte
 M_OR = CM.OR
 M_IN = CM.IN
 
-ACTIVE_TABLES = set(CT.activeTables)
+ACTUAL_TABLES = set(CT.actualTables)
 VALUE_TABLES = set(CT.valueTables)
 REFERENCE_SPECS = CT.reference
 
@@ -77,20 +77,20 @@ class Db(object):
         )
       serverprint(f'COLLECTED {valueTable}')
 
-    self.collectActiveItems(table=None)
+    self.collectActualItems(table=None)
 
-  def collectActiveItems(self, table=None):
+  def collectActualItems(self, table=None):
     if (
         table is not None
         and
-        table not in ACTIVE_TABLES
+        table not in ACTUAL_TABLES
     ):
       return
 
     mongo = self.mongo
 
     justNow = now()
-    packageActive = {
+    packageActual = {
         record[N._id]
         for record in mongo.package.find(
             {
@@ -100,30 +100,30 @@ class Db(object):
         )
     }
     for record in self.package.values():
-      record[N.active] = record[N._id] in packageActive
+      record[N.actual] = record[N._id] in packageActual
 
-    typeActive = set(chain.from_iterable(
+    typeActual = set(chain.from_iterable(
         record.get(N.typeContribution, None) or []
         for (_id, record) in self.package.items()
-        if _id in packageActive
+        if _id in packageActual
     ))
     for record in self.typeContribution.values():
-      record[N.active] = record[N._id] in typeActive
+      record[N.actual] = record[N._id] in typeActual
 
-    criteriaActive = {
+    criteriaActual = {
         _id
         for (_id, record) in self.criteria.items()
-        if record[N.package] in packageActive
+        if record[N.package] in packageActual
     }
     for record in self.criteria.values():
-      record[N.active] = record[N._id] in criteriaActive
+      record[N.actual] = record[N._id] in criteriaActual
 
     self.typeCriteria = {}
     for (_id, record) in self.criteria.items():
       for tp in record.get(N.typeContribution, None) or []:
         self.typeCriteria.setdefault(tp, set()).add(_id)
 
-    serverprint(f'UPDATED {", ".join(ACTIVE_TABLES)}')
+    serverprint(f'UPDATED {", ".join(ACTUAL_TABLES)}')
 
   def makeCrit(self, mainTable, conditions):
     mongo = self.mongo
@@ -152,8 +152,6 @@ class Db(object):
     return criterium
 
   def getList(self, table, titleSort, my=None, our=None, select=False, **conditions):
-    mongo = self.mongo
-
     crit = {}
     if my:
       crit.update({
@@ -167,7 +165,29 @@ class Db(object):
           N.country: our,
       })
 
-    records = mongo[table].find(crit)
+    if table in VALUE_TABLES:
+      records = (
+          record
+          for record in getattr(self, table, {}).values()
+          if (
+              (
+                  my is None
+                  or
+                  record.get(N.creator, None) == my
+                  or
+                  my in record.get(N.editors, [])
+              )
+              and
+              (
+                  our is None
+                  or
+                  record.get(N.country, None) == our
+              )
+          )
+      )
+    else:
+      mongo = self.mongo
+      records = mongo[table].find(crit)
     if select:
       criterium = self.makeCrit(table, conditions)
       records = (
@@ -178,10 +198,15 @@ class Db(object):
     return sorted(records, key=titleSort)
 
   def getItem(self, table, eid):
+    oid = ObjectId(eid)
+
+    if table in VALUE_TABLES:
+      return getattr(self, table, {})[oid]
+
     mongo = self.mongo
 
     records = list(
-        mongo[table].find({N._id: ObjectId(eid)})
+        mongo[table].find({N._id: oid})
     )
     record = (
         records[0]
@@ -190,23 +215,29 @@ class Db(object):
     )
     return record
 
-  def getDetails(self, table, masterField, eids, stripMasterField):
-    mongo = self.mongo
-
-    crit = {
-        masterField:
-        {M_IN: list(eids)}
-        if isIterable(eids) else
-        eids
-    }
-    proj = {masterField: False} if stripMasterField else None
-    return list(
-        mongo[table].find(crit, proj)
-    )
+  def getDetails(self, table, masterField, eids):
+    if table in VALUE_TABLES:
+      crit = eids if isIterable(eids) else [eids]
+      details = (
+          record
+          for record in getattr(self, table, {}).values()
+          if record.get(masterField, None) in crit
+      )
+    else:
+      mongo = self.mongo
+      crit = {
+          masterField:
+          {M_IN: list(eids)}
+          if isIterable(eids) else
+          eids
+      }
+      details = mongo[table].find(crit, None)
+    return list(details)
 
   def getValueRecords(
       self,
       relTable,
+      constrain=None,
   ):
     records = getattr(self, relTable, {}).values()
     return list(
@@ -216,6 +247,12 @@ class Db(object):
             if r.get(N.isMember, None) or False
         )
         if relTable == N.country else
+        (
+            r
+            for r in records
+            if r.get(constrain[0], None) == constrain[1]
+        )
+        if constrain else
         records
     )
 

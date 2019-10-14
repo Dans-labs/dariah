@@ -20,10 +20,12 @@ BOOLEAN_TYPES = CT.boolTypes
 VALUE_TABLES = CT.valueTables
 USER_TABLES = CT.userTables
 USER_ENTRY_TABLES = CT.userEntryTables
+ACTUAL_TABLES = set(CT.actualTables)
 
 QQ = CW.unknown[N.generic]
 QN = CW.unknown[N.number]
 MESSAGES = CW.messages
+FILTER_THRESHOLD = CW.filterThreshold
 
 
 stripNonnumeric = re.compile(r'[^-0-9.,]')
@@ -411,19 +413,21 @@ class Related(TypeBase):
     if record is None and eid is None:
       return QQ
 
+    table = self.name
+
     if record is None:
       db = self.db
-      table = self.name
       record = db.getItem(table, eid)
 
     titleStr = self.titleStr(record)
     titleHint = self.titleHint(record)
 
     if markup:
+
       if eid is None:
         eid = record.get(N._id, None)
 
-      atts = dict(cls=f"tag medium field")
+      atts = dict(cls=f"tag medium field {self.actualCls(record)}")
       if titleHint:
         atts['title'] = titleHint
 
@@ -432,6 +436,12 @@ class Related(TypeBase):
       return (titleStr, titleFormatted)
     else:
       return titleStr
+
+  def actualCls(self, record):
+    table = self.name
+
+    isActual = table not in ACTUAL_TABLES or record.get(N.actual, False)
+    return E if isActual else "inactual"
 
 
 class Master(Related):
@@ -499,28 +509,32 @@ class Value(Related):
   def toOrig(self, val):
     return val if val is None else str(val)
 
-  def widget(self, val, multiple, extensible):
+  def widget(self, val, multiple, extensible, constrain):
     db = self.db
     table = self.name
+    valueRecords = db.getValueRecords(table, constrain=constrain)
 
-    filterControl = [
-        H.input(
-            E,
-            type=N.text,
-            placeholder=MESSAGES.get(N.filter, E),
-            cls="wfilter",
-        ),
-        H.icon(
-            N.plus,
-            cls="button small add",
-            title="add value",
-        ) if extensible else E,
-        H.icon(
-            N.times,
-            cls="button small wfilter",
-            title="clear filter",
-        )
-    ]
+    filterControl = (
+        [
+            H.input(
+                E,
+                type=N.text,
+                placeholder=MESSAGES.get(N.filter, E),
+                cls="wfilter",
+            ),
+            H.icon(
+                N.plus,
+                cls="button small add",
+                title="add value",
+            ) if extensible else E,
+            H.icon(
+                N.times,
+                cls="button small wfilter",
+                title="clear filter",
+            )
+        ]
+        if len(valueRecords) > FILTER_THRESHOLD else []
+    )
     return H.div(
         filterControl
         +
@@ -542,7 +556,7 @@ class Value(Related):
                             record=record,
                             markup=True, asEdit=True, multiple=multiple, active=val,
                         )
-                        for record in db.getValueRecords(table)
+                        for record in valueRecords
                     ),
                     key=lambda x: x[0].lower()
                 )
@@ -584,7 +598,7 @@ class Value(Related):
           "tag "
       )
       activeCls = "active " if isActive else E
-      atts = dict(cls=f"{baseCls}{activeCls}medium field")
+      atts = dict(cls=f"{baseCls}{activeCls}medium field {self.actualCls(record)}")
       if asEdit and eid is not None:
         atts[N.eid] = str(eid)
 
@@ -663,7 +677,10 @@ class Score(Value):
     super().__init__(db)
 
   def titleStr(self, record):
-    score = he(record.get(N.score, None) or QQ)
+    score = record.get(N.score, None)
+    if score is None:
+      return '❌'
+    score = he(score)
     level = he(record.get(N.level, None) or QQ)
     return f"""{score} - {level}"""
 

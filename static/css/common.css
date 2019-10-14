@@ -23,40 +23,50 @@ table {
 td {
     vertical-align: top;
 }
+.heavy
+{
+  font-weight: bold;
+}
 .error {
-	color: var(--error-fore);
-	background-color: var(--error-back);
+	color: var(--error-fore) ! important;
+	background-color: var(--error-back) ! important;
 }
 .error-o {
 	color: var(--error-fore-o) ! important;
 }
 .warning {
-	color: var(--warning-fore);
-	background-color: var(--warning-back);
+	color: var(--warning-fore) ! important;
+	background-color: var(--warning-back) ! important;
 }
 .warning-o {
 	color: var(--warning-fore-o) ! important;
 }
 .good {
-	color: var(--good-fore);
-	background-color: var(--good-back);
+	color: var(--good-fore) ! important;
+	background-color: var(--good-back) ! important;
 }
 .good-o {
 	color: var(--good-fore-o) ! important;
 }
 .info {
-	color: var(--info-fore);
-	background-color: var(--info-back);
+	color: var(--info-fore) ! important;
+	background-color: var(--info-back) ! important;
 }
 .info-o {
 	color: var(--info-fore-o) ! important;
 }
 .special {
-	color: var(--special-fore);
-	background-color: var(--special-back);
+	color: var(--special-fore) ! important;
+	background-color: var(--special-back) ! important;
 }
 .special-o {
 	color: var(--special-fore-o) ! important;
+}
+.legacy
+{
+  color: var(--legacy-fore) ! important;
+  background-color: var(--legacy-back) ! important;
+
 }
 div.error-boundary {
 	font-size: medium;
@@ -338,5 +348,11 @@ span.option
   margin-top: 0.5em;
   padding-top: 0.5em;
   border-top: 0.2em solid var(--dim-back);
+}
+.right {
+  float: right;
+}
+.small {
+  font-size: small;
 }
 

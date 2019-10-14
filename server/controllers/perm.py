@@ -81,21 +81,22 @@ def sysadmin(user):
   return group in {SYSTEM, ROOT}
 
 
-def getPerms(perm, require):
-  readRequire = (
-      DEFAULT_PERM[N.read]
-      if require is None or N.read not in require else
-      require[N.read]
-  )
-  editRequire = (
-      DEFAULT_PERM[N.edit]
-      if require is None or N.edit not in require else
-      require[N.edit]
-  )
-  return (
-      checkPerm(readRequire, perm),
-      checkPerm(editRequire, perm),
-  )
+def getPerms(perm, require, mayRead=None, mayEdit=None):
+  if mayRead is None:
+    readRequire = (
+        DEFAULT_PERM[N.read]
+        if require is None or N.read not in require else
+        require[N.read]
+    )
+    mayRead = checkPerm(readRequire, perm),
+  if mayEdit is None:
+    editRequire = (
+        DEFAULT_PERM[N.edit]
+        if require is None or N.edit not in require else
+        require[N.edit]
+    )
+    mayEdit = checkPerm(editRequire, perm),
+  return (mayRead, mayEdit)
 
 
 def permRecord(user, record, country=None, ourFields=[]):

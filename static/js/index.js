@@ -1,7 +1,7 @@
 /*eslint-env jquery*/
 
 const SAVE = true
-const DEBUG = false
+const DEBUG = true
 const BLUR = true
 
 const widgets = {
@@ -64,28 +64,30 @@ const widgets = {
           edit(table, eid, field, valueEl, parent)
         })
         const filterControl = el.find('input.wfilter')
-        const filterOff = el.find('.button.wfilter')
-        const filterAdd = el.find('.button.add')
-        const prevFilter = localStorage.getItem(filterKey) || ''
-        filterControl.val(prevFilter)
-        filterTags(options, prevFilter, filterOff, filterAdd, extensible)
-        filterControl.off('keyup').on('keyup', () => {
-          const curFilter = filterControl.val()
-          localStorage.setItem(filterKey, curFilter)
-          filterTags(options, curFilter, filterOff, filterAdd, extensible)
-        })
-        filterOff.off('click').click(() => {
-          const newFilter = ''
-          filterControl.val(newFilter)
-          localStorage.setItem(filterKey, newFilter)
-          filterTags(options, newFilter, filterOff, filterAdd, extensible)
-        })
-        filterAdd.off('click').click(() => {
-          const newTag = filterControl.val()
-          if (extensible && newTag) {
-            edit(table, eid, field, valueEl, parent, newTag)
-          }
-        })
+        if (filterControl) {
+          const filterOff = el.find('.button.wfilter')
+          const filterAdd = el.find('.button.add')
+          const prevFilter = localStorage.getItem(filterKey) || ''
+          filterControl.val(prevFilter)
+          filterTags(options, prevFilter, filterOff, filterAdd, extensible)
+          filterControl.off('keyup').on('keyup', () => {
+            const curFilter = filterControl.val()
+            localStorage.setItem(filterKey, curFilter)
+            filterTags(options, curFilter, filterOff, filterAdd, extensible)
+          })
+          filterOff.off('click').click(() => {
+            const newFilter = ''
+            filterControl.val(newFilter)
+            localStorage.setItem(filterKey, newFilter)
+            filterTags(options, newFilter, filterOff, filterAdd, extensible)
+          })
+          filterAdd.off('click').click(() => {
+            const newTag = filterControl.val()
+            if (extensible && newTag) {
+              edit(table, eid, field, valueEl, parent, newTag)
+            }
+          })
+        }
       })
     },
     read(elem) {
@@ -232,6 +234,11 @@ const edit = (table, eid, field, valueEl, parent, newTag) => {
   fetch(url, parent, saveValue)
 }
 
+const refresh = () => {
+  const currentUrl = window.location.href
+  window.location.href = currentUrl
+}
+
 const getDynValues = (valueEl, newTag) => {
   const origAttValue = valueEl.attr('orig')
   if (origAttValue === undefined) {
@@ -288,11 +295,6 @@ const activateActions = destElem => {
     const parent = $(elem.closest('div'))
     const valueEl = parent.find('[orig]')
     const focusEl = parent.find('input,textarea')
-    const focusElFirst = $(focusEl.get(0))
-    if (focusElFirst) {
-      focusElFirst.focus()
-      focusElFirst.val(focusElFirst.val())
-    }
 
     if (action == 'edit') {
       parent.removeClass('edit')
@@ -300,20 +302,24 @@ const activateActions = destElem => {
     else if (action == 'view') {
       parent.addClass('edit')
     }
-    const actionFunc = (action == 'edit') ? edit : view
+    const actionFunc =
+      (action == 'edit') ? edit : view
 
-    focusEl.off('mousedown').mousedown(() => {
-      const eventKey = `${table}:${eid}.${field}`
-      collectEvents[eventKey] = true
-    })
     el.off('mousedown').mousedown(() => {
       const eventKey = `${table}:${eid}.${field}`
       collectEvents[eventKey] = true
     })
-    el.off('click').click(() => {
-      const eventKey = `${table}:${eid}.${field}`
-      actionFunc(table, eid, field, valueEl, parent)
-      collectEvents[eventKey] = false
+    el.off('click').click(e => {
+      if (action == 'refresh') {
+        e.preventDefault()
+        e.stopPropagation()
+        refresh()
+      }
+      else {
+        const eventKey = `${table}:${eid}.${field}`
+        actionFunc(table, eid, field, valueEl, parent)
+        collectEvents[eventKey] = false
+      }
     })
     focusEl.off('keyup').keyup(() => {
       const { dirty } = getDynValues(valueEl)
@@ -325,15 +331,17 @@ const activateActions = destElem => {
       }
     })
     if (BLUR) {
-      focusEl.off('blur').blur(() => {
-        const eventKey = `${table}:${eid}.${field}`
-        if (collectEvents[eventKey]) {
-          collectEvents[eventKey] = false
-        }
-        else {
-          edit(table, eid, field, valueEl, parent)
-        }
-      })
+      if (focusEl.length) {
+        focusEl.off('blur').blur(() => {
+          const eventKey = `${table}:${eid}.${field}`
+          if (collectEvents[eventKey]) {
+            collectEvents[eventKey] = false
+          }
+          else {
+            edit(table, eid, field, valueEl, parent)
+          }
+        })
+      }
     }
     const wType = valueEl.attr('wtype')
     const { [wType]: widget } = widgets
@@ -341,6 +349,12 @@ const activateActions = destElem => {
       const widgetTargets = valueEl.find('.wvalue')
       widget.activate(table, eid, field, parent, valueEl, widgetTargets)
     }
+    /*
+    if (focusElFirst) {
+      focusElFirst.focus()
+      focusElFirst.val(focusElFirst.val())
+    }
+    */
   })
 }
 const applyOptions = (destElem, optionElements, init) => {

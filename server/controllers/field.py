@@ -10,6 +10,7 @@ CW = C.web
 
 
 DEFAULT_TYPE = CT.defaultType
+CONSTRAINED = CT.constrained
 
 REFRESH = CW.messages[N.refresh]
 
@@ -28,7 +29,7 @@ class Field(object):
       'table', 'record', 'eid', 'perm',
   )
 
-  def __init__(self, recordObj, field, asMaster=False):
+  def __init__(self, recordObj, field, asMaster=False, mayRead=None, mayEdit=None):
     for prop in Field.inheritProps:
       setattr(self, prop, getattr(recordObj, prop, None))
 
@@ -62,7 +63,7 @@ class Field(object):
     self.fieldTypeClass = fieldTypeClass
     self.widgetType = fieldTypeClass.widgetType
 
-    (self.mayRead, self.mayEdit) = getPerms(perm, require)
+    (self.mayRead, self.mayEdit) = getPerms(perm, require, mayEdit=mayEdit)
     if asMaster:
       self.mayEdit = False
 
@@ -138,7 +139,24 @@ class Field(object):
 
     (self.mayRead, self.mayEdit) = getPerms(perm, require)
 
-  def wrap(self, action=None):
+  def isEmpty(self):
+    value = self.value
+    multiple = self.multiple
+    return value is None or multiple and value == []
+
+  def isBlank(self):
+    value = self.value
+    multiple = self.multiple
+    return (
+        value is None or
+        value == E or
+        multiple and (
+            value == []
+            or all(v is None or v == E for v in value)
+        )
+    )
+
+  def wrap(self, action=None, empty=False):
     mayRead = self.mayRead
 
     if not mayRead:
@@ -157,6 +175,9 @@ class Field(object):
 
     if action is not None:
       return E.join(widget)
+
+    if empty and self.isEmpty():
+      return E
 
     label = self.label
     editClass = " edit" if editable else E
@@ -219,12 +240,21 @@ class Field(object):
     widgetType = self.widgetType
 
     cls = "tags" if widgetType == N.related else "values"
-    collapseMultiple = widgetType == N.related
+    isSelectWidget = widgetType == N.related
 
     args = []
-    if collapseMultiple and editable:
+    if isSelectWidget and editable:
+      record = self.record
+      field = self.field
+      constrain = None
+      constrainField = CONSTRAINED.get(field, None)
+      if constrainField:
+        constrainValue = record.get(constrainField, None)
+        if constrainValue:
+          constrain = (constrainField, constrainValue)
       args.append(multiple)
       args.append(extensible)
+      args.append(constrain)
     method = fieldTypeClass.widget if editable else fieldTypeClass.toDisplay
     atts = dict(wtype=widgetType)
 
@@ -245,7 +275,7 @@ class Field(object):
             **atts,
             cls=cls,
         )
-        if multiple and not (editable and collapseMultiple) else
+        if multiple and not (editable and isSelectWidget) else
         H.div(
             method(value, *args),
             **atts,
