@@ -4,10 +4,19 @@ from flask import request
 
 from controllers.config import Config as C, Names as N
 from controllers.perm import UNAUTH
-from controllers.record import Record
 from controllers.html import HtmlElements as H
 from controllers.utils import E, ELLIPS, NBSP
 
+from controllers.record import Record
+from controllers.assessment_record import AssessmentR
+from controllers.review_record import ReviewR
+from controllers.criteriaentry_record import CriteriaEntryR
+
+CASES = (
+    (N.assessment, AssessmentR),
+    (N.review, ReviewR),
+    (N.criteriaEntry, CriteriaEntryR),
+)
 
 CT = C.tables
 CW = C.web
@@ -21,7 +30,6 @@ ITEMS = CT.items
 DEFAULT_TYPE = CT.defaultType
 PROV_SPECS = CT.prov
 
-PROV = CW.provLabel
 FORBIDDEN = CW.messages[N.forbidden]
 QQ = CW.unknown[N.generic]
 QN = CW.unknown[N.number]
@@ -67,8 +75,21 @@ class Table(object):
 
     self.titleSortkey = titleSortkey
 
-  def record(self, eid=None, record=None, details=False):
-    return Record(Table, self, eid=eid, record=record, details=details)
+  def recordFactory(self):
+    table = self.table
+
+    RecordClass = Record
+    for (tb, Rcl) in CASES:
+      if tb == table:
+        RecordClass = Rcl
+        break
+
+    return RecordClass
+
+  def record(self, eid=None, record=None, withDetails=False):
+    return self.recordFactory()(
+        Table, self, eid=eid, record=record, withDetails=withDetails,
+    )
 
   def insert(self):
     mayInsert = self.mayInsert
@@ -124,11 +145,9 @@ class Table(object):
             (
                 H.details(
                     self.title(record),
-                    H.div(
-                        ELLIPS,
-                        fetchurl=f"""/api/{table}/{N.item}/{record[N._id]}""",
-                    ),
+                    H.div(ELLIPS),
                     f"""{table}/{record[N._id]}""",
+                    fetchurl=f"""/api/{table}/{N.item}/{record[N._id]}""",
                     **forceOpen(record[N._id], openEid),
                 )
                 for record in records

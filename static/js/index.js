@@ -135,6 +135,17 @@ const filterTags = (options, pattern, off, add, extensible) => {
   }
 }
 
+const processHtml = (destElem, detail) => html => {
+  destElem.html(html)
+  openCloseItems(destElem)
+  activateFetch(destElem)
+  activateActions(destElem)
+  if (detail) {
+    const child = destElem.children('details')
+    child.unwrap()
+  }
+}
+
 const fetch = (url, destElem, data) => {
   if (data === undefined) {
     $.ajax({
@@ -142,12 +153,7 @@ const fetch = (url, destElem, data) => {
       url,
       processData: false,
       contentType: false,
-      success: html => {
-        destElem.html(html)
-        activateFetch(destElem)
-        activateActions(destElem)
-        openCloseItems(destElem)
-      },
+      success: processHtml(destElem),
     })
   }
   else {
@@ -158,29 +164,37 @@ const fetch = (url, destElem, data) => {
       data,
       processData: false,
       contentType: true,
-      success: html => {
-        destElem.html(html)
-        activateFetch(destElem)
-        activateActions(destElem)
-        openCloseItems(destElem)
-      },
+      success: processHtml(destElem),
     })
   }
+}
+
+const fetchDetail = (url, destElem) => {
+  $.ajax({
+    type: 'GET',
+    url,
+    processData: false,
+    contentType: false,
+    success: processHtml(destElem, true),
+  })
 }
 
 const activateFetch = destElem => {
   const targets = destElem ? destElem.find('[fetchurl]') : $('[fetchurl]')
   targets.each((i, elem) => {
-    const parent = elem.closest('details')
     const el = $(elem)
-    $(parent).on('toggle', () => {
-      if (parent.open) {
-        const url = el.attr('fetchurl')
-        fetch(url, el)
+    const isFat = el.attr('fat')
+    const fetchUrl = el.attr('fetchurl')
+    el.on('toggle', () => {
+      const isOpen = elem.open
+      if ((isOpen && isFat) || (!isOpen && !isFat)) {
+        return
       }
-      else {
-        el.html('...')
-      }
+      const url = fetchUrl + (isOpen ? '' : '/title')
+      el.wrap('<div></div>')
+      const parent = el.closest('div')
+      el.remove()
+      fetchDetail(url, parent)
     })
   })
 }
@@ -190,6 +204,14 @@ const openCloseItems = destElem => {
   targets.each((i, elem) => {
     const el = $(elem)
     const itemKey = el.attr('itemkey')
+    el.on('toggle', () => {
+      if (elem.open) {
+        localStorage.setItem(itemKey, 'open')
+      }
+      else {
+        localStorage.setItem(itemKey, '')
+      }
+    })
     const forceOpen = el.attr('forceopen')
     const curOpen = el.prop('open')
     const prevOpen = localStorage.getItem(itemKey)
@@ -204,14 +226,6 @@ const openCloseItems = destElem => {
         el.prop('open', true)
       }
     }
-    el.on('toggle', () => {
-      if (elem.open) {
-        localStorage.setItem(itemKey, 'open')
-      }
-      else {
-        localStorage.setItem(itemKey, '')
-      }
-    })
   })
 }
 
@@ -430,8 +444,8 @@ const activateOptions = destElem => {
 
 $(() => {
   const contribHeading = $('details[itemkey=contrib]')
+  openCloseItems()
   activateFetch()
   activateActions()
   activateOptions(contribHeading)
-  openCloseItems()
 })

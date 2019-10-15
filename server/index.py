@@ -162,7 +162,14 @@ def factory():
   def serveRecord(table, eid):
     if table in ALL_TABLES:
       auth.authenticate()
-      return Table(control, table).record(eid=eid, details=True).wrap()
+      return Table(control, table).record(eid=eid, withDetails=True).wrap()
+    return noTable(table)
+
+  @app.route(f"""/api/<string:table>/{N.item}/<string:eid>/{N.title}""")
+  def serveRecordTitle(table, eid):
+    if table in ALL_TABLES:
+      auth.authenticate()
+      return Table(control, table).record(eid=eid, withDetails=True).wrap()
     return noTable(table)
 
   @app.route(f"""/<string:table>/{N.item}/<string:eid>""")
@@ -172,7 +179,7 @@ def factory():
       auth.authenticate()
       userLine = User(control).wrap()
       sidebar = Sidebar(control, path).wrap()
-      record = Table(control, table).record(eid=eid, details=True).wrap()
+      record = Table(control, table).record(eid=eid, withDetails=True).wrap(collapsed=True)
       return render_template(
           INDEX,
           userLine=userLine,

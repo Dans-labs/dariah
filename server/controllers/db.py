@@ -198,6 +198,9 @@ class Db(object):
     return sorted(records, key=titleSort)
 
   def getItem(self, table, eid):
+    if not eid:
+      return {}
+
     oid = ObjectId(eid)
 
     if table in VALUE_TABLES:
@@ -215,14 +218,14 @@ class Db(object):
     )
     return record
 
-  def getDetails(self, table, masterField, eids):
+  def getDetails(self, table, masterField, eids, sortKey=None):
     if table in VALUE_TABLES:
       crit = eids if isIterable(eids) else [eids]
-      details = (
+      details = [
           record
           for record in getattr(self, table, {}).values()
           if record.get(masterField, None) in crit
-      )
+      ]
     else:
       mongo = self.mongo
       crit = {
@@ -231,8 +234,16 @@ class Db(object):
           if isIterable(eids) else
           eids
       }
-      details = mongo[table].find(crit, None)
-    return list(details)
+      details = list(mongo[table].find(crit, None))
+
+    return (
+        sorted(
+            details,
+            key=sortKey,
+        )
+        if sortKey else
+        details
+    )
 
   def getValueRecords(
       self,

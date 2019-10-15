@@ -126,6 +126,8 @@ names:
   - bool
   - constrained
   - eid
+  - expert
+  - final
   - orig
   - pattern
   - reference

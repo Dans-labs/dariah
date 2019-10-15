@@ -37,7 +37,6 @@ class Assessment(object):
     db = self.db
     eid = self.eid
     Table = self.Table
-    details = self.details
 
     assessmentRecords = []
     for aRecord in sorted(

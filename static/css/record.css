@@ -103,3 +103,18 @@
   margin: 0.2rem;
   border-radius: 0.2rem;
 }
+details.prov
+{
+  margin-left: 2rem;
+  border: 0.2rem solid var(--value-border);
+}
+span.prov
+{
+  font-weight: bold;
+  font-size: small;
+}
+div.prov
+{
+  padding-left: 2rem;
+  font-size: small;
+}

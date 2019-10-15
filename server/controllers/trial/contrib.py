@@ -9,12 +9,12 @@ from controllers.assessment import Assessment
 
 
 class Contrib(Details):
-  def __init__(self, recordObj, *args, **kwargs):
-    super().__init__(recordObj, *args, **kwargs)
+  def __init__(self, recordObj, *args):
+    super().__init__(recordObj, *args)
     self.getAllDetails()
 
   def wrap(self):
-    if not self.doDetails:
+    if not self.withDetails:
       return E
 
     details = self.details

@@ -21,6 +21,8 @@ messages:
   legacyCriterion: >-
     This is a legacy criterion.
   scoreLegend: Score legend
+  orphanedReviewer: >-
+    This reviewer is not currently associated with this assessment.
 
 unknown:
   generic: '??'
@@ -28,6 +30,7 @@ unknown:
   country: unknown country
   user: unidentified user
   group: unknown group
+  reviewKind: orphaned
 
 constants:
   y: 'Yes'

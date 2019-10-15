@@ -355,4 +355,9 @@ span.option
 .small {
   font-size: small;
 }
+summary
+{
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+}
 

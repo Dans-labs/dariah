@@ -1,31 +1,29 @@
 from controllers.config import Config as C, Names as N
 from controllers.perm import permRecord
-from controllers.utils import E, ELLIPS
+from controllers.utils import E, ELLIPS, ONE
 from controllers.html import HtmlElements as H
 from controllers.field import Field
+
 from controllers.details import Details
-from controllers.contrib import Contrib
+from controllers.contrib_details import ContribD
+from controllers.assessment_details import AssessmentD
+from controllers.review_details import ReviewD
+
+CASES = (
+    (N.contrib, ContribD),
+    (N.assessment, AssessmentD),
+    (N.review, ReviewD),
+)
 
 
 CT = C.tables
 CW = C.web
 
 
-DEFAULT_TYPE = CT.defaultType
-DETAILS = CT.details
 MASTERS = CT.masters
 ACTUAL_TABLES = set(CT.actualTables)
 
 PROV = CW.provLabel
-QQ = CW.unknown[N.generic]
-QN = CW.unknown[N.number]
-
-
-def makeDetails(obj):
-  table = obj.table
-  if table == N.contrib:
-    return Contrib(obj)
-  return Details(obj)
 
 
 class Record(object):
@@ -37,11 +35,11 @@ class Record(object):
       'itemLabels',
   )
 
-  def __init__(self, Table, tableObj, record=None, eid=None, details=False):
+  def __init__(self, Table, tableObj, record=None, eid=None, withDetails=False):
     for prop in Record.inheritProps:
       setattr(self, prop, getattr(tableObj, prop, None))
 
-    self.doDetails = details
+    self.withDetails = withDetails
     self.Table = Table
     self.parent = tableObj
 
@@ -75,6 +73,17 @@ class Record(object):
         db.dependencies(table, record) if mayDelete else None
     )
 
+  def detailsFactory(self):
+    table = self.table
+
+    DetailsClass = Details
+    for (tb, Dcl) in CASES:
+      if tb == table:
+        DetailsClass = Dcl
+        break
+
+    return DetailsClass(self)
+
   def setPerm(self):
     auth = self.auth
     record = self.record
@@ -101,51 +110,71 @@ class Record(object):
 
     db.delItem(table, eid)
 
-  def wrap(self, collapsed=False):
-    table = self.table
-    record = self.record
+  def body(self, myMasters=None):
     fieldSpecs = self.fields
     provSpecs = self.prov
+    return E.join(
+        self.field(field, asMaster=field in myMasters).wrap()
+        for field in fieldSpecs
+        if field not in provSpecs
+    )
 
-    if collapsed:
-      return H.details(
-          self.title(),
-          H.div(
-              ELLIPS,
-              fetchurl=f"""/api/{table}/{N.item}/{record[N._id]}""",
-          ),
-          f"""{table}/{record[N._id]}""",
-      )
+  def wrap(self, collapsed=False):
+    return self.wrapHelper(collapsed=collapsed)
+
+  def wrapHelper(self, addCls=E, withDelete=True, collapsed=False):
+    table = self.table
+    record = self.record
+    provSpecs = self.prov
+    withDetails = self.withDetails
+
+    theTitle = self.title()
+    fetchUrl = f"""/api/{table}/{N.item}/{record[N._id]}"""
+    itemKey = f"""{table}/{record[N._id]}"""
 
     myMasters = MASTERS.get(table, [])
 
-    deleteButton = self.deleteButton()
+    if collapsed:
+      return H.details(
+          theTitle,
+          H.div(ELLIPS),
+          itemKey,
+          fetchurl=fetchUrl,
+      )
+
+    deleteButton = self.deleteButton() if withDelete else E
 
     main = (
         H.div(
             [deleteButton]
             +
-            [
-                self.field(field, asMaster=field in myMasters).wrap()
-                for field in fieldSpecs
-                if field not in provSpecs
-            ]
+            [self.body(myMasters=myMasters)]
             +
             [H.details(
-                PROV,
+                H.span(PROV, cls="prov"),
                 H.div(
                     [
                         self.field(field).wrap()
                         for field in provSpecs
-                    ]
+                    ],
+                    cls="prov"
                 ),
                 f"""{table}/{record[N._id]}/{N.prov}""",
+                cls="prov"
             )],
-            cls="record",
+            cls=f"record {addCls}",
         )
     )
 
-    return main + makeDetails(self).wrap()
+    details = self.detailsFactory().wrap() if withDetails else E
+    return H.details(
+        theTitle,
+        H.div(main + details),
+        itemKey,
+        fetchurl=fetchUrl,
+        fat=ONE,
+    )
+    return
 
   def deleteButton(self):
     mayDelete = self.mayDelete

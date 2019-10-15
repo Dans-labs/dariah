@@ -2,7 +2,7 @@ from flask import request
 
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import E, ONE, cap1
+from controllers.utils import E, BLANK, ONE, cap1
 from controllers.perm import getPerms
 
 CT = C.tables
@@ -229,6 +229,24 @@ class Field(object):
     )
 
     return [button, self.wrapValue(editable)]
+
+  def wrapBare(self):
+    types = self.types
+    tp = self.tp
+    value = self.value
+    multiple = self.multiple
+
+    fieldTypeClass = getattr(types, tp)
+    method = fieldTypeClass.toDisplay
+
+    return (
+        BLANK.join(
+            method(val)
+            for val in (value or [])
+        )
+        if multiple else
+        method(value)
+    )
 
   def wrapValue(self, editable):
     fieldTypeClass = self.fieldTypeClass
