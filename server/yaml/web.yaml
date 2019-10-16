@@ -39,6 +39,7 @@ constants:
 fontAwesome:
   - check
   - eye
+  - info
   - minus
   - pencil
   - plus
@@ -150,8 +151,13 @@ filterThreshold: 10
 
 names:
   - actual
-  - html
+  - body
+  - bodyCompact
+  - dismiss
   - from
+  - html
+  - method
   - save
   - option
   - select
+  - wrapHelp

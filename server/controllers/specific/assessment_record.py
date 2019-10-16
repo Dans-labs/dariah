@@ -17,12 +17,10 @@ class AssessmentR(Record):
     db = self.db
     record = self.record
 
-    aId = record.get(N.assessment, None)
-    aRecord = db.getItem(N.assessment, aId)
-    aTypeId = aRecord.get(N.assessmentType, None)
-    reviewerE = aRecord.get(N.reviewerE, None)
-    reviewerF = aRecord.get(N.reviewerF, None)
-    cId = aRecord.get(N.contrib, None)
+    aTypeId = record.get(N.assessmentType, None)
+    reviewerE = record.get(N.reviewerE, None)
+    reviewerF = record.get(N.reviewerF, None)
+    cId = record.get(N.contrib, None)
     cRecord = db.getItem(N.contrib, cId)
     cTypeId = cRecord.get(N.typeContribution, None)
     self.aTypeId = aTypeId

@@ -5,9 +5,9 @@ from controllers.html import HtmlElements as H
 from controllers.field import Field
 
 from controllers.details import Details
-from controllers.contrib_details import ContribD
-from controllers.assessment_details import AssessmentD
-from controllers.review_details import ReviewD
+from controllers.specific.contrib_details import ContribD
+from controllers.specific.assessment_details import AssessmentD
+from controllers.specific.review_details import ReviewD
 
 CASES = (
     (N.contrib, ContribD),
@@ -33,13 +33,22 @@ class Record(object):
       'table', 'fields', 'prov',
       'isUserTable', 'isUserEntryTable',
       'itemLabels',
+      'mayDelete',
   )
 
-  def __init__(self, Table, tableObj, record=None, eid=None, withDetails=False):
+  def __init__(
+      self, Table, tableObj,
+      record=None, eid=None,
+      withDetails=False,
+      readOnly=False,
+      bodyMethod=None,
+  ):
     for prop in Record.inheritProps:
       setattr(self, prop, getattr(tableObj, prop, None))
 
     self.withDetails = withDetails
+    self.readOnly = readOnly
+    self.bodyMethod = bodyMethod
     self.Table = Table
     self.parent = tableObj
 
@@ -47,6 +56,7 @@ class Record(object):
     auth = self.auth
     table = self.table
     isUserTable = self.isUserTable
+    isUserEntryTable = self.isUserEntryTable
 
     if record is None:
       record = db.getItem(table, eid)
@@ -60,6 +70,10 @@ class Record(object):
     perm = self.perm
 
     mayDelete = (
+        not isUserEntryTable
+        and
+        not readOnly
+        and
         isAuthenticated
         and
         (
@@ -68,6 +82,7 @@ class Record(object):
             isUserTable and perm[N.isEdit]
         )
     )
+
     self.mayDelete = mayDelete
     self.dependencies = (
         db.dependencies(table, record) if mayDelete else None
@@ -110,71 +125,112 @@ class Record(object):
 
     db.delItem(table, eid)
 
-  def body(self, myMasters=None):
+  def body(self, myMasters=None, hideMasters=False):
     fieldSpecs = self.fields
     provSpecs = self.prov
+    readOnly = self.readOnly
+
+    mayEdit = False if readOnly else None
     return E.join(
-        self.field(field, asMaster=field in myMasters).wrap()
+        self.field(field, mayEdit=mayEdit, asMaster=field in myMasters).wrap()
         for field in fieldSpecs
-        if field not in provSpecs
+        if (
+            field not in provSpecs and
+            not (hideMasters and field in myMasters)
+        )
     )
 
-  def wrap(self, collapsed=False):
-    return self.wrapHelper(collapsed=collapsed)
+  def wrap(
+      self,
+      wrapMethod=None,
+      expanded=1,
+      withProv=True,
+      hideMasters=False,
+  ):
+    return self.wrapHelper(
+        wrapMethod=wrapMethod,
+        expanded=expanded,
+        withProv=withProv,
+        hideMasters=hideMasters,
+    )
 
-  def wrapHelper(self, addCls=E, withDelete=True, collapsed=False):
+  def wrapHelper(
+      self,
+      wrapMethod=None,
+      expanded=1,
+      withProv=True,
+      hideMasters=False,
+      addCls=E,
+  ):
     table = self.table
     record = self.record
     provSpecs = self.prov
     withDetails = self.withDetails
 
-    theTitle = self.title()
+    func = getattr(self, wrapMethod, None) if wrapMethod else None
+    if func:
+      return func()
+
+    bodyMethod = self.bodyMethod
+    urlExtra = f'?method={bodyMethod}' if bodyMethod else E
     fetchUrl = f"""/api/{table}/{N.item}/{record[N._id]}"""
+
     itemKey = f"""{table}/{record[N._id]}"""
+    theTitle = self.title()
 
-    myMasters = MASTERS.get(table, [])
-
-    if collapsed:
+    if expanded == -1:
       return H.details(
           theTitle,
           H.div(ELLIPS),
           itemKey,
-          fetchurl=fetchUrl,
+          fetchurl=f"""{fetchUrl}{urlExtra}""",
       )
 
-    deleteButton = self.deleteButton() if withDelete else E
+    bodyFunc = getattr(self, bodyMethod, self.body) if bodyMethod else self.body
+    myMasters = MASTERS.get(table, [])
+
+    deleteButton = self.deleteButton()
+    readOnly = self.readOnly
+    mayEdit = False if readOnly else None
 
     main = (
         H.div(
-            [deleteButton]
+            deleteButton
             +
-            [self.body(myMasters=myMasters)]
+            E.join(bodyFunc(myMasters=myMasters, hideMasters=hideMasters))
             +
-            [H.details(
-                H.span(PROV, cls="prov"),
-                H.div(
-                    [
-                        self.field(field).wrap()
-                        for field in provSpecs
-                    ],
+            (
+                E.join(H.details(
+                    H.span(PROV, cls="prov"),
+                    H.div(
+                        [
+                            self.field(field, mayEdit=mayEdit).wrap()
+                            for field in provSpecs
+                        ],
+                        cls="prov"
+                    ),
+                    f"""{table}/{record[N._id]}/{N.prov}""",
                     cls="prov"
-                ),
-                f"""{table}/{record[N._id]}/{N.prov}""",
-                cls="prov"
-            )],
+                ))
+                if withProv else
+                E
+            ),
             cls=f"record {addCls}",
         )
     )
 
     details = self.detailsFactory().wrap() if withDetails else E
-    return H.details(
-        theTitle,
-        H.div(main + details),
-        itemKey,
-        fetchurl=fetchUrl,
-        fat=ONE,
+    return (
+        H.details(
+            theTitle,
+            H.div(main + details),
+            itemKey,
+            fetchurl=f"""{fetchUrl}/title{urlExtra}""",
+            fat=ONE,
+        )
+        if expanded == 1 else
+        H.div(main + details)
     )
-    return
 
   def deleteButton(self):
     mayDelete = self.mayDelete

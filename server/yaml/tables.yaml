@@ -56,7 +56,7 @@ items:
   criteria: [criterion, criteria]
   criteriaEntry: [criteria entry, criteria entries]
   reviewEntry: [review entry, review entries]
-  score: [score point, score points]
+  score: [score level, score levels]
   tadirahActivity: [TADIRAH Activity, TADIRAH Activities]
   tadirahObject: [TADIRAH Object, TADIRAH Objects]
   tadirahTechnique: [TADIRAH Technique, TADIRAH Techniques]

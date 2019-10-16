@@ -137,6 +137,7 @@ const filterTags = (options, pattern, off, add, extensible) => {
 
 const processHtml = (destElem, detail) => html => {
   destElem.html(html)
+  openCloseMyItems(destElem)
   openCloseItems(destElem)
   activateFetch(destElem)
   activateActions(destElem)
@@ -190,11 +191,11 @@ const activateFetch = destElem => {
       if ((isOpen && isFat) || (!isOpen && !isFat)) {
         return
       }
-      const url = fetchUrl + (isOpen ? '' : '/title')
+      //const url = fetchUrl + (isOpen ? '' : '/title')
       el.wrap('<div></div>')
       const parent = el.closest('div')
       el.remove()
-      fetchDetail(url, parent)
+      fetchDetail(fetchUrl, parent)
     })
   })
 }
@@ -225,6 +226,46 @@ const openCloseItems = destElem => {
       if (mustBeOpen) {
         el.prop('open', true)
       }
+    }
+  })
+}
+
+const openCloseMyItems = destElem => {
+  const triggerPat = (itemKey, t) => `[itemkey="${itemKey}"][trigger="${t}"]`
+  const targets = destElem
+    ? destElem.find('[itemkey][body]')
+    : $('[itemkey][body]')
+  targets.each((i, elem) => {
+    const body = $(elem)
+    const itemKey = body.attr('itemkey')
+    const triggerOn = destElem
+      ? destElem.find(triggerPat(itemKey, '1'))
+      : $(triggerPat(itemKey, '1'))
+    const triggerOff = destElem
+      ? destElem.find(triggerPat(itemKey, '-1'))
+      : $(triggerPat(itemKey, '-1'))
+    triggerOn.on('click', () => {
+      localStorage.setItem(itemKey, 'open')
+      body.show()
+      triggerOn.hide()
+      triggerOff.show()
+    })
+    triggerOff.on('click', () => {
+      localStorage.setItem(itemKey, '')
+      body.hide()
+      triggerOn.show()
+      triggerOff.hide()
+    })
+    const prevOpen = localStorage.getItem(itemKey)
+    if (prevOpen) {
+      body.show()
+      triggerOn.hide()
+      triggerOff.show()
+    }
+    else {
+      body.hide()
+      triggerOn.show()
+      triggerOff.hide()
     }
   })
 }
@@ -444,6 +485,7 @@ const activateOptions = destElem => {
 
 $(() => {
   const contribHeading = $('details[itemkey=contrib]')
+  openCloseMyItems()
   openCloseItems()
   activateFetch()
   activateActions()

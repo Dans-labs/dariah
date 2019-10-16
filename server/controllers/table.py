@@ -8,11 +8,15 @@ from controllers.html import HtmlElements as H
 from controllers.utils import E, ELLIPS, NBSP
 
 from controllers.record import Record
-from controllers.assessment_record import AssessmentR
-from controllers.review_record import ReviewR
-from controllers.criteriaentry_record import CriteriaEntryR
+from controllers.specific.criteria_record import CriteriaR
+from controllers.specific.score import ScoreR
+from controllers.specific.assessment_record import AssessmentR
+from controllers.specific.review_record import ReviewR
+from controllers.specific.criteriaentry_record import CriteriaEntryR
 
 CASES = (
+    (N.criteria, CriteriaR),
+    (N.score, ScoreR),
     (N.assessment, AssessmentR),
     (N.review, ReviewR),
     (N.criteriaEntry, CriteriaEntryR),
@@ -63,11 +67,13 @@ class Table(object):
     self.multiple = {N.editors}
 
     isUserTable = self.isUserTable
+    isUserEntryTable = self.isUserEntryTable
     isSuperuser = auth.superuser()
 
     self.mayInsert = (
         auth.authenticated()
         and (isUserTable or isSuperuser)
+        and not isUserEntryTable
     )
 
     def titleSortkey(r):
@@ -86,9 +92,20 @@ class Table(object):
 
     return RecordClass
 
-  def record(self, eid=None, record=None, withDetails=False):
+  def record(
+      self,
+      eid=None, record=None,
+      withDetails=False,
+      readOnly=False,
+      bodyMethod=None,
+  ):
     return self.recordFactory()(
-        Table, self, eid=eid, record=record, withDetails=withDetails,
+        Table, self,
+        eid=eid,
+        record=record,
+        withDetails=withDetails,
+        readOnly=readOnly,
+        bodyMethod=bodyMethod,
     )
 
   def insert(self):

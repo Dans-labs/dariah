@@ -41,15 +41,23 @@ class Details(object):
         tuple(drecords),
     )
 
-  def wrap(self):
+  def wrap(self, readOnly=False):
     table = self.table
 
     for dtable in DETAILS.get(table, []):
       self.fetchDetails(dtable)
 
-    return self.wrapAll()
+    return self.wrapAll(readOnly=readOnly)
 
-  def wrapDetail(self, dtable, extraMsg=None, extraCls=None):
+  def wrapDetail(
+      self, dtable,
+      wrapMethod=None,
+      bodyMethod=None,
+      combineMethod=None,
+      expanded=False,
+      readOnly=False,
+      extraMsg=None, extraCls=None,
+  ):
     details = self.details
 
     (dtableObj, drecords) = details.get(dtable, (None, []))
@@ -61,23 +69,34 @@ class Details(object):
     itemLabel = itemSingular if nRecords == 1 else itemPlural
 
     nRep = H.div(f"""{nRecords} {itemLabel}""", cls="stats")
+
+    drecordReps = [
+        dtableObj.record(
+            record=drecord, readOnly=readOnly,
+            bodyMethod=bodyMethod,
+        ).wrap(
+            wrapMethod=wrapMethod,
+            expanded=0 if expanded else -1,
+        )
+        for drecord in drecords
+    ]
+    if combineMethod:
+      drecordReps = combineMethod(drecordReps)
+
     return H.div(
         [
             H.div(extraMsg, cls=extraCls) if extraMsg else E,
             nRep,
         ]
         +
-        [
-            dtableObj.record(record=drecord).wrap(collapsed=True)
-            for drecord in drecords
-        ],
+        drecordReps,
         cls=f"record-details",
     )
 
-  def wrapAll(self):
+  def wrapAll(self, readOnly=False):
     details = self.details
 
     return E.join(
-        self.wrapDetail(dtable)
+        self.wrapDetail(dtable, readOnly=readOnly)
         for dtable in details
     )

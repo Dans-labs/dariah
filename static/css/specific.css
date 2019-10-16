@@ -5,7 +5,7 @@ details.assessment
   margin-left: 1rem;
   font-size: large;
 }
-details.criterion
+.criteria
 {
   margin-top: 0.2rem;
   margin-bottom: 0.2rem;
@@ -17,13 +17,37 @@ details.criterion
 	padding: 0.2rem;
 }
 
-details.criterion .comments
+div.criteriahelp
 {
 	font-size: small;
 	margin-left: 1rem;
 	margin-right: 1rem;
+	margin-bottom: 1rem;
+  color: var(--assessment-quoted-fore);
+  background-color: var(--assessment-quoted-back);
+	border: 2px solid var(--assessment-quoted-border);
+	border-radius: 0.2rem;
+	padding: 0.2rem;
 }
 
 .assessment-head {
   font-weight: bold;
+}
+
+.scoredesc {
+  font-style: italic;
+}
+
+.centrytitle
+{
+  display: inline-flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  width: calc(100% - 3rem);
+}
+.centrytitle .col1 {
+  width: 50%;
+}
+.centrytitle .col2 {
+  width: 30%;
 }

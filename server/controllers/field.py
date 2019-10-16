@@ -27,9 +27,14 @@ class Field(object):
       N.db, N.auth, N.types,
       'uid', 'eppn',
       'table', 'record', 'eid', 'perm',
+      'readOnly',
   )
 
-  def __init__(self, recordObj, field, asMaster=False, mayRead=None, mayEdit=None):
+  def __init__(
+      self, recordObj, field,
+      asMaster=False,
+      mayRead=None, mayEdit=None,
+  ):
     for prop in Field.inheritProps:
       setattr(self, prop, getattr(recordObj, prop, None))
 
@@ -58,10 +63,14 @@ class Field(object):
     eid = self.eid
     tp = self.tp
     types = self.types
+    readOnly = self.readOnly
 
     fieldTypeClass = getattr(types, tp)
     self.fieldTypeClass = fieldTypeClass
     self.widgetType = fieldTypeClass.widgetType
+
+    if readOnly:
+      mayEdit = False
 
     (self.mayRead, self.mayEdit) = getPerms(perm, require, mayEdit=mayEdit)
     if asMaster:
@@ -156,7 +165,7 @@ class Field(object):
         )
     )
 
-  def wrap(self, action=None, empty=False):
+  def wrap(self, action=None, asEdit=False, empty=False, withLabel=True, cls=E):
     mayRead = self.mayRead
 
     if not mayRead:
@@ -164,14 +173,14 @@ class Field(object):
 
     asMaster = self.asMaster
     mayEdit = self.mayEdit
-    editable = mayEdit and action == N.edit and not asMaster
+    editable = mayEdit and (action == N.edit or asEdit) and not asMaster
 
     if action is not None and not asMaster:
       data = request.get_json()
       if data is not None and N.save in data:
         self.save(data[N.save])
 
-    widget = self.wrapWidget(editable)
+    widget = self.wrapWidget(editable, cls=cls)
 
     if action is not None:
       return E.join(widget)
@@ -193,9 +202,14 @@ class Field(object):
             ],
             cls="record-row",
         )
+        if withLabel else
+        H.div(
+            widget,
+            cls=f"record-value{editClass}",
+        )
     )
 
-  def wrapWidget(self, editable):
+  def wrapWidget(self, editable, cls=E):
     atts = self.atts
     mayEdit = self.mayEdit
     withRefresh = self.withRefresh
@@ -228,7 +242,7 @@ class Field(object):
         )
     )
 
-    return [button, self.wrapValue(editable)]
+    return [button, self.wrapValue(editable, cls=cls)]
 
   def wrapBare(self):
     types = self.types
@@ -248,7 +262,7 @@ class Field(object):
         method(value)
     )
 
-  def wrapValue(self, editable):
+  def wrapValue(self, editable, cls=E):
     fieldTypeClass = self.fieldTypeClass
     value = self.value
     tp = self.tp
@@ -257,7 +271,7 @@ class Field(object):
     extensible = self.extensible
     widgetType = self.widgetType
 
-    cls = "tags" if widgetType == N.related else "values"
+    baseCls = "tags" if widgetType == N.related else "values"
     isSelectWidget = widgetType == N.related
 
     args = []
@@ -274,6 +288,7 @@ class Field(object):
       args.append(extensible)
       args.append(constrain)
     method = fieldTypeClass.widget if editable else fieldTypeClass.toDisplay
+    extraCls = E if editable else cls
     atts = dict(wtype=widgetType)
 
     if editable:
@@ -291,12 +306,12 @@ class Field(object):
                 for val in (value or []) + ([E] if editable else [])
             ],
             **atts,
-            cls=cls,
+            cls=baseCls,
         )
         if multiple and not (editable and isSelectWidget) else
         H.div(
             method(value, *args),
             **atts,
-            cls="value",
+            cls=f"value {extraCls}",
         )
     )

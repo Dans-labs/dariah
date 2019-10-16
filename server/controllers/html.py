@@ -1,9 +1,10 @@
 from controllers.config import Config as C, Names as N
-from controllers.utils import asString, E, AMP, LT, APOS, QUOT, DOLLAR
+from controllers.utils import asString, E, AMP, LT, APOS, QUOT, DOLLAR, ONE, MINONE
 
 CW = C.web
 
 EMPTY_ELEMENTS = set(CW.emptyElements)
+ICONS = set(CW.fontAwesome)
 
 CLASS = 'class'
 
@@ -71,6 +72,39 @@ class HtmlElements(object):
     return HtmlElement(N.details).wrap(
         HtmlElement(N.summary).wrap(summary) + content,
         itemkey=itemkey, **atts
+    )
+
+  @staticmethod
+  def mydetails(
+      icons,
+      material,
+      itemkey,
+      openAtts=None, closeAtts=None,
+      **atts,
+  ):
+    content = asString(material)
+    (iconOpen, iconClose) = (
+        (icons, icons)
+        if type(icons) is str else
+        icons
+    )
+    triggerElements = [
+        (HtmlElements.icon if icon in ICONS else HtmlElements.span)(
+            icon,
+            itemkey=itemkey,
+            trigger=value,
+            **openAtts,
+        )
+        for (icon, value) in ((iconOpen, ONE), (iconClose, MINONE))
+    ]
+    return (
+        *triggerElements,
+        HtmlElement(N.div).wrap(
+            content,
+            itemkey=itemkey,
+            body=ONE,
+            **atts
+        ),
     )
 
   @staticmethod

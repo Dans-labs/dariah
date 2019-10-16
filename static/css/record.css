@@ -118,3 +118,6 @@ div.prov
   padding-left: 2rem;
   font-size: small;
 }
+dt {
+  font-weight: bold;
+}

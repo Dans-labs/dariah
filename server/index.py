@@ -2,6 +2,7 @@ import os
 
 from flask import (
     Flask,
+    request,
     render_template,
     send_file,
     redirect,
@@ -162,14 +163,18 @@ def factory():
   def serveRecord(table, eid):
     if table in ALL_TABLES:
       auth.authenticate()
-      return Table(control, table).record(eid=eid, withDetails=True).wrap()
+      return Table(control, table).record(
+          eid=eid, withDetails=True, **method(),
+      ).wrap()
     return noTable(table)
 
   @app.route(f"""/api/<string:table>/{N.item}/<string:eid>/{N.title}""")
   def serveRecordTitle(table, eid):
     if table in ALL_TABLES:
       auth.authenticate()
-      return Table(control, table).record(eid=eid, withDetails=True).wrap()
+      return Table(control, table).record(
+          eid=eid, withDetails=True, **method(),
+      ).wrap(expanded=-1)
     return noTable(table)
 
   @app.route(f"""/<string:table>/{N.item}/<string:eid>""")
@@ -179,7 +184,9 @@ def factory():
       auth.authenticate()
       userLine = User(control).wrap()
       sidebar = Sidebar(control, path).wrap()
-      record = Table(control, table).record(eid=eid, withDetails=True).wrap(collapsed=True)
+      record = Table(control, table).record(
+          eid=eid, withDetails=True, **method(),
+      ).wrap()
       return render_template(
           INDEX,
           userLine=userLine,
@@ -187,6 +194,10 @@ def factory():
           material=record,
       )
     return noTable(table)
+
+  def method():
+      method = request.args.get(N.method, None)
+      return dict(bodyMethod=method) if method else {}
 
   # FIELD VIEWS AND EDITS
 
