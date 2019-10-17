@@ -1,5 +1,3 @@
-mainTable: contrib
-
 userTables:
   - contrib
   - assessment
@@ -78,11 +76,11 @@ scalarTypes:
 boolTypes:
   bool2:
     true: check
-    false: times
+    false: cross
   bool3:
     true: check
-    null: minus
-    false: times
+    null: none
+    false: cross
 
 prov:
   creator:
@@ -127,8 +125,16 @@ names:
   - constrained
   - eid
   - expert
+  - fields
   - final
+  - isUserTable
+  - isUserEntryTable
+  - itemLabels
   - orig
   - pattern
+  - readonly
   - reference
   - sorted
+  - Table
+  - table
+  - uid

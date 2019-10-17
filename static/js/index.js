@@ -21,8 +21,8 @@ const widgets = {
     activate(table, eid, field, parent, valueEl, targets) {
       targets.each((i, elem) => {
         const el = $(elem)
-        const options = el.find('.button, .label')
-        el.find('.button').off('click').click(e => {
+        const options = el.find('[bool]')
+        el.find('.icon').off('click').click(e => {
           options.removeClass('active')
           const me = $(e.currentTarget)
           me.addClass('active')
@@ -32,9 +32,10 @@ const widgets = {
     },
     read(elem) {
       const el = elem.find('.active')
-      return el.hasClass('fa-check')
+      const boolValue = el.attr('bool')
+      return (boolValue == 'true')
         ? true
-        : el.hasClass('fa-times')
+        : (boolValue == 'false')
         ? false
         : null
     },
@@ -65,8 +66,8 @@ const widgets = {
         })
         const filterControl = el.find('input.wfilter')
         if (filterControl) {
-          const filterOff = el.find('.button.wfilter')
-          const filterAdd = el.find('.button.add')
+          const filterOff = el.find('.icon.wfilter')
+          const filterAdd = el.find('.icon.add')
           const prevFilter = localStorage.getItem(filterKey) || ''
           filterControl.val(prevFilter)
           filterTags(options, prevFilter, filterOff, filterAdd, extensible)
@@ -479,6 +480,39 @@ const activateOptions = destElem => {
   applyOptions(destElem, optionElements, true)
 }
 
+const activateCfilter = () => {
+  const cfilter = 'cfilter'
+  const fcontrol = $('#cfilter')
+  const clist = $('.table.contrib')
+  const summaries = clist.children('details').
+    map((i, elem) => $(elem).children('summary'))
+
+
+  const adjust = pat => {
+    summaries.each((i, elem) => {
+      const el = $(elem)
+      const text = el.html().toLowerCase()
+      if (text.indexOf(pat) == -1) {
+        el.hide()
+      }
+      else {
+        el.show()
+      }
+    })
+  }
+  const prevPat = localStorage.getItem(cfilter)
+  if (prevPat) {
+    fcontrol.val(prevPat)
+    adjust(prevPat)
+  }
+
+  fcontrol.on('keyup', () => {
+    const pat = fcontrol.val().toLowerCase()
+    localStorage.setItem(cfilter, pat)
+    adjust(pat)
+  })
+}
+
 /* main
  *
  */
@@ -490,4 +524,5 @@ $(() => {
   activateFetch()
   activateActions()
   activateOptions(contribHeading)
+  activateCfilter()
 })

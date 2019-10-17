@@ -14,7 +14,7 @@ from controllers.config import Config as C, Names as N
 from controllers.db import Db
 from controllers.auth import Auth
 from controllers.sidebar import Sidebar
-from controllers.user import User
+from controllers.topbar import Topbar
 from controllers.table import Table
 from controllers.types import Types
 
@@ -32,6 +32,7 @@ MESSAGES = CW.messages
 
 INDEX = CW.indexPage
 LANDING = CW.landing
+BODY_METHODS = set(CW.bodyMethods)
 
 START = URLS[N.home][N.url]
 DUMMY = URLS[N.dummy][N.url]
@@ -77,11 +78,11 @@ def factory():
   def serveIndex():
     path = START
     auth.authenticate()
-    userLine = User(control).wrap()
+    topbar = Topbar(control).wrap()
     sidebar = Sidebar(control, path).wrap()
     return render_template(
         INDEX,
-        userLine=userLine,
+        topbar=topbar,
         sidebar=sidebar,
         material=LANDING,
     )
@@ -133,12 +134,12 @@ def factory():
     if table in ALL_TABLES:
       path = f"""/{table}/{action}"""
       auth.authenticate()
-      userLine = User(control).wrap()
+      topbar = Topbar(control).wrap()
       sidebar = Sidebar(control, path).wrap()
       tableList = Table(control, table).wrap(eid, action=action)
       return render_template(
           INDEX,
-          userLine=userLine,
+          topbar=topbar,
           sidebar=sidebar,
           material=tableList,
       )
@@ -182,14 +183,14 @@ def factory():
     if table in ALL_TABLES:
       path = f"""/{table}/{N.item}/{eid}"""
       auth.authenticate()
-      userLine = User(control).wrap()
+      topbar = Topbar(control).wrap()
       sidebar = Sidebar(control, path).wrap()
       record = Table(control, table).record(
           eid=eid, withDetails=True, **method(),
       ).wrap()
       return render_template(
           INDEX,
-          userLine=userLine,
+          topbar=topbar,
           sidebar=sidebar,
           material=record,
       )
@@ -197,7 +198,9 @@ def factory():
 
   def method():
       method = request.args.get(N.method, None)
-      return dict(bodyMethod=method) if method else {}
+      if method not in BODY_METHODS:
+        return {}
+      return dict(bodyMethod=method)
 
   # FIELD VIEWS AND EDITS
 
@@ -240,11 +243,11 @@ def factory():
 
   def notFound(path):
     auth.authenticate()
-    userLine = User(control).wrap()
+    topbar = Topbar(control).wrap()
     sidebar = Sidebar(control, path).wrap()
     return render_template(
         INDEX,
-        userLine=userLine,
+        topbar=topbar,
         sidebar=sidebar,
         material=f"""{NO_PAGE} {path}""",
     )

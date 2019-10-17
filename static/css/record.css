@@ -1,20 +1,26 @@
-.dirty {
+.dirty
+{
 	color: var(--edit-dirty-fore);
 	background-color: var(--edit-dirty-back);
 	outline: 4px dashed var(--edit-dirty-border);
 }
-.record {
+.record
+{
 	display: flex;
 	flex-flow: column nowrap;
 	justify-content: flex-start;
 	align-content: flex-start;
   background-color: var(--record-back);
+}
+.record.inner
+{
   border: 1pt solid var(--record-border);
   border-radius: 0.5rem;
   padding: 0.5rem;
   margin-left: 1rem;
 }
-.record-row {
+.record-row
+{
 	width: 100%;
 	display: inline-flex;
 	margin-bottom: 0.1rem;
@@ -25,18 +31,26 @@
   margin-top: 0.0rem;
   margin-bottom: 0.0rem;
 }
-.record-details {
-  background-color: var(--record-details-back);
+.record-details
+{
+  
+  ackground-color: var(--record-details-back);
+}
+.record-details.inner
+{
   border: 1pt solid var(--record-border);
   border-radius: 0.5rem;
   padding: 0.5rem;
   margin-left: 1rem;
 }
-.record-label {
+.record-label
+{
 	flex: 0 0 10rem;
 	font-weight: bold;
 }
-.record-value {
+.record-value
+{
+  width: 100%;
   flex: 1 1 calc(100%);
 	display: inline-flex;
 	flex-flow: row wrap;
@@ -49,20 +63,24 @@
   border: 1pt solid var(--value-border);
 }
 .record-value .values,
-.record-value .tags {
+.record-value .tags
+{
   flex: 1 1 auto;
 	display: inline-flex;
 	justify-content: flex-start;
 	align-items: flex-start;
 	align-content: flex-start;
 }
-.record-value .values {
+.record-value .values
+{
 	flex-flow: column nowrap;
 }
-.record-value .tags {
+.record-value .tags
+{
 	flex-flow: row wrap;
 }
-.wvalue {
+.wvalue
+{
   flex: 1 1 auto;
 	display: inline-flex;
 	flex-flow: row wrap;
@@ -72,10 +90,12 @@
 	width: 100%;
 }
 .record-value.edit,
-.record-value .value.edit {
+.record-value .value.edit
+{
   background-color: var(--value-edit-back);
 }
-.tag {
+.tag
+{
   flex: 0 1 auto;
   color: var(--tag-fore);
   background-color: var(--tag-back);
@@ -84,13 +104,15 @@
   padding: 0.1rem 0.2rem;
   margin: 0.1rem 0.3rem;
 }
-.inactual {
+.inactual
+{
   color: var(--tag-inactual-fore) !important;
   background-color: var(--tag-inactual-back) !important;
   border-color: var(--tag-inactual-border) !important;
   border-radius: 0.2rem;
 }
-.delete {
+.delete
+{
   float: right;
 }
 .stats
@@ -118,6 +140,7 @@ div.prov
   padding-left: 2rem;
   font-size: small;
 }
-dt {
+dt
+{
   font-weight: bold;
 }

@@ -13,6 +13,7 @@ SORTED_TABLES = CT.sorted
 
 HOME = CW.urls[N.home]
 OPTIONS = CW.options
+CAPTIONS = CW.captions
 
 
 class Sidebar(object):
@@ -40,9 +41,9 @@ class Sidebar(object):
 
     refPath = self.path
     active = (
-        refPath.startswith(f'/{path}/')
+        refPath.startswith(f"""/{path}/""")
         if type(path) is str else
-        any(refPath.startswith(f'/{p}/') for p in path)
+        any(refPath.startswith(f"""/{p}/""") for p in path)
     )
     navClass = " active" if active else E
     atts = dict(
@@ -50,8 +51,10 @@ class Sidebar(object):
     )
     itemkey = path if type(path) is str else label
     if rule:
-      atts['addClass'] = " ruleabove"
-    return H.details(label, entries, itemkey, **atts)
+      atts[N.addClass] = " ruleabove"
+
+    entriesRep = H.div(entries, cls="sidebarsec")
+    return H.details(label, entriesRep, itemkey, **atts)
 
   def makeEntry(self, label, path, withOptions=False):
     options = self.options
@@ -61,7 +64,7 @@ class Sidebar(object):
 
     optionsRep = (
         AMP.join(
-            f'{name}={value}'
+            f"""{name}={value}"""
             for (name, value) in options.items()
         )
         if withOptions else
@@ -74,7 +77,16 @@ class Sidebar(object):
 
   def makeOptions(self):
     options = self.options
-    return [
+
+    filterRep = [
+        H.input(
+            E,
+            type=N.text,
+            id="cfilter",
+            placeholder="match title",
+        ),
+    ]
+    optionsRep = [
         H.span(
             [
                 H.checkbox(name, trival=value),
@@ -84,6 +96,8 @@ class Sidebar(object):
         )
         for (name, value) in options.items()
     ]
+
+    return filterRep + optionsRep
 
   def tableEntry(self, table):
     control = self.control
@@ -185,14 +199,14 @@ class Sidebar(object):
         E.join(self.mainEntries)
         +
         self.makeCaption(
-            'User content',
+            CAPTIONS[N.user],
             self.userPaths,
             self.userEntries,
             rule=True,
         )
         +
         self.makeCaption(
-            'Office content',
+            CAPTIONS[N.office],
             self.valuePaths,
             self.valueEntries,
             rule=True,

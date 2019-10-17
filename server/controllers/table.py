@@ -5,7 +5,7 @@ from flask import request
 from controllers.config import Config as C, Names as N
 from controllers.perm import UNAUTH
 from controllers.html import HtmlElements as H
-from controllers.utils import E, ELLIPS, NBSP
+from controllers.utils import E, ELLIPS, NBSP, ONE
 
 from controllers.record import Record
 from controllers.specific.criteria_record import CriteriaR
@@ -13,6 +13,7 @@ from controllers.specific.score import ScoreR
 from controllers.specific.assessment_record import AssessmentR
 from controllers.specific.review_record import ReviewR
 from controllers.specific.criteriaentry_record import CriteriaEntryR
+from controllers.specific.reviewentry_record import ReviewEntryR
 
 CASES = (
     (N.criteria, CriteriaR),
@@ -20,13 +21,14 @@ CASES = (
     (N.assessment, AssessmentR),
     (N.review, ReviewR),
     (N.criteriaEntry, CriteriaEntryR),
+    (N.reviewEntry, ReviewEntryR),
 )
 
 CT = C.tables
 CW = C.web
 
 
-MAIN_TABLE = CT.mainTable
+MAIN_TABLE = CT.userTables[0]
 USER_TABLES = set(CT.userTables)
 USER_ENTRY_TABLES = set(CT.userEntryTables)
 VALUE_TABLES = set(CT.valueTables)
@@ -46,7 +48,6 @@ class Table(object):
     self.auth = control[N.auth]
     self.types = control[N.types]
 
-    db = self.db
     auth = self.auth
     user = auth.user
 
@@ -55,7 +56,7 @@ class Table(object):
     self.isUserTable = table in USER_TABLES
     self.isUserEntryTable = table in USER_ENTRY_TABLES
     self.isValueTable = table in VALUE_TABLES
-    self.itemLabels = ITEMS.get(table, [table, f'{table}s'])
+    self.itemLabels = ITEMS.get(table, [table, f"""{table}s"""])
     self.prov = PROV_SPECS
     self.fields = getattr(CT, table, {})
 
@@ -63,8 +64,6 @@ class Table(object):
     self.eppn = user.get(N.eppn, None)
     self.group = user.get(N.groupRep, None) or UNAUTH
     self.countryId = user.get(N.country, None)
-    self.country = db.country.get(self.countryId, {})
-    self.multiple = {N.editors}
 
     isUserTable = self.isUserTable
     isUserEntryTable = self.isUserEntryTable
@@ -96,7 +95,7 @@ class Table(object):
       self,
       eid=None, record=None,
       withDetails=False,
-      readOnly=False,
+      readonly=False,
       bodyMethod=None,
   ):
     return self.recordFactory()(
@@ -104,7 +103,7 @@ class Table(object):
         eid=eid,
         record=record,
         withDetails=withDetails,
-        readOnly=readOnly,
+        readonly=readonly,
         bodyMethod=bodyMethod,
     )
 
@@ -169,7 +168,8 @@ class Table(object):
                 )
                 for record in records
             ),
-        ))
+        )),
+        cls=f"table {table}",
     )
 
   def insertButton(self):
@@ -182,8 +182,8 @@ class Table(object):
     itemSingle = self.itemLabels[0]
 
     return H.icon(
-        N.plus,
-        cls="button medium",
+        N.insert,
+        cls="medium",
         href=f"""/api/{table}/{N.insert}""",
         title=f"""New {itemSingle}"""
     )
@@ -207,7 +207,7 @@ class Table(object):
 
 def forceOpen(theEid, openEid):
   return (
-      dict(forceopen='1')
+      dict(forceopen=ONE)
       if openEid and str(theEid) == openEid else
       dict()
   )

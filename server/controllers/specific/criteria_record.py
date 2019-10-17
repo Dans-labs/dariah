@@ -18,7 +18,7 @@ class CriteriaR(Record):
 
   def wrapHelp(self, typeOk, cls):
     info = E.join(
-        self.field(field, mayEdit=False).wrap(action=N.view)
+        self.field(field, readonly=False).wrap(action=N.view)
         for field in [N.typeContribution, N.remarks]
         if not typeOk or field != N.typeContribution
     )
@@ -26,7 +26,7 @@ class CriteriaR(Record):
     detailsObj = self.detailsFactory()
     detailsObj.fetchDetails(N.score)
     details = detailsObj.wrapDetail(
-        N.score, expanded=True, readOnly=True,
+        N.score, expanded=True, readonly=True,
         wrapMethod=N.wrapHelp,
         combineMethod=lambda x: [H.dl(x)],
     )

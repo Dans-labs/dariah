@@ -20,6 +20,7 @@ class CriteriaEntryR(Record):
     aId = record.get(N.assessment, None)
     aRecord = db.getItem(N.assessment, aId)
     aTypeId = aRecord.get(N.assessmentType, None)
+
     cId = aRecord.get(N.contrib, None)
     cRecord = db.getItem(N.contrib, cId)
     cTypeId = cRecord.get(N.typeContribution, None)
@@ -40,7 +41,13 @@ class CriteriaEntryR(Record):
     cls = self.cls
     critRecord = self.critRecord
 
-    withEvidence = '❌' if self.field(N.evidence).isBlank() else '✅'
+    withEvidence = (
+        H.icon(
+            N.exclamation
+            if self.field(N.evidence).isBlank() else
+            N.check
+        )
+    )
     status = H.span(
         f"""with{NBSP}evidence{NBSP}{withEvidence}""",
         cls="right small",
@@ -71,6 +78,7 @@ class CriteriaEntryR(Record):
     cls = self.cls
     critId = self.critId
     critRecord = self.critRecord
+    perm = self.perm
 
     critData = critRecord.record
     actual = critData.get(N.actual, False)
@@ -78,7 +86,7 @@ class CriteriaEntryR(Record):
     msg2 = E if typeOk else MESSAGES[N.wrongCriterionForType]
 
     critKey = f"""{N.criteria}/{critId}/help"""
-    (infoShow, infoHide, infoBody) = H.mydetails(
+    (infoShow, infoHide, infoBody) = H.detailx(
         (N.info, N.dismiss),
         critRecord.wrapHelp(typeOk, cls),
         critKey,
@@ -92,16 +100,20 @@ class CriteriaEntryR(Record):
         ),
     )
 
+    score = H.div(
+        self.field(N.score).wrap(asEdit=perm[N.isEdit]),
+    )
     evidence = H.div(
-        self.field(N.evidence).wrap(asEdit=True),
+        self.field(N.evidence).wrap(asEdit=perm[N.isEdit]),
     )
     entry = H.div(
         [
             H.div(he(msg1), cls="heavy") if msg1 else E,
             H.div(he(msg2), cls="heavy") if msg2 else E,
             infoShow,
-            infoBody,
             infoHide,
+            infoBody,
+            score,
             evidence,
         ],
     )

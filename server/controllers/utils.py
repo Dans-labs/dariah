@@ -6,50 +6,51 @@ from flask.json import JSONEncoder
 from bson.objectid import ObjectId
 
 
-ISO_DTP = '%Y-%m-%dT%H:%M:%S.%f'
-ISO_DT = '%Y-%m-%dT%H:%M:%S'
-ISO_D = '%Y-%m-%d'
+ISO_DTP = """%Y-%m-%dT%H:%M:%S.%f"""
+ISO_DT = """%Y-%m-%dT%H:%M:%S"""
+ISO_D = """%Y-%m-%d"""
 
-E = ''
-BLANK = ' '
-COMMA = ','
-COLON = ':'
-DOT = '.'
-PIPE = '|'
-T = 'T'
-Z = 'Z'
-AT = '@'
-EURO = '€'
-MINONE = '-1'
-ZERO = '0'
-ONE = '1'
-TWO = '2'
-THREE = '3'
-SLASH = '/'
-LOW = '_'
-AMP = '&'
-LT = '<'
+E = ""
+BLANK = " "
+COMMA = ","
+COLON = ":"
+DOT = "."
+PIPE = "|"
+T = "T"
+Z = "Z"
+AT = "@"
+EURO = "€"
+MINONE = "-1"
+ZERO = "0"
+ONE = "1"
+TWO = "2"
+THREE = "3"
+SLASH = "/"
+LOW = "_"
+AMP = "&"
+LT = "<"
 APOS = "'"
 QUOT = '"'
-DOLLAR = '$'
-Q = '?'
+DOLLAR = "$"
+Q = "?"
+S = "s"
 
-NL = '\n'
+NL = "\n"
 
-MIN = '-'
-HYPHEN = '-'
-WHYPHEN = ' - '
-ELLIPS = '...'
-ON = ' on '
+MIN = "-"
+HYPHEN = "-"
+WHYPHEN = " - "
+ELLIPS = "..."
+ON = " on "
 
-NBSP = '&#xa;'
+NBSP = "&#xa;"
 
-LATIN1 = 'latin1'
-UTF8 = 'utf8'
+LATIN1 = "latin1"
+UTF8 = "utf8"
 
-EMPTY_DATE = '1900-01-01T00:00:00Z'
+EMPTY_DATE = "1900-01-01T00:00:00Z"
 
-ITER = '__iter__'
+ITER = "__iter__"
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -95,7 +96,7 @@ def now():
 
 
 def serverprint(msg):
-  sys.stdout.write(f'{msg}\n')
+  sys.stdout.write(f"""{msg}\n""")
   sys.stdout.flush()
 
 
@@ -153,7 +154,10 @@ def _trimM(mdt, trim):
 
 
 def _composeM(modified):
-  return [f'{m[0]}{ON}{_trimM(m[1], trim)}' for (m, trim) in reversed(modified)]
+  return [
+      f"""{m[0]}{ON}{_trimM(m[1], trim)}"""
+      for (m, trim) in reversed(modified)
+  ]
 
 
 def _perDay(modified):

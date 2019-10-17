@@ -21,8 +21,6 @@ names:
   - DARIAH
   - devel
   - eppn
-  - group
-  - groupRep
   - Guest
   - isEdit
   - isOur
@@ -32,15 +30,17 @@ names:
   - mail
   - master
   - modified
+  - my
   - name
   - No
   - number
   - org
+  - patternn
   - REGIME
   - read
   - record
   - related
-  - sameCountry
   - text
   - unknown
   - Yes
+  - you

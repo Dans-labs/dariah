@@ -1,17 +1,19 @@
 from controllers.config import Config as C, Names as N
 from controllers.perm import permRecord
-from controllers.utils import E, ELLIPS, ONE
+from controllers.utils import cap1, E, ELLIPS, ONE, S
 from controllers.html import HtmlElements as H
 from controllers.field import Field
 
 from controllers.details import Details
 from controllers.specific.contrib_details import ContribD
 from controllers.specific.assessment_details import AssessmentD
+from controllers.specific.criteriaentry_details import CriteriaEntryD
 from controllers.specific.review_details import ReviewD
 
 CASES = (
     (N.contrib, ContribD),
     (N.assessment, AssessmentD),
+    (N.criteriaEntry, CriteriaEntryD),
     (N.review, ReviewD),
 )
 
@@ -29,25 +31,24 @@ PROV = CW.provLabel
 class Record(object):
   inheritProps = (
       N.control, N.db, N.auth, N.types,
-      'uid', 'eppn',
-      'table', 'fields', 'prov',
-      'isUserTable', 'isUserEntryTable',
-      'itemLabels',
-      'mayDelete',
+      N.uid, N.eppn,
+      N.table, N.fields, N.prov,
+      N.isUserTable, N.isUserEntryTable,
+      N.itemLabels,
   )
 
   def __init__(
       self, Table, tableObj,
       record=None, eid=None,
       withDetails=False,
-      readOnly=False,
+      readonly=False,
       bodyMethod=None,
   ):
     for prop in Record.inheritProps:
       setattr(self, prop, getattr(tableObj, prop, None))
 
     self.withDetails = withDetails
-    self.readOnly = readOnly
+    self.readonly = readonly
     self.bodyMethod = bodyMethod
     self.Table = Table
     self.parent = tableObj
@@ -72,7 +73,7 @@ class Record(object):
     mayDelete = (
         not isUserEntryTable
         and
-        not readOnly
+        not readonly
         and
         isAuthenticated
         and
@@ -100,13 +101,16 @@ class Record(object):
     return DetailsClass(self)
 
   def setPerm(self):
+    db = self.db
     auth = self.auth
+    table = self.table
     record = self.record
 
     self.perm = permRecord(
+        db,
         auth.user,
+        table,
         record,
-        country=record.get(N.country, None),
     )
 
   def field(self, fieldName, **kwargs):
@@ -128,11 +132,9 @@ class Record(object):
   def body(self, myMasters=None, hideMasters=False):
     fieldSpecs = self.fields
     provSpecs = self.prov
-    readOnly = self.readOnly
 
-    mayEdit = False if readOnly else None
     return E.join(
-        self.field(field, mayEdit=mayEdit, asMaster=field in myMasters).wrap()
+        self.field(field, asMaster=field in myMasters).wrap()
         for field in fieldSpecs
         if (
             field not in provSpecs and
@@ -142,12 +144,14 @@ class Record(object):
 
   def wrap(
       self,
+      inner=True,
       wrapMethod=None,
       expanded=1,
       withProv=True,
       hideMasters=False,
   ):
     return self.wrapHelper(
+        inner=inner,
         wrapMethod=wrapMethod,
         expanded=expanded,
         withProv=withProv,
@@ -156,6 +160,7 @@ class Record(object):
 
   def wrapHelper(
       self,
+      inner=True,
       wrapMethod=None,
       expanded=1,
       withProv=True,
@@ -172,7 +177,7 @@ class Record(object):
       return func()
 
     bodyMethod = self.bodyMethod
-    urlExtra = f'?method={bodyMethod}' if bodyMethod else E
+    urlExtra = f"""?method={bodyMethod}""" if bodyMethod else E
     fetchUrl = f"""/api/{table}/{N.item}/{record[N._id]}"""
 
     itemKey = f"""{table}/{record[N._id]}"""
@@ -186,25 +191,32 @@ class Record(object):
           fetchurl=f"""{fetchUrl}{urlExtra}""",
       )
 
-    bodyFunc = getattr(self, bodyMethod, self.body) if bodyMethod else self.body
+    bodyFunc = (
+        getattr(self, f"""{N.body}{cap1(bodyMethod)}""", self.body)
+        if bodyMethod else
+        self.body
+    )
     myMasters = MASTERS.get(table, [])
 
     deleteButton = self.deleteButton()
-    readOnly = self.readOnly
-    mayEdit = False if readOnly else None
+
+    innerCls = " inner" if inner else E
 
     main = (
         H.div(
             deleteButton
             +
-            E.join(bodyFunc(myMasters=myMasters, hideMasters=hideMasters))
+            H.div(
+                E.join(bodyFunc(myMasters=myMasters, hideMasters=hideMasters)),
+                cls=f"{table.lower()}",
+            )
             +
             (
                 E.join(H.details(
                     H.span(PROV, cls="prov"),
                     H.div(
                         [
-                            self.field(field, mayEdit=mayEdit).wrap()
+                            self.field(field).wrap()
                             for field in provSpecs
                         ],
                         cls="prov"
@@ -215,7 +227,7 @@ class Record(object):
                 if withProv else
                 E
             ),
-            cls=f"record {addCls}",
+            cls=f"record{innerCls} {addCls}",
         )
     )
 
@@ -244,12 +256,13 @@ class Record(object):
     dependencies = self.dependencies
 
     if dependencies:
-      plural = '' if dependencies == 1 else 's'
+      plural = E if dependencies == 1 else S
       return H.span(
           [
               H.icon(
-                  N.puzzle_piece,
-                  cls="label medium warning-o delete",
+                  N.chain,
+                  clickable=False,
+                  cls="medium warning-o delete",
                   title=f"""Cannot delete because of {dependencies} dependent record{plural}"""
               ),
               H.span(
@@ -262,7 +275,7 @@ class Record(object):
     return H.span(
         H.icon(
             N.trash,
-            cls="button medium error-o delete",
+            cls="medium error-o delete",
             href=f"""/api/{table}/{N.delete}/{record[N._id]}""",
             title=f"""Delete this {itemSingle}"""
         ),

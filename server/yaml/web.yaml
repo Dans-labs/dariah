@@ -23,9 +23,10 @@ messages:
   scoreLegend: Score legend
   orphanedReviewer: >-
     This reviewer is not currently associated with this assessment.
+  reviewDecision: Review decision
 
 unknown:
-  generic: '??'
+  generic: '❓'
   number: '0'
   country: unknown country
   user: unidentified user
@@ -36,17 +37,24 @@ constants:
   y: 'Yes'
   n: 'No'
 
-fontAwesome:
-  - check
-  - eye
-  - info
-  - minus
-  - pencil
-  - plus
-  - puzzle-piece
-  - refresh
-  - times
-  - trash
+icons:
+  check: ✅
+  ok: 🆗
+  info: ℹ️
+  none: ❓
+  edit: ▶️
+  insert: 🆕
+  chain: 🔗
+  refresh: 🔄
+  cross: ❌
+  exclamation: ❗️
+  trash: 🗑
+  dismiss: ⏏️
+  up: ⬆️
+  down: ⬇️
+  clear: ❎
+  add: ❇️
+  noIcon: 🧐
 
 landing: >-
   Welcome to the DARIAH contribution tool
@@ -55,10 +63,16 @@ request:
   - GET
   - POST
 
+
 urls:
   home:
     text: Home
     url: /
+  logo:
+    text: Documentation
+    url: https://dans-labs.github.io/dariah/
+    src: /static/images/logo.png
+    height: 56
   login:
     text: log in
     url: /login
@@ -126,6 +140,7 @@ attributeNames:
   - checked
   - cls
   - href
+  - title
   - type
   - value
 
@@ -147,17 +162,26 @@ options:
     label: 'reviewed'
     table: review
 
+captions:
+  user: User content
+  office: Office content
+
 filterThreshold: 10
+
+bodyMethods:
+  - compact
 
 names:
   - actual
+  - addClass
   - body
-  - bodyCompact
   - dismiss
   - from
   - html
+  - icon
   - method
-  - save
   - option
+  - save
   - select
+  - symbol
   - wrapHelp

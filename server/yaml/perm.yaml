@@ -3,7 +3,7 @@ default:
   edit: edit
   delete: edit
 
-names:
+roles:
   - nobody
   - public
   - auth
@@ -14,3 +14,12 @@ names:
   - office
   - system
   - root
+
+names:
+  - group
+  - groupRep
+  - isCoordinated
+  - isEdit
+  - isOwn
+  - reviewers
+  - sameCountry

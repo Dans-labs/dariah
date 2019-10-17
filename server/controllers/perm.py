@@ -1,10 +1,7 @@
-from itertools import chain
-
-from controllers.utils import asIterable
 from controllers.config import Config as C, Names as N
 
+CT = C.tables
 CP = C.perm
-
 
 DEFAULT_PERM = CP.default
 NOBODY = N.nobody
@@ -17,6 +14,8 @@ COORD = N.coord
 OFFICE = N.office
 SYSTEM = N.system
 ROOT = N.root
+
+ALLOW_OUR = set(CT.userTables) | set(CT.userEntryTables)
 
 
 def checkPerm(
@@ -81,7 +80,10 @@ def sysadmin(user):
   return group in {SYSTEM, ROOT}
 
 
-def getPerms(perm, require, mayRead=None, mayEdit=None):
+def getPerms(table, perm, require):
+  mayRead = None
+  if table in ALLOW_OUR:
+    mayRead = perm[N.isOur] or None
   if mayRead is None:
     readRequire = (
         DEFAULT_PERM[N.read]
@@ -89,61 +91,62 @@ def getPerms(perm, require, mayRead=None, mayEdit=None):
         require[N.read]
     )
     mayRead = checkPerm(readRequire, perm)
-  if mayEdit is None:
-    editRequire = (
-        DEFAULT_PERM[N.edit]
-        if require is None or N.edit not in require else
-        require[N.edit]
-    )
-    mayEdit = checkPerm(editRequire, perm)
+
+  editRequire = (
+      DEFAULT_PERM[N.edit]
+      if require is None or N.edit not in require else
+      require[N.edit]
+  )
+  mayEdit = checkPerm(editRequire, perm)
   return (mayRead, mayEdit)
 
 
-def permRecord(user, record, country=None, ourFields=[]):
+def permRecord(db, user, table, record):
   uid = user.get(N._id, None)
   group = user.get(N.groupRep, None) or UNAUTH
   uCountry = user.get(N.country, None)
-  refCountry = country or record.get(country, None)
-  ourValues = set(chain.from_iterable(
-      asIterable(record.get(field, None) or [])
-      for field in ourFields
-  ))
+
+  cRecord = {}
+  aRecord = {}
+
+  if table == N.contrib:
+    cRecord = record
+  elif table == N.assessment:
+    aRecord = record
+    cId = record.get(N.contrib, None)
+    cRecord = db.getItem(N.contrib, cId)
+  elif table in {N.review, N.criteriaEntry, N.reviewEntry}:
+    aId = record.get(N.assessment, None)
+    aRecord = db.getItem(N.assessment, aId)
+    cId = aRecord.get(N.contrib, None)
+    cRecord = db.getItem(N.contrib, cId)
+
+  refCountry = cRecord.get(N.country, None)
+  reviewerE = aRecord.get(N.reviewerE, None)
+  reviewerF = aRecord.get(N.reviewerF, None)
+  reviewers = {reviewerE, reviewerF} - {None}
+
+  sameCountry = (
+      refCountry is not None
+      and
+      refCountry == uCountry
+  )
+  isAuth = group != UNAUTH and uid is not None
+  isCreator = uid == record.get(N.creator, None)
+  isEditor = uid in (record.get(N.editors, None) or set())
+  isCoordinated = isAuth and sameCountry and group == COORD
+
+  isOur = isCoordinated or isCreator or isEditor or uid in reviewers
 
   return {
       N.group: group,
-      N.isOwn: (
-          group != UNAUTH
-          and
-          uid is not None
-          and (
-              uid == record.get(N.creator, None)
-          )
-      ),
-      N.isEdit: (
-          group != UNAUTH
-          and
-          uid is not None
-          and (
-              uid == record.get(N.creator, None)
-              or
-              uid in (record.get(N.editors, None) or set())
-          )
-      ),
-      N.isOur: (
-          group != UNAUTH
-          and
-          uid is not None
-          and (
-              uid == record.get(N.creator, None)
-              or
-              uid in (record.get(N.editors, None) or set())
-              or
-              uid in ourValues
-          )
-      ),
-      N.sameCountry: (
-          refCountry is not None
-          and
-          refCountry == uCountry
-      ),
+      N.country: refCountry,
+      N.isOwn: isAuth and isCreator,
+      N.isEdit: isAuth and (isCreator or isEditor),
+      N.sameCountry: sameCountry,
+      N.isCoordinated: isCoordinated,
+      N.isOur: isOur,
+      N.reviewers: reviewers,
+      N.reviewerE: reviewerE,
+      N.reviewerF: reviewerF,
   }

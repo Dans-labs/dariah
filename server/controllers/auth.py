@@ -144,7 +144,7 @@ class Auth(object):
         # process the attributes provided by the identity server
         # they may have been changed after the last login
         attributes = {
-            toolKey: utf8FromLatin1(env.get(envKey, ''))
+            toolKey: utf8FromLatin1(env.get(envKey, E))
             for (envKey, toolKey) in ATTRIBUTES.items()
             if envKey in env
         }
@@ -245,11 +245,7 @@ class Auth(object):
 
   def coordinator(self):
     user = self.user
-    return (
-        self.country()
-        if coordinator(user) else
-        {}
-    )
+    return coordinator(user)
 
   def superuser(self):
     user = self.user

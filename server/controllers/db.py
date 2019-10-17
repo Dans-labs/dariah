@@ -21,12 +21,15 @@ M_LTE = CM.lte
 M_GTE = CM.gte
 M_OR = CM.OR
 M_IN = CM.IN
+M_EX = CM.ex
 
 ACTUAL_TABLES = set(CT.actualTables)
 VALUE_TABLES = set(CT.valueTables)
 REFERENCE_SPECS = CT.reference
 
 OPTIONS = CW.options
+
+MOD_FMT = """{} on {}"""
 
 
 class Db(object):
@@ -75,7 +78,7 @@ class Db(object):
                 for record in mongo[valueTable].find()
             },
         )
-      serverprint(f'COLLECTED {valueTable}')
+      serverprint(f"""COLLECTED {valueTable}""")
 
     self.collectActualItems(table=None)
 
@@ -123,7 +126,7 @@ class Db(object):
       for tp in record.get(N.typeContribution, None) or []:
         self.typeCriteria.setdefault(tp, set()).add(_id)
 
-    serverprint(f'UPDATED {", ".join(ACTUAL_TABLES)}')
+    serverprint(f"""UPDATED {", ".join(ACTUAL_TABLES)}""")
 
   def makeCrit(self, mainTable, conditions):
     mongo = self.mongo
@@ -141,7 +144,7 @@ class Db(object):
       eids = {
           record[mainTable]
           for record in mongo[table].find(
-              {mainTable: {'$exists': True}},
+              {mainTable: {N.M_EX: True}},
               {mainTable: True},
           )
       }
@@ -204,7 +207,7 @@ class Db(object):
     oid = ObjectId(eid)
 
     if table in VALUE_TABLES:
-      return getattr(self, table, {})[oid]
+      return getattr(self, table, {}).get(oid, {})
 
     mongo = self.mongo
 
@@ -274,7 +277,7 @@ class Db(object):
     result = mongo[table].insert_one({
         N.dateCreated: justNow,
         N.creator: uid,
-        N.modified: ['{} on {}'.format(eppn, justNow)],
+        N.modified: [MOD_FMT.format(eppn, justNow)],
         **fields,
     })
     self.collect(table)
@@ -291,7 +294,7 @@ class Db(object):
         N.mayLogin: True,
         N.creator: creatorId,
         N.dateCreated: justNow,
-        N.modified: ['{} on {}'.format(CREATOR, justNow)],
+        N.modified: [MOD_FMT.format(CREATOR, justNow)],
     })
     result = mongo.user.insert_one(record)
     self.collect(N.user)

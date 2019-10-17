@@ -1,13 +1,7 @@
-from controllers.config import Config as C, Names as N
+from controllers.config import Names as N
 from controllers.record import Record
 from controllers.html import HtmlElements as H
 from controllers.utils import E, SLASH
-
-
-CW = C.web
-
-ORPHAN = CW.unknown[N.reviewKind]
-ORPHAN_MSG = CW.messages[N.orphanedReviewer]
 
 
 class AssessmentR(Record):
@@ -18,15 +12,11 @@ class AssessmentR(Record):
     record = self.record
 
     aTypeId = record.get(N.assessmentType, None)
-    reviewerE = record.get(N.reviewerE, None)
-    reviewerF = record.get(N.reviewerF, None)
     cId = record.get(N.contrib, None)
     cRecord = db.getItem(N.contrib, cId)
     cTypeId = cRecord.get(N.typeContribution, None)
     self.aTypeId = aTypeId
     self.cTypeId = cTypeId
-    self.reviewerE = reviewerE
-    self.reviewerF = reviewerF
 
   def title(self):
     aTypeId = self.aTypeId
@@ -38,8 +28,8 @@ class AssessmentR(Record):
     aType = self.field(N.assessmentType).wrapBare()
     creator = self.field(N.creator).wrapBare()
     editors = self.field(N.editors).wrapBare()
-    sep = f' {SLASH} ' if editors else E
+    sep = f""" {SLASH} """ if editors else E
     return H.span(
-        f'on {date} as {aType} by {creator}{sep}{editors}',
+        f"""on {date} as {aType} by {creator}{sep}{editors}""",
         cls=f"small{cls}",
     )

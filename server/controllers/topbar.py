@@ -9,9 +9,10 @@ URLS = CW.urls
 LOGIN = URLS[N.login]
 LOGOUT = URLS[N.logout]
 SLOGOUT = URLS[N.slogout]
+LOGO = URLS[N.logo]
 
 
-class User(object):
+class Topbar(object):
   def __init__(self, control):
     self.db = control[N.db]
     self.auth = control[N.auth]
@@ -58,6 +59,14 @@ class User(object):
             ),
             login,
             *logout,
+            H.img(
+                LOGO[N.src],
+                href=LOGO[N.url],
+                target=N._blank,
+                title=LOGO[N.text],
+                imgAtts=dict(height=LOGO[N.height]),
+                id="logo",
+            )
         ],
         cls="headline",
     )

@@ -25,15 +25,15 @@ def labelDiv(label):
 class Field(object):
   inheritProps = (
       N.db, N.auth, N.types,
-      'uid', 'eppn',
-      'table', 'record', 'eid', 'perm',
-      'readOnly',
+      N.uid, N.eppn,
+      N.table, N.record, N.eid, N.perm,
+      N.readonly,
   )
 
   def __init__(
       self, recordObj, field,
       asMaster=False,
-      mayRead=None, mayEdit=None,
+      readonly=None,
   ):
     for prop in Field.inheritProps:
       setattr(self, prop, getattr(recordObj, prop, None))
@@ -63,17 +63,17 @@ class Field(object):
     eid = self.eid
     tp = self.tp
     types = self.types
-    readOnly = self.readOnly
 
     fieldTypeClass = getattr(types, tp)
     self.fieldTypeClass = fieldTypeClass
     self.widgetType = fieldTypeClass.widgetType
 
-    if readOnly:
-      mayEdit = False
+    readonly = self.readonly if readonly is None else readonly
 
-    (self.mayRead, self.mayEdit) = getPerms(perm, require, mayEdit=mayEdit)
-    if asMaster:
+    (self.mayRead, self.mayEdit) = getPerms(
+        table, perm, require,
+    )
+    if readonly or asMaster:
       self.mayEdit = False
 
     self.atts = (
@@ -105,7 +105,7 @@ class Field(object):
           None
       )
       args = (
-          dict(db=db, uid=uid, eppn=eppn, extensible=True)
+          dict(uid=uid, eppn=eppn, extensible=True)
           if extensible else
           {}
       )
@@ -132,6 +132,7 @@ class Field(object):
 
   def update(self, updates, deletions):
     parent = self.parent
+    table = self.table
     record = self.record
     field = self.field
     require = self.require
@@ -146,7 +147,7 @@ class Field(object):
     self.perm = parent.perm
     perm = self.perm
 
-    (self.mayRead, self.mayEdit) = getPerms(perm, require)
+    (self.mayRead, self.mayEdit) = getPerms(table, perm, require)
 
   def isEmpty(self):
     value = self.value
@@ -216,23 +217,23 @@ class Field(object):
 
     button = (
         H.icon(
-            N.eye,
-            cls="button small",
+            N.ok,
+            cls="small",
             action=N.view,
             **atts,
         )
         if editable else
         (
             H.icon(
-                N.pencil,
-                cls="button small",
+                N.edit,
+                cls="small",
                 action=N.edit,
                 **atts,
             )
             if mayEdit else
             H.icon(
                 N.refresh,
-                cls="button small",
+                cls="small",
                 action=N.view,
                 title=REFRESH,
                 **atts,

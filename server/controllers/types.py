@@ -28,15 +28,15 @@ MESSAGES = CW.messages
 FILTER_THRESHOLD = CW.filterThreshold
 
 
-stripNonnumeric = re.compile(r'[^-0-9.,]')
-stripFraction = re.compile(r'[.,][0-9]*$')
-stripDecimal = re.compile(r'[.,]')
-stripLeading = re.compile(r'^0+')
-decimalSep = re.compile(r'[.,]+')
-urlStart = re.compile(r'^https?://', re.I)
-urlTrim = re.compile(r'^([htps:/]*)')
-dtTrim = re.compile(r'[^0-9  T/:.-]+')
-dtSep = re.compile(r'[ T/:.-]+')
+stripNonnumeric = re.compile(r"""[^-0-9.,]""")
+stripFraction = re.compile(r"""[.,][0-9]*$""")
+stripDecimal = re.compile(r"""[.,]""")
+stripLeading = re.compile(r"""^0+""")
+decimalSep = re.compile(r"""[.,]+""")
+urlStart = re.compile(r"""^https?://""", re.I)
+urlTrim = re.compile(r"""^([htps:/]*)""")
+dtTrim = re.compile(r"""[^0-9  T/:.-]+""")
+dtSep = re.compile(r"""[ T/:.-]+""")
 
 
 TODAY = now()
@@ -141,7 +141,7 @@ class TypeBase(object):
   def widget(self, val):
     atts = {}
     if self.pattern:
-      atts['pattern'] = self.pattern
+      atts[N.pattern] = self.pattern
     validationMsg = Types.validationMsg(self.name)
 
     widgetElem = H.input(
@@ -151,7 +151,7 @@ class TypeBase(object):
         **atts,
     )
     validationElem = (
-        H.span('', valmsg=validationMsg)
+        H.span(E, valmsg=validationMsg)
         if validationMsg else
         E
     )
@@ -178,7 +178,7 @@ class Url(Text):
     if not urlStart.match(normalVal):
       match = urlTrim.match(normalVal)
       if match and len(match.group(1)) > 3:
-        normalVal = urlTrim.sub('', normalVal)
+        normalVal = urlTrim.sub(E, normalVal)
       normalVal = f"""{N.https}://{normalVal}"""
     if DOT not in normalVal:
       normalVal += f"""{DOT}{N.org}"""
@@ -250,7 +250,7 @@ class Datetime(TypeBase):
   pattern = DATETIME_PATTERN
 
   def partition(self, strVal):
-    normalVal = dtTrim.sub('', strVal)
+    normalVal = dtTrim.sub(E, strVal)
     if not normalVal:
       return None
     normalParts = [
@@ -345,7 +345,8 @@ class Bool(TypeBase):
 
     return H.icon(
         values.get(val, values[noneValue]),
-        cls="label medium",
+        clickable=False,
+        cls="medium",
     )
 
   def toEdit(self, val):
@@ -363,11 +364,13 @@ class Bool(TypeBase):
         [
             H.icon(
                 values[w],
+                clickable=False,
+                bool=str(w).lower(),
                 cls=(
                     (
-                        "label active"
+                        "active"
                         if values[w] is refV else
-                        "button"
+                        "icon"
                     )
                     +
                     " medium"
@@ -411,7 +414,7 @@ class Related(TypeBase):
       markup=False, active=None,
   ):
     if record is None and eid is None:
-      return QQ
+      return (QQ, QQ) if markup else QQ
 
     table = self.name
 
@@ -429,9 +432,9 @@ class Related(TypeBase):
 
       atts = dict(cls=f"tag medium field {self.actualCls(record)}")
       if titleHint:
-        atts['title'] = titleHint
+        atts[N.title] = titleHint
 
-      href = f'/{table}/item/{eid}'
+      href = f"""/{table}/item/{eid}"""
       titleFormatted = H.a(titleStr, href, target=N._blank, **atts)
       return (titleStr, titleFormatted)
     else:
@@ -512,6 +515,7 @@ class Value(Related):
   def widget(self, val, multiple, extensible, constrain):
     db = self.db
     table = self.name
+
     valueRecords = db.getValueRecords(table, constrain=constrain)
 
     filterControl = (
@@ -523,17 +527,20 @@ class Value(Related):
                 cls="wfilter",
             ),
             H.icon(
-                N.plus,
-                cls="button small add",
+                N.add,
+                cls="small add",
                 title="add value",
             ) if extensible else E,
             H.icon(
-                N.times,
-                cls="button small wfilter",
+                N.clear,
+                cls="small wfilter",
                 title="clear filter",
             )
         ]
         if len(valueRecords) > FILTER_THRESHOLD else []
+    )
+    atts = dict(
+        markup=True, clickable=True, multiple=multiple, active=val,
     )
     return H.div(
         filterControl
@@ -544,18 +551,12 @@ class Value(Related):
                 (
                     []
                     if multiple else
-                    [self.title(
-                        record={},
-                        markup=True, asEdit=True, active=val,
-                    )]
+                    [self.title(record={}, **atts)]
                 )
                 +
                 sorted(
                     (
-                        self.title(
-                            record=record,
-                            markup=True, asEdit=True, multiple=multiple, active=val,
-                        )
+                        self.title(record=record, **atts)
                         for record in valueRecords
                     ),
                     key=lambda x: x[0].lower()
@@ -568,10 +569,10 @@ class Value(Related):
   def title(
       self,
       eid=None, record=None,
-      markup=False, asEdit=False, multiple=False, active=None,
+      markup=False, clickable=False, multiple=False, active=None,
   ):
     if record is None and eid is None:
-      return QQ
+      return (QQ, QQ) if markup else QQ
 
     if record is None:
       db = self.db
@@ -594,20 +595,21 @@ class Value(Related):
           (
               "button " if multiple or not isActive else "label "
           )
-          if asEdit else
+          if clickable else
           "tag "
       )
       activeCls = "active " if isActive else E
       atts = dict(cls=f"{baseCls}{activeCls}medium field {self.actualCls(record)}")
-      if asEdit and eid is not None:
+      if clickable and eid is not None:
         atts[N.eid] = str(eid)
 
       if titleHint:
-        atts['title'] = titleHint
+        atts[N.title] = titleHint
 
       titleIcon = (
           (NBSP + H.icon(
-              N.times if isActive else N.plus,
+              N.cross if isActive else N.add,
+              cls="small",
           ))
           if multiple else
           E
@@ -679,7 +681,7 @@ class Score(Value):
   def titleStr(self, record):
     score = record.get(N.score, None)
     if score is None:
-      return '❌'
+      return QQ
     score = he(score)
     level = he(record.get(N.level, None) or QQ)
     return f"""{score} - {level}"""
@@ -775,7 +777,7 @@ def cleanNumber(strVal, isInt):
     isNegative = normalVal.startswith(MIN)
     normalVal = normalVal.replace(MIN, E)
     if isNegative:
-      normalVal = f'{MIN}{normalVal}'
+      normalVal = f"""{MIN}{normalVal}"""
     if isInt:
       normalVal = stripFraction.sub(E, normalVal)
       normalVal = stripDecimal.sub(E, normalVal)

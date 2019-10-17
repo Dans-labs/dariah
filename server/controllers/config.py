@@ -3,11 +3,11 @@ import yaml
 
 from controllers.utils import serverprint, cap1, E, LOW, HYPHEN
 
-CONFIG_EXT = '.yaml'
-CONFIG_DIR = 'yaml'
-TABLE_DIR = 'tables'
+CONFIG_EXT = ".yaml"
+CONFIG_DIR = "yaml"
+TABLE_DIR = "tables"
 
-ALL = 'all'
+ALL = "all"
 
 
 class Config(object):
@@ -34,11 +34,11 @@ class Tables(object):
   @classmethod
   def showReferences(cls):
     reference = cls.reference
-    serverprint('\nREFERENCE FIELD DEPENDENCIES')
+    serverprint("""\nREFERENCE FIELD DEPENDENCIES""")
     for (dep, tables) in sorted(reference.items()):
       serverprint(dep)
       for (table, fields) in tables.items():
-        serverprint(f'\t{table:<20}: {", ".join(fields)}')
+        serverprint(f"""\t{table:<20}: {", ".join(fields)}""")
 
 
 class Names(object):
@@ -80,15 +80,15 @@ class Names(object):
 
   @classmethod
   def showNames(cls):
-    serverprint('\nNAMES')
+    serverprint("""\nNAMES""")
     for (k, v) in sorted(cls.__dict__.items()):
-      serverprint(f'\t{k:<20} = {v}')
+      serverprint(f"""\t{k:<20} = {v}""")
 
 
 N = Names
 C = Config
 
-NAMES = 'names'
+NAMES = "names"
 
 
 with os.scandir(CONFIG_DIR) as sd:
@@ -100,7 +100,7 @@ for configFile in files:
   setattr(Config, section, classObj)
 
   with open(f"""{CONFIG_DIR}/{section}{CONFIG_EXT}""") as fh:
-    settings = yaml.load(fh)
+    settings = yaml.load(fh, Loader=yaml.FullLoader)
 
   for (subsection, subsettings) in settings.items():
     if subsection != NAMES:
@@ -115,14 +115,14 @@ masters = {}
 for (master, details) in CT.details.items():
   for detail in details:
     masters.setdefault(detail, set()).add(master)
-setattr(CT, 'masters', masters)
+setattr(CT, "masters", masters)
 
 with os.scandir(TABLE_DIR) as sd:
   files = tuple(e.name for e in sd if e.is_file() and e.name.endswith(CONFIG_EXT))
 
 tables = set()
 
-MAIN_TABLE = CT.mainTable
+MAIN_TABLE = CT.userTables[0]
 USER_TABLES = set(CT.userTables)
 USER_ENTRY_TABLES = set(CT.userEntryTables)
 VALUE_TABLES = set(CT.valueTables)
@@ -149,7 +149,7 @@ for table in tables:
   tableFile = f"""{TABLE_DIR}/{table}{CONFIG_EXT}"""
   if os.path.exists(tableFile):
     with open(tableFile) as fh:
-      specs.update(yaml.load(fh))
+      specs.update(yaml.load(fh, Loader=yaml.FullLoader))
   else:
     specs.update(VALUE_SPECS)
   specs.update(PROV_SPECS)

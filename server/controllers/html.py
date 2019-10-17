@@ -4,9 +4,9 @@ from controllers.utils import asString, E, AMP, LT, APOS, QUOT, DOLLAR, ONE, MIN
 CW = C.web
 
 EMPTY_ELEMENTS = set(CW.emptyElements)
-ICONS = set(CW.fontAwesome)
+ICONS = CW.icons
 
-CLASS = 'class'
+CLASS = "class"
 
 
 def htmlEscape(val):
@@ -27,14 +27,15 @@ def atNormal(k):
 def attStr(atts, addClass=None):
     if addClass:
       if atts and N.cls in atts:
-        atts[N.cls] += addClass
+        atts[N.cls] += f" {addClass}"
       elif atts:
         atts[N.cls] = addClass
       else:
         atts = dict(cls=addClass)
     return E.join(
-        f""" {atNormal(k)}""" + (E if v is True else f'="{v}"')
+        f""" {atNormal(k)}""" + (E if v is True else f"""='{v}'""")
         for (k, v) in atts.items()
+        if v is not None
     )
 
 
@@ -75,7 +76,7 @@ class HtmlElements(object):
     )
 
   @staticmethod
-  def mydetails(
+  def detailx(
       icons,
       material,
       itemkey,
@@ -126,11 +127,29 @@ class HtmlElements(object):
     return HtmlElement(N.dt).wrap(material, **atts)
 
   @staticmethod
-  def icon(icon, **atts):
-    iconClass = f" fa fa-{icon}"
-    if N.href in atts:
-      return HtmlElement(N.a).wrap(E, addClass=iconClass, **atts)
-    return HtmlElement(N.span).wrap(E, addClass=iconClass, **atts)
+  def icon(icon, clickable=True, **atts):
+    iconChar = ICONS.get(icon, ICONS[N.noIcon])
+    atts[N.addClass] = N.icon if clickable else N.symbol
+    return (
+        HtmlElement(N.a).wrap(iconChar, **atts)
+        if N.href in atts else
+        HtmlElement(N.span).wrap(iconChar, **atts)
+        if clickable or atts else
+        iconChar
+    )
+
+  @staticmethod
+  def img(src, href=None, title=None, imgAtts={}, **atts):
+    return (
+        HtmlElements.a(
+            HtmlElement(N.img).wrap(E, src=src, **imgAtts),
+            href,
+            title=title,
+            **atts,
+        )
+        if href else
+        HtmlElement(N.img).wrap(E, src=src, title=title, **imgAtts, **atts)
+    )
 
   @staticmethod
   def input(material, **atts):

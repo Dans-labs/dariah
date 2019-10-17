@@ -10,10 +10,11 @@ DETAILS = CT.details
 class Details(object):
   inheritProps = (
       N.control, N.db, N.auth, N.types,
-      'uid', 'eppn',
-      'Table', 'table',
-      'record', 'eid',
-      'fields', 'prov',
+      N.uid, N.eppn,
+      N.Table, N.table,
+      N.record, N.eid,
+      N.fields, N.prov,
+      N.perm,
   )
 
   def __init__(self, recordObj):
@@ -41,21 +42,25 @@ class Details(object):
         tuple(drecords),
     )
 
-  def wrap(self, readOnly=False):
+  def wrap(self, readonly=False):
     table = self.table
 
     for dtable in DETAILS.get(table, []):
       self.fetchDetails(dtable)
 
-    return self.wrapAll(readOnly=readOnly)
+    return self.wrapAll(readonly=readonly)
 
   def wrapDetail(
       self, dtable,
+      inner=True,
+      filterFunc=None,
       wrapMethod=None,
       bodyMethod=None,
       combineMethod=None,
       expanded=False,
-      readOnly=False,
+      readonly=False,
+      withProv=True,
+      withN=True,
       extraMsg=None, extraCls=None,
   ):
     details = self.details
@@ -72,31 +77,35 @@ class Details(object):
 
     drecordReps = [
         dtableObj.record(
-            record=drecord, readOnly=readOnly,
+            record=drecord, readonly=readonly,
             bodyMethod=bodyMethod,
         ).wrap(
+            inner=inner,
             wrapMethod=wrapMethod,
+            withProv=withProv,
             expanded=0 if expanded else -1,
         )
         for drecord in drecords
+        if filterFunc is None or filterFunc(drecord)
     ]
     if combineMethod:
       drecordReps = combineMethod(drecordReps)
 
+    innerCls = " inner" if inner else E
     return H.div(
         [
             H.div(extraMsg, cls=extraCls) if extraMsg else E,
-            nRep,
+            nRep if withN else E,
         ]
         +
         drecordReps,
-        cls=f"record-details",
+        cls=f"record-details{innerCls}",
     )
 
-  def wrapAll(self, readOnly=False):
+  def wrapAll(self, readonly=False):
     details = self.details
 
     return E.join(
-        self.wrapDetail(dtable, readOnly=readOnly)
+        self.wrapDetail(dtable, readonly=readonly)
         for dtable in details
     )
