@@ -120,6 +120,7 @@ div.headline
   flex: 2 0 auto;
   text-align: right;
   height: calc(var(--topbar-height) - 1rem);
+  z-index: 999;
 }
 
 /* SIDEBAR */
