@@ -2,9 +2,10 @@ import os
 
 from flask import request, session
 from controllers.utils import (
-    serverprint, utf8FromLatin1, E, BLANK, PIPE, NL, AT, WHYPHEN
+    serverprint, utf8FromLatin1, shiftRegional, E, BLANK, PIPE, NL, AT, WHYPHEN
 )
 from controllers.config import Config as C, Names as N
+from controllers.html import HtmlElements as H
 from controllers.perm import (
     sysadmin, superuser, coordinator, authenticated, AUTH, UNAUTH
 )
@@ -18,9 +19,10 @@ SHIB_KEY = CB.shibKey
 ATTRIBUTES = CB.attributes
 
 UNKNOWN = CW.unknown
-UNKNOWN_COUNTRY = UNKNOWN[N.country]
-UNKNOWN_USER = UNKNOWN[N.user]
-UNKNOWN_GROUP = UNKNOWN[N.group]
+
+Qc = H.icon(CW.unknown[N.country], asChar=True)
+Qu = H.icon(CW.unknown[N.user], asChar=True)
+Qg = H.icon(CW.unknown[N.group], asChar=True)
 
 
 class Auth(object):
@@ -181,12 +183,9 @@ class Auth(object):
 
     countryId = record.get(N.country, None)
     countryInfo = db.country.get(countryId, {})
-    countryLong = (
-        f"""{countryInfo.get(N.name, None) or N.unknown}"""
-        f""" ({countryInfo.get(N.iso, None) or E})"""
-        if countryInfo else
-        UNKNOWN_COUNTRY
-    )
+    iso = countryInfo.get(N.iso, None) or E
+    flag = shiftRegional(iso) if iso else Qc
+    countryShort = iso + flag
 
     identityRep = (
         f"""{name}{orgRep}"""
@@ -195,9 +194,9 @@ class Auth(object):
         if email else
         f"""{eppn}{authorityRep}"""
         if eppn else
-        UNKNOWN_USER
+        Qu
     ) + """ from """ + (
-        countryLong
+        countryShort
     )
     return identityRep
 
@@ -206,7 +205,7 @@ class Auth(object):
     user = self.user
 
     group = user.get(N.groupRep, None) or UNAUTH
-    groupDesc = db.permissionGroupDesc.get(group, None) or UNKNOWN_GROUP
+    groupDesc = db.permissionGroupDesc.get(group, None) or Qg
 
     if group == UNAUTH:
       return (N.Guest, groupDesc)

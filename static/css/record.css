@@ -34,7 +34,7 @@
 .record-details
 {
   
-  ackground-color: var(--record-details-back);
+  background-color: var(--record-details-back);
 }
 .record-details.inner
 {
@@ -125,7 +125,7 @@
   margin: 0.2rem;
   border-radius: 0.2rem;
 }
-details.prov
+div.provx
 {
   margin-left: 2rem;
   border: 0.2rem solid var(--value-border);

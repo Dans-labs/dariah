@@ -1,5 +1,4 @@
 staticRoot: ../static/
-provLabel: 'Provenance'
 indexPage: index.html
 
 messages:
@@ -26,35 +25,35 @@ messages:
   reviewDecision: Review decision
 
 unknown:
-  generic: '❓'
-  number: '0'
-  country: unknown country
-  user: unidentified user
-  group: unknown group
-  reviewKind: orphaned
-
-constants:
-  y: 'Yes'
-  n: 'No'
+  generic: none
+  number: nonumber
+  country: flag 
+  user: nouser
+  group: nogroup
+  reviewKind: detached
 
 icons:
-  check: ✅
-  ok: 🆗
-  info: ℹ️
-  none: ❓
-  edit: ▶️
-  insert: 🆕
-  chain: 🔗
-  refresh: 🔄
-  cross: ❌
-  exclamation: ❗️
-  trash: 🗑
-  dismiss: ⏏️
-  up: ⬆️
-  down: ⬇️
-  clear: ❎
-  add: ❇️
-  noIcon: 🧐
+  add: ✚
+  chain: ⚭
+  check: ✔︎
+  clear: ✖︎
+  cross: ✘
+  delete: ✖︎
+  detached: ⚮
+  dismiss: ⏏︎
+  edit: ✎
+  flag: ⚐ 
+  info: ℹ︎
+  insert: ✦
+  missing: ☒
+  nogroup: ☺︎☺︎
+  noicon: ☹︎
+  none: ○
+  nonumber: '0'
+  nouser: ☺︎
+  ok: ↩︎
+  prov: ⌚︎
+  refresh: ♺
 
 landing: >-
   Welcome to the DARIAH contribution tool

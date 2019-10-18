@@ -9,9 +9,6 @@
     --user-back:                       hsla(  0,   0%,  90%, 0.8);
     --user-border:                     hsla(  0,   0%,  95%, 0.5);
 
-    --legacy-fore:                     hsla(240, 100%,   0%, 1  );
-    --legacy-back:                     hsla(240,   0%,  98%, 0.8);
-
     --access-fore:                     hsla( 60, 100%,   0%, 1  );
     --access-back:                     hsla( 60,   0%,  90%, 0.8);
     --access-border:                   hsla( 60,   0%,  95%, 0.5);
@@ -20,8 +17,6 @@
     --action-back:                     hsla(210, 100%,  90%, 1  );
     --action-border:                   hsla(210, 100%,  50%, 0.5);
     --action-disabled-back:            hsla(210,   0%,  90%, 1  );
-    --action-link-fore:                hsla(210, 100%,  20%, 1  );
-    --action-link-back:                hsla(210, 100%,  90%, 1  );
     --action-active-fore:              hsla(210, 100%,  40%, 1  );
     --action-active-back:              hsla(060,  80%,  90%, 0.8);
     --action-active-border:            hsla(060, 100%,  40%, 1.0);
@@ -30,24 +25,9 @@
     --assessment-quoted-back:          hsla(180,  35%,  92%, 1  );
     --assessment-quoted-border:        hsla(180,  35%,  35%, 0.5);
 
-    --entry-complete-back:             hsla(120, 100%, 100%, 1  );
-    --entry-complete-border:           hsla(120, 100%,  50%, 0.5);
-    --entry-incomplete-back:           hsla(  0, 100%, 100%, 1  );
-    --entry-incomplete-border:         hsla(  0, 100%,  50%, 0.5);
-    --entry-edit-complete-back:        hsla(120, 100%, 100%, 1  );
-    --entry-edit-complete-border:      hsla(120, 100%,  50%, 0.5);
-    --entry-edit-incomplete-back:      hsla(  0, 100%, 100%, 1  );
-    --entry-edit-incomplete-border:    hsla(  0, 100%,  50%, 0.5);
-
     --dim-fore-o:                      hsla(  0,   0%,  30%, 1  );
     --dim-fore:                        hsla(  0,   0%,  50%, 1  );
     --dim-back:                        hsla(  0,   0%,  85%, 0.5);
-
-    --edit-help-fore:                  hsla( 50, 100%,  20%, 1  );
-    --edit-help-back:                  hsla( 50, 100%,  80%, 0.9);
-    --edit-help-border:                hsla( 50, 100%,  50%, 0.5);
-    --edit-help-code-fore:             hsla(210, 100%,  40%, 1  );
-    --edit-help-item-back:             hsla( 50, 100%,  95%, 1  );
 
     --edit-text-fore:                  hsla(240,  50%,  30%, 1  );
     --edit-text-back:                  hsla(210, 100%,  98%, 1  );
@@ -58,30 +38,24 @@
     --edit-dirty-fore:                 hsla( 30, 100%,  20%, 1  );
     --edit-dirty-back:                 hsla(210, 100%,  90%, 1  );
     --edit-dirty-border:               hsla( 30, 100%,  40%, 0.9);
-    --edit-invalid-fore:               hsla(240,  70%, 100%, 1  );
-    --edit-invalid-back:               hsla(  0, 100%,  30%, 1  );
-    --edit-invalid-border:             hsla(  0, 100%,  30%, 0.5);
-    --edit-invalid-diag-fore:          hsla(  0, 100%,  30%, 1  );
-    --edit-invalid-diag-back:          hsla(  0, 100%,  80%, 0.5);
 
     --error-fore-o:                    hsla(  0, 100%,  30%, 1  );
     --error-fore:                      hsla(  0, 100%,  50%, 1  );
     --error-back:                      hsla(  0, 100%,  80%, 0.5);
 
-    --errorboundary-fore:              hsla(  0, 100%,   0%, 1  );
-    --errorboundary-back:              hsla(  0, 100%,  80%, 0.8);
-    --errorboundary-border:            hsla(  0, 100%,  50%, 0.5);
-
     --good-fore-o:                     hsla(120, 100%,  30%, 1  );
     --good-fore:                       hsla(120, 100%,  50%, 1  );
     --good-back:                       hsla(120, 100%,  80%, 0.5);
 
+    --icon-fore:                       hsla(210,   0%,  20%, 1  );
+    --icon-special-fore:               hsla(210, 100%,  40%, 1  );
+    --icon-error-fore:                 hsla(  0, 100%,  40%, 1  );
+    --icon-good-fore:                  hsla(120, 100%,  40%, 1  );
+    --icon-warning-fore:               hsla( 30, 100%,  40%, 1  );
+
     --info-fore-o:                     hsla(120,   0%,  30%, 1  );
     --info-fore:                       hsla(120,   0%,  50%, 1  );
     --info-back:                       hsla(120,   0%,  80%, 0.5);
-
-    --msg-box-back:                    hsla(  0,   0%,  90%, 1  );
-    --msg-box-border:                  hsla(  0,   0%,  50%, 0.5);
 
     --record-back:                     hsla(  0,   0%,  90%, 0.8);
     --record-border:                   hsla(  0,   0%,  70%, 0.5);
@@ -91,32 +65,12 @@
 
     --record-details-back:             hsla(  0,   0%,  95%, 0.8);
 
-    --resize-fore:                     hsla(  0,   0%,  50%, 0.1);
-
     --review-quoted-fore:              hsla( 30,  45%,  10%, 1  );
     --review-quoted-back:              hsla( 30,  45%,  92%, 1  );
     --review-quoted-border:            hsla( 30,  45%,  35%, 0.5);
 
-    --score-fore:                      hsla(120,  80%,  30%, 1  );
-    --score-back:                      hsla(120, 100%,  98%, 1  );
-    --score-border:                    hsla(120,  80%,  50%, 0.5);
-
-    --sort-back:                       hsla(120, 100%,  95%, 1  );
-    --sort--col-back:                  hsla(120,   0%,  95%, 1  );
-    --sort--specs-fore:                hsla(120,   0%,  40%, 1  );
-
-    --stats-border:                    hsla(  0,   0%,  50%, 0.5);
-    --stats-cost-fore:                 hsla(120,  20%,  10%, 1  );
-    --stats-cost-back:                 hsla(120,  20%,  98%, 1  );
-    --stats-n-fore:                    hsla(120,  20%,  10%, 1  );
-    --stats-n-back:                    hsla(120,  20%,  94%, 1  );
-    --stats-title-fore:                hsla(  0,   0%, 100%, 1  );
-    --stats-title-back:                hsla(  0,   0%,  10%, 1  );
-    --stats-title-border:              hsla(  0,   0%,  95%, 0.8);
     --stats-value-fore:                hsla(  0,   0%,   0%, 1  );
     --stats-value-back:                hsla(  0,   0%,  90%, 1  );
-
-    --subbar-back:                     hsla( 30,  30%,  80%, 0.4);
 
     --special-fore-o:                  hsla(120,  00%,  30%, 1  );
     --special-fore:                    hsla(120,  00%,  50%, 1  );
@@ -127,23 +81,9 @@
     --tag-border:                      hsla(  0,   0%,  60%, 0.5);
     --tag-var-fore:                    hsla(  0,  50%,  50%, 1  );
     --tag-var-back:                    hsla(210, 100%,  95%, 1  );
-    --tag-link-fore:                   hsla(210,  50%,  30%, 1  );
-    --tag-link-back:                   hsla(210,  50%,  98%, 1  );
     --tag-inactual-fore:               hsla(  0, 100%,   0%, 1  );
     --tag-inactual-back:               hsla(  0, 100%,  80%, 1  );
     --tag-inactual-border:             hsla(  0, 100%,  50%, 0.5);
-    --tag-disabled-fore:               hsla(  0,   0%, 100%, 1  );
-    --tag-disabled-back:               hsla(  0, 100%,  40%, 1  );
-    --tag-disabled-border:             hsla(  0, 100%,  50%, 0.5);
-
-    --template-error:                  hsla(  0,  80%,  50%, 1  );
-    --template-good:                   hsla(120,  80%,  50%, 1  );
-
-    --tooltip-fore:                    hsla( 50, 100%,  20%, 1  );
-    --tooltip-back:                    hsla( 50, 100%,  70%, 1  );
-    --tooltip-arrow:                   hsla( 30, 100%,  40%, 1  );
-
-    --topbar-back:                     hsla( 30,  30%,  80%, 0.4);
 
     --value-edit-back:                 hsla(120, 100%, 100%, 1  );
     --value-back:                      hsla(  0,   0%,  91%, 0.8);
@@ -153,49 +93,41 @@
     --warning-fore:                    hsla( 30, 100%,  50%, 1  );
     --warning-back:                    hsla( 30, 100%,  80%, 0.5);
 
-    --widget-fixed-fore:               hsla(120,  40%,  10%, 1  );
-    --widget-fixed-back:               hsla(120,  40%, 100%, 1  );
-    --widget-fixed-edit-back:          hsla(  0,   0%,  80%, 0.8);
-    --widget-border:                   hsla(120,  40%,  90%, 1  );
+    --step-info-fore:                  hsla(240, 100%, 100%, 1  );
+    --step-info-back:                  hsla(240, 100%,  30%, 1  );
+    --step-info-border:                hsla(240, 100%,  90%, 0.7);
 
-    --workflow-active:                 hsla(120, 100%,  80%, 0.8);
-    --workflow-item-back:              hsla(120,   0%,  50%, 0.8);
+    --step-good-fore:                  hsla(120, 100%, 100%, 1  );
+    --step-good-back:                  hsla(120, 100%,  30%, 1  );
+    --step-good-border:                hsla(120, 100%,  90%, 0.7);
 
-    --workflow-action-info-fore:       hsla(240, 100%, 100%, 1  );
-    --workflow-action-info-back:       hsla(240, 100%,  30%, 1  );
-    --workflow-action-info-border:     hsla(240, 100%,  90%, 0.7);
+    --step-warning-fore:               hsla( 30, 100%, 100%, 1  );
+    --step-warning-back:               hsla( 30, 100%,  40%, 1  );
+    --step-warning-border:             hsla( 30, 100%,  90%, 0.7);
 
-    --workflow-action-good-fore:       hsla(120, 100%, 100%, 1  );
-    --workflow-action-good-back:       hsla(120, 100%,  30%, 1  );
-    --workflow-action-good-border:     hsla(120, 100%,  90%, 0.7);
+    --step-error-fore:                 hsla(  0, 100%, 100%, 1  );
+    --step-error-back:                 hsla(  0, 100%,  40%, 1  );
+    --step-error-border:               hsla(  0, 100%,  90%, 0.7);
 
-    --workflow-action-warning-fore:    hsla( 30, 100%, 100%, 1  );
-    --workflow-action-warning-back:    hsla( 30, 100%,  40%, 1  );
-    --workflow-action-warning-border:  hsla( 30, 100%,  90%, 0.7);
+    --step-active-fore:                hsla(210, 100%,  40%, 1  );
+    --step-active-back:                hsla(060,  80%,  90%, 0.8);
+    --step-active-border:              hsla(060, 100%,  50%, 0.5);
 
-    --workflow-action-error-fore:      hsla(  0, 100%, 100%, 1  );
-    --workflow-action-error-back:      hsla(  0, 100%,  40%, 1  );
-    --workflow-action-error-border:    hsla(  0, 100%,  90%, 0.7);
+    --status-info-fore:                hsla(240,   0%,   0%, 1  );
+    --status-info-back:                hsla(240, 100%,  95%, 1  );
+    --status-info-border:              hsla(240, 100%,  95%, 1  );
 
-    --workflow-action-active-fore:     hsla(210, 100%,  40%, 1  );
-    --workflow-action-active-back:     hsla(060,  80%,  90%, 0.8);
-    --workflow-action-active-border:   hsla(060, 100%,  50%, 0.5);
+    --status-good-fore:                hsla(120,   0%,   0%, 1  );
+    --status-good-back:                hsla(120, 100%,  90%, 1  );
+    --status-good-border:              hsla(120, 100%,  90%, 1  );
 
-    --workflow-info-fore:              hsla(240,   0%,   0%, 1  );
-    --workflow-info-back:              hsla(240, 100%,  95%, 1  );
-    --workflow-info-border:            hsla(240, 100%,  95%, 1  );
+    --status-warning-fore:             hsla( 30,   0%,   0%, 1  );
+    --status-warning-back:             hsla( 30, 100%,  90%, 1  );
+    --status-warning-border:           hsla( 30, 100%,  90%, 1  );
 
-    --workflow-good-fore:              hsla(120,   0%,   0%, 1  );
-    --workflow-good-back:              hsla(120, 100%,  90%, 1  );
-    --workflow-good-border:            hsla(120, 100%,  90%, 1  );
-
-    --workflow-warning-fore:           hsla( 30,   0%,   0%, 1  );
-    --workflow-warning-back:           hsla( 30, 100%,  90%, 1  );
-    --workflow-warning-border:         hsla( 30, 100%,  90%, 1  );
-
-    --workflow-error-fore:             hsla(  0,   0%,   0%, 1  );
-    --workflow-error-back:             hsla(  0, 100%,  80%, 1  );
-    --workflow-error-border:           hsla(  0, 100%,  80%, 1  );
+    --status-error-fore:               hsla(  0,   0%,   0%, 1  );
+    --status-error-back:               hsla(  0, 100%,  80%, 1  );
+    --status-error-border:             hsla(  0, 100%,  80%, 1  );
 
 
     /* SIZES */

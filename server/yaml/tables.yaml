@@ -117,6 +117,12 @@ value:
     perm:
       edit: office
 
+workflow:
+  - assessmentId
+  - assessmentType
+  - contribId
+  - contribType
+
 names:
   - _id
   - active
@@ -131,9 +137,11 @@ names:
   - isUserEntryTable
   - itemLabels
   - orig
+  - orphaned
   - pattern
   - readonly
   - reference
+  - reviews
   - sorted
   - Table
   - table

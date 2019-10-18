@@ -14,7 +14,7 @@ class Details(object):
       N.Table, N.table,
       N.record, N.eid,
       N.fields, N.prov,
-      N.perm,
+      N.perm, N.workflow,
   )
 
   def __init__(self, recordObj):
@@ -65,11 +65,20 @@ class Details(object):
   ):
     details = self.details
 
-    (dtableObj, drecords) = details.get(dtable, (None, []))
+    (dtableObj, drecordsAll) = details.get(dtable, (None, []))
     if not dtableObj:
       return E
 
+    drecords = [
+        drecord
+        for drecord in drecordsAll
+        if filterFunc is None or filterFunc(drecord)
+    ]
+
     nRecords = len(drecords)
+    if nRecords == 0:
+      return E
+
     (itemSingular, itemPlural) = dtableObj.itemLabels
     itemLabel = itemSingular if nRecords == 1 else itemPlural
 
@@ -86,7 +95,6 @@ class Details(object):
             expanded=0 if expanded else -1,
         )
         for drecord in drecords
-        if filterFunc is None or filterFunc(drecord)
     ]
     if combineMethod:
       drecordReps = combineMethod(drecordReps)

@@ -33,12 +33,9 @@ USER_TABLES = set(CT.userTables)
 USER_ENTRY_TABLES = set(CT.userEntryTables)
 VALUE_TABLES = set(CT.valueTables)
 ITEMS = CT.items
-DEFAULT_TYPE = CT.defaultType
 PROV_SPECS = CT.prov
 
 FORBIDDEN = CW.messages[N.forbidden]
-QQ = CW.unknown[N.generic]
-QN = CW.unknown[N.number]
 
 
 class Table(object):
@@ -181,9 +178,9 @@ class Table(object):
     table = self.table
     itemSingle = self.itemLabels[0]
 
-    return H.icon(
+    return H.iconx(
         N.insert,
-        cls="medium",
+        cls="large",
         href=f"""/api/{table}/{N.insert}""",
         title=f"""New {itemSingle}"""
     )
@@ -202,6 +199,7 @@ class Table(object):
     )
 
   def title(self, record):
+    # return obj.record(record=record).title(**atts)
     return Record.titleRaw(self, record)
 
 

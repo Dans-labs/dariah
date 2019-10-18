@@ -10,10 +10,10 @@ class CriteriaEntryD(Details):
 
   def wrap(self):
     details = self.details
-    perm = self.perm
+    workflow = self.workflow
 
-    reviewerE = perm[N.reviewerE]
-    reviewerF = perm[N.reviewerF]
+    reviewerE = workflow.reviewerE
+    reviewerF = workflow.reviewerF
 
     self.fetchDetails(
         N.reviewEntry,

@@ -14,16 +14,14 @@ class CriteriaEntryR(Record):
 
     Table = self.Table
     control = self.control
-    db = self.db
     record = self.record
+    workflow = self.workflow
 
-    aId = record.get(N.assessment, None)
-    aRecord = db.getItem(N.assessment, aId)
-    aTypeId = aRecord.get(N.assessmentType, None)
+    contribType = workflow.contribType
+    assessmentType = workflow.assessmentType
 
-    cId = aRecord.get(N.contrib, None)
-    cRecord = db.getItem(N.contrib, cId)
-    cTypeId = cRecord.get(N.typeContribution, None)
+    goodType = assessmentType == contribType
+    cls = E if goodType else "warning"
 
     critObj = Table(control, N.criteria)
     critId = record.get(N.criteria, None)
@@ -31,9 +29,7 @@ class CriteriaEntryR(Record):
     self.critId = critId
     self.critRecord = critRecord
 
-    typeOk = aTypeId == cTypeId
-    cls = E if typeOk else "warning"
-    self.typeOk = typeOk
+    self.goodType = goodType
     self.cls = cls
 
   def title(self):
@@ -43,7 +39,7 @@ class CriteriaEntryR(Record):
 
     withEvidence = (
         H.icon(
-            N.exclamation
+            N.missing
             if self.field(N.evidence).isBlank() else
             N.check
         )
@@ -74,7 +70,7 @@ class CriteriaEntryR(Record):
     )
 
   def bodyCompact(self, **kwargs):
-    typeOk = self.typeOk
+    goodType = self.goodType
     cls = self.cls
     critId = self.critId
     critRecord = self.critRecord
@@ -83,12 +79,12 @@ class CriteriaEntryR(Record):
     critData = critRecord.record
     actual = critData.get(N.actual, False)
     msg1 = E if actual else MESSAGES[N.legacyCriterion]
-    msg2 = E if typeOk else MESSAGES[N.wrongCriterionForType]
+    msg2 = E if goodType else MESSAGES[N.wrongCriterionForType]
 
     critKey = f"""{N.criteria}/{critId}/help"""
     (infoShow, infoHide, infoBody) = H.detailx(
         (N.info, N.dismiss),
-        critRecord.wrapHelp(typeOk, cls),
+        critRecord.wrapHelp(goodType, cls),
         critKey,
         openAtts=dict(
             cls="button small",

@@ -25,8 +25,6 @@ CW = C.web
 MASTERS = CT.masters
 ACTUAL_TABLES = set(CT.actualTables)
 
-PROV = CW.provLabel
-
 
 class Record(object):
   inheritProps = (
@@ -106,7 +104,7 @@ class Record(object):
     table = self.table
     record = self.record
 
-    self.perm = permRecord(
+    (self.perm, self.workflow) = permRecord(
         db,
         auth.user,
         table,
@@ -202,31 +200,49 @@ class Record(object):
 
     innerCls = " inner" if inner else E
 
+    provenance = (
+        H.div(
+            H.detailx(
+                (N.prov, N.dismiss),
+                H.div(
+                    [
+                        self.field(field).wrap()
+                        for field in provSpecs
+                    ],
+                    cls="prov"
+                ),
+                f"""{table}/{record[N._id]}/{N.prov}""",
+                openAtts=dict(
+                    cls="button small",
+                    title="Provenance and editors of this record",
+                ),
+                closeAtts=dict(
+                    cls="button small",
+                    title="Hide provenance",
+                ),
+                cls="prov",
+            ),
+            cls="provx",
+        )
+        if withProv else
+        E
+    )
+
     main = (
         H.div(
-            deleteButton
-            +
-            H.div(
-                E.join(bodyFunc(myMasters=myMasters, hideMasters=hideMasters)),
-                cls=f"{table.lower()}",
-            )
-            +
-            (
-                E.join(H.details(
-                    H.span(PROV, cls="prov"),
-                    H.div(
-                        [
-                            self.field(field).wrap()
-                            for field in provSpecs
-                        ],
-                        cls="prov"
+            [
+                deleteButton,
+                H.div(
+                    E.join(
+                        bodyFunc(
+                            myMasters=myMasters,
+                            hideMasters=hideMasters,
+                        )
                     ),
-                    f"""{table}/{record[N._id]}/{N.prov}""",
-                    cls="prov"
-                ))
-                if withProv else
-                E
-            ),
+                    cls=f"{table.lower()}",
+                ),
+                *provenance,
+            ],
             cls=f"record{innerCls} {addCls}",
         )
     )
@@ -261,21 +277,20 @@ class Record(object):
           [
               H.icon(
                   N.chain,
-                  clickable=False,
-                  cls="medium warning-o delete",
+                  cls="medium right",
                   title=f"""Cannot delete because of {dependencies} dependent record{plural}"""
               ),
               H.span(
                   f"""{dependencies} dependent record{plural}""",
-                  cls="label small warning-o delete",
+                  cls="label small warning-o right",
               ),
           ]
       )
 
     return H.span(
-        H.icon(
-            N.trash,
-            cls="medium error-o delete",
+        H.iconx(
+            N.delete,
+            cls="medium right",
             href=f"""/api/{table}/{N.delete}/{record[N._id]}""",
             title=f"""Delete this {itemSingle}"""
         ),

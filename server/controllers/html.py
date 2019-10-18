@@ -80,7 +80,7 @@ class HtmlElements(object):
       icons,
       material,
       itemkey,
-      openAtts=None, closeAtts=None,
+      openAtts={}, closeAtts={},
       **atts,
   ):
     content = asString(material)
@@ -90,13 +90,16 @@ class HtmlElements(object):
         icons
     )
     triggerElements = [
-        (HtmlElements.icon if icon in ICONS else HtmlElements.span)(
+        (HtmlElements.iconx if icon in ICONS else HtmlElements.span)(
             icon,
             itemkey=itemkey,
             trigger=value,
-            **openAtts,
+            **triggerAtts,
         )
-        for (icon, value) in ((iconOpen, ONE), (iconClose, MINONE))
+        for (icon, value, triggerAtts) in (
+            (iconOpen, ONE, openAtts),
+            (iconClose, MINONE, closeAtts),
+        )
     ]
     return (
         *triggerElements,
@@ -127,15 +130,20 @@ class HtmlElements(object):
     return HtmlElement(N.dt).wrap(material, **atts)
 
   @staticmethod
-  def icon(icon, clickable=True, **atts):
-    iconChar = ICONS.get(icon, ICONS[N.noIcon])
-    atts[N.addClass] = N.icon if clickable else N.symbol
+  def icon(icon, asChar=False, **atts):
+    iconChar = ICONS.get(icon, ICONS[N.noicon])
+    if asChar:
+      return ICONS.get(icon, ICONS[N.noicon])
+    return HtmlElement(N.span).wrap(iconChar, addClass=N.symbol, **atts)
+
+  @staticmethod
+  def iconx(icon, href=None, **atts):
+    iconChar = ICONS.get(icon, ICONS[N.noicon])
+    addClass = f"{N.icon} i-{icon} "
     return (
-        HtmlElement(N.a).wrap(iconChar, **atts)
-        if N.href in atts else
-        HtmlElement(N.span).wrap(iconChar, **atts)
-        if clickable or atts else
-        iconChar
+        HtmlElement(N.a).wrap(iconChar, addClass=addClass, href=href, **atts)
+        if href else
+        HtmlElement(N.span).wrap(iconChar, addClass=addClass, **atts)
     )
 
   @staticmethod

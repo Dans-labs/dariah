@@ -6,6 +6,8 @@ from flask.json import JSONEncoder
 from bson.objectid import ObjectId
 
 
+REGION_SHIFT = 0x1F1E6 - ord('A')
+
 ISO_DTP = """%Y-%m-%dT%H:%M:%S.%f"""
 ISO_DT = """%Y-%m-%dT%H:%M:%S"""
 ISO_D = """%Y-%m-%d"""
@@ -91,12 +93,16 @@ def cap1(string):
   )
 
 
+def shiftRegional(region):
+  return E.join(chr(ord(r) + REGION_SHIFT) for r in region)
+
+
 def now():
   return dt.utcnow()
 
 
 def serverprint(msg):
-  sys.stdout.write(f"""{msg}\n""")
+  sys.stdout.write(f"""{msg}{NL}""")
   sys.stdout.flush()
 
 

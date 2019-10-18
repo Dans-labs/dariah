@@ -7,7 +7,7 @@ from bson.objectid import ObjectId
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H, htmlEscape as he
 from controllers.utils import (
-    serverprint, bencode, now, cap1,
+    serverprint, bencode, now, cap1, shiftRegional,
     E, DOT, MIN, EURO, WHYPHEN, NBSP,
 )
 
@@ -22,8 +22,11 @@ USER_TABLES = CT.userTables
 USER_ENTRY_TABLES = CT.userEntryTables
 ACTUAL_TABLES = set(CT.actualTables)
 
-QQ = CW.unknown[N.generic]
-QN = CW.unknown[N.number]
+QQ = H.icon(CW.unknown[N.generic])
+Qq = H.icon(CW.unknown[N.generic], asChar=True)
+Qn = H.icon(CW.unknown[N.number], asChar=True)
+Qc = H.icon(CW.unknown[N.country], asChar=True)
+
 MESSAGES = CW.messages
 FILTER_THRESHOLD = CW.filterThreshold
 
@@ -120,10 +123,10 @@ class TypeBase(object):
     return val if cast is None else cast(val)
 
   def toDisplay(self, val):
-    return H.span(
+    return (
         QQ
         if val is None else
-        he(self.normalize(str(val)))
+        H.span(he(self.normalize(str(val))))
     )
 
   def toEdit(self, val):
@@ -186,7 +189,7 @@ class Url(Text):
 
   def toDisplay(self, val):
     if val is None:
-      return H.span(QQ)
+      return QQ
 
     val = he(self.normalize(str(val)))
     return H.a(val, val)
@@ -205,7 +208,7 @@ class Email(Text):
 
   def toDisplay(self, val):
     if val is None:
-      return H.span(QQ)
+      return QQ
 
     val = he(self.normalize(str(val)))
     return H.a(val, val)
@@ -237,10 +240,10 @@ class Decimal(Numeric):
 class Money(Decimal):
 
   def toDisplay(self, val):
-    return H.span(
+    return (
         QQ
         if val is None else
-        f"""{EURO} {self.normalize(str(val))}"""
+        H.span(f"""{EURO} {self.normalize(str(val))}""")
     )
 
 
@@ -289,10 +292,10 @@ class Datetime(TypeBase):
     return cast(*normalParts)
 
   def toDisplay(self, val):
-    return H.span(
+    return (
         QQ
         if val is None else
-        self.normalize(val.isoformat())
+        H.span(self.normalize(val.isoformat()))
     )
 
   def toEdit(self, val):
@@ -318,7 +321,7 @@ class Markdown(TypeBase):
     return self.normalize(editVal)
 
   def toDisplay(self, val):
-    return H.div(markdown(val or QQ))
+    return QQ if val is None else H.div(markdown(val))
 
   def toEdit(self, val):
     return val
@@ -345,7 +348,6 @@ class Bool(TypeBase):
 
     return H.icon(
         values.get(val, values[noneValue]),
-        clickable=False,
         cls="medium",
     )
 
@@ -362,15 +364,14 @@ class Bool(TypeBase):
 
     return H.div(
         [
-            H.icon(
+            H.iconx(
                 values[w],
-                clickable=False,
                 bool=str(w).lower(),
                 cls=(
                     (
                         "active"
                         if values[w] is refV else
-                        "icon"
+                        E
                     )
                     +
                     " medium"
@@ -403,7 +404,7 @@ class Related(TypeBase):
     return self.title(eid=val, markup=True)[1]
 
   def titleStr(self, record):
-    return he(record.get(N.title, None) or record.get(N.rep, None) or QQ)
+    return he(record.get(N.title, None)) or he(record.get(N.rep, None)) or Qq
 
   def titleHint(self, record):
     return None
@@ -414,7 +415,7 @@ class Related(TypeBase):
       markup=False, active=None,
   ):
     if record is None and eid is None:
-      return (QQ, QQ) if markup else QQ
+      return (QQ, QQ) if markup else Qq
 
     table = self.name
 
@@ -430,7 +431,7 @@ class Related(TypeBase):
       if eid is None:
         eid = record.get(N._id, None)
 
-      atts = dict(cls=f"tag medium field {self.actualCls(record)}")
+      atts = dict(cls=f"tag medium {self.actualCls(record)}")
       if titleHint:
         atts[N.title] = titleHint
 
@@ -461,10 +462,10 @@ class CriteriaEntry(Master):
   def titleStr(self, record):
     types = self.types
 
-    seq = he(record.get(N.seq, None) or QN)
+    seq = he(record.get(N.seq, None)) or Qn
     eid = record.get(N.criteria, None)
     title = (
-        QQ
+        Qq
         if eid is None else
         types.criteria.title(eid=eid)
     )
@@ -478,10 +479,10 @@ class ReviewEntry(Master):
   def titleStr(self, record):
     types = self.types
 
-    seq = he(record.get(N.seq, None) or QN)
+    seq = he(record.get(N.seq, None)) or Qn
     eid = record.get(N.criteria, None)
     title = (
-        QQ
+        Qq
         if eid is None else
         types.criteria.title(eid=eid)
     )
@@ -526,14 +527,14 @@ class Value(Related):
                 placeholder=MESSAGES.get(N.filter, E),
                 cls="wfilter",
             ),
-            H.icon(
+            H.iconx(
                 N.add,
-                cls="small add",
+                cls="small wfilter add",
                 title="add value",
             ) if extensible else E,
-            H.icon(
+            H.iconx(
                 N.clear,
-                cls="small wfilter",
+                cls="small wfilter clear",
                 title="clear filter",
             )
         ]
@@ -542,6 +543,7 @@ class Value(Related):
     atts = dict(
         markup=True, clickable=True, multiple=multiple, active=val,
     )
+    print(self.name, val)
     return H.div(
         filterControl
         +
@@ -572,7 +574,7 @@ class Value(Related):
       markup=False, clickable=False, multiple=False, active=None,
   ):
     if record is None and eid is None:
-      return (QQ, QQ) if markup else QQ
+      return (QQ, QQ) if markup else Qq
 
     if record is None:
       db = self.db
@@ -589,7 +591,7 @@ class Value(Related):
       isActive = (
           eid in (active or [])
           if multiple else
-          eid is not None and eid == active
+          eid == active
       )
       baseCls = (
           (
@@ -599,7 +601,7 @@ class Value(Related):
           "tag "
       )
       activeCls = "active " if isActive else E
-      atts = dict(cls=f"{baseCls}{activeCls}medium field {self.actualCls(record)}")
+      atts = dict(cls=f"{baseCls}{activeCls}medium {self.actualCls(record)}")
       if clickable and eid is not None:
         atts[N.eid] = str(eid)
 
@@ -646,10 +648,11 @@ class Country(Value):
     super().__init__(db)
 
   def titleStr(self, record):
-    return he(record.get(N.iso, None)) or QQ
+    iso = he(record.get(N.iso, None))
+    return iso + shiftRegional(iso) if iso else Qc
 
   def titleHint(self, record):
-    return record.get(N.name, None) or QQ
+    return record.get(N.name, None) or Qc
 
 
 class TypeContribution(Value):
@@ -671,7 +674,7 @@ class Criteria(Value):
     super().__init__(db)
 
   def titleStr(self, record):
-    return he(record.get(N.criterion, None) or QQ)
+    return he(record.get(N.criterion, None)) or Qq
 
 
 class Score(Value):
@@ -681,9 +684,9 @@ class Score(Value):
   def titleStr(self, record):
     score = record.get(N.score, None)
     if score is None:
-      return QQ
+      return Qq
     score = he(score)
-    level = he(record.get(N.level, None) or QQ)
+    level = he(record.get(N.level, None)) or Qq
     return f"""{score} - {level}"""
 
 
@@ -788,7 +791,7 @@ def cleanNumber(strVal, isInt):
         parts = parts[0:2]
       normalVal = DOT.join(parts)
     return normalVal or (
-        QN
+        Qn
         if isInt else
-        f"""{QN}{DOT}{QN}"""
+        f"""{Qn}{DOT}{Qn}"""
     )

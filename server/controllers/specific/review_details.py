@@ -14,9 +14,9 @@ class ReviewD(Details):
 
   def wrap(self):
     record = self.record
-    perm = self.perm
+    workflow = self.workflow
 
-    reviewers = perm[N.reviewers]
+    reviewers = workflow.reviewers
 
     creatorId = record.get(N.creator, None)
 

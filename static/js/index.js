@@ -47,7 +47,7 @@ const widgets = {
       const extensible = valueEl.attr('extensible')
       targets.each((i, elem) => {
         const el = $(elem)
-        const options = el.find('.button.field, .label.field')
+        const options = el.find('[lab]')
         el.find('.button').off('click').click(e => {
           const me = $(e.currentTarget)
           if (multiple) {
@@ -66,8 +66,8 @@ const widgets = {
         })
         const filterControl = el.find('input.wfilter')
         if (filterControl) {
-          const filterOff = el.find('.icon.wfilter')
-          const filterAdd = el.find('.icon.add')
+          const filterOff = el.find('.icon.wfilter.clear')
+          const filterAdd = el.find('.icon.wfilter.add')
           const prevFilter = localStorage.getItem(filterKey) || ''
           filterControl.val(prevFilter)
           filterTags(options, prevFilter, filterOff, filterAdd, extensible)
@@ -136,15 +136,23 @@ const filterTags = (options, pattern, off, add, extensible) => {
   }
 }
 
-const processHtml = (destElem, detail) => html => {
+const processHtml = (destElem, detail, forceOpen) => html => {
   destElem.html(html)
   openCloseMyItems(destElem)
   openCloseItems(destElem)
   activateFetch(destElem)
   activateActions(destElem)
+  let targetElem
   if (detail) {
     const child = destElem.children('details')
     child.unwrap()
+    targetElem = child
+  }
+  else {
+    targetElem = destElem
+  }
+  if (forceOpen) {
+    targetElem[0].scrollIntoView(true)
   }
 }
 
@@ -171,13 +179,13 @@ const fetch = (url, destElem, data) => {
   }
 }
 
-const fetchDetail = (url, destElem) => {
+const fetchDetail = (url, forceOpen, destElem) => {
   $.ajax({
     type: 'GET',
     url,
     processData: false,
     contentType: false,
-    success: processHtml(destElem, true),
+    success: processHtml(destElem, true, forceOpen),
   })
 }
 
@@ -192,11 +200,11 @@ const activateFetch = destElem => {
       if ((isOpen && isFat) || (!isOpen && !isFat)) {
         return
       }
-      //const url = fetchUrl + (isOpen ? '' : '/title')
+      const forceOpen = el.attr('forceopen')
       el.wrap('<div></div>')
       const parent = el.closest('div')
       el.remove()
-      fetchDetail(fetchUrl, parent)
+      fetchDetail(fetchUrl, forceOpen, parent)
     })
   })
 }

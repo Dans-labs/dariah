@@ -77,194 +77,105 @@ td
 {
 	color: var(--special-fore-o) ! important;
 }
-.legacy
-{
-  color: var(--legacy-fore) ! important;
-  background-color: var(--legacy-back) ! important;
 
-}
-div.error-boundary
-{
-	font-size: medium;
-	font-weight: normal;
-	background-color: var(--errorboundary-back);
-	color: var(--errorboundary-fore);
-	border: 2px dotted var(--errorboundary-border);
-	border-radius: 0.8rem;
-	padding: 0.3rem;
-}
+.i-add {color: var(--icon-good-fore)}
+.i-chain {color: var(--icon-fore)}
+.i-check {color: var(--icon-good-fore)}
+.i-clear {color: var(--icon-good-fore)}
+.i-cross {color: var(--icon-error-fore)}
+.i-delete {color: var(--icon-error-fore)}
+.i-detached {color: var(--icon-warning-fore)}
+.i-dismiss {color: var(--icon-special-fore)}
+.i-edit {color: var(--icon-special-fore)}
+.i-flag {color: var(--icon-warning-fore)}
+.i-info {color: var(--icon-special-fore)}
+.i-insert {color: var(--icon-special-fore)}
+.i-missing {color: var(--icon-error-fore)}
+.i-nogroup {color: var(--icon-warning-fore)}
+.i-noicon {color: var(--icon-error-fore)}
+.i-none {color: var(--icon-warning-fore)}
+.i-nonumber {color: var(--icon-warning-fore)}
+.i-nouser {color: var(--icon-warning-fore)}
+.i-ok {color: var(--icon-special-fore)}
+.i-refresh {color: var(--icon-special-fore)}
 
-
-input.wfilter[type=text]
+.icon,
+.symbol
 {
-  width: 10rem;
-	color: var(--tag-var-fore);
-	background-color: var(--tag-var-back);
+  border: 0;
 }
-.icon
+.icon,
+.button
 {
   cursor: pointer;
+}
+.symbol,
+.label
+{
+  cursor: default;
 }
 .button
 {
 	color: var(--action-fore);
-	cursor: pointer;
 	background-color: var(--action-back);
 	border-color: var(--action-border);
-	/*white-space: nowrap;*/
-}
-.button.wfilter
-{
-	color: var(--tag-var-fore);
-	background-color: var(--value-edit-back);
-  border: 0;
-}
-.button.add
-{
-	color: var(--action-fore);
-	background-color: var(--value-edit-back);
-  border: 0;
 }
 .button.disabled
 {
 	cursor: default;
 	background-color: var(--action-disabled-back);
 }
-.icon.field.active,
-.icon.active,
-.symbol.active,
-.button.field.active,
-.button.active,
-.label.active,
-.nav.active,
-.tag.active
+.active
 {
-	color: var(--action-active-fore);
 	background-color: var(--action-active-back);
 	border-color: var(--action-active-border);
   border-width: 0.2em;
 }
-.icon.field
-.button.field
+.button.active,
+.label.active
 {
-	color: var(--tag-var-fore);
-	background-color: var(--tag-var-back);
+	color: var(--action-active-fore);
 }
-.label.active,
-.symbol.active
+.large,
+.medium,
+.small
 {
-	cursor: default;
+	border-radius: var(--radius);
+	padding-top: calc(var(--radius) * 0.4);
+	padding-bottom: calc(var(--radius) * 0.4);
+	padding-left: calc(var(--radius) * 1.2);
+	padding-right: calc(var(--radius) * 1.2);
+  margin: var(--radius) calc(var(--radius) * 0.5);
+}
+.large
+{
+	font-size: large;
+	--radius: 0.5rem;
+}
+.medium
+{
+	font-size: medium;
+	--radius: 0.4rem;
+}
+.small
+{
+	font-size: medium;
+	--radius: 0.3rem;
 }
 .icon.large,
 .symbol.large
-.button.large,
-.label.large
 {
-	--size: medium;
-	--radius: 0.5rem;
-	font-size: var(--size);
-	border-radius: var(--radius);
-	padding-top: calc(var(--radius) * 0.4);
-	padding-bottom: calc(var(--radius) * 0.4);
-	padding-left: calc(var(--radius) * 1.2);
-	padding-right: calc(var(--radius) * 1.2);
-}
-.icon.large.active,
-.symbol.large.active,
-.button.large,
-.label.large
-{
-	--border: 2px;
-	border-style: solid;
-	border-width: var(--border);
-}
-.icon.large.nav,
-.symbol.large.nav,
-.button.large.nav,
-.label.large.nav
-{
-  margin: 0.5rem 0.1rem;
-}
-.icon.large.field,
-.symbol.large.field,
-.button.large.field,
-.label.large.field
-{
-  margin: 0.5rem;
+	font-size: 2rem;
 }
 .icon.medium,
-.symbol.medium,
-.button.medium,
-.label.medium
+.symbol.medium
 {
-	--size: medium;
-	--radius: 0.4rem;
-	font-size: var(--size);
-	border-radius: var(--radius);
-	padding-top: calc(var(--radius) * 0.4);
-	padding-bottom: calc(var(--radius) * 0.4);
-	padding-left: calc(var(--radius) * 1.2);
-	padding-right: calc(var(--radius) * 1.2);
-}
-.icon.medium.active,
-.symbol.medium.active,
-.button.medium,
-.label.medium
-{
-	--border: 1px;
-	border-style: solid;
-	border-width: var(--border);
-}
-.icon.medium.nav,
-.symbol.medium.nav,
-.button.medium.nav,
-.label.medium.nav
-{
-  margin: 0.4rem 0.1rem;
-}
-.icon.medium.field,
-.symbol.medium.field,
-.button.medium.field,
-.label.medium.field
-{
-  margin: 0.3rem;
+	font-size: 1.5rem;
 }
 .icon.small,
-.symbol.small,
-.button.small,
-.label.small
+.symbol.small
 {
-	--size: small;
-	--radius: 0.3rem;
-	font-size: var(--size);
-	border-radius: var(--radius);
-	padding-top: calc(var(--radius) * 0.4);
-	padding-bottom: calc(var(--radius) * 0.4);
-	padding-left: calc(var(--radius) * 1.2);
-	padding-right: calc(var(--radius) * 1.2);
-}
-.icon.small.active,
-.symbol.small.active,
-.button.small,
-.label.small
-{
-	--border: 0;
-	border-style: solid;
-	border-width: var(--border);
-}
-.icon.small.nav,
-.symbol.small.nav,
-.button.small.nav,
-.label.small.nav
-{
-  margin: 0.3rem 0.1rem;
-}
-.icon.small.field,
-.symbol.small.field,
-.button.small.field,
-.label.small.field
-{
-  margin: 0.2rem;
+	font-size: 1rem;
 }
 
 .a-none
@@ -346,11 +257,17 @@ textarea:focus
 	outline: 4px inset var(--edit-focus-border);
 	border: 0;
 }
-input.wfilter:valid+span:after
+input.wfilter[type=text]
+{
+  width: 10rem;
+	color: var(--tag-var-fore);
+	background-color: var(--tag-var-back);
+}
+input.wfilter[type=text]:valid+span:after
 {
   content: '';
 }
-input.wfilter:invalid+span:after
+input.wfilter[type=text]:invalid+span:after
 {
   content: '';
 }

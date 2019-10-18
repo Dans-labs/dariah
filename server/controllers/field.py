@@ -26,7 +26,8 @@ class Field(object):
   inheritProps = (
       N.db, N.auth, N.types,
       N.uid, N.eppn,
-      N.table, N.record, N.eid, N.perm,
+      N.table, N.record, N.eid,
+      N.perm, N.workflow,
       N.readonly,
   )
 
@@ -216,7 +217,7 @@ class Field(object):
     withRefresh = self.withRefresh
 
     button = (
-        H.icon(
+        H.iconx(
             N.ok,
             cls="small",
             action=N.view,
@@ -224,14 +225,14 @@ class Field(object):
         )
         if editable else
         (
-            H.icon(
+            H.iconx(
                 N.edit,
                 cls="small",
                 action=N.edit,
                 **atts,
             )
             if mayEdit else
-            H.icon(
+            H.iconx(
                 N.refresh,
                 cls="small",
                 action=N.view,

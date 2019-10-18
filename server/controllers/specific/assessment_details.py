@@ -7,10 +7,6 @@ from controllers.utils import cap1, E
 CT = C.tables
 CW = C.web
 
-CONSTRAINED = CT.constrained
-
-ORPHAN = CW.unknown[N.reviewKind]
-QQ = CW.unknown[N.generic]
 REVIEW_DECISION = CW.messages[N.reviewDecision]
 
 
@@ -19,24 +15,25 @@ class AssessmentD(Details):
     super().__init__(recordObj)
 
   def wrap(self):
-    details = self.details
-    perm = self.perm
-    reviewerE = perm[N.reviewerE]
-    reviewerF = perm[N.reviewerF]
+    workflow = self.workflow
+    reviewers = workflow.reviewers
+    reviewerE = workflow.reviewerE
+    reviewerF = workflow.reviewerF
+
+    self.fetchDetails(N.criteriaEntry, sortKey=cEntrySort)
+
+    criteriaPart = self.wrapDetail(
+        N.criteriaEntry,
+        bodyMethod=N.compact,
+    )
 
     self.fetchDetails(
         N.review,
         sortKey=lambda r: r.get(N.dateCreated, 0),
     )
-    (tableObj, records) = details.get(N.review, (None, []))
-    if not tableObj:
-      return E
 
     reviewer = {N.expert: reviewerE, N.final: reviewerF}
     byReviewer = {N.expert: [], N.final: []}
-
-    self.fetchDetails(N.review)
-    self.fetchDetails(N.criteriaEntry, sortKey=cEntrySort)
 
     for dest in (N.expert, N.final):
       byReviewer[dest] = self.wrapDetail(
@@ -49,27 +46,45 @@ class AssessmentD(Details):
           inner=False,
       )
 
-    criteriaPart = self.wrapDetail(
-        N.criteriaEntry,
-        bodyMethod=N.compact,
+    orphanedReviews = self.wrapDetail(
+        N.review,
+        filterFunc=lambda r: r.get(N.creator, None) not in reviewers,
+        withProv=True,
     )
 
-    reviewPart = H.div(
-        [
+    reviewPart = (
+        H.div(
+            [
+                H.div(
+                    [
+                        H.div(
+                            cap1(dest),
+                            cls="head",
+                        ),
+                        byReviewer[dest],
+                    ],
+                    cls=f"reviews {dest}",
+                )
+                for dest in reviewer
+            ],
+            cls="reviewers",
+        )
+        +
+        (
             H.div(
                 [
                     H.div(
-                        cap1(dest),
+                        cap1(N.orphaned) + " " + N.reviews,
                         cls="head",
                     ),
-                    byReviewer[dest],
+                    orphanedReviews,
                 ],
-                cls=f"reviews {dest}",
             )
-            for dest in reviewer
-        ],
-        cls="reviewers",
+            if orphanedReviews else
+            E
+        )
     )
+
     return H.div(
         [
             criteriaPart,

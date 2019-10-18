@@ -13,10 +13,10 @@ class ReviewEntryR(Record):
     super().__init__(*args, **kwargs)
 
     record = self.record
-    perm = self.perm
+    workflow = self.workflow
 
-    reviewerE = perm[N.reviewerE]
-    reviewerF = perm[N.reviewerF]
+    reviewerE = workflow.reviewerE
+    reviewerF = workflow.reviewerF
 
     creatorId = record.get(N.creator, None)
     kind = (
