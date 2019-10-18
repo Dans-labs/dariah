@@ -45,7 +45,7 @@ class CriteriaEntryR(Record):
         )
     )
     status = H.span(
-        f"""with{NBSP}evidence{NBSP}{withEvidence}""",
+        f"""evidence{NBSP}{withEvidence}""",
         cls="right small",
     )
     seq = record.get(N.seq, Q)
