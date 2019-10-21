@@ -15,8 +15,8 @@ class ReviewEntryR(Record):
     record = self.record
     workflow = self.workflow
 
-    reviewerE = workflow.reviewerE
-    reviewerF = workflow.reviewerF
+    reviewerE = workflow.reviewer[N.expert]
+    reviewerF = workflow.reviewer[N.final]
 
     creatorId = record.get(N.creator, None)
     kind = (

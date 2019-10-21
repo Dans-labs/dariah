@@ -9,9 +9,11 @@ class AssessmentR(Record):
     super().__init__(*args, **kwargs)
 
   def title(self):
+    record = self.record
+
     workflow = self.workflow
     contribType = workflow.contribType
-    assessmentType = workflow.assessmentType
+    assessmentType = record.get(N.assessmentType, None)
 
     goodType = assessmentType == contribType
     cls = E if goodType else " warning"

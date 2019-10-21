@@ -176,7 +176,7 @@ def factory():
     if table in ALL_TABLES:
       auth.authenticate()
       return Table(control, table).record(
-          eid=eid, withDetails=True, **method(),
+          eid=eid, withDetails=False, **method(),
       ).wrap(expanded=-1)
     return noTable(table)
 

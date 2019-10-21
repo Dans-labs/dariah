@@ -17,8 +17,7 @@ class AssessmentD(Details):
   def wrap(self):
     workflow = self.workflow
     reviewers = workflow.reviewers
-    reviewerE = workflow.reviewerE
-    reviewerF = workflow.reviewerF
+    reviewer = workflow.reviewer
 
     self.fetchDetails(N.criteriaEntry, sortKey=cEntrySort)
 
@@ -32,7 +31,6 @@ class AssessmentD(Details):
         sortKey=lambda r: r.get(N.dateCreated, 0),
     )
 
-    reviewer = {N.expert: reviewerE, N.final: reviewerF}
     byReviewer = {N.expert: [], N.final: []}
 
     for dest in (N.expert, N.final):

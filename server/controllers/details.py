@@ -9,7 +9,7 @@ DETAILS = CT.details
 
 class Details(object):
   inheritProps = (
-      N.control, N.db, N.auth, N.types,
+      N.control, N.db, N.wf, N.auth, N.types,
       N.uid, N.eppn,
       N.Table, N.table,
       N.record, N.eid,

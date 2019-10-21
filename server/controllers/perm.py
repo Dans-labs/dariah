@@ -1,5 +1,4 @@
 from controllers.config import Config as C, Names as N
-from controllers.workflow import WorkflowOld
 
 CT = C.tables
 CP = C.perm
@@ -139,25 +138,13 @@ def permRecord(db, user, table, record):
 
   isOur = isCoordinated or isCreator or isEditor or uid in reviewers
 
-  return (
-      {
-          N.group: group,
-          N.country: refCountry,
-          N.isOwn: isAuth and isCreator,
-          N.isEdit: isAuth and (isCreator or isEditor),
-          N.sameCountry: sameCountry,
-          N.isCoordinated: isCoordinated,
-          N.isOur: isOur,
-      },
-      WorkflowOld({
-          N.contrib: cRecord,
-          N.contribId: cRecord.get(N._id, None),
-          N.contribType: cRecord.get(N.typeContribution, None),
-          N.assessment: aRecord,
-          N.assessmentId: aRecord.get(N._id, None),
-          N.assessmentType: aRecord.get(N.assessmentType, None),
-          N.reviewers: reviewers,
-          N.reviewerE: reviewerE,
-          N.reviewerF: reviewerF,
-      }),
-  )
+  return {
+      N.group: group,
+      N.country: refCountry,
+      N.isOwn: isAuth and isCreator,
+      N.isEdit: isAuth and (isCreator or isEditor),
+      N.sameCountry: sameCountry,
+      N.isCoordinated: isCoordinated,
+      N.isOur: isOur,
+      N.contribId: cRecord.get(N._id, None),
+  }

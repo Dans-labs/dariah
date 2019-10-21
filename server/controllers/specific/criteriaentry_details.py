@@ -12,8 +12,7 @@ class CriteriaEntryD(Details):
     details = self.details
     workflow = self.workflow
 
-    reviewerE = workflow.reviewerE
-    reviewerF = workflow.reviewerF
+    reviewer = workflow.reviewer
 
     self.fetchDetails(
         N.reviewEntry,
@@ -23,7 +22,6 @@ class CriteriaEntryD(Details):
     if not tableObj:
       return E
 
-    reviewer = {N.expert: reviewerE, N.final: reviewerF}
     byReviewer = {N.expert: [], N.final: []}
 
     for dest in (N.expert, N.final):

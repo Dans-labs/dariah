@@ -31,6 +31,8 @@ OPTIONS = CW.options
 
 MOD_FMT = """{} on {}"""
 
+DEBUG = True
+
 
 class Db(object):
   def __init__(self, mongo):
@@ -53,12 +55,16 @@ class Db(object):
     for valueTable in (
         {table} if table else VALUE_TABLES
     ):
+      if DEBUG:
+        serverprint(f"""MONGO<<collect>>.{valueTable}.find()""")
+      valueList = list(mongo[valueTable].find())
+
       setattr(
           self,
           valueTable,
           {
               record[N._id]: record
-              for record in mongo[valueTable].find()
+              for record in valueList
           },
       )
       if valueTable == N.permissionGroup:
@@ -67,7 +73,7 @@ class Db(object):
             f"""{valueTable}Inv""",
             {
                 record[N.rep]: record[N._id]
-                for record in mongo[valueTable].find()
+                for record in valueList
             },
         )
         setattr(
@@ -75,7 +81,7 @@ class Db(object):
             f"""{valueTable}Desc""",
             {
                 record[N.rep]: record[N.description]
-                for record in mongo[valueTable].find()
+                for record in valueList
             },
         )
       serverprint(f"""COLLECTED {valueTable}""")
@@ -93,6 +99,12 @@ class Db(object):
     mongo = self.mongo
 
     justNow = now()
+    if DEBUG:
+      serverprint(
+          f"""MONGO<<collectActualItems>>.{N.package}."""
+          f"""find({N.startDate} {M_LTE} now {M_LTE} {N.endDate})"""
+      )
+
     packageActual = {
         record[N._id]
         for record in mongo.package.find(
@@ -141,10 +153,12 @@ class Db(object):
 
     criterium = {}
     for (table, crit) in activeOptions.items():
+      if DEBUG:
+        serverprint(f"""MONGO<<makeCrit>>.{table}.find({mainTable}: true)""")
       eids = {
           record[mainTable]
           for record in mongo[table].find(
-              {mainTable: {N.M_EX: True}},
+              {mainTable: {M_EX: True}},
               {mainTable: True},
           )
       }
@@ -190,6 +204,8 @@ class Db(object):
       )
     else:
       mongo = self.mongo
+      if DEBUG:
+        serverprint(f"""MONGO<<getList>>.{table}.find({crit})""")
       records = mongo[table].find(crit)
     if select:
       criterium = self.makeCrit(table, conditions)
@@ -211,6 +227,8 @@ class Db(object):
 
     mongo = self.mongo
 
+    if DEBUG:
+      serverprint(f"""MONGO<<getItem>>.{table}.find({N._id}: {oid})""")
     records = list(
         mongo[table].find({N._id: oid})
     )
@@ -237,7 +255,9 @@ class Db(object):
           if isIterable(eids) else
           eids
       }
-      details = list(mongo[table].find(crit, None))
+      if DEBUG:
+        serverprint(f"""MONGO<<getDetails>>.{table}.find({crit})""")
+      details = list(mongo[table].find(crit))
 
     return (
         sorted(
@@ -274,12 +294,15 @@ class Db(object):
     mongo = self.mongo
 
     justNow = now()
-    result = mongo[table].insert_one({
+    newRecord = {
         N.dateCreated: justNow,
         N.creator: uid,
         N.modified: [MOD_FMT.format(eppn, justNow)],
         **fields,
-    })
+    }
+    if DEBUG:
+      serverprint(f"""MONGO<<insertItem>>.{table}.insertOne()""")
+    result = mongo[table].insert_one(newRecord)
     self.collect(table)
     return result.inserted_id
 
@@ -296,6 +319,8 @@ class Db(object):
         N.dateCreated: justNow,
         N.modified: [MOD_FMT.format(CREATOR, justNow)],
     })
+    if DEBUG:
+      serverprint(f"""MONGO<<isertUser>>.user.insertOne()""")
     result = mongo.user.insert_one(record)
     self.collect(N.user)
     return result.inserted_id
@@ -303,6 +328,8 @@ class Db(object):
   def delItem(self, table, eid):
     mongo = self.mongo
 
+    if DEBUG:
+      serverprint(f"""MONGO<<delItem>>.{table}.deleteOne({N._id}: {eid})""")
     mongo[table].delete_one({N._id: ObjectId(eid)})
     self.collect(table)
 
@@ -321,19 +348,20 @@ class Db(object):
     newModified = filterModified(
         (modified or []) + [f"""{actor}{ON}{justNow}"""]
     )
+    criterion = {N._id: ObjectId(eid)}
     update = {
         field: data,
         N.modified: newModified,
     }
     delete = {N.isPristine: E}
+    instructions = {
+        M_SET: update,
+        M_UNSET: delete,
+    }
 
-    mongo[table].update_one(
-        {N._id: ObjectId(eid)},
-        {
-            M_SET: update,
-            M_UNSET: delete,
-        },
-    )
+    if DEBUG:
+      serverprint(f"""MONGO<<updateField>>.{table}.updateOne({criterion})""")
+    mongo[table].update_one(criterion, instructions)
     self.collect(table)
     return (
         update,
@@ -351,15 +379,15 @@ class Db(object):
         for (k, v) in record.items()
         if k != N._id
     }
-    mongo.user.update_one(
-        criterion,
-        {
-            M_SET: updates,
-            M_UNSET: {
-                N.isPristine: E
-            }
-        },
-    )
+    instructions = {
+        M_SET: updates,
+        M_UNSET: {
+            N.isPristine: E
+        }
+    }
+    if DEBUG:
+      serverprint(f"""MONGO<<updateUser>>.user.updateOne({criterion})""")
+    mongo.user.update_one(criterion, instructions)
     self.collect(N.user)
 
   def dependencies(self, table, record):
@@ -388,6 +416,8 @@ class Db(object):
           }
       )
 
+      if DEBUG:
+        serverprint(f"""MONGO<<dependencies>>.{referringTable}.count({crit})""")
       nDependent += mongo[referringTable].count(crit)
 
     return nDependent
@@ -395,16 +425,22 @@ class Db(object):
   def dropWorkflow(self):
     mongo = self.mongo
 
+    if DEBUG:
+      serverprint(f"""MONGO<<dropWorkflow>>.{N.workflow}.drop()""")
     mongo[N.workflow].drop()
 
   def clearWorkflow(self):
     mongo = self.mongo
 
-    mongo[N.workflow].delete_many({N.table: {'$ne': N.workflow}})
+    if DEBUG:
+      serverprint(f"""MONGO<<clearWorkflow>>.{N.workflow}.deleteMany()""")
+    mongo[N.workflow].delete_many()
 
   def entries(self, table, fields):
     mongo = self.mongo
 
+    if DEBUG:
+      serverprint(f"""MONGO<<entries>>.{table}.find()""")
     entries = {}
     for record in list(mongo[table].find({}, fields)):
         entries[record.get(N._id, None)] = record
@@ -414,7 +450,25 @@ class Db(object):
   def insertWorkflow(self, records):
     mongo = self.mongo
 
+    if DEBUG:
+      serverprint(f"""MONGO<<isertWorkflow>>.{N.workflow}.insertMany()""")
     mongo[N.workflow].insert_many(records)
+
+  def getWorkflowItem(self, contribId):
+    if contribId is None:
+      return {}
+
+    mongo = self.mongo
+
+    crit = {N._id: contribId}
+    if DEBUG:
+      serverprint(f"""MONGO<<getWorkflow>>.{N.workflow}.find({crit})""")
+    entries = list(mongo[N.workflow].find(crit))
+    return (
+        entries[0]
+        if entries else
+        {}
+    )
 
 
 def satisfies(record, criterium):

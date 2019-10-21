@@ -9,10 +9,16 @@ WORKFLOW_FIELDS = CT.workflowFields
 DETAILS = CT.details
 
 
-class WorkflowOld(object):
+class WorkflowItem(object):
   def __init__(self, workflowRecord):
     for (k, v) in workflowRecord.items():
       setattr(self, k, v)
+
+
+def workflowRecord(db, contribId):
+  attributes = db.getWorkflowItem(contribId)
+
+  return WorkflowItem(attributes)
 
 
 class Workflow(object):
@@ -105,8 +111,7 @@ class Workflow(object):
     wfRecords = []
     for mainRecord in entries[MAIN_TABLE].values():
       attributes = self.computeWorkflow(mainRecord)
-      if attributes is not None:
-        wfRecords.append(attributes)
+      wfRecords.append(attributes)
     serverprint("WORKFLOW: Store workflow info")
     db.insertWorkflow(wfRecords)
     serverprint("WORKFLOW: Initialization done")
@@ -131,9 +136,22 @@ class Workflow(object):
 
     cId = mainRecord.get(N._id, None)
     if cId is None:
-      return None
+      return {}
 
     cType = mainRecord.get(N.typeContribution, None)
+
+    aId = None
+    aType = None
+    aScore = None
+    complete = None
+    submitted = None
+    dateSubmitted = None
+    dateWithdrawn = None
+    review = {}
+    reviewer = {}
+    reviewers = []
+    decision = None
+    dateDecided = None
 
     latestAssessment = getLast([
         record
@@ -141,33 +159,11 @@ class Workflow(object):
         if cType is not None and
         record.get(N.assessmentType, None) == cType
     ])
-    aId = None
-    reviewer = {N.expert: None, N.final: None}
-    latestReview = {N.expert: None, N.final: None}
+
     if latestAssessment is not None:
       aId = latestAssessment.get(N._id, None)
-      reviewer[N.expert] = latestAssessment.get(N.reviewerE, None)
-      reviewer[N.final] = latestAssessment.get(N.reviewerF, None)
-    for kind in latestReview:
-      latestReview[kind] = (
-          getLast([
-              record
-              for record in mainRecord.get(N.review, [])
-              if (
-                  cType is not None and
-                  aId is not None and
-                  reviewer[kind] is not None and
-                  record.get(N.reviewType) == cType and
-                  record.get(N.assessment, None) == aId and
-                  record.get(N.creator, None) == reviewer[kind]
-              )
-          ])
-      )
+      aType = latestAssessment.get(N.assessmentType, None)
 
-    isComplete = None
-    aScore = None
-
-    if aId is not None:
       latestCentries = [
           record
           for record in latestAssessment.get(N.criteriaEntry, [])
@@ -177,44 +173,58 @@ class Workflow(object):
               record.get(N.assessment, None) == aId
           )
       ]
-      isComplete = all(
+      complete = all(
           record.get(N.score, None) and record.get(N.evidence, None)
           for record in latestCentries
       )
       aScore = self.computeScore(latestCentries)
 
-    submitted = None
-    dateSubmitted = None
-    dateWithdrawn = None
-    if latestAssessment is not None:
       submitted = latestAssessment.get(N.submitted, None)
       dateSubmitted = latestAssessment.get(N.dateSubmitted, None)
       dateWithdrawn = latestAssessment.get(N.dateWithdrawn, None)
 
-    decision = None
-    dateDecided = None
-    refReview = latestReview[N.final]
-    if refReview is not None:
-      decision = decisions.get(refReview.get(N.decision, None), None)
-      dateDecided = refReview.get(N.dateDecided, None)
-    latestReviewId = {
-        kind: (latestReview.get(kind, None) or {}).get(N._id, None)
-        for kind in latestReview
-    }
+      reviewer[N.expert] = latestAssessment.get(N.reviewerE, None)
+      reviewer[N.final] = latestAssessment.get(N.reviewerF, None)
+      reviewers = sorted({reviewer[N.expert], reviewer[N.final]} - {None})
 
-    contribInfo = {
+      latestReview = {}
+      review = {}
+
+      for kind in (N.expert, N.final):
+        thisReview = getLast([
+            record
+            for record in mainRecord.get(N.review, [])
+            if (
+                cType is not None and
+                aId is not None and
+                reviewer[kind] is not None and
+                record.get(N.reviewType) == cType and
+                record.get(N.assessment, None) == aId and
+                record.get(N.creator, None) == reviewer[kind]
+            )
+        ])
+        latestReview[kind] = thisReview
+        review[kind] = (thisReview or {}).get(N._id, None)
+
+      refReview = latestReview[N.final]
+      if refReview is not None:
+        decision = decisions.get(refReview.get(N.decision, None), None)
+        dateDecided = refReview.get(N.dateDecided, None)
+
+    return {
         N._id: cId,
-        N.assessment: aId,
-        N.reviewer: reviewer,
-        N.review: latestReviewId,
         N.contribType: cType,
         N.selected: mainRecord.get(N.selected, None),
+        N.assessment: aId,
+        N.assessmentType: aType,
+        N.score: aScore,
+        N.complete: complete,
         N.submitted: submitted,
         N.dateSubmitted: dateSubmitted,
         N.dateWithdrawn: dateWithdrawn,
-        N.complete: isComplete,
-        N.score: aScore,
+        N.review: review,
+        N.reviewer: reviewer,
+        N.reviewers: reviewers,
         N.decision: decision,
         N.dateDecided: dateDecided,
     }
-    return contribInfo

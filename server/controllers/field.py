@@ -11,6 +11,7 @@ CW = C.web
 
 DEFAULT_TYPE = CT.defaultType
 CONSTRAINED = CT.constrained
+WORKFLOW_TABLES = set(CT.userTables) | set(CT.userEntryTables)
 
 REFRESH = CW.messages[N.refresh]
 
@@ -24,7 +25,7 @@ def labelDiv(label):
 
 class Field(object):
   inheritProps = (
-      N.db, N.auth, N.types,
+      N.db, N.wf, N.auth, N.types,
       N.uid, N.eppn,
       N.table, N.record, N.eid,
       N.perm, N.workflow,
@@ -147,6 +148,8 @@ class Field(object):
     parent.setPerm()
     self.perm = parent.perm
     perm = self.perm
+    parent.setWorkflow()
+    self.workflow = parent.workflow
 
     (self.mayRead, self.mayEdit) = getPerms(table, perm, require)
 

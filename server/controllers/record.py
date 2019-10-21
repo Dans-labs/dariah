@@ -1,5 +1,6 @@
 from controllers.config import Config as C, Names as N
 from controllers.perm import permRecord
+from controllers.workflow import workflowRecord
 from controllers.utils import cap1, E, ELLIPS, ONE, S
 from controllers.html import HtmlElements as H
 from controllers.field import Field
@@ -28,7 +29,7 @@ ACTUAL_TABLES = set(CT.actualTables)
 
 class Record(object):
   inheritProps = (
-      N.control, N.db, N.auth, N.types,
+      N.control, N.db, N.wf, N.auth, N.types,
       N.uid, N.eppn,
       N.table, N.fields, N.prov,
       N.isUserTable, N.isUserEntryTable,
@@ -58,6 +59,7 @@ class Record(object):
     isUserEntryTable = self.isUserEntryTable
 
     if record is None:
+      print('A getItem')
       record = db.getItem(table, eid)
     self.record = record
     self.eid = record.get(N._id, None)
@@ -67,6 +69,7 @@ class Record(object):
 
     self.setPerm()
     perm = self.perm
+    self.setWorkflow()
 
     mayDelete = (
         not isUserEntryTable
@@ -83,9 +86,13 @@ class Record(object):
     )
 
     self.mayDelete = mayDelete
-    self.dependencies = (
-        db.dependencies(table, record) if mayDelete else None
-    )
+
+  def getDependencies(self):
+    db = self.db
+    table = self.table
+    record = self.record
+
+    self.dependencies = db.dependencies(table, record)
 
   def detailsFactory(self):
     table = self.table
@@ -104,21 +111,33 @@ class Record(object):
     table = self.table
     record = self.record
 
-    (self.perm, self.workflow) = permRecord(
+    self.perm = permRecord(
         db,
         auth.user,
         table,
         record,
     )
 
+  def setWorkflow(self):
+    db = self.db
+    perm = self.perm
+
+    contribId = perm.get(N.contribId, None)
+
+    self.workflow = workflowRecord(db, contribId)
+
   def field(self, fieldName, **kwargs):
     return Field(self, fieldName, **kwargs)
 
   def delete(self):
     mayDelete = self.mayDelete
+    if not mayDelete:
+      return
+
+    self.getDependencies()
     dependencies = self.dependencies
 
-    if not mayDelete or dependencies:
+    if dependencies:
       return
 
     db = self.db
@@ -189,6 +208,7 @@ class Record(object):
           fetchurl=f"""{fetchUrl}{urlExtra}""",
       )
 
+    print('wrap B')
     bodyFunc = (
         getattr(self, f"""{N.body}{cap1(bodyMethod)}""", self.body)
         if bodyMethod else
@@ -197,6 +217,7 @@ class Record(object):
     myMasters = MASTERS.get(table, [])
 
     deleteButton = self.deleteButton()
+    print('wrap C')
 
     innerCls = " inner" if inner else E
 
@@ -227,6 +248,7 @@ class Record(object):
         if withProv else
         E
     )
+    print('wrap D')
 
     main = (
         H.div(
@@ -246,8 +268,10 @@ class Record(object):
             cls=f"record{innerCls} {addCls}",
         )
     )
+    print('wrap E')
 
     details = self.detailsFactory().wrap() if withDetails else E
+    print('wrap F')
     return (
         H.details(
             theTitle,
@@ -269,6 +293,8 @@ class Record(object):
     record = self.record
     table = self.table
     itemSingle = self.itemLabels[0]
+
+    self.getDependencies()
     dependencies = self.dependencies
 
     if dependencies:

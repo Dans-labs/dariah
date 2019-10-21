@@ -18,8 +18,8 @@ class ReviewR(Record):
 
     contribType = workflow.contribType
     assessmentType = workflow.assessmentType
-    reviewerE = workflow.reviewerE
-    reviewerF = workflow.reviewerF
+    reviewerE = workflow.reviewer[N.expert]
+    reviewerF = workflow.reviewer[N.final]
 
     reviewType = record.get(N.reviewType, None)
     goodType = (
