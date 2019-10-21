@@ -12,6 +12,7 @@ from pymongo import MongoClient
 
 from controllers.config import Config as C, Names as N
 from controllers.db import Db
+from controllers.workflow import Workflow
 from controllers.auth import Auth
 from controllers.sidebar import Sidebar
 from controllers.topbar import Topbar
@@ -43,6 +44,7 @@ NO_TABLE = MESSAGES[N.noTable]
 
 mongo = MongoClient().dariah
 db = Db(mongo)
+wf = Workflow(db)
 
 DEBUG = False
 
@@ -54,7 +56,7 @@ GP = dict(methods=[N.GET, N.POST])
 def factory():
   app = Flask(__name__, static_url_path=DUMMY)
   auth = Auth(app, db)
-  control = dict(db=db, auth=auth, types=Types(db, auth))
+  control = dict(db=db, wf=wf, auth=auth, types=Types(db, auth))
 
   if DEBUG and auth.isDevel:
     CT.showReferences()

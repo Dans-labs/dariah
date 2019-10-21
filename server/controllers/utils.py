@@ -139,6 +139,10 @@ def asString(value):
   )
 
 
+def getLast(sequence):
+  return sequence[-1] if sequence else None
+
+
 def filterModified(modified):
   logicM = _decomposeM(modified)
   chunks = _perDay(logicM)

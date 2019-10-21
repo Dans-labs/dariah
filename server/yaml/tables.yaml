@@ -48,6 +48,27 @@ details:
   review:
     - reviewEntry
 
+workflowFields:
+  - contrib
+  - assessment
+  - review
+  - criteria
+  - score
+  - criteriaEntry
+  - typeContribution
+  - assessmentType
+  - reviewType
+  - selected
+  - submitted
+  - decision
+  - dateDecided
+  - dateSubmitted
+  - dateWithdrawn
+  - reviewerE
+  - reviewerF
+  - dateCreated
+  - creator
+
 items:
   contrib: [contribution, contributions]
   country: [country, countries]
@@ -120,8 +141,16 @@ value:
 workflow:
   - assessmentId
   - assessmentType
+  - complete
   - contribId
   - contribType
+  - reviewer
+  - reviews
+
+decisions:
+  - Accept
+  - Reject
+  - Revise
 
 names:
   - _id
@@ -141,7 +170,6 @@ names:
   - pattern
   - readonly
   - reference
-  - reviews
   - sorted
   - Table
   - table

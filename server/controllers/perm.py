@@ -1,5 +1,5 @@
 from controllers.config import Config as C, Names as N
-from controllers.workflow import Workflow
+from controllers.workflow import WorkflowOld
 
 CT = C.tables
 CP = C.perm
@@ -149,7 +149,7 @@ def permRecord(db, user, table, record):
           N.isCoordinated: isCoordinated,
           N.isOur: isOur,
       },
-      Workflow({
+      WorkflowOld({
           N.contrib: cRecord,
           N.contribId: cRecord.get(N._id, None),
           N.contribType: cRecord.get(N.typeContribution, None),

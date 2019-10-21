@@ -392,6 +392,30 @@ class Db(object):
 
     return nDependent
 
+  def dropWorkflow(self):
+    mongo = self.mongo
+
+    mongo[N.workflow].drop()
+
+  def clearWorkflow(self):
+    mongo = self.mongo
+
+    mongo[N.workflow].delete_many({N.table: {'$ne': N.workflow}})
+
+  def entries(self, table, fields):
+    mongo = self.mongo
+
+    entries = {}
+    for record in list(mongo[table].find({}, fields)):
+        entries[record.get(N._id, None)] = record
+
+    return entries
+
+  def insertWorkflow(self, records):
+    mongo = self.mongo
+
+    mongo[N.workflow].insert_many(records)
+
 
 def satisfies(record, criterium):
   eid = record.get(N._id, None)
