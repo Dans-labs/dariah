@@ -53,25 +53,26 @@ details:
     - reviewEntry
 
 workflowFields:
-  - contrib
   - assessment
-  - review
-  - criteria
-  - score
-  - criteriaEntry
-  - typeContribution
   - assessmentType
-  - reviewType
-  - selected
-  - submitted
-  - decision
+  - contrib
+  - creator
+  - criteria
+  - criteriaEntry
+  - dateCreated
   - dateDecided
   - dateSubmitted
   - dateWithdrawn
+  - decision
+  - evidence
+  - review
   - reviewerE
   - reviewerF
-  - dateCreated
-  - creator
+  - reviewType
+  - score
+  - selected
+  - submitted
+  - typeContribution
 
 items:
   contrib: [contribution, contributions]

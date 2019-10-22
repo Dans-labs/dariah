@@ -34,48 +34,48 @@ td
 }
 .error
 {
-	color: var(--error-fore) ! important;
-	background-color: var(--error-back) ! important;
+	color: var(--error-fore);
+	background-color: var(--error-back);
 }
 .error-o
 {
-	color: var(--error-fore-o) ! important;
+	color: var(--error-fore-o);
 }
 .warning
 {
-	color: var(--warning-fore) ! important;
-	background-color: var(--warning-back) ! important;
+	color: var(--warning-fore);
+	background-color: var(--warning-back);
 }
 .warning-o
 {
-	color: var(--warning-fore-o) ! important;
+	color: var(--warning-fore-o);
 }
 .good
 {
-	color: var(--good-fore) ! important;
-	background-color: var(--good-back) ! important;
+	color: var(--good-fore);
+	background-color: var(--good-back);
 }
 .good-o
 {
-	color: var(--good-fore-o) ! important;
+	color: var(--good-fore-o);
 }
 .info
 {
-	color: var(--info-fore) ! important;
-	background-color: var(--info-back) ! important;
+	color: var(--info-fore);
+	background-color: var(--info-back);
 }
 .info-o
 {
-	color: var(--info-fore-o) ! important;
+	color: var(--info-fore-o);
 }
 .special
 {
-	color: var(--special-fore) ! important;
-	background-color: var(--special-back) ! important;
+	color: var(--special-fore);
+	background-color: var(--special-back);
 }
 .special-o
 {
-	color: var(--special-fore-o) ! important;
+	color: var(--special-fore-o);
 }
 
 .i-add {color: var(--icon-good-fore)}
@@ -145,7 +145,7 @@ td
 	padding-bottom: calc(var(--radius) * 0.4);
 	padding-left: calc(var(--radius) * 1.2);
 	padding-right: calc(var(--radius) * 1.2);
-  margin: var(--radius) calc(var(--radius) * 0.5);
+  margin: calc(var(--radius) * 0.9) calc(var(--radius) * 0.5);
 }
 .large
 {

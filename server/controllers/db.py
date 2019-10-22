@@ -418,6 +418,10 @@ class Db(object):
   def insertWorkflow(self, records):
     self.mongoCmd(N.insertWorkflow, N.workflow, N.insert_many, records)
 
+  def adjustWorkflow(self, contribId, record):
+    crit = {N._id: contribId}
+    self.mongoCmd(N.adjustWorkflow, N.workflow, N.replace_one, crit, record)
+
   def getWorkflowItem(self, contribId):
     if contribId is None:
       return {}

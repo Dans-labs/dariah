@@ -50,6 +50,9 @@ class Workflow(object):
 
     self.initWorkflow(drop=True)
 
+  def addControl(self, control):
+    self.control = control
+
   def computeScore(self, cEntries):
     scoreMapping = self.scoreMapping
     maxScoreByCrit = self.maxScoreByCrit
@@ -110,11 +113,19 @@ class Workflow(object):
     serverprint("WORKFLOW: Compute workflow info")
     wfRecords = []
     for mainRecord in entries[MAIN_TABLE].values():
-      attributes = self.computeWorkflow(mainRecord)
+      attributes = self.computeWorkflow(record=mainRecord)
       wfRecords.append(attributes)
     serverprint("WORKFLOW: Store workflow info")
     db.insertWorkflow(wfRecords)
     serverprint("WORKFLOW: Initialization done")
+
+  def adjustWorkflow(self, contribId):
+    control = self.control
+    db = control.db
+
+    attributes = self.computeWorkflow(eid=contribId)
+    serverprint(f"WORKFLOW: Adjust workflow info {contribId} => {attributes}")
+    db.adjustWorkflow(contribId, attributes)
 
   def linkDetails(self, masterTable, detailsTables):
     entries = self.entries
@@ -131,14 +142,19 @@ class Workflow(object):
               detailsTable, []
           ).append(record)
 
-  def computeWorkflow(self, mainRecord):
+  def computeWorkflow(self, record=None, eid=None):
     decisions = self.decisions
 
-    cId = mainRecord.get(N._id, None)
+    if record is None:
+      control = self.control
+      record = control.getItem(MAIN_TABLE, eid)
+      print('XXX', record)
+
+    cId = record.get(N._id, None)
     if cId is None:
       return {}
 
-    cType = mainRecord.get(N.typeContribution, None)
+    cType = record.get(N.typeContribution, None)
 
     aId = None
     aType = None
@@ -154,10 +170,10 @@ class Workflow(object):
     dateDecided = None
 
     latestAssessment = getLast([
-        record
-        for record in mainRecord.get(N.assessment, [])
+        rec
+        for rec in record.get(N.assessment, [])
         if cType is not None and
-        record.get(N.assessmentType, None) == cType
+        rec.get(N.assessmentType, None) == cType
     ])
 
     if latestAssessment is not None:
@@ -165,17 +181,17 @@ class Workflow(object):
       aType = latestAssessment.get(N.assessmentType, None)
 
       latestCentries = [
-          record
-          for record in latestAssessment.get(N.criteriaEntry, [])
+          rec
+          for rec in latestAssessment.get(N.criteriaEntry, [])
           if (
               aId is not None and
-              record.get(N.criteria, None) is not None and
-              record.get(N.assessment, None) == aId
+              rec.get(N.criteria, None) is not None and
+              rec.get(N.assessment, None) == aId
           )
       ]
       complete = all(
-          record.get(N.score, None) and record.get(N.evidence, None)
-          for record in latestCentries
+          rec.get(N.score, None) and rec.get(N.evidence, None)
+          for rec in latestCentries
       )
       aScore = self.computeScore(latestCentries)
 
@@ -192,15 +208,15 @@ class Workflow(object):
 
       for kind in (N.expert, N.final):
         thisReview = getLast([
-            record
-            for record in mainRecord.get(N.review, [])
+            rec
+            for rec in record.get(N.review, [])
             if (
                 cType is not None and
                 aId is not None and
                 reviewer[kind] is not None and
-                record.get(N.reviewType) == cType and
-                record.get(N.assessment, None) == aId and
-                record.get(N.creator, None) == reviewer[kind]
+                rec.get(N.reviewType) == cType and
+                rec.get(N.assessment, None) == aId and
+                rec.get(N.creator, None) == reviewer[kind]
             )
         ])
         latestReview[kind] = thisReview
@@ -214,7 +230,7 @@ class Workflow(object):
     return {
         N._id: cId,
         N.contribType: cType,
-        N.selected: mainRecord.get(N.selected, None),
+        N.selected: record.get(N.selected, None),
         N.assessment: aId,
         N.assessmentType: aType,
         N.score: aScore,

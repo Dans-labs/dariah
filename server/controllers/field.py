@@ -40,7 +40,7 @@ class Field(object):
     for prop in Field.inheritProps:
       setattr(self, prop, getattr(recordObj, prop, None))
 
-    self.parent = recordObj
+    self.recordObj = recordObj
 
     self.field = field
     self.asMaster = asMaster
@@ -136,7 +136,7 @@ class Field(object):
       self.update(updates, deletions)
 
   def update(self, updates, deletions):
-    parent = self.parent
+    recordObj = self.recordObj
     table = self.table
     record = self.record
     field = self.field
@@ -148,11 +148,11 @@ class Field(object):
         del record[f]
     self.value = record.get(field, None)
 
-    parent.setPerm()
-    self.perm = parent.perm
+    recordObj.setPerm()
+    self.perm = recordObj.perm
     perm = self.perm
-    parent.setWorkflow()
-    self.workflow = parent.workflow
+    recordObj.adjustWorkflow()
+    self.workflow = recordObj.workflow
 
     (self.mayRead, self.mayEdit) = getPerms(table, perm, require)
 

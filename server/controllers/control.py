@@ -45,12 +45,15 @@ class Control(object):
     If such a record changes, db will reread the whole table.
     But this happens very rarely.
   """
+
   def __init__(self, db, wf, auth):
     self.db = db
     self.wf = wf
     self.auth = auth
     self.types = Types(self)
     self.cache = {}
+
+    wf.addControl(self)
 
   def getItem(self, table, eid):
     if not eid:

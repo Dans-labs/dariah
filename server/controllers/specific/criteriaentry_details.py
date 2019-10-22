@@ -11,6 +11,8 @@ class CriteriaEntryD(Details):
   def wrap(self):
     details = self.details
     workflow = self.workflow
+    for (k, v) in workflow.__dict__.items():
+      print(f'{k} = {v}')
 
     reviewer = workflow.reviewer
 

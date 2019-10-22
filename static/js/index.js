@@ -417,7 +417,7 @@ const activateActions = destElem => {
       const eventKey = `${table}:${eid}.${field}`
       collectEvents[eventKey] = true
     })
-    el.off('click').click(e => {
+    el.off('click').click(() => {
       const eventKey = `${table}:${eid}.${field}`
       actionFunc(table, eid, field, valueEl, parent)
       collectEvents[eventKey] = false

@@ -134,7 +134,8 @@ class HtmlElements(object):
     iconChar = ICONS.get(icon, ICONS[N.noicon])
     if asChar:
       return ICONS.get(icon, ICONS[N.noicon])
-    return HtmlElement(N.span).wrap(iconChar, addClass=N.symbol, **atts)
+    addClass = f"{N.symbol} i-{icon} "
+    return HtmlElement(N.span).wrap(iconChar, addClass=addClass, **atts)
 
   @staticmethod
   def iconx(icon, href=None, **atts):

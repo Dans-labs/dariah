@@ -8,12 +8,13 @@ IN: '$in'
 
 showArgs:
   - count
+  - delete_many
+  - delete_one
   - find
   - find_one
   - update_many
   - update_one
-  - delete_many
-  - delete_one
+  - replace_one
 
 otherCommands:
   - drop
@@ -21,20 +22,21 @@ otherCommands:
   - insert_many
 
 labels:
+  - adjustWorkflow
   - collect
   - collectActualItems
-  - makeCrit
-  - getList
-  - getItem
-  - getDetails
-  - insertItem
-  - insertUser
+  - clearWorkflow
   - delItem
-  - updateField
-  - updateUser
   - dependencies
   - dropWorkflow
-  - clearWorkflow
   - entries
-  - insertWorkflow
+  - getDetails
+  - getItem
+  - getList
   - getWorkflowItem
+  - insertItem
+  - insertUser
+  - insertWorkflow
+  - makeCrit
+  - updateField
+  - updateUser

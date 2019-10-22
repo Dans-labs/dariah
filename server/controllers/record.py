@@ -52,7 +52,6 @@ class Record(object):
     self.readonly = readonly
     self.bodyMethod = bodyMethod
     self.Table = Table
-    self.parent = tableObj
 
     control = self.control
     auth = control.auth
@@ -124,6 +123,15 @@ class Record(object):
 
     contribId = perm.get(N.contribId, None)
 
+    self.workflow = workflowRecord(control, contribId)
+
+  def adjustWorkflow(self):
+    control = self.control
+    wf = control.wf
+    perm = self.perm
+
+    contribId = perm.get(N.contribId, None)
+    wf.adjustWorkflow(contribId)
     self.workflow = workflowRecord(control, contribId)
 
   def field(self, fieldName, **kwargs):

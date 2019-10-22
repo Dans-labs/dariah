@@ -83,9 +83,22 @@ class AssessmentD(Details):
         )
     )
 
+    completeCls = "good" if workflow.complete else "warning"
+    completePart = H.span(
+        "Complete" if workflow.complete else "... not yet complete ...",
+        cls=f"large status {completeCls}",
+    )
+    workflowPart = H.div(
+        [
+            completePart,
+        ],
+        cls="workflow",
+    )
+
     return H.div(
         [
             criteriaPart,
+            workflowPart,
             H.div(REVIEW_DECISION, cls="head"),
             reviewPart,
         ],
