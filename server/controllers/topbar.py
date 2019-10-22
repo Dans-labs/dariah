@@ -14,11 +14,11 @@ LOGO = URLS[N.logo]
 
 class Topbar(object):
   def __init__(self, control):
-    self.db = control[N.db]
-    self.auth = control[N.auth]
+    self.control = control
 
   def wrap(self):
-    auth = self.auth
+    control = self.control
+    auth = control.auth
 
     (identityRep, accessRep) = auth.credentials()
     login = (

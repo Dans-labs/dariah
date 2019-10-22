@@ -5,3 +5,36 @@ gte: '$gte'
 ex: '$exists'
 OR: '$or'
 IN: '$in'
+
+showArgs:
+  - count
+  - find
+  - find_one
+  - update_many
+  - update_one
+  - delete_many
+  - delete_one
+
+otherCommands:
+  - drop
+  - insert_one
+  - insert_many
+
+labels:
+  - collect
+  - collectActualItems
+  - makeCrit
+  - getList
+  - getItem
+  - getDetails
+  - insertItem
+  - insertUser
+  - delItem
+  - updateField
+  - updateUser
+  - dependencies
+  - dropWorkflow
+  - clearWorkflow
+  - entries
+  - insertWorkflow
+  - getWorkflowItem

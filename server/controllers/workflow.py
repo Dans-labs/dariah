@@ -15,8 +15,8 @@ class WorkflowItem(object):
       setattr(self, k, v)
 
 
-def workflowRecord(db, contribId):
-  attributes = db.getWorkflowItem(contribId)
+def workflowRecord(control, contribId):
+  attributes = control.getWorkflowItem(contribId)
 
   return WorkflowItem(attributes)
 

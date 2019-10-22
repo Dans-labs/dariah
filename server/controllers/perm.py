@@ -101,7 +101,9 @@ def getPerms(table, perm, require):
   return (mayRead, mayEdit)
 
 
-def permRecord(db, user, table, record):
+def permRecord(control, table, record):
+  auth = control.auth
+  user = auth.user
   uid = user.get(N._id, None)
   group = user.get(N.groupRep, None) or UNAUTH
   uCountry = user.get(N.country, None)
@@ -114,12 +116,12 @@ def permRecord(db, user, table, record):
   elif table == N.assessment:
     aRecord = record
     cId = record.get(N.contrib, None)
-    cRecord = db.getItem(N.contrib, cId)
+    cRecord = control.getItem(N.contrib, cId)
   elif table in {N.review, N.criteriaEntry, N.reviewEntry}:
     aId = record.get(N.assessment, None)
-    aRecord = db.getItem(N.assessment, aId)
+    aRecord = control.getItem(N.assessment, aId)
     cId = aRecord.get(N.contrib, None)
-    cRecord = db.getItem(N.contrib, cId)
+    cRecord = control.getItem(N.contrib, cId)
 
   refCountry = cRecord.get(N.country, None)
   reviewerE = aRecord.get(N.reviewerE, None)

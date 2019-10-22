@@ -25,7 +25,7 @@ def labelDiv(label):
 
 class Field(object):
   inheritProps = (
-      N.db, N.wf, N.auth, N.types,
+      N.control,
       N.uid, N.eppn,
       N.table, N.record, N.eid,
       N.perm, N.workflow,
@@ -60,11 +60,13 @@ class Field(object):
     self.multiple = fieldSpec.get(N.multiple, False)
     self.extensible = fieldSpec.get(N.extensible, False)
 
+    control = self.control
+
     perm = self.perm
     table = self.table
     eid = self.eid
     tp = self.tp
-    types = self.types
+    types = control.types
 
     fieldTypeClass = getattr(types, tp)
     self.fieldTypeClass = fieldTypeClass
@@ -87,7 +89,8 @@ class Field(object):
     )
 
   def save(self, data):
-    db = self.db
+    control = self.control
+    db = control.db
     uid = self.uid
     eppn = self.eppn
     table = self.table
@@ -250,7 +253,8 @@ class Field(object):
     return [button, self.wrapValue(editable, cls=cls)]
 
   def wrapBare(self):
-    types = self.types
+    control = self.control
+    types = control.types
     tp = self.tp
     value = self.value
     multiple = self.multiple
@@ -268,10 +272,11 @@ class Field(object):
     )
 
   def wrapValue(self, editable, cls=E):
+    control = self.control
+    types = control.types
     fieldTypeClass = self.fieldTypeClass
     value = self.value
     tp = self.tp
-    types = self.types
     multiple = self.multiple
     extensible = self.extensible
     widgetType = self.widgetType

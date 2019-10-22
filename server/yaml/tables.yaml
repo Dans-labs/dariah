@@ -29,6 +29,10 @@ actualTables:
   - package
   - typeContribution
 
+refreshTables:
+  - assessment
+  - criteriaEntry
+
 details:
   assessment:
     - criteriaEntry

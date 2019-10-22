@@ -109,8 +109,7 @@ class TypeBase(object):
   widgetType = None
   pattern = None
   rawType = None
-  needsDb = False
-  needsAuth = False
+  needsControl = False
 
   def normalize(self, strVal):
     return str(strVal).strip()
@@ -392,10 +391,10 @@ class Bool3(Bool):
 
 
 class Related(TypeBase):
-  needsDb = True
+  needsControl = True
 
-  def __init__(self, db):
-    self.db = db
+  def __init__(self, control):
+    self.control = control
 
   def normalize(self, strVal):
     return strVal
@@ -420,8 +419,8 @@ class Related(TypeBase):
     table = self.name
 
     if record is None:
-      db = self.db
-      record = db.getItem(table, eid)
+      control = self.control
+      record = control.getItem(table, eid)
 
     titleStr = self.titleStr(record)
     titleHint = self.titleHint(record)
@@ -451,16 +450,17 @@ class Related(TypeBase):
 class Master(Related):
   widgetType = N.master
 
-  def __init__(self, db):
-    self.db = db
+  def __init__(self, control):
+    self.control = control
 
 
 class CriteriaEntry(Master):
-  def __init__(self, db):
-    super().__init__(db)
+  def __init__(self, control):
+    super().__init__(control)
 
   def titleStr(self, record):
-    types = self.types
+    control = self.control
+    types = control.types
 
     seq = he(record.get(N.seq, None)) or Qn
     eid = record.get(N.criteria, None)
@@ -473,11 +473,12 @@ class CriteriaEntry(Master):
 
 
 class ReviewEntry(Master):
-  def __init__(self, db):
-    super().__init__(db)
+  def __init__(self, control):
+    super().__init__(control)
 
   def titleStr(self, record):
-    types = self.types
+    control = self.control
+    types = control.types
 
     seq = he(record.get(N.seq, None)) or Qn
     eid = record.get(N.criteria, None)
@@ -492,15 +493,16 @@ class ReviewEntry(Master):
 class Value(Related):
   widgetType = N.related
 
-  def __init__(self, db):
-    self.db = db
+  def __init__(self, control):
+    self.control = control
 
   def fromStr(self, editVal, uid=None, eppn=None, extensible=False):
     if not editVal:
       return None
     if type(editVal) is list:
       if extensible and editVal:
-        db = self.db
+        control = self.control
+        db = control.db
         table = self.name
         return db.insertItem(table, uid, eppn, rep=editVal[0])
       else:
@@ -514,7 +516,8 @@ class Value(Related):
     return val if val is None else str(val)
 
   def widget(self, val, multiple, extensible, constrain):
-    db = self.db
+    control = self.control
+    db = control.db
     table = self.name
 
     valueRecords = db.getValueRecords(table, constrain=constrain)
@@ -543,7 +546,6 @@ class Value(Related):
     atts = dict(
         markup=True, clickable=True, multiple=multiple, active=val,
     )
-    print(self.name, val)
     return H.div(
         filterControl
         +
@@ -577,9 +579,9 @@ class Value(Related):
       return (QQ, QQ) if markup else Qq
 
     if record is None:
-      db = self.db
+      control = self.control
       table = self.name
-      record = db.getItem(table, eid)
+      record = control.getItem(table, eid)
 
     titleStr = self.titleStr(record)
     titleHint = self.titleHint(record)
@@ -631,21 +633,21 @@ class Value(Related):
 
 
 class User(Value):
-  needsAuth = True
+  needsControl = True
 
-  def __init__(self, db, auth):
-    super().__init__(db)
-    self.auth = auth
+  def __init__(self, control):
+    super().__init__(control)
 
   def titleStr(self, record):
-    auth = self.auth
+    control = self.control
+    auth = control.auth
 
     return he(auth.identity(record))
 
 
 class Country(Value):
-  def __init__(self, db):
-    super().__init__(db)
+  def __init__(self, control):
+    super().__init__(control)
 
   def titleStr(self, record):
     iso = he(record.get(N.iso, None))
@@ -656,8 +658,8 @@ class Country(Value):
 
 
 class TypeContribution(Value):
-  def __init__(self, db):
-    super().__init__(db)
+  def __init__(self, control):
+    super().__init__(control)
 
   def titleStr(self, record):
     mainType = record.get(N.mainType, None) or E
@@ -670,16 +672,16 @@ class TypeContribution(Value):
 
 
 class Criteria(Value):
-  def __init__(self, db):
-    super().__init__(db)
+  def __init__(self, control):
+    super().__init__(control)
 
   def titleStr(self, record):
     return he(record.get(N.criterion, None)) or Qq
 
 
 class Score(Value):
-  def __init__(self, db):
-    super().__init__(db)
+  def __init__(self, control):
+    super().__init__(control)
 
   def titleStr(self, record):
     score = record.get(N.score, None)
@@ -691,9 +693,8 @@ class Score(Value):
 
 
 class Types(object):
-  def __init__(self, db, auth):
-    self.db = db
-    self.auth = auth
+  def __init__(self, control):
+    self.control = control
     self.defineAll()
 
   def make(self, tp, Base=None, TypeClass=None):
@@ -710,17 +711,14 @@ class Types(object):
     This object is registered.
     """
 
-    db = self.db
-    auth = self.auth
+    control = self.control
 
     if TypeClass is None:
       TypeClass = type(tp, (Base,), {})
 
     atts = []
-    if TypeClass.needsDb:
-      atts.append(db)
-    if TypeClass.needsAuth:
-      atts.append(auth)
+    if TypeClass.needsControl:
+      atts.append(control)
 
     typeObj = TypeClass(*atts)
     self.register(typeObj, tp)

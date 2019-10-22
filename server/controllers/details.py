@@ -9,7 +9,7 @@ DETAILS = CT.details
 
 class Details(object):
   inheritProps = (
-      N.control, N.db, N.wf, N.auth, N.types,
+      N.control,
       N.uid, N.eppn,
       N.Table, N.table,
       N.record, N.eid,
@@ -25,7 +25,7 @@ class Details(object):
 
   def fetchDetails(self, dtable, masterTable=None, eids=None, sortKey=None):
     control = self.control
-    db = self.db
+    db = control.db
     Table = self.Table
     table = self.table
     eid = self.eid

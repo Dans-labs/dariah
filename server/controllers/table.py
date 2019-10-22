@@ -41,11 +41,8 @@ FORBIDDEN = CW.messages[N.forbidden]
 class Table(object):
   def __init__(self, control, table):
     self.control = control
-    self.db = control[N.db]
-    self.auth = control[N.auth]
-    self.types = control[N.types]
 
-    auth = self.auth
+    auth = control.auth
     user = auth.user
 
     self.table = table
@@ -109,7 +106,8 @@ class Table(object):
     if not mayInsert:
       return None
 
-    db = self.db
+    control = self.control
+    db = control.db
     uid = self.uid
     eppn = self.eppn
     table = self.table
@@ -120,7 +118,8 @@ class Table(object):
     if not self.mayList(action=action):
       return FORBIDDEN
 
-    db = self.db
+    control = self.control
+    db = control.db
     table = self.table
     uid = self.uid
     countryId = self.countryId
@@ -161,6 +160,8 @@ class Table(object):
                     H.div(ELLIPS),
                     f"""{table}/{record[N._id]}""",
                     fetchurl=f"""/api/{table}/{N.item}/{record[N._id]}""",
+                    urltitle=E,
+                    urlextra=E,
                     **forceOpen(record[N._id], openEid),
                 )
                 for record in records
@@ -186,7 +187,8 @@ class Table(object):
     )
 
   def mayList(self, action=None):
-    auth = self.auth
+    control = self.control
+    auth = control.auth
     isMainTable = self.isMainTable
     isValueTable = self.isValueTable
     return (

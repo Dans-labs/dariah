@@ -4,6 +4,9 @@ const SAVE = true
 const DEBUG = true
 const BLUR = true
 
+const emptyS = ''
+const emptyO = {}
+
 const widgets = {
   text: {
     activate() {},
@@ -136,7 +139,7 @@ const filterTags = (options, pattern, off, add, extensible) => {
   }
 }
 
-const processHtml = (destElem, detail, forceOpen) => html => {
+const processHtml = (destElem, detail, forceOpen, tag) => html => {
   destElem.html(html)
   openCloseMyItems(destElem)
   openCloseItems(destElem)
@@ -152,7 +155,18 @@ const processHtml = (destElem, detail, forceOpen) => html => {
     targetElem = destElem
   }
   if (forceOpen) {
-    targetElem[0].scrollIntoView(true)
+    let scrollElem
+    if (tag) {
+      const itemKey = targetElem.attr('itemkey')
+      const jq = `[targetkey="${itemKey}"][tag="${tag}"]`
+      scrollElem = $(jq)
+    }
+    else {
+      scrollElem = targetElem
+    }
+    if (scrollElem && scrollElem[0]) {
+      scrollElem[0].scrollIntoView(true)
+    }
   }
 }
 
@@ -179,13 +193,13 @@ const fetch = (url, destElem, data) => {
   }
 }
 
-const fetchDetail = (url, forceOpen, destElem) => {
+const fetchDetail = (url, forceOpen, tag, destElem) => {
   $.ajax({
     type: 'GET',
     url,
     processData: false,
     contentType: false,
-    success: processHtml(destElem, true, forceOpen),
+    success: processHtml(destElem, true, forceOpen, tag),
   })
 }
 
@@ -194,19 +208,28 @@ const activateFetch = destElem => {
   targets.each((i, elem) => {
     const el = $(elem)
     const isFat = el.attr('fat')
-    const fetchUrl = el.attr('fetchurl')
     el.on('toggle', () => {
       const isOpen = elem.open
       if ((isOpen && isFat) || (!isOpen && !isFat)) {
         return
       }
-      const forceOpen = el.attr('forceopen')
-      el.wrap('<div></div>')
-      const parent = el.closest('div')
-      el.remove()
-      fetchDetail(fetchUrl, forceOpen, parent)
+      fetchDetailOpen(el)
     })
   })
+}
+
+const fetchDetailOpen = (el, tag) => {
+  const forceOpen = el.attr('forceopen')
+  const fetchUrl = el.attr('fetchurl') || emptyS
+  const urlTitle = el.attr('urltitle') || emptyS
+  const urlExtra = el.attr('urlextra') || emptyS
+  const url = tag
+    ? fetchUrl + urlExtra
+    : fetchUrl + urlTitle + urlExtra
+  el.wrap('<div></div>')
+  const parent = el.closest('div')
+  el.remove()
+  fetchDetail(url, forceOpen, tag, parent)
 }
 
 const openCloseItems = destElem => {
@@ -298,15 +321,26 @@ const edit = (table, eid, field, valueEl, parent, newTag) => {
   fetch(url, parent, saveValue)
 }
 
-const refresh = () => {
-  const currentUrl = window.location.href
-  window.location.href = currentUrl
+const refresh = el => {
+    const targetKey = el.attr('targetkey')
+  if (targetKey) {
+    const targetElem = $(`[itemkey="${targetKey}"]`)
+    targetElem.attr('fat', '')
+    targetElem.attr('forceopen', '1')
+    const tag = el.attr('tag')
+    fetchDetailOpen(targetElem, tag)
+
+  }
+  else {
+    const currentUrl = window.location.href
+    window.location.href = currentUrl
+  }
 }
 
 const getDynValues = (valueEl, newTag) => {
   const origAttValue = valueEl.attr('orig')
   if (origAttValue === undefined) {
-    return {}
+    return emptyO
   }
   const origValue = atob(origAttValue)
   const multiple = valueEl.attr('multiple')
@@ -353,6 +387,16 @@ const activateActions = destElem => {
   targets.each((i, elem) => {
     const el = $(elem)
     const action = el.attr('action')
+
+    if (action == 'refresh') {
+      el.off('click').click(e => {
+        e.preventDefault()
+        e.stopPropagation()
+        refresh(el)
+      })
+      return
+    }
+
     const table = el.attr('table')
     const eid = el.attr('eid')
     const field = el.attr('field')
@@ -374,16 +418,9 @@ const activateActions = destElem => {
       collectEvents[eventKey] = true
     })
     el.off('click').click(e => {
-      if (action == 'refresh') {
-        e.preventDefault()
-        e.stopPropagation()
-        refresh()
-      }
-      else {
-        const eventKey = `${table}:${eid}.${field}`
-        actionFunc(table, eid, field, valueEl, parent)
-        collectEvents[eventKey] = false
-      }
+      const eventKey = `${table}:${eid}.${field}`
+      actionFunc(table, eid, field, valueEl, parent)
+      collectEvents[eventKey] = false
     })
     focusEl.off('keyup').keyup(() => {
       const { dirty } = getDynValues(valueEl)
@@ -413,12 +450,6 @@ const activateActions = destElem => {
       const widgetTargets = valueEl.find('.wvalue')
       widget.activate(table, eid, field, parent, valueEl, widgetTargets)
     }
-    /*
-    if (focusElFirst) {
-      focusElFirst.focus()
-      focusElFirst.val(focusElFirst.val())
-    }
-    */
   })
 }
 const applyOptions = (destElem, optionElements, init) => {

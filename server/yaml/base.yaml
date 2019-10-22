@@ -3,6 +3,8 @@ secretFile: /opt/web-apps/dariah_jwt.secret
 shibKey: Shib-Session-ID
 creator: HaSProject
 
+debug: true
+
 attributes:
   o: org
   cn: name

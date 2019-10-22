@@ -306,6 +306,10 @@ span.option
   padding-top: 0.5em;
   border-top: 0.2em solid var(--dim-back);
 }
+.left
+{
+  float: left;
+}
 .right
 {
   float: right;

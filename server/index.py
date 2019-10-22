@@ -14,10 +14,10 @@ from controllers.config import Config as C, Names as N
 from controllers.db import Db
 from controllers.workflow import Workflow
 from controllers.auth import Auth
+from controllers.control import Control
 from controllers.sidebar import Sidebar
 from controllers.topbar import Topbar
 from controllers.table import Table
-from controllers.types import Types
 
 CT = C.tables
 CW = C.web
@@ -56,7 +56,9 @@ GP = dict(methods=[N.GET, N.POST])
 def factory():
   app = Flask(__name__, static_url_path=DUMMY)
   auth = Auth(app, db)
-  control = dict(db=db, wf=wf, auth=auth, types=Types(db, auth))
+
+  def getControl():
+    return Control(db, wf, auth)
 
   if DEBUG and auth.isDevel:
     CT.showReferences()
@@ -78,6 +80,7 @@ def factory():
   @app.route(f"""/{N.index}""")
   @app.route(f"""/{INDEX}""")
   def serveIndex():
+    control = getControl()
     path = START
     auth.authenticate()
     topbar = Topbar(control).wrap()
@@ -93,6 +96,7 @@ def factory():
 
   @app.route(f"""/api/<string:table>/{N.insert}""")
   def serveTableInsert(table):
+    control = getControl()
     if table in ALL_TABLES:
       path = f"""/api/{table}/{N.insert}"""
       auth.authenticate()
@@ -133,6 +137,7 @@ def factory():
     return serveTable(table, None, action=N.ourlist)
 
   def serveTable(table, eid, action=None):
+    control = getControl()
     if table in ALL_TABLES:
       path = f"""/{table}/{action}"""
       auth.authenticate()
@@ -151,6 +156,7 @@ def factory():
 
   @app.route(f"""/api/<string:table>/{N.delete}/<string:eid>""")
   def serveRecordDelete(table, eid):
+    control = getControl()
     if table in ALL_TABLES:
       path = f"""/api/{table}/{N.delete}/{eid}"""
       auth.authenticate()
@@ -164,6 +170,7 @@ def factory():
 
   @app.route(f"""/api/<string:table>/{N.item}/<string:eid>""")
   def serveRecord(table, eid):
+    control = getControl()
     if table in ALL_TABLES:
       auth.authenticate()
       return Table(control, table).record(
@@ -173,6 +180,7 @@ def factory():
 
   @app.route(f"""/api/<string:table>/{N.item}/<string:eid>/{N.title}""")
   def serveRecordTitle(table, eid):
+    control = getControl()
     if table in ALL_TABLES:
       auth.authenticate()
       return Table(control, table).record(
@@ -182,6 +190,7 @@ def factory():
 
   @app.route(f"""/<string:table>/{N.item}/<string:eid>""")
   def serveRecordPage(table, eid):
+    control = getControl()
     if table in ALL_TABLES:
       path = f"""/{table}/{N.item}/{eid}"""
       auth.authenticate()
@@ -215,6 +224,7 @@ def factory():
     return serveField(table, eid, field, action=N.view)
 
   def serveField(table, eid, field, action=None):
+    control = getControl()
     auth.authenticate()
     if table in ALL_TABLES:
       return Table(control, table).record(eid=eid).field(field).wrap(action=action)
@@ -244,6 +254,7 @@ def factory():
     return notFound(anything)
 
   def notFound(path):
+    control = getControl()
     auth.authenticate()
     topbar = Topbar(control).wrap()
     sidebar = Sidebar(control, path).wrap()

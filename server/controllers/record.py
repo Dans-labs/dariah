@@ -25,11 +25,12 @@ CW = C.web
 
 MASTERS = CT.masters
 ACTUAL_TABLES = set(CT.actualTables)
+REFRESH_TABLES = set(CT.refreshTables)
 
 
 class Record(object):
   inheritProps = (
-      N.control, N.db, N.wf, N.auth, N.types,
+      N.control,
       N.uid, N.eppn,
       N.table, N.fields, N.prov,
       N.isUserTable, N.isUserEntryTable,
@@ -46,21 +47,21 @@ class Record(object):
     for prop in Record.inheritProps:
       setattr(self, prop, getattr(tableObj, prop, None))
 
+    self.table = self.table
     self.withDetails = withDetails
     self.readonly = readonly
     self.bodyMethod = bodyMethod
     self.Table = Table
     self.parent = tableObj
 
-    db = self.db
-    auth = self.auth
+    control = self.control
+    auth = control.auth
     table = self.table
     isUserTable = self.isUserTable
     isUserEntryTable = self.isUserEntryTable
 
     if record is None:
-      print('A getItem')
-      record = db.getItem(table, eid)
+      record = control.getItem(table, eid)
     self.record = record
     self.eid = record.get(N._id, None)
 
@@ -88,7 +89,8 @@ class Record(object):
     self.mayDelete = mayDelete
 
   def getDependencies(self):
-    db = self.db
+    control = self.control
+    db = control.db
     table = self.table
     record = self.record
 
@@ -106,25 +108,23 @@ class Record(object):
     return DetailsClass(self)
 
   def setPerm(self):
-    db = self.db
-    auth = self.auth
+    control = self.control
     table = self.table
     record = self.record
 
     self.perm = permRecord(
-        db,
-        auth.user,
+        control,
         table,
         record,
     )
 
   def setWorkflow(self):
-    db = self.db
+    control = self.control
     perm = self.perm
 
     contribId = perm.get(N.contribId, None)
 
-    self.workflow = workflowRecord(db, contribId)
+    self.workflow = workflowRecord(control, contribId)
 
   def field(self, fieldName, **kwargs):
     return Field(self, fieldName, **kwargs)
@@ -140,7 +140,8 @@ class Record(object):
     if dependencies:
       return
 
-    db = self.db
+    control = self.control
+    db = control.db
     table = self.table
     eid = self.eid
 
@@ -185,9 +186,11 @@ class Record(object):
       addCls=E,
   ):
     table = self.table
+    eid = self.eid
     record = self.record
     provSpecs = self.prov
     withDetails = self.withDetails
+    withRefresh = table in REFRESH_TABLES
 
     func = getattr(self, wrapMethod, None) if wrapMethod else None
     if func:
@@ -195,7 +198,7 @@ class Record(object):
 
     bodyMethod = self.bodyMethod
     urlExtra = f"""?method={bodyMethod}""" if bodyMethod else E
-    fetchUrl = f"""/api/{table}/{N.item}/{record[N._id]}"""
+    fetchUrl = f"""/api/{table}/{N.item}/{eid}"""
 
     itemKey = f"""{table}/{record[N._id]}"""
     theTitle = self.title()
@@ -205,10 +208,11 @@ class Record(object):
           theTitle,
           H.div(ELLIPS),
           itemKey,
-          fetchurl=f"""{fetchUrl}{urlExtra}""",
+          fetchurl=fetchUrl,
+          urlextra=urlExtra,
+          urltitle=E,
       )
 
-    print('wrap B')
     bodyFunc = (
         getattr(self, f"""{N.body}{cap1(bodyMethod)}""", self.body)
         if bodyMethod else
@@ -217,7 +221,6 @@ class Record(object):
     myMasters = MASTERS.get(table, [])
 
     deleteButton = self.deleteButton()
-    print('wrap C')
 
     innerCls = " inner" if inner else E
 
@@ -248,7 +251,23 @@ class Record(object):
         if withProv else
         E
     )
-    print('wrap D')
+
+    def refreshButton(tag):
+      return (
+          H.iconx(
+              N.refresh,
+              cls="small",
+              action=N.refresh,
+              title=f"""{cap1(N.refresh)} {table}""",
+              targetkey=itemKey,
+              tag=tag,
+          )
+          if withRefresh else
+          E
+      )
+
+    rButton1 = refreshButton('#1')
+    rButton2 = refreshButton('#2')
 
     main = (
         H.div(
@@ -267,17 +286,18 @@ class Record(object):
             ],
             cls=f"record{innerCls} {addCls}",
         )
+
     )
-    print('wrap E')
 
     details = self.detailsFactory().wrap() if withDetails else E
-    print('wrap F')
     return (
         H.details(
-            theTitle,
-            H.div(main + details),
+            rButton1 + theTitle,
+            H.div(main + rButton2 + details),
             itemKey,
-            fetchurl=f"""{fetchUrl}/title{urlExtra}""",
+            fetchurl=fetchUrl,
+            urlextra=urlExtra,
+            urltitle="""/title""",
             fat=ONE,
         )
         if expanded == 1 else
@@ -331,7 +351,7 @@ class Record(object):
     table = obj.table
     control = obj.control
 
-    types = control[N.types]
+    types = control.types
     typesObj = getattr(types, table)
 
     isActual = table not in ACTUAL_TABLES or record.get(N.actual, False)

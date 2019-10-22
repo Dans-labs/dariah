@@ -19,8 +19,6 @@ CAPTIONS = CW.captions
 class Sidebar(object):
   def __init__(self, control, path):
     self.control = control
-    self.db = control[N.db]
-    self.auth = control[N.auth]
     self.path = path
     self.entries = []
     self.mainEntries = []
@@ -101,7 +99,7 @@ class Sidebar(object):
 
   def tableEntry(self, table):
     control = self.control
-    auth = self.auth
+    auth = control.auth
 
     tableObj = Table(control, table)
     isMainTable = tableObj.isMainTable
