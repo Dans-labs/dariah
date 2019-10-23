@@ -31,26 +31,25 @@ actualTables:
 
 refreshTables:
   - assessment
-  - criteriaEntry
 
 details:
+  contrib: 
+    - assessment
+    - review
   assessment:
     - criteriaEntry
     - review
     - reviewEntry
-  contrib: 
-    - assessment
-    - review
+  criteriaEntry:
+    - reviewEntry
+  review:
+    - reviewEntry
   criteria:
     - score
     - criteriaEntry
     - reviewEntry
-  criteriaEntry:
-    - reviewEntry
   package:
     - criteria
-  review:
-    - reviewEntry
 
 workflowFields:
   - assessment
@@ -72,6 +71,7 @@ workflowFields:
   - score
   - selected
   - submitted
+  - title
   - typeContribution
 
 items:
@@ -146,9 +146,11 @@ value:
 workflow:
   - assessmentId
   - assessmentType
+  - assessmentTitle
   - complete
   - contribId
   - contribType
+  - contribTitle
   - reviewer
   - reviews
 
@@ -167,6 +169,8 @@ names:
   - expert
   - fields
   - final
+  - getItem
+  - getWorkflowItem
   - isUserTable
   - isUserEntryTable
   - itemLabels

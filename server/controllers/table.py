@@ -112,7 +112,20 @@ class Table(object):
     eppn = self.eppn
     table = self.table
 
-    return db.insertItem(table, uid, eppn)
+    result = db.insertItem(table, uid, eppn)
+    if table == MAIN_TABLE:
+      self.adjustWorkflow(result)
+
+    return result
+
+  def adjustWorkflow(self, contribId, new=True):
+    control = self.control
+    wf = control.wf
+
+    if new:
+      wf.insert(contribId)
+    else:
+      wf.recompute(contribId)
 
   def wrap(self, openEid, action=None):
     if not self.mayList(action=action):

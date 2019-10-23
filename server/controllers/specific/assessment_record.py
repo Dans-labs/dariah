@@ -12,6 +12,7 @@ class AssessmentR(Record):
     record = self.record
 
     workflow = self.workflow
+
     contribType = workflow.contribType
     assessmentType = record.get(N.assessmentType, None)
 

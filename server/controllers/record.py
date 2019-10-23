@@ -1,6 +1,6 @@
 from controllers.config import Config as C, Names as N
 from controllers.perm import permRecord
-from controllers.workflow import workflowRecord
+from controllers.workflow import WorkflowItem
 from controllers.utils import cap1, E, ELLIPS, ONE, S
 from controllers.html import HtmlElements as H
 from controllers.field import Field
@@ -24,8 +24,19 @@ CW = C.web
 
 
 MASTERS = CT.masters
+MAIN_TABLE = CT.userTables[0]
 ACTUAL_TABLES = set(CT.actualTables)
 REFRESH_TABLES = set(CT.refreshTables)
+USER_TABLES_LIST = CT.userTables
+WORKFLOW_TABLES = set(USER_TABLES_LIST) | set(CT.userEntryTables)
+
+# an easy way to go from assessment to contrib and from contrib to assessment
+# used in deleteButton
+
+TO_MASTER = {
+    USER_TABLES_LIST[i + 1]: USER_TABLES_LIST[i]
+    for i in range(len(USER_TABLES_LIST) - 1)
+}
 
 
 class Record(object):
@@ -54,24 +65,29 @@ class Record(object):
     self.Table = Table
 
     control = self.control
-    auth = control.auth
     table = self.table
-    isUserTable = self.isUserTable
-    isUserEntryTable = self.isUserEntryTable
 
     if record is None:
       record = control.getItem(table, eid)
     self.record = record
     self.eid = record.get(N._id, None)
 
+    self.setPerm()
+    self.setWorkflow()
+    self.mayDelete = self.getDelPerm()
+
+  def getDelPerm(self):
+    control = self.control
+    auth = control.auth
+    isUserTable = self.isUserTable
+    isUserEntryTable = self.isUserEntryTable
+    readonly = self.readonly
+    perm = self.perm
+
     isAuthenticated = auth.authenticated()
     isSuperuser = auth.superuser()
 
-    self.setPerm()
-    perm = self.perm
-    self.setWorkflow()
-
-    mayDelete = (
+    return (
         not isUserEntryTable
         and
         not readonly
@@ -85,7 +101,13 @@ class Record(object):
         )
     )
 
-    self.mayDelete = mayDelete
+  def reload(
+      self, record,
+  ):
+    self.record = record
+    self.setPerm()
+    self.setWorkflow()
+    self.mayDelete = self.getDelPerm()
 
   def getDependencies(self):
     control = self.control
@@ -123,16 +145,20 @@ class Record(object):
 
     contribId = perm.get(N.contribId, None)
 
-    self.workflow = workflowRecord(control, contribId)
+    self.workflow = WorkflowItem(control, contribId)
 
-  def adjustWorkflow(self):
+  def adjustWorkflow(self, update=True, delete=False):
     control = self.control
     wf = control.wf
     perm = self.perm
 
     contribId = perm.get(N.contribId, None)
-    wf.adjustWorkflow(contribId)
-    self.workflow = workflowRecord(control, contribId)
+    if delete:
+      wf.delete(contribId)
+    else:
+      wf.recompute(contribId)
+      if update:
+        self.workflow = WorkflowItem(control, contribId, requireFresh=True)
 
   def field(self, fieldName, **kwargs):
     return Field(self, fieldName, **kwargs)
@@ -149,11 +175,15 @@ class Record(object):
       return
 
     control = self.control
-    db = control.db
     table = self.table
     eid = self.eid
 
-    db.delItem(table, eid)
+    control.delItem(table, eid)
+
+    if table == MAIN_TABLE:
+      self.adjustWorkflow(delete=True)
+    elif table in WORKFLOW_TABLES:
+      self.adjustWorkflow(update=False)
 
   def body(self, myMasters=None, hideMasters=False):
     fieldSpecs = self.fields
@@ -260,23 +290,6 @@ class Record(object):
         E
     )
 
-    def refreshButton(tag):
-      return (
-          H.iconx(
-              N.refresh,
-              cls="small",
-              action=N.refresh,
-              title=f"""{cap1(N.refresh)} {table}""",
-              targetkey=itemKey,
-              tag=tag,
-          )
-          if withRefresh else
-          E
-      )
-
-    rButton1 = refreshButton('#1')
-    rButton2 = refreshButton('#2')
-
     main = (
         H.div(
             [
@@ -297,11 +310,13 @@ class Record(object):
 
     )
 
+    rButton = H.iconr(itemKey, "#main", msg=table) if withRefresh else E
     details = self.detailsFactory().wrap() if withDetails else E
+
     return (
         H.details(
-            rButton1 + theTitle,
-            H.div(main + rButton2 + details),
+            rButton + theTitle,
+            H.div(main + details),
             itemKey,
             fetchurl=fetchUrl,
             urlextra=urlExtra,
@@ -341,11 +356,23 @@ class Record(object):
           ]
       )
 
+    if table in TO_MASTER:
+      masterTable = TO_MASTER[table]
+      masterId = record.get(masterTable, None)
+    else:
+      masterTable = None
+      masterId = None
+
+    url = (
+        f"""/api/{table}/{N.delete}/{record[N._id]}"""
+        if masterTable is None or masterId is None else
+        f"""/api/{masterTable}/{masterId}/{table}/{N.delete}/{record[N._id]}"""
+    )
     return H.span(
         H.iconx(
             N.delete,
             cls="medium right",
-            href=f"""/api/{table}/{N.delete}/{record[N._id]}""",
+            href=url,
             title=f"""Delete this {itemSingle}"""
         ),
     )

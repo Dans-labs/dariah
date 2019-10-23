@@ -55,7 +55,7 @@ class Control(object):
 
     wf.addControl(self)
 
-  def getItem(self, table, eid):
+  def getItem(self, table, eid, requireFresh=False):
     if not eid:
       return {}
 
@@ -64,36 +64,44 @@ class Control(object):
     if table in VALUE_TABLES:
       return db.getItem(table, eid)
 
+    return self.getCached(
+        db.getItem, N.getItem, [table, eid], table, eid, requireFresh,
+    )
+
+  def getWorkflowItem(self, eid, requireFresh=False):
+    if not eid:
+      return {}
+
+    db = self.db
+
+    return self.getCached(
+        db.getWorkflowItem, N.getWorkflowItem, [eid], N.workflow, eid, requireFresh,
+    )
+
+  def delItem(self, table, eid):
+    db = self.db
+    cache = self.cache
+
+    db.delItem(table, eid)
+    if table in VALUE_TABLES:
+      key = eid if type(eid) is str else str(eid)
+      if table in cache:
+        cachedTable = cache[table]
+        if key in cachedTable:
+          del cachedTable[key]
+
+  def getCached(self, method, methodName, methodArgs, table, eid, requireFresh):
     cache = self.cache
 
     key = eid if type(eid) is str else str(eid)
 
-    if table in cache:
-      if key in cache[table]:
-        if DEBUG:
-          serverprint(f"""CACHE HIT getItem({table}, {key})""")
-        return cache[table][key]
+    if not requireFresh:
+      if table in cache:
+        if key in cache[table]:
+          if DEBUG:
+            serverprint(f"""CACHE HIT {methodName}({key})""")
+          return cache[table][key]
 
-    result = db.getItem(table, eid)
+    result = method(*methodArgs)
     cache.setdefault(table, {})[key] = result
-    return result
-
-  def getWorkflowItem(self, eid):
-    if not eid:
-      return {}
-
-    cache = self.cache
-
-    table = N.workflow
-
-    if table in cache:
-      if eid in cache[table]:
-        if DEBUG:
-          serverprint(f"""CACHE HIT getWorkflowItem({eid})""")
-        return cache[table][eid]
-
-    db = self.db
-
-    result = db.getWorkflowItem(eid)
-    cache.setdefault(table, {})[eid] = result
     return result

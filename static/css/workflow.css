@@ -9,6 +9,7 @@
 .step {
 	border-width: 0.3rem;
 	border-style: outset;
+  cursor: pointer;
 }
 .status {
 	border-radius: 0;

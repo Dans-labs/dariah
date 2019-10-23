@@ -1,5 +1,7 @@
 from controllers.config import Config as C, Names as N
-from controllers.utils import asString, E, AMP, LT, APOS, QUOT, DOLLAR, ONE, MINONE
+from controllers.utils import (
+    cap1, asString, E, AMP, LT, APOS, QUOT, DOLLAR, ONE, MINONE
+)
 
 CW = C.web
 
@@ -145,6 +147,19 @@ class HtmlElements(object):
         HtmlElement(N.a).wrap(iconChar, addClass=addClass, href=href, **atts)
         if href else
         HtmlElement(N.span).wrap(iconChar, addClass=addClass, **atts)
+    )
+
+  @staticmethod
+  def iconr(itemKey, tag, msg=None):
+    if msg is None:
+      msg = E
+    return HtmlElements.iconx(
+        N.refresh,
+        cls="small",
+        action=N.refresh,
+        title=f"""{cap1(N.refresh)} {msg}""",
+        targetkey=itemKey,
+        tag=tag,
     )
 
   @staticmethod

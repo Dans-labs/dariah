@@ -12,6 +12,7 @@ CW = C.web
 DEFAULT_TYPE = CT.defaultType
 CONSTRAINED = CT.constrained
 WORKFLOW_TABLES = set(CT.userTables) | set(CT.userEntryTables)
+WORKFLOW_FIELDS = CT.workflowFields
 
 REFRESH = CW.messages[N.refresh]
 
@@ -28,7 +29,7 @@ class Field(object):
       N.control,
       N.uid, N.eppn,
       N.table, N.record, N.eid,
-      N.perm, N.workflow,
+      N.perm,
       N.readonly,
   )
 
@@ -89,6 +90,11 @@ class Field(object):
     )
 
   def save(self, data):
+    mayEdit = self.mayEdit
+
+    if not mayEdit:
+      return
+
     control = self.control
     db = control.db
     uid = self.uid
@@ -96,65 +102,52 @@ class Field(object):
     table = self.table
     eid = self.eid
     field = self.field
-    mayEdit = self.mayEdit
     extensible = self.extensible
-
-    if mayEdit:
-      record = self.record
-
-      multiple = self.multiple
-      fieldTypeClass = self.fieldTypeClass
-      conversion = (
-          fieldTypeClass.fromStr
-          if fieldTypeClass else
-          None
-      )
-      args = (
-          dict(uid=uid, eppn=eppn, extensible=True)
-          if extensible else
-          {}
-      )
-
-      if conversion is not None:
-        if multiple:
-          data = [
-              conversion(d, **args)
-              for d in data or []
-          ]
-        else:
-          data = conversion(data, **args)
-
-      modified = record.get(N.modified, None)
-      (updates, deletions) = db.updateField(
-          table,
-          eid,
-          field,
-          data,
-          eppn,
-          modified,
-      )
-      self.update(updates, deletions)
-
-  def update(self, updates, deletions):
-    recordObj = self.recordObj
-    table = self.table
     record = self.record
-    field = self.field
+    recordObj = self.recordObj
     require = self.require
 
-    record.update(updates)
-    for f in deletions:
-      if f in record:
-        del record[f]
-    self.value = record.get(field, None)
+    multiple = self.multiple
+    fieldTypeClass = self.fieldTypeClass
+    conversion = (
+        fieldTypeClass.fromStr
+        if fieldTypeClass else
+        None
+    )
+    args = (
+        dict(uid=uid, eppn=eppn, extensible=True)
+        if extensible else
+        {}
+    )
 
-    recordObj.setPerm()
+    if conversion is not None:
+      if multiple:
+        data = [
+            conversion(d, **args)
+            for d in data or []
+        ]
+      else:
+        data = conversion(data, **args)
+
+    modified = record.get(N.modified, None)
+    (updates, deletions) = db.updateField(
+        table,
+        eid,
+        field,
+        data,
+        eppn,
+        modified,
+    )
+    record = control.getItem(table, eid, requireFresh=True)
+
+    recordObj.reload(record)
+    self.value = record.get(field, None)
     self.perm = recordObj.perm
     perm = self.perm
-    recordObj.adjustWorkflow()
-    self.workflow = recordObj.workflow
-
     (self.mayRead, self.mayEdit) = getPerms(table, perm, require)
+
+    if table in WORKFLOW_TABLES and field in WORKFLOW_FIELDS:
+      recordObj.adjustWorkflow()
 
   def isEmpty(self):
     value = self.value

@@ -3,22 +3,31 @@ from controllers.utils import getLast, serverprint
 
 
 CT = C.tables
+CM = C.mongo
+
 MAIN_TABLE = CT.userTables[0]
-WORKFLOW_TABLES = set(CT.userTables) | set(CT.userEntryTables)
+INTER_TABLE = CT.userTables[1]
+WORKFLOW_TABLES_LIST = CT.userTables + CT.userEntryTables
+WORKFLOW_TABLES = set(WORKFLOW_TABLES_LIST)
 WORKFLOW_FIELDS = CT.workflowFields
 DETAILS = CT.details
 
+M_IN = CM.IN
+
 
 class WorkflowItem(object):
-  def __init__(self, workflowRecord):
-    for (k, v) in workflowRecord.items():
+  def __init__(self, control, contribId, requireFresh=False):
+    attributes = control.getWorkflowItem(contribId, requireFresh=requireFresh)
+    for (k, v) in attributes.items():
       setattr(self, k, v)
 
-
-def workflowRecord(control, contribId):
-  attributes = control.getWorkflowItem(contribId)
-
-  return WorkflowItem(attributes)
+  def display(self):
+    attributes = self.__dict__
+    if not len(attributes):
+      serverprint(f'workflow has no attributes')
+    else:
+      for (k, v) in sorted(attributes.items()):
+        serverprint(f'workflow.{k} = {v}')
 
 
 class Workflow(object):
@@ -93,22 +102,13 @@ class Workflow(object):
       serverprint("WORKFLOW: Clear exisiting table")
       db.clearWorkflow()
 
-    fields = {field: True for field in WORKFLOW_FIELDS}
     entries = {}
     serverprint("WORKFLOW: Read user (entry) tables")
     for table in WORKFLOW_TABLES:
-      entries[table] = db.entries(table, fields)
-    self.entries = entries
+      entries[table] = db.entries(table)
 
     serverprint("WORKFLOW: Link masters and details")
-    for (masterTable, detailTables) in DETAILS.items():
-      if masterTable in WORKFLOW_TABLES:
-        detailTablesWf = [
-            detailTable
-            for detailTable in detailTables
-            if detailTable in WORKFLOW_TABLES
-        ]
-        self.linkDetails(masterTable, detailTablesWf)
+    aggregate(entries)
 
     serverprint("WORKFLOW: Compute workflow info")
     wfRecords = []
@@ -116,48 +116,70 @@ class Workflow(object):
       attributes = self.computeWorkflow(record=mainRecord)
       wfRecords.append(attributes)
     serverprint("WORKFLOW: Store workflow info")
-    db.insertWorkflow(wfRecords)
+    db.insertWorkflowMany(wfRecords)
     serverprint("WORKFLOW: Initialization done")
 
-  def adjustWorkflow(self, contribId):
+  def insert(self, contribId):
     control = self.control
     db = control.db
 
-    attributes = self.computeWorkflow(eid=contribId)
-    serverprint(f"WORKFLOW: Adjust workflow info {contribId} => {attributes}")
-    db.adjustWorkflow(contribId, attributes)
+    attributes = self.computeWorkflow(contribId=contribId)
+    attributes[N._id] = contribId
+    serverprint(f"WORKFLOW: New workflow info {contribId}")
+    db.insertWorkflow(attributes)
 
-  def linkDetails(self, masterTable, detailsTables):
-    entries = self.entries
+  def recompute(self, contribId):
+    control = self.control
+    db = control.db
 
-    for detailsTable in detailsTables:
-      serverprint(f"WORKFLOW: {masterTable}: lookup details from {detailsTable}")
-      for record in sorted(
-          entries.get(detailsTable, []).values(),
-          key=lambda r: r.get(N.dateCreated, 0),
-      ):
-        masterId = record.get(masterTable, None)
-        if masterId:
-          entries.get(masterTable, {}).get(masterId, {}).setdefault(
-              detailsTable, []
-          ).append(record)
+    attributes = self.computeWorkflow(contribId=contribId)
+    serverprint(f"WORKFLOW: Adjust workflow info {contribId}")
+    db.updateWorkflow(contribId, attributes)
 
-  def computeWorkflow(self, record=None, eid=None):
+  def delete(self, contribId):
+    control = self.control
+    db = control.db
+
+    serverprint(f"WORKFLOW: Delete workflow info {contribId}")
+    db.delWorkflow(contribId)
+
+  def getFullItem(self, contribId):
+    db = self.db
+
+    entries = {}
+    for table in WORKFLOW_TABLES_LIST:
+      crit = (
+          {N._id: contribId}
+          if table == MAIN_TABLE else
+          {N.contrib: contribId}
+          if table in CT.userTables else
+          {
+              INTER_TABLE: {
+                  M_IN: list(entries.get(INTER_TABLE, {}))
+              }
+          }
+      )
+      entries[table] = db.entries(table, crit)
+    aggregate(entries)
+
+    return entries.get(MAIN_TABLE, {}).get(contribId, None)
+
+  def computeWorkflow(self, record=None, contribId=None):
     decisions = self.decisions
 
     if record is None:
-      control = self.control
-      record = control.getItem(MAIN_TABLE, eid)
-      print('XXX', record)
+      record = self.getFullItem(contribId)
 
     cId = record.get(N._id, None)
     if cId is None:
       return {}
 
     cType = record.get(N.typeContribution, None)
+    cTitle = record.get(N.title, None)
 
     aId = None
     aType = None
+    aTitle = None
     aScore = None
     complete = None
     submitted = None
@@ -179,6 +201,7 @@ class Workflow(object):
     if latestAssessment is not None:
       aId = latestAssessment.get(N._id, None)
       aType = latestAssessment.get(N.assessmentType, None)
+      aTitle = latestAssessment.get(N.title, None)
 
       latestCentries = [
           rec
@@ -230,9 +253,11 @@ class Workflow(object):
     return {
         N._id: cId,
         N.contribType: cType,
+        N.contribTitle: cTitle,
         N.selected: record.get(N.selected, None),
         N.assessment: aId,
         N.assessmentType: aType,
+        N.assessmentTitle: aTitle,
         N.score: aScore,
         N.complete: complete,
         N.submitted: submitted,
@@ -244,3 +269,24 @@ class Workflow(object):
         N.decision: decision,
         N.dateDecided: dateDecided,
     }
+
+
+def aggregate(entries):
+  for (masterTable, detailTables) in DETAILS.items():
+    if masterTable in WORKFLOW_TABLES:
+      detailTablesWf = [
+          detailTable
+          for detailTable in detailTables
+          if detailTable in WORKFLOW_TABLES
+      ]
+      for detailTable in detailTablesWf:
+        serverprint(f"WORKFLOW: {masterTable}: lookup details from {detailTable}")
+        for record in sorted(
+            entries.get(detailTable, {}).values(),
+            key=lambda r: r.get(N.dateCreated, 0),
+        ):
+          masterId = record.get(masterTable, None)
+          if masterId:
+            entries.get(masterTable, {}).get(masterId, {}).setdefault(
+                detailTable, []
+            ).append(record)

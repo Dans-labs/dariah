@@ -22,11 +22,11 @@ otherCommands:
   - insert_many
 
 labels:
-  - adjustWorkflow
   - collect
   - collectActualItems
   - clearWorkflow
   - delItem
+  - delWorkflow
   - dependencies
   - dropWorkflow
   - entries
@@ -37,6 +37,8 @@ labels:
   - insertItem
   - insertUser
   - insertWorkflow
+  - insertWorkflowMany
   - makeCrit
   - updateField
   - updateUser
+  - updateWorkflow

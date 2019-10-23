@@ -11,13 +11,23 @@ from flask import (
 from pymongo import MongoClient
 
 from controllers.config import Config as C, Names as N
+from controllers.utils import E
 from controllers.db import Db
 from controllers.workflow import Workflow
 from controllers.auth import Auth
 from controllers.control import Control
 from controllers.sidebar import Sidebar
 from controllers.topbar import Topbar
+
 from controllers.table import Table
+from controllers.specific.assessment_table import AssessmentT
+from controllers.specific.review_table import ReviewT
+
+CASES = (
+    (N.assessment, AssessmentT),
+    (N.review, ReviewT),
+)
+
 
 CT = C.tables
 CW = C.web
@@ -26,7 +36,10 @@ CW = C.web
 STATIC_ROOT = os.path.abspath(CW.staticRoot)
 
 ALL_TABLES = CT.all
-USER_TABLES = set(CT.userTables)
+USER_TABLES_LIST = CT.userTables
+USER_TABLES = set(USER_TABLES_LIST)
+MASTERS = CT.masters
+DETAILS = CT.details
 
 URLS = CW.urls
 MESSAGES = CW.messages
@@ -51,6 +64,20 @@ DEBUG = False
 GP = dict(methods=[N.GET, N.POST])
 
 # N.showNames()
+
+
+def tableFactory(table):
+  TableClass = Table
+  for (tb, Tcl) in CASES:
+    if tb == table:
+      TableClass = Tcl
+      break
+
+  return TableClass
+
+
+def mkTable(control, tb):
+  return tableFactory(tb)(control, tb)
 
 
 def factory():
@@ -80,8 +107,8 @@ def factory():
   @app.route(f"""/{N.index}""")
   @app.route(f"""/{INDEX}""")
   def serveIndex():
-    control = getControl()
     path = START
+    control = getControl()
     auth.authenticate()
     topbar = Topbar(control).wrap()
     sidebar = Sidebar(control, path).wrap()
@@ -96,9 +123,12 @@ def factory():
 
   @app.route(f"""/api/<string:table>/{N.insert}""")
   def serveTableInsert(table):
+    path = f"""/api/{table}/{N.insert}"""
     control = getControl()
-    if table in ALL_TABLES:
-      path = f"""/api/{table}/{N.insert}"""
+    if (
+        table in ALL_TABLES
+        and table not in MASTERS
+    ):
       auth.authenticate()
       eid = Table(control, table).insert()
       newUrlPart = N.mylist if table in USER_TABLES else N.list
@@ -107,6 +137,26 @@ def factory():
           if eid else
           f"""/{table}/{newUrlPart}"""
       )
+      return redirect(newPath)
+    return notFound(path)
+
+  # INSERT RECORD IN DETAIL TABLE
+
+  @app.route(f"""/api/<string:table>/<string:eid>/<string:dtable>/{N.insert}""")
+  def serveTableInsertDetail(table, eid, dtable):
+    path = f"""/api/{table}/{eid}/{dtable}/{N.insert}"""
+    control = getControl()
+    if (
+        table in USER_TABLES_LIST[0:2]
+        and
+        table in DETAILS
+        and
+        dtable in DETAILS[table]
+    ):
+      auth.authenticate()
+      contribId = mkTable(control, dtable).insert(masterTable=table, masterId=eid) or E
+      newUrlPart = N.mylist
+      newPath = f"""/{N.contrib}/{newUrlPart}/{contribId}"""
       return redirect(newPath)
     return notFound(path)
 
@@ -137,9 +187,9 @@ def factory():
     return serveTable(table, None, action=N.ourlist)
 
   def serveTable(table, eid, action=None):
+    path = f"""/{table}/{action}"""
     control = getControl()
     if table in ALL_TABLES:
-      path = f"""/{table}/{action}"""
       auth.authenticate()
       topbar = Topbar(control).wrap()
       sidebar = Sidebar(control, path).wrap()
@@ -152,13 +202,13 @@ def factory():
       )
     return notFound(path)
 
-  # RECORD VIEW / DELETE
+  # RECORD DELETE
 
   @app.route(f"""/api/<string:table>/{N.delete}/<string:eid>""")
   def serveRecordDelete(table, eid):
+    path = f"""/api/{table}/{N.delete}/{eid}"""
     control = getControl()
     if table in ALL_TABLES:
-      path = f"""/api/{table}/{N.delete}/{eid}"""
       auth.authenticate()
       Table(control, table).record(eid=eid).delete()
       newUrlPart = N.mylist if table in USER_TABLES else N.list
@@ -168,31 +218,60 @@ def factory():
       return redirect(newPath)
     return notFound(path)
 
+  # RECORD DELETE DETAIL
+
+  @app.route(
+      f"""/api/<string:table>/<string:masterId>/<string:dtable>/{N.delete}/<string:eid>"""
+  )
+  def serveRecordDeleteDetail(table, masterId, dtable, eid):
+    path = f"""/api/{table}/{masterId}/{dtable}/{N.delete}/{eid}"""
+    control = getControl()
+    if (
+        table in USER_TABLES_LIST[0:2]
+        and
+        table in DETAILS
+        and
+        dtable in DETAILS[table]
+    ):
+      auth.authenticate()
+      recordObj = Table(control, dtable).record(eid=eid)
+      recordObj.delete()
+      workflow = recordObj.workflow
+      contribId = workflow._id
+      newUrlPart = N.mylist
+      newPath = f"""/{N.contrib}/{newUrlPart}/{contribId}"""
+      return redirect(newPath)
+    return notFound(path)
+
+  # RECORD VIEW
+
   @app.route(f"""/api/<string:table>/{N.item}/<string:eid>""")
   def serveRecord(table, eid):
+    path = f"""/api/{table}/{N.item}/{eid}"""
     control = getControl()
     if table in ALL_TABLES:
       auth.authenticate()
       return Table(control, table).record(
           eid=eid, withDetails=True, **method(),
       ).wrap()
-    return noTable(table)
+    return notFound(path)
 
   @app.route(f"""/api/<string:table>/{N.item}/<string:eid>/{N.title}""")
   def serveRecordTitle(table, eid):
+    path = f"""/api/{table}/{N.item}/{eid}/{N.title}"""
     control = getControl()
     if table in ALL_TABLES:
       auth.authenticate()
       return Table(control, table).record(
           eid=eid, withDetails=False, **method(),
       ).wrap(expanded=-1)
-    return noTable(table)
+    return notFound(path)
 
   @app.route(f"""/<string:table>/{N.item}/<string:eid>""")
   def serveRecordPage(table, eid):
+    path = f"""/{table}/{N.item}/{eid}"""
     control = getControl()
     if table in ALL_TABLES:
-      path = f"""/{table}/{N.item}/{eid}"""
       auth.authenticate()
       topbar = Topbar(control).wrap()
       sidebar = Sidebar(control, path).wrap()
@@ -205,7 +284,7 @@ def factory():
           sidebar=sidebar,
           material=record,
       )
-    return noTable(table)
+    return notFound(path)
 
   def method():
       method = request.args.get(N.method, None)

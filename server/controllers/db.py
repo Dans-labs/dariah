@@ -37,6 +37,9 @@ OPTIONS = CW.options
 
 MOD_FMT = """{} on {}"""
 
+WORKFLOW_FIELDS = CT.workflowFields
+FIELD_PROJ = {field: True for field in WORKFLOW_FIELDS}
+
 
 class Db(object):
   def __init__(self, mongo):
@@ -302,7 +305,8 @@ class Db(object):
         **fields,
     }
     result = self.mongoCmd(N.insertItem, table, N.insert_one, newRecord)
-    self.collect(table)
+    if table in VALUE_TABLES:
+      self.collect(table=table)
     return result.inserted_id
 
   def insertUser(self, record):
@@ -318,12 +322,13 @@ class Db(object):
         N.modified: [MOD_FMT.format(CREATOR, justNow)],
     })
     result = self.mongoCmd(N.insertUser, N.user, N.insert_one, record)
-    self.collect(N.user)
+    self.collect(table=N.user)
     return result.inserted_id
 
   def delItem(self, table, eid):
     self.mongoCmd(N.delItem, table, N.delete_one, {N._id: ObjectId(eid)})
-    self.collect(table)
+    if table in VALUE_TABLES:
+      self.collect(table=table)
 
   def updateField(
       self,
@@ -350,7 +355,8 @@ class Db(object):
     }
 
     self.mongoCmd(N.updateField, table, N.update_one, criterion, instructions)
-    self.collect(table)
+    if table in VALUE_TABLES:
+      self.collect(table=table)
     return (
         update,
         set(delete.keys()),
@@ -372,7 +378,7 @@ class Db(object):
         }
     }
     self.mongoCmd(N.updateUser, N.user, N.update_one, criterion, instructions)
-    self.collect(N.user)
+    self.collect(table=N.user)
 
   def dependencies(self, table, record):
     eid = record.get(N._id, None)
@@ -408,19 +414,26 @@ class Db(object):
   def clearWorkflow(self):
     self.mongoCmd(N.clearWorkflow, N.workflow, N.delete_many)
 
-  def entries(self, table, fields):
+  def entries(self, table, crit={}):
     entries = {}
-    for record in list(self.mongoCmd(N.entries, table, N.find, {}, fields)):
+    for record in list(self.mongoCmd(N.entries, table, N.find, crit, FIELD_PROJ)):
         entries[record.get(N._id, None)] = record
 
     return entries
 
-  def insertWorkflow(self, records):
-    self.mongoCmd(N.insertWorkflow, N.workflow, N.insert_many, records)
+  def insertWorkflowMany(self, records):
+    self.mongoCmd(N.insertWorkflowMany, N.workflow, N.insert_many, records)
 
-  def adjustWorkflow(self, contribId, record):
+  def insertWorkflow(self, record):
+    self.mongoCmd(N.insertWorkflow, N.workflow, N.insert_one, record)
+
+  def updateWorkflow(self, contribId, record):
     crit = {N._id: contribId}
-    self.mongoCmd(N.adjustWorkflow, N.workflow, N.replace_one, crit, record)
+    self.mongoCmd(N.updateWorkflow, N.workflow, N.replace_one, crit, record)
+
+  def delWorkflow(self, contribId):
+    crit = {N._id: contribId}
+    self.mongoCmd(N.delWorkflow, N.workflow, N.delete_one, crit)
 
   def getWorkflowItem(self, contribId):
     if contribId is None:

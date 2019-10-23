@@ -15,6 +15,8 @@ class AssessmentD(Details):
     super().__init__(recordObj)
 
   def wrap(self):
+    eid = self.eid
+    table = self.table
     workflow = self.workflow
     reviewers = workflow.reviewers
     reviewer = workflow.reviewer
@@ -83,6 +85,16 @@ class AssessmentD(Details):
         )
     )
 
+    itemKey = f"""{table}/{eid}"""
+    rButton = H.iconr(itemKey, "#workflow", msg=N.status)
+
+    newPart = H.a(
+        "New review",
+        f"""/api/{table}/{eid}/{N.review}/{N.insert}""",
+        title=f"""New review""",
+        cls=f"large step info",
+    )
+
     completeCls = "good" if workflow.complete else "warning"
     completePart = H.span(
         "Complete" if workflow.complete else "... not yet complete ...",
@@ -90,6 +102,7 @@ class AssessmentD(Details):
     )
     workflowPart = H.div(
         [
+            rButton,
             completePart,
         ],
         cls="workflow",
@@ -101,6 +114,7 @@ class AssessmentD(Details):
             workflowPart,
             H.div(REVIEW_DECISION, cls="head"),
             reviewPart,
+            newPart,
         ],
     )
 
