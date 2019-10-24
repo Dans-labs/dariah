@@ -25,13 +25,25 @@ class AssessmentT(Table):
 
     masterOid = ObjectId(masterId)
     workflow = WorkflowItem(control, masterOid)
+    contribType = workflow.contribType
 
     fields = {
         masterTable: masterOid,
-        N.assessmentType: workflow.contribType,
+        N.assessmentType: contribType,
         N.title: f"assessment of {workflow.contribTitle}",
     }
-    db.insertItem(table, uid, eppn, **fields)
+    aId = db.insertItem(table, uid, eppn, **fields)
+
+    criteria = db.typeCriteria.get(contribType, [])
+    records = [
+        {
+            N.seq: seq,
+            N.criteria: crit,
+            N.assessment: aId,
+        }
+        for (seq, crit) in enumerate(criteria)
+    ]
+    db.insertMany(N.criteriaEntry, uid, eppn, records)
     self.adjustWorkflow(masterOid, new=False)
 
     return masterId

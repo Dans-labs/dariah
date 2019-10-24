@@ -31,6 +31,7 @@ M_COMMANDS = SHOW_ARGS | OTHER_COMMANDS
 ACTUAL_TABLES = set(CT.actualTables)
 VALUE_TABLES = set(CT.valueTables)
 REFERENCE_SPECS = CT.reference
+CASCADE_SPECS = CT.cascade
 
 
 OPTIONS = CW.options
@@ -309,6 +310,19 @@ class Db(object):
       self.collect(table=table)
     return result.inserted_id
 
+  def insertMany(self, table, uid, eppn, records):
+    justNow = now()
+    newRecords = [
+        {
+            N.dateCreated: justNow,
+            N.creator: uid,
+            N.modified: [MOD_FMT.format(eppn, justNow)],
+            **record,
+        }
+        for record in records
+    ]
+    self.mongoCmd(N.insertMany, table, N.insert_many, newRecords)
+
   def insertUser(self, record):
     creatorId = self.creatorId
 
@@ -329,6 +343,9 @@ class Db(object):
     self.mongoCmd(N.delItem, table, N.delete_one, {N._id: ObjectId(eid)})
     if table in VALUE_TABLES:
       self.collect(table=table)
+
+  def delMany(self, table, crit):
+    self.mongoCmd(N.delMany, table, N.delete_many, crit)
 
   def updateField(
       self,
@@ -385,28 +402,34 @@ class Db(object):
     if eid is None:
       return True
 
-    referenceSpecs = REFERENCE_SPECS.get(table, {})
-    nDependent = 0
-    for (referringTable, referringFields) in referenceSpecs.items():
-      if not len(referringFields):
-        continue
-      fields = list(referringFields)
-      crit = (
-          {
-              fields[0]: eid,
-          }
-          if len(fields) == 1 else
-          {
-              M_OR: [
-                  {field: eid}
-                  for field in fields
-              ],
-          }
-      )
+    depSpecs = dict(
+        reference=REFERENCE_SPECS.get(table, {}),
+        cascade=CASCADE_SPECS.get(table, {}),
+    )
+    depResult = {}
+    for (depKind, depSpec) in depSpecs.items():
+      nDep = 0
+      for (referringTable, referringFields) in depSpec.items():
+        if not len(referringFields):
+          continue
+        fields = list(referringFields)
+        crit = (
+            {
+                fields[0]: eid,
+            }
+            if len(fields) == 1 else
+            {
+                M_OR: [
+                    {field: eid}
+                    for field in fields
+                ],
+            }
+        )
 
-      nDependent += self.mongoCmd(N.dependencies, referringTable, N.count, crit)
+        nDep += self.mongoCmd(depKind, referringTable, N.count, crit)
+      depResult[depKind] = nDep
 
-    return nDependent
+    return depResult
 
   def dropWorkflow(self):
     self.mongoCmd(N.dropWorkflow, N.workflow, N.drop)
@@ -458,3 +481,7 @@ def satisfies(record, criterium):
     ):
       return False
   return True
+
+
+def inCrit(items):
+  return {M_IN: list(items)}

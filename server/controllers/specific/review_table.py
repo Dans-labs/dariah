@@ -37,8 +37,25 @@ class ReviewT(Table):
         N.reviewType: workflow.contribType,
         N.title: f"review of {workflow.assessmentTitle}",
     }
-    print('XXX', masterTable, fields)
-    db.insertItem(table, uid, eppn, **fields)
+    rId = db.insertItem(table, uid, eppn, **fields)
+
+    criteriaEntries = db.getDetails(
+        N.criteriaEntry,
+        N.assessment,
+        masterOid,
+        sortKey=lambda r: r.get(N.seq, 0),
+    )
+    records = [
+        {
+            N.seq: critEntry.get(N.seq, 0),
+            N.criteria: critEntry.get(N.criteria, None),
+            N.criteriaEntry: critEntry.get(N._id, None),
+            N.assessment: masterOid,
+            N.review: rId,
+        }
+        for critEntry in criteriaEntries
+    ]
+    db.insertMany(N.reviewEntry, uid, eppn, records)
     self.adjustWorkflow(contribId, new=False)
 
     return contribId

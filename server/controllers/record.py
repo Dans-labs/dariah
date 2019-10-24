@@ -6,14 +6,14 @@ from controllers.html import HtmlElements as H
 from controllers.field import Field
 
 from controllers.details import Details
-from controllers.specific.contrib_details import ContribD
 from controllers.specific.assessment_details import AssessmentD
+from controllers.specific.contrib_details import ContribD
 from controllers.specific.criteriaentry_details import CriteriaEntryD
 from controllers.specific.review_details import ReviewD
 
 CASES = (
-    (N.contrib, ContribD),
     (N.assessment, AssessmentD),
+    (N.contrib, ContribD),
     (N.criteriaEntry, CriteriaEntryD),
     (N.review, ReviewD),
 )
@@ -29,6 +29,7 @@ ACTUAL_TABLES = set(CT.actualTables)
 REFRESH_TABLES = set(CT.refreshTables)
 USER_TABLES_LIST = CT.userTables
 WORKFLOW_TABLES = set(USER_TABLES_LIST) | set(CT.userEntryTables)
+CASCADE_SPECS = CT.cascade
 
 # an easy way to go from assessment to contrib and from contrib to assessment
 # used in deleteButton
@@ -115,7 +116,7 @@ class Record(object):
     table = self.table
     record = self.record
 
-    self.dependencies = db.dependencies(table, record)
+    return db.dependencies(table, record)
 
   def detailsFactory(self):
     table = self.table
@@ -168,11 +169,16 @@ class Record(object):
     if not mayDelete:
       return
 
-    self.getDependencies()
-    dependencies = self.dependencies
+    dependencies = self.getDependencies()
+    nRef = dependencies.get(N.reference, 0)
 
-    if dependencies:
+    if nRef:
       return
+
+    nCas = dependencies.get(N.cascade, 0)
+    if nCas:
+      if not self.deleteDetails():
+        return
 
     control = self.control
     table = self.table
@@ -184,6 +190,18 @@ class Record(object):
       self.adjustWorkflow(delete=True)
     elif table in WORKFLOW_TABLES:
       self.adjustWorkflow(update=False)
+
+  def deleteDetails(self):
+    control = self.control
+    db = control.db
+    table = self.table
+    eid = self.eid
+
+    for dtable in CASCADE_SPECS.get(table, []):
+      db.delMany(dtable, {table: eid})
+    dependencies = self.getDependencies()
+    nRef = dependencies.get(N.reference, 0)
+    return nRef == 0
 
   def body(self, myMasters=None, hideMasters=False):
     fieldSpecs = self.fields
@@ -337,22 +355,35 @@ class Record(object):
     table = self.table
     itemSingle = self.itemLabels[0]
 
-    self.getDependencies()
-    dependencies = self.dependencies
+    dependencies = self.getDependencies()
 
-    if dependencies:
-      plural = E if dependencies == 1 else S
+    nCas = dependencies.get(N.cascade, 0)
+    cascadeMsg = (
+        H.span(
+            f"""{nCas} detail record{E if nCas == 1 else S}""",
+            title=f"""Detail records will be deleted with the master record""",
+            cls="label small warning-o right",
+        )
+        if nCas else
+        E
+    )
+
+    nRef = dependencies.get(N.reference, 0)
+
+    if nRef:
+      plural = E if nRef == 1 else S
       return H.span(
           [
               H.icon(
                   N.chain,
                   cls="medium right",
-                  title=f"""Cannot delete because of {dependencies} dependent record{plural}"""
+                  title=f"""Cannot delete because of {nRef} dependent record{plural}"""
               ),
               H.span(
-                  f"""{dependencies} dependent record{plural}""",
+                  f"""{nRef} dependent record{plural}""",
                   cls="label small warning-o right",
               ),
+              cascadeMsg,
           ]
       )
 
@@ -369,12 +400,15 @@ class Record(object):
         f"""/api/{masterTable}/{masterId}/{table}/{N.delete}/{record[N._id]}"""
     )
     return H.span(
-        H.iconx(
-            N.delete,
-            cls="medium right",
-            href=url,
-            title=f"""Delete this {itemSingle}"""
-        ),
+        [
+            cascadeMsg,
+            H.iconx(
+                N.delete,
+                cls="medium right",
+                href=url,
+                title=f"""Delete this {itemSingle}"""
+            ),
+        ]
     )
 
   def title(self):

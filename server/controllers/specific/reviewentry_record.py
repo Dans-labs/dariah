@@ -1,6 +1,6 @@
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import E
+from controllers.utils import cap1, E
 from controllers.record import Record
 
 CW = C.web
@@ -24,7 +24,7 @@ class ReviewEntryR(Record):
         if creatorId == reviewerE else
         N.final
         if creatorId == reviewerF else
-        None
+        cap1(N.orphaned)
     )
     self.kind = kind
     self.creatorId = creatorId

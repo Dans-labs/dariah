@@ -51,6 +51,12 @@ details:
   package:
     - criteria
 
+cascade:
+  assessment:
+    - criteriaEntry
+  review:
+    - reviewEntry
+
 workflowFields:
   - assessment
   - assessmentType

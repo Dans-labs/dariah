@@ -26,6 +26,7 @@ labels:
   - collectActualItems
   - clearWorkflow
   - delItem
+  - delMany
   - delWorkflow
   - dependencies
   - dropWorkflow
@@ -35,6 +36,7 @@ labels:
   - getList
   - getWorkflowItem
   - insertItem
+  - insertMany
   - insertUser
   - insertWorkflow
   - insertWorkflowMany

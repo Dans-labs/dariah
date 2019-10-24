@@ -1,5 +1,6 @@
 from controllers.config import Config as C, Names as N
 from controllers.utils import getLast, serverprint
+from controllers.db import inCrit
 
 
 CT = C.tables
@@ -11,8 +12,6 @@ WORKFLOW_TABLES_LIST = CT.userTables + CT.userEntryTables
 WORKFLOW_TABLES = set(WORKFLOW_TABLES_LIST)
 WORKFLOW_FIELDS = CT.workflowFields
 DETAILS = CT.details
-
-M_IN = CM.IN
 
 
 class WorkflowItem(object):
@@ -154,9 +153,7 @@ class Workflow(object):
           {N.contrib: contribId}
           if table in CT.userTables else
           {
-              INTER_TABLE: {
-                  M_IN: list(entries.get(INTER_TABLE, {}))
-              }
+              INTER_TABLE: inCrit(entries.get(INTER_TABLE, {}))
           }
       )
       entries[table] = db.entries(table, crit)
@@ -165,6 +162,7 @@ class Workflow(object):
     return entries.get(MAIN_TABLE, {}).get(contribId, None)
 
   def computeWorkflow(self, record=None, contribId=None):
+    db = self.db
     decisions = self.decisions
 
     if record is None:
@@ -202,6 +200,7 @@ class Workflow(object):
       aId = latestAssessment.get(N._id, None)
       aType = latestAssessment.get(N.assessmentType, None)
       aTitle = latestAssessment.get(N.title, None)
+      nCriteria = len(db.typeCriteria.get(aType, []))
 
       latestCentries = [
           rec
@@ -212,9 +211,13 @@ class Workflow(object):
               rec.get(N.assessment, None) == aId
           )
       ]
-      complete = all(
-          rec.get(N.score, None) and rec.get(N.evidence, None)
-          for rec in latestCentries
+      complete = (
+          len(latestCentries) == nCriteria
+          and
+          all(
+              rec.get(N.score, None) and rec.get(N.evidence, None)
+              for rec in latestCentries
+          )
       )
       aScore = self.computeScore(latestCentries)
 

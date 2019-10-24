@@ -129,6 +129,7 @@ VALUE_TABLES = set(CT.valueTables)
 SCALAR_TYPES = set(CT.scalarTypes)
 PROV_SPECS = CT.prov
 VALUE_SPECS = CT.value
+CASCADE = CT.cascade
 
 tables = (
     tables |
@@ -143,6 +144,7 @@ sortedTables = (
 )
 
 reference = {}
+cascade = {}
 
 for table in tables:
   specs = {}
@@ -153,10 +155,15 @@ for table in tables:
   else:
     specs.update(VALUE_SPECS)
   specs.update(PROV_SPECS)
+
   for (field, fieldSpecs) in specs.items():
     fieldType = fieldSpecs.get(N.type, None)
     if fieldType and fieldType not in SCALAR_TYPES:
-      reference.setdefault(fieldType, {}).setdefault(table, set()).add(field)
+      cascaded = set(CASCADE.get(fieldType, []))
+      if table in cascaded:
+        cascade.setdefault(fieldType, {}).setdefault(table, set()).add(field)
+      else:
+        reference.setdefault(fieldType, {}).setdefault(table, set()).add(field)
   setattr(Tables, table, specs)
   tables.add(table)
 
@@ -183,4 +190,5 @@ for table in tables:
 setattr(Tables, ALL, tables)
 setattr(Tables, N.sorted, sortedTables)
 setattr(Tables, N.reference, reference)
+setattr(Tables, N.cascade, cascade)
 setattr(Tables, N.constrained, constrained)

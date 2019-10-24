@@ -8,20 +8,20 @@ from controllers.html import HtmlElements as H
 from controllers.utils import E, ELLIPS, NBSP, ONE
 
 from controllers.record import Record
-from controllers.specific.criteria_record import CriteriaR
-from controllers.specific.score import ScoreR
 from controllers.specific.assessment_record import AssessmentR
-from controllers.specific.review_record import ReviewR
+from controllers.specific.criteria_record import CriteriaR
 from controllers.specific.criteriaentry_record import CriteriaEntryR
+from controllers.specific.review_record import ReviewR
 from controllers.specific.reviewentry_record import ReviewEntryR
+from controllers.specific.score import ScoreR
 
 CASES = (
-    (N.criteria, CriteriaR),
-    (N.score, ScoreR),
     (N.assessment, AssessmentR),
-    (N.review, ReviewR),
+    (N.criteria, CriteriaR),
     (N.criteriaEntry, CriteriaEntryR),
+    (N.review, ReviewR),
     (N.reviewEntry, ReviewEntryR),
+    (N.score, ScoreR),
 )
 
 CT = C.tables
