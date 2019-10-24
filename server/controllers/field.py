@@ -2,7 +2,7 @@ from flask import request
 
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import E, BLANK, ONE, cap1
+from controllers.utils import pick as G, cap1, E, BLANK, ONE
 from controllers.perm import getPerms
 
 CT = C.tables
@@ -48,18 +48,18 @@ class Field(object):
     self.withRefresh = field == N.modified
 
     fieldSpecs = recordObj.fields
-    fieldSpec = fieldSpecs.get(field, {})
+    fieldSpec = G(fieldSpecs, field)
 
     record = self.record
-    self.value = record.get(field, None)
+    self.value = G(record, field)
 
-    require = fieldSpec.get(N.perm, {})
+    require = G(fieldSpec, N.perm, default={})
     self.require = require
 
-    self.label = fieldSpec.get(N.label, cap1(field))
-    self.tp = fieldSpec.get(N.type, DEFAULT_TYPE)
-    self.multiple = fieldSpec.get(N.multiple, False)
-    self.extensible = fieldSpec.get(N.extensible, False)
+    self.label = G(fieldSpec, N.label, default=cap1(field))
+    self.tp = G(fieldSpec, N.type, default=DEFAULT_TYPE)
+    self.multiple = G(fieldSpec, N.multiple, default=False)
+    self.extensible = G(fieldSpec, N.extensible, default=False)
 
     control = self.control
 
@@ -129,7 +129,7 @@ class Field(object):
       else:
         data = conversion(data, **args)
 
-    modified = record.get(N.modified, None)
+    modified = G(record, N.modified)
     (updates, deletions) = db.updateField(
         table,
         eid,
@@ -141,7 +141,7 @@ class Field(object):
     record = control.getItem(table, eid, requireFresh=True)
 
     recordObj.reload(record)
-    self.value = record.get(field, None)
+    self.value = G(record, field)
     self.perm = recordObj.perm
     perm = self.perm
     (self.mayRead, self.mayEdit) = getPerms(table, perm, require)
@@ -282,9 +282,9 @@ class Field(object):
       record = self.record
       field = self.field
       constrain = None
-      constrainField = CONSTRAINED.get(field, None)
+      constrainField = G(CONSTRAINED, field)
       if constrainField:
-        constrainValue = record.get(constrainField, None)
+        constrainValue = G(record, constrainField)
         if constrainValue:
           constrain = (constrainField, constrainValue)
       args.append(multiple)

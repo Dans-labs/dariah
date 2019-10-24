@@ -80,6 +80,14 @@ workflowFields:
   - title
   - typeContribution
 
+workflowSubfields:
+  - overall
+  - relevantScore
+  - relevantMax
+  - relevantN
+  - allMax
+  - allN
+
 items:
   contrib: [contribution, contributions]
   country: [country, countries]
@@ -150,15 +158,19 @@ value:
       edit: office
 
 workflow:
+  - assessments
   - assessmentId
-  - assessmentType
   - assessmentTitle
+  - assessmentType
   - complete
   - contribId
-  - contribType
   - contribTitle
+  - reviewEId
+  - reviewFId
+  - reviewTitle
   - reviewer
   - reviews
+  - type
 
 decisions:
   - Accept
@@ -175,8 +187,6 @@ names:
   - expert
   - fields
   - final
-  - getItem
-  - getWorkflowItem
   - isUserTable
   - isUserEntryTable
   - itemLabels

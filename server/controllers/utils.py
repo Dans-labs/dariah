@@ -143,6 +143,10 @@ def getLast(sequence):
   return sequence[-1] if sequence else None
 
 
+def pick(record, field, default=None):
+  return default if record is None else record.get(field, default)
+
+
 def filterModified(modified):
   logicM = _decomposeM(modified)
   chunks = _perDay(logicM)

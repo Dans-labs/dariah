@@ -1,6 +1,6 @@
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H, htmlEscape as he
-from controllers.utils import E, DOT, Q, NBSP
+from controllers.utils import pick as G, E, DOT, Q, NBSP
 from controllers.record import Record
 
 CW = C.web
@@ -17,14 +17,14 @@ class CriteriaEntryR(Record):
     record = self.record
     workflow = self.workflow
 
-    contribType = workflow.contribType
-    assessmentType = workflow.assessmentType
+    contribType = G(workflow, N.type)
+    assessmentType = G(workflow, N.assessmentType)
 
     goodType = assessmentType == contribType
     cls = E if goodType else "warning"
 
     critObj = Table(control, N.criteria)
-    critId = record.get(N.criteria, None)
+    critId = G(record, N.criteria)
     critRecord = critObj.record(eid=critId)
     self.critId = critId
     self.critRecord = critRecord
@@ -48,7 +48,7 @@ class CriteriaEntryR(Record):
         f"""evidence{NBSP}{withEvidence}""",
         cls="right small",
     )
-    seq = record.get(N.seq, Q)
+    seq = G(record, N.seq, default=Q)
     scoreRep = self.field(N.score).wrapBare()
 
     return H.span(
@@ -77,9 +77,9 @@ class CriteriaEntryR(Record):
     perm = self.perm
 
     critData = critRecord.record
-    actual = critData.get(N.actual, False)
-    msg1 = E if actual else MESSAGES[N.legacyCriterion]
-    msg2 = E if goodType else MESSAGES[N.wrongCriterionForType]
+    actual = G(critData, N.actual, default=False)
+    msg1 = E if actual else G(MESSAGES, N.legacyCriterion)
+    msg2 = E if goodType else G(MESSAGES, N.wrongCriterionForType)
 
     critKey = f"""{N.criteria}/{critId}/help"""
     (infoShow, infoHide, infoBody) = H.detailx(
@@ -97,10 +97,10 @@ class CriteriaEntryR(Record):
     )
 
     score = H.div(
-        self.field(N.score).wrap(asEdit=perm[N.isEdit]),
+        self.field(N.score).wrap(asEdit=G(perm, N.isEdit)),
     )
     evidence = H.div(
-        self.field(N.evidence).wrap(asEdit=perm[N.isEdit]),
+        self.field(N.evidence).wrap(asEdit=G(perm, N.isEdit)),
     )
     entry = H.div(
         [

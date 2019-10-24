@@ -1,8 +1,8 @@
 from bson.objectid import ObjectId
 
 from controllers.config import Names as N
+from controllers.utils import pick
 from controllers.table import Table
-from controllers.workflow import WorkflowItem
 
 
 class ReviewT(Table):
@@ -25,33 +25,36 @@ class ReviewT(Table):
 
     masterOid = ObjectId(masterId)
     masterRecord = control.getItem(N.assessment, masterOid)
-    contribId = masterRecord.get(N.contrib, None)
+    contribId = G(masterRecord, N.contrib)
     if not contribId:
       return None
 
-    workflow = WorkflowItem(control, contribId)
+    workflow = control.getWorkflowItem(contribId)
+    contribId = G(workflow, N._id)
+    contribType = G(workflow, N.type)
+    assessmentTitle = G(workflow, N.assessmentTitle)
 
     fields = {
-        N.contrib: workflow._id,
+        N.contrib: contribId,
         masterTable: masterOid,
-        N.reviewType: workflow.contribType,
-        N.title: f"review of {workflow.assessmentTitle}",
+        N.reviewType: contribType,
+        N.title: f"review of {assessmentTitle}",
     }
-    rId = db.insertItem(table, uid, eppn, **fields)
+    reviewId = db.insertItem(table, uid, eppn, **fields)
 
     criteriaEntries = db.getDetails(
         N.criteriaEntry,
         N.assessment,
         masterOid,
-        sortKey=lambda r: r.get(N.seq, 0),
+        sortKey=lambda r: G(r, N.seq, default=0),
     )
     records = [
         {
-            N.seq: critEntry.get(N.seq, 0),
-            N.criteria: critEntry.get(N.criteria, None),
-            N.criteriaEntry: critEntry.get(N._id, None),
+            N.seq: G(critEntry, N.seq, default=0),
+            N.criteria: G(critEntry, N.criteria),
+            N.criteriaEntry: G(critEntry, N._id),
             N.assessment: masterOid,
-            N.review: rId,
+            N.review: reviewId,
         }
         for critEntry in criteriaEntries
     ]

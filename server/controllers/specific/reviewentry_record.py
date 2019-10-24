@@ -1,6 +1,6 @@
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import cap1, E
+from controllers.utils import pick as G, cap1, E
 from controllers.record import Record
 
 CW = C.web
@@ -15,10 +15,11 @@ class ReviewEntryR(Record):
     record = self.record
     workflow = self.workflow
 
-    reviewerE = workflow.reviewer[N.expert]
-    reviewerF = workflow.reviewer[N.final]
+    reviewer = G(workflow, N.reviewer)
+    reviewerE = G(reviewer, N.expert)
+    reviewerF = G(reviewer, N.final)
 
-    creatorId = record.get(N.creator, None)
+    creatorId = G(record, N.creator)
     kind = (
         N.expert
         if creatorId == reviewerE else
@@ -48,7 +49,7 @@ class ReviewEntryR(Record):
 
     theTitle = self.title()
     comments = H.div(
-        self.field(N.comments).wrap(withLabel=False, asEdit=perm[N.isEdit]),
+        self.field(N.comments).wrap(withLabel=False, asEdit=G(perm, N.isEdit)),
     )
 
     return H.div(

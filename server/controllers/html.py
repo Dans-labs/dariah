@@ -1,6 +1,6 @@
 from controllers.config import Config as C, Names as N
 from controllers.utils import (
-    cap1, asString, E, AMP, LT, APOS, QUOT, DOLLAR, ONE, MINONE
+    pick as G, cap1, asString, E, AMP, LT, APOS, QUOT, DOLLAR, ONE, MINONE
 )
 
 CW = C.web
@@ -133,15 +133,15 @@ class HtmlElements(object):
 
   @staticmethod
   def icon(icon, asChar=False, **atts):
-    iconChar = ICONS.get(icon, ICONS[N.noicon])
+    iconChar = G(ICONS, icon, default=ICONS[N.noicon])
     if asChar:
-      return ICONS.get(icon, ICONS[N.noicon])
+      return G(ICONS, icon, default=ICONS[N.noicon])
     addClass = f"{N.symbol} i-{icon} "
     return HtmlElement(N.span).wrap(iconChar, addClass=addClass, **atts)
 
   @staticmethod
   def iconx(icon, href=None, **atts):
-    iconChar = ICONS.get(icon, ICONS[N.noicon])
+    iconChar = G(ICONS, icon, default=ICONS[N.noicon])
     addClass = f"{N.icon} i-{icon} "
     return (
         HtmlElement(N.a).wrap(iconChar, addClass=addClass, href=href, **atts)

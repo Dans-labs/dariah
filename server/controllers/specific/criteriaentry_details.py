@@ -1,7 +1,7 @@
 from controllers.config import Names as N
 from controllers.details import Details
 from controllers.html import HtmlElements as H
-from controllers.utils import cap1, E
+from controllers.utils import pick as G, cap1, E
 
 
 class CriteriaEntryD(Details):
@@ -12,13 +12,13 @@ class CriteriaEntryD(Details):
     details = self.details
     workflow = self.workflow
 
-    reviewer = workflow.reviewer
+    reviewer = G(workflow, N.reviewer)
 
     self.fetchDetails(
         N.reviewEntry,
-        sortKey=lambda r: r.get(N.dateCreated, 0),
+        sortKey=lambda r: G(r, N.dateCreated, default=0),
     )
-    (tableObj, records) = details.get(N.reviewEntry, (None, []))
+    (tableObj, records) = G(details, N.reviewEntry, default=(None, []))
     if not tableObj:
       return E
 
@@ -27,7 +27,7 @@ class CriteriaEntryD(Details):
     for dest in (N.expert, N.final):
       byReviewer[dest] = self.wrapDetail(
           N.reviewEntry,
-          filterFunc=lambda r: r.get(N.creator, None) == reviewer[dest],
+          filterFunc=lambda r: G(r, N.creator) == G(reviewer, dest),
           bodyMethod=N.compact,
           expanded=True,
           withProv=False,
@@ -43,7 +43,7 @@ class CriteriaEntryD(Details):
                         cap1(dest),
                         cls="head",
                     ),
-                    byReviewer[dest],
+                    G(byReviewer, dest),
                 ],
                 cls=f"reviewentries {dest}",
             )

@@ -11,7 +11,7 @@ from flask import (
 from pymongo import MongoClient
 
 from controllers.config import Config as C, Names as N
-from controllers.utils import E
+from controllers.utils import pick as G, E
 from controllers.db import Db
 from controllers.workflow import Workflow
 from controllers.auth import Auth
@@ -237,7 +237,9 @@ def factory():
       recordObj = Table(control, dtable).record(eid=eid)
       recordObj.delete()
       workflow = recordObj.workflow
-      contribId = workflow._id
+
+      contribId = G(workflow, N._id)
+
       newUrlPart = N.mylist
       newPath = f"""/{N.contrib}/{newUrlPart}/{contribId}"""
       return redirect(newPath)
@@ -287,7 +289,7 @@ def factory():
     return notFound(path)
 
   def method():
-      method = request.args.get(N.method, None)
+      method = G(request.args, N.method)
       if method not in BODY_METHODS:
         return {}
       return dict(bodyMethod=method)

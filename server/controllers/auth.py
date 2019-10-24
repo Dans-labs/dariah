@@ -2,7 +2,7 @@ import os
 
 from flask import request, session
 from controllers.utils import (
-    serverprint, utf8FromLatin1, shiftRegional, E, BLANK, PIPE, NL, AT, WHYPHEN
+    pick as G, serverprint, utf8FromLatin1, shiftRegional, E, BLANK, PIPE, NL, AT, WHYPHEN
 )
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
@@ -29,9 +29,11 @@ class Auth(object):
 
   def __init__(self, app, db):
     self.db = db
+    environ = os.environ
+    permissionGroupInv = db.permissionGroupInv
 
     # determine production or devel
-    regime = os.environ.get(N.REGIME, None)
+    regime = G(environ, N.REGIME)
     self.isDevel = regime == N.devel
     self.authority = N.local if self.isDevel else N.DARIAH
 
@@ -40,9 +42,9 @@ class Auth(object):
     with open(SECRET_FILE) as fh:
       app.secret_key = fh.read()
 
-    self.authId = db.permissionGroupInv.get(AUTH, None)
+    self.authId = G(permissionGroupInv, AUTH)
     self.authUser = {N.group: self.authId, N.groupRep: AUTH}
-    self.unauthId = db.permissionGroupInv.get(UNAUTH, None)
+    self.unauthId = G(permissionGroupInv, UNAUTH)
     self.unauthUser = {N.group: self.unauthId, N.groupRep: UNAUTH}
     self.user = {}
 
@@ -63,16 +65,16 @@ class Auth(object):
         record
         for record in db.user.values()
         if (
-            record.get(N.authority, None) == authority
+            G(record, N.authority) == authority
             and
             (
-                (eppn is not None and record.get(N.eppn, None) == eppn)
+                (eppn is not None and G(record, N.eppn) == eppn)
                 or
                 (
                     eppn is None and
                     email is not None and
-                    record.get(N.eppn, None) is None and
-                    record.get(N.email, None) == email
+                    G(record, N.eppn) is None and
+                    G(record, N.email) == email
                 )
             )
         )
@@ -86,7 +88,7 @@ class Auth(object):
       user[N.email] = email
     if len(userFound) == 1:
       user.update(userFound[0])
-    if not user.get(N.mayLogin, True):
+    if not G(user, N.mayLogin, default=True):
       # this checks whether mayLogin is explicitly set to False
       self.clearUser()
     else:
@@ -108,7 +110,7 @@ class Auth(object):
       testUsers = {
           record[N.eppn]: record
           for record in db.user.values()
-          if N.eppn in record and record.get(N.authority, None) == N.local
+          if N.eppn in record and G(record, N.authority) == N.local
       }
 
       try:
@@ -134,7 +136,7 @@ class Auth(object):
         eppn = utf8FromLatin1(env[N.eppn])
         email = utf8FromLatin1(env[N.mail])
         self.getUser(eppn, email=email)
-        if user.get(N.group, None) == unauthId:
+        if G(user, N.group) == unauthId:
           # the user us refused because the database says (s)he may not login
           self.clearUser()
           return
@@ -146,7 +148,7 @@ class Auth(object):
         # process the attributes provided by the identity server
         # they may have been changed after the last login
         attributes = {
-            toolKey: utf8FromLatin1(env.get(envKey, E))
+            toolKey: utf8FromLatin1(G(env, envKey, default=E))
             for (envKey, toolKey) in ATTRIBUTES.items()
             if envKey in env
         }
@@ -162,28 +164,29 @@ class Auth(object):
   def identity(self, record):
     db = self.db
     user = self.user
+    country = db.country
 
-    name = record.get(N.name, None) or E
+    name = G(record, N.name) or E
     if not name:
-      firstName = record.get(N.firstName, None) or E
-      lastName = record.get(N.lastName, None) or E
+      firstName = G(record, N.firstName) or E
+      lastName = G(record, N.lastName) or E
       name = (
           firstName +
           (BLANK if firstName and lastName else E) +
           lastName
       )
-    group = user.get(N.groupRep, None) or UNAUTH
+    group = G(user, N.groupRep) or UNAUTH
     isAuth = group != UNAUTH
-    org = record.get(N.org, None) or E
+    org = G(record, N.org) or E
     orgRep = f""" ({org})""" if org else E
-    email = (record.get(N.email, None) or E) if isAuth else E
-    authority = (record.get(N.authority, None) or E) if isAuth else E
+    email = (G(record, N.email) or E) if isAuth else E
+    authority = (G(record, N.authority) or E) if isAuth else E
     authorityRep = f"""{WHYPHEN}{authority}""" if authority else E
-    eppn = (record.get(N.eppn, None) or E) if isAuth else E
+    eppn = (G(record, N.eppn) or E) if isAuth else E
 
-    countryId = record.get(N.country, None)
-    countryInfo = db.country.get(countryId, {})
-    iso = countryInfo.get(N.iso, None) or E
+    countryId = G(record, N.country)
+    countryInfo = G(country, countryId)
+    iso = G(countryInfo, N.iso, default=E)
     flag = shiftRegional(iso) if iso else Qc
     countryShort = iso + flag
 
@@ -203,9 +206,10 @@ class Auth(object):
   def credentials(self):
     db = self.db
     user = self.user
+    permissionGroupDesc = db.permissionGroupDesc
 
-    group = user.get(N.groupRep, None) or UNAUTH
-    groupDesc = db.permissionGroupDesc.get(group, None) or Qg
+    group = G(user, N.groupRep) or UNAUTH
+    groupDesc = G(permissionGroupDesc, group) or Qg
 
     if group == UNAUTH:
       return (N.Guest, groupDesc)
@@ -224,11 +228,11 @@ class Auth(object):
     if login:
       session.pop(N.eppn, None)
       self.checkLogin()
-      if (user.get(N.group, None) or unauthId) != unauthId:
+      if G(user, N.group, default=unauthId) != unauthId:
         # in this case there is an eppn
-        session[N.eppn] = user[N.eppn]
+        session[N.eppn] = G(user, N.eppn)
     else:
-      eppn = session.get(N.eppn, None)
+      eppn = G(session, N.eppn)
       if eppn:
         self.getUser(eppn)
       else:
@@ -257,6 +261,7 @@ class Auth(object):
   def country(self):
     db = self.db
     user = self.user
+    country = db.country
 
-    countryId = user.get(N.country, None)
-    return db.country.get(countryId, {})
+    countryId = G(user, N.country)
+    return G(country, countryId, default={})

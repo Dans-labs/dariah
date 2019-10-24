@@ -62,3 +62,22 @@
 	background-color: var(--step-active-back);
 	border-color: var(--step-active-border);
 }
+.ass-score-box {
+	background-color: var(--score-back);
+	padding: 0.3rem;
+	margin-bottom: 0.3rem;
+	border: 3px solid var(--score-border);
+	border-radius: 0.5rem;
+	display: inline-flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+.ass-score {
+	color: var(--score-fore);
+	font-size: xx-large;
+}
+.ass-score-deriv {
+	color: var(--score-fore);
+	font-size: medium;
+}

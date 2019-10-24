@@ -1,7 +1,7 @@
 import os
 import yaml
 
-from controllers.utils import serverprint, cap1, E, LOW, HYPHEN
+from controllers.utils import pick as G, serverprint, cap1, E, LOW, HYPHEN
 
 CONFIG_EXT = ".yaml"
 CONFIG_DIR = "yaml"
@@ -157,9 +157,9 @@ for table in tables:
   specs.update(PROV_SPECS)
 
   for (field, fieldSpecs) in specs.items():
-    fieldType = fieldSpecs.get(N.type, None)
+    fieldType = G(fieldSpecs, N.type)
     if fieldType and fieldType not in SCALAR_TYPES:
-      cascaded = set(CASCADE.get(fieldType, []))
+      cascaded = set(G(CASCADE, fieldType, default=[]))
       if table in cascaded:
         cascade.setdefault(fieldType, {}).setdefault(table, set()).add(field)
       else:
@@ -173,7 +173,7 @@ constrainedPre = {}
 for table in VALUE_TABLES:
   fieldSpecs = getattr(Tables, table)
   for (field, fieldSpecs) in fieldSpecs.items():
-    tp = fieldSpecs.get(N.type, None)
+    tp = G(fieldSpecs, N.type)
     if tp in VALUE_TABLES and tp == field:
       constrainedPre[table] = field
 
@@ -183,7 +183,7 @@ for table in tables:
   fields = set(fieldSpecs)
   for (ctable, mfield) in constrainedPre.items():
     if ctable in fields and mfield in fields:
-      ctp = fieldSpecs[ctable].get(N.type, None)
+      ctp = G(fieldSpecs[ctable], N.type)
       if ctp == ctable:
         constrained[ctable] = mfield
 

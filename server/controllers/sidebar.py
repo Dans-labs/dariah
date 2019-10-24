@@ -2,7 +2,7 @@ from flask import request
 
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import E, Q, AMP, ZERO
+from controllers.utils import pick as G, E, Q, AMP, ZERO
 from controllers.table import Table
 
 CT = C.tables
@@ -29,7 +29,7 @@ class Sidebar(object):
     self.valueEntries = []
     self.valuePaths = []
     self.options = {
-        option: request.args.get(option, ZERO)
+        option: G(request.args, option, default=ZERO)
         for option in OPTIONS.keys()
     }
 
@@ -88,7 +88,7 @@ class Sidebar(object):
         H.span(
             [
                 H.checkbox(name, trival=value),
-                OPTIONS[name][N.label],
+                G(G(OPTIONS, name), N.label),
             ],
             cls=N.option,
         )
@@ -127,7 +127,7 @@ class Sidebar(object):
         )
 
       if country:
-        iso = country.get(N.iso, None)
+        iso = G(country, N.iso)
         if iso:
           entries.append(
               self.makeEntry(
@@ -187,7 +187,7 @@ class Sidebar(object):
   def wrap(self):
     entries = self.entries
     entries.append(
-        self.makeEntry(HOME[N.text], HOME[N.url])
+        self.makeEntry(G(HOME, N.text), G(HOME, N.url))
     )
 
     for table in SORTED_TABLES:
@@ -197,14 +197,14 @@ class Sidebar(object):
         E.join(self.mainEntries)
         +
         self.makeCaption(
-            CAPTIONS[N.user],
+            G(CAPTIONS, N.user),
             self.userPaths,
             self.userEntries,
             rule=True,
         )
         +
         self.makeCaption(
-            CAPTIONS[N.office],
+            G(CAPTIONS, N.office),
             self.valuePaths,
             self.valueEntries,
             rule=True,

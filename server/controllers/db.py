@@ -3,7 +3,7 @@ from bson.objectid import ObjectId
 
 from controllers.config import Config as C, Names as N
 from controllers.utils import (
-    serverprint, now, filterModified, isIterable,
+    pick as G, serverprint, now, filterModified, isIterable,
     E, ON, ONE, MINONE
 )
 
@@ -49,9 +49,9 @@ class Db(object):
     self.collect()
 
     self.creatorId = [
-        record[N._id]
+        G(record, N._id)
         for record in self.user.values()
-        if record.get(N.eppn, None) == CREATOR
+        if G(record, N.eppn) == CREATOR
     ][0]
 
   def mongoCmd(self, label, table, command, *args):
@@ -87,7 +87,7 @@ class Db(object):
           self,
           valueTable,
           {
-              record[N._id]: record
+              G(record, N._id): record
               for record in valueList
           },
       )
@@ -96,7 +96,7 @@ class Db(object):
             self,
             f"""{valueTable}Inv""",
             {
-                record[N.rep]: record[N._id]
+                G(record, N.rep): G(record, N._id)
                 for record in valueList
             },
         )
@@ -104,7 +104,7 @@ class Db(object):
             self,
             f"""{valueTable}Desc""",
             {
-                record[N.rep]: record[N.description]
+                G(record, N.rep): G(record, N.description)
                 for record in valueList
             },
         )
@@ -123,7 +123,7 @@ class Db(object):
     justNow = now()
 
     packageActual = {
-        record[N._id]
+        G(record, N._id)
         for record in self.mongoCmd(
             N.collectActualItems, N.package, N.find,
             {
@@ -133,34 +133,34 @@ class Db(object):
         )
     }
     for record in self.package.values():
-      record[N.actual] = record[N._id] in packageActual
+      record[N.actual] = G(record, N._id) in packageActual
 
     typeActual = set(chain.from_iterable(
-        record.get(N.typeContribution, None) or []
+        G(record, N.typeContribution) or []
         for (_id, record) in self.package.items()
         if _id in packageActual
     ))
     for record in self.typeContribution.values():
-      record[N.actual] = record[N._id] in typeActual
+      record[N.actual] = G(record, N._id) in typeActual
 
     criteriaActual = {
         _id
         for (_id, record) in self.criteria.items()
-        if record[N.package] in packageActual
+        if G(record, N.package) in packageActual
     }
     for record in self.criteria.values():
-      record[N.actual] = record[N._id] in criteriaActual
+      record[N.actual] = G(record, N._id) in criteriaActual
 
     self.typeCriteria = {}
     for (_id, record) in self.criteria.items():
-      for tp in record.get(N.typeContribution, None) or []:
+      for tp in G(record, N.typeContribution) or []:
         self.typeCriteria.setdefault(tp, set()).add(_id)
 
     serverprint(f"""UPDATED {", ".join(ACTUAL_TABLES)}""")
 
   def makeCrit(self, mainTable, conditions):
     activeOptions = {
-        OPTIONS.get(cond, {}).get(N.table, None): crit == ONE
+        G(G(OPTIONS, cond), N.table): crit == ONE
         for (cond, crit) in conditions.items()
         if crit in {ONE, MINONE}
     }
@@ -170,7 +170,7 @@ class Db(object):
     criterium = {}
     for (table, crit) in activeOptions.items():
       eids = {
-          record[mainTable]
+          G(record, mainTable)
           for record in self.mongoCmd(
               N.makeCrit, table, N.find,
               {mainTable: {M_EX: True}},
@@ -205,15 +205,15 @@ class Db(object):
               (
                   my is None
                   or
-                  record.get(N.creator, None) == my
+                  G(record, N.creator) == my
                   or
-                  my in record.get(N.editors, [])
+                  my in G(record, N.editors, default=[])
               )
               and
               (
                   our is None
                   or
-                  record.get(N.country, None) == our
+                  G(record, N.country) == our
               )
           )
       )
@@ -237,7 +237,7 @@ class Db(object):
     oid = ObjectId(eid)
 
     if table in VALUE_TABLES:
-      return getattr(self, table, {}).get(oid, {})
+      return G(getattr(self, table, {}), oid, default={})
 
     records = list(
         self.mongoCmd(N.getItem, table, N.find, {N._id: oid})
@@ -255,7 +255,7 @@ class Db(object):
       details = [
           record
           for record in getattr(self, table, {}).values()
-          if record.get(masterField, None) in crit
+          if G(record, masterField) in crit
       ]
     else:
       crit = {
@@ -285,13 +285,13 @@ class Db(object):
         (
             r
             for r in records
-            if r.get(N.isMember, None) or False
+            if G(r, N.isMember) or False
         )
         if relTable == N.country else
         (
             r
             for r in records
-            if r.get(constrain[0], None) == constrain[1]
+            if G(r, constrain[0]) == constrain[1]
         )
         if constrain else
         records
@@ -382,7 +382,7 @@ class Db(object):
   def updateUser(self, record):
     if N.isPristine in record:
       del record[N.isPristine]
-    criterion = {N._id: record[N._id]}
+    criterion = {N._id: G(record, N._id)}
     updates = {
         k: v
         for (k, v) in record.items()
@@ -398,13 +398,13 @@ class Db(object):
     self.collect(table=N.user)
 
   def dependencies(self, table, record):
-    eid = record.get(N._id, None)
+    eid = G(record, N._id)
     if eid is None:
       return True
 
     depSpecs = dict(
-        reference=REFERENCE_SPECS.get(table, {}),
-        cascade=CASCADE_SPECS.get(table, {}),
+        reference=G(REFERENCE_SPECS, table, default={}),
+        cascade=G(CASCADE_SPECS, table, default={}),
     )
     depResult = {}
     for (depKind, depSpec) in depSpecs.items():
@@ -440,7 +440,7 @@ class Db(object):
   def entries(self, table, crit={}):
     entries = {}
     for record in list(self.mongoCmd(N.entries, table, N.find, crit, FIELD_PROJ)):
-        entries[record.get(N._id, None)] = record
+        entries[G(record, N._id)] = record
 
     return entries
 
@@ -472,7 +472,7 @@ class Db(object):
 
 
 def satisfies(record, criterium):
-  eid = record.get(N._id, None)
+  eid = G(record, N._id)
   for (crit, eids) in criterium.items():
     if (
         crit and eid not in eids

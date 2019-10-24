@@ -1,5 +1,5 @@
 from controllers.config import Config as C, Names as N
-from controllers.utils import E
+from controllers.utils import pick as G, E
 from controllers.html import HtmlElements as H
 
 CT = C.tables
@@ -45,7 +45,7 @@ class Details(object):
   def wrap(self, readonly=False):
     table = self.table
 
-    for dtable in DETAILS.get(table, []):
+    for dtable in G(DETAILS, table, default=[]):
       self.fetchDetails(dtable)
 
     return self.wrapAll(readonly=readonly)
@@ -61,11 +61,12 @@ class Details(object):
       readonly=False,
       withProv=True,
       withN=True,
+      withDetails=False,
       extraMsg=None, extraCls=None,
   ):
     details = self.details
 
-    (dtableObj, drecordsAll) = details.get(dtable, (None, []))
+    (dtableObj, drecordsAll) = G(details, dtable, default=(None, []))
     if not dtableObj:
       return E
 
@@ -88,6 +89,7 @@ class Details(object):
         dtableObj.record(
             record=drecord, readonly=readonly,
             bodyMethod=bodyMethod,
+            withDetails=withDetails,
         ).wrap(
             inner=inner,
             wrapMethod=wrapMethod,

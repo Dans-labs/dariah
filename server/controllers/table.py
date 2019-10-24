@@ -5,7 +5,7 @@ from flask import request
 from controllers.config import Config as C, Names as N
 from controllers.perm import UNAUTH
 from controllers.html import HtmlElements as H
-from controllers.utils import E, ELLIPS, NBSP, ONE
+from controllers.utils import pick as G, E, ELLIPS, NBSP, ONE
 
 from controllers.record import Record
 from controllers.specific.assessment_record import AssessmentR
@@ -50,14 +50,14 @@ class Table(object):
     self.isUserTable = table in USER_TABLES
     self.isUserEntryTable = table in USER_ENTRY_TABLES
     self.isValueTable = table in VALUE_TABLES
-    self.itemLabels = ITEMS.get(table, [table, f"""{table}s"""])
+    self.itemLabels = G(ITEMS, table, default=[table, f"""{table}s"""])
     self.prov = PROV_SPECS
     self.fields = getattr(CT, table, {})
 
-    self.uid = user.get(N._id, None)
-    self.eppn = user.get(N.eppn, None)
-    self.group = user.get(N.groupRep, None) or UNAUTH
-    self.countryId = user.get(N.country, None)
+    self.uid = G(user, N._id)
+    self.eppn = G(user, N.eppn)
+    self.group = G(user, N.groupRep) or UNAUTH
+    self.countryId = G(user, N.country)
 
     isUserTable = self.isUserTable
     isUserEntryTable = self.isUserEntryTable
@@ -171,11 +171,11 @@ class Table(object):
                 H.details(
                     self.title(record),
                     H.div(ELLIPS),
-                    f"""{table}/{record[N._id]}""",
-                    fetchurl=f"""/api/{table}/{N.item}/{record[N._id]}""",
+                    f"""{table}/{G(record, N._id)}""",
+                    fetchurl=f"""/api/{table}/{N.item}/{G(record, N._id)}""",
                     urltitle=E,
                     urlextra=E,
-                    **forceOpen(record[N._id], openEid),
+                    **forceOpen(G(record, N._id), openEid),
                 )
                 for record in records
             ),

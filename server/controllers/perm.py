@@ -1,4 +1,5 @@
 from controllers.config import Config as C, Names as N
+from controllers.utils import pick as G
 
 CT = C.tables
 CP = C.perm
@@ -25,7 +26,7 @@ def checkPerm(
   if require == UNAUTH:
     return True
 
-  group = perm[N.group]
+  group = G(perm, N.group)
 
   if require == NOBODY:
     return False
@@ -45,57 +46,57 @@ def checkPerm(
     return group == ROOT
 
   if require == EDIT:
-    return group != UNAUTH and (perm[N.isEdit] or isSuper)
+    return group != UNAUTH and (G(perm, N.isEdit) or isSuper)
 
   if require == OWN:
-    return group != UNAUTH and (perm[N.isOwn] or isSuper)
+    return group != UNAUTH and (G(perm, N.isOwn) or isSuper)
 
   if require == COORD:
     return (
-        group == COORD and perm[N.sameCountry]
+        group == COORD and G(perm, N.sameCountry)
         or
         isSuper
     )
 
 
 def authenticated(user):
-  group = user.get(N.groupRep, None) or UNAUTH
+  group = G(user, N.groupRep) or UNAUTH
   return group != UNAUTH
 
 
 def coordinator(user):
-  group = user.get(N.groupRep, None) or UNAUTH
+  group = G(user, N.groupRep) or UNAUTH
   return group == COORD
 
   return group in {OFFICE, SYSTEM, ROOT}
 
 
 def superuser(user):
-  group = user.get(N.groupRep, None) or UNAUTH
+  group = G(user, N.groupRep) or UNAUTH
   return group in {OFFICE, SYSTEM, ROOT}
 
 
 def sysadmin(user):
-  group = user.get(N.groupRep, None) or UNAUTH
+  group = G(user, N.groupRep) or UNAUTH
   return group in {SYSTEM, ROOT}
 
 
 def getPerms(table, perm, require):
   mayRead = None
   if table in ALLOW_OUR:
-    mayRead = perm[N.isOur] or None
+    mayRead = G(perm, N.isOur) or None
   if mayRead is None:
     readRequire = (
-        DEFAULT_PERM[N.read]
+        G(DEFAULT_PERM, N.read)
         if require is None or N.read not in require else
-        require[N.read]
+        G(require, N.read)
     )
     mayRead = checkPerm(readRequire, perm)
 
   editRequire = (
-      DEFAULT_PERM[N.edit]
+      G(DEFAULT_PERM, N.edit)
       if require is None or N.edit not in require else
-      require[N.edit]
+      G(require, N.edit)
   )
   mayEdit = checkPerm(editRequire, perm)
   return (mayRead, mayEdit)
@@ -104,9 +105,9 @@ def getPerms(table, perm, require):
 def permRecord(control, table, record):
   auth = control.auth
   user = auth.user
-  uid = user.get(N._id, None)
-  group = user.get(N.groupRep, None) or UNAUTH
-  uCountry = user.get(N.country, None)
+  uid = G(user, N._id)
+  group = G(user, N.groupRep) or UNAUTH
+  uCountry = G(user, N.country)
 
   cRecord = {}
   aRecord = {}
@@ -115,17 +116,17 @@ def permRecord(control, table, record):
     cRecord = record
   elif table == N.assessment:
     aRecord = record
-    cId = record.get(N.contrib, None)
-    cRecord = control.getItem(N.contrib, cId)
+    contribId = G(record, N.contrib)
+    cRecord = control.getItem(N.contrib, contribId)
   elif table in {N.review, N.criteriaEntry, N.reviewEntry}:
-    aId = record.get(N.assessment, None)
-    aRecord = control.getItem(N.assessment, aId)
-    cId = aRecord.get(N.contrib, None)
-    cRecord = control.getItem(N.contrib, cId)
+    assessmentId = G(record, N.assessment)
+    aRecord = control.getItem(N.assessment, assessmentId)
+    contribId = G(aRecord, N.contrib)
+    cRecord = control.getItem(N.contrib, contribId)
 
-  refCountry = cRecord.get(N.country, None)
-  reviewerE = aRecord.get(N.reviewerE, None)
-  reviewerF = aRecord.get(N.reviewerF, None)
+  refCountry = G(cRecord, N.country)
+  reviewerE = G(aRecord, N.reviewerE)
+  reviewerF = G(aRecord, N.reviewerF)
   reviewers = {reviewerE, reviewerF} - {None}
 
   sameCountry = (
@@ -134,8 +135,8 @@ def permRecord(control, table, record):
       refCountry == uCountry
   )
   isAuth = group != UNAUTH and uid is not None
-  isCreator = uid == record.get(N.creator, None)
-  isEditor = uid in (record.get(N.editors, None) or set())
+  isCreator = uid == G(record, N.creator)
+  isEditor = uid in (G(record, N.editors) or set())
   isCoordinated = isAuth and sameCountry and group == COORD
 
   isOur = isCoordinated or isCreator or isEditor or uid in reviewers
@@ -148,5 +149,5 @@ def permRecord(control, table, record):
       N.sameCountry: sameCountry,
       N.isCoordinated: isCoordinated,
       N.isOur: isOur,
-      N.contribId: cRecord.get(N._id, None),
+      N.contribId: G(cRecord, N._id),
   }

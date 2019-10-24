@@ -1,7 +1,7 @@
 from controllers.config import Config as C, Names as N
 from controllers.record import Record
 from controllers.html import HtmlElements as H
-from controllers.utils import cap1, E
+from controllers.utils import pick as G, getLast, cap1, E
 
 
 CW = C.web
@@ -13,15 +13,39 @@ class ReviewR(Record):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-    record = self.record
     workflow = self.workflow
+    record = self.record
+    eid = self.eid
 
-    contribType = workflow.contribType
-    assessmentType = workflow.assessmentType
-    reviewerE = workflow.reviewer[N.expert]
-    reviewerF = workflow.reviewer[N.final]
+    assessmentId = G(record, N.assessment)
 
-    reviewType = record.get(N.reviewType, None)
+    assessment = getLast([
+        rec
+        for rec in G(workflow, N.assessments, default=[])
+        if G(rec, N._id) == assessmentId
+    ])
+    reviews = G(assessment, N.reviews)
+    reviewE = getLast([
+        rec
+        for rec in G(reviews, N.expert, default=[])
+        if G(rec, N._id) == eid
+    ])
+    reviewF = getLast([
+        rec
+        for rec in G(reviews, N.final, default=[])
+        if G(rec, N._id) == eid
+    ])
+    review = reviewE or reviewF
+
+    contribType = G(workflow, N.type)
+    assessmentType = G(assessment, N.type)
+    reviewType = G(review, N.type)
+
+    reviewer = G(assessment, N.reviewer)
+    reviewerE = G(reviewer, N.expert)
+    reviewerF = G(reviewer, N.final)
+
+    reviewType = G(record, N.reviewType)
     goodType = (
         assessmentType == contribType
         and
@@ -29,7 +53,7 @@ class ReviewR(Record):
     )
     cls = E if goodType else " warning"
 
-    creatorId = record.get(N.creator, None)
+    creatorId = G(record, N.creator)
 
     kind = cap1(
         N.expert
@@ -41,26 +65,25 @@ class ReviewR(Record):
     self.kind = kind
     self.creatorId = creatorId
     self.cls = cls
-    self.reviewType = reviewType
     self.goodType = goodType
 
   def title(self):
     kind = self.kind
     cls = self.cls
-    reviewType = self.reviewType
     goodType = self.goodType
 
     datetime = self.field(N.dateCreated).wrapBare()
     date = datetime.split(maxsplit=1)[0]
     creator = self.field(N.creator).wrapBare()
-    rTypeRep = (
+    reviewType = self.field(N.reviewType).wrapBare()
+    reviewTypeRep = (
         E
         if goodType else
-        " as " + reviewType.wrapBare()
+        " as " + reviewType
     )
 
     return H.span(
-        f"""{kind} on {date} as {rTypeRep} by {creator}""",
+        f"""{kind} on {date}{reviewTypeRep} by {creator}""",
         cls=f"small{cls}",
     )
 
@@ -71,25 +94,19 @@ class ReviewR(Record):
 
     remarks = H.div(
         self.field(N.remarks).wrap(
-            withLabel=False, asEdit=perm[N.isEdit],
+            withLabel=False, asEdit=G(perm, N.isEdit),
         ),
     )
-    decision = H.div(
+    decisionPart = H.div(
         self.field(N.decision).wrap(
-            withLabel=False, asEdit=perm[N.isEdit],
-        ),
-    )
-    dateDecided = H.div(
-        self.field(N.dateDecided).wrap(
-            withLabel=False,
-        ),
+            withLabel=False, asEdit=G(perm, N.isEdit),
+        )
     )
 
     return H.div(
         [
+            decisionPart,
             theTitle,
-            decision,
-            dateDecided,
             remarks,
         ],
         cls=f"review"

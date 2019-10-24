@@ -1,8 +1,8 @@
 from bson.objectid import ObjectId
 
 from controllers.config import Names as N
+from controllers.utils import pick as G
 from controllers.table import Table
-from controllers.workflow import WorkflowItem
 
 
 class AssessmentT(Table):
@@ -22,24 +22,26 @@ class AssessmentT(Table):
     uid = self.uid
     eppn = self.eppn
     table = self.table
+    typeCriteria = db.typeCriteria
 
     masterOid = ObjectId(masterId)
-    workflow = WorkflowItem(control, masterOid)
-    contribType = workflow.contribType
+    workflow = control.getWorkflowItem(masterOid)
+    contribType = G(workflow, N.type)
+    contribTitle = G(workflow, N.title)
 
     fields = {
         masterTable: masterOid,
         N.assessmentType: contribType,
-        N.title: f"assessment of {workflow.contribTitle}",
+        N.title: f"assessment of {contribTitle}",
     }
-    aId = db.insertItem(table, uid, eppn, **fields)
+    assessmentId = db.insertItem(table, uid, eppn, **fields)
 
-    criteria = db.typeCriteria.get(contribType, [])
+    criteria = G(typeCriteria, contribType, default=[])
     records = [
         {
             N.seq: seq,
             N.criteria: crit,
-            N.assessment: aId,
+            N.assessment: assessmentId,
         }
         for (seq, crit) in enumerate(criteria)
     ]

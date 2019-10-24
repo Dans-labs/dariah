@@ -1,7 +1,6 @@
 from controllers.config import Config as C, Names as N
 from controllers.perm import permRecord
-from controllers.workflow import WorkflowItem
-from controllers.utils import cap1, E, ELLIPS, ONE, S
+from controllers.utils import pick as G, cap1, E, ELLIPS, ONE, S
 from controllers.html import HtmlElements as H
 from controllers.field import Field
 
@@ -71,7 +70,7 @@ class Record(object):
     if record is None:
       record = control.getItem(table, eid)
     self.record = record
-    self.eid = record.get(N._id, None)
+    self.eid = G(record, N._id)
 
     self.setPerm()
     self.setWorkflow()
@@ -98,7 +97,7 @@ class Record(object):
         (
             isSuperuser
             or
-            isUserTable and perm[N.isEdit]
+            isUserTable and G(perm, N.isEdit)
         )
     )
 
@@ -144,22 +143,22 @@ class Record(object):
     control = self.control
     perm = self.perm
 
-    contribId = perm.get(N.contribId, None)
+    contribId = G(perm, N.contribId)
 
-    self.workflow = WorkflowItem(control, contribId)
+    self.workflow = control.getWorkflowItem(contribId)
 
   def adjustWorkflow(self, update=True, delete=False):
     control = self.control
     wf = control.wf
     perm = self.perm
 
-    contribId = perm.get(N.contribId, None)
+    contribId = G(perm, N.contribId)
     if delete:
       wf.delete(contribId)
     else:
       wf.recompute(contribId)
       if update:
-        self.workflow = WorkflowItem(control, contribId, requireFresh=True)
+        self.workflow = control.getWorkflowItem(contribId, requireFresh=True)
 
   def field(self, fieldName, **kwargs):
     return Field(self, fieldName, **kwargs)
@@ -170,12 +169,12 @@ class Record(object):
       return
 
     dependencies = self.getDependencies()
-    nRef = dependencies.get(N.reference, 0)
+    nRef = G(dependencies, N.reference, default=0)
 
     if nRef:
       return
 
-    nCas = dependencies.get(N.cascade, 0)
+    nCas = G(dependencies, N.cascade, default=0)
     if nCas:
       if not self.deleteDetails():
         return
@@ -197,10 +196,10 @@ class Record(object):
     table = self.table
     eid = self.eid
 
-    for dtable in CASCADE_SPECS.get(table, []):
+    for dtable in G(CASCADE_SPECS, table, default=[]):
       db.delMany(dtable, {table: eid})
     dependencies = self.getDependencies()
-    nRef = dependencies.get(N.reference, 0)
+    nRef = G(dependencies, N.reference, default=0)
     return nRef == 0
 
   def body(self, myMasters=None, hideMasters=False):
@@ -217,22 +216,6 @@ class Record(object):
     )
 
   def wrap(
-      self,
-      inner=True,
-      wrapMethod=None,
-      expanded=1,
-      withProv=True,
-      hideMasters=False,
-  ):
-    return self.wrapHelper(
-        inner=inner,
-        wrapMethod=wrapMethod,
-        expanded=expanded,
-        withProv=withProv,
-        hideMasters=hideMasters,
-    )
-
-  def wrapHelper(
       self,
       inner=True,
       wrapMethod=None,
@@ -256,7 +239,7 @@ class Record(object):
     urlExtra = f"""?method={bodyMethod}""" if bodyMethod else E
     fetchUrl = f"""/api/{table}/{N.item}/{eid}"""
 
-    itemKey = f"""{table}/{record[N._id]}"""
+    itemKey = f"""{table}/{G(record, N._id)}"""
     theTitle = self.title()
 
     if expanded == -1:
@@ -274,7 +257,7 @@ class Record(object):
         if bodyMethod else
         self.body
     )
-    myMasters = MASTERS.get(table, [])
+    myMasters = G(MASTERS, table, default=[])
 
     deleteButton = self.deleteButton()
 
@@ -291,7 +274,7 @@ class Record(object):
                     ],
                     cls="prov"
                 ),
-                f"""{table}/{record[N._id]}/{N.prov}""",
+                f"""{table}/{G(record, N._id)}/{N.prov}""",
                 openAtts=dict(
                     cls="button small",
                     title="Provenance and editors of this record",
@@ -357,7 +340,7 @@ class Record(object):
 
     dependencies = self.getDependencies()
 
-    nCas = dependencies.get(N.cascade, 0)
+    nCas = G(dependencies, N.cascade, default=0)
     cascadeMsg = (
         H.span(
             f"""{nCas} detail record{E if nCas == 1 else S}""",
@@ -368,7 +351,7 @@ class Record(object):
         E
     )
 
-    nRef = dependencies.get(N.reference, 0)
+    nRef = G(dependencies, N.reference, default=0)
 
     if nRef:
       plural = E if nRef == 1 else S
@@ -388,16 +371,16 @@ class Record(object):
       )
 
     if table in TO_MASTER:
-      masterTable = TO_MASTER[table]
-      masterId = record.get(masterTable, None)
+      masterTable = G(TO_MASTER, table)
+      masterId = G(record, masterTable)
     else:
       masterTable = None
       masterId = None
 
     url = (
-        f"""/api/{table}/{N.delete}/{record[N._id]}"""
+        f"""/api/{table}/{N.delete}/{G(record, N._id)}"""
         if masterTable is None or masterId is None else
-        f"""/api/{masterTable}/{masterId}/{table}/{N.delete}/{record[N._id]}"""
+        f"""/api/{masterTable}/{masterId}/{table}/{N.delete}/{G(record, N._id)}"""
     )
     return H.span(
         [
@@ -423,7 +406,7 @@ class Record(object):
     types = control.types
     typesObj = getattr(types, table)
 
-    isActual = table not in ACTUAL_TABLES or record.get(N.actual, False)
+    isActual = table not in ACTUAL_TABLES or G(record, N.actual, default=False)
     atts = {} if isActual else dict(cls="inactual")
 
     return H.span(typesObj.title(record=record), **atts)

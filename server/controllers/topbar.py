@@ -1,6 +1,6 @@
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import E
+from controllers.utils import pick as G, E
 
 CW = C.web
 
@@ -25,23 +25,23 @@ class Topbar(object):
         E
         if auth.authenticated() else
         H.a(
-            LOGIN[N.text],
-            LOGIN[N.url],
+            G(LOGIN, N.text),
+            G(LOGIN, N.url),
             cls="button small loginout"
         )
     )
     logout = (
         [
             H.a(
-                LOGOUT[N.text],
-                LOGOUT[N.url],
+                G(LOGOUT, N.text),
+                G(LOGOUT, N.url),
                 cls="button small loginout"
             ),
             H.a(
-                SLOGOUT[N.text],
-                SLOGOUT[N.url],
+                G(SLOGOUT, N.text),
+                G(SLOGOUT, N.url),
                 cls="button small loginout",
-                title=SLOGOUT[N.title],
+                title=G(SLOGOUT, N.title),
             ),
         ]
         if auth.authenticated() else
@@ -60,11 +60,11 @@ class Topbar(object):
             login,
             *logout,
             H.img(
-                LOGO[N.src],
-                href=LOGO[N.url],
+                G(LOGO, N.src),
+                href=G(LOGO, N.url),
                 target=N._blank,
-                title=LOGO[N.text],
-                imgAtts=dict(height=LOGO[N.height]),
+                title=G(LOGO, N.text),
+                imgAtts=dict(height=G(LOGO, N.height)),
                 id="logo",
             )
         ],

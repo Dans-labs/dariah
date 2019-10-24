@@ -7,7 +7,7 @@ from bson.objectid import ObjectId
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H, htmlEscape as he
 from controllers.utils import (
-    serverprint, bencode, now, cap1, shiftRegional,
+    pick as G, serverprint, bencode, now, cap1, shiftRegional,
     E, DOT, MIN, EURO, WHYPHEN, NBSP,
 )
 
@@ -342,11 +342,11 @@ class Bool(TypeBase):
     return editVal
 
   def toDisplay(self, val):
-    values = BOOLEAN_TYPES[self.name]
+    values = G(BOOLEAN_TYPES, self.name)
     noneValue = False if len(values) == 2 else None
 
     return H.icon(
-        values.get(val, values[noneValue]),
+        G(values, val, default=G(values, noneValue)),
         cls="medium",
     )
 
@@ -357,9 +357,9 @@ class Bool(TypeBase):
     return val
 
   def widget(self, val):
-    values = BOOLEAN_TYPES[self.name]
+    values = G(BOOLEAN_TYPES, self.name)
     noneValue = False if len(values) == 2 else None
-    refV = values.get(val, values[noneValue])
+    refV = G(values, val, default=G(values, noneValue))
 
     return H.div(
         [
@@ -403,7 +403,7 @@ class Related(TypeBase):
     return self.title(eid=val, markup=True)[1]
 
   def titleStr(self, record):
-    return he(record.get(N.title, None)) or he(record.get(N.rep, None)) or Qq
+    return he(G(record, N.title)) or he(G(record, N.rep)) or Qq
 
   def titleHint(self, record):
     return None
@@ -428,7 +428,7 @@ class Related(TypeBase):
     if markup:
 
       if eid is None:
-        eid = record.get(N._id, None)
+        eid = G(record, N._id)
 
       atts = dict(cls=f"tag medium {self.actualCls(record)}")
       if titleHint:
@@ -443,7 +443,7 @@ class Related(TypeBase):
   def actualCls(self, record):
     table = self.name
 
-    isActual = table not in ACTUAL_TABLES or record.get(N.actual, False)
+    isActual = table not in ACTUAL_TABLES or G(record, N.actual, default=False)
     return E if isActual else "inactual"
 
 
@@ -462,8 +462,8 @@ class CriteriaEntry(Master):
     control = self.control
     types = control.types
 
-    seq = he(record.get(N.seq, None)) or Qn
-    eid = record.get(N.criteria, None)
+    seq = he(G(record, N.seq)) or Qn
+    eid = G(record, N.criteria)
     title = (
         Qq
         if eid is None else
@@ -480,8 +480,8 @@ class ReviewEntry(Master):
     control = self.control
     types = control.types
 
-    seq = he(record.get(N.seq, None)) or Qn
-    eid = record.get(N.criteria, None)
+    seq = he(G(record, N.seq)) or Qn
+    eid = G(record, N.criteria)
     title = (
         Qq
         if eid is None else
@@ -527,7 +527,7 @@ class Value(Related):
             H.input(
                 E,
                 type=N.text,
-                placeholder=MESSAGES.get(N.filter, E),
+                placeholder=G(MESSAGES, N.filter, default=E),
                 cls="wfilter",
             ),
             H.iconx(
@@ -588,7 +588,7 @@ class Value(Related):
 
     if markup:
       if eid is None:
-        eid = record.get(N._id, None)
+        eid = G(record, N._id)
 
       isActive = (
           eid in (active or [])
@@ -650,11 +650,11 @@ class Country(Value):
     super().__init__(control)
 
   def titleStr(self, record):
-    iso = he(record.get(N.iso, None))
+    iso = he(G(record, N.iso))
     return iso + shiftRegional(iso) if iso else Qc
 
   def titleHint(self, record):
-    return record.get(N.name, None) or Qc
+    return G(record, N.name) or Qc
 
 
 class TypeContribution(Value):
@@ -662,13 +662,13 @@ class TypeContribution(Value):
     super().__init__(control)
 
   def titleStr(self, record):
-    mainType = record.get(N.mainType, None) or E
-    subType = record.get(N.subType, None) or E
+    mainType = G(record, N.mainType) or E
+    subType = G(record, N.subType) or E
     sep = WHYPHEN if mainType and subType else E
     return he(f"""{mainType}{sep}{subType}""")
 
   def titleHint(self, record):
-    return E.join(record.get(N.explanation, None) or [])
+    return E.join(G(record, N.explanation) or [])
 
 
 class Criteria(Value):
@@ -676,7 +676,7 @@ class Criteria(Value):
     super().__init__(control)
 
   def titleStr(self, record):
-    return he(record.get(N.criterion, None)) or Qq
+    return he(G(record, N.criterion)) or Qq
 
 
 class Score(Value):
@@ -684,12 +684,66 @@ class Score(Value):
     super().__init__(control)
 
   def titleStr(self, record):
-    score = record.get(N.score, None)
+    score = G(record, N.score)
     if score is None:
       return Qq
     score = he(score)
-    level = he(record.get(N.level, None)) or Qq
+    level = he(G(record, N.level)) or Qq
     return f"""{score} - {level}"""
+
+
+class Decision(Value):
+  def __init__(self, control):
+    super().__init__(control)
+
+  def titleStr(self, record):
+    decision = G(record, N.participle)
+    if decision is None:
+      return Qq
+    sign = G(record, N.sign)
+    decision = f"""{sign}{NBSP}{decision}"""
+    return decision
+
+  def title(
+      self,
+      eid=None, record=None,
+      markup=False, clickable=False, active=None,
+      multiple=False,
+  ):
+    if record is None and eid is None:
+      return (QQ, QQ) if markup else Qq
+
+    if record is None:
+      control = self.control
+      table = self.name
+      record = control.getItem(table, eid)
+
+    titleStr = self.titleStr(record)
+    titleHint = self.titleHint(record)
+
+    if markup:
+      if eid is None:
+        eid = G(record, N._id)
+
+      isActive = eid == active
+      baseCls = "step" if clickable else "status"
+      activeCls = "active " if isActive else E
+      extraCls = G(record, N.acro)
+      atts = dict(cls=f"{baseCls} {extraCls} {activeCls} large {self.actualCls(record)}")
+      if clickable and eid is not None:
+        atts[N.eid] = str(eid)
+
+      if titleHint:
+        atts[N.title] = titleHint
+
+      titleFormatted = H.span(
+          titleStr,
+          lab=titleStr.lower(),
+          **atts,
+      )
+      return (titleStr, titleFormatted)
+    else:
+      return titleStr
 
 
 class Types(object):
@@ -743,7 +797,7 @@ class Types(object):
 
   @staticmethod
   def validationMsg(tp):
-    return MESSAGES.get(tp, None)
+    return G(MESSAGES, tp)
 
   def defineAll(self):
     done = set()
@@ -765,7 +819,7 @@ class Types(object):
       done.add(tp)
 
       typeName = cap1(tp)
-      TypeClass = globals().get(typeName, None)
+      TypeClass = G(globals(), typeName)
       if not TypeClass:
         self.make(tp, Base=Value if tp in VALUE_TABLES else Master)
       else:

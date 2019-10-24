@@ -1,7 +1,7 @@
 from controllers.config import Names as N
 from controllers.record import Record
 from controllers.html import HtmlElements as H
-from controllers.utils import E
+from controllers.utils import pick as G, E
 
 
 class AssessmentR(Record):
@@ -13,12 +13,12 @@ class AssessmentR(Record):
 
     workflow = self.workflow
 
-    contribType = workflow.contribType
-    assessmentType = record.get(N.assessmentType, None)
+    contribType = G(workflow, N.type)
+    assessmentType = G(record, N.assessmentType)
 
     goodType = assessmentType == contribType
     cls = E if goodType else " warning"
-    aTypeRep = (
+    assessmentTypeRep = (
         E
         if goodType else
         " as " + self.field(N.assessmentType).wrapBare()
@@ -28,6 +28,6 @@ class AssessmentR(Record):
     date = datetime.split(maxsplit=1)[0]
     creator = self.field(N.creator).wrapBare()
     return H.span(
-        f"""on {date}{aTypeRep} by {creator}""",
+        f"""on {date}{assessmentTypeRep} by {creator}""",
         cls=f"small{cls}",
     )
