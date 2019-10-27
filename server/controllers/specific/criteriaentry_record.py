@@ -2,6 +2,7 @@ from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H, htmlEscape as he
 from controllers.utils import pick as G, E, DOT, Q, NBSP
 from controllers.record import Record
+from controllers.workflow import getWf
 
 CW = C.web
 
@@ -15,12 +16,11 @@ class CriteriaEntryR(Record):
     Table = self.Table
     control = self.control
     record = self.record
+    eid = self.eid
     workflow = self.workflow
 
-    contribType = G(workflow, N.type)
-    assessmentType = G(workflow, N.assessmentType)
-
-    goodType = assessmentType == contribType
+    thisWf = getWf(workflow, N.assessment, eid=eid)
+    goodType = G(thisWf, N.goodType)
     cls = E if goodType else "warning"
 
     critObj = Table(control, N.criteria)

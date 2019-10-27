@@ -160,17 +160,35 @@ value:
 workflow:
   - assessments
   - assessmentId
+  - assessmentStatus
   - assessmentTitle
   - assessmentType
+  - assessmentValid
+  - code
   - complete
   - contribId
   - contribTitle
+  - frozen
+  - goodType
+  - hasValid
+  - kind
   - reviewEId
   - reviewFId
   - reviewTitle
+  - reviewValid
   - reviewer
   - reviews
+  - reviewsValid
+  - status
   - type
+  - valid
+  - validRel
+
+frozenReasons:
+  - Contribution and assessment open for editing
+  - Contribution and assessment frozen
+  - Contribution, assessments and reviews frozen
+  - Contribution, assessments and reviews permanently frozen
 
 decisions:
   - Accept

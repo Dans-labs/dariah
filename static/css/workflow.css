@@ -81,3 +81,13 @@
 	color: var(--score-fore);
 	font-size: medium;
 }
+.frozen1 {
+  border: 2px solid var(--frozen-border);
+}
+.frozen2 {
+  border: 4px solid var(--frozen-border);
+}
+.frozen3 {
+  background-color: var(--frozen-back);
+  border: 4px solid var(--frozen-border);
+}

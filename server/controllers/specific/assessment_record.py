@@ -2,6 +2,7 @@ from controllers.config import Names as N
 from controllers.record import Record
 from controllers.html import HtmlElements as H
 from controllers.utils import pick as G, E
+from controllers.workflow import getWf
 
 
 class AssessmentR(Record):
@@ -9,14 +10,12 @@ class AssessmentR(Record):
     super().__init__(*args, **kwargs)
 
   def title(self):
-    record = self.record
-
     workflow = self.workflow
+    eid = self.eid
 
-    contribType = G(workflow, N.type)
-    assessmentType = G(record, N.assessmentType)
+    thisWf = getWf(workflow, N.assessment, eid=eid)
+    goodType = G(thisWf, N.goodType)
 
-    goodType = assessmentType == contribType
     cls = E if goodType else " warning"
     assessmentTypeRep = (
         E

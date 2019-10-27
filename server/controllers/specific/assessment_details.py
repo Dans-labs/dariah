@@ -1,7 +1,8 @@
 from controllers.config import Config as C, Names as N
 from controllers.details import Details
 from controllers.html import HtmlElements as H
-from controllers.utils import pick as G, getLast, cap1, E
+from controllers.utils import pick as G, cap1, E
+from controllers.workflow import wfStatus, getWf
 
 
 CT = C.tables
@@ -15,35 +16,15 @@ class AssessmentD(Details):
     super().__init__(recordObj)
 
   def wrap(self):
+    uid = self.uid
     eid = self.eid
     table = self.table
     workflow = self.workflow
 
-    defAssessmentId = G(workflow, N.assessmentId)
-    defPart = (
-        E
-        if defAssessmentId is None else
-        H.span(
-            "This is the authoritative assessment",
-            cls="large status good",
-        )
-        if defAssessmentId == eid else
-        H.span(
-            "This assessment is not authoritative",
-            cls="large status error",
-        )
-    )
+    thisWf = getWf(workflow, N.assessment, eid=eid)
 
-    assessment = getLast([
-        rec
-        for rec in G(workflow, N.assessments, default=[])
-        if G(rec, N._id) == eid
-    ])
-
-    reviewers = G(assessment, N.reviewers, default=set())
-    reviewer = G(assessment, N.reviewer)
-    complete = G(assessment, N.complete)
-    score = G(assessment, N.score)
+    reviewers = G(thisWf, N.reviewers, default=set())
+    reviewer = G(thisWf, N.reviewer)
 
     self.fetchDetails(N.criteriaEntry, sortKey=cEntrySort)
 
@@ -76,72 +57,6 @@ class AssessmentD(Details):
         filterFunc=lambda r: G(r, N.creator) not in reviewers,
         withProv=True,
     )
-
-    overall = G(score, N.overall, default=0)
-    relevantScore = G(score, N.relevantScore, default=0)
-    relevantMax = G(score, N.relevantMax, default=0)
-    relevantN = G(score, N.relevantN, default=0)
-    allMax = G(score, N.allMax, default=0)
-    allN = G(score, N.allN, default=0)
-    irrelevantN = allN - relevantN
-
-    fullScore = H.span(
-        f"Score {overall}%",
-        title="overall score of this assessment",
-        cls="ass-score",
-    )
-    scoreMaterial = H.div(
-        [
-            H.div(
-                [
-                    H.p(f"""This assessment scores {relevantScore} points."""),
-                    H.p(
-                        f"""For this type of contribution there is a total of
-                            {allMax} points, divided over {allN} criteria.
-                        """
-                    ),
-                    (
-                        H.p(
-                            f"""However,
-                                {irrelevantN}
-                                rule{" is " if irrelevantN == 1 else "s are"}
-                                not applicable to this contribution,
-                                which leaves the total amount to
-                                {relevantMax} points,
-                                divided over {relevantN} criteria.
-                            """
-                        )
-                        if irrelevantN else
-                        E
-                    ),
-                    H.p(
-                        f"""The total score is expressed as a percentage:
-                            the fraction of {relevantScore} scored points
-                            with respect to {relevantMax} scorable points:
-                            {overall}%.
-                        """
-                    )
-                ],
-                cls="ass-score-deriv",
-            ),
-        ],
-        cls="ass-score-box",
-    )
-
-    scoreWidget = H.detailx(
-        (N.calc, N.dismiss),
-        scoreMaterial,
-        f"""{table}/{eid}/scorebox""",
-        openAtts=dict(
-            cls="button small",
-            title="Show derivation",
-        ),
-        closeAtts=dict(
-            cls="button small",
-            title="Hide derivation",
-        ),
-    )
-    scorePart = (fullScore, *scoreWidget)
 
     reviewPart = (
         H.div(
@@ -176,35 +91,35 @@ class AssessmentD(Details):
         )
     )
 
-    itemKey = f"""{table}/{eid}"""
-    rButton = H.iconr(itemKey, "#workflow", msg=N.status)
+    (frozen, hasValid, statusRep) = wfStatus(workflow, N.assessment, eid)
 
-    newPart = H.a(
-        "New review",
-        f"""/api/{table}/{eid}/{N.review}/{N.insert}""",
-        title=f"""New review""",
-        cls=f"large step info",
+    newKind = (
+        None
+        if uid is None else
+        (
+            N.expert
+            if G(reviewer, N.expert) == uid else
+            N.final
+            if G(reviewer, N.final) == uid else
+            None
+        )
     )
 
-    completeCls = "good" if complete else "warning"
-    completePart = H.span(
-        "Complete" if complete else "... not yet complete ...",
-        cls=f"large status {completeCls}",
-    )
-    workflowPart = H.div(
-        [
-            rButton,
-            defPart,
-            *scorePart,
-            completePart,
-        ],
-        cls="workflow",
+    newPart = (
+        E
+        if newKind is None else
+        H.a(
+            f"Start {newKind} review",
+            f"""/api/{table}/{eid}/{N.review}/{N.insert}""",
+            title=f"""New review""",
+            cls=f"large step info",
+        )
     )
 
     return H.div(
         [
             criteriaPart,
-            workflowPart,
+            statusRep,
             H.div(REVIEW_DECISION, cls="head"),
             reviewPart,
             newPart,

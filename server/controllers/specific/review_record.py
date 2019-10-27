@@ -1,7 +1,8 @@
 from controllers.config import Config as C, Names as N
 from controllers.record import Record
 from controllers.html import HtmlElements as H
-from controllers.utils import pick as G, getLast, cap1, E
+from controllers.utils import pick as G, E
+from controllers.workflow import getWf
 
 
 CW = C.web
@@ -17,45 +18,17 @@ class ReviewR(Record):
     record = self.record
     eid = self.eid
 
-    assessmentId = G(record, N.assessment)
-
-    assessment = getLast([
-        rec
-        for rec in G(workflow, N.assessments, default=[])
-        if G(rec, N._id) == assessmentId
-    ])
-    reviews = G(assessment, N.reviews)
-    reviewE = getLast([
-        rec
-        for rec in G(reviews, N.expert, default=[])
-        if G(rec, N._id) == eid
-    ])
-    reviewF = getLast([
-        rec
-        for rec in G(reviews, N.final, default=[])
-        if G(rec, N._id) == eid
-    ])
-    review = reviewE or reviewF
-
-    contribType = G(workflow, N.type)
-    assessmentType = G(assessment, N.type)
-    reviewType = G(review, N.type)
-
-    reviewer = G(assessment, N.reviewer)
+    thisWf = getWf(workflow, N.review, eid=eid)
+    reviewer = G(thisWf, N.reviewer)
     reviewerE = G(reviewer, N.expert)
     reviewerF = G(reviewer, N.final)
 
-    reviewType = G(record, N.reviewType)
-    goodType = (
-        assessmentType == contribType
-        and
-        assessmentType == reviewType
-    )
+    goodType = G(workflow, N.goodType)
     cls = E if goodType else " warning"
 
     creatorId = G(record, N.creator)
 
-    kind = cap1(
+    kind = (
         N.expert
         if creatorId == reviewerE else
         N.final
@@ -69,12 +42,15 @@ class ReviewR(Record):
 
   def title(self):
     kind = self.kind
+    uid = self.uid
     cls = self.cls
     goodType = self.goodType
+    creatorId = self.creatorId
 
     datetime = self.field(N.dateCreated).wrapBare()
     date = datetime.split(maxsplit=1)[0]
     creator = self.field(N.creator).wrapBare()
+    youRep = f""" ({N.you})""" if creatorId == uid else E
     reviewType = self.field(N.reviewType).wrapBare()
     reviewTypeRep = (
         E
@@ -83,7 +59,7 @@ class ReviewR(Record):
     )
 
     return H.span(
-        f"""{kind} on {date}{reviewTypeRep} by {creator}""",
+        f"""{kind} on {date}{reviewTypeRep} by {creator}{youRep}""",
         cls=f"small{cls}",
     )
 

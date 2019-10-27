@@ -1,11 +1,14 @@
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import pick as G, cap1, E
+from controllers.utils import pick as G, E
 from controllers.record import Record
+from controllers.workflow import getWf
 
 CW = C.web
 
 MESSAGES = CW.messages
+
+ORPHAN = H.icon(CW.unknown[N.reviewKind])
 
 
 class ReviewEntryR(Record):
@@ -14,8 +17,10 @@ class ReviewEntryR(Record):
 
     record = self.record
     workflow = self.workflow
+    eid = self.eid
 
-    reviewer = G(workflow, N.reviewer)
+    thisWf = getWf(workflow, N.review, eid=eid)
+    reviewer = G(thisWf, N.reviewer)
     reviewerE = G(reviewer, N.expert)
     reviewerF = G(reviewer, N.final)
 
@@ -25,7 +30,7 @@ class ReviewEntryR(Record):
         if creatorId == reviewerE else
         N.final
         if creatorId == reviewerF else
-        cap1(N.orphaned)
+        ORPHAN
     )
     self.kind = kind
     self.creatorId = creatorId

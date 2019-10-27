@@ -1,7 +1,8 @@
 from controllers.config import Config as C, Names as N
 from controllers.details import Details
-from controllers.utils import pick as G, E
+from controllers.utils import pick as G
 from controllers.html import HtmlElements as H
+from controllers.workflow import wfStatus, getWf
 
 
 CW = C.web
@@ -18,29 +19,11 @@ class ReviewD(Details):
     eid = self.eid
     workflow = self.workflow
 
-    reviewers = G(workflow, N.reviewers)
+    thisWf = getWf(workflow, N.assessment, eid=eid)
+    reviewers = G(thisWf, N.reviewers, default={})
     creatorId = G(record, N.creator)
 
-    defReviewEId = G(workflow, N.reviewEId)
-    defReviewFId = G(workflow, N.reviewFId)
-    defPart = (
-        E
-        if defReviewFId is None and defReviewFId is None else
-        H.span(
-            f"This is the authoritative {N.final} review",
-            cls="large status good",
-        )
-        if defReviewFId == eid else
-        H.span(
-            f"This is the authoritative {N.expert} review",
-            cls="large status good",
-        )
-        if defReviewEId == eid else
-        H.span(
-            "This review is not authoritative",
-            cls="large status error",
-        )
-    )
+    (frozen, hasValid, statusRep) = wfStatus(workflow, N.review, eid)
 
     orphaned = creatorId not in reviewers
     if orphaned:
@@ -49,10 +32,10 @@ class ReviewD(Details):
       return H.div(
           [
               entryPart,
-              defPart,
+              statusRep,
           ]
       )
 
     return H.div(
-        defPart
+        statusRep
     )

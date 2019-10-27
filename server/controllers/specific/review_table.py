@@ -1,7 +1,7 @@
 from bson.objectid import ObjectId
 
 from controllers.config import Names as N
-from controllers.utils import pick
+from controllers.utils import pick as G
 from controllers.table import Table
 
 
