@@ -145,6 +145,7 @@ const processHtml = (destElem, detail, forceOpen, tag) => html => {
   openCloseItems(destElem)
   activateFetch(destElem)
   activateActions(destElem)
+  activateQActions(destElem)
   let targetElem
   if (detail) {
     const child = destElem.children('details')
@@ -191,6 +192,20 @@ const fetch = (url, destElem, data) => {
       success: processHtml(destElem),
     })
   }
+}
+
+const post = (url, data, after) => {
+  $.ajax({
+    type: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    url,
+    data,
+    processData: false,
+    contentType: true,
+    success: () => {
+      window.location.href = after
+    },
+  })
 }
 
 const fetchDetail = (url, forceOpen, tag, destElem) => {
@@ -321,8 +336,13 @@ const edit = (table, eid, field, valueEl, parent, newTag) => {
   fetch(url, parent, saveValue)
 }
 
+const qEdit = (table, eid, field, value, after) => {
+  const url = makeFieldUrl(table, eid, field, 'save')
+  post(url, value, after)
+}
+
 const refresh = el => {
-    const targetKey = el.attr('targetkey')
+  const targetKey = el.attr('targetkey')
   if (targetKey) {
     const targetElem = $(`[itemkey="${targetKey}"]`)
     targetElem.attr('fat', '')
@@ -452,6 +472,22 @@ const activateActions = destElem => {
     }
   })
 }
+const activateQActions = destElem => {
+  const targets = destElem ? destElem.find('[qvalue]') : $('[qvalue]')
+  targets.each((i, elem) => {
+    const el = $(elem)
+    const table = el.attr('table')
+    const eid = el.attr('eid')
+    const field = el.attr('field')
+    const givenValue = el.attr('qvalue')
+    const after = el.attr('after')
+    el.off('click').click(() => {
+      const newValue = JSON.stringify({ save: givenValue })
+      qEdit(table, eid, field, newValue, after)
+    })
+  })
+}
+
 const applyOptions = (destElem, optionElements, init) => {
   const options = {}
   optionElements.each((i, elem) => {
@@ -562,6 +598,7 @@ $(() => {
   openCloseItems()
   activateFetch()
   activateActions()
+  activateQActions()
   activateOptions(contribHeading)
   activateCfilter()
 })

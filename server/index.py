@@ -304,6 +304,10 @@ def factory():
   def serveFieldView(table, eid, field):
     return serveField(table, eid, field, action=N.view)
 
+  @app.route(f"""/api/<string:table>/{N.item}/<string:eid>/{N.save}/<string:field>""", **GP)
+  def serveFieldSave(table, eid, field):
+    return serveField(table, eid, field, action=N.save)
+
   def serveField(table, eid, field, action=None):
     control = getControl()
     auth.authenticate()

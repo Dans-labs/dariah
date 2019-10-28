@@ -81,13 +81,38 @@
 	color: var(--score-fore);
 	font-size: medium;
 }
+.workflow
+{
+  border-radius: 0.5em;
+  padding: 0.5em;
+  margin: 0.5em;
+  border: 4px solid var(--workflow-border);
+}
+.frozen0,
+.frozen1, 
+.frozen2, 
+.frozen3 
+{
+  border-radius: 0.3em;
+  padding: 0.2em;
+  margin: 0.2em;
+}
+.frozen0 {
+  border: 4px solid var(--thaw-border);
+}
 .frozen1 {
-  border: 2px solid var(--frozen-border);
+  border: 4px solid var(--frozen-border);
 }
 .frozen2 {
-  border: 4px solid var(--frozen-border);
+  border: 8px solid var(--frozen-border);
 }
 .frozen3 {
   background-color: var(--frozen-back);
-  border: 4px solid var(--frozen-border);
+  border: 8px solid var(--frozen-border);
+}
+.workflow-line
+{
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
 }

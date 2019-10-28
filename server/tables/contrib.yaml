@@ -9,6 +9,12 @@ selected:
   type: bool3
   perm:
     edit: coord
+dateDecided:
+  label: Selection decision on
+  type: datetime
+  perm:
+    read: auth
+    edit: nobody
 vcc:
   label: VCC(s)
   type: vcc

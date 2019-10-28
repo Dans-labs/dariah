@@ -194,7 +194,7 @@ class Sidebar(object):
       self.tableEntry(table)
 
     return (
-        E.join(self.mainEntries)
+        H.join(self.mainEntries)
         +
         self.makeCaption(
             G(CAPTIONS, N.user),

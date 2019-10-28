@@ -18,7 +18,6 @@ class AssessmentD(Details):
   def wrap(self):
     uid = self.uid
     eid = self.eid
-    table = self.table
     workflow = self.workflow
 
     thisWf = getWf(workflow, N.assessment, eid=eid)
@@ -91,30 +90,7 @@ class AssessmentD(Details):
         )
     )
 
-    (frozen, hasValid, statusRep) = wfStatus(workflow, N.assessment, eid)
-
-    newKind = (
-        None
-        if uid is None else
-        (
-            N.expert
-            if G(reviewer, N.expert) == uid else
-            N.final
-            if G(reviewer, N.final) == uid else
-            None
-        )
-    )
-
-    newPart = (
-        E
-        if newKind is None else
-        H.a(
-            f"Start {newKind} review",
-            f"""/api/{table}/{eid}/{N.review}/{N.insert}""",
-            title=f"""New review""",
-            cls=f"large step info",
-        )
-    )
+    (frozen, statusRep) = wfStatus(workflow, N.assessment, eid, uid)
 
     return H.div(
         [
@@ -122,7 +98,6 @@ class AssessmentD(Details):
             statusRep,
             H.div(REVIEW_DECISION, cls="head"),
             reviewPart,
-            newPart,
         ],
     )
 

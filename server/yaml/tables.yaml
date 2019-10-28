@@ -24,6 +24,10 @@ valueTables:
   - vcc
   - year
 
+systemTables:
+  - decision
+  - permissionGroup
+
 actualTables:
   - criteria
   - package
@@ -56,37 +60,6 @@ cascade:
     - criteriaEntry
   review:
     - reviewEntry
-
-workflowFields:
-  - assessment
-  - assessmentType
-  - contrib
-  - creator
-  - criteria
-  - criteriaEntry
-  - dateCreated
-  - dateDecided
-  - dateSubmitted
-  - dateWithdrawn
-  - decision
-  - evidence
-  - review
-  - reviewerE
-  - reviewerF
-  - reviewType
-  - score
-  - selected
-  - submitted
-  - title
-  - typeContribution
-
-workflowSubfields:
-  - overall
-  - relevantScore
-  - relevantMax
-  - relevantN
-  - allMax
-  - allN
 
 items:
   contrib: [contribution, contributions]
@@ -157,44 +130,20 @@ value:
     perm:
       edit: office
 
-workflow:
-  - assessments
-  - assessmentId
-  - assessmentStatus
-  - assessmentTitle
-  - assessmentType
-  - assessmentValid
-  - code
-  - complete
-  - contribId
-  - contribTitle
-  - frozen
-  - goodType
-  - hasValid
-  - kind
-  - reviewEId
-  - reviewFId
-  - reviewTitle
-  - reviewValid
-  - reviewer
-  - reviews
-  - reviewsValid
-  - status
-  - type
-  - valid
-  - validRel
-
-frozenReasons:
-  - Contribution and assessment open for editing
-  - Contribution and assessment frozen
-  - Contribution, assessments and reviews frozen
-  - Contribution, assessments and reviews permanently frozen
-
 decisions:
   - Accept
   - Reject
   - Revise
 
+withNow:
+  contrib:
+    selected: dateDecided
+  assessment:
+    submitted:
+      - dateSubmitted
+      - dateWithdrawn
+  review:
+    decision: dateDecided
 names:
   - _id
   - active
@@ -208,6 +157,7 @@ names:
   - isUserTable
   - isUserEntryTable
   - itemLabels
+  - legacy
   - orig
   - orphaned
   - pattern

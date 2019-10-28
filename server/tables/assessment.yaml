@@ -24,6 +24,7 @@ submitted:
   type: bool2
   perm:
     read: auth
+    edit: office
 dateSubmitted:
   label: Submitted on
   type: datetime
@@ -39,11 +40,13 @@ dateWithdrawn:
 reviewerE:
   label: Reviewer (1)
   type: user
+  extensible: email
   perm:
     edit: office
 reviewerF:
   label: Reviewer (2)
   type: user
+  extensible: email
   perm:
     read: auth
     edit: office

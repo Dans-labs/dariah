@@ -3,6 +3,7 @@ from bson.objectid import ObjectId
 from controllers.config import Names as N
 from controllers.utils import pick as G
 from controllers.table import Table
+from controllers.workflow import wfPermission
 
 
 class AssessmentT(Table):
@@ -34,6 +35,11 @@ class AssessmentT(Table):
         N.assessmentType: contribType,
         N.title: f"assessment of {contribTitle}",
     }
+    if not wfPermission(
+        workflow, N.contrib, masterOid, uid, N.startAssessment,
+    ):
+      return masterId
+
     assessmentId = db.insertItem(table, uid, eppn, **fields)
 
     criteria = G(typeCriteria, contribType, default=[])

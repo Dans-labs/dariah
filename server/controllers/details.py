@@ -115,7 +115,7 @@ class Details(object):
   def wrapAll(self, readonly=False):
     details = self.details
 
-    return E.join(
+    return H.join(
         self.wrapDetail(dtable, readonly=readonly)
         for dtable in details
     )

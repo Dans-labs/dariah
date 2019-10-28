@@ -16,7 +16,7 @@ class CriteriaEntryD(Details):
 
     assessmentId = G(record, N.assessment)
     thisWf = getWf(workflow, N.review, eid=assessmentId)
-    reviewer = G(thisWf, N.reviewer)
+    reviewer = G(thisWf, N.reviewer, default={})
 
     self.fetchDetails(
         N.reviewEntry,

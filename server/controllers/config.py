@@ -30,6 +30,10 @@ class Perm(object):
   pass
 
 
+class Workflow(object):
+  pass
+
+
 class Tables(object):
   @classmethod
   def showReferences(cls):

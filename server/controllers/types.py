@@ -157,7 +157,12 @@ class TypeBase(object):
         if validationMsg else
         E
     )
-    return E.join([widgetElem, validationElem])
+    return H.join(
+        [
+            widgetElem,
+            validationElem,
+        ]
+    )
 
 
 class Text(TypeBase):
@@ -504,7 +509,9 @@ class Value(Related):
         control = self.control
         db = control.db
         table = self.name
-        return db.insertItem(table, uid, eppn, rep=editVal[0])
+        extensionField = N.rep if extensible is True else extensible
+        extension = {extensionField: editVal[0]}
+        return db.insertIfNew(table, uid, eppn, extension)
       else:
         return None
     return ObjectId(editVal)
@@ -668,7 +675,7 @@ class TypeContribution(Value):
     return he(f"""{mainType}{sep}{subType}""")
 
   def titleHint(self, record):
-    return E.join(G(record, N.explanation) or [])
+    return H.join(G(record, N.explanation) or [])
 
 
 class Criteria(Value):

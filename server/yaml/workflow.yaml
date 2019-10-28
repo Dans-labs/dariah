@@ -1,0 +1,73 @@
+fields:
+  - assessment
+  - assessmentType
+  - contrib
+  - creator
+  - criteria
+  - criteriaEntry
+  - dateCreated
+  - dateDecided
+  - dateSubmitted
+  - dateWithdrawn
+  - decision
+  - evidence
+  - review
+  - reviewerE
+  - reviewerF
+  - reviewType
+  - score
+  - selected
+  - submitted
+  - title
+  - typeContribution
+
+workflowSubfields:
+  - overall
+  - relevantScore
+  - relevantMax
+  - relevantN
+  - allMax
+  - allN
+
+frozenReasons:
+  - Contribution and assessment open for editing
+  - Contribution and assessment frozen
+  - Contribution, assessments and reviews frozen
+  - Contribution, assessments and reviews permanently frozen
+
+workflow:
+  - assessments
+  - assessmentId
+  - assessmentIndex
+  - assessmentStatus
+  - assessmentTitle
+  - assessmentType
+  - assessmentValid
+  - code
+  - complete
+  - contribId
+  - contribTitle
+  - frozen
+  - goodType
+  - hasValid
+  - kind
+  - reviewIndex
+  - reviewEId
+  - reviewFId
+  - reviewTitle
+  - reviewValid
+  - reviewer
+  - reviews
+  - reviewsValid
+  - status
+  - type
+  - valid
+  - validRel
+
+actions:
+  - startAssessment
+  - submitAssessment
+  - withdrawAssessment
+  - startReview
+  - decideExpertReview
+

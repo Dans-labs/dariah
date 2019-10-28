@@ -15,17 +15,20 @@ class ReviewD(Details):
     super().__init__(recordObj)
 
   def wrap(self):
+    uid = self.uid
     record = self.record
     eid = self.eid
     workflow = self.workflow
 
-    thisWf = getWf(workflow, N.assessment, eid=eid)
-    reviewers = G(thisWf, N.reviewers, default={})
+    thisWf = getWf(workflow, N.review, eid=eid)
+    reviewer = G(thisWf, N.reviewer, default={})
+    kind = G(thisWf, N.kind)
+    thisReviewer = G(reviewer, kind)
     creatorId = G(record, N.creator)
 
-    (frozen, hasValid, statusRep) = wfStatus(workflow, N.review, eid)
+    (frozen, statusRep) = wfStatus(workflow, N.review, eid, uid)
 
-    orphaned = creatorId not in reviewers
+    orphaned = creatorId is None or thisReviewer != creatorId
     if orphaned:
       self.fetchDetails(N.reviewEntry)
       entryPart = self.wrapDetail(N.reviewEntry, extraMsg=ORPHAN_MSG, extraCls="warning")

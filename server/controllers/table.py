@@ -32,6 +32,7 @@ MAIN_TABLE = CT.userTables[0]
 USER_TABLES = set(CT.userTables)
 USER_ENTRY_TABLES = set(CT.userEntryTables)
 VALUE_TABLES = set(CT.valueTables)
+SYSTEM_TABLES = set(CT.systemTables)
 ITEMS = CT.items
 PROV_SPECS = CT.prov
 
@@ -50,6 +51,7 @@ class Table(object):
     self.isUserTable = table in USER_TABLES
     self.isUserEntryTable = table in USER_ENTRY_TABLES
     self.isValueTable = table in VALUE_TABLES
+    self.isSystemTable = table in SYSTEM_TABLES
     self.itemLabels = G(ITEMS, table, default=[table, f"""{table}s"""])
     self.prov = PROV_SPECS
     self.fields = getattr(CT, table, {})
@@ -60,13 +62,20 @@ class Table(object):
     self.countryId = G(user, N.country)
 
     isUserTable = self.isUserTable
-    isUserEntryTable = self.isUserEntryTable
+    isValueTable = self.isValueTable
+    isSystemTable = self.isSystemTable
     isSuperuser = auth.superuser()
+    isSysadmin = auth.sysadmin()
 
     self.mayInsert = (
         auth.authenticated()
-        and (isUserTable or isSuperuser)
-        and not isUserEntryTable
+        and (
+            isUserTable
+            or
+            isValueTable and isSuperuser
+            or
+            isSystemTable and isSysadmin
+        )
     )
 
     def titleSortkey(r):

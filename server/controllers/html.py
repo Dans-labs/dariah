@@ -183,6 +183,10 @@ class HtmlElements(object):
     )
 
   @staticmethod
+  def join(material):
+    return asString(material)
+
+  @staticmethod
   def checkbox(var, **atts):
     return HtmlElement(N.input).wrap(
         E,

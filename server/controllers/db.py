@@ -10,6 +10,7 @@ from controllers.utils import (
 CB = C.base
 CM = C.mongo
 CT = C.tables
+CF = C.workflow
 CW = C.web
 
 DEBUG = CB.debug
@@ -33,13 +34,12 @@ VALUE_TABLES = set(CT.valueTables)
 REFERENCE_SPECS = CT.reference
 CASCADE_SPECS = CT.cascade
 
+WORKFLOW_FIELDS = CF.fields
+FIELD_PROJ = {field: True for field in WORKFLOW_FIELDS}
 
 OPTIONS = CW.options
 
 MOD_FMT = """{} on {}"""
-
-WORKFLOW_FIELDS = CT.workflowFields
-FIELD_PROJ = {field: True for field in WORKFLOW_FIELDS}
 
 
 class Db(object):
@@ -291,6 +291,12 @@ class Db(object):
         (
             r
             for r in records
+            if G(r, N.authority) != N.legacy
+        )
+        if relTable == N.user else
+        (
+            r
+            for r in records
             if G(r, constrain[0]) == constrain[1]
         )
         if constrain else
@@ -304,6 +310,33 @@ class Db(object):
         N.creator: uid,
         N.modified: [MOD_FMT.format(eppn, justNow)],
         **fields,
+    }
+    result = self.mongoCmd(N.insertItem, table, N.insert_one, newRecord)
+    if table in VALUE_TABLES:
+      self.collect(table=table)
+    return result.inserted_id
+
+  def insertIfNew(self, table, uid, eppn, extension):
+    existing = [
+        G(rec, N._id)
+        for rec in getattr(self, table, {}).values()
+        if all(G(rec, k) == v for (k, v) in extension.items())
+    ]
+    print('----------')
+    for rec in getattr(self, table, {}).values():
+      print('RRRRR', G(rec, N.eppn), G(rec, N.email))
+    print(extension)
+    if existing:
+      print('XXXXX', existing)
+      return existing[0]
+
+    print('NNNNNN')
+    justNow = now()
+    newRecord = {
+        N.dateCreated: justNow,
+        N.creator: uid,
+        N.modified: [MOD_FMT.format(eppn, justNow)],
+        **extension,
     }
     result = self.mongoCmd(N.insertItem, table, N.insert_one, newRecord)
     if table in VALUE_TABLES:
@@ -355,15 +388,21 @@ class Db(object):
       data,
       actor,
       modified,
+      nowFields=[],
   ):
     justNow = now()
     newModified = filterModified(
         (modified or []) + [f"""{actor}{ON}{justNow}"""]
     )
     criterion = {N._id: ObjectId(eid)}
+    nowItems = {
+        nowField: justNow
+        for nowField in nowFields
+    }
     update = {
         field: data,
         N.modified: newModified,
+        **nowItems,
     }
     delete = {N.isPristine: E}
     instructions = {

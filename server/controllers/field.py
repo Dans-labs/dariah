@@ -7,12 +7,15 @@ from controllers.perm import getPerms
 
 CT = C.tables
 CW = C.web
+CF = C.workflow
 
 
 DEFAULT_TYPE = CT.defaultType
 CONSTRAINED = CT.constrained
+WITH_NOW = CT.withNow
 WORKFLOW_TABLES = set(CT.userTables) | set(CT.userEntryTables)
-WORKFLOW_FIELDS = CT.workflowFields
+
+WORKFLOW_FIELDS = CF.fields
 
 REFRESH = CW.messages[N.refresh]
 
@@ -45,7 +48,26 @@ class Field(object):
 
     self.field = field
     self.asMaster = asMaster
-    self.withRefresh = field == N.modified
+
+    table = self.table
+
+    withNow = G(WITH_NOW, table)
+    if withNow:
+      nowFields = []
+      for info in withNow.values():
+        if type(info) is str:
+          nowFields.append(info)
+        else:
+          nowFields.extend(info)
+      nowFields = set(nowFields)
+    else:
+      nowFields = set()
+
+    self.withRefresh = (
+        field == N.modified or
+        field in nowFields
+    )
+    self.withNow = G(withNow, field)
 
     fieldSpecs = recordObj.fields
     fieldSpec = G(fieldSpecs, field)
@@ -115,7 +137,7 @@ class Field(object):
         None
     )
     args = (
-        dict(uid=uid, eppn=eppn, extensible=True)
+        dict(uid=uid, eppn=eppn, extensible=extensible)
         if extensible else
         {}
     )
@@ -130,6 +152,19 @@ class Field(object):
         data = conversion(data, **args)
 
     modified = G(record, N.modified)
+    nowFields = []
+    if data is not None:
+      withNow = self.withNow
+      if withNow:
+        withNowField = (
+            withNow
+            if type(withNow) is str else
+            withNow[0]
+            if data else
+            withNow[1]
+        )
+        nowFields.append(withNowField)
+
     (updates, deletions) = db.updateField(
         table,
         eid,
@@ -137,6 +172,7 @@ class Field(object):
         data,
         eppn,
         modified,
+        nowFields=nowFields,
     )
     record = control.getItem(table, eid, requireFresh=True)
 
@@ -172,19 +208,25 @@ class Field(object):
     if not mayRead:
       return E
 
+    if action == N.save:
+      self.mayEdit = True
+
     asMaster = self.asMaster
     mayEdit = self.mayEdit
-    editable = mayEdit and (action == N.edit or asEdit) and not asMaster
 
     if action is not None and not asMaster:
       data = request.get_json()
       if data is not None and N.save in data:
         self.save(data[N.save])
 
+    if action == N.save:
+      return E
+
+    editable = mayEdit and (action == N.edit or asEdit) and not asMaster
     widget = self.wrapWidget(editable, cls=cls)
 
     if action is not None:
-      return E.join(widget)
+      return H.join(widget)
 
     if empty and self.isEmpty():
       return E

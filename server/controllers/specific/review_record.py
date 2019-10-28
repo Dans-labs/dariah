@@ -23,7 +23,7 @@ class ReviewR(Record):
     reviewerE = G(reviewer, N.expert)
     reviewerF = G(reviewer, N.final)
 
-    goodType = G(workflow, N.goodType)
+    goodType = G(thisWf, N.goodType)
     cls = E if goodType else " warning"
 
     creatorId = G(record, N.creator)

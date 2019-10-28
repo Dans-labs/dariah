@@ -206,7 +206,7 @@ class Record(object):
     fieldSpecs = self.fields
     provSpecs = self.prov
 
-    return E.join(
+    return H.join(
         self.field(field, asMaster=field in myMasters).wrap()
         for field in fieldSpecs
         if (
@@ -296,7 +296,7 @@ class Record(object):
             [
                 deleteButton,
                 H.div(
-                    E.join(
+                    H.join(
                         bodyFunc(
                             myMasters=myMasters,
                             hideMasters=hideMasters,
