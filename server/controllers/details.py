@@ -14,7 +14,7 @@ class Details(object):
       N.Table, N.table,
       N.record, N.eid,
       N.fields, N.prov,
-      N.perm, N.workflow,
+      N.perm, N.wfitem,
   )
 
   def __init__(self, recordObj):

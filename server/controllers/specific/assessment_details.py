@@ -2,7 +2,6 @@ from controllers.config import Config as C, Names as N
 from controllers.details import Details
 from controllers.html import HtmlElements as H
 from controllers.utils import pick as G, cap1, E
-from controllers.workflow import wfStatus, getWf
 
 
 CT = C.tables
@@ -16,14 +15,13 @@ class AssessmentD(Details):
     super().__init__(recordObj)
 
   def wrap(self):
-    uid = self.uid
     eid = self.eid
-    workflow = self.workflow
+    wfitem = self.wfitem
 
-    thisWf = getWf(workflow, N.assessment, eid=eid)
-
-    reviewers = G(thisWf, N.reviewers, default=set())
-    reviewer = G(thisWf, N.reviewer)
+    (reviewer, reviewers) = wfitem.attributes(
+        N.assessment, eid,
+        N.reviewer, N.reviewers,
+    )
 
     self.fetchDetails(N.criteriaEntry, sortKey=cEntrySort)
 
@@ -90,7 +88,7 @@ class AssessmentD(Details):
         )
     )
 
-    (frozen, statusRep) = wfStatus(workflow, N.assessment, eid, uid)
+    (frozen, statusRep) = wfitem.status(N.assessment, eid)
 
     return H.div(
         [

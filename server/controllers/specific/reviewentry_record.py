@@ -2,7 +2,6 @@ from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
 from controllers.utils import pick as G, E
 from controllers.record import Record
-from controllers.workflow import getWf
 
 CW = C.web
 
@@ -16,11 +15,15 @@ class ReviewEntryR(Record):
     super().__init__(*args, **kwargs)
 
     record = self.record
-    workflow = self.workflow
-    eid = self.eid
+    wfitem = self.wfitem
 
-    thisWf = getWf(workflow, N.review, eid=eid)
-    reviewer = G(thisWf, N.reviewer)
+    reviewId = G(record, N.review)
+
+    (reviewer,) = wfitem.attributes(
+        N.review, reviewId,
+        N.reviewer,
+    )
+
     reviewerE = G(reviewer, N.expert)
     reviewerF = G(reviewer, N.final)
 

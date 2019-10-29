@@ -2,7 +2,6 @@ from controllers.config import Names as N
 from controllers.details import Details
 from controllers.html import HtmlElements as H
 from controllers.utils import pick as G
-from controllers.workflow import wfStatus
 
 
 class ContribD(Details):
@@ -10,16 +9,15 @@ class ContribD(Details):
     super().__init__(recordObj)
 
   def wrap(self):
-    uid = self.uid
     eid = self.eid
-    workflow = self.workflow
+    wfitem = self.wfitem
 
     self.fetchDetails(
         N.assessment,
         sortKey=lambda r: G(r, N.dateCreated, default=0),
     )
 
-    (frozen, statusRep) = wfStatus(workflow, N.contrib, eid, uid)
+    (frozen, statusRep) = wfitem.status(N.contrib, eid)
 
     return H.div(
         [

@@ -3,7 +3,6 @@ from bson.objectid import ObjectId
 from controllers.config import Names as N
 from controllers.utils import pick as G
 from controllers.table import Table
-from controllers.workflow import wfPermission
 
 
 class AssessmentT(Table):
@@ -26,18 +25,20 @@ class AssessmentT(Table):
     typeCriteria = db.typeCriteria
 
     masterOid = ObjectId(masterId)
-    workflow = control.getWorkflowItem(masterOid)
-    contribType = G(workflow, N.type)
-    contribTitle = G(workflow, N.title)
+
+    wfitem = control.getWorkflowItem(masterOid)
+
+    (contribType, contribTitle) = wfitem.attributes(
+        N.contrib, masterOid,
+        N.type, N.title,
+    )
 
     fields = {
         masterTable: masterOid,
         N.assessmentType: contribType,
         N.title: f"assessment of {contribTitle}",
     }
-    if not wfPermission(
-        workflow, N.contrib, masterOid, uid, N.startAssessment,
-    ):
+    if not wfitem.permission(N.contrib, masterOid, N.startAssessment):
       return masterId
 
     assessmentId = db.insertItem(table, uid, eppn, **fields)

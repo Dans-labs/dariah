@@ -145,7 +145,7 @@ class Record(object):
 
     contribId = G(perm, N.contribId)
 
-    self.workflow = control.getWorkflowItem(contribId)
+    self.wfitem = control.getWorkflowItem(contribId)
 
   def adjustWorkflow(self, update=True, delete=False):
     control = self.control
@@ -155,10 +155,11 @@ class Record(object):
     contribId = G(perm, N.contribId)
     if delete:
       wf.delete(contribId)
+      self.wfitem = None
     else:
       wf.recompute(contribId)
       if update:
-        self.workflow = control.getWorkflowItem(contribId, requireFresh=True)
+        self.wfitem = control.getWorkflowItem(contribId, requireFresh=True)
 
   def field(self, fieldName, **kwargs):
     return Field(self, fieldName, **kwargs)

@@ -2,7 +2,6 @@ from controllers.config import Config as C, Names as N
 from controllers.record import Record
 from controllers.html import HtmlElements as H
 from controllers.utils import pick as G, E
-from controllers.workflow import getWf
 
 
 CW = C.web
@@ -14,16 +13,17 @@ class ReviewR(Record):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-    workflow = self.workflow
+    wfitem = self.wfitem
     record = self.record
     eid = self.eid
 
-    thisWf = getWf(workflow, N.review, eid=eid)
-    reviewer = G(thisWf, N.reviewer)
+    (goodType, reviewer,) = wfitem.attributes(
+        N.review, eid,
+        N.goodType, N.reviewer,
+    )
     reviewerE = G(reviewer, N.expert)
     reviewerF = G(reviewer, N.final)
 
-    goodType = G(thisWf, N.goodType)
     cls = E if goodType else " warning"
 
     creatorId = G(record, N.creator)

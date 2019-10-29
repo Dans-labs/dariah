@@ -29,10 +29,16 @@ class ReviewT(Table):
     if not contribId:
       return None
 
-    workflow = control.getWorkflowItem(contribId)
-    contribId = G(workflow, N._id)
-    contribType = G(workflow, N.type)
-    assessmentTitle = G(workflow, N.assessmentTitle)
+    wfitem = control.getWorkflowItem(contribId)
+
+    (contribType,) = wfitem.attributes(
+        N.contrib, contribId,
+        N.type,
+    )
+    assessmentTitle = wfitem.attributes(
+        N.assessment, masterOid,
+        N.title,
+    )
 
     fields = {
         N.contrib: contribId,

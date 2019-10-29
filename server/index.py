@@ -13,7 +13,7 @@ from pymongo import MongoClient
 from controllers.config import Config as C, Names as N
 from controllers.utils import pick as G, E
 from controllers.db import Db
-from controllers.workflow import Workflow
+from controllers.workflow.compute import Workflow
 from controllers.auth import Auth
 from controllers.control import Control
 from controllers.sidebar import Sidebar
@@ -236,9 +236,12 @@ def factory():
       auth.authenticate()
       recordObj = Table(control, dtable).record(eid=eid)
       recordObj.delete()
-      workflow = recordObj.workflow
+      wfitem = recordObj.wfitem
 
-      contribId = G(workflow, N._id)
+      (contribId,) = wfitem.attributes(
+          N.contrib, None,
+          N._id,
+      )
 
       newUrlPart = N.mylist
       newPath = f"""/{N.contrib}/{newUrlPart}/{contribId}"""

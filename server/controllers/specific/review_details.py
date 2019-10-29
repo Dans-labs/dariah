@@ -2,7 +2,6 @@ from controllers.config import Config as C, Names as N
 from controllers.details import Details
 from controllers.utils import pick as G
 from controllers.html import HtmlElements as H
-from controllers.workflow import wfStatus, getWf
 
 
 CW = C.web
@@ -15,18 +14,19 @@ class ReviewD(Details):
     super().__init__(recordObj)
 
   def wrap(self):
-    uid = self.uid
     record = self.record
     eid = self.eid
-    workflow = self.workflow
+    wfitem = self.wfitem
 
-    thisWf = getWf(workflow, N.review, eid=eid)
-    reviewer = G(thisWf, N.reviewer, default={})
-    kind = G(thisWf, N.kind)
+    (reviewer, kind) = wfitem.attributes(
+        N.review, eid,
+        N.reviewer, N.kind,
+    )
+
     thisReviewer = G(reviewer, kind)
     creatorId = G(record, N.creator)
 
-    (frozen, statusRep) = wfStatus(workflow, N.review, eid, uid)
+    (frozen, statusRep) = wfitem.status(N.review, eid)
 
     orphaned = creatorId is None or thisReviewer != creatorId
     if orphaned:

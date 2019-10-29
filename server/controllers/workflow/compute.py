@@ -1,7 +1,7 @@
 from controllers.config import Config as C, Names as N
 from controllers.utils import getLast, pick as G, serverprint, E
-from controllers.html import HtmlElements as H
 from controllers.db import inCrit
+from controllers.workflow.apply import WorkflowItem
 
 
 CT = C.tables
@@ -9,14 +9,11 @@ CF = C.workflow
 CM = C.mongo
 
 USER_TABLES_LIST = CT.userTables
-USER_TABLES = set(USER_TABLES_LIST)
 MAIN_TABLE = USER_TABLES_LIST[0]
 INTER_TABLE = USER_TABLES_LIST[1]
 DETAILS = CT.details
 WORKFLOW_TABLES_LIST = CT.userTables + CT.userEntryTables
 
-FROZEN_REASONS = CF.frozenReasons
-WORKFLOW_FIELDS = CF.fields
 WORKFLOW_TABLES = set(WORKFLOW_TABLES_LIST)
 
 
@@ -53,9 +50,20 @@ class Workflow(object):
     self.maxScoreByCrit = maxScoreByCrit
 
     self.initWorkflow(drop=True)
+    self.items = {}
 
   def addControl(self, control):
-    self.control = control
+    auth = control.auth
+    user = auth.user
+    self.uid = G(user, N._id)
+    self.eppn = G(user, N.eppn)
+
+  def getItem(self, eid):
+    items = self.items
+    return G(items, eid)
+
+  def makeItem(self, attributes):
+    return WorkflowItem(self, attributes)
 
   def initWorkflow(self, drop=False):
     db = self.db
@@ -86,11 +94,15 @@ class Workflow(object):
 
   def insert(self, contribId):
     db = self.db
+    items = self.items
 
     attributes = self.computeWorkflow(contribId=contribId)
     attributes[N._id] = contribId
     serverprint(f"WORKFLOW: New workflow info {contribId}")
     db.insertWorkflow(attributes)
+
+    itemObj = self.makeItem(attributes)
+    items[contribId] = itemObj
 
   def recompute(self, contribId):
     db = self.db
@@ -99,11 +111,19 @@ class Workflow(object):
     serverprint(f"WORKFLOW: Adjust workflow info {contribId}")
     db.updateWorkflow(contribId, attributes)
 
+    itemObj = self.getItem(contribId)
+    itemObj.updateData(attributes)
+
   def delete(self, contribId):
     db = self.db
+    items = self.items
 
     serverprint(f"WORKFLOW: Delete workflow info {contribId}")
     db.delWorkflow(contribId)
+
+    itemObj = self.getItem(contribId)
+    itemObj.clearData()
+    items.pop(contribId)
 
   def getFullItem(self, contribId):
     db = self.db
@@ -133,6 +153,7 @@ class Workflow(object):
       return {}
 
     contribType = G(record, N.typeContribution)
+    contribTitle = G(record, N.title)
     creator = G(record, N.creator)
 
     assessments = [
@@ -176,6 +197,7 @@ class Workflow(object):
         N._id: contribId,
         N.creator: creator,
         N.type: contribType,
+        N.title: contribTitle,
         N.selected: G(record, N.selected),
         N.assessments: assessmentIds,
         N.assessmentValid: assessmentValid,
@@ -193,6 +215,7 @@ class Workflow(object):
 
     assessmentId = G(record, N._id)
     assessmentType = G(record, N.assessmentType)
+    assessmentTitle = G(record, N.assessmentTitle)
     creator = G(record, N.creator)
     nCriteria = len(G(typeCriteria, assessmentType, default=[]))
 
@@ -257,6 +280,7 @@ class Workflow(object):
         N._id: assessmentId,
         N.creator: creator,
         N.type: assessmentType,
+        N.title: assessmentTitle,
         N.goodType: (
             assessmentType is not None and
             assessmentType == contribType
@@ -278,6 +302,7 @@ class Workflow(object):
 
     reviewId = G(record, N._id)
     reviewType = G(record, N.reviewType)
+    reviewTitle = G(record, N.reviewTitle)
     creator = G(record, N.creator)
     decision = G(decisions, G(record, N.decision))
     dateDecided = G(record, N.dateDecided)
@@ -286,6 +311,7 @@ class Workflow(object):
         N._id: reviewId,
         N.creator: creator,
         N.type: reviewType,
+        N.title: reviewTitle,
         N.goodType: (
             reviewType is not None and
             reviewType == assessmentType and
@@ -523,373 +549,3 @@ def aggregate(entries):
             ).setdefault(
                 detailTable, []
             ).append(record)
-
-
-def getWf(wfRecord, wfType, eid=None):
-  return (
-      wfRecord
-      if wfType == N.contrib else
-      G(G(wfRecord, N.assessmentIndex), str(eid))
-      if wfType == N.assessment else
-      G(G(wfRecord, N.reviewIndex), str(eid))
-      if wfType == N.review else
-      None
-  )
-
-
-def presentScore(score, wfType, eid, derivation=True):
-  overall = G(score, N.overall, default=0)
-  relevantScore = G(score, N.relevantScore, default=0)
-  relevantMax = G(score, N.relevantMax, default=0)
-  relevantN = G(score, N.relevantN, default=0)
-  allMax = G(score, N.allMax, default=0)
-  allN = G(score, N.allN, default=0)
-  irrelevantN = allN - relevantN
-
-  fullScore = H.span(
-      f"Score {overall}%",
-      title="overall score of this assessment",
-      cls="ass-score",
-  )
-  if not derivation:
-    return fullScore
-
-  scoreMaterial = H.div(
-      [
-          H.div(
-              [
-                  H.p(f"""This assessment scores {relevantScore} points."""),
-                  H.p(
-                      f"""For this type of contribution there is a total of
-                          {allMax} points, divided over {allN} criteria.
-                      """
-                  ),
-                  (
-                      H.p(
-                          f"""However,
-                              {irrelevantN}
-                              rule{" is " if irrelevantN == 1 else "s are"}
-                              not applicable to this contribution,
-                              which leaves the total amount to
-                              {relevantMax} points,
-                              divided over {relevantN} criteria.
-                          """
-                      )
-                      if irrelevantN else
-                      E
-                  ),
-                  H.p(
-                      f"""The total score is expressed as a percentage:
-                          the fraction of {relevantScore} scored points
-                          with respect to {relevantMax} scorable points:
-                          {overall}%.
-                      """
-                  )
-              ],
-              cls="ass-score-deriv",
-          ),
-      ],
-      cls="ass-score-box",
-  )
-
-  scoreWidget = H.detailx(
-      (N.calc, N.dismiss),
-      scoreMaterial,
-      f"""{wfType}/{eid}/scorebox""",
-      openAtts=dict(
-          cls="button small",
-          title="Show derivation",
-      ),
-      closeAtts=dict(
-          cls="button small",
-          title="Hide derivation",
-      ),
-  )
-  return (fullScore, *scoreWidget)
-
-
-def wfPermission(wfRecord, wfType, eid, uid, action):
-  if (
-      uid is None or
-      wfType not in USER_TABLES
-  ):
-    return False
-
-  reviewIndex = G(wfRecord, N.reviewIndex)
-  thisWf = getWf(wfRecord, wfType, eid=eid)
-  src = (
-      G(thisWf, N.assessmentStatus)
-      if wfType == N.contrib else
-      thisWf
-  )
-  hasValid = G(src, N.hasValid)
-  creator = G(thisWf, N.creator)
-
-  finalReview = G(G(thisWf, N.reviews), N.final)
-  finalReviewWf = G(reviewIndex, finalReview)
-  decision = G(finalReviewWf, N.decision)
-  isDecided = decision not in {None, N.Revise}
-
-  if isDecided:
-    return False
-
-  if wfType == N.contrib:
-    if action == N.startAssessment:
-      return (
-          not hasValid and
-          uid == creator
-      )
-    return False
-
-  complete = G(thisWf, N.complete)
-  submitted = G(thisWf, N.submitted)
-  dateSubmitted = G(thisWf, N.dateSubmitted)
-  dateWithdrawn = G(thisWf, N.dateWithdrawn)
-
-  reviewer = G(thisWf, N.reviewer)
-  newKind = (
-      N.expert
-      if G(reviewer, N.expert) == uid else
-      N.final
-      if G(reviewer, N.final) == uid else
-      None
-  )
-  if wfType == N.assessment:
-    if uid != creator:
-      return False
-
-    if action == N.submitAssessment:
-      if not complete:
-        return False
-      return (
-          not dateSubmitted or
-          dateWithdrawn and dateSubmitted < dateWithdrawn
-      )
-    if action == N.withdrawAssessment:
-      if not submitted:
-        return False
-
-    if action == N.startReview:
-      if newKind is None:
-        return False
-      return not G(hasValid, newKind)
-
-    return False
-
-  if wfType == N.review:
-    if action == N.decideExpertReview:
-      pass
-
-    return False
-
-  return False
-
-
-def wfStatus(wfRecord, wfType, eid, uid):
-  thisWf = getWf(wfRecord, wfType, eid=eid)
-  frozen = (
-      G(thisWf, N.frozen, default=0)
-      if thisWf else
-      0
-  )
-  reason = FROZEN_REASONS[frozen]
-  frozenCls = f"frozen{frozen}"
-
-  cls = G(thisWf, N.cls)
-  rep = G(thisWf, N.rep)
-
-  contribRep = (
-      H.span(
-          rep,
-          cls=f"large status {cls}",
-      )
-      if wfType == N.contrib else
-      E
-  )
-
-  src = (
-      G(thisWf, N.assessmentStatus)
-      if wfType == N.contrib else
-      thisWf
-  )
-  cls = G(src, N.cls)
-  rep = G(src, N.rep)
-
-  assessmentRep = H.join(
-      [
-          H.span(
-              rep,
-              cls=f"large status {cls}",
-          ),
-          H.span(
-              rep,
-              cls=f"large status {cls}",
-          ),
-      ]
-  )
-
-  valid = G(src, N.valid)
-  validRel = G(src, N.validRel)
-  kind = G(src, N.kind, default=E)
-
-  scoreParts = presentScore(
-      G(src, N.score),
-      wfType,
-      eid,
-  )
-  scorePart = (
-      H.span(scoreParts)
-      if wfType == N.assessment else
-      (scoreParts[0] if scoreParts else E)
-      if wfType == N.contrib else
-      E
-  )
-  validPart = E
-  if wfType in {N.assessment, N.review}:
-    preYes = "THE "
-    preNo = "not a "
-    clsYes = "good"
-    clsNo = "error"
-    post = E
-    cond = valid
-
-    if wfType == N.review:
-      cond = validRel
-      if not valid:
-        preYes = E
-        post = " for this assessment"
-        clsYes = "warning"
-
-    validPart = (
-        H.span(
-            f"{preYes}valid {kind} {wfType}{post}",
-            cls=f"large status {clsYes}",
-        )
-        if cond else
-        H.span(
-            f"{preNo}valid {kind} {wfType}{post}",
-            cls=f"large status {clsNo}",
-        )
-    )
-
-  assessmentPart = H.div(
-      [
-          contribRep,
-          assessmentRep,
-          scorePart,
-      ],
-      cls="workflow-line",
-  )
-
-  reasonPart = H.div(
-      reason,
-      cls=frozenCls,
-  )
-
-  itemKey = f"""{wfType}/{eid}"""
-  rButton = H.iconr(itemKey, "#workflow", msg=N.status)
-
-  actionPart = E
-  if (
-      uid is not None and
-      uid == G(thisWf, N.creator) and
-      wfType in USER_TABLES_LIST[0:2]
-  ):
-    if wfType == N.contrib:
-      if wfPermission(
-          wfRecord, wfType, eid, uid, N.startAssessment,
-      ):
-        dTable = N.assessment
-        actionPart = H.a(
-            f"Start {dTable}",
-            f"""/api/{wfType}/{eid}/{dTable}/{N.insert}""",
-            title=f"""New {dTable}""",
-            cls=f"large step info",
-        )
-    elif wfType == N.assessment:
-      valid = G(thisWf, N.valid)
-      if not valid:
-        actionPart = H.span(
-            "There is no workflow for invalid items",
-            cls=f"large step info",
-        )
-      else:
-        if wfPermission(
-            wfRecord, wfType, eid, uid, N.submitAssessment,
-        ):
-          contribId = G(wfRecord, N._id)
-          reviewer = G(thisWf, N.reviewer)
-          dTable = N.review
-          dateSubmitted = G(thisWf, N.dateSubmitted)
-
-          actionParts = []
-
-          if wfPermission(
-              wfRecord, wfType, eid, uid, N.withdrawAssessment,
-          ):
-            actionParts.append(H.span(
-                f"Withdraw {wfType}",
-                table=wfType,
-                eid=eid,
-                field=N.submitted,
-                qvalue="",
-                after=f"/{N.contrib}/item/{contribId}",
-                title=f"""Withdraw this {wfType} from review""",
-                cls=f"large step error",
-            ))
-          if wfPermission(
-              wfRecord, wfType, eid, uid, N.submitAssessment,
-          ):
-            verb = "Submit" if not dateSubmitted else "Resubmit"
-            actionParts.append(H.span(
-                f"{verb} {wfType}",
-                table=wfType,
-                eid=eid,
-                field=N.submitted,
-                qvalue="1",
-                after=f"/{N.contrib}/item/{contribId}",
-                title=f"""{verb} this {wfType} for review""",
-                cls=f"large step info",
-            ))
-          if wfPermission(
-              wfRecord, wfType, eid, uid, N.startReview,
-          ):
-
-            newKind = (
-                N.expert
-                if G(reviewer, N.expert) == uid else
-                N.final
-                if G(reviewer, N.final) == uid else
-                None
-            )
-            actionParts.append(H.a(
-                f"Start {newKind} {dTable}",
-                f"""/api/{wfType}/{eid}/{dTable}/{N.insert}""",
-                title=f"""New {dTable}""",
-                cls=f"large step info",
-            ))
-
-          actionPart = H.join(actionParts)
-
-    elif wfType == N.review:
-      valid = G(thisWf, N.valid)
-      if not valid:
-        actionPart = H.span(
-            "There is no workflow for invalid items",
-            cls=f"large step info",
-        )
-      else:
-        pass
-
-  statusRep = H.div(
-      [
-          rButton,
-          validPart,
-          assessmentPart,
-          reasonPart,
-          actionPart,
-      ],
-      cls=f"workflow",
-  )
-
-  return (frozen, statusRep)

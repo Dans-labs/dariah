@@ -2,7 +2,6 @@ from controllers.config import Names as N
 from controllers.details import Details
 from controllers.html import HtmlElements as H
 from controllers.utils import pick as G, cap1, E
-from controllers.workflow import getWf
 
 
 class CriteriaEntryD(Details):
@@ -11,12 +10,15 @@ class CriteriaEntryD(Details):
 
   def wrap(self):
     details = self.details
-    workflow = self.workflow
+    wfitem = self.wfitem
     record = self.record
 
     assessmentId = G(record, N.assessment)
-    thisWf = getWf(workflow, N.review, eid=assessmentId)
-    reviewer = G(thisWf, N.reviewer, default={})
+
+    (reviewer,) = wfitem.attributes(
+        N.assessment, assessmentId,
+        N.reviewer,
+    )
 
     self.fetchDetails(
         N.reviewEntry,

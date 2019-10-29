@@ -68,15 +68,22 @@ class Control(object):
         db.getItem, N.getItem, [table, eid], table, eid, requireFresh,
     )
 
-  def getWorkflowItem(self, eid, requireFresh=False):
-    if not eid:
-      return {}
+  def getWorkflowItem(self, contribId, requireFresh=False):
+    if not contribId:
+      return None
 
     db = self.db
+    wf = self.wf
 
-    return self.getCached(
-        db.getWorkflowItem, N.getWorkflowItem, [eid], N.workflow, eid, requireFresh,
+    if not requireFresh:
+      wfitem = wf.getItem(contribId)
+      if wfitem:
+        return wfitem
+
+    attributes = self.getCached(
+        db.getWorkflowItem, N.getWorkflowItem, [contribId], N.workflow, contribId, requireFresh,
     )
+    return wf.makeItem(attributes)
 
   def delItem(self, table, eid):
     db = self.db

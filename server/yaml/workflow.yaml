@@ -71,3 +71,28 @@ actions:
   - startReview
   - decideExpertReview
 
+attributes:
+  - _id
+  - assessmentStatus
+  - cls
+  - complete
+  - creator
+  - contribId
+  - dateSubmitted
+  - dateWithdrawn
+  - frozen
+  - goodType
+  - kind
+  - rep
+  - reviewer
+  - reviewIdex
+  - reviewers
+  - reviews
+  - submitted
+  - title
+  - type
+  - valid
+  - validRel
+
+names:
+  - wfitem
