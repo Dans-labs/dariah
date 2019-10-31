@@ -42,196 +42,175 @@ FORBIDDEN = CW.messages[N.forbidden]
 
 
 class Table:
-  def __init__(self, control, table):
-    self.control = control
+    def __init__(self, control, table):
+        self.control = control
 
-    auth = control.auth
-    user = auth.user
+        auth = control.auth
+        user = auth.user
 
-    self.table = table
-    self.isMainTable = table == MAIN_TABLE
-    self.isUserTable = table in USER_TABLES
-    self.isUserEntryTable = table in USER_ENTRY_TABLES
-    self.isValueTable = table in VALUE_TABLES
-    self.isSystemTable = table in SYSTEM_TABLES
-    self.itemLabels = G(ITEMS, table, default=[table, f"""{table}s"""])
-    self.prov = PROV_SPECS
-    self.fields = getattr(CT, table, {})
+        self.table = table
+        self.isMainTable = table == MAIN_TABLE
+        self.isUserTable = table in USER_TABLES
+        self.isUserEntryTable = table in USER_ENTRY_TABLES
+        self.isValueTable = table in VALUE_TABLES
+        self.isSystemTable = table in SYSTEM_TABLES
+        self.itemLabels = G(ITEMS, table, default=[table, f"""{table}s"""])
+        self.prov = PROV_SPECS
+        self.fields = getattr(CT, table, {})
 
-    self.uid = G(user, N._id)
-    self.eppn = G(user, N.eppn)
-    self.group = G(user, N.groupRep) or UNAUTH
-    self.countryId = G(user, N.country)
+        self.uid = G(user, N._id)
+        self.eppn = G(user, N.eppn)
+        self.group = G(user, N.groupRep) or UNAUTH
+        self.countryId = G(user, N.country)
 
-    isUserTable = self.isUserTable
-    isValueTable = self.isValueTable
-    isSystemTable = self.isSystemTable
-    isSuperuser = auth.superuser()
-    isSysadmin = auth.sysadmin()
+        isUserTable = self.isUserTable
+        isValueTable = self.isValueTable
+        isSystemTable = self.isSystemTable
+        isSuperuser = auth.superuser()
+        isSysadmin = auth.sysadmin()
 
-    self.mayInsert = (
-        auth.authenticated()
-        and (
-            isUserTable
-            or
-            isValueTable and isSuperuser
-            or
-            isSystemTable and isSysadmin
+        self.mayInsert = auth.authenticated() and (
+            isUserTable or isValueTable and isSuperuser or isSystemTable and isSysadmin
         )
-    )
 
-    def titleSortkey(r):
-      return self.title(r).lower()
+        def titleSortkey(r):
+            return self.title(r).lower()
 
-    self.titleSortkey = titleSortkey
+        self.titleSortkey = titleSortkey
 
-  def recordFactory(self):
-    table = self.table
+    def recordFactory(self):
+        table = self.table
 
-    RecordClass = Record
-    for (tb, Rcl) in CASES:
-      if tb == table:
-        RecordClass = Rcl
-        break
+        RecordClass = Record
+        for (tb, Rcl) in CASES:
+            if tb == table:
+                RecordClass = Rcl
+                break
 
-    return RecordClass
+        return RecordClass
 
-  def record(
-      self,
-      eid=None, record=None,
-      withDetails=False,
-      readonly=False,
-      bodyMethod=None,
-  ):
-    return self.recordFactory()(
-        Table, self,
-        eid=eid,
-        record=record,
-        withDetails=withDetails,
-        readonly=readonly,
-        bodyMethod=bodyMethod,
-    )
+    def record(
+        self, eid=None, record=None, withDetails=False, readonly=False, bodyMethod=None,
+    ):
+        return self.recordFactory()(
+            Table,
+            self,
+            eid=eid,
+            record=record,
+            withDetails=withDetails,
+            readonly=readonly,
+            bodyMethod=bodyMethod,
+        )
 
-  def insert(self):
-    mayInsert = self.mayInsert
-    if not mayInsert:
-      return None
+    def insert(self):
+        mayInsert = self.mayInsert
+        if not mayInsert:
+            return None
 
-    control = self.control
-    db = control.db
-    uid = self.uid
-    eppn = self.eppn
-    table = self.table
+        control = self.control
+        db = control.db
+        uid = self.uid
+        eppn = self.eppn
+        table = self.table
 
-    result = db.insertItem(table, uid, eppn)
-    if table == MAIN_TABLE:
-      self.adjustWorkflow(result)
+        result = db.insertItem(table, uid, eppn)
+        if table == MAIN_TABLE:
+            self.adjustWorkflow(result)
 
-    return result
+        return result
 
-  def adjustWorkflow(self, contribId, new=True):
-    control = self.control
-    wf = control.wf
+    def adjustWorkflow(self, contribId, new=True):
+        control = self.control
+        wf = control.wf
 
-    if new:
-      wf.insert(contribId)
-    else:
-      wf.recompute(contribId)
+        if new:
+            wf.insert(contribId)
+        else:
+            wf.recompute(contribId)
 
-  def wrap(self, openEid, action=None):
-    if not self.mayList(action=action):
-      return FORBIDDEN
+    def wrap(self, openEid, action=None):
+        if not self.mayList(action=action):
+            return FORBIDDEN
 
-    control = self.control
-    db = control.db
-    table = self.table
-    uid = self.uid
-    countryId = self.countryId
-    titleSortkey = self.titleSortkey
-    (itemSingular, itemPlural) = self.itemLabels
+        control = self.control
+        db = control.db
+        table = self.table
+        uid = self.uid
+        countryId = self.countryId
+        titleSortkey = self.titleSortkey
+        (itemSingular, itemPlural) = self.itemLabels
 
-    params = (
-        dict(my=uid)
-        if action == N.mylist else
-        dict(our=countryId)
-        if action == N.ourlist else
-        {}
-    )
-    if request.args:
-      params.update(request.args)
+        params = (
+            dict(my=uid)
+            if action == N.mylist
+            else dict(our=countryId)
+            if action == N.ourlist
+            else {}
+        )
+        if request.args:
+            params.update(request.args)
 
-    records = db.getList(table, titleSortkey, select=self.isMainTable, **params)
-    nRecords = len(records)
-    itemLabel = itemSingular if nRecords == 1 else itemPlural
-    nRep = H.span(f"""{nRecords} {itemLabel}""", cls="stats")
-    insertButton = self.insertButton()
-    sep = NBSP if insertButton else E
+        records = db.getList(table, titleSortkey, select=self.isMainTable, **params)
+        nRecords = len(records)
+        itemLabel = itemSingular if nRecords == 1 else itemPlural
+        nRep = H.span(f"""{nRecords} {itemLabel}""", cls="stats")
+        insertButton = self.insertButton()
+        sep = NBSP if insertButton else E
 
-    return H.div(
-        chain.from_iterable((
-            [
-                H.span(
-                    [
-                        self.insertButton(),
-                        sep,
-                        nRep,
-                    ],
+        return H.div(
+            chain.from_iterable(
+                (
+                    [H.span([self.insertButton(), sep, nRep])],
+                    (
+                        H.details(
+                            self.title(record),
+                            H.div(ELLIPS),
+                            f"""{table}/{G(record, N._id)}""",
+                            fetchurl=f"""/api/{table}/{N.item}/{G(record, N._id)}""",
+                            urltitle=E,
+                            urlextra=E,
+                            **forceOpen(G(record, N._id), openEid),
+                        )
+                        for record in records
+                    ),
                 )
-            ],
-            (
-                H.details(
-                    self.title(record),
-                    H.div(ELLIPS),
-                    f"""{table}/{G(record, N._id)}""",
-                    fetchurl=f"""/api/{table}/{N.item}/{G(record, N._id)}""",
-                    urltitle=E,
-                    urlextra=E,
-                    **forceOpen(G(record, N._id), openEid),
-                )
-                for record in records
             ),
-        )),
-        cls=f"table {table}",
-    )
-
-  def insertButton(self):
-    mayInsert = self.mayInsert
-
-    if not mayInsert:
-      return E
-
-    table = self.table
-    itemSingle = self.itemLabels[0]
-
-    return H.iconx(
-        N.insert,
-        cls="large",
-        href=f"""/api/{table}/{N.insert}""",
-        title=f"""New {itemSingle}"""
-    )
-
-  def mayList(self, action=None):
-    control = self.control
-    auth = control.auth
-    isMainTable = self.isMainTable
-    isValueTable = self.isValueTable
-    return (
-        (
-            isMainTable and action == N.list
-            or
-            auth.superuser() or
-            (isMainTable or isValueTable) and auth.authenticated()
+            cls=f"table {table}",
         )
-    )
 
-  def title(self, record):
-    # return obj.record(record=record).title(**atts)
-    return Record.titleRaw(self, record)
+    def insertButton(self):
+        mayInsert = self.mayInsert
+
+        if not mayInsert:
+            return E
+
+        table = self.table
+        itemSingle = self.itemLabels[0]
+
+        return H.iconx(
+            N.insert,
+            cls="large",
+            href=f"""/api/{table}/{N.insert}""",
+            title=f"""New {itemSingle}""",
+        )
+
+    def mayList(self, action=None):
+        control = self.control
+        auth = control.auth
+        isMainTable = self.isMainTable
+        isValueTable = self.isValueTable
+        return (
+            isMainTable
+            and action == N.list
+            or auth.superuser()
+            or (isMainTable or isValueTable)
+            and auth.authenticated()
+        )
+
+    def title(self, record):
+        # return obj.record(record=record).title(**atts)
+        return Record.titleRaw(self, record)
 
 
 def forceOpen(theEid, openEid):
-  return (
-      dict(forceopen=ONE)
-      if openEid and str(theEid) == openEid else
-      dict()
-  )
+    return dict(forceopen=ONE) if openEid and str(theEid) == openEid else dict()

@@ -5,23 +5,17 @@ from controllers.utils import pick as G
 
 
 class ContribD(Details):
-  def __init__(self, recordObj):
-    super().__init__(recordObj)
+    def __init__(self, recordObj):
+        super().__init__(recordObj)
 
-  def wrap(self):
-    eid = self.eid
-    wfitem = self.wfitem
+    def wrap(self):
+        eid = self.eid
+        wfitem = self.wfitem
 
-    self.fetchDetails(
-        N.assessment,
-        sortKey=lambda r: G(r, N.dateCreated, default=0),
-    )
+        self.fetchDetails(
+            N.assessment, sortKey=lambda r: G(r, N.dateCreated, default=0),
+        )
 
-    statusRep = wfitem.status(N.contrib, eid)
+        statusRep = wfitem.status(N.contrib, eid)
 
-    return H.div(
-        [
-            statusRep,
-            self.wrapDetail(N.assessment),
-        ],
-    )
+        return H.div([statusRep, self.wrapDetail(N.assessment)])

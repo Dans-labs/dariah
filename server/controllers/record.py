@@ -40,269 +40,249 @@ TO_MASTER = {
 
 
 class Record:
-  inheritProps = (
-      N.control,
-      N.uid, N.eppn,
-      N.table, N.fields, N.prov,
-      N.isUserTable, N.isUserEntryTable,
-      N.itemLabels,
-  )
+    inheritProps = (
+        N.control,
+        N.uid,
+        N.eppn,
+        N.table,
+        N.fields,
+        N.prov,
+        N.isUserTable,
+        N.isUserEntryTable,
+        N.itemLabels,
+    )
 
-  def __init__(
-      self, Table, tableObj,
-      record=None, eid=None,
-      withDetails=False,
-      readonly=False,
-      bodyMethod=None,
-  ):
-    for prop in Record.inheritProps:
-      setattr(self, prop, getattr(tableObj, prop, None))
+    def __init__(
+        self,
+        Table,
+        tableObj,
+        record=None,
+        eid=None,
+        withDetails=False,
+        readonly=False,
+        bodyMethod=None,
+    ):
+        for prop in Record.inheritProps:
+            setattr(self, prop, getattr(tableObj, prop, None))
 
-    self.table = self.table
-    self.withDetails = withDetails
-    self.readonly = readonly
-    self.bodyMethod = bodyMethod
-    self.Table = Table
+        self.table = self.table
+        self.withDetails = withDetails
+        self.readonly = readonly
+        self.bodyMethod = bodyMethod
+        self.Table = Table
 
-    control = self.control
-    table = self.table
+        control = self.control
+        table = self.table
 
-    if record is None:
-      record = control.getItem(table, eid)
-    self.record = record
-    self.eid = G(record, N._id)
+        if record is None:
+            record = control.getItem(table, eid)
+        self.record = record
+        self.eid = G(record, N._id)
 
-    self.setPerm()
-    self.setWorkflow()
-    self.mayDelete = self.getDelPerm()
+        self.setPerm()
+        self.setWorkflow()
+        self.mayDelete = self.getDelPerm()
 
-  def getDelPerm(self):
-    control = self.control
-    auth = control.auth
-    isUserTable = self.isUserTable
-    isUserEntryTable = self.isUserEntryTable
-    readonly = self.readonly
-    perm = self.perm
+    def getDelPerm(self):
+        control = self.control
+        auth = control.auth
+        isUserTable = self.isUserTable
+        isUserEntryTable = self.isUserEntryTable
+        readonly = self.readonly
+        perm = self.perm
 
-    isAuthenticated = auth.authenticated()
-    isSuperuser = auth.superuser()
+        isAuthenticated = auth.authenticated()
+        isSuperuser = auth.superuser()
 
-    return (
-        not isUserEntryTable
-        and
-        not readonly
-        and
-        isAuthenticated
-        and
-        (
-            isSuperuser
-            or
-            isUserTable and G(perm, N.isEdit)
+        return (
+            not isUserEntryTable
+            and not readonly
+            and isAuthenticated
+            and (isSuperuser or isUserTable and G(perm, N.isEdit))
         )
-    )
 
-  def reload(
-      self, record,
-  ):
-    self.record = record
-    self.setPerm()
-    self.setWorkflow()
-    self.mayDelete = self.getDelPerm()
+    def reload(
+        self, record,
+    ):
+        self.record = record
+        self.setPerm()
+        self.setWorkflow()
+        self.mayDelete = self.getDelPerm()
 
-  def getDependencies(self):
-    control = self.control
-    db = control.db
-    table = self.table
-    record = self.record
+    def getDependencies(self):
+        control = self.control
+        db = control.db
+        table = self.table
+        record = self.record
 
-    return db.dependencies(table, record)
+        return db.dependencies(table, record)
 
-  def detailsFactory(self):
-    table = self.table
+    def detailsFactory(self):
+        table = self.table
 
-    DetailsClass = Details
-    for (tb, Dcl) in CASES:
-      if tb == table:
-        DetailsClass = Dcl
-        break
+        DetailsClass = Details
+        for (tb, Dcl) in CASES:
+            if tb == table:
+                DetailsClass = Dcl
+                break
 
-    return DetailsClass(self)
+        return DetailsClass(self)
 
-  def setPerm(self):
-    control = self.control
-    table = self.table
-    record = self.record
+    def setPerm(self):
+        control = self.control
+        table = self.table
+        record = self.record
 
-    self.perm = permRecord(
-        control,
-        table,
-        record,
-    )
+        self.perm = permRecord(control, table, record,)
 
-  def setWorkflow(self):
-    control = self.control
-    perm = self.perm
+    def setWorkflow(self):
+        control = self.control
+        perm = self.perm
 
-    contribId = G(perm, N.contribId)
+        contribId = G(perm, N.contribId)
 
-    self.wfitem = control.getWorkflowItem(contribId)
+        self.wfitem = control.getWorkflowItem(contribId)
 
-  def adjustWorkflow(self, update=True, delete=False):
-    control = self.control
-    wf = control.wf
-    perm = self.perm
+    def adjustWorkflow(self, update=True, delete=False):
+        control = self.control
+        wf = control.wf
+        perm = self.perm
 
-    contribId = G(perm, N.contribId)
-    if delete:
-      wf.delete(contribId)
-      self.wfitem = None
-    else:
-      wf.recompute(contribId)
-      if update:
-        self.wfitem = control.getWorkflowItem(contribId, requireFresh=True)
+        contribId = G(perm, N.contribId)
+        if delete:
+            wf.delete(contribId)
+            self.wfitem = None
+        else:
+            wf.recompute(contribId)
+            if update:
+                self.wfitem = control.getWorkflowItem(contribId, requireFresh=True)
 
-  def field(self, fieldName, **kwargs):
-    return Field(self, fieldName, **kwargs)
+    def field(self, fieldName, **kwargs):
+        return Field(self, fieldName, **kwargs)
 
-  def delete(self):
-    mayDelete = self.mayDelete
-    if not mayDelete:
-      return
+    def delete(self):
+        mayDelete = self.mayDelete
+        if not mayDelete:
+            return
 
-    dependencies = self.getDependencies()
-    nRef = G(dependencies, N.reference, default=0)
+        dependencies = self.getDependencies()
+        nRef = G(dependencies, N.reference, default=0)
 
-    if nRef:
-      return
+        if nRef:
+            return
 
-    nCas = G(dependencies, N.cascade, default=0)
-    if nCas:
-      if not self.deleteDetails():
-        return
+        nCas = G(dependencies, N.cascade, default=0)
+        if nCas:
+            if not self.deleteDetails():
+                return
 
-    control = self.control
-    table = self.table
-    eid = self.eid
+        control = self.control
+        table = self.table
+        eid = self.eid
 
-    control.delItem(table, eid)
+        control.delItem(table, eid)
 
-    if table == MAIN_TABLE:
-      self.adjustWorkflow(delete=True)
-    elif table in WORKFLOW_TABLES:
-      self.adjustWorkflow(update=False)
+        if table == MAIN_TABLE:
+            self.adjustWorkflow(delete=True)
+        elif table in WORKFLOW_TABLES:
+            self.adjustWorkflow(update=False)
 
-  def deleteDetails(self):
-    control = self.control
-    db = control.db
-    table = self.table
-    eid = self.eid
+    def deleteDetails(self):
+        control = self.control
+        db = control.db
+        table = self.table
+        eid = self.eid
 
-    for dtable in G(CASCADE_SPECS, table, default=[]):
-      db.delMany(dtable, {table: eid})
-    dependencies = self.getDependencies()
-    nRef = G(dependencies, N.reference, default=0)
-    return nRef == 0
+        for dtable in G(CASCADE_SPECS, table, default=[]):
+            db.delMany(dtable, {table: eid})
+        dependencies = self.getDependencies()
+        nRef = G(dependencies, N.reference, default=0)
+        return nRef == 0
 
-  def body(self, myMasters=None, hideMasters=False):
-    fieldSpecs = self.fields
-    provSpecs = self.prov
+    def body(self, myMasters=None, hideMasters=False):
+        fieldSpecs = self.fields
+        provSpecs = self.prov
 
-    return H.join(
-        self.field(field, asMaster=field in myMasters).wrap()
-        for field in fieldSpecs
-        if (
-            field not in provSpecs and
-            not (hideMasters and field in myMasters)
+        return H.join(
+            self.field(field, asMaster=field in myMasters).wrap()
+            for field in fieldSpecs
+            if (field not in provSpecs and not (hideMasters and field in myMasters))
         )
-    )
 
-  def wrap(
-      self,
-      inner=True,
-      wrapMethod=None,
-      expanded=1,
-      withProv=True,
-      hideMasters=False,
-      addCls=E,
-  ):
-    table = self.table
-    eid = self.eid
-    record = self.record
-    provSpecs = self.prov
-    withDetails = self.withDetails
-    withRefresh = table in REFRESH_TABLES
+    def wrap(
+        self,
+        inner=True,
+        wrapMethod=None,
+        expanded=1,
+        withProv=True,
+        hideMasters=False,
+        addCls=E,
+    ):
+        table = self.table
+        eid = self.eid
+        record = self.record
+        provSpecs = self.prov
+        withDetails = self.withDetails
+        withRefresh = table in REFRESH_TABLES
 
-    func = getattr(self, wrapMethod, None) if wrapMethod else None
-    if func:
-      return func()
+        func = getattr(self, wrapMethod, None) if wrapMethod else None
+        if func:
+            return func()
 
-    bodyMethod = self.bodyMethod
-    urlExtra = f"""?method={bodyMethod}""" if bodyMethod else E
-    fetchUrl = f"""/api/{table}/{N.item}/{eid}"""
+        bodyMethod = self.bodyMethod
+        urlExtra = f"""?method={bodyMethod}""" if bodyMethod else E
+        fetchUrl = f"""/api/{table}/{N.item}/{eid}"""
 
-    itemKey = f"""{table}/{G(record, N._id)}"""
-    theTitle = self.title()
+        itemKey = f"""{table}/{G(record, N._id)}"""
+        theTitle = self.title()
 
-    if expanded == -1:
-      return H.details(
-          theTitle,
-          H.div(ELLIPS),
-          itemKey,
-          fetchurl=fetchUrl,
-          urlextra=urlExtra,
-          urltitle=E,
-      )
+        if expanded == -1:
+            return H.details(
+                theTitle,
+                H.div(ELLIPS),
+                itemKey,
+                fetchurl=fetchUrl,
+                urlextra=urlExtra,
+                urltitle=E,
+            )
 
-    bodyFunc = (
-        getattr(self, f"""{N.body}{cap1(bodyMethod)}""", self.body)
-        if bodyMethod else
-        self.body
-    )
-    myMasters = G(MASTERS, table, default=[])
-
-    deleteButton = self.deleteButton()
-
-    innerCls = " inner" if inner else E
-
-    provenance = (
-        H.div(
-            H.detailx(
-                (N.prov, N.dismiss),
-                H.div(
-                    [
-                        self.field(field).wrap()
-                        for field in provSpecs
-                    ],
-                    cls="prov"
-                ),
-                f"""{table}/{G(record, N._id)}/{N.prov}""",
-                openAtts=dict(
-                    cls="button small",
-                    title="Provenance and editors of this record",
-                ),
-                closeAtts=dict(
-                    cls="button small",
-                    title="Hide provenance",
-                ),
-                cls="prov",
-            ),
-            cls="provx",
+        bodyFunc = (
+            getattr(self, f"""{N.body}{cap1(bodyMethod)}""", self.body)
+            if bodyMethod
+            else self.body
         )
-        if withProv else
-        E
-    )
+        myMasters = G(MASTERS, table, default=[])
 
-    main = (
-        H.div(
+        deleteButton = self.deleteButton()
+
+        innerCls = " inner" if inner else E
+
+        provenance = (
+            H.div(
+                H.detailx(
+                    (N.prov, N.dismiss),
+                    H.div(
+                        [self.field(field).wrap() for field in provSpecs], cls="prov"
+                    ),
+                    f"""{table}/{G(record, N._id)}/{N.prov}""",
+                    openAtts=dict(
+                        cls="button small",
+                        title="Provenance and editors of this record",
+                    ),
+                    closeAtts=dict(cls="button small", title="Hide provenance",),
+                    cls="prov",
+                ),
+                cls="provx",
+            )
+            if withProv
+            else E
+        )
+
+        main = H.div(
             [
                 deleteButton,
                 H.div(
-                    H.join(
-                        bodyFunc(
-                            myMasters=myMasters,
-                            hideMasters=hideMasters,
-                        )
-                    ),
+                    H.join(bodyFunc(myMasters=myMasters, hideMasters=hideMasters,)),
                     cls=f"{table.lower()}",
                 ),
                 *provenance,
@@ -310,104 +290,102 @@ class Record:
             cls=f"record{innerCls} {addCls}",
         )
 
-    )
+        rButton = H.iconr(itemKey, "#main", msg=table) if withRefresh else E
+        details = self.detailsFactory().wrap() if withDetails else E
 
-    rButton = H.iconr(itemKey, "#main", msg=table) if withRefresh else E
-    details = self.detailsFactory().wrap() if withDetails else E
-
-    return (
-        H.details(
-            rButton + theTitle,
-            H.div(main + details),
-            itemKey,
-            fetchurl=fetchUrl,
-            urlextra=urlExtra,
-            urltitle="""/title""",
-            fat=ONE,
+        return (
+            H.details(
+                rButton + theTitle,
+                H.div(main + details),
+                itemKey,
+                fetchurl=fetchUrl,
+                urlextra=urlExtra,
+                urltitle="""/title""",
+                fat=ONE,
+            )
+            if expanded == 1
+            else H.div(main + details)
         )
-        if expanded == 1 else
-        H.div(main + details)
-    )
 
-  def deleteButton(self):
-    mayDelete = self.mayDelete
+    def deleteButton(self):
+        mayDelete = self.mayDelete
 
-    if not mayDelete:
-      return E
+        if not mayDelete:
+            return E
 
-    record = self.record
-    table = self.table
-    itemSingle = self.itemLabels[0]
+        record = self.record
+        table = self.table
+        itemSingle = self.itemLabels[0]
 
-    dependencies = self.getDependencies()
+        dependencies = self.getDependencies()
 
-    nCas = G(dependencies, N.cascade, default=0)
-    cascadeMsg = (
-        H.span(
-            f"""{nCas} detail record{E if nCas == 1 else S}""",
-            title=f"""Detail records will be deleted with the master record""",
-            cls="label small warning-o right",
+        nCas = G(dependencies, N.cascade, default=0)
+        cascadeMsg = (
+            H.span(
+                f"""{nCas} detail record{E if nCas == 1 else S}""",
+                title=f"""Detail records will be deleted with the master record""",
+                cls="label small warning-o right",
+            )
+            if nCas
+            else E
         )
-        if nCas else
-        E
-    )
 
-    nRef = G(dependencies, N.reference, default=0)
+        nRef = G(dependencies, N.reference, default=0)
 
-    if nRef:
-      plural = E if nRef == 1 else S
-      return H.span(
-          [
-              H.icon(
-                  N.chain,
-                  cls="medium right",
-                  title=f"""Cannot delete because of {nRef} dependent record{plural}"""
-              ),
-              H.span(
-                  f"""{nRef} dependent record{plural}""",
-                  cls="label small warning-o right",
-              ),
-              cascadeMsg,
-          ]
-      )
+        if nRef:
+            plural = E if nRef == 1 else S
+            return H.span(
+                [
+                    H.icon(
+                        N.chain,
+                        cls="medium right",
+                        title=f"""Cannot delete because of {nRef} dependent record{plural}""",
+                    ),
+                    H.span(
+                        f"""{nRef} dependent record{plural}""",
+                        cls="label small warning-o right",
+                    ),
+                    cascadeMsg,
+                ]
+            )
 
-    if table in TO_MASTER:
-      masterTable = G(TO_MASTER, table)
-      masterId = G(record, masterTable)
-    else:
-      masterTable = None
-      masterId = None
+        if table in TO_MASTER:
+            masterTable = G(TO_MASTER, table)
+            masterId = G(record, masterTable)
+        else:
+            masterTable = None
+            masterId = None
 
-    url = (
-        f"""/api/{table}/{N.delete}/{G(record, N._id)}"""
-        if masterTable is None or masterId is None else
-        f"""/api/{masterTable}/{masterId}/{table}/{N.delete}/{G(record, N._id)}"""
-    )
-    return H.span(
-        [
-            cascadeMsg,
-            H.iconx(
-                N.delete,
-                cls="medium right",
-                href=url,
-                title=f"""Delete this {itemSingle}"""
-            ),
-        ]
-    )
+        url = (
+            f"""/api/{table}/{N.delete}/{G(record, N._id)}"""
+            if masterTable is None or masterId is None
+            else f"""/api/{masterTable}/{masterId}/{table}/{N.delete}/{G(record, N._id)}"""
+        )
+        return H.span(
+            [
+                cascadeMsg,
+                H.iconx(
+                    N.delete,
+                    cls="medium right",
+                    href=url,
+                    title=f"""Delete this {itemSingle}""",
+                ),
+            ]
+        )
 
-  def title(self):
-    record = self.record
-    return Record.titleRaw(self, record)
+    def title(self):
+        record = self.record
+        return Record.titleRaw(self, record)
 
-  @staticmethod
-  def titleRaw(obj, record):
-    table = obj.table
-    control = obj.control
+    @staticmethod
+    def titleRaw(obj, record):
+        table = obj.table
+        control = obj.control
 
-    types = control.types
-    typesObj = getattr(types, table)
+        types = control.types
+        typesObj = getattr(types, table)
 
-    isActual = table not in ACTUAL_TABLES or G(record, N.actual, default=False)
-    atts = {} if isActual else dict(cls="inactual")
+        isActual = table not in ACTUAL_TABLES or G(record, N.actual, default=False)
+        atts = {} if isActual else dict(cls="inactual")
 
-    return H.span(typesObj.title(record=record), **atts)
+        return H.span(typesObj.title(record=record), **atts)

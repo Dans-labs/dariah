@@ -6,53 +6,48 @@ from controllers.table import Table
 
 
 class AssessmentT(Table):
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-  def insert(self, masterTable=None, masterId=None):
-    mayInsert = self.mayInsert
-    if not mayInsert:
-      return None
+    def insert(self, masterTable=None, masterId=None):
+        mayInsert = self.mayInsert
+        if not mayInsert:
+            return None
 
-    if not masterTable or not masterId:
-      return None
+        if not masterTable or not masterId:
+            return None
 
-    control = self.control
-    db = control.db
-    uid = self.uid
-    eppn = self.eppn
-    table = self.table
-    typeCriteria = db.typeCriteria
+        control = self.control
+        db = control.db
+        uid = self.uid
+        eppn = self.eppn
+        table = self.table
+        typeCriteria = db.typeCriteria
 
-    masterOid = ObjectId(masterId)
+        masterOid = ObjectId(masterId)
 
-    wfitem = control.getWorkflowItem(masterOid)
+        wfitem = control.getWorkflowItem(masterOid)
 
-    if not wfitem.permission(N.contrib, masterOid, N.startAssessment):
-      return masterId
+        if not wfitem.permission(N.contrib, masterOid, N.startAssessment):
+            return masterId
 
-    (contribType, contribTitle) = wfitem.attributes(
-        N.contrib, masterOid,
-        N.type, N.title,
-    )
+        (contribType, contribTitle) = wfitem.attributes(
+            N.contrib, masterOid, N.type, N.title,
+        )
 
-    fields = {
-        masterTable: masterOid,
-        N.assessmentType: contribType,
-        N.title: f"assessment of {contribTitle}",
-    }
-    assessmentId = db.insertItem(table, uid, eppn, **fields)
-
-    criteria = G(typeCriteria, contribType, default=[])
-    records = [
-        {
-            N.seq: seq,
-            N.criteria: crit,
-            N.assessment: assessmentId,
+        fields = {
+            masterTable: masterOid,
+            N.assessmentType: contribType,
+            N.title: f"assessment of {contribTitle}",
         }
-        for (seq, crit) in enumerate(criteria)
-    ]
-    db.insertMany(N.criteriaEntry, uid, eppn, records)
-    self.adjustWorkflow(masterOid, new=False)
+        assessmentId = db.insertItem(table, uid, eppn, **fields)
 
-    return masterId
+        criteria = G(typeCriteria, contribType, default=[])
+        records = [
+            {N.seq: seq, N.criteria: crit, N.assessment: assessmentId}
+            for (seq, crit) in enumerate(criteria)
+        ]
+        db.insertMany(N.criteriaEntry, uid, eppn, records)
+        self.adjustWorkflow(masterOid, new=False)
+
+        return masterId

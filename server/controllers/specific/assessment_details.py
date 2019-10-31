@@ -11,94 +11,71 @@ REVIEW_DECISION = CW.messages[N.reviewDecision]
 
 
 class AssessmentD(Details):
-  def __init__(self, recordObj):
-    super().__init__(recordObj)
+    def __init__(self, recordObj):
+        super().__init__(recordObj)
 
-  def wrap(self):
-    eid = self.eid
-    wfitem = self.wfitem
+    def wrap(self):
+        eid = self.eid
+        wfitem = self.wfitem
 
-    (reviewer, reviewers) = wfitem.attributes(
-        N.assessment, eid,
-        N.reviewer, N.reviewers,
-    )
+        (reviewer, reviewers) = wfitem.attributes(
+            N.assessment, eid, N.reviewer, N.reviewers,
+        )
 
-    self.fetchDetails(N.criteriaEntry, sortKey=cEntrySort)
+        self.fetchDetails(N.criteriaEntry, sortKey=cEntrySort)
 
-    criteriaPart = self.wrapDetail(
-        N.criteriaEntry,
-        bodyMethod=N.compact,
-    )
+        criteriaPart = self.wrapDetail(N.criteriaEntry, bodyMethod=N.compact,)
 
-    self.fetchDetails(
-        N.review,
-        sortKey=lambda r: G(r, N.dateCreated, default=0),
-    )
+        self.fetchDetails(
+            N.review, sortKey=lambda r: G(r, N.dateCreated, default=0),
+        )
 
-    byReviewer = {N.expert: [], N.final: []}
+        byReviewer = {N.expert: [], N.final: []}
 
-    for dest in (N.expert, N.final):
-      byReviewer[dest] = self.wrapDetail(
-          N.review,
-          filterFunc=lambda r: G(r, N.creator) == G(reviewer, dest),
-          bodyMethod=N.compact,
-          withDetails=True,
-          expanded=True,
-          withProv=True,
-          withN=False,
-          inner=False,
-      )
+        for dest in (N.expert, N.final):
+            byReviewer[dest] = self.wrapDetail(
+                N.review,
+                filterFunc=lambda r: G(r, N.creator) == G(reviewer, dest),
+                bodyMethod=N.compact,
+                withDetails=True,
+                expanded=True,
+                withProv=True,
+                withN=False,
+                inner=False,
+            )
 
-    orphanedReviews = self.wrapDetail(
-        N.review,
-        filterFunc=lambda r: G(r, N.creator) not in reviewers,
-        withProv=True,
-    )
+        orphanedReviews = self.wrapDetail(
+            N.review,
+            filterFunc=lambda r: G(r, N.creator) not in reviewers,
+            withProv=True,
+        )
 
-    reviewPart = (
-        H.div(
+        reviewPart = H.div(
             [
                 H.div(
-                    [
-                        H.div(
-                            cap1(dest),
-                            cls="head",
-                        ),
-                        G(byReviewer, dest),
-                    ],
+                    [H.div(cap1(dest), cls="head",), G(byReviewer, dest)],
                     cls=f"reviews {dest}",
                 )
                 for dest in reviewer
             ],
             cls="reviewers",
-        )
-        +
-        (
+        ) + (
             H.div(
                 [
-                    H.div(
-                        cap1(N.orphaned) + " " + N.reviews,
-                        cls="head",
-                    ),
+                    H.div(cap1(N.orphaned) + " " + N.reviews, cls="head",),
                     orphanedReviews,
                 ],
             )
-            if orphanedReviews else
-            E
+            if orphanedReviews
+            else E
         )
-    )
 
-    statusRep = wfitem.status(N.assessment, eid)
+        statusRep = wfitem.status(N.assessment, eid)
 
-    return H.div(
-        [
-            criteriaPart,
-            statusRep,
-            H.div(REVIEW_DECISION, cls="head"),
-            reviewPart,
-        ],
-    )
+        return H.div(
+            [criteriaPart, statusRep, H.div(REVIEW_DECISION, cls="head"), reviewPart],
+        )
 
 
 def cEntrySort(r):
-  return (G(r, N.assessment), G(r, N.seq) or 0)
+    return (G(r, N.assessment), G(r, N.seq) or 0)

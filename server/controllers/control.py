@@ -12,7 +12,7 @@ VALUE_TABLES = set(CT.valueTables)
 
 
 class Control:
-  """
+    """
   * db
     Contains db-access methods and the content of all value tables.
     It is server wide, it exists before the webapp is created.
@@ -44,71 +44,76 @@ class Control:
     Note that the value records are already cached in db itself.
     If such a record changes, db will reread the whole table.
     But this happens very rarely.
-  """
+    """
 
-  def __init__(self, db, wf, auth):
-    self.db = db
-    self.wf = wf
-    self.auth = auth
-    self.types = Types(self)
-    self.cache = {}
+    def __init__(self, db, wf, auth):
+        self.db = db
+        self.wf = wf
+        self.auth = auth
+        self.types = Types(self)
+        self.cache = {}
 
-    wf.addControl(self)
+        wf.addControl(self)
 
-  def getItem(self, table, eid, requireFresh=False):
-    if not eid:
-      return {}
+    def getItem(self, table, eid, requireFresh=False):
+        if not eid:
+            return {}
 
-    db = self.db
+        db = self.db
 
-    if table in VALUE_TABLES:
-      return db.getItem(table, eid)
+        if table in VALUE_TABLES:
+            return db.getItem(table, eid)
 
-    return self.getCached(
-        db.getItem, N.getItem, [table, eid], table, eid, requireFresh,
-    )
+        return self.getCached(
+            db.getItem, N.getItem, [table, eid], table, eid, requireFresh,
+        )
 
-  def getWorkflowItem(self, contribId, requireFresh=False):
-    if not contribId:
-      return None
+    def getWorkflowItem(self, contribId, requireFresh=False):
+        if not contribId:
+            return None
 
-    db = self.db
-    wf = self.wf
+        db = self.db
+        wf = self.wf
 
-    if not requireFresh:
-      wfitem = wf.getItem(contribId)
-      if wfitem:
-        return wfitem
+        if not requireFresh:
+            wfitem = wf.getItem(contribId)
+            if wfitem:
+                return wfitem
 
-    attributes = self.getCached(
-        db.getWorkflowItem, N.getWorkflowItem, [contribId], N.workflow, contribId, requireFresh,
-    )
-    return wf.makeItem(attributes)
+        attributes = self.getCached(
+            db.getWorkflowItem,
+            N.getWorkflowItem,
+            [contribId],
+            N.workflow,
+            contribId,
+            requireFresh,
+        )
+        return wf.makeItem(attributes)
 
-  def delItem(self, table, eid):
-    db = self.db
-    cache = self.cache
+    def delItem(self, table, eid):
+        db = self.db
+        cache = self.cache
 
-    db.delItem(table, eid)
-    if table in VALUE_TABLES:
-      key = eid if type(eid) is str else str(eid)
-      if table in cache:
-        cachedTable = cache[table]
-        if key in cachedTable:
-          del cachedTable[key]
+        db.delItem(table, eid)
+        if table in VALUE_TABLES:
+            key = eid if type(eid) is str else str(eid)
+            if table in cache:
+                cachedTable = cache[table]
+                if key in cachedTable:
+                    del cachedTable[key]
 
-  def getCached(self, method, methodName, methodArgs, table, eid, requireFresh):
-    cache = self.cache
+    def getCached(self, method, methodName, methodArgs, table, eid, requireFresh):
+        cache = self.cache
 
-    key = eid if type(eid) is str else str(eid)
+        key = eid if type(eid) is str else str(eid)
 
-    if not requireFresh:
-      if table in cache:
-        if key in cache[table]:
-          if DEBUG:
-            serverprint(f"""CACHE HIT {methodName}({key})""")
-          return cache[table][key]
+        if not requireFresh:
+            if table in cache:
+                if key in cache[table]:
+                    if DEBUG:
+                        serverprint(f"""CACHE HIT {methodName}({key})""")
+                    return cache[table][key]
 
-    result = method(*methodArgs)
-    cache.setdefault(table, {})[key] = result
-    return result
+        result = method(*methodArgs)
+        cache.setdefault(table, {})[key] = result
+        return result
