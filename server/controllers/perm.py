@@ -64,11 +64,14 @@ def authenticated(user):
   return group != UNAUTH
 
 
-def coordinator(user):
+def coordinator(user, country):
   group = G(user, N.groupRep) or UNAUTH
-  return group == COORD
-
-  return group in {OFFICE, SYSTEM, ROOT}
+  uCountry = G(user, N.country)
+  isCoord = group == COORD
+  return (
+      isCoord and
+      (country is None or uCountry == country)
+  )
 
 
 def superuser(user):

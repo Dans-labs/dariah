@@ -41,7 +41,7 @@ def attStr(atts, addClass=None):
     )
 
 
-class HtmlElement(object):
+class HtmlElement:
   def __init__(self, name):
     self.name = name
 
@@ -56,7 +56,7 @@ class HtmlElement(object):
     )
 
 
-class HtmlElements(object):
+class HtmlElements:
   @staticmethod
   def a(material, href, **atts):
     return HtmlElement(N.a).wrap(material, href=href, **atts)

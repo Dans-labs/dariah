@@ -39,7 +39,7 @@ TO_MASTER = {
 }
 
 
-class Record(object):
+class Record:
   inheritProps = (
       N.control,
       N.uid, N.eppn,

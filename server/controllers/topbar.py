@@ -12,7 +12,7 @@ SLOGOUT = URLS[N.slogout]
 LOGO = URLS[N.logo]
 
 
-class Topbar(object):
+class Topbar:
   def __init__(self, control):
     self.control = control
 

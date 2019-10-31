@@ -27,7 +27,7 @@ def labelDiv(label):
   )
 
 
-class Field(object):
+class Field:
   inheritProps = (
       N.control,
       N.uid, N.eppn,
@@ -40,6 +40,8 @@ class Field(object):
       self, recordObj, field,
       asMaster=False,
       readonly=None,
+      mayRead=None,
+      mayEdit=None,
   ):
     for prop in Field.inheritProps:
       setattr(self, prop, getattr(recordObj, prop, None))
@@ -97,9 +99,12 @@ class Field(object):
 
     readonly = self.readonly if readonly is None else readonly
 
-    (self.mayRead, self.mayEdit) = getPerms(
-        table, perm, require,
-    )
+    (self.mayRead, self.mayEdit) = getPerms(table, perm, require)
+    if mayRead is not None:
+      self.mayRead = mayRead
+    if mayEdit is not None:
+      self.mayEdit = mayEdit
+
     if readonly or asMaster:
       self.mayEdit = False
 
@@ -111,12 +116,12 @@ class Field(object):
         )
     )
 
-  def save(self, data):
+  def checkSave(self, data):
     mayEdit = self.mayEdit
 
-    if not mayEdit:
-      return
+    return mayEdit
 
+  def save(self, data):
     control = self.control
     db = control.db
     uid = self.uid
@@ -150,6 +155,9 @@ class Field(object):
         ]
       else:
         data = conversion(data, **args)
+
+    if not self.checkSave(data):
+      return
 
     modified = G(record, N.modified)
     nowFields = []

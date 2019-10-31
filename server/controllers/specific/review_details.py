@@ -26,7 +26,7 @@ class ReviewD(Details):
     thisReviewer = G(reviewer, kind)
     creatorId = G(record, N.creator)
 
-    (frozen, statusRep) = wfitem.status(N.review, eid)
+    statusRep = wfitem.status(N.review, eid)
 
     orphaned = creatorId is None or thisReviewer != creatorId
     if orphaned:

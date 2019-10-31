@@ -88,7 +88,7 @@ class AssessmentD(Details):
         )
     )
 
-    (frozen, statusRep) = wfitem.status(N.assessment, eid)
+    statusRep = wfitem.status(N.assessment, eid)
 
     return H.div(
         [

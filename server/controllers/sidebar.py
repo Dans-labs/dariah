@@ -16,7 +16,7 @@ OPTIONS = CW.options
 CAPTIONS = CW.captions
 
 
-class Sidebar(object):
+class Sidebar:
   def __init__(self, control, path):
     self.control = control
     self.path = path

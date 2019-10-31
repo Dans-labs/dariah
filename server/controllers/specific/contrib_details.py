@@ -17,7 +17,7 @@ class ContribD(Details):
         sortKey=lambda r: G(r, N.dateCreated, default=0),
     )
 
-    (frozen, statusRep) = wfitem.status(N.contrib, eid)
+    statusRep = wfitem.status(N.contrib, eid)
 
     return H.div(
         [

@@ -17,7 +17,7 @@ WORKFLOW_TABLES_LIST = CT.userTables + CT.userEntryTables
 WORKFLOW_TABLES = set(WORKFLOW_TABLES_LIST)
 
 
-class Workflow(object):
+class Workflow:
   def __init__(self, db):
     self.db = db
     decisionRecords = db.getValueRecords(N.decision)
@@ -55,6 +55,7 @@ class Workflow(object):
   def addControl(self, control):
     auth = control.auth
     user = auth.user
+    self.auth = auth
     self.uid = G(user, N._id)
     self.eppn = G(user, N.eppn)
 
@@ -155,6 +156,17 @@ class Workflow(object):
     contribType = G(record, N.typeContribution)
     contribTitle = G(record, N.title)
     creator = G(record, N.creator)
+    country = G(record, N.country)
+    selected = G(record, N.selected)
+
+    stage = (
+        N.selectNone
+        if selected else
+        N.selectYes
+        if selected is not None else
+        N.selectNo
+    )
+    frozen = stage != N.selectNone
 
     assessments = [
         self.computeWorkflowAssessment(rec, contribType)
@@ -172,42 +184,102 @@ class Workflow(object):
       assessmentIndex[assessmentId] = assessment
       reviewIndex.update(thisReviewIndex)
 
+    (assessmentValid, locked, mayAdd) = self.extendWorkflow(
+        contribType, frozen,
+        assessments,
+        assessmentIndex,
+        reviewIndex,
+    )
+
+    return {
+        N._id: contribId,
+        N.creator: creator,
+        N.country: country,
+        N.type: contribType,
+        N.title: contribTitle,
+        N.stage: stage,
+        N.frozen: frozen,
+        N.locked: locked,
+        N.mayAdd: mayAdd,
+        N.selected: G(record, N.selected),
+        N.assessments: assessmentIds,
+        N.assessmentValid: assessmentValid,
+        N.assessmentIndex: assessmentIndex,
+        N.reviewIndex: reviewIndex,
+    }
+
+  def extendWorkflow(
+      self,
+      contribType, frozen,
+      assessments,
+      assessmentIndex,
+      reviewIndex,
+  ):
     ref = getLast([
         attributes
         for attributes in assessments
         if contribType is not None and G(attributes, N.type) == contribType
     ])
+    locked = False
     assessmentValid = str(G(ref, N._id, default=E))
-    assessmentType = G(ref, N.type)
+    finalReviewStage = None
 
-    reviewValid = {
-        kind:
-        getLast([
-            rId
-            for rId in theReviews or []
-            if (
-                assessmentType is not None and
-                G(G(reviewIndex, rId), N.type) == assessmentType
-            )
-        ])
-        for (kind, theReviews) in G(ref, N.reviews, default={}).items()
-    }
+    if assessmentValid:
+      assessmentRecord = assessmentIndex[assessmentValid]
+      assessmentRecord.update({
+          N.valid: True,
+          N.frozen: frozen,
+      })
+      reviewValid = G(G(assessmentIndex, assessmentValid), N.reviewValid, default={})
+      for (kind, reviewId) in reviewValid.items():
+        reviewRecord = G(reviewIndex, reviewId)
+        reviewRecord.update({
+            N.valid: True,
+            N.frozen: frozen,
+        })
 
-    wfRecord = {
-        N._id: contribId,
-        N.creator: creator,
-        N.type: contribType,
-        N.title: contribTitle,
-        N.selected: G(record, N.selected),
-        N.assessments: assessmentIds,
-        N.assessmentValid: assessmentValid,
-        N.assessmentIndex: assessmentIndex,
-        N.reviewValid: reviewValid,
-        N.reviewIndex: reviewIndex,
-    }
+      expertReviewId = G(reviewValid, N.expert)
+      expertReviewRecord = G(reviewIndex, expertReviewId)
+      expertReviewStage = G(expertReviewRecord, N.stage)
+      finalReviewId = G(reviewValid, N.final)
+      finalReviewRecord = G(reviewIndex, finalReviewId)
+      finalReviewStage = G(finalReviewRecord, N.stage)
+      if finalReviewRecord:
+        if expertReviewStage:
+          if not finalReviewStage:
+            finalReviewRecord[N.locked] = False
+        else:
+          finalReviewRecord[N.locked] = True
 
-    self.addToWorkflow(wfRecord)
-    return wfRecord
+      if finalReviewStage:
+        if finalReviewStage == N.reviewRevise:
+          finalReviewDate = G(finalReviewRecord, N.datedecided)
+          newAstage = None
+          aStage = G(assessmentRecord, N.stage)
+          if aStage == N.submitted:
+            if finalReviewDate < G(assessmentRecord, N.dateSubmitted):
+              newAstage = N.submittedRevised
+              locked = True
+          elif aStage == N.complete:
+            newAstage = N.completeRevised
+          elif aStage == N.incomplete:
+            newAstage = N.incompleteRevised
+          if newAstage:
+            assessmentRecord[N.stage] = newAstage
+        else:
+          locked = True
+          finalReviewRecord[N.locked] = True
+          expertReviewRecord[N.locked] = True
+          assessmentRecord[N.locked] = True
+
+        mayAddR = {
+            kind: not locked and not frozen and not G(reviewValid, kind)
+            for kind in reviewValid
+        }
+        assessmentRecord[N.mayAdd] = mayAddR
+
+    mayAdd = not locked and not frozen and not assessmentValid
+    return (assessmentValid, locked, mayAdd)
 
   def computeWorkflowAssessment(self, record, contribType):
     db = self.db
@@ -239,6 +311,13 @@ class Workflow(object):
     submitted = G(record, N.submitted)
     dateSubmitted = G(record, N.dateSubmitted)
     dateWithdrawn = G(record, N.dateWithdrawn)
+    if submitted:
+      stage = N.submitted
+    else:
+      if complete:
+        stage = N.complete
+      else:
+        stage = N.incomplete
 
     score = self.computeScore(centries)
 
@@ -258,7 +337,7 @@ class Workflow(object):
             G(rec, N.creator) == theReviewer
         ):
           reviewWf = self.computeWorkflowReview(
-              rec, reviewer, assessmentType, contribType,
+              kind, rec, reviewer, assessmentType, contribType,
           )
           reviewId = str(G(reviewWf, N._id, default=E))
           reviews.setdefault(kind, []).append(reviewId)
@@ -276,6 +355,7 @@ class Workflow(object):
         ])
         for (kind, theReviews) in reviews.items()
     }
+
     return {
         N._id: assessmentId,
         N.creator: creator,
@@ -290,6 +370,7 @@ class Workflow(object):
         N.submitted: submitted,
         N.dateSubmitted: dateSubmitted,
         N.dateWithdrawn: dateWithdrawn,
+        N.stage: stage,
         N.reviewer: reviewer,
         N.reviewers: reviewers,
         N.reviews: reviews,
@@ -297,7 +378,7 @@ class Workflow(object):
         N.reviewIndex: reviewIndex,
     }
 
-  def computeWorkflowReview(self, record, reviewer, assessmentType, contribType):
+  def computeWorkflowReview(self, kind, record, reviewer, assessmentType, contribType):
     decisions = self.decisions
 
     reviewId = G(record, N._id)
@@ -305,7 +386,21 @@ class Workflow(object):
     reviewTitle = G(record, N.reviewTitle)
     creator = G(record, N.creator)
     decision = G(decisions, G(record, N.decision))
+    decisionRep = G(decisions, decision)
     dateDecided = G(record, N.dateDecided)
+
+    if kind == N.expert:
+      if decisionRep:
+        stage = N.reviewExpert
+    else:
+      if decisionRep == N.Accept:
+        stage = N.reviewAccept
+      elif decisionRep == N.Reject:
+        stage = N.reviewReject
+      elif decisionRep == N.Revise:
+        stage = N.reviewRevise
+      else:
+        stage = None
 
     return {
         N._id: reviewId,
@@ -317,184 +412,11 @@ class Workflow(object):
             reviewType == assessmentType and
             reviewType == contribType
         ),
-        N.decision: decision,
+        N.kind: kind,
         N.dateDecided: dateDecided,
+        N.stage: stage,
         N.reviewer: reviewer,
     }
-
-  def addToWorkflow(self, wfRecord):
-    selected = G(wfRecord, N.selected)
-
-    rep = E
-    cls = ""
-    frozen = 0
-    if selected:
-      frozen = 3
-      cls = "good"
-      rep = "Selected by National Coordinator"
-    elif selected is not None:
-      frozen = 3
-      cls = "error"
-      rep = "No selection decision by National Coordinator"
-
-    contribStatus = dict(
-        frozen=frozen,
-        cls=cls,
-        rep=rep,
-    )
-
-    self.addToWorkflowAssessments(wfRecord, contribStatus)
-    assessmentIndex = G(wfRecord, N.assessmentIndex)
-
-    assessmentValid = G(wfRecord, N.assessmentValid)
-    assessmentStatus = {}
-    if assessmentValid:
-      awfRecord = G(assessmentIndex, assessmentValid)
-      aFrozen = awfRecord[N.frozen]
-      aScore = awfRecord[N.score]
-      assessmentStatus = dict(
-          hasValid=True,
-          frozen=aFrozen,
-          score=aScore,
-          cls=awfRecord[N.cls],
-          rep=awfRecord[N.rep],
-      )
-      if frozen < aFrozen:
-        frozen = aFrozen
-    else:
-      assessmentStatus = dict(
-          hasValid=False,
-          frozen=None,
-          cls="info",
-          rep="No valid assessment",
-      )
-
-    wfRecord.update(dict(
-        frozen=frozen,
-        rep=rep,
-        cls=cls,
-        assessmentStatus=assessmentStatus
-    ))
-
-  def addToWorkflowAssessments(self, wfRecord, contribStatus):
-    assessmentIndex = G(wfRecord, N.assessmentIndex)
-    reviewIndex = G(wfRecord, N.reviewIndex)
-    assessmentValid = G(wfRecord, N.assessmentValid)
-    aIds = G(wfRecord, N.assessments, default=[])
-
-    for aId in aIds:
-      wfAssessment = G(assessmentIndex, aId)
-      complete = G(wfAssessment, N.complete)
-      submitted = G(wfAssessment, N.submitted)
-      dateSubmitted = G(wfAssessment, N.dateSubmitted)
-      dateWithdrawn = G(wfAssessment, N.dateWithdrawn)
-
-      valid = assessmentValid and assessmentValid == aId
-      wfAssessment[N.valid] = valid
-      code = None
-      rep = E
-      cls = ""
-      if complete:
-        if submitted:
-          if dateWithdrawn:
-            if dateWithdrawn < dateSubmitted:
-              rep = "Assessment resubmitted"
-              cls = "info"
-              code = 2
-            else:
-              rep = "Assessment being revised by author"
-              cls = "warning"
-              code = -1
-          else:
-            rep = "Assessment submitted"
-            cls = "info"
-            code = 2
-        else:
-          rep = "Assessment complete"
-          cls = "info"
-          code = 1
-      else:
-        rep = "Assessment still incomplete"
-        cls = "warning"
-        code = 0
-
-      self.addToWorkflowReviews(wfAssessment, wfRecord, contribStatus)
-
-      reviewValid = G(wfAssessment, N.reviewValid)
-      reviewFinal = G(reviewValid, N.final)
-      wfReviewFinal = G(reviewIndex, reviewFinal)
-
-      if reviewFinal and G(wfReviewFinal, N.frozen) == 2:
-        frozen = G(wfReviewFinal, N.frozen)
-        rep = G(wfReviewFinal, N.rep)
-        cls = G(wfReviewFinal, N.cls)
-      else:
-        frozen = 1 if code == 2 else 0
-
-      contribFrozen = contribStatus[N.frozen]
-      if contribFrozen > frozen:
-        frozen = contribFrozen
-
-      wfAssessment.update(dict(
-          hasValid={
-              kind: not not G(reviewValid, kind)
-              for kind in {N.expert, N.final}
-          },
-          frozen=frozen,
-          rep=rep,
-          cls=cls,
-      ))
-
-  def addToWorkflowReviews(self, wfAssessment, wfRecord, contribStatus):
-    reviewIndex = G(wfRecord, N.reviewIndex)
-    reviewValidByKind = G(wfAssessment, N.reviewValid)
-    reviewIdsByKind = G(wfAssessment, N.reviews, default={})
-
-    decisions = self.decisions
-    decisionParticiple = self.decisionParticiple
-
-    validAssessment = G(wfAssessment, N.valid)
-
-    for (kind, reviewIds) in reviewIdsByKind.items():
-      for rId in reviewIds:
-        wfReview = G(reviewIndex, rId)
-        reviewValid = G(reviewValidByKind, kind)
-        decision = G(wfReview, N.decision)
-        decisionRep = G(decisions, decision)
-        decisionPart = G(decisionParticiple, decision, default=E).lower()
-
-        validRel = reviewValid and reviewValid == rId
-        valid = validAssessment and validRel
-        code = None
-        rep = E
-        cls = "info"
-        if decisionRep == N.Accept:
-          code = 1
-          rep = f"Review outcome: {decisionPart}"
-          cls = "good"
-        elif decisionRep == N.Reject:
-          code = -1
-          rep = f"Review outcome: {decisionPart}"
-          cls = "good"
-        elif decisionRep == N.Revise:
-          code = 0
-          rep = f"Review outcome: {decisionPart}"
-          cls = "warning"
-
-        frozen = 2 if code in {1, -1} else 0
-
-        contribFrozen = contribStatus[N.frozen]
-        if contribFrozen > frozen:
-          frozen = contribFrozen
-
-        wfReview.update(dict(
-            kind=kind,
-            valid=valid,
-            validRel=validRel,
-            frozen=frozen,
-            rep=rep,
-            cls=cls,
-        ))
 
   def computeScore(self, cEntries):
     scoreMapping = self.scoreMapping

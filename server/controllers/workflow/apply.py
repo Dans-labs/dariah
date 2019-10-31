@@ -1,5 +1,5 @@
 from controllers.config import Config as C, Names as N
-from controllers.utils import getLast, pick as G, E
+from controllers.utils import pick as G, E
 from controllers.html import HtmlElements as H
 
 
@@ -9,11 +9,16 @@ CF = C.workflow
 USER_TABLES_LIST = CT.userTables
 USER_TABLES = set(USER_TABLES_LIST)
 
-FROZEN_REASONS = CF.frozenReasons
+STAGES = CF.stages
+
+STAGE_ATTS = CF.stageAtts
+ACTIONS = CF.actions
+STATUS_REP = CF.statusRep
 
 
-class WorkflowItem(object):
+class WorkflowItem:
   def __init__(self, wf, data):
+    self.auth = wf.auth
     self.uid = wf.uid
     self.eppn = wf.eppn
     self.data = data
@@ -45,6 +50,17 @@ class WorkflowItem(object):
         None
     )
 
+  def getKindReviewer(self, reviewer):
+    uid = self.uid
+
+    return (
+        N.expert
+        if G(reviewer, N.expert) == uid else
+        N.final
+        if G(reviewer, N.final) == uid else
+        None
+    )
+
   def attributes(self, table, eid, *atts):
     data = self.data
 
@@ -54,17 +70,13 @@ class WorkflowItem(object):
         for att in atts
     )
 
-  def attributesA(self, table, eid, *atts):
-    thatData = self._getWf(table, eid=eid)
-    thisData = (
-        G(thatData, N.assessmentStatus)
-        if table == N.contrib else
-        thatData
-    )
-    return (G(thisData, att) for att in atts)
-
   def permission(self, table, eid, action):
+    auth = self.auth
     uid = self.uid
+
+    allowedActions = set(G(ACTIONS, table, default=[]))
+    if action not in allowedActions:
+      return False
 
     if (
         uid is None or
@@ -72,261 +84,206 @@ class WorkflowItem(object):
     ):
       return False
 
-    (hasValid,) = self.attributesA(
+    (locked, frozen, mayAdd) = self.attributes(
         table, eid,
-        N.hasValid,
+        N.locked, N.frozen, N.mayAdd,
     )
-    (creator, reviewIndex, reviews) = self.attributes(
+    (assessmentValid, ) = self.attributes(
+        N.contrib, None,
+        N.assessmentValid,
+    )
+    (stage, creator, country) = self.attributes(
         table, eid,
-        N.creator, N.reviewIndex, N.reviews
+        N.stage, N.creator, N.country,
     )
-
-    finalReview = getLast(G(reviews, N.final))
-    finalReviewWf = G(reviewIndex, finalReview)
-    decision = G(finalReviewWf, N.decision)
-    isDecided = decision not in {None, N.Revise}
-
-    if isDecided:
-      return False
 
     if table == N.contrib:
+      isCoord = auth.coordinator(country=country)
+      isSuper = auth.superuser()
+      if uid != creator and not isCoord and not isSuper:
+        return False
+
+      if action == N.selectContrib:
+        return isCoord and not frozen
+
+      if action == N.deselectContrib:
+        return isCoord and not frozen
+
+      if action == N.unselectContrib:
+        return isSuper
+
       if action == N.startAssessment:
-        return (
-            not hasValid and
-            uid == creator
-        )
+        return mayAdd and not frozen and not locked
+
       return False
 
-    (complete, submitted, dateSubmitted, dateWithdrawn, reviewer) = self.attributes(
+    if locked or frozen:
+      return False
+
+    (reviewer, ) = self.attributes(
         table, eid,
-        N.complete, N.submitted, N.dateSubmitted, N.dateWithdrawn, N.reviewer,
+        N.reviewer,
     )
-    newKind = (
-        N.expert
-        if G(reviewer, N.expert) == uid else
-        N.final
-        if G(reviewer, N.final) == uid else
-        None
-    )
+
     if table == N.assessment:
-      if uid != creator:
+      if uid != creator or eid != assessmentValid:
         return False
 
       if action == N.submitAssessment:
-        if not complete:
-          return False
-        return (
-            not dateSubmitted or
-            dateWithdrawn and dateSubmitted < dateWithdrawn
-        )
+        return stage == N.complete
+
       if action == N.withdrawAssessment:
-        if not submitted:
-          return False
+        return True
+
+      if action == N.submitRevision:
+        return stage == N.completeRevised
 
       if action == N.startReview:
-        if newKind is None:
-          return False
-        return not G(hasValid, newKind)
-
-      return False
-
-    if table == N.review:
-      if action == N.decideExpertReview:
-        pass
+        kind = self.getReviewKind(reviewer)
+        return G(mayAdd, kind)
 
       return False
 
     return False
 
-  def status(self, table, eid):
-    uid = self.uid
-
+  def statusOverview(self, table, eid):
     (
-        contribId, creator, cls, rep, frozen, valid, validRel, kind,
-        dateSubmitted, reviewer,
+        stage, locked, frozen, valid, score,
     ) = self.attributes(
         table, eid,
-        None, N.creator, N.cls, N.rep, N.frozen, N.valid, N.validRel, N.kind,
-        N.dateSubmitted, N.reviewer,
+        N.stage, N.locked, N.frozen, N.valid, N.score,
     )
+    stageInfo = G(STAGE_ATTS, stage)
+    statusMsg = G(stageInfo, N.msg)
+    statusCls = G(stageInfo, N.cls)
+    invalidMsg = None
+    invalidCls = None
+    if not valid and table != N.contrib:
+      invalidMsg = f"{G(STATUS_REP, N.invalid)} {table}"
+      invalidCls = "warning"
+    lockedMsg = G(STATUS_REP, N.locked) if locked else E
+    lockedCls = N.locked if locked else E
+    frozenMsg = G(STATUS_REP, N.frozen) if frozen else E
+    frozenCls = N.frozen if frozen else E
 
-    frozen = frozen or 0
-    reason = FROZEN_REASONS[frozen]
-    frozenCls = f"frozen{frozen}"
-
-    contribRep = (
+    invalidStatus = (
+        E
+        if invalidMsg is None else
         H.span(
-            rep,
-            cls=f"large status {cls}",
+            invalidMsg,
+            cls=invalidCls,
         )
-        if table == N.contrib else
-        E
     )
-
-    (cls, rep, score) = self.attributesA(
-        table, eid,
-        N.cls, N.rep, N.score,
-    )
-
-    assessmentRep = H.join(
+    statusRep = H.div(
         [
+            invalidStatus,
             H.span(
-                rep,
-                cls=f"large status {cls}",
+                statusMsg,
+                cls=f"large status {statusCls}",
             ),
             H.span(
-                rep,
-                cls=f"large status {cls}",
+                lockedMsg,
+                cls=f"large status {lockedCls}",
             ),
-        ]
+            H.span(
+                frozenMsg,
+                cls=f"small status info",
+            ),
+        ],
+        cls=frozenCls,
     )
 
-    scoreParts = presentScore(
-        score,
-        table,
-        eid,
-    )
-    scorePart = (
-        H.span(scoreParts)
-        if table == N.assessment else
-        (scoreParts[0] if scoreParts else E)
-        if table == N.contrib else
-        E
-    )
-    validPart = E
-    if table in {N.assessment, N.review}:
-      preYes = "THE "
-      preNo = "not a "
-      clsYes = "good"
-      clsNo = "error"
-      post = E
-      cond = valid
-
-      if table == N.review:
-        cond = validRel
-        if not valid:
-          preYes = E
-          post = " for this assessment"
-          clsYes = "warning"
-
-      validPart = (
-          H.span(
-              f"{preYes}valid {kind} {table}{post}",
-              cls=f"large status {clsYes}",
-          )
-          if cond else
-          H.span(
-              f"{preNo}valid {kind} {table}{post}",
-              cls=f"large status {clsNo}",
-          )
+    scorePart = E
+    if table == N.assessment:
+      scoreParts = presentScore(
+          score,
+          table,
+          eid,
+      )
+      scorePart = (
+          H.span(scoreParts)
+          if table == N.assessment else
+          (scoreParts[0] if scoreParts else E)
+          if table == N.contrib else
+          E
       )
 
-    assessmentPart = H.div(
+    return H.div(
         [
-            contribRep,
-            assessmentRep,
+            statusRep,
             scorePart,
         ],
         cls="workflow-line",
     )
 
-    reasonPart = H.div(
-        reason,
-        cls=frozenCls,
+  def actions(self, table, eid):
+    uid = self.uid
+
+    (
+        contribId, creator, stage, valid, validRelative, score, kind, reviewer,
+    ) = self.attributes(
+        table, eid,
+        None, N.creator, N.stage, N.valid, N.validRelative, N.score, N.kind, N.reviewer,
     )
 
+    if (
+        not uid or
+        table not in USER_TABLES
+    ):
+      return E
+
+    actionParts = []
+
+    allowedActions = set(G(ACTIONS, table, default=[]))
+
+    for action in allowedActions:
+      if not self.permission(table, eid, action):
+        continue
+
+      actionInfo = G(allowedActions, action)
+      actionMsg = G(actionInfo, N.msg)
+      actionCls = G(actionInfo, N.Cls)
+      actionAction = G(actionInfo, N.action)
+      actionTable = G(actionInfo, N.actionTable)
+      actionField = G(actionInfo, N.actionField)
+      actionValue = G(actionInfo, N.actionValue)
+
+      actionPart = (
+          H.a(
+              actionMsg,
+              f"""/api/{table}/{eid}/{actionTable}/{N.insert}""",
+              cls=f"large step {actionCls}",
+          )
+          if actionAction == N.add else
+          H.span(
+              actionMsg,
+              table=table,
+              eid=eid,
+              field=actionField,
+              qvalue=actionValue,
+              after=f"/{N.contrib}/item/{contribId}",
+              cls=f"large step {actionCls}",
+          )
+          if actionAction == N.set else
+          E
+      )
+
+      actionParts.append(actionPart)
+
+    return H.join(actionParts)
+
+  def status(self, table, eid):
     itemKey = f"""{table}/{eid}"""
     rButton = H.iconr(itemKey, "#workflow", msg=N.status)
 
-    actionPart = E
-    if (
-        uid is not None and
-        uid == creator and
-        table in USER_TABLES_LIST[0:2]
-    ):
-      if table == N.contrib:
-        if self.permission(table, eid, N.startAssessment):
-          dTable = N.assessment
-          actionPart = H.a(
-              f"Start {dTable}",
-              f"""/api/{table}/{eid}/{dTable}/{N.insert}""",
-              title=f"""New {dTable}""",
-              cls=f"large step info",
-          )
-      elif table == N.assessment:
-        if not valid:
-          actionPart = H.span(
-              "There is no workflow for invalid items",
-              cls=f"large step info",
-          )
-        else:
-          if self.permission(table, eid, N.submitAssessment):
-            dTable = N.review
-
-            actionParts = []
-
-            if self.permission(table, eid, N.withdrawAssessment):
-              actionParts.append(H.span(
-                  f"Withdraw {table}",
-                  table=table,
-                  eid=eid,
-                  field=N.submitted,
-                  qvalue="",
-                  after=f"/{N.contrib}/item/{contribId}",
-                  title=f"""Withdraw this {table} from review""",
-                  cls=f"large step error",
-              ))
-            if self.permission(table, eid, N.submitAssessment):
-              verb = "Submit" if not dateSubmitted else "Resubmit"
-              actionParts.append(H.span(
-                  f"{verb} {table}",
-                  table=table,
-                  eid=eid,
-                  field=N.submitted,
-                  qvalue="1",
-                  after=f"/{N.contrib}/item/{contribId}",
-                  title=f"""{verb} this {table} for review""",
-                  cls=f"large step info",
-              ))
-            if self.permission(table, eid, N.startReview):
-
-              newKind = (
-                  N.expert
-                  if G(reviewer, N.expert) == uid else
-                  N.final
-                  if G(reviewer, N.final) == uid else
-                  None
-              )
-              actionParts.append(H.a(
-                  f"Start {newKind} {dTable}",
-                  f"""/api/{table}/{eid}/{dTable}/{N.insert}""",
-                  title=f"""New {dTable}""",
-                  cls=f"large step info",
-              ))
-
-            actionPart = H.join(actionParts)
-
-      elif table == N.review:
-        if not valid:
-          actionPart = H.span(
-              "There is no workflow for invalid items",
-              cls=f"large step info",
-          )
-        else:
-          pass
-
-    statusRep = H.div(
+    return H.div(
         [
             rButton,
-            validPart,
-            assessmentPart,
-            reasonPart,
-            actionPart,
+            self.statusOverview(table, eid),
+            self.actions(table, eid),
         ],
         cls=f"workflow",
     )
-
-    return (frozen, statusRep)
 
 
 def presentScore(score, table, eid, derivation=True):

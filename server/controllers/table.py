@@ -8,6 +8,7 @@ from controllers.html import HtmlElements as H
 from controllers.utils import pick as G, E, ELLIPS, NBSP, ONE
 
 from controllers.record import Record
+from controllers.specific.contrib_record import ContribR
 from controllers.specific.assessment_record import AssessmentR
 from controllers.specific.criteria_record import CriteriaR
 from controllers.specific.criteriaentry_record import CriteriaEntryR
@@ -16,6 +17,7 @@ from controllers.specific.reviewentry_record import ReviewEntryR
 from controllers.specific.score import ScoreR
 
 CASES = (
+    (N.contrib, ContribR),
     (N.assessment, AssessmentR),
     (N.criteria, CriteriaR),
     (N.criteriaEntry, CriteriaEntryR),
@@ -39,7 +41,7 @@ PROV_SPECS = CT.prov
 FORBIDDEN = CW.messages[N.forbidden]
 
 
-class Table(object):
+class Table:
   def __init__(self, control, table):
     self.control = control
 

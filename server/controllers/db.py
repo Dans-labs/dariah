@@ -42,7 +42,7 @@ OPTIONS = CW.options
 MOD_FMT = """{} on {}"""
 
 
-class Db(object):
+class Db:
   def __init__(self, mongo):
     self.mongo = mongo
 
@@ -91,15 +91,15 @@ class Db(object):
               for record in valueList
           },
       )
+      setattr(
+          self,
+          f"""{valueTable}Inv""",
+          {
+              G(record, N.rep): G(record, N._id)
+              for record in valueList
+          },
+      )
       if valueTable == N.permissionGroup:
-        setattr(
-            self,
-            f"""{valueTable}Inv""",
-            {
-                G(record, N.rep): G(record, N._id)
-                for record in valueList
-            },
-        )
         setattr(
             self,
             f"""{valueTable}Desc""",

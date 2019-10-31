@@ -11,7 +11,7 @@ DEBUG = CB.debug
 VALUE_TABLES = set(CT.valueTables)
 
 
-class Control(object):
+class Control:
   """
   * db
     Contains db-access methods and the content of all value tables.

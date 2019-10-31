@@ -2,6 +2,7 @@ fields:
   - assessment
   - assessmentType
   - contrib
+  - country
   - creator
   - criteria
   - criteriaEntry
@@ -29,17 +30,140 @@ workflowSubfields:
   - allMax
   - allN
 
-frozenReasons:
-  - Contribution and assessment open for editing
-  - Contribution and assessment frozen
-  - Contribution, assessments and reviews frozen
-  - Contribution, assessments and reviews permanently frozen
+stagesAtts:
+  selectNone:
+    msg: No selection decision by National Coordinator
+    cls: info
+  selectYes:
+    msg: Contribution has been accepted by National Coordinator
+    cls: good
+  selectNo:
+    msg: Contribution has been rejected by National Coordinator
+    cls: error
+  submitted:
+    msg: Assessment submitted
+    cls: info
+  submittedRevision:
+    msg: Revised Assessment submitted
+    cls: info
+  complete:
+    msg: Assessment complete
+    cls: info
+  completeRevised:
+    msg: Revised assessment complete
+    cls: info
+  incomplete:
+    msg: Assessment incomplete
+    cls: warning
+  incompleteRevised:
+    msg: Revised assessment incomplete
+    cls: warning
+  reviewExpert:
+    msg: Expert reviewer has decided
+    cls: info
+  reviewRevise:
+    msg: Revision recommended
+    cls: warning
+  reviewAccept:
+    msg: Accepted by final reviewer
+    cls: good
+  reviewReject:
+    msg: Rejected by final reviewer
+    cls: error
+
+statusRep:
+  frozen: Finalized and frozen
+  locked: Locked
+  invalid: This is not the valid
+
+actions:
+  contrib:
+    selectContrib:
+      msg: Select as national contribution to DARIAH
+      cls: good
+      action: set
+      field: selected
+      value: "1"
+    deselectContrib:
+      msg: Not eligible as national contribution to DARIAH
+      cls: error
+      action: set
+      field: selected
+      value: "-1"
+    unselectContrib:
+      msg: Revoke selection decision for this contribution
+      cls: warning
+      action: set
+      field: selected
+      value: "0"
+    startAssessment:
+      msg: Start a self-assessment for this contribution
+      cls: info
+      action: add
+      table: assessment
+  assessment:
+    submitAssessment:
+      msg: Submit assessment
+      cls: info
+      action: set
+      field: submitted
+      value: "1"
+    submitRevision:
+      msg: Submit revised assessment
+      action: set
+      field: submitted
+      value: "1"
+    withdrawAssessment:
+      msg: Withdraw assessment from review
+      action: set
+      field: submitted
+      value: "0"
+    startReview:
+      msg: Start a review of this assessment
+      action: add
+      table: review
+  review:
+    expertReviewRevise:
+      msg: Advise revision
+      cls: warning
+      action: set
+      field: decision
+      value: Revise
+    expertReviewAccept:
+      msg: Advise to accept
+      cls: good
+      action: set
+      field: decision
+      value: Accept
+    expertReviewReject:
+      msg: Advise to reject
+      cls: error
+      action: set
+      field: decision
+      value: Reject
+    finalReviewRevise:
+      msg: Require revision
+      cls: warning
+      action: set
+      field: decision
+      value: Revise
+    finalReviewAccept:
+      msg: Accept
+      cls: good
+      action: set
+      field: decision
+      value: Accept
+    finalReviewReject:
+      msg: Reject
+      cls: error
+      action: set
+      field: decision
+      value: Reject
 
 workflow:
   - assessments
   - assessmentId
   - assessmentIndex
-  - assessmentStatus
   - assessmentTitle
   - assessmentType
   - assessmentValid
@@ -49,7 +173,6 @@ workflow:
   - contribTitle
   - frozen
   - goodType
-  - hasValid
   - kind
   - reviewIndex
   - reviewEId
@@ -62,18 +185,10 @@ workflow:
   - status
   - type
   - valid
-  - validRel
-
-actions:
-  - startAssessment
-  - submitAssessment
-  - withdrawAssessment
-  - startReview
-  - decideExpertReview
+  - validRelative
 
 attributes:
   - _id
-  - assessmentStatus
   - cls
   - complete
   - creator
@@ -83,11 +198,13 @@ attributes:
   - frozen
   - goodType
   - kind
+  - mayAdd
   - rep
   - reviewer
   - reviewIdex
   - reviewers
   - reviews
+  - stage
   - submitted
   - title
   - type

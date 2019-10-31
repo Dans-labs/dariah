@@ -8,7 +8,7 @@ from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H, htmlEscape as he
 from controllers.utils import (
     pick as G, serverprint, bencode, now, cap1, shiftRegional,
-    E, DOT, MIN, EURO, WHYPHEN, NBSP,
+    E, DOT, MIN, EURO, WHYPHEN, NBSP, ZERO, ONE, MINONE
 )
 
 
@@ -105,7 +105,7 @@ toOrig:
 """
 
 
-class TypeBase(object):
+class TypeBase:
   widgetType = None
   pattern = None
   rawType = None
@@ -388,11 +388,21 @@ class Bool(TypeBase):
 
 
 class Bool2(Bool):
-  pass
+  def fromStr(self, editVal):
+    return (
+        True
+        if editVal and editVal != ZERO and editVal != MINONE else
+        False
+    )
 
 
 class Bool3(Bool):
-  pass
+  def fromStr(self, editVal):
+    return (
+        True if editVal == ONE else
+        None if not editVal or editVal == ZERO else
+        False
+    )
 
 
 class Related(TypeBase):
@@ -504,17 +514,26 @@ class Value(Related):
   def fromStr(self, editVal, uid=None, eppn=None, extensible=False):
     if not editVal:
       return None
+
+    control = self.control
+    db = control.db
+
     if type(editVal) is list:
       if extensible and editVal:
-        control = self.control
-        db = control.db
         table = self.name
         extensionField = N.rep if extensible is True else extensible
         extension = {extensionField: editVal[0]}
         return db.insertIfNew(table, uid, eppn, extension)
       else:
         return None
-    return ObjectId(editVal)
+
+    table = self.name
+    values = getattr(db, f"""{table}Inv""", default={}).items()
+    return (
+        values[editVal]
+        if editVal in values else
+        ObjectId(editVal)
+    )
 
   def toEdit(self, val):
     return val
@@ -753,7 +772,7 @@ class Decision(Value):
       return titleStr
 
 
-class Types(object):
+class Types:
   def __init__(self, control):
     self.control = control
     self.defineAll()

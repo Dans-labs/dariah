@@ -7,7 +7,7 @@ CT = C.tables
 DETAILS = CT.details
 
 
-class Details(object):
+class Details:
   inheritProps = (
       N.control,
       N.uid, N.eppn,

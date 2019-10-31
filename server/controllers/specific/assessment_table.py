@@ -28,6 +28,9 @@ class AssessmentT(Table):
 
     wfitem = control.getWorkflowItem(masterOid)
 
+    if not wfitem.permission(N.contrib, masterOid, N.startAssessment):
+      return masterId
+
     (contribType, contribTitle) = wfitem.attributes(
         N.contrib, masterOid,
         N.type, N.title,
@@ -38,9 +41,6 @@ class AssessmentT(Table):
         N.assessmentType: contribType,
         N.title: f"assessment of {contribTitle}",
     }
-    if not wfitem.permission(N.contrib, masterOid, N.startAssessment):
-      return masterId
-
     assessmentId = db.insertItem(table, uid, eppn, **fields)
 
     criteria = G(typeCriteria, contribType, default=[])

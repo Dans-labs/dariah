@@ -25,7 +25,7 @@ Qu = H.icon(CW.unknown[N.user], asChar=True)
 Qg = H.icon(CW.unknown[N.group], asChar=True)
 
 
-class Auth(object):
+class Auth:
 
   def __init__(self, app, db):
     self.db = db
@@ -246,9 +246,9 @@ class Auth(object):
     user = self.user
     return authenticated(user)
 
-  def coordinator(self):
+  def coordinator(self, country=None):
     user = self.user
-    return coordinator(user)
+    return coordinator(user, country)
 
   def superuser(self):
     user = self.user

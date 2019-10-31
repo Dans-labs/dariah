@@ -10,31 +10,31 @@ TABLE_DIR = "tables"
 ALL = "all"
 
 
-class Config(object):
+class Config:
   pass
 
 
-class Base(object):
+class Base:
   pass
 
 
-class Mongo(object):
+class Mongo:
   pass
 
 
-class Web(object):
+class Web:
   pass
 
 
-class Perm(object):
+class Perm:
   pass
 
 
-class Workflow(object):
+class Workflow:
   pass
 
 
-class Tables(object):
+class Tables:
   @classmethod
   def showReferences(cls):
     reference = cls.reference
@@ -45,7 +45,7 @@ class Tables(object):
         serverprint(f"""\t{table:<20}: {", ".join(fields)}""")
 
 
-class Names(object):
+class Names:
   @staticmethod
   def isName(val):
       return val.replace(LOW, E).replace(HYPHEN, E).isalnum()
@@ -196,3 +196,16 @@ setattr(Tables, N.sorted, sortedTables)
 setattr(Tables, N.reference, reference)
 setattr(Tables, N.cascade, cascade)
 setattr(Tables, N.constrained, constrained)
+
+CF = C.workflow
+
+ACTIONS = CF.actions
+
+actionFields = {
+    table: {
+        G(actionInfo, N.field)
+        for actionInfo in tableActions.values()
+        if G(actionInfo, N.action) == N.set
+    }
+    for (table, tableActions) in ACTIONS.items()
+}
