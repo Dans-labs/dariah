@@ -15,11 +15,11 @@ class CriteriaR(Record):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def wrapHelp(self, typeOk, cls):
+    def wrapHelp(self):
         info = H.join(
             self.field(field, readonly=False).wrap(action=N.view)
             for field in [N.typeContribution, N.remarks]
-            if not typeOk or field != N.typeContribution
+            if field != N.typeContribution
         )
 
         detailsObj = self.detailsFactory()

@@ -12,12 +12,14 @@ ORPHAN = H.icon(CW.unknown[N.reviewKind])
 class ReviewR(Record):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         wfitem = self.wfitem
+        if not wfitem:
+            return
+
         record = self.record
         eid = self.eid
 
-        (goodType, reviewer,) = wfitem.attributes(
+        (goodType, reviewer,) = wfitem.info(
             N.review, eid, N.goodType, N.reviewer,
         )
         reviewerE = G(reviewer, N.expert)

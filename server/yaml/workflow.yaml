@@ -9,7 +9,6 @@ fields:
   - dateCreated
   - dateDecided
   - dateSubmitted
-  - dateWithdrawn
   - decision
   - evidence
   - review
@@ -30,7 +29,7 @@ workflowSubfields:
   - allMax
   - allN
 
-stagesAtts:
+stageAtts:
   selectNone:
     msg: No selection decision by National Coordinator
     cls: info
@@ -74,89 +73,88 @@ stagesAtts:
 statusRep:
   frozen: Finalized and frozen
   locked: Locked
-  invalid: This is not the valid
 
-actions:
+commands:
   contrib:
     selectContrib:
       msg: Select as national contribution to DARIAH
       cls: good
-      action: set
+      operator: set
       field: selected
       value: "1"
     deselectContrib:
       msg: Not eligible as national contribution to DARIAH
       cls: error
-      action: set
+      operator: set
       field: selected
-      value: "-1"
+      value: "0"
     unselectContrib:
       msg: Revoke selection decision for this contribution
       cls: warning
-      action: set
+      operator: set
       field: selected
-      value: "0"
+      value: "1"
     startAssessment:
       msg: Start a self-assessment for this contribution
       cls: info
-      action: add
+      operator: add
       table: assessment
   assessment:
     submitAssessment:
       msg: Submit assessment
       cls: info
-      action: set
+      operator: set
       field: submitted
       value: "1"
     submitRevision:
       msg: Submit revised assessment
-      action: set
-      field: submitted
-      value: "1"
+      operator: set
+      field: dateSubmitted
+      value: "now"
     withdrawAssessment:
       msg: Withdraw assessment from review
-      action: set
+      operator: set
       field: submitted
       value: "0"
     startReview:
       msg: Start a review of this assessment
-      action: add
+      operator: add
       table: review
   review:
     expertReviewRevise:
       msg: Advise revision
       cls: warning
-      action: set
+      operator: set
       field: decision
       value: Revise
     expertReviewAccept:
       msg: Advise to accept
       cls: good
-      action: set
+      operator: set
       field: decision
       value: Accept
     expertReviewReject:
       msg: Advise to reject
       cls: error
-      action: set
+      operator: set
       field: decision
       value: Reject
     finalReviewRevise:
       msg: Require revision
       cls: warning
-      action: set
+      operator: set
       field: decision
       value: Revise
     finalReviewAccept:
       msg: Accept
       cls: good
-      action: set
+      operator: set
       field: decision
       value: Accept
     finalReviewReject:
       msg: Reject
       cls: error
-      action: set
+      operator: set
       field: decision
       value: Reject
 
@@ -184,17 +182,14 @@ workflow:
   - reviewsValid
   - status
   - type
-  - valid
-  - validRelative
 
-attributes:
+info:
   - _id
   - cls
   - complete
   - creator
   - contribId
   - dateSubmitted
-  - dateWithdrawn
   - frozen
   - goodType
   - kind
@@ -208,8 +203,7 @@ attributes:
   - submitted
   - title
   - type
-  - valid
-  - validRel
 
 names:
+  - commandFields
   - wfitem

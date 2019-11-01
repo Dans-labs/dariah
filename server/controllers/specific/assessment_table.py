@@ -26,13 +26,13 @@ class AssessmentT(Table):
 
         masterOid = ObjectId(masterId)
 
-        wfitem = control.getWorkflowItem(masterOid)
+        wfitem = control.getWorkflowItem(masterOid, N.contrib, None, None)
 
-        if not wfitem.permission(N.contrib, masterOid, N.startAssessment):
+        if not wfitem.permission(N.contrib, None, N.startAssessment):
             return masterId
 
-        (contribType, contribTitle) = wfitem.attributes(
-            N.contrib, masterOid, N.type, N.title,
+        (contribType, contribTitle) = wfitem.info(
+            N.contrib, None, N.type, N.title,
         )
 
         fields = {

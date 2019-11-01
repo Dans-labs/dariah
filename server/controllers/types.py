@@ -20,7 +20,6 @@ from controllers.utils import (
     WHYPHEN,
     NBSP,
     ZERO,
-    ONE,
     MINONE,
 )
 
@@ -55,15 +54,22 @@ dtTrim = re.compile(r"""[^0-9  T/:.-]+""")
 dtSep = re.compile(r"""[ T/:.-]+""")
 
 
-TODAY = now()
-DEFAULT_DATE = (
-    TODAY.year,
-    TODAY.month,
-    TODAY.day,
-    TODAY.hour,
-    TODAY.minute,
-    TODAY.second,
-)
+NONE_VALUES = {"null", "none", "empty", E, ZERO}
+FALSE_VALUES = {"no", "false", "off", MINONE}
+
+
+def getDefaultDate():
+    today = now()
+    return (
+        today.year,
+        today.month,
+        today.day,
+        today.hour,
+        today.minute,
+        today.second,
+    )
+
+
 DATETIME_FORMAT = """{:>04}-{:>02}-{:>02} {:>02}:{:>02}:{:>02}"""
 
 
@@ -239,22 +245,26 @@ class Datetime(TypeBase):
         normalVal = dtTrim.sub(E, strVal)
         if not normalVal:
             return None
+
         normalParts = [int(p) for p in dtSep.split(normalVal)]
         if len(normalParts) == 0:
             return None
+
         if not 1900 <= normalParts[0] <= 2100:
             return None
+
+        defaultDate = getDefaultDate()
         if len(normalParts) > 6:
             normalParts = normalParts[0:6]
         if len(normalParts) < 6:
             normalParts = [
-                normalParts[i] if i < len(normalParts) else DEFAULT_DATE[i]
+                normalParts[i] if i < len(normalParts) else defaultDate[i]
                 for i in range(6)
             ]
         try:
             dt(*normalParts)  # only for checking
         except Exception:
-            normalParts = DEFAULT_DATE
+            normalParts = defaultDate
         return normalParts
 
     def normalize(self, strVal):
@@ -266,6 +276,8 @@ class Datetime(TypeBase):
     def fromStr(self, editVal):
         if not editVal:
             return None
+        if editVal == N.now:
+            return now()
         normalParts = self.partition(editVal)
         if normalParts is None:
             return None
@@ -344,17 +356,21 @@ class Bool(TypeBase):
 
 class Bool2(Bool):
     def fromStr(self, editVal):
-        return True if editVal and editVal != ZERO and editVal != MINONE else False
+        return (
+            False
+            if editVal is None or editVal.lower() in NONE_VALUES | FALSE_VALUES
+            else True
+        )
 
 
 class Bool3(Bool):
     def fromStr(self, editVal):
         return (
-            True
-            if editVal == ONE
-            else None
-            if not editVal or editVal == ZERO
+            None
+            if editVal is None or editVal.lower() in NONE_VALUES
             else False
+            if editVal.lower() in FALSE_VALUES
+            else True
         )
 
 

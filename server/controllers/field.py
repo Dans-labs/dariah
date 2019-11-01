@@ -110,11 +110,12 @@ class Field:
         self.atts = dict(table=table, eid=eid, field=field,)
 
     def checkSave(self, data):
-        mayEdit = self.mayEdit
+        wfitem = self.wfitem
 
-        return mayEdit
+        fixed = wfitem.checkFixed(data, self) if wfitem else False
+        return not fixed and self.mayEdit
 
-    def save(self, data):
+    def save(self, data, force=False):
         control = self.control
         db = control.db
         uid = self.uid
@@ -138,7 +139,7 @@ class Field:
             else:
                 data = conversion(data, **args)
 
-        if not self.checkSave(data):
+        if not force or self.checkSave(data):
             return
 
         modified = G(record, N.modified)
@@ -189,9 +190,6 @@ class Field:
 
         if not mayRead:
             return E
-
-        if action == N.save:
-            self.mayEdit = True
 
         asMaster = self.asMaster
         mayEdit = self.mayEdit

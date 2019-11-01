@@ -3,6 +3,7 @@ from controllers.html import HtmlElements as H, htmlEscape as he
 from controllers.utils import pick as G, E, DOT, Q, NBSP
 from controllers.record import Record
 
+
 CW = C.web
 
 MESSAGES = CW.messages
@@ -12,28 +13,22 @@ class CriteriaEntryR(Record):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        Table = self.Table
+        wfitem = self.wfitem
+        if not wfitem:
+            return
+
         control = self.control
         record = self.record
-        eid = self.eid
-        wfitem = self.wfitem
+        mkTable = self.mkTable
 
-        (goodType,) = wfitem.attributes(N.assessment, eid, N.goodType,)
-
-        cls = E if goodType else "warning"
-
-        critObj = Table(control, N.criteria)
+        critObj = mkTable(control, N.criteria)
         critId = G(record, N.criteria)
         critRecord = critObj.record(eid=critId)
         self.critId = critId
         self.critRecord = critRecord
 
-        self.goodType = goodType
-        self.cls = cls
-
     def title(self):
         record = self.record
-        cls = self.cls
         critRecord = self.critRecord
 
         withEvidence = H.icon(
@@ -49,25 +44,22 @@ class CriteriaEntryR(Record):
                 H.span(scoreRep, cls="col2",),
                 status,
             ],
-            cls=f"{cls} centrytitle criteria",
+            cls=f"centrytitle criteria",
         )
 
     def bodyCompact(self, **kwargs):
-        goodType = self.goodType
-        cls = self.cls
         critId = self.critId
         critRecord = self.critRecord
         perm = self.perm
 
         critData = critRecord.record
         actual = G(critData, N.actual, default=False)
-        msg1 = E if actual else G(MESSAGES, N.legacyCriterion)
-        msg2 = E if goodType else G(MESSAGES, N.wrongCriterionForType)
+        msg = E if actual else G(MESSAGES, N.legacyCriterion)
 
         critKey = f"""{N.criteria}/{critId}/help"""
         (infoShow, infoHide, infoBody) = H.detailx(
             (N.info, N.dismiss),
-            critRecord.wrapHelp(goodType, cls),
+            critRecord.wrapHelp(),
             critKey,
             openAtts=dict(cls="button small", title="Explanation and scoring guide",),
             closeAtts=dict(cls="button small", title="Hide criteria explanation",),
@@ -77,8 +69,7 @@ class CriteriaEntryR(Record):
         evidence = H.div(self.field(N.evidence).wrap(asEdit=G(perm, N.isEdit)),)
         entry = H.div(
             [
-                H.div(he(msg1), cls="heavy") if msg1 else E,
-                H.div(he(msg2), cls="heavy") if msg2 else E,
+                H.div(he(msg), cls="heavy") if msg else E,
                 infoShow,
                 infoHide,
                 infoBody,

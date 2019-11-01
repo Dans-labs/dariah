@@ -8,9 +8,12 @@ class ContribD(Details):
     def __init__(self, recordObj):
         super().__init__(recordObj)
 
-    def wrap(self):
-        eid = self.eid
+    def wrap(self, *args, **kwargs):
         wfitem = self.wfitem
+        if not wfitem:
+            return super().wrap(*args, **kwargs)
+
+        eid = self.eid
 
         self.fetchDetails(
             N.assessment, sortKey=lambda r: G(r, N.dateCreated, default=0),

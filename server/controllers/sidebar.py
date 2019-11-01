@@ -3,7 +3,8 @@ from flask import request
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
 from controllers.utils import pick as G, E, Q, AMP, ZERO
-from controllers.table import Table
+
+from controllers.specific.factory_table import make as mkTable
 
 CT = C.tables
 CW = C.web
@@ -87,7 +88,7 @@ class Sidebar:
         control = self.control
         auth = control.auth
 
-        tableObj = Table(control, table)
+        tableObj = mkTable(control, table)
         isMainTable = tableObj.isMainTable
         isUserTable = tableObj.isUserTable
         isUserEntryTable = tableObj.isUserEntryTable

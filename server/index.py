@@ -18,15 +18,7 @@ from controllers.auth import Auth
 from controllers.control import Control
 from controllers.sidebar import Sidebar
 from controllers.topbar import Topbar
-
-from controllers.table import Table
-from controllers.specific.assessment_table import AssessmentT
-from controllers.specific.review_table import ReviewT
-
-CASES = (
-    (N.assessment, AssessmentT),
-    (N.review, ReviewT),
-)
+from controllers.specific.factory_table import make as mkTable
 
 
 CT = C.tables
@@ -64,20 +56,6 @@ DEBUG = False
 GP = dict(methods=[N.GET, N.POST])
 
 # N.showNames()
-
-
-def tableFactory(table):
-    TableClass = Table
-    for (tb, Tcl) in CASES:
-        if tb == table:
-            TableClass = Tcl
-            break
-
-    return TableClass
-
-
-def mkTable(control, tb):
-    return tableFactory(tb)(control, tb)
 
 
 def factory():
@@ -120,7 +98,7 @@ def factory():
         control = getControl()
         if table in ALL_TABLES and table not in MASTERS:
             auth.authenticate()
-            eid = Table(control, table).insert()
+            eid = mkTable(control, table).insert()
             newUrlPart = N.mylist if table in USER_TABLES else N.list
             newPath = (
                 f"""/{table}/{newUrlPart}/{eid}"""
@@ -183,7 +161,7 @@ def factory():
             auth.authenticate()
             topbar = Topbar(control).wrap()
             sidebar = Sidebar(control, path).wrap()
-            tableList = Table(control, table).wrap(eid, action=action)
+            tableList = mkTable(control, table).wrap(eid, action=action)
             return render_template(
                 INDEX, topbar=topbar, sidebar=sidebar, material=tableList,
             )
@@ -197,7 +175,7 @@ def factory():
         control = getControl()
         if table in ALL_TABLES:
             auth.authenticate()
-            Table(control, table).record(eid=eid).delete()
+            mkTable(control, table).record(eid=eid).delete()
             newUrlPart = N.mylist if table in USER_TABLES else N.list
             newPath = f"""/{table}/{newUrlPart}"""
             return redirect(newPath)
@@ -217,14 +195,17 @@ def factory():
             and dtable in DETAILS[table]
         ):
             auth.authenticate()
-            recordObj = Table(control, dtable).record(eid=eid)
-            recordObj.delete()
+            recordObj = mkTable(control, dtable).record(eid=eid)
+            backId = masterId
+
             wfitem = recordObj.wfitem
+            if wfitem:
+                recordObj.delete()
+                (contribId,) = wfitem.info(N.contrib, None, N._id,)
+                backId = contribId
 
-            (contribId,) = wfitem.attributes(N.contrib, None, N._id,)
+            newPath = f"""/{N.contrib}/{N.mylist}/{backId}"""
 
-            newUrlPart = N.mylist
-            newPath = f"""/{N.contrib}/{newUrlPart}/{contribId}"""
             return redirect(newPath)
         return notFound(path)
 
@@ -237,7 +218,7 @@ def factory():
         if table in ALL_TABLES:
             auth.authenticate()
             return (
-                Table(control, table)
+                mkTable(control, table)
                 .record(eid=eid, withDetails=True, **method(),)
                 .wrap()
             )
@@ -250,7 +231,7 @@ def factory():
         if table in ALL_TABLES:
             auth.authenticate()
             return (
-                Table(control, table)
+                mkTable(control, table)
                 .record(eid=eid, withDetails=False, **method(),)
                 .wrap(expanded=-1)
             )
@@ -265,7 +246,7 @@ def factory():
             topbar = Topbar(control).wrap()
             sidebar = Sidebar(control, path).wrap()
             record = (
-                Table(control, table)
+                mkTable(control, table)
                 .record(eid=eid, withDetails=True, **method(),)
                 .wrap()
             )
@@ -305,8 +286,20 @@ def factory():
         auth.authenticate()
         if table in ALL_TABLES:
             return (
-                Table(control, table).record(eid=eid).field(field).wrap(action=action)
+                mkTable(control, table).record(eid=eid).field(field).wrap(action=action)
             )
+        return noTable(table)
+
+    # COMMANDS
+
+    @app.route(f"""/api/command/<string:command>/<string:table>/<string:eid>""")
+    def serveCommand(command, table, eid):
+        control = getControl()
+        auth.authenticate()
+        if table in ALL_TABLES:
+            newPath = mkTable(control, table).record(eid=eid).command(command)
+            if newPath:
+                return redirect(newPath)
         return noTable(table)
 
     # LOGIN / LOGOUT

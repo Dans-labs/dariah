@@ -68,7 +68,7 @@ class Control:
             db.getItem, N.getItem, [table, eid], table, eid, requireFresh,
         )
 
-    def getWorkflowItem(self, contribId, requireFresh=False):
+    def getWorkflowItem(self, contribId, table, eid, record, requireFresh=False):
         if not contribId:
             return None
 
@@ -80,7 +80,7 @@ class Control:
             if wfitem:
                 return wfitem
 
-        attributes = self.getCached(
+        info = self.getCached(
             db.getWorkflowItem,
             N.getWorkflowItem,
             [contribId],
@@ -88,7 +88,10 @@ class Control:
             contribId,
             requireFresh,
         )
-        return wf.makeItem(attributes)
+        wfitem = wf.makeItem(info, table, eid, record)
+        if not wfitem or not wfitem.valid:
+            wfitem = None
+        return wfitem
 
     def delItem(self, table, eid):
         db = self.db

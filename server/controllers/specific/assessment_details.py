@@ -14,12 +14,15 @@ class AssessmentD(Details):
     def __init__(self, recordObj):
         super().__init__(recordObj)
 
-    def wrap(self):
-        eid = self.eid
+    def wrap(self, *args, **kwargs):
         wfitem = self.wfitem
+        if not wfitem:
+            return super().wrap(*args, **kwargs)
 
-        (reviewer, reviewers) = wfitem.attributes(
-            N.assessment, eid, N.reviewer, N.reviewers,
+        eid = self.eid
+
+        (reviewer, reviewers) = wfitem.info(
+            N.assessment, None, N.reviewer, N.reviewers,
         )
 
         self.fetchDetails(N.criteriaEntry, sortKey=cEntrySort)

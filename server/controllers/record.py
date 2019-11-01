@@ -4,18 +4,7 @@ from controllers.utils import pick as G, cap1, E, ELLIPS, ONE, S
 from controllers.html import HtmlElements as H
 from controllers.field import Field
 
-from controllers.details import Details
-from controllers.specific.assessment_details import AssessmentD
-from controllers.specific.contrib_details import ContribD
-from controllers.specific.criteriaentry_details import CriteriaEntryD
-from controllers.specific.review_details import ReviewD
-
-CASES = (
-    (N.assessment, AssessmentD),
-    (N.contrib, ContribD),
-    (N.criteriaEntry, CriteriaEntryD),
-    (N.review, ReviewD),
-)
+from controllers.specific.factory_details import factory as detailsFactory
 
 
 CT = C.tables
@@ -44,6 +33,7 @@ class Record:
         N.control,
         N.uid,
         N.eppn,
+        N.mkTable,
         N.table,
         N.fields,
         N.prov,
@@ -54,7 +44,6 @@ class Record:
 
     def __init__(
         self,
-        Table,
         tableObj,
         record=None,
         eid=None,
@@ -65,14 +54,15 @@ class Record:
         for prop in Record.inheritProps:
             setattr(self, prop, getattr(tableObj, prop, None))
 
-        self.table = self.table
+        self.tableObj = tableObj
         self.withDetails = withDetails
         self.readonly = readonly
         self.bodyMethod = bodyMethod
-        self.Table = Table
 
         control = self.control
         table = self.table
+
+        self.DetailsClass = detailsFactory(table)
 
         if record is None:
             record = control.getItem(table, eid)
@@ -117,17 +107,6 @@ class Record:
 
         return db.dependencies(table, record)
 
-    def detailsFactory(self):
-        table = self.table
-
-        DetailsClass = Details
-        for (tb, Dcl) in CASES:
-            if tb == table:
-                DetailsClass = Dcl
-                break
-
-        return DetailsClass(self)
-
     def setPerm(self):
         control = self.control
         table = self.table
@@ -138,15 +117,21 @@ class Record:
     def setWorkflow(self):
         control = self.control
         perm = self.perm
+        table = self.table
+        eid = self.eid
+        record = self.record
 
         contribId = G(perm, N.contribId)
 
-        self.wfitem = control.getWorkflowItem(contribId)
+        self.wfitem = control.getWorkflowItem(contribId, table, eid, record)
 
     def adjustWorkflow(self, update=True, delete=False):
         control = self.control
         wf = control.wf
         perm = self.perm
+        table = self.table
+        eid = self.eid
+        record = self.record
 
         contribId = G(perm, N.contribId)
         if delete:
@@ -155,9 +140,29 @@ class Record:
         else:
             wf.recompute(contribId)
             if update:
-                self.wfitem = control.getWorkflowItem(contribId, requireFresh=True)
+                self.wfitem = control.getWorkflowItem(
+                    contribId, table, eid, record, requireFresh=True
+                )
+
+    def command(self, command):
+        wfitem = self.wfitem
+
+        if wfitem:
+            return wfitem.doCommand(command, self)
+
+        table = self.table
+        eid = self.eid
+
+        return f"""/{table}/{N.item}/{eid}"""
 
     def field(self, fieldName, **kwargs):
+        wfitem = self.wfitem
+        if wfitem:
+            if wfitem.checkFixed(self):
+                kwargs[N.mayEdit] = False
+            if wfitem.isCommand(self):
+                kwargs[N.mayRead] = False
+                kwargs[N.mayEdit] = False
         return Field(self, fieldName, **kwargs)
 
     def delete(self):
@@ -291,7 +296,7 @@ class Record:
         )
 
         rButton = H.iconr(itemKey, "#main", msg=table) if withRefresh else E
-        details = self.detailsFactory().wrap() if withDetails else E
+        details = self.DetailsClass().wrap() if withDetails else E
 
         return (
             H.details(

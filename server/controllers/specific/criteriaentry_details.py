@@ -8,14 +8,14 @@ class CriteriaEntryD(Details):
     def __init__(self, recordObj):
         super().__init__(recordObj)
 
-    def wrap(self):
-        details = self.details
+    def wrap(self, *args, **kwargs):
         wfitem = self.wfitem
-        record = self.record
+        if not wfitem:
+            return super().wrap(*args, **kwargs)
 
-        assessmentId = G(record, N.assessment)
+        details = self.details
 
-        (reviewer,) = wfitem.attributes(N.assessment, assessmentId, N.reviewer,)
+        (reviewer,) = wfitem.info(N.assessment, None, N.reviewer,)
 
         self.fetchDetails(
             N.reviewEntry, sortKey=lambda r: G(r, N.dateCreated, default=0),

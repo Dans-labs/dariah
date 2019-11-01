@@ -6,25 +6,7 @@ from controllers.config import Config as C, Names as N
 from controllers.perm import UNAUTH
 from controllers.html import HtmlElements as H
 from controllers.utils import pick as G, E, ELLIPS, NBSP, ONE
-
-from controllers.record import Record
-from controllers.specific.contrib_record import ContribR
-from controllers.specific.assessment_record import AssessmentR
-from controllers.specific.criteria_record import CriteriaR
-from controllers.specific.criteriaentry_record import CriteriaEntryR
-from controllers.specific.review_record import ReviewR
-from controllers.specific.reviewentry_record import ReviewEntryR
-from controllers.specific.score import ScoreR
-
-CASES = (
-    (N.contrib, ContribR),
-    (N.assessment, AssessmentR),
-    (N.criteria, CriteriaR),
-    (N.criteriaEntry, CriteriaEntryR),
-    (N.review, ReviewR),
-    (N.reviewEntry, ReviewEntryR),
-    (N.score, ScoreR),
-)
+from controllers.specific.factory_record import factory as recordFactory
 
 CT = C.tables
 CW = C.web
@@ -78,22 +60,12 @@ class Table:
 
         self.titleSortkey = titleSortkey
 
-    def recordFactory(self):
-        table = self.table
-
-        RecordClass = Record
-        for (tb, Rcl) in CASES:
-            if tb == table:
-                RecordClass = Rcl
-                break
-
-        return RecordClass
+        self.RecordClass = recordFactory(table)
 
     def record(
         self, eid=None, record=None, withDetails=False, readonly=False, bodyMethod=None,
     ):
-        return self.recordFactory()(
-            Table,
+        return self.RecordClass()(
             self,
             eid=eid,
             record=record,
@@ -102,8 +74,8 @@ class Table:
             bodyMethod=bodyMethod,
         )
 
-    def insert(self):
-        mayInsert = self.mayInsert
+    def insert(self, force=False):
+        mayInsert = force or self.mayInsert
         if not mayInsert:
             return None
 
@@ -209,7 +181,7 @@ class Table:
 
     def title(self, record):
         # return obj.record(record=record).title(**atts)
-        return Record.titleRaw(self, record)
+        return self.RecordClass.titleRaw(self, record)
 
 
 def forceOpen(theEid, openEid):

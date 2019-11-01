@@ -55,6 +55,16 @@ EMPTY_DATE = "1900-01-01T00:00:00Z"
 ITER = "__iter__"
 
 
+def factory(name, Base, Deriveds):
+    Derived = Base
+    for (nm, NmCl) in Deriveds:
+        if nm == name:
+            Derived = NmCl
+            break
+
+    return Derived
+
+
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, dt):

@@ -194,13 +194,14 @@ setattr(Tables, N.constrained, constrained)
 
 CF = C.workflow
 
-ACTIONS = CF.actions
+COMMANDS = CF.commands
 
-actionFields = {
+commandFields = {
     table: {
-        G(actionInfo, N.field)
-        for actionInfo in tableActions.values()
-        if G(actionInfo, N.action) == N.set
+        G(commandInfo, N.field)
+        for commandInfo in tableActions.values()
+        if G(commandInfo, N.operator) == N.set
     }
-    for (table, tableActions) in ACTIONS.items()
+    for (table, tableActions) in COMMANDS.items()
 }
+setattr(Workflow, N.commandFields, commandFields)

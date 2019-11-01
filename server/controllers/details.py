@@ -12,7 +12,8 @@ class Details:
         N.control,
         N.uid,
         N.eppn,
-        N.Table,
+        N.tableObj,
+        N.mkTable,
         N.table,
         N.record,
         N.eid,
@@ -31,11 +32,11 @@ class Details:
     def fetchDetails(self, dtable, masterTable=None, eids=None, sortKey=None):
         control = self.control
         db = control.db
-        Table = self.Table
+        mkTable = self.mkTable
         table = self.table
         eid = self.eid
 
-        dtableObj = Table(control, dtable)
+        dtableObj = mkTable(control, dtable)
         drecords = db.getDetails(
             dtable, masterTable or table, eids or eid, sortKey=sortKey,
         )

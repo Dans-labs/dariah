@@ -262,15 +262,9 @@ class Db:
             for rec in getattr(self, table, {}).values()
             if all(G(rec, k) == v for (k, v) in extension.items())
         ]
-        print("----------")
-        for rec in getattr(self, table, {}).values():
-            print("RRRRR", G(rec, N.eppn), G(rec, N.email))
-        print(extension)
         if existing:
-            print("XXXXX", existing)
             return existing[0]
 
-        print("NNNNNN")
         justNow = now()
         newRecord = {
             N.dateCreated: justNow,

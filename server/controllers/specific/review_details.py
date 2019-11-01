@@ -13,12 +13,15 @@ class ReviewD(Details):
     def __init__(self, recordObj):
         super().__init__(recordObj)
 
-    def wrap(self):
+    def wrap(self, *args, **kwargs):
+        wfitem = self.wfitem
+        if not wfitem:
+            return super().wrap(*args, **kwargs)
+
         record = self.record
         eid = self.eid
-        wfitem = self.wfitem
 
-        (reviewer, kind) = wfitem.attributes(N.review, eid, N.reviewer, N.kind,)
+        (reviewer, kind) = wfitem.info(N.review, eid, N.reviewer, N.kind)
 
         thisReviewer = G(reviewer, kind)
         creatorId = G(record, N.creator)
