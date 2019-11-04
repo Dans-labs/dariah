@@ -65,7 +65,7 @@ class Table:
     def record(
         self, eid=None, record=None, withDetails=False, readonly=False, bodyMethod=None,
     ):
-        return self.RecordClass()(
+        return self.RecordClass(
             self,
             eid=eid,
             record=record,

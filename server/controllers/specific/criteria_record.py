@@ -22,7 +22,7 @@ class CriteriaR(Record):
             if field != N.typeContribution
         )
 
-        detailsObj = self.detailsFactory()
+        detailsObj = self.DetailsClass(self)
         detailsObj.fetchDetails(N.score)
         details = detailsObj.wrapDetail(
             N.score,

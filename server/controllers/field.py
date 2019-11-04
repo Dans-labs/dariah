@@ -21,7 +21,7 @@ REFRESH = CW.messages[N.refresh]
 
 
 def labelDiv(label):
-    return H.div(f"""{label}:""", cls="record-label",)
+    return H.div(f"""{label}:""", cls="record-label")
 
 
 class Field:
@@ -107,15 +107,9 @@ class Field:
         if readonly or asMaster:
             self.mayEdit = False
 
-        self.atts = dict(table=table, eid=eid, field=field,)
+        self.atts = dict(table=table, eid=eid, field=field)
 
-    def checkSave(self, data):
-        wfitem = self.wfitem
-
-        fixed = wfitem.checkFixed(data, self) if wfitem else False
-        return not fixed and self.mayEdit
-
-    def save(self, data, force=False):
+    def save(self, data):
         control = self.control
         db = control.db
         uid = self.uid
@@ -138,9 +132,6 @@ class Field:
                 data = [conversion(d, **args) for d in data or []]
             else:
                 data = conversion(data, **args)
-
-        if not force or self.checkSave(data):
-            return
 
         modified = G(record, N.modified)
         nowFields = []
@@ -220,7 +211,7 @@ class Field:
                 cls="record-row",
             )
             if withLabel
-            else H.div(widget, cls=f"record-value{editClass}",)
+            else H.div(widget, cls=f"record-value{editClass}")
         )
 
     def wrapWidget(self, editable, cls=E):
@@ -229,10 +220,10 @@ class Field:
         withRefresh = self.withRefresh
 
         button = (
-            H.iconx(N.ok, cls="small", action=N.view, **atts,)
+            H.iconx(N.ok, cls="small", action=N.view, **atts)
             if editable
             else (
-                H.iconx(N.edit, cls="small", action=N.edit, **atts,)
+                H.iconx(N.edit, cls="small", action=N.edit, **atts)
                 if mayEdit
                 else H.iconx(
                     N.refresh, cls="small", action=N.view, title=REFRESH, **atts,
@@ -308,5 +299,5 @@ class Field:
                 cls=baseCls,
             )
             if multiple and not (editable and isSelectWidget)
-            else H.div(method(value, *args), **atts, cls=f"value {extraCls}",)
+            else H.div(method(value, *args), **atts, cls=f"value {extraCls}")
         )

@@ -88,7 +88,7 @@ def factory():
         auth.authenticate()
         topbar = Topbar(control).wrap()
         sidebar = Sidebar(control, path).wrap()
-        return render_template(INDEX, topbar=topbar, sidebar=sidebar, material=LANDING,)
+        return render_template(INDEX, topbar=topbar, sidebar=sidebar, material=LANDING)
 
     # INSERT RECORD IN TABLE
 
@@ -201,7 +201,7 @@ def factory():
             wfitem = recordObj.wfitem
             if wfitem:
                 recordObj.delete()
-                (contribId,) = wfitem.info(N.contrib, None, N._id,)
+                (contribId,) = wfitem.info(N.contrib, N._id)
                 backId = contribId
 
             newPath = f"""/{N.contrib}/{N.mylist}/{backId}"""
@@ -219,7 +219,7 @@ def factory():
             auth.authenticate()
             return (
                 mkTable(control, table)
-                .record(eid=eid, withDetails=True, **method(),)
+                .record(eid=eid, withDetails=True, **method())
                 .wrap()
             )
         return notFound(path)
@@ -232,7 +232,7 @@ def factory():
             auth.authenticate()
             return (
                 mkTable(control, table)
-                .record(eid=eid, withDetails=False, **method(),)
+                .record(eid=eid, withDetails=False, **method())
                 .wrap(expanded=-1)
             )
         return notFound(path)
@@ -247,7 +247,7 @@ def factory():
             sidebar = Sidebar(control, path).wrap()
             record = (
                 mkTable(control, table)
-                .record(eid=eid, withDetails=True, **method(),)
+                .record(eid=eid, withDetails=True, **method())
                 .wrap()
             )
             return render_template(

@@ -80,16 +80,18 @@ class Record:
         isUserEntryTable = self.isUserEntryTable
         readonly = self.readonly
         perm = self.perm
+        fixed = self.fixed
 
         isAuthenticated = auth.authenticated()
         isSuperuser = auth.superuser()
 
-        return (
+        normalDelPerm = (
             not isUserEntryTable
             and not readonly
             and isAuthenticated
             and (isSuperuser or isUserTable and G(perm, N.isEdit))
         )
+        return normalDelPerm if fixed is None else not fixed
 
     def reload(
         self, record,
@@ -112,7 +114,7 @@ class Record:
         table = self.table
         record = self.record
 
-        self.perm = permRecord(control, table, record,)
+        self.perm = permRecord(control, table, record)
 
     def setWorkflow(self):
         control = self.control
@@ -123,7 +125,17 @@ class Record:
 
         contribId = G(perm, N.contribId)
 
-        self.wfitem = control.getWorkflowItem(contribId, table, eid, record)
+        self.kind = None
+        self.fixed = None
+        valid = False
+
+        wfitem = control.getWorkflowItem(contribId, table, eid, record)
+        if wfitem:
+            self.kind = wfitem.getKind(table, record)
+            valid = wfitem.isValid(table, eid, record)
+            self.fixed = wfitem.checkFixed(self)
+
+        self.wfitem = wfitem if valid else None
 
     def adjustWorkflow(self, update=True, delete=False):
         control = self.control
@@ -158,11 +170,12 @@ class Record:
     def field(self, fieldName, **kwargs):
         wfitem = self.wfitem
         if wfitem:
-            if wfitem.checkFixed(self):
+            fixed = wfitem.checkFixed(self)
+            if fixed:
                 kwargs[N.mayEdit] = False
             if wfitem.isCommand(self):
                 kwargs[N.mayRead] = False
-                kwargs[N.mayEdit] = False
+                kwargs[N.mayEdit] = not fixed
         return Field(self, fieldName, **kwargs)
 
     def delete(self):
@@ -274,7 +287,7 @@ class Record:
                         cls="button small",
                         title="Provenance and editors of this record",
                     ),
-                    closeAtts=dict(cls="button small", title="Hide provenance",),
+                    closeAtts=dict(cls="button small", title="Hide provenance"),
                     cls="prov",
                 ),
                 cls="provx",
@@ -287,7 +300,7 @@ class Record:
             [
                 deleteButton,
                 H.div(
-                    H.join(bodyFunc(myMasters=myMasters, hideMasters=hideMasters,)),
+                    H.join(bodyFunc(myMasters=myMasters, hideMasters=hideMasters)),
                     cls=f"{table.lower()}",
                 ),
                 *provenance,
@@ -296,7 +309,7 @@ class Record:
         )
 
         rButton = H.iconr(itemKey, "#main", msg=table) if withRefresh else E
-        details = self.DetailsClass().wrap() if withDetails else E
+        details = self.DetailsClass(self).wrap() if withDetails else E
 
         return (
             H.details(
@@ -314,6 +327,7 @@ class Record:
 
     def deleteButton(self):
         mayDelete = self.mayDelete
+        print("DELETE?", self.table, mayDelete)
 
         if not mayDelete:
             return E

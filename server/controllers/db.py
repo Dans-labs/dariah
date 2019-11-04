@@ -227,7 +227,7 @@ class Db:
             crit = {masterField: {M_IN: list(eids)} if isIterable(eids) else eids}
             details = list(self.mongoCmd(N.getDetails, table, N.find, crit))
 
-        return sorted(details, key=sortKey,) if sortKey else details
+        return sorted(details, key=sortKey) if sortKey else details
 
     def getValueRecords(
         self, relTable, constrain=None,

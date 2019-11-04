@@ -12,53 +12,25 @@ ORPHAN = H.icon(CW.unknown[N.reviewKind])
 class ReviewR(Record):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def title(self, *args, **kwargs):
         wfitem = self.wfitem
         if not wfitem:
-            return
+            return super().title(*args, **kwargs)
 
-        record = self.record
-        eid = self.eid
-
-        (goodType, reviewer,) = wfitem.info(
-            N.review, eid, N.goodType, N.reviewer,
-        )
-        reviewerE = G(reviewer, N.expert)
-        reviewerF = G(reviewer, N.final)
-
-        cls = E if goodType else " warning"
-
-        creatorId = G(record, N.creator)
-
-        kind = (
-            N.expert
-            if creatorId == reviewerE
-            else N.final
-            if creatorId == reviewerF
-            else ORPHAN
-        )
-        self.kind = kind
-        self.creatorId = creatorId
-        self.cls = cls
-        self.goodType = goodType
-
-    def title(self):
         kind = self.kind
         uid = self.uid
-        cls = self.cls
-        goodType = self.goodType
-        creatorId = self.creatorId
+        record = self.record
+
+        creatorId = G(record, N.creator)
 
         datetime = self.field(N.dateCreated).wrapBare()
         date = datetime.split(maxsplit=1)[0]
         creator = self.field(N.creator).wrapBare()
         youRep = f""" ({N.you})""" if creatorId == uid else E
-        reviewType = self.field(N.reviewType).wrapBare()
-        reviewTypeRep = E if goodType else " as " + reviewType
+        kindRep = kind or ORPHAN
 
-        return H.span(
-            f"""{kind} on {date}{reviewTypeRep} by {creator}{youRep}""",
-            cls=f"small{cls}",
-        )
+        return H.span(f"""{kindRep} on {date} by {creator}{youRep}""", cls=f"small")
 
     def bodyCompact(self, myMasters=None, hideMasters=False):
         perm = self.perm
@@ -66,10 +38,10 @@ class ReviewR(Record):
         theTitle = self.title()
 
         remarks = H.div(
-            self.field(N.remarks).wrap(withLabel=False, asEdit=G(perm, N.isEdit),),
+            self.field(N.remarks).wrap(withLabel=False, asEdit=G(perm, N.isEdit)),
         )
         decisionPart = H.div(
-            self.field(N.decision).wrap(withLabel=False, asEdit=G(perm, N.isEdit),)
+            self.field(N.decision).wrap(withLabel=False, asEdit=G(perm, N.isEdit))
         )
 
         return H.div([decisionPart, theTitle, remarks], cls=f"review")

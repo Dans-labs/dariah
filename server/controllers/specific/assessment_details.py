@@ -21,13 +21,11 @@ class AssessmentD(Details):
 
         eid = self.eid
 
-        (reviewer, reviewers) = wfitem.info(
-            N.assessment, None, N.reviewer, N.reviewers,
-        )
+        (reviewer, reviewers) = wfitem.info(N.assessment, N.reviewer, N.reviewers)
 
         self.fetchDetails(N.criteriaEntry, sortKey=cEntrySort)
 
-        criteriaPart = self.wrapDetail(N.criteriaEntry, bodyMethod=N.compact,)
+        criteriaPart = self.wrapDetail(N.criteriaEntry, bodyMethod=N.compact)
 
         self.fetchDetails(
             N.review, sortKey=lambda r: G(r, N.dateCreated, default=0),
@@ -56,7 +54,7 @@ class AssessmentD(Details):
         reviewPart = H.div(
             [
                 H.div(
-                    [H.div(cap1(dest), cls="head",), G(byReviewer, dest)],
+                    [H.div(cap1(dest), cls="head"), G(byReviewer, dest)],
                     cls=f"reviews {dest}",
                 )
                 for dest in reviewer
@@ -65,7 +63,7 @@ class AssessmentD(Details):
         ) + (
             H.div(
                 [
-                    H.div(cap1(N.orphaned) + " " + N.reviews, cls="head",),
+                    H.div(cap1(N.orphaned) + " " + N.reviews, cls="head"),
                     orphanedReviews,
                 ],
             )

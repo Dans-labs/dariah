@@ -1,6 +1,5 @@
 from controllers.config import Config as C, Names as N
 from controllers.details import Details
-from controllers.utils import pick as G
 from controllers.html import HtmlElements as H
 
 
@@ -18,22 +17,9 @@ class ReviewD(Details):
         if not wfitem:
             return super().wrap(*args, **kwargs)
 
-        record = self.record
         eid = self.eid
+        kind = self.kind
 
-        (reviewer, kind) = wfitem.info(N.review, eid, N.reviewer, N.kind)
-
-        thisReviewer = G(reviewer, kind)
-        creatorId = G(record, N.creator)
-
-        statusRep = wfitem.status(N.review, eid)
-
-        orphaned = creatorId is None or thisReviewer != creatorId
-        if orphaned:
-            self.fetchDetails(N.reviewEntry)
-            entryPart = self.wrapDetail(
-                N.reviewEntry, extraMsg=ORPHAN_MSG, extraCls="warning"
-            )
-            return H.div([entryPart, statusRep])
+        statusRep = wfitem.status(N.review, eid, kind=kind)
 
         return H.div(statusRep)

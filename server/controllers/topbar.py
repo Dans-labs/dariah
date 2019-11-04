@@ -41,8 +41,8 @@ class Topbar:
         )
         return H.div(
             [
-                H.div(identityRep, cls="user",),
-                H.div(accessRep, cls="access",),
+                H.div(identityRep, cls="user"),
+                H.div(accessRep, cls="access"),
                 login,
                 *logout,
                 H.img(

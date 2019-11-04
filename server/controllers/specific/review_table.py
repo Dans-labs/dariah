@@ -29,13 +29,13 @@ class ReviewT(Table):
         if not contribId:
             return None
 
-        wfitem = control.getWorkflowItem(contribId, N.contribId, None, None)
+        wfitem = control.getWorkflowItem(contribId, N.contrib, N.contribId, None)
 
-        if not wfitem.permission(N.assessment, None, N.startReview):
+        if not wfitem.permission(N.assessment, N.startReview):
             return contribId
 
-        (contribType,) = wfitem.info(N.contrib, contribId, N.type,)
-        assessmentTitle = wfitem.info(N.assessment, masterOid, N.title,)
+        (contribType,) = wfitem.info(N.contrib, N.type)
+        assessmentTitle = wfitem.info(N.assessment, N.title)
 
         fields = {
             N.contrib: contribId,

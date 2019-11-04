@@ -59,12 +59,17 @@ class Workflow:
         self.uid = G(user, N._id)
         self.eppn = G(user, N.eppn)
 
-    def getItem(self, eid):
+    def getItem(self, contribId):
         items = self.items
-        return G(items, eid)
+        return G(items, contribId)
 
-    def makeItem(self, info, table, eid, record):
-        return WorkflowItem(self, info, table, eid, record)
+    def putItem(self, contribId, info):
+        items = self.items
+
+        items[contribId] = WorkflowItem(self, info)
+
+    def makeItem(self, info):
+        return WorkflowItem(self, info)
 
     def initWorkflow(self, drop=False):
         db = self.db
@@ -102,18 +107,20 @@ class Workflow:
         serverprint(f"WORKFLOW: New workflow info {contribId}")
         db.insertWorkflow(info)
 
-        itemObj = self.makeItem(info, N.contrib, None, None)
+        itemObj = self.makeItem(info)
         items[contribId] = itemObj
 
     def recompute(self, contribId):
         db = self.db
 
         info = self.computeWorkflow(contribId=contribId)
-        serverprint(f"WORKFLOW: Adjust workflow info {contribId}")
         db.updateWorkflow(contribId, info)
 
         itemObj = self.getItem(contribId)
-        itemObj.updateData(info)
+        if itemObj is None:
+            self.putItem(contribId, info)
+        else:
+            itemObj.updateData(info)
 
     def delete(self, contribId):
         db = self.db
@@ -155,10 +162,10 @@ class Workflow:
         selected = G(record, N.selected)
 
         stage = (
-            N.selectNone
+            N.selectYes
             if selected
-            else N.selectYes
-            if selected is not None
+            else N.selectNone
+            if selected is None
             else N.selectNo
         )
         frozen = stage != N.selectNone
@@ -248,7 +255,7 @@ class Workflow:
         finalReviewStage = G(finalReviewWf, N.stage)
 
         revision = finalReviewStage == N.reviewRevise
-        locked = finalReviewStage and not revision
+        locked = not not finalReviewStage and not revision
 
         if locked:
             finalReviewWf[N.locked] = True
@@ -331,7 +338,7 @@ class Workflow:
         return {
             N._id: G(record, N._id),
             N.creator: G(record, N.creator),
-            N.title: G(record, N.reviewTitle),
+            N.title: G(record, N.title),
             N.dateDecided: G(record, N.dateDecided),
             N.kind: kind,
             N.stage: stage,

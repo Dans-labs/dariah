@@ -44,7 +44,7 @@ class Sidebar:
             else any(refPath.startswith(f"""/{p}/""") for p in path)
         )
         navClass = " active" if active else E
-        atts = dict(cls=f"nav {navClass}",)
+        atts = dict(cls=f"nav {navClass}")
         itemkey = path if type(path) is str else label
         if rule:
             atts[N.addClass] = " ruleabove"
@@ -72,7 +72,7 @@ class Sidebar:
         options = self.options
 
         filterRep = [
-            H.input(E, type=N.text, id="cfilter", placeholder="match title",),
+            H.input(E, type=N.text, id="cfilter", placeholder="match title"),
         ]
         optionsRep = [
             H.span(
@@ -138,7 +138,7 @@ class Sidebar:
         if isUserTable:
             if isSuperUser:
                 self.userEntries.append(
-                    self.makeEntry(f"""{itemPlural}""", f"""/{table}/list""",)
+                    self.makeEntry(f"""{itemPlural}""", f"""/{table}/list""")
                 )
                 self.userPaths.append(table)
             return
@@ -146,14 +146,14 @@ class Sidebar:
         if isUserEntryTable:
             if isSysAdmin:
                 self.userEntries.append(
-                    self.makeEntry(f"""{itemPlural}""", f"""/{table}/list""",)
+                    self.makeEntry(f"""{itemPlural}""", f"""/{table}/list""")
                 )
                 self.userPaths.append(table)
 
         if isValueTable:
             if isSuperUser:
                 self.valueEntries.append(
-                    self.makeEntry(f"""{itemPlural}""", f"""/{table}/list""",)
+                    self.makeEntry(f"""{itemPlural}""", f"""/{table}/list""")
                 )
                 self.valuePaths.append(table)
             return

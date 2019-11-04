@@ -175,7 +175,7 @@ class HtmlElements:
     @staticmethod
     def input(material, **atts):
         content = asString(material)
-        return HtmlElement(N.input).wrap(E, value=htmlEscape(content), **atts,)
+        return HtmlElement(N.input).wrap(E, value=htmlEscape(content), **atts)
 
     @staticmethod
     def join(material):

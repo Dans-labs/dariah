@@ -15,7 +15,7 @@ class CriteriaEntryD(Details):
 
         details = self.details
 
-        (reviewer,) = wfitem.info(N.assessment, None, N.reviewer,)
+        (reviewer,) = wfitem.info(N.assessment, N.reviewer)
 
         self.fetchDetails(
             N.reviewEntry, sortKey=lambda r: G(r, N.dateCreated, default=0),
@@ -40,7 +40,7 @@ class CriteriaEntryD(Details):
         return H.div(
             [
                 H.div(
-                    [H.div(cap1(dest), cls="head",), G(byReviewer, dest)],
+                    [H.div(cap1(dest), cls="head"), G(byReviewer, dest)],
                     cls=f"reviewentries {dest}",
                 )
                 for dest in reviewer

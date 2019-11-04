@@ -21,6 +21,7 @@ class Details:
         N.prov,
         N.perm,
         N.wfitem,
+        N.kind,
     )
 
     def __init__(self, recordObj):

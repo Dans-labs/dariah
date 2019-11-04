@@ -1,4 +1,4 @@
-.step,
+.command,
 .status {
 	font-weight: bold;
 	padding: 0.5rem;
@@ -6,7 +6,7 @@
 	display: inline-block;
     max-width: 100%;
 }
-.step {
+.command {
 	border-width: 0.3rem;
 	border-style: outset;
   cursor: pointer;
@@ -34,33 +34,33 @@
 	background-color: var(--status-error-back);
 	border-color: var(--status-error-border);
 }
-.step.info {
-	color: var(--step-info-fore);
-	background-color: var(--step-info-back);
-	border-color: var(--step-info-border);
+.command.info {
+	color: var(--command-info-fore);
+	background-color: var(--command-info-back);
+	border-color: var(--command-info-border);
 }
-.step.good {
-	color: var(--step-good-fore);
-	background-color: var(--step-good-back);
-	border-color: var(--step-good-border);
+.command.good {
+	color: var(--command-good-fore);
+	background-color: var(--command-good-back);
+	border-color: var(--command-good-border);
 }
-.step.warning {
-	color: var(--step-warning-fore);
-	background-color: var(--step-warning-back);
-	border-color: var(--step-warning-border);
+.command.warning {
+	color: var(--command-warning-fore);
+	background-color: var(--command-warning-back);
+	border-color: var(--command-warning-border);
 }
-.step.error {
-	color: var(--step-error-fore);
-	background-color: var(--step-error-back);
-	border-color: var(--step-error-border);
+.command.error {
+	color: var(--command-error-fore);
+	background-color: var(--command-error-back);
+	border-color: var(--command-error-border);
 }
-.step.info.active,
-.step.good.active,
-.step.warning.active,
-.step.error.active {
-	color: var(--step-active-fore);
-	background-color: var(--step-active-back);
-	border-color: var(--step-active-border);
+.command.info.active,
+.command.good.active,
+.command.warning.active,
+.command.error.active {
+	color: var(--command-active-fore);
+	background-color: var(--command-active-back);
+	border-color: var(--command-active-border);
 }
 .ass-score-box {
 	background-color: var(--score-back);

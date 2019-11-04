@@ -157,7 +157,7 @@ class TypeBase:
             atts[N.pattern] = self.pattern
         validationMsg = Types.validationMsg(self.name)
 
-        widgetElem = H.input(self.toEdit(val), type=N.text, cls="wvalue", **atts,)
+        widgetElem = H.input(self.toEdit(val), type=N.text, cls="wvalue", **atts)
         validationElem = H.span(E, valmsg=validationMsg) if validationMsg else E
         return H.join([widgetElem, validationElem])
 
@@ -312,7 +312,7 @@ class Markdown(TypeBase):
         return val
 
     def widget(self, val):
-        return H.textarea(val or E, cls="wvalue",)
+        return H.textarea(val or E, cls="wvalue")
 
 
 class Bool(TypeBase):
@@ -328,7 +328,7 @@ class Bool(TypeBase):
         values = G(BOOLEAN_TYPES, self.name)
         noneValue = False if len(values) == 2 else None
 
-        return H.icon(G(values, val, default=G(values, noneValue)), cls="medium",)
+        return H.icon(G(values, val, default=G(values, noneValue)), cls="medium")
 
     def toEdit(self, val):
         return val
@@ -511,15 +511,15 @@ class Value(Related):
                     placeholder=G(MESSAGES, N.filter, default=E),
                     cls="wfilter",
                 ),
-                H.iconx(N.add, cls="small wfilter add", title="add value",)
+                H.iconx(N.add, cls="small wfilter add", title="add value")
                 if extensible
                 else E,
-                H.iconx(N.clear, cls="small wfilter clear", title="clear filter",),
+                H.iconx(N.clear, cls="small wfilter clear", title="clear filter"),
             ]
             if len(valueRecords) > FILTER_THRESHOLD
             else []
         )
-        atts = dict(markup=True, clickable=True, multiple=multiple, active=val,)
+        atts = dict(markup=True, clickable=True, multiple=multiple, active=val)
         return H.div(
             filterControl
             + [
@@ -574,7 +574,7 @@ class Value(Related):
                 atts[N.title] = titleHint
 
             titleIcon = (
-                (NBSP + H.icon(N.cross if isActive else N.add, cls="small",))
+                (NBSP + H.icon(N.cross if isActive else N.add, cls="small"))
                 if multiple
                 else E
             )
@@ -684,7 +684,7 @@ class Decision(Value):
                 eid = G(record, N._id)
 
             isActive = eid == active
-            baseCls = "step" if clickable else "status"
+            baseCls = "command" if clickable else "status"
             activeCls = "active " if isActive else E
             extraCls = G(record, N.acro)
             atts = dict(
@@ -696,7 +696,7 @@ class Decision(Value):
             if titleHint:
                 atts[N.title] = titleHint
 
-            titleFormatted = H.span(titleStr, lab=titleStr.lower(), **atts,)
+            titleFormatted = H.span(titleStr, lab=titleStr.lower(), **atts)
             return (titleStr, titleFormatted)
         else:
             return titleStr

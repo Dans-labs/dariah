@@ -122,36 +122,42 @@ commands:
       table: review
   review:
     expertReviewRevise:
+      kind: expert
       msg: Advise revision
       cls: warning
       operator: set
       field: decision
       value: Revise
     expertReviewAccept:
+      kind: expert
       msg: Advise to accept
       cls: good
       operator: set
       field: decision
       value: Accept
     expertReviewReject:
+      kind: expert
       msg: Advise to reject
       cls: error
       operator: set
       field: decision
       value: Reject
     finalReviewRevise:
+      kind: final
       msg: Require revision
       cls: warning
       operator: set
       field: decision
       value: Revise
     finalReviewAccept:
+      kind: final
       msg: Accept
       cls: good
       operator: set
       field: decision
       value: Accept
     finalReviewReject:
+      kind: final
       msg: Reject
       cls: error
       operator: set
@@ -170,7 +176,6 @@ workflow:
   - contribId
   - contribTitle
   - frozen
-  - goodType
   - kind
   - reviewIndex
   - reviewEId
@@ -191,7 +196,6 @@ info:
   - contribId
   - dateSubmitted
   - frozen
-  - goodType
   - kind
   - mayAdd
   - rep
@@ -204,6 +208,10 @@ info:
   - title
   - type
 
+decisionDelay: 3600
+
 names:
   - commandFields
+  - expert
+  - final
   - wfitem

@@ -80,17 +80,16 @@ class Control:
             if wfitem:
                 return wfitem
 
-        info = self.getCached(
-            db.getWorkflowItem,
-            N.getWorkflowItem,
-            [contribId],
-            N.workflow,
-            contribId,
-            requireFresh,
-        )
-        wfitem = wf.makeItem(info, table, eid, record)
-        if not wfitem or not wfitem.valid:
-            wfitem = None
+        if not wfitem:
+            info = self.getCached(
+                db.getWorkflowItem,
+                N.getWorkflowItem,
+                [contribId],
+                N.workflow,
+                contribId,
+                requireFresh,
+            )
+            wfitem = wf.makeItem(info)
         return wfitem
 
     def delItem(self, table, eid):

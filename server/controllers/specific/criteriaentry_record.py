@@ -13,10 +13,6 @@ class CriteriaEntryR(Record):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        wfitem = self.wfitem
-        if not wfitem:
-            return
-
         control = self.control
         record = self.record
         mkTable = self.mkTable
@@ -34,14 +30,14 @@ class CriteriaEntryR(Record):
         withEvidence = H.icon(
             N.missing if self.field(N.evidence).isBlank() else N.check
         )
-        status = H.span(f"""evidence{NBSP}{withEvidence}""", cls="right small",)
+        status = H.span(f"""evidence{NBSP}{withEvidence}""", cls="right small")
         seq = G(record, N.seq, default=Q)
         scoreRep = self.field(N.score).wrapBare()
 
         return H.span(
             [
                 H.span([f"""{seq}{DOT}{NBSP}""", critRecord.title()], cls="col1"),
-                H.span(scoreRep, cls="col2",),
+                H.span(scoreRep, cls="col2"),
                 status,
             ],
             cls=f"centrytitle criteria",
@@ -61,12 +57,12 @@ class CriteriaEntryR(Record):
             (N.info, N.dismiss),
             critRecord.wrapHelp(),
             critKey,
-            openAtts=dict(cls="button small", title="Explanation and scoring guide",),
-            closeAtts=dict(cls="button small", title="Hide criteria explanation",),
+            openAtts=dict(cls="button small", title="Explanation and scoring guide"),
+            closeAtts=dict(cls="button small", title="Hide criteria explanation"),
         )
 
-        score = H.div(self.field(N.score).wrap(asEdit=G(perm, N.isEdit)),)
-        evidence = H.div(self.field(N.evidence).wrap(asEdit=G(perm, N.isEdit)),)
+        score = H.div(self.field(N.score).wrap(asEdit=G(perm, N.isEdit)))
+        evidence = H.div(self.field(N.evidence).wrap(asEdit=G(perm, N.isEdit)))
         entry = H.div(
             [
                 H.div(he(msg), cls="heavy") if msg else E,

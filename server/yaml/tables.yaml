@@ -151,9 +151,7 @@ names:
   - bool
   - constrained
   - eid
-  - expert
   - fields
-  - final
   - isUserTable
   - isUserEntryTable
   - itemLabels
@@ -162,7 +160,6 @@ names:
   - orig
   - orphaned
   - pattern
-  - readonly
   - reference
   - sorted
   - Table
