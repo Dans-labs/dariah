@@ -170,7 +170,7 @@ for table in tables:
 
 constrainedPre = {}
 for table in VALUE_TABLES:
-    fieldSpecs = getattr(Tables, table)
+    fieldSpecs = getattr(Tables, table, {})
     for (field, fieldSpecs) in fieldSpecs.items():
         tp = G(fieldSpecs, N.type)
         if tp in VALUE_TABLES and tp == field:
@@ -178,7 +178,7 @@ for table in VALUE_TABLES:
 
 constrained = {}
 for table in tables:
-    fieldSpecs = getattr(Tables, table)
+    fieldSpecs = getattr(Tables, table, {})
     fields = set(fieldSpecs)
     for (ctable, mfield) in constrainedPre.items():
         if ctable in fields and mfield in fields:
@@ -196,12 +196,14 @@ CF = C.workflow
 
 COMMANDS = CF.commands
 
-commandFields = {
-    table: {
-        G(commandInfo, N.field)
-        for commandInfo in tableActions.values()
-        if G(commandInfo, N.operator) == N.set
-    }
-    for (table, tableActions) in COMMANDS.items()
-}
+commandFields = {}
+
+for (table, tableActions) in COMMANDS.items():
+    for commandInfo in tableActions.values():
+        if G(commandInfo, N.operator) == N.set:
+            commandFields.setdefault(table, set()).add(G(commandInfo, N.field))
+            dateField = G(commandInfo, N.date)
+            if dateField:
+                commandFields[table].add(dateField)
+
 setattr(Workflow, N.commandFields, commandFields)

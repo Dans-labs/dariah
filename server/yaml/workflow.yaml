@@ -9,7 +9,9 @@ fields:
   - dateCreated
   - dateDecided
   - dateSubmitted
+  - dateWithdrawn
   - decision
+  - editors
   - evidence
   - review
   - reviewerE
@@ -42,7 +44,7 @@ stageAtts:
   submitted:
     msg: Assessment submitted
     cls: info
-  submittedRevision:
+  submittedRevised:
     msg: Revised Assessment submitted
     cls: info
   complete:
@@ -51,12 +53,18 @@ stageAtts:
   completeRevised:
     msg: Revised assessment complete
     cls: info
+  completeWithdrawn:
+    msg: Withdrawn
+    cls: error
   incomplete:
     msg: Assessment incomplete
     cls: warning
   incompleteRevised:
     msg: Revised assessment incomplete
     cls: warning
+  incompleteWithdrawn:
+    msg: Withdrawn
+    cls: error
   reviewExpert:
     msg: Expert reviewer has decided
     cls: info
@@ -81,19 +89,25 @@ commands:
       cls: good
       operator: set
       field: selected
+      date: dateDecided
+      delay: 48
       value: "1"
     deselectContrib:
-      msg: Not eligible as national contribution to DARIAH
+      msg: Discard as national contribution to DARIAH
       cls: error
       operator: set
       field: selected
-      value: "0"
+      date: dateDecided
+      delay: 48
+      value: "-1"
     unselectContrib:
       msg: Revoke selection decision for this contribution
       cls: warning
       operator: set
       field: selected
-      value: "1"
+      date: dateDecided
+      delay: 48
+      value: "0"
     startAssessment:
       msg: Start a self-assessment for this contribution
       cls: info
@@ -105,19 +119,36 @@ commands:
       cls: info
       operator: set
       field: submitted
+      date: dateSubmitted
+      delay: 1
       value: "1"
-    submitRevision:
+    resubmitAssessment:
+      msg: Resubmit assessment
+      cls: info
+      operator: set
+      field: submitted
+      date: dateSubmitted
+      delay: 1
+      value: "1"
+    submitRevised:
       msg: Submit revised assessment
+      cls: info
       operator: set
       field: dateSubmitted
+      date: dateSubmitted
+      delay: 1
       value: "now"
     withdrawAssessment:
       msg: Withdraw assessment from review
+      cls: error
       operator: set
       field: submitted
+      date: dateWithdrawn
+      delay: 1
       value: "0"
     startReview:
       msg: Start a review of this assessment
+      cls: info
       operator: add
       table: review
   review:
@@ -127,6 +158,8 @@ commands:
       cls: warning
       operator: set
       field: decision
+      date: dateDecided
+      delay: 2
       value: Revise
     expertReviewAccept:
       kind: expert
@@ -134,6 +167,8 @@ commands:
       cls: good
       operator: set
       field: decision
+      date: dateDecided
+      delay: 2
       value: Accept
     expertReviewReject:
       kind: expert
@@ -141,6 +176,8 @@ commands:
       cls: error
       operator: set
       field: decision
+      date: dateDecided
+      delay: 2
       value: Reject
     finalReviewRevise:
       kind: final
@@ -148,6 +185,8 @@ commands:
       cls: warning
       operator: set
       field: decision
+      date: dateDecided
+      delay: 24
       value: Revise
     finalReviewAccept:
       kind: final
@@ -155,6 +194,8 @@ commands:
       cls: good
       operator: set
       field: decision
+      date: dateDecided
+      delay: 24
       value: Accept
     finalReviewReject:
       kind: final
@@ -162,49 +203,32 @@ commands:
       cls: error
       operator: set
       field: decision
+      date: dateDecided
+      delay: 24
       value: Reject
 
 workflow:
-  - assessments
-  - assessmentId
-  - assessmentIndex
-  - assessmentTitle
-  - assessmentType
-  - assessmentValid
-  - code
   - complete
   - contribId
-  - contribTitle
   - frozen
   - kind
-  - reviewIndex
-  - reviewEId
-  - reviewFId
-  - reviewTitle
-  - reviewValid
   - reviewer
   - reviews
-  - reviewsValid
   - status
   - type
 
 info:
   - _id
-  - cls
-  - complete
-  - creator
+  - creators
   - contribId
-  - dateSubmitted
   - frozen
   - kind
   - mayAdd
-  - rep
   - reviewer
-  - reviewIdex
   - reviewers
   - reviews
   - stage
-  - submitted
+  - stageDate
   - title
   - type
 
@@ -214,4 +238,5 @@ names:
   - commandFields
   - expert
   - final
+  - now
   - wfitem

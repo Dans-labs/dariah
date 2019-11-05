@@ -23,6 +23,7 @@ class Sidebar:
         self.path = path
         self.entries = []
         self.mainEntries = []
+        self.Entries = []
         self.userEntries = []
         self.userPaths = []
         self.userEntryEntries = []
@@ -90,19 +91,22 @@ class Sidebar:
 
         tableObj = mkTable(control, table)
         isMainTable = tableObj.isMainTable
+        isInterTable = tableObj.isInterTable
         isUserTable = tableObj.isUserTable
         isUserEntryTable = tableObj.isUserEntryTable
         isValueTable = tableObj.isValueTable
         itemPlural = tableObj.itemLabels[1]
 
         isAuth = auth.authenticated()
+        isOffice = auth.officeuser()
         isSuperUser = auth.superuser()
         isSysAdmin = auth.sysadmin()
         country = auth.country()
 
-        if isMainTable:
+        if isMainTable or isInterTable:
             entries = []
-            entries.extend(self.makeOptions())
+            if isMainTable:
+                entries.extend(self.makeOptions())
 
             if isAuth:
                 entries.append(
@@ -112,17 +116,34 @@ class Sidebar:
                         withOptions=True,
                     )
                 )
-
-            if country:
-                iso = G(country, N.iso)
-                if iso:
+                if isInterTable:
+                    if isOffice:
+                        entries.append(
+                            self.makeEntry(
+                                f"""{itemPlural} needing reviewers""",
+                                f"""/{table}/{N.assignlist}""",
+                                withOptions=True,
+                            )
+                        )
                     entries.append(
                         self.makeEntry(
-                            f"""{iso} {itemPlural}""",
-                            f"""/{table}/{N.ourlist}""",
+                            f"""my reviews""",
+                            f"""/{table}/{N.reviewlist}""",
                             withOptions=True,
                         )
                     )
+
+                if isMainTable:
+                    if country:
+                        iso = G(country, N.iso)
+                        if iso:
+                            entries.append(
+                                self.makeEntry(
+                                    f"""{iso} {itemPlural}""",
+                                    f"""/{table}/{N.ourlist}""",
+                                    withOptions=True,
+                                )
+                            )
 
             entries.append(
                 self.makeEntry(
@@ -130,7 +151,8 @@ class Sidebar:
                 )
             )
 
-            entries = [self.makeCaption("""Contributions""", table, entries)]
+            caption = """Contributions""" if isMainTable else """Assessments"""
+            entries = [self.makeCaption(f"""{caption}""", table, entries)]
 
             self.mainEntries.extend(entries)
             return

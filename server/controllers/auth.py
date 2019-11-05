@@ -18,6 +18,7 @@ from controllers.html import HtmlElements as H
 from controllers.perm import (
     sysadmin,
     superuser,
+    officeuser,
     coordinator,
     authenticated,
     AUTH,
@@ -91,9 +92,7 @@ class Auth:
             )
         ]
         user.clear()
-        user.update(
-            {N.eppn: eppn, N.authority: authority}
-        )
+        user.update({N.eppn: eppn, N.authority: authority})
         if email:
             user[N.email] = email
         if len(userFound) == 1:
@@ -102,7 +101,11 @@ class Auth:
             # this checks whether mayLogin is explicitly set to False
             self.clearUser()
         else:
-            if N.group not in user:
+            if N.group in user:
+                if N.groupRep not in user:
+                    groupRep = G(G(db.permissionGroup, user[N.group]), N.rep)
+                    user[N.groupRep] = groupRep
+            else:
                 user[N.group] = authId
                 user[N.groupRep] = AUTH
 
@@ -257,6 +260,10 @@ class Auth:
     def coordinator(self, country=None):
         user = self.user
         return coordinator(user, country)
+
+    def officeuser(self):
+        user = self.user
+        return officeuser(user)
 
     def superuser(self):
         user = self.user

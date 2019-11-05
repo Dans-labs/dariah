@@ -1,7 +1,6 @@
 from controllers.config import Config as C, Names as N
-from controllers.utils import getLast, pick as G, serverprint
+from controllers.utils import getLast, pick as G, serverprint, creators
 from controllers.db import inCrit
-from controllers.workflow.apply import WorkflowItem
 
 
 CT = C.tables
@@ -50,26 +49,6 @@ class Workflow:
         self.maxScoreByCrit = maxScoreByCrit
 
         self.initWorkflow(drop=True)
-        self.items = {}
-
-    def addControl(self, control):
-        auth = control.auth
-        user = auth.user
-        self.auth = auth
-        self.uid = G(user, N._id)
-        self.eppn = G(user, N.eppn)
-
-    def getItem(self, contribId):
-        items = self.items
-        return G(items, contribId)
-
-    def putItem(self, contribId, info):
-        items = self.items
-
-        items[contribId] = WorkflowItem(self, info)
-
-    def makeItem(self, info):
-        return WorkflowItem(self, info)
 
     def initWorkflow(self, drop=False):
         db = self.db
@@ -100,15 +79,11 @@ class Workflow:
 
     def insert(self, contribId):
         db = self.db
-        items = self.items
 
         info = self.computeWorkflow(contribId=contribId)
         info[N._id] = contribId
         serverprint(f"WORKFLOW: New workflow info {contribId}")
         db.insertWorkflow(info)
-
-        itemObj = self.makeItem(info)
-        items[contribId] = itemObj
 
     def recompute(self, contribId):
         db = self.db
@@ -116,22 +91,11 @@ class Workflow:
         info = self.computeWorkflow(contribId=contribId)
         db.updateWorkflow(contribId, info)
 
-        itemObj = self.getItem(contribId)
-        if itemObj is None:
-            self.putItem(contribId, info)
-        else:
-            itemObj.updateData(info)
-
     def delete(self, contribId):
         db = self.db
-        items = self.items
 
         serverprint(f"WORKFLOW: Delete workflow info {contribId}")
         db.delWorkflow(contribId)
-
-        itemObj = self.getItem(contribId)
-        itemObj.clearData()
-        items.pop(contribId)
 
     def getFullItem(self, contribId):
         db = self.db
@@ -160,6 +124,7 @@ class Workflow:
 
         contribType = G(record, N.typeContribution)
         selected = G(record, N.selected)
+        dateDecided = G(record, N.dateDecided)
 
         stage = (
             N.selectYes
@@ -190,13 +155,13 @@ class Workflow:
 
         return {
             N._id: contribId,
-            N.creator: G(record, N.creator),
+            N.creators: creators(record, N.creator, N.editors),
             N.country: G(record, N.country),
             N.type: contribType,
             N.title: G(record, N.title),
-            N.selected: G(record, N.selected),
             N.assessment: assessmentWf,
             N.stage: stage,
+            N.stageDate: dateDecided,
             N.frozen: frozen,
             N.locked: locked,
             N.mayAdd: mayAdd,
@@ -224,6 +189,8 @@ class Workflow:
         )
         submitted = G(record, N.submitted)
         dateSubmitted = G(record, N.dateSubmitted)
+        dateWithdrawn = G(record, N.dateWithdrawn)
+        withdrawn = not submitted and dateWithdrawn
 
         score = self.computeScore(centries)
 
@@ -254,41 +221,46 @@ class Workflow:
         finalReviewWf = G(reviewsWf, N.final)
         finalReviewStage = G(finalReviewWf, N.stage)
 
-        revision = finalReviewStage == N.reviewRevise
-        locked = not not finalReviewStage and not revision
+        finalReviewDate = G(finalReviewWf, N.stageDate)
+        revisedProgress = (
+            submitted
+            and finalReviewStage == N.reviewRevise
+            and finalReviewDate > dateSubmitted
+        )
+        revisedDone = (
+            submitted
+            and finalReviewStage == N.reviewRevise
+            and finalReviewDate < dateSubmitted
+        )
 
-        if locked:
+        stage = (
+            (N.completeWithdrawn if complete else N.incompleteWithdrawn)
+            if withdrawn
+            else (N.completeRevised if complete else N.incompleteRevised)
+            if revisedProgress
+            else N.submittedRevised
+            if revisedDone
+            else (
+                N.submitted if submitted else N.complete if complete else N.incomplete
+            )
+        )
+        stageDate = dateWithdrawn if withdrawn else dateSubmitted
+
+        aLocked = stage in {N.submitted, N.submittedRevised}
+
+        rLocked = not not finalReviewStage and not finalReviewStage == N.reviewRevise
+
+        if rLocked:
             finalReviewWf[N.locked] = True
             if expertReviewWf:
                 expertReviewWf[N.locked] = True
         else:
             if finalReviewWf:
                 finalReviewWf[N.locked] = not expertReviewStage
+            if expertReviewWf:
+                expertReviewWf[N.locked] = False
 
-        if submitted:
-            stage = N.submitted
-        else:
-            if complete:
-                stage = N.complete
-            else:
-                stage = N.incomplete
-
-        finalReviewDate = G(finalReviewWf, N.dateDecided)
-        revisionComplete = finalReviewDate and finalReviewDate < dateSubmitted
-
-        stage = (
-            (
-                N.submittedRevised
-                if submitted
-                else N.completeRevised
-                if complete
-                else N.incompleteRevised
-            )
-            if revisionComplete
-            else (
-                N.submitted if submitted else N.complete if complete else N.incomplete
-            )
-        )
+        locked = aLocked or rLocked
 
         mayAdd = {
             kind: not locked and not frozen and not G(reviewsWf, kind)
@@ -299,18 +271,16 @@ class Workflow:
             locked,
             {
                 N._id: assessmentId,
-                N.creator: G(record, N.creator),
-                N.title: G(record, N.assessmentTitle),
-                N.submitted: submitted,
-                N.dateSubmitted: dateSubmitted,
+                N.creators: creators(record, N.creator, N.editors),
+                N.title: G(record, N.title),
                 N.reviewer: reviewer,
                 N.reviewers: reviewers,
                 N.reviews: reviewsWf,
                 N.score: score,
-                N.complete: complete,
                 N.stage: stage,
+                N.stageDate: stageDate,
                 N.frozen: frozen,
-                N.locked: locked,
+                N.locked: locked or aLocked,
                 N.mayAdd: mayAdd,
             },
         )
@@ -319,29 +289,28 @@ class Workflow:
         decisions = self.decisions
 
         decision = G(decisions, G(record, N.decision))
-        decisionRep = G(decisions, decision)
 
         stage = (
-            (N.reviewExpert if decisionRep else None)
+            (N.reviewExpert if decision else None)
             if kind == N.expert
             else (
                 N.reviewAccept
-                if decisionRep == N.Accept
+                if decision == N.Accept
                 else N.reviewReject
-                if decisionRep == N.Reject
+                if decision == N.Reject
                 else N.reviewRevise
-                if decisionRep == N.Revise
+                if decision == N.Revise
                 else None
             )
         )
 
         return {
             N._id: G(record, N._id),
-            N.creator: G(record, N.creator),
+            N.creators: creators(record, N.creator, N.editors),
             N.title: G(record, N.title),
-            N.dateDecided: G(record, N.dateDecided),
             N.kind: kind,
             N.stage: stage,
+            N.stageDate: G(record, N.dateDecided),
             N.frozen: frozen,
         }
 

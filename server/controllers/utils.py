@@ -141,6 +141,12 @@ def pick(record, field, default=None):
     return default if record is None else record.get(field, default)
 
 
+def creators(record, creatorField, editorsField):
+    editors = set(pick(record, editorsField, default=[]))
+    editors.add(pick(record, creatorField))
+    return sorted(editors)
+
+
 def filterModified(modified):
     logicM = _decomposeM(modified)
     chunks = _perDay(logicM)

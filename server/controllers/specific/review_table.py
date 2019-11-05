@@ -29,7 +29,7 @@ class ReviewT(Table):
         if not contribId:
             return None
 
-        wfitem = control.getWorkflowItem(contribId, N.contrib, N.contribId, None)
+        wfitem = control.getWorkflowItem(contribId)
 
         if not wfitem.permission(N.assessment, N.startReview):
             return contribId

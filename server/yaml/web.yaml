@@ -89,21 +89,23 @@ urls:
     url: /xxx
 
 urlParts:
+  - assignlist
+  - edit
+  - favicons
   - http
   - https
-  - www
   - index
-  - static
-  - favicons
   - insert
+  - item
   - list
   - mailto
   - mylist
-  - ourlist
-  - item
-  - edit
-  - view
   - org
+  - ourlist
+  - reviewlist
+  - static
+  - view
+  - www
 
 elements:
   - a

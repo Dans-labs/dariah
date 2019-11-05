@@ -6,6 +6,7 @@ from flask import (
     render_template,
     send_file,
     redirect,
+    flash,
 )
 
 from pymongo import MongoClient
@@ -99,11 +100,8 @@ def factory():
         if table in ALL_TABLES and table not in MASTERS:
             auth.authenticate()
             eid = mkTable(control, table).insert()
-            newUrlPart = N.mylist if table in USER_TABLES else N.list
             newPath = (
-                f"""/{table}/{newUrlPart}/{eid}"""
-                if eid
-                else f"""/{table}/{newUrlPart}"""
+                f"""/{table}/{N.item}/{eid}""" if eid else f"""/{table}/{N.list}"""
             )
             return redirect(newPath)
         return notFound(path)
@@ -123,8 +121,7 @@ def factory():
             contribId = (
                 mkTable(control, dtable).insert(masterTable=table, masterId=eid) or E
             )
-            newUrlPart = N.mylist
-            newPath = f"""/{N.contrib}/{newUrlPart}/{contribId}"""
+            newPath = f"""/{N.contrib}/{N.item}/{contribId}"""
             return redirect(newPath)
         return notFound(path)
 
@@ -146,13 +143,29 @@ def factory():
     def serveTableMyList(table):
         return serveTable(table, None, action=N.mylist)
 
-    @app.route(f"""/<string:table>/{N.ourlist}/<string:eid>""")
-    def serveTableOurListOpen(table, eid):
-        return serveTable(table, eid, action=N.ourlist)
+    @app.route(f"""/{N.contrib}/{N.ourlist}/<string:eid>""")
+    def serveTableOurListOpen(eid):
+        return serveTable(N.contrib, eid, action=N.ourlist)
 
-    @app.route(f"""/<string:table>/{N.ourlist}""")
-    def serveTableOurList(table):
-        return serveTable(table, None, action=N.ourlist)
+    @app.route(f"""/{N.contrib}/{N.ourlist}""")
+    def serveTableOurList():
+        return serveTable(N.contrib, None, action=N.ourlist)
+
+    @app.route(f"""/{N.assessment}/{N.assignlist}/<string:eid>""")
+    def serveTableAssignListOpen(eid):
+        return serveTable(N.assessment, eid, action=N.assignlist)
+
+    @app.route(f"""/{N.assessment}/{N.assignlist}""")
+    def serveTableAssignList():
+        return serveTable(N.assessment, None, action=N.assignlist)
+
+    @app.route(f"""/{N.assessment}/{N.reviewlist}/<string:eid>""")
+    def serveTableReviewListOpen(eid):
+        return serveTable(N.assessment, eid, action=N.reviewlist)
+
+    @app.route(f"""/{N.assessment}/{N.reviewlist}""")
+    def serveTableReviewList():
+        return serveTable(N.assessment, None, action=N.reviewlist)
 
     def serveTable(table, eid, action=None):
         path = f"""/{table}/{action}"""
@@ -307,16 +320,19 @@ def factory():
     @app.route(f"""/{N.slogout}""")
     def serveSlogout():
         auth.deauthenticate()
+        flash("logged out from DARIAH")
         return redirect(SHIB_LOGOUT)
 
     @app.route(f"""/{N.login}""")
     def serveLogin():
         auth.authenticate(login=True)
+        flash("logged in")
         return redirect(START)
 
     @app.route(f"""/{N.logout}""")
     def serveLogout():
         auth.deauthenticate()
+        flash("logged out")
         return redirect(START)
 
     # FALL-BACK

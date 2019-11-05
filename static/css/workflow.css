@@ -6,6 +6,11 @@
 	display: inline-block;
     max-width: 100%;
 }
+.status .date {
+	font-weight: normal;
+  font-size: small;
+  background-color: var(--user-back);
+}
 .command {
 	border-width: 0.3rem;
 	border-style: outset;

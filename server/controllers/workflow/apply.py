@@ -1,6 +1,10 @@
+from datetime import timedelta
+
 from controllers.config import Config as C, Names as N
 from controllers.utils import pick as G, E, now
 from controllers.html import HtmlElements as H
+from controllers.types import Datetime
+from controllers.specific.score import presentScore
 
 
 CT = C.tables
@@ -15,12 +19,16 @@ COMMAND_FIELDS = CF.commandFields
 STATUS_REP = CF.statusRep
 DECISION_DELAY = CF.decisionDelay
 
+datetime = Datetime()
+
 
 class WorkflowItem:
-    def __init__(self, wf, data):
-        self.auth = wf.auth
-        self.uid = wf.uid
-        self.eppn = wf.eppn
+    def __init__(self, control, data):
+        auth = control.auth
+        user = auth.user
+        self.auth = auth
+        self.uid = G(user, N._id)
+        self.eppn = G(user, N.eppn)
         self.data = data
         self.mykind = self.myReviewerKind()
 
@@ -105,10 +113,30 @@ class WorkflowItem:
             }
 
     def info(self, table, *atts, kind=None):
-        data = self.data
-
         thisData = self._getWf(table, kind=kind)
-        return (G(data, N._id) if att is None else G(thisData, att) for att in atts)
+        return (G(thisData, att) for att in atts)
+
+    def checkFixed(self, recordObj, field=None):
+        auth = self.auth
+        table = recordObj.table
+        kind = recordObj.kind
+
+        (frozen, locked) = self.info(table, N.frozen, N.locked, kind=kind)
+
+        if field is None:
+            return frozen or locked
+
+        if frozen:
+            return True
+
+        if not locked:
+            return False
+
+        isOffice = auth.officeuser()
+        if isOffice and table == N.assessment:
+            return field not in {N.reviewerE, N.reviewerF}
+
+        return True
 
     def permission(self, table, command, kind=None):
         auth = self.auth
@@ -123,60 +151,94 @@ class WorkflowItem:
 
         myKind = self.mykind
 
-        (locked, frozen, mayAdd, stage, creator, country) = self.info(
+        (locked, frozen, mayAdd, stage, stageDate, creators, country) = self.info(
             table,
             N.locked,
             N.frozen,
             N.mayAdd,
             N.stage,
-            N.creator,
+            N.stageDate,
+            N.creators,
             N.country,
             kind=kind,
         )
 
+        isCoord = auth.coordinator(country=country)
+        isSuper = auth.superuser()
+
+        commandInfo = allowedCommands[command]
+        decisionDelay = G(commandInfo, N.delay)
+        if decisionDelay:
+            decisionDelay = timedelta(hours=decisionDelay)
+
+        justNow = now()
+        remaining = False
+        if decisionDelay and stageDate:
+            remaining = stageDate + decisionDelay - justNow
+            if remaining <= timedelta(hours=0):
+                remaining = False
+
+        if frozen and not remaining:
+            return False
+
         if table == N.contrib:
-            isCoord = auth.coordinator(country=country)
-            isSuper = auth.superuser()
-            if uid != creator and not isCoord and not isSuper:
+            if uid not in creators and not isCoord and not isSuper:
                 return False
-
-            inDelay = False
-            if isCoord:
-                (dateDecided,) = self.info(table, N.dateDecided, kind=kind)
-                inDelay = now() < dateDecided + DECISION_DELAY
-
-            if command == N.selectContrib:
-                return isCoord and (not frozen or inDelay)
-
-            if command == N.deselectContrib:
-                return isCoord and (not frozen or inDelay)
-
-            if command == N.unselectContrib:
-                return isCoord and (not frozen or inDelay)
 
             if command == N.startAssessment:
                 return mayAdd and not frozen and not locked
 
-            return False
-
-        if locked or frozen:
-            return False
-
-        if table == N.assessment:
-            if uid != creator:
+            if not isCoord:
                 return False
 
-            if command == N.submitAssessment:
-                return stage == N.complete
+            answer = not frozen or remaining
 
-            if command == N.withdrawAssessment:
-                return True
+            if table == N.contrib and command in {
+                N.selectContrib,
+                N.deselectContrib,
+                N.unselectContrib,
+            }:
+                print(command, stage)
 
-            if command == N.submitRevision:
-                return stage == N.completeRevised
+            if command == N.selectContrib:
+                return stage != N.selectYes and answer
+
+            if command == N.deselectContrib:
+                return stage != N.selectNo and answer
+
+            if command == N.unselectContrib:
+                return stage != N.selectNone and answer
+
+            return False
+
+        if frozen:
+            return False
+
+        if locked and not remaining:
+            return False
+
+        answer = not locked or remaining
+
+        if table == N.assessment:
+            if uid not in creators:
+                return False
 
             if command == N.startReview:
-                return G(mayAdd, myKind)
+                return G(mayAdd, myKind) and not locked
+
+            if command == N.submitAssessment:
+                return stage == N.complete and answer
+
+            if command == N.resubmitAssessment:
+                return stage == N.completeWithdrawn and answer
+
+            if command == N.submitRevised:
+                return stage == N.completeRevised and answer
+
+            if command == N.withdrawAssessment:
+                return (
+                    stage not in {N.incompleteWithdrawn, N.completeWithdrawn} and answer
+                )
 
             return False
 
@@ -191,42 +253,45 @@ class WorkflowItem:
                 N.expertReviewAccept,
                 N.expertReviewReject,
             }:
-                return not locked and kind == N.expert
+                return kind == N.expert and answer
 
             if command in {
                 N.finalReviewRevise,
                 N.finalReviewAccept,
                 N.finalReviewReject,
             }:
-                (dateDecided,) = self.info(table, N.dateDecided, kind=kind)
-                inDelay = now() < dateDecided + DECISION_DELAY
-
-                return (not locked or inDelay) and kind == N.final
+                return kind == N.final and answer
 
             return False
 
         return False
 
     def statusOverview(self, table, eid, kind=None):
-        (stage, locked, frozen, score) = self.info(
-            table, N.stage, N.locked, N.frozen, N.score, kind=kind
+        (stage, stageDate, locked, frozen, score) = self.info(
+            table, N.stage, N.stageDate, N.locked, N.frozen, N.score, kind=kind
         )
         stageInfo = G(STAGE_ATTS, stage)
-        statusMsg = G(stageInfo, N.msg)
         statusCls = G(stageInfo, N.cls)
-        lockedMsg = G(STATUS_REP, N.locked) if locked else E
-        lockedCls = N.locked if locked else E
-        frozenMsg = G(STATUS_REP, N.frozen) if frozen else E
-        frozenCls = N.frozen if frozen else E
-
-        statusRep = H.div(
-            [
-                H.span(statusMsg, cls=f"large status {statusCls}"),
-                E if frozen else H.span(lockedMsg, cls=f"large status {lockedCls}"),
-                H.span(frozenMsg, cls=f"small status info"),
-            ],
-            cls=frozenCls,
+        stageOn = (
+            H.span(f""" on {datetime.toDisplay(stageDate)}""", cls="date")
+            if stageDate
+            else E
         )
+        statusMsg = H.span(
+            [G(stageInfo, N.msg) or E, stageOn], cls=f"large status {statusCls}"
+        )
+        lockedCls = N.locked if locked else E
+        lockedMsg = (
+            H.span(G(STATUS_REP, N.locked), cls=f"large status {lockedCls}")
+            if locked and not frozen
+            else E
+        )
+        frozenCls = N.frozen if frozen else E
+        frozenMsg = (
+            H.span(G(STATUS_REP, N.frozen), cls=f"small status info") if frozen else E
+        )
+
+        statusRep = H.div([statusMsg, lockedMsg, frozenMsg], cls=frozenCls)
 
         scorePart = E
         if table == N.assessment:
@@ -263,16 +328,24 @@ class WorkflowItem:
         commandParts = []
 
         allowedCommands = G(COMMANDS, table, default={})
+        justNow = now()
 
         for (command, commandInfo) in sorted(allowedCommands.items()):
-            if not self.permission(table, command, kind=kind):
+            permitted = self.permission(table, command, kind=kind)
+            print("PERM", table, command, permitted)
+            if not permitted:
                 continue
 
+            remaining = type(permitted) is timedelta and permitted
+            commandUntil = E
+            if remaining:
+                remainingRep = datetime.toDisplay(justNow + remaining)
+                commandUntil = H.span(f""" until {remainingRep}""", cls="date")
             commandMsg = G(commandInfo, N.msg)
             commandCls = G(commandInfo, N.cls)
 
             commandPart = H.a(
-                commandMsg,
+                [commandMsg, commandUntil],
                 f"""/api/command/{command}/{table}/{eid}""",
                 cls=f"large command {commandCls}",
             )
@@ -280,11 +353,9 @@ class WorkflowItem:
 
         return H.join(commandParts)
 
-    def isCommand(self, fieldObj):
-        table = fieldObj.table
-        field = fieldObj.field
-
-        commandFields = set(G(COMMAND_FIELDS, table, default=[]))
+    @staticmethod
+    def isCommand(table, field):
+        commandFields = G(COMMAND_FIELDS, table, default=set())
         return field in commandFields
 
     def doCommand(self, command, recordObj):
@@ -292,6 +363,7 @@ class WorkflowItem:
         eid = recordObj.eid
         kind = recordObj.kind
         commands = G(COMMANDS, table)
+        (contribId,) = self.info(N.contrib, N._id)
 
         if self.permission(table, command, kind=kind):
             commandInfo = commands[command]
@@ -299,81 +371,10 @@ class WorkflowItem:
             if operator == N.add:
                 tableObj = recordObj.tableObj
 
-                contribId = (
-                    tableObj.insert(masterTable=table, masterId=eid, force=True) or E
-                )
+                tableObj.insert(masterTable=table, masterId=eid, force=True) or E
             elif operator == N.set:
                 field = G(commandInfo, N.field)
                 value = G(commandInfo, N.value)
                 recordObj.field(field, mayEdit=True).save(value)
-        return f"""/{N.contrib}/{N.mylist}/{contribId}"""
 
-    def checkFixed(self, recordObj):
-        table = recordObj.table
-        kind = recordObj.kind
-
-        (frozen, locked) = self.info(table, N.frozen, N.locked, kind=kind)
-        return frozen or locked
-
-
-def presentScore(score, table, eid, derivation=True):
-    overall = G(score, N.overall, default=0)
-    relevantScore = G(score, N.relevantScore, default=0)
-    relevantMax = G(score, N.relevantMax, default=0)
-    relevantN = G(score, N.relevantN, default=0)
-    allMax = G(score, N.allMax, default=0)
-    allN = G(score, N.allN, default=0)
-    irrelevantN = allN - relevantN
-
-    fullScore = H.span(
-        f"Score {overall}%", title="overall score of this assessment", cls="ass-score",
-    )
-    if not derivation:
-        return fullScore
-
-    scoreMaterial = H.div(
-        [
-            H.div(
-                [
-                    H.p(f"""This assessment scores {relevantScore} points."""),
-                    H.p(
-                        f"""For this type of contribution there is a total of
-                          {allMax} points, divided over {allN} criteria.
-                      """
-                    ),
-                    (
-                        H.p(
-                            f"""However,
-                              {irrelevantN}
-                              rule{" is " if irrelevantN == 1 else "s are"}
-                              not applicable to this contribution,
-                              which leaves the total amount to
-                              {relevantMax} points,
-                              divided over {relevantN} criteria.
-                          """
-                        )
-                        if irrelevantN
-                        else E
-                    ),
-                    H.p(
-                        f"""The total score is expressed as a percentage:
-                          the fraction of {relevantScore} scored points
-                          with respect to {relevantMax} scorable points:
-                          {overall}%.
-                      """
-                    ),
-                ],
-                cls="ass-score-deriv",
-            ),
-        ],
-        cls="ass-score-box",
-    )
-
-    scoreWidget = H.detailx(
-        (N.calc, N.dismiss),
-        scoreMaterial,
-        f"""{table}/{eid}/scorebox""",
-        openAtts=dict(cls="button small", title="Show derivation"),
-        closeAtts=dict(cls="button small", title="Hide derivation"),
-    )
-    return (fullScore, *scoreWidget)
+        return f"""/{N.contrib}/{N.item}/{contribId}"""

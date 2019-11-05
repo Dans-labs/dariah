@@ -7,7 +7,7 @@ from controllers.specific.criteria_record import CriteriaR
 from controllers.specific.criteriaentry_record import CriteriaEntryR
 from controllers.specific.review_record import ReviewR
 from controllers.specific.reviewentry_record import ReviewEntryR
-from controllers.specific.score import ScoreR
+from controllers.specific.score_record import ScoreR
 
 
 DERIVEDS = (

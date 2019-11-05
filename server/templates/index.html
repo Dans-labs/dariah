@@ -38,6 +38,16 @@
       <div id="topbar">
         {{topbar|safe}}
       </div>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div id="msgbar">
+          {% for message in messages %}
+            <div class="msgitem">{{ message }}</div>
+          {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      </div>
       <div id="rest">
         <div id="sidebar">
           {{sidebar|safe}}

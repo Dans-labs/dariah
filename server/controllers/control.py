@@ -1,6 +1,7 @@
 from controllers.config import Config as C, Names as N
 from controllers.types import Types
 from controllers.utils import serverprint
+from controllers.workflow.apply import WorkflowItem
 
 
 CB = C.base
@@ -53,8 +54,6 @@ class Control:
         self.types = Types(self)
         self.cache = {}
 
-        wf.addControl(self)
-
     def getItem(self, table, eid, requireFresh=False):
         if not eid:
             return {}
@@ -68,29 +67,21 @@ class Control:
             db.getItem, N.getItem, [table, eid], table, eid, requireFresh,
         )
 
-    def getWorkflowItem(self, contribId, table, eid, record, requireFresh=False):
+    def getWorkflowItem(self, contribId, requireFresh=False):
         if not contribId:
             return None
 
         db = self.db
-        wf = self.wf
 
-        if not requireFresh:
-            wfitem = wf.getItem(contribId)
-            if wfitem:
-                return wfitem
-
-        if not wfitem:
-            info = self.getCached(
-                db.getWorkflowItem,
-                N.getWorkflowItem,
-                [contribId],
-                N.workflow,
-                contribId,
-                requireFresh,
-            )
-            wfitem = wf.makeItem(info)
-        return wfitem
+        info = self.getCached(
+            db.getWorkflowItem,
+            N.getWorkflowItem,
+            [contribId],
+            N.workflow,
+            contribId,
+            requireFresh,
+        )
+        return WorkflowItem(self, info)
 
     def delItem(self, table, eid):
         db = self.db

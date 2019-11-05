@@ -13,6 +13,7 @@ CW = C.web
 
 
 MAIN_TABLE = CT.userTables[0]
+INTER_TABLE = CT.userTables[1]
 USER_TABLES = set(CT.userTables)
 USER_ENTRY_TABLES = set(CT.userEntryTables)
 VALUE_TABLES = set(CT.valueTables)
@@ -32,6 +33,7 @@ class Table:
 
         self.table = table
         self.isMainTable = table == MAIN_TABLE
+        self.isInterTable = table == INTER_TABLE
         self.isUserTable = table in USER_TABLES
         self.isUserEntryTable = table in USER_ENTRY_TABLES
         self.isValueTable = table in VALUE_TABLES
@@ -117,6 +119,10 @@ class Table:
             if action == N.mylist
             else dict(our=countryId)
             if action == N.ourlist
+            else dict(assign=True)
+            if action == N.assignlist
+            else dict(reviewer=uid)
+            if action == N.reviewlist
             else {}
         )
         if request.args:
@@ -170,12 +176,13 @@ class Table:
         control = self.control
         auth = control.auth
         isMainTable = self.isMainTable
+        isInterTable = self.isInterTable
         isValueTable = self.isValueTable
         return (
             isMainTable
             and action == N.list
             or auth.superuser()
-            or (isMainTable or isValueTable)
+            or (isMainTable or isInterTable or isValueTable)
             and auth.authenticated()
         )
 

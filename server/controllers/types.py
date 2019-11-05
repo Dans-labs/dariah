@@ -487,7 +487,7 @@ class Value(Related):
                 return None
 
         table = self.name
-        values = getattr(db, f"""{table}Inv""", default={}).items()
+        values = getattr(db, f"""{table}Inv""", {})
         return values[editVal] if editVal in values else ObjectId(editVal)
 
     def toEdit(self, val):
@@ -739,7 +739,7 @@ class Types:
         setattr(self, tp, typeObj)
 
     def toOrig(self, val, tp, multiple):
-        typeObj = getattr(self, tp)
+        typeObj = getattr(self, tp, None)
         method = typeObj.toOrig
         origStr = [method(v) for v in val or []] if multiple else method(val)
         return bencode(origStr)

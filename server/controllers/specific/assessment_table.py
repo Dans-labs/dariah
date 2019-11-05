@@ -26,7 +26,7 @@ class AssessmentT(Table):
 
         masterOid = ObjectId(masterId)
 
-        wfitem = control.getWorkflowItem(masterOid, N.contrib, masterOid, None)
+        wfitem = control.getWorkflowItem(masterOid)
 
         if not wfitem.permission(N.contrib, N.startAssessment):
             return masterId

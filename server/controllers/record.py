@@ -129,7 +129,7 @@ class Record:
         self.fixed = None
         valid = False
 
-        wfitem = control.getWorkflowItem(contribId, table, eid, record)
+        wfitem = control.getWorkflowItem(contribId)
         if wfitem:
             self.kind = wfitem.getKind(table, record)
             valid = wfitem.isValid(table, eid, record)
@@ -141,9 +141,6 @@ class Record:
         control = self.control
         wf = control.wf
         perm = self.perm
-        table = self.table
-        eid = self.eid
-        record = self.record
 
         contribId = G(perm, N.contribId)
         if delete:
@@ -152,9 +149,7 @@ class Record:
         else:
             wf.recompute(contribId)
             if update:
-                self.wfitem = control.getWorkflowItem(
-                    contribId, table, eid, record, requireFresh=True
-                )
+                self.wfitem = control.getWorkflowItem(contribId, requireFresh=True)
 
     def command(self, command):
         wfitem = self.wfitem
@@ -168,12 +163,14 @@ class Record:
         return f"""/{table}/{N.item}/{eid}"""
 
     def field(self, fieldName, **kwargs):
+        table = self.table
         wfitem = self.wfitem
+
         if wfitem:
-            fixed = wfitem.checkFixed(self)
+            fixed = wfitem.checkFixed(self, field=fieldName)
             if fixed:
                 kwargs[N.mayEdit] = False
-            if wfitem.isCommand(self):
+            if wfitem.isCommand(table, fieldName):
                 kwargs[N.mayRead] = False
                 kwargs[N.mayEdit] = not fixed
         return Field(self, fieldName, **kwargs)
@@ -327,7 +324,6 @@ class Record:
 
     def deleteButton(self):
         mayDelete = self.mayDelete
-        print("DELETE?", self.table, mayDelete)
 
         if not mayDelete:
             return E
@@ -402,7 +398,7 @@ class Record:
         control = obj.control
 
         types = control.types
-        typesObj = getattr(types, table)
+        typesObj = getattr(types, table, None)
 
         isActual = table not in ACTUAL_TABLES or G(record, N.actual, default=False)
         atts = {} if isActual else dict(cls="inactual")

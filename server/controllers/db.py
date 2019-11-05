@@ -171,16 +171,28 @@ class Db:
                 criterium[crit] = eids
         return criterium
 
-    def getList(self, table, titleSort, my=None, our=None, select=False, **conditions):
+    def getList(
+        self,
+        table,
+        titleSort,
+        my=None,
+        our=None,
+        assign=False,
+        reviewer=None,
+        select=False,
+        **conditions,
+    ):
         crit = {}
         if my:
-            crit.update(
-                {M_OR: [{N.creator: my}, {N.editors: my}]}
-            )
+            crit.update({M_OR: [{N.creator: my}, {N.editors: my}]})
         if our:
+            crit.update({N.country: our})
+        if assign:
             crit.update(
-                {N.country: our}
+                {N.submitted: True, M_OR: [{N.reviewerE: None}, {N.reviewerF: None}]}
             )
+        if reviewer:
+            crit.update({M_OR: [{N.reviewerE: reviewer}, {N.reviewerF: reviewer}]})
 
         if table in VALUE_TABLES:
             records = (

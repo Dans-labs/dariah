@@ -92,7 +92,7 @@ class Field:
         tp = self.tp
         types = control.types
 
-        fieldTypeClass = getattr(types, tp)
+        fieldTypeClass = getattr(types, tp, None)
         self.fieldTypeClass = fieldTypeClass
         self.widgetType = fieldTypeClass.widgetType
 
@@ -242,7 +242,7 @@ class Field:
         value = self.value
         multiple = self.multiple
 
-        fieldTypeClass = getattr(types, tp)
+        fieldTypeClass = getattr(types, tp, None)
         method = fieldTypeClass.toDisplay
 
         return (

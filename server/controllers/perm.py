@@ -66,6 +66,11 @@ def coordinator(user, country):
     return isCoord and (country is None or uCountry == country)
 
 
+def officeuser(user):
+    group = G(user, N.groupRep) or UNAUTH
+    return group == OFFICE
+
+
 def superuser(user):
     group = G(user, N.groupRep) or UNAUTH
     return group in {OFFICE, SYSTEM, ROOT}
