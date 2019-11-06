@@ -19,5 +19,4 @@ cache/*
 .cache/*
 _temp
 _temp/*
-__pycache__
 __pycache__/*

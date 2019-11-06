@@ -17,6 +17,11 @@ SUBHEAD_X_COLS = set(
 """.strip().split()
 )
 
+U = "dummy"
+Contrib = "dummy"
+rawSortCol = "dummy"
+rawReverse = "dummy"
+
 
 class Overview:
     def __init__(self, control):
