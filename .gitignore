@@ -17,5 +17,6 @@ uploads/*
 errors/*
 cache/*
 .cache/*
+_temp
 _temp/*
 __pycache__/*
