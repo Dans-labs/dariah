@@ -23,7 +23,11 @@ class CriteriaEntryR(Record):
         self.critId = critId
         self.critRecord = critRecord
 
-    def title(self):
+    def title(self, *args, **kwargs):
+        wfitem = self.wfitem
+        if not wfitem:
+            return super().title(*args, **kwargs)
+
         record = self.record
         critRecord = self.critRecord
 

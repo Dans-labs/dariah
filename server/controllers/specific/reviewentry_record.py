@@ -7,15 +7,16 @@ CW = C.web
 
 MESSAGES = CW.messages
 
-ORPHAN = H.icon(CW.unknown[N.reviewKind])
-
 
 class ReviewEntryR(Record):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def title(self):
-        kind = self.kind
+    def title(self, *args, **kwargs):
+        wfitem = self.wfitem
+        if not wfitem:
+            return super().title(*args, **kwargs)
+
         uid = self.uid
         record = self.record
 
@@ -23,9 +24,8 @@ class ReviewEntryR(Record):
 
         youRep = f""" ({N.you})""" if creatorId == uid else E
         lastModified = self.field(N.modified).value[-1].rsplit(DOT, maxsplit=1)[0]
-        kindRep = f""" ({kind or ORPHAN})"""
 
-        return H.span(f"""{lastModified}{kindRep}{youRep}""", cls=f"rentrytitle")
+        return H.span(f"""{lastModified}{youRep}""", cls=f"rentrytitle")
 
     def bodyCompact(self, **kwargs):
         perm = self.perm

@@ -35,18 +35,18 @@
       <link rel="stylesheet" href="/static/css/specific.css"/>
     </head>
     <body>
+      <div id="msgbar">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for (category, message) in messages %}
+          <div class="msgitem {{category}}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      </div>
       <div id="topbar">
         {{topbar|safe}}
       </div>
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          <div id="msgbar">
-          {% for message in messages %}
-            <div class="msgitem">{{ message }}</div>
-          {% endfor %}
-          </div>
-        {% endif %}
-      {% endwith %}
       </div>
       <div id="rest">
         <div id="sidebar">

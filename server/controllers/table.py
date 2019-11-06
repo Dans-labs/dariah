@@ -102,6 +102,12 @@ class Table:
         else:
             wf.recompute(contribId)
 
+    def stage(self, record, table, kind=None):
+        recordObj = self.record(record=record)
+
+        wfitem = recordObj.wfitem
+        return wfitem.stage(table, kind=kind) if wfitem else None
+
     def wrap(self, openEid, action=None):
         if not self.mayList(action=action):
             return FORBIDDEN
@@ -116,13 +122,17 @@ class Table:
 
         params = (
             dict(my=uid)
-            if action == N.mylist
+            if action == N.my
             else dict(our=countryId)
-            if action == N.ourlist
+            if action == N.our
+            else dict(assessor=uid)
+            if action == N.assess
             else dict(assign=True)
-            if action == N.assignlist
+            if action == N.assign
             else dict(reviewer=uid)
-            if action == N.reviewlist
+            if action == N.review
+            else dict(selectable=countryId)
+            if action == N.select
             else {}
         )
         if request.args:
@@ -134,6 +144,21 @@ class Table:
         nRep = H.span(f"""{nRecords} {itemLabel}""", cls="stats")
         insertButton = self.insertButton()
         sep = NBSP if insertButton else E
+
+        if action == N.assess:
+            records = [
+                record
+                for record in records
+                if self.stage(record, N.review, kind=N.final)
+                not in {N.reviewAccept, N.reviewReject}
+            ]
+        if action == N.review:
+            records = [
+                record
+                for record in records
+                if self.stage(record, N.review, kind=N.final)
+                not in {N.reviewAccept, N.reviewReject, N.reviewExpert}
+            ]
 
         return H.div(
             chain.from_iterable(
@@ -180,7 +205,7 @@ class Table:
         isValueTable = self.isValueTable
         return (
             isMainTable
-            and action == N.list
+            and not action
             or auth.superuser()
             or (isMainTable or isInterTable or isValueTable)
             and auth.authenticated()

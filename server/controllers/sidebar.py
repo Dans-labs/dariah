@@ -3,6 +3,7 @@ from flask import request
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
 from controllers.utils import pick as G, E, Q, AMP, ZERO
+from controllers.types import Country
 
 from controllers.specific.factory_table import make as mkTable
 
@@ -15,6 +16,11 @@ SORTED_TABLES = CT.sorted
 HOME = CW.urls[N.home]
 OPTIONS = CW.options
 CAPTIONS = CW.captions
+USER_TABLES_LIST = CT.userTables
+USER_ENTRY_TABLES = set(CT.userEntryTables)
+VALUE_TABLES = CT.valueTables
+SYSTEM_TABLES = CT.systemTables
+OFFICE_TABLES = [t for t in VALUE_TABLES if t not in SYSTEM_TABLES]
 
 
 class Sidebar:
@@ -34,40 +40,21 @@ class Sidebar:
             option: G(request.args, option, default=ZERO) for option in OPTIONS.keys()
         }
 
-    def makeCaption(self, label, path, entries, rule=False):
+    def makeCaption(self, label, entries, rule=False):
         if not entries:
             return E
 
         refPath = self.path
-        active = (
-            refPath.startswith(f"""/{path}/""")
-            if type(path) is str
-            else any(refPath.startswith(f"""/{p}/""") for p in path)
-        )
+        paths = {path for (path, rep) in entries}
+        reps = [rep for (path, rep) in entries]
+        active = any(refPath.startswith(f"""/{p}/""") for p in paths)
         navClass = " active" if active else E
         atts = dict(cls=f"nav {navClass}")
-        itemkey = path if type(path) is str else label
         if rule:
             atts[N.addClass] = " ruleabove"
 
-        entriesRep = H.div(entries, cls="sidebarsec")
-        return H.details(label, entriesRep, itemkey, **atts)
-
-    def makeEntry(self, label, path, withOptions=False):
-        options = self.options
-        active = path == self.path
-
-        navClass = "button small nav" + (" active" if active else E)
-
-        optionsRep = (
-            AMP.join(f"""{name}={value}""" for (name, value) in options.items())
-            if withOptions
-            else E
-        )
-        if optionsRep:
-            optionsRep = Q + optionsRep
-
-        return H.a(label, path + optionsRep, hrefbase=path, cls=navClass)
+        entriesRep = H.div(reps, cls="sidebarsec")
+        return H.details(label, entriesRep, label, **atts)
 
     def makeOptions(self):
         options = self.options
@@ -83,116 +70,200 @@ class Sidebar:
             for (name, value) in options.items()
         ]
 
-        return filterRep + optionsRep
+        return [("XXX", rep) for rep in filterRep + optionsRep]
 
-    def tableEntry(self, table):
+    def makeEntry(self, label, path, withOptions=False, command=False):
+        options = self.options
+        active = path == self.path
+
+        command = "command info" if command else "button"
+        navClass = f"{command} small nav" + (" active" if active else E)
+
+        optionsRep = (
+            AMP.join(f"""{name}={value}""" for (name, value) in options.items())
+            if withOptions
+            else E
+        )
+        if optionsRep:
+            optionSep = AMP if Q in path else Q
+            optionsRep = optionSep + optionsRep
+
+        return (path, H.a(label, path + optionsRep, hrefbase=path, cls=navClass))
+
+    def tableEntry(
+        self,
+        table,
+        prefix=None,
+        item=None,
+        postfix=None,
+        action=None,
+        withOptions=False,
+        command=False,
+    ):
         control = self.control
-        auth = control.auth
 
         tableObj = mkTable(control, table)
-        isMainTable = tableObj.isMainTable
-        isInterTable = tableObj.isInterTable
-        isUserTable = tableObj.isUserTable
-        isUserEntryTable = tableObj.isUserEntryTable
-        isValueTable = tableObj.isValueTable
-        itemPlural = tableObj.itemLabels[1]
+        item = tableObj.itemLabels[1] if item is None else item
+        actionRep = f"?action={action}" if action else E
+        prefixRep = f"{prefix} " if prefix else E
+        postfixRep = f" {postfix}" if postfix else E
 
+        return self.makeEntry(
+            f"""{prefixRep}{item}{postfixRep}""",
+            f"""/{table}/{N.list}{actionRep}""",
+            withOptions=True,
+            command=command,
+        )
+
+    def wrap(self):
+        control = self.control
+        auth = control.auth
         isAuth = auth.authenticated()
         isOffice = auth.officeuser()
         isSuperUser = auth.superuser()
         isSysAdmin = auth.sysadmin()
+        isCoord = auth.coordinator()
         country = auth.country()
 
-        if isMainTable or isInterTable:
-            entries = []
-            if isMainTable:
-                entries.extend(self.makeOptions())
+        entries = []
 
-            if isAuth:
-                entries.append(
-                    self.makeEntry(
-                        f"""my {itemPlural}""",
-                        f"""/{table}/{N.mylist}""",
-                        withOptions=True,
-                    )
-                )
-                if isInterTable:
-                    if isOffice:
-                        entries.append(
-                            self.makeEntry(
-                                f"""{itemPlural} needing reviewers""",
-                                f"""/{table}/{N.assignlist}""",
-                                withOptions=True,
-                            )
-                        )
-                    entries.append(
-                        self.makeEntry(
-                            f"""my reviews""",
-                            f"""/{table}/{N.reviewlist}""",
+        # home
+        entries.append(self.makeEntry(G(HOME, N.text), G(HOME, N.url))[1])
+
+        # options
+
+        entries.append(
+            self.makeCaption(G(CAPTIONS, N.options), self.makeOptions(), rule=True)
+        )
+
+        # DARIAH contributions
+
+        subEntries = []
+
+        subEntries.append(self.tableEntry(N.contrib, prefix="All", withOptions=True))
+
+        if isAuth:
+
+            # my country
+
+            if country:
+                countryType = Country(control)
+
+                countryRep = countryType.titleStr(country)
+                iso = G(country, N.iso)
+                if iso:
+                    subEntries.append(
+                        self.tableEntry(
+                            N.contrib,
+                            action=N.our,
+                            prefix=f"{countryRep}",
                             withOptions=True,
                         )
                     )
 
-                if isMainTable:
-                    if country:
-                        iso = G(country, N.iso)
-                        if iso:
-                            entries.append(
-                                self.makeEntry(
-                                    f"""{iso} {itemPlural}""",
-                                    f"""/{table}/{N.ourlist}""",
-                                    withOptions=True,
-                                )
-                            )
+            # - my contributions and assessments
 
-            entries.append(
-                self.makeEntry(
-                    f"""all {itemPlural}""", f"""/{table}/list""", withOptions=True,
-                )
+            subEntries.extend(
+                [
+                    self.tableEntry(
+                        N.contrib, action="my", prefix="My", withOptions=True
+                    ),
+                    self.tableEntry(N.assessment, action="my", prefix="My"),
+                    self.tableEntry(N.review, action="my", prefix="My"),
+                ]
             )
 
-            caption = """Contributions""" if isMainTable else """Assessments"""
-            entries = [self.makeCaption(f"""{caption}""", table, entries)]
+        # - reviewed by me (all)
 
-            self.mainEntries.extend(entries)
-            return
+        entries.append(self.makeCaption(G(CAPTIONS, N.contrib), subEntries))
 
-        if isUserTable:
-            if isSuperUser:
-                self.userEntries.append(
-                    self.makeEntry(f"""{itemPlural}""", f"""/{table}/list""")
+        # tasks
+
+        if not isAuth:
+            return H.join(entries)
+
+        subEntries = []
+
+        if isCoord:
+
+            # - select contributions
+
+            subEntries.append(
+                self.tableEntry(
+                    N.contrib,
+                    action="select",
+                    item="Contributions",
+                    postfix="to be selected",
+                    command=True,
                 )
-                self.userPaths.append(table)
-            return
-
-        if isUserEntryTable:
-            if isSysAdmin:
-                self.userEntries.append(
-                    self.makeEntry(f"""{itemPlural}""", f"""/{table}/list""")
-                )
-                self.userPaths.append(table)
-
-        if isValueTable:
-            if isSuperUser:
-                self.valueEntries.append(
-                    self.makeEntry(f"""{itemPlural}""", f"""/{table}/list""")
-                )
-                self.valuePaths.append(table)
-            return
-
-    def wrap(self):
-        entries = self.entries
-        entries.append(self.makeEntry(G(HOME, N.text), G(HOME, N.url)))
-
-        for table in SORTED_TABLES:
-            self.tableEntry(table)
-
-        return (
-            H.join(self.mainEntries)
-            + self.makeCaption(
-                G(CAPTIONS, N.user), self.userPaths, self.userEntries, rule=True,
             )
-            + self.makeCaption(
-                G(CAPTIONS, N.office), self.valuePaths, self.valueEntries, rule=True,
+        # - my unfinished assessments
+
+        subEntries.append(
+            self.tableEntry(
+                N.contrib,
+                action="assess",
+                item="Contributions",
+                postfix="I am assessing",
+                command=True,
             )
         )
+
+        if isOffice:
+
+            # - assign reviewers
+
+            subEntries.append(
+                self.tableEntry(
+                    N.assessment,
+                    action="assign",
+                    item="Assessments",
+                    postfix="needing reviewers",
+                    command=True,
+                )
+            )
+
+        # - reviewed by me (unfinished)
+
+        subEntries.append(
+            self.tableEntry(
+                N.assessment,
+                action="review",
+                item="Assessments",
+                postfix="in review by me",
+                command=True,
+            )
+        )
+
+        entries.append(self.makeCaption(G(CAPTIONS, N.tasks), subEntries, rule=True))
+
+        # user content
+
+        subEntries = []
+        if isSuperUser:
+            for table in USER_TABLES_LIST[1:]:
+                if isSysAdmin or table not in USER_ENTRY_TABLES:
+                    subEntries.append(self.tableEntry(table, prefix="all"))
+            entries.append(self.makeCaption(G(CAPTIONS, N.user), subEntries, rule=True))
+
+        # office content
+
+        subEntries = []
+        if isSuperUser:
+            for table in OFFICE_TABLES:
+                subEntries.append(self.tableEntry(table, command=table == N.user))
+            entries.append(
+                self.makeCaption(G(CAPTIONS, N.office), subEntries, rule=True)
+            )
+
+        # system content
+
+        subEntries = []
+        if isSysAdmin:
+            for table in SYSTEM_TABLES:
+                subEntries.append(self.tableEntry(table))
+            entries.append(
+                self.makeCaption(G(CAPTIONS, N.system), subEntries, rule=True)
+            )
+
+        return H.join(entries)

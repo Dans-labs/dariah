@@ -1,4 +1,5 @@
 from datetime import timedelta
+from flask import flash
 
 from controllers.config import Config as C, Names as N
 from controllers.utils import pick as G, E, now
@@ -193,13 +194,6 @@ class WorkflowItem:
 
             answer = not frozen or remaining
 
-            if table == N.contrib and command in {
-                N.selectContrib,
-                N.deselectContrib,
-                N.unselectContrib,
-            }:
-                print(command, stage)
-
             if command == N.selectContrib:
                 return stage != N.selectYes and answer
 
@@ -265,6 +259,9 @@ class WorkflowItem:
             return False
 
         return False
+
+    def stage(self, table, kind=None):
+        return list(self.info(table, N.stage, kind=kind))[0]
 
     def statusOverview(self, table, eid, kind=None):
         (stage, stageDate, locked, frozen, score) = self.info(
@@ -332,7 +329,6 @@ class WorkflowItem:
 
         for (command, commandInfo) in sorted(allowedCommands.items()):
             permitted = self.permission(table, command, kind=kind)
-            print("PERM", table, command, permitted)
             if not permitted:
                 continue
 
@@ -340,7 +336,7 @@ class WorkflowItem:
             commandUntil = E
             if remaining:
                 remainingRep = datetime.toDisplay(justNow + remaining)
-                commandUntil = H.span(f""" until {remainingRep}""", cls="date")
+                commandUntil = H.span(f""" before {remainingRep}""", cls="datex")
             commandMsg = G(commandInfo, N.msg)
             commandCls = G(commandInfo, N.cls)
 
@@ -364,9 +360,10 @@ class WorkflowItem:
         kind = recordObj.kind
         commands = G(COMMANDS, table)
         (contribId,) = self.info(N.contrib, N._id)
+        commandInfo = commands[command]
+        acro = G(commandInfo, N.acro)
 
         if self.permission(table, command, kind=kind):
-            commandInfo = commands[command]
             operator = G(commandInfo, N.operator)
             if operator == N.add:
                 tableObj = recordObj.tableObj
@@ -376,5 +373,8 @@ class WorkflowItem:
                 field = G(commandInfo, N.field)
                 value = G(commandInfo, N.value)
                 recordObj.field(field, mayEdit=True).save(value)
+            flash(f"""<{acro}> done""", "message")
+        else:
+            flash(f"""<{acro}> not permitted""", "error")
 
         return f"""/{N.contrib}/{N.item}/{contribId}"""

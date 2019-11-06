@@ -19,6 +19,7 @@ from controllers.auth import Auth
 from controllers.control import Control
 from controllers.sidebar import Sidebar
 from controllers.topbar import Topbar
+from controllers.overview import Overview
 from controllers.specific.factory_table import make as mkTable
 
 
@@ -40,12 +41,16 @@ MESSAGES = CW.messages
 INDEX = CW.indexPage
 LANDING = CW.landing
 BODY_METHODS = set(CW.bodyMethods)
+LIST_ACTIONS = set(CW.listActions)
+FIELD_ACTIONS = set(CW.fieldActions)
 
 START = URLS[N.home][N.url]
+OVERVIEW = URLS[N.info][N.url]
 DUMMY = URLS[N.dummy][N.url]
 SHIB_LOGOUT = URLS[N.shibLogout][N.url]
 NO_PAGE = MESSAGES[N.noPage]
 NO_TABLE = MESSAGES[N.noTable]
+NO_FIELD = MESSAGES[N.noField]
 
 
 mongo = MongoClient().dariah
@@ -91,6 +96,18 @@ def factory():
         sidebar = Sidebar(control, path).wrap()
         return render_template(INDEX, topbar=topbar, sidebar=sidebar, material=LANDING)
 
+    # OVERVIEW PAGE
+
+    @app.route(f"""/{OVERVIEW}""")
+    def serveOverview():
+        path = START
+        control = getControl()
+        auth.authenticate()
+        topbar = Topbar(control).wrap()
+        sidebar = Sidebar(control, path).wrap()
+        overview = Overview(control).wrap()
+        return render_template(INDEX, topbar=topbar, sidebar=sidebar, material=overview)
+
     # INSERT RECORD IN TABLE
 
     @app.route(f"""/api/<string:table>/{N.insert}""")
@@ -129,55 +146,27 @@ def factory():
 
     @app.route(f"""/<string:table>/{N.list}/<string:eid>""")
     def serveTableListOpen(table, eid):
-        return serveTable(table, eid, action=N.list)
+        return serveTable(table, eid)
 
     @app.route(f"""/<string:table>/{N.list}""")
     def serveTableList(table):
-        return serveTable(table, None, action=N.list)
+        return serveTable(table, None)
 
-    @app.route(f"""/<string:table>/{N.mylist}/<string:eid>""")
-    def serveTableMyListOpen(table, eid):
-        return serveTable(table, eid, action=N.mylist)
-
-    @app.route(f"""/<string:table>/{N.mylist}""")
-    def serveTableMyList(table):
-        return serveTable(table, None, action=N.mylist)
-
-    @app.route(f"""/{N.contrib}/{N.ourlist}/<string:eid>""")
-    def serveTableOurListOpen(eid):
-        return serveTable(N.contrib, eid, action=N.ourlist)
-
-    @app.route(f"""/{N.contrib}/{N.ourlist}""")
-    def serveTableOurList():
-        return serveTable(N.contrib, None, action=N.ourlist)
-
-    @app.route(f"""/{N.assessment}/{N.assignlist}/<string:eid>""")
-    def serveTableAssignListOpen(eid):
-        return serveTable(N.assessment, eid, action=N.assignlist)
-
-    @app.route(f"""/{N.assessment}/{N.assignlist}""")
-    def serveTableAssignList():
-        return serveTable(N.assessment, None, action=N.assignlist)
-
-    @app.route(f"""/{N.assessment}/{N.reviewlist}/<string:eid>""")
-    def serveTableReviewListOpen(eid):
-        return serveTable(N.assessment, eid, action=N.reviewlist)
-
-    @app.route(f"""/{N.assessment}/{N.reviewlist}""")
-    def serveTableReviewList():
-        return serveTable(N.assessment, None, action=N.reviewlist)
-
-    def serveTable(table, eid, action=None):
-        path = f"""/{table}/{action}"""
-        control = getControl()
-        if table in ALL_TABLES:
-            auth.authenticate()
-            topbar = Topbar(control).wrap()
-            sidebar = Sidebar(control, path).wrap()
-            tableList = mkTable(control, table).wrap(eid, action=action)
-            return render_template(
-                INDEX, topbar=topbar, sidebar=sidebar, material=tableList,
-            )
+    def serveTable(table, eid):
+        action = G(request.args, N.action)
+        actionRep = f"?action={action}" if action else E
+        eidRep = f"""/{eid}""" if eid else E
+        path = f"""/{table}/{N.list}{eidRep}{actionRep}"""
+        if not action or action in LIST_ACTIONS:
+            control = getControl()
+            if table in ALL_TABLES:
+                auth.authenticate()
+                topbar = Topbar(control).wrap()
+                sidebar = Sidebar(control, path).wrap()
+                tableList = mkTable(control, table).wrap(eid, action=action)
+                return render_template(
+                    INDEX, topbar=topbar, sidebar=sidebar, material=tableList,
+                )
         return notFound(path)
 
     # RECORD DELETE
@@ -189,15 +178,16 @@ def factory():
         if table in ALL_TABLES:
             auth.authenticate()
             mkTable(control, table).record(eid=eid).delete()
-            newUrlPart = N.mylist if table in USER_TABLES else N.list
-            newPath = f"""/{table}/{newUrlPart}"""
+            newUrlPart = "?{N.action}={N.my}" if table in USER_TABLES else E
+            newPath = f"""/{table}/{N.list}{newUrlPart}"""
             return redirect(newPath)
         return notFound(path)
 
     # RECORD DELETE DETAIL
 
     @app.route(
-        f"""/api/<string:table>/<string:masterId>/<string:dtable>/{N.delete}/<string:eid>"""
+        f"""/api/<string:table>/<string:masterId>/"""
+        f"""<string:dtable>/{N.delete}/<string:eid>"""
     )
     def serveRecordDeleteDetail(table, masterId, dtable, eid):
         path = f"""/api/{table}/{masterId}/{dtable}/{N.delete}/{eid}"""
@@ -217,7 +207,7 @@ def factory():
                 (contribId,) = wfitem.info(N.contrib, N._id)
                 backId = contribId
 
-            newPath = f"""/{N.contrib}/{N.mylist}/{backId}"""
+            newPath = f"""/{N.contrib}/{N.list}/{backId}"""
 
             return redirect(newPath)
         return notFound(path)
@@ -277,31 +267,21 @@ def factory():
     # FIELD VIEWS AND EDITS
 
     @app.route(
-        f"""/api/<string:table>/{N.item}/<string:eid>/{N.edit}/<string:field>""", **GP
+        f"""/api/<string:table>/{N.item}/<string:eid>/{N.field}/<string:field>""", **GP
     )
-    def serveFieldEdit(table, eid, field):
-        return serveField(table, eid, field, action=N.edit)
-
-    @app.route(
-        f"""/api/<string:table>/{N.item}/<string:eid>/{N.view}/<string:field>""", **GP
-    )
-    def serveFieldView(table, eid, field):
-        return serveField(table, eid, field, action=N.view)
-
-    @app.route(
-        f"""/api/<string:table>/{N.item}/<string:eid>/{N.save}/<string:field>""", **GP
-    )
-    def serveFieldSave(table, eid, field):
-        return serveField(table, eid, field, action=N.save)
-
-    def serveField(table, eid, field, action=None):
-        control = getControl()
-        auth.authenticate()
-        if table in ALL_TABLES:
-            return (
-                mkTable(control, table).record(eid=eid).field(field).wrap(action=action)
-            )
-        return noTable(table)
+    def serveField(table, eid, field):
+        action = G(request.args, N.action)
+        if action in FIELD_ACTIONS:
+            control = getControl()
+            auth.authenticate()
+            if table in ALL_TABLES:
+                return (
+                    mkTable(control, table)
+                    .record(eid=eid)
+                    .field(field)
+                    .wrap(action=action)
+                )
+        return noField(table, field)
 
     # COMMANDS
 
@@ -352,6 +332,9 @@ def factory():
 
     def noTable(table):
         return f"""{NO_TABLE} {table}"""
+
+    def noField(table, field):
+        return f"""{NO_FIELD} {table}:{field}"""
 
     return app
 

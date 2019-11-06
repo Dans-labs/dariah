@@ -25,22 +25,20 @@ const widgets = {
       targets.each((i, elem) => {
         const el = $(elem)
         const options = el.find('[bool]')
-        el.find('.icon').off('click').click(e => {
-          options.removeClass('active')
-          const me = $(e.currentTarget)
-          me.addClass('active')
-          edit(table, eid, field, valueEl, parent)
-        })
+        el.find('.icon')
+          .off('click')
+          .click(e => {
+            options.removeClass('active')
+            const me = $(e.currentTarget)
+            me.addClass('active')
+            edit(table, eid, field, valueEl, parent)
+          })
       })
     },
     read(elem) {
       const el = elem.find('.active')
       const boolValue = el.attr('bool')
-      return (boolValue == 'true')
-        ? true
-        : (boolValue == 'false')
-        ? false
-        : null
+      return boolValue == 'true' ? true : boolValue == 'false' ? false : null
     },
   },
   related: {
@@ -51,22 +49,22 @@ const widgets = {
       targets.each((i, elem) => {
         const el = $(elem)
         const options = el.find('[lab]')
-        el.find('.button,.command').off('click').click(e => {
-          const me = $(e.currentTarget)
-          if (multiple) {
-            if (me.hasClass('active')) {
-              me.removeClass('active')
-            }
-            else {
+        el.find('.button,.command')
+          .off('click')
+          .click(e => {
+            const me = $(e.currentTarget)
+            if (multiple) {
+              if (me.hasClass('active')) {
+                me.removeClass('active')
+              } else {
+                me.addClass('active')
+              }
+            } else {
+              options.removeClass('active')
               me.addClass('active')
             }
-          }
-          else {
-            options.removeClass('active')
-            me.addClass('active')
-          }
-          edit(table, eid, field, valueEl, parent)
-        })
+            edit(table, eid, field, valueEl, parent)
+          })
         const filterControl = el.find('input.wfilter')
         if (filterControl) {
           const filterOff = el.find('.icon.wfilter.clear')
@@ -114,8 +112,7 @@ const filterTags = (options, pattern, off, add, extensible) => {
       const lab = el.attr('lab')
       if (lab.indexOf(pat) == -1) {
         el.hide()
-      }
-      else {
+      } else {
         el.show()
         remaining++
       }
@@ -124,35 +121,40 @@ const filterTags = (options, pattern, off, add, extensible) => {
     if (extensible) {
       if (remaining) {
         add.hide()
-      }
-      else {
+      } else {
         add.show()
       }
-    }
-    else {
+    } else {
       add.hide()
     }
-  }
-  else {
+  } else {
     options.show()
     off.hide()
   }
 }
 
-const processHtml = (destElem, detail, forceOpen, tag) => html => {
+const flash = (task, error) => {
+  const msgbar = $('#msgbar')
+  const stat = error || 'succeeded'
+  const cls = error ? 'error' : 'message'
+  msgbar.html(`<div class="msgitem ${cls}">&lt${task}&gt; ${stat}</div>`)
+}
+
+const processHtml = (task, destElem, detail, forceOpen, tag) => html => {
   destElem.html(html)
   openCloseMyItems(destElem)
   openCloseItems(destElem)
   activateFetch(destElem)
   activateActions(destElem)
-  activateQActions(destElem)
+  if (task != null) {
+    flash(task)
+  }
   let targetElem
   if (detail) {
     const child = destElem.children('details')
     child.unwrap()
     targetElem = child
-  }
-  else {
+  } else {
     targetElem = destElem
   }
   if (forceOpen) {
@@ -161,8 +163,7 @@ const processHtml = (destElem, detail, forceOpen, tag) => html => {
       const itemKey = targetElem.attr('itemkey')
       const jq = `[targetkey="${itemKey}"][tag="${tag}"]`
       scrollElem = $(jq)
-    }
-    else {
+    } else {
       scrollElem = targetElem
     }
     if (scrollElem && scrollElem[0]) {
@@ -171,17 +172,17 @@ const processHtml = (destElem, detail, forceOpen, tag) => html => {
   }
 }
 
-const fetch = (url, destElem, data) => {
+const fetch = (url, task, destElem, data) => {
   if (data === undefined) {
     $.ajax({
       type: 'GET',
       url,
       processData: false,
       contentType: false,
-      success: processHtml(destElem),
+      success: processHtml(task, destElem),
+      error: report(task),
     })
-  }
-  else {
+  } else {
     $.ajax({
       type: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -189,33 +190,28 @@ const fetch = (url, destElem, data) => {
       data,
       processData: false,
       contentType: true,
-      success: processHtml(destElem),
+      success: processHtml(task, destElem),
+      error: report(task),
     })
   }
 }
 
-const post = (url, data, after) => {
-  $.ajax({
-    type: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    url,
-    data,
-    processData: false,
-    contentType: true,
-    success: () => {
-      window.location.href = after
-    },
-  })
-}
-
-const fetchDetail = (url, forceOpen, tag, destElem) => {
+const fetchDetail = (url, task, forceOpen, tag, destElem) => {
   $.ajax({
     type: 'GET',
     url,
     processData: false,
     contentType: false,
-    success: processHtml(destElem, true, forceOpen, tag),
+    success: processHtml(task, destElem, true, forceOpen, tag),
+    error: report(task),
   })
+}
+
+const report = task => (jqXHR, stat, error) => {
+  if (task != null) {
+    Console.error(stat, { error })
+    flash(task, stat)
+  }
 }
 
 const activateFetch = destElem => {
@@ -238,13 +234,11 @@ const fetchDetailOpen = (el, tag) => {
   const fetchUrl = el.attr('fetchurl') || emptyS
   const urlTitle = el.attr('urltitle') || emptyS
   const urlExtra = el.attr('urlextra') || emptyS
-  const url = tag
-    ? fetchUrl + urlExtra
-    : fetchUrl + urlTitle + urlExtra
+  const url = tag ? fetchUrl + urlExtra : fetchUrl + urlTitle + urlExtra
   el.wrap('<div></div>')
   const parent = el.closest('div')
   el.remove()
-  fetchDetail(url, forceOpen, tag, parent)
+  fetchDetail(url, null, forceOpen, tag, parent)
 }
 
 const openCloseItems = destElem => {
@@ -255,8 +249,7 @@ const openCloseItems = destElem => {
     el.on('toggle', () => {
       if (elem.open) {
         localStorage.setItem(itemKey, 'open')
-      }
-      else {
+      } else {
         localStorage.setItem(itemKey, '')
       }
     })
@@ -268,8 +261,7 @@ const openCloseItems = destElem => {
       if (!mustBeOpen) {
         el.prop('open', false)
       }
-    }
-    else if (!curOpen) {
+    } else if (!curOpen) {
       if (mustBeOpen) {
         el.prop('open', true)
       }
@@ -279,9 +271,7 @@ const openCloseItems = destElem => {
 
 const openCloseMyItems = destElem => {
   const triggerPat = (itemKey, t) => `[itemkey="${itemKey}"][trigger="${t}"]`
-  const targets = destElem
-    ? destElem.find('[itemkey][body]')
-    : $('[itemkey][body]')
+  const targets = destElem ? destElem.find('[itemkey][body]') : $('[itemkey][body]')
   targets.each((i, elem) => {
     const body = $(elem)
     const itemKey = body.attr('itemkey')
@@ -308,8 +298,7 @@ const openCloseMyItems = destElem => {
       body.show()
       triggerOn.hide()
       triggerOff.show()
-    }
-    else {
+    } else {
       body.hide()
       triggerOn.show()
       triggerOff.hide()
@@ -320,25 +309,22 @@ const openCloseMyItems = destElem => {
 const Console = console
 
 const makeFieldUrl = (table, eid, field, action) =>
-  `/api/${table}/item/${eid}/${action}/${field}`
+  `/api/${table}/item/${eid}/field/${field}?action=${action}`
 
 const collectEvents = {}
 
 const view = (table, eid, field, valueEl, parent) => {
   const saveValue = save(table, eid, field, valueEl)
   const url = makeFieldUrl(table, eid, field, 'view')
-  fetch(url, parent, saveValue)
+  const task = saveValue === undefined ? null : `save ${field}`
+  fetch(url, task, parent, saveValue)
 }
 
 const edit = (table, eid, field, valueEl, parent, newTag) => {
   const saveValue = save(table, eid, field, valueEl, newTag)
   const url = makeFieldUrl(table, eid, field, 'edit')
-  fetch(url, parent, saveValue)
-}
-
-const qEdit = (table, eid, field, value, after) => {
-  const url = makeFieldUrl(table, eid, field, 'save')
-  post(url, value, after)
+  const task = saveValue === undefined ? null : `save ${field}`
+  fetch(url, task, parent, saveValue)
 }
 
 const refresh = el => {
@@ -349,9 +335,7 @@ const refresh = el => {
     targetElem.attr('forceopen', '1')
     const tag = el.attr('tag')
     fetchDetailOpen(targetElem, tag)
-
-  }
-  else {
+  } else {
     const currentUrl = window.location.href
     window.location.href = currentUrl
   }
@@ -367,18 +351,20 @@ const getDynValues = (valueEl, newTag) => {
   const extensible = valueEl.attr('extensible')
   const valueCarrier = valueEl.find('.wvalue')
   const wType = valueEl.attr('wtype')
-  const { [wType]: { read, readMultiple } } = widgets
+  const {
+    [wType]: { read, readMultiple },
+  } = widgets
   const givenValuePre = multiple
     ? readMultiple
       ? readMultiple(valueCarrier)
-      : $.makeArray(valueCarrier.map((i, el) => read($(el))))
-        .filter(v => v !== '')
+      : $.makeArray(valueCarrier.map((i, el) => read($(el)))).filter(v => v !== '')
     : read(valueCarrier)
-  const givenValue = (extensible && newTag)
-    ? multiple
-      ? [...givenValuePre, [newTag]]
-      : [newTag]
-    : givenValuePre
+  const givenValue =
+    extensible && newTag
+      ? multiple
+        ? [...givenValuePre, [newTag]]
+        : [newTag]
+      : givenValuePre
   const newValue = JSON.stringify(givenValue)
   const dirty = origValue != newValue
   return { origValue, givenValue, newValue, dirty }
@@ -394,12 +380,13 @@ const save = (table, eid, field, valueEl, newTag) => {
     const wType = valueEl.attr('wtype')
     const dirtyRep = dirty ? 'dirty' : 'clean'
     const actionRep = dirty ? (SAVE ? 'saving' : 'suppress saving') : 'no save'
-    Console.log(
-      `WIDGET ${wType}: ${dirtyRep} => ${actionRep}`,
-      { valueEl, origValue, newValue }
-    )
+    Console.log(`WIDGET ${wType}: ${dirtyRep} => ${actionRep}`, {
+      valueEl,
+      origValue,
+      newValue,
+    })
   }
-  return (dirty && SAVE) ? JSON.stringify({ save: givenValue }) : undefined
+  return dirty && SAVE ? JSON.stringify({ save: givenValue }) : undefined
 }
 
 const activateActions = destElem => {
@@ -426,12 +413,10 @@ const activateActions = destElem => {
 
     if (action == 'edit') {
       parent.removeClass('edit')
-    }
-    else if (action == 'view') {
+    } else if (action == 'view') {
       parent.addClass('edit')
     }
-    const actionFunc =
-      (action == 'edit') ? edit : view
+    const actionFunc = action == 'edit' ? edit : view
 
     el.off('mousedown').mousedown(() => {
       const eventKey = `${table}:${eid}.${field}`
@@ -446,8 +431,7 @@ const activateActions = destElem => {
       const { dirty } = getDynValues(valueEl)
       if (dirty) {
         valueEl.addClass('dirty')
-      }
-      else {
+      } else {
         valueEl.removeClass('dirty')
       }
     })
@@ -457,8 +441,7 @@ const activateActions = destElem => {
           const eventKey = `${table}:${eid}.${field}`
           if (collectEvents[eventKey]) {
             collectEvents[eventKey] = false
-          }
-          else {
+          } else {
             edit(table, eid, field, valueEl, parent)
           }
         })
@@ -470,21 +453,6 @@ const activateActions = destElem => {
       const widgetTargets = valueEl.find('.wvalue')
       widget.activate(table, eid, field, parent, valueEl, widgetTargets)
     }
-  })
-}
-const activateQActions = destElem => {
-  const targets = destElem ? destElem.find('[qvalue]') : $('[qvalue]')
-  targets.each((i, elem) => {
-    const el = $(elem)
-    const table = el.attr('table')
-    const eid = el.attr('eid')
-    const field = el.attr('field')
-    const givenValue = el.attr('qvalue')
-    const after = el.attr('after')
-    el.off('click').click(() => {
-      const newValue = JSON.stringify({ save: givenValue })
-      qEdit(table, eid, field, newValue, after)
-    })
   })
 }
 
@@ -506,7 +474,8 @@ const applyOptions = (destElem, optionElements, init) => {
   links.each((i, elem) => {
     const el = $(elem)
     const urlPrefix = el.attr('hrefbase')
-    const url = `${urlPrefix}${optionRep ? '?' : ''}${optionRep}`
+    const urlSep = urlPrefix.indexOf('?') >= 0 ? '&' : '?'
+    const url = `${urlPrefix}${optionRep ? urlSep : ''}${optionRep}`
     el.attr('href', url)
   })
   if (!init) {
@@ -521,25 +490,21 @@ const applyOptions = (destElem, optionElements, init) => {
 const elOption = (el, value) => {
   if (value === undefined) {
     return el.attr('trival') || '0'
-  }
-  else {
+  } else {
     el.attr('trival', value || '0')
     if (value == '1') {
       el.prop('checked', true)
       el.prop('indeterminate', false)
-    }
-    else if (value == '-1') {
+    } else if (value == '-1') {
       el.prop('checked', false)
       el.prop('indeterminate', false)
-    }
-    else {
+    } else {
       el.prop('indeterminate', true)
     }
   }
 }
 
-const nextOption = val =>
-  (val == '1') ? '0' : (val == '-1') ? '1' : '-1'
+const nextOption = val => (val == '1' ? '0' : val == '-1' ? '1' : '-1')
 
 const activateOptions = destElem => {
   const optionElements = destElem.find('input.option')
@@ -559,9 +524,9 @@ const activateCfilter = () => {
   const cfilter = 'cfilter'
   const fcontrol = $('#cfilter')
   const clist = $('.table.contrib')
-  const summaries = clist.children('details').
-    map((i, elem) => $(elem).children('summary'))
-
+  const summaries = clist
+    .children('details')
+    .map((i, elem) => $(elem).children('summary'))
 
   const adjust = pat => {
     summaries.each((i, elem) => {
@@ -569,8 +534,7 @@ const activateCfilter = () => {
       const text = el.html().toLowerCase()
       if (text.indexOf(pat) == -1) {
         el.hide()
-      }
-      else {
+      } else {
         el.show()
       }
     })
@@ -593,12 +557,11 @@ const activateCfilter = () => {
  */
 
 $(() => {
-  const contribHeading = $('details[itemkey=contrib]')
+  const sidebar = $('#sidebar')
   openCloseMyItems()
   openCloseItems()
   activateFetch()
   activateActions()
-  activateQActions()
-  activateOptions(contribHeading)
+  activateOptions(sidebar)
   activateCfilter()
 })

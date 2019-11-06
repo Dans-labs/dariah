@@ -79,6 +79,7 @@ class Db:
 
         for valueTable in {table} if table else VALUE_TABLES:
             valueList = list(self.mongoCmd(N.collect, valueTable, N.find))
+            repField = N.iso if valueTable == N.country else N.rep
 
             setattr(
                 self, valueTable, {G(record, N._id): record for record in valueList},
@@ -86,14 +87,14 @@ class Db:
             setattr(
                 self,
                 f"""{valueTable}Inv""",
-                {G(record, N.rep): G(record, N._id) for record in valueList},
+                {G(record, repField): G(record, N._id) for record in valueList},
             )
             if valueTable == N.permissionGroup:
                 setattr(
                     self,
                     f"""{valueTable}Desc""",
                     {
-                        G(record, N.rep): G(record, N.description)
+                        G(record, repField): G(record, N.description)
                         for record in valueList
                     },
                 )
@@ -178,8 +179,11 @@ class Db:
         my=None,
         our=None,
         assign=False,
+        assessor=None,
         reviewer=None,
         select=False,
+        selectable=None,
+        unfinished=False,
         **conditions,
     ):
         crit = {}
@@ -187,12 +191,16 @@ class Db:
             crit.update({M_OR: [{N.creator: my}, {N.editors: my}]})
         if our:
             crit.update({N.country: our})
+        if assessor:
+            crit.update({M_OR: [{N.creator: my}, {N.editors: my}]})
         if assign:
             crit.update(
                 {N.submitted: True, M_OR: [{N.reviewerE: None}, {N.reviewerF: None}]}
             )
         if reviewer:
             crit.update({M_OR: [{N.reviewerE: reviewer}, {N.reviewerF: reviewer}]})
+        if selectable:
+            crit.update({N.country: selectable, N.selected: None})
 
         if table in VALUE_TABLES:
             records = (

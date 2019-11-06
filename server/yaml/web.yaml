@@ -5,6 +5,7 @@ messages:
   forbidden: Forbidden
   noPage: Page not found
   noTable: No table
+  noField: No field
   refreshCrit: refresh criteria overview
   refresh: refresh modification history
   url: http(s)://letters.domain
@@ -68,6 +69,9 @@ urls:
   home:
     text: Home
     url: /
+  info:
+    text: Overview
+    url: /info
   logo:
     text: Documentation
     url: https://dans-labs.github.io/dariah/
@@ -89,7 +93,6 @@ urls:
     url: /xxx
 
 urlParts:
-  - assignlist
   - edit
   - favicons
   - http
@@ -99,10 +102,7 @@ urlParts:
   - item
   - list
   - mailto
-  - mylist
   - org
-  - ourlist
-  - reviewlist
   - static
   - view
   - www
@@ -165,15 +165,33 @@ options:
     table: review
 
 captions:
+  options: Filter
+  contrib: DARIAH Contributions
+  tasks: Tasks
   user: User content
   office: Office content
+  system: System content
 
 filterThreshold: 10
 
 bodyMethods:
   - compact
 
+fieldActions:
+  - save
+  - edit
+  - view
+
+listActions:
+  - assess
+  - assign
+  - my
+  - our
+  - review
+  - select
+
 names:
+  - action
   - actual
   - addClass
   - body
@@ -181,9 +199,9 @@ names:
   - from
   - html
   - icon
+  - list
   - method
   - option
-  - save
   - select
   - status
   - symbol

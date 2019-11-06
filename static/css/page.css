@@ -24,6 +24,21 @@ body
 	align-content: flex-start;
 }
 
+/* MAIN PAGE DIVISION - absolute */
+
+#msgbar
+{
+  position: absolute;
+  top: 0.5rem;
+  right: 5vw;
+	width: 30vw;
+  display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+  align-items: stretch;
+	align-content: flex-start;
+}
+
 /* MAIN PAGE DIVISION - vertical */
 
 #topbar
@@ -72,6 +87,25 @@ body
 	padding: 0.5rem;
 }
 
+/* MSG BAR */
+
+div.msgitem {
+	padding: 0.2em;
+  border-radius: 0.3em;
+  font-size: medium;
+  font-family: monospace;
+}
+
+div.msgitem.message {
+  color: var(--msg-fore);
+  background-color: var(--msg-back);
+}
+
+div.msgitem.error {
+  color: var(--error-fore-o);
+  background-color: var(--error-back);
+}
+
 /* TOP BAR */
 
 div.headline
@@ -114,26 +148,6 @@ div.headline
 {
   flex: 0 1 auto;
   margin: 0.1rem 1rem;
-}
-#msgbar
-{
-  position: absolute;
-  top: 0.5rem;
-  right: 5vw;
-	width: 30vw;
-  display: flex;
-	flex-flow: column nowrap;
-	justify-content: flex-start;
-  align-items: stretch;
-	align-content: flex-start;
-  color: var(--msg-fore);
-  background-color: var(--msg-back);
-	padding: 0.2em;
-  border-radius: 0.3em;
-  font-size: medium;
-}
-div.msgitem {
-  font-family: monospace;
 }
 #logo
 {

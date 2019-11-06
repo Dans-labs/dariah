@@ -86,6 +86,7 @@ commands:
   contrib:
     selectContrib:
       msg: Select as national contribution to DARIAH
+      acro: select contribution
       cls: good
       operator: set
       field: selected
@@ -94,6 +95,7 @@ commands:
       value: "1"
     deselectContrib:
       msg: Discard as national contribution to DARIAH
+      acro: discard contribution
       cls: error
       operator: set
       field: selected
@@ -102,6 +104,7 @@ commands:
       value: "-1"
     unselectContrib:
       msg: Revoke selection decision for this contribution
+      acro: unselect contribution
       cls: warning
       operator: set
       field: selected
@@ -110,12 +113,14 @@ commands:
       value: "0"
     startAssessment:
       msg: Start a self-assessment for this contribution
+      acro: start assessment
       cls: info
       operator: add
       table: assessment
   assessment:
     submitAssessment:
       msg: Submit assessment
+      acro: submit assessment
       cls: info
       operator: set
       field: submitted
@@ -124,6 +129,7 @@ commands:
       value: "1"
     resubmitAssessment:
       msg: Resubmit assessment
+      acro: resubmit assessment
       cls: info
       operator: set
       field: submitted
@@ -132,6 +138,7 @@ commands:
       value: "1"
     submitRevised:
       msg: Submit revised assessment
+      acro: resubmit revision
       cls: info
       operator: set
       field: dateSubmitted
@@ -140,6 +147,7 @@ commands:
       value: "now"
     withdrawAssessment:
       msg: Withdraw assessment from review
+      acro: unsubmit assessment
       cls: error
       operator: set
       field: submitted
@@ -148,6 +156,7 @@ commands:
       value: "0"
     startReview:
       msg: Start a review of this assessment
+      acro: start review
       cls: info
       operator: add
       table: review
@@ -155,6 +164,7 @@ commands:
     expertReviewRevise:
       kind: expert
       msg: Advise revision
+      acro: advise revision
       cls: warning
       operator: set
       field: decision
@@ -164,6 +174,7 @@ commands:
     expertReviewAccept:
       kind: expert
       msg: Advise to accept
+      acro: advise accept
       cls: good
       operator: set
       field: decision
@@ -173,6 +184,7 @@ commands:
     expertReviewReject:
       kind: expert
       msg: Advise to reject
+      acro: advise reject
       cls: error
       operator: set
       field: decision
@@ -182,6 +194,7 @@ commands:
     finalReviewRevise:
       kind: final
       msg: Require revision
+      acro: require revision
       cls: warning
       operator: set
       field: decision
@@ -191,6 +204,7 @@ commands:
     finalReviewAccept:
       kind: final
       msg: Accept
+      acro: accept
       cls: good
       operator: set
       field: decision
@@ -200,6 +214,7 @@ commands:
     finalReviewReject:
       kind: final
       msg: Reject
+      acro: reject
       cls: error
       operator: set
       field: decision

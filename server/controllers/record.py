@@ -16,7 +16,8 @@ MAIN_TABLE = CT.userTables[0]
 ACTUAL_TABLES = set(CT.actualTables)
 REFRESH_TABLES = set(CT.refreshTables)
 USER_TABLES_LIST = CT.userTables
-WORKFLOW_TABLES = set(USER_TABLES_LIST) | set(CT.userEntryTables)
+USER_TABLES = set(USER_TABLES_LIST)
+WORKFLOW_TABLES = USER_TABLES | set(CT.userEntryTables)
 CASCADE_SPECS = CT.cascade
 
 # an easy way to go from assessment to contrib and from contrib to assessment
@@ -134,8 +135,11 @@ class Record:
             self.kind = wfitem.getKind(table, record)
             valid = wfitem.isValid(table, eid, record)
             self.fixed = wfitem.checkFixed(self)
+        else:
+            valid = False if table in USER_TABLES - {MAIN_TABLE} else True
 
-        self.wfitem = wfitem if valid else None
+        self.valid = valid
+        self.wfitem = wfitem if valid and wfitem else None
 
     def adjustWorkflow(self, update=True, delete=False):
         control = self.control
@@ -237,7 +241,9 @@ class Record:
         eid = self.eid
         record = self.record
         provSpecs = self.prov
+        valid = self.valid
         withDetails = self.withDetails
+
         withRefresh = table in REFRESH_TABLES
 
         func = getattr(self, wrapMethod, None) if wrapMethod else None
@@ -271,6 +277,7 @@ class Record:
         deleteButton = self.deleteButton()
 
         innerCls = " inner" if inner else E
+        warningCls = E if valid else " warning "
 
         provenance = (
             H.div(
@@ -302,7 +309,7 @@ class Record:
                 ),
                 *provenance,
             ],
-            cls=f"record{innerCls} {addCls}",
+            cls=f"record{innerCls} {addCls} {warningCls}",
         )
 
         rButton = H.iconr(itemKey, "#main", msg=table) if withRefresh else E
@@ -390,10 +397,14 @@ class Record:
 
     def title(self):
         record = self.record
-        return Record.titleRaw(self, record)
+        valid = self.valid
+
+        warningCls = E if valid else " warning "
+
+        return Record.titleRaw(self, record, cls=warningCls)
 
     @staticmethod
-    def titleRaw(obj, record):
+    def titleRaw(obj, record, cls=E):
         table = obj.table
         control = obj.control
 
@@ -401,6 +412,6 @@ class Record:
         typesObj = getattr(types, table, None)
 
         isActual = table not in ACTUAL_TABLES or G(record, N.actual, default=False)
-        atts = {} if isActual else dict(cls="inactual")
+        atts = dict(cls=cls) if isActual else dict(cls=f"inactual {cls}")
 
         return H.span(typesObj.title(record=record), **atts)
