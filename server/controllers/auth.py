@@ -23,6 +23,7 @@ from controllers.perm import (
     authenticated,
     AUTH,
     UNAUTH,
+    COORD,
 )
 
 CB = C.base
@@ -174,30 +175,45 @@ class Auth:
             else:
                 user.update(unauthUser)
 
-    def identity(self, record):
+    def countryRep(self, user=None):
         db = self.db
-        user = self.user
         country = db.country
 
-        name = G(record, N.name) or E
-        if not name:
-            firstName = G(record, N.firstName) or E
-            lastName = G(record, N.lastName) or E
-            name = firstName + (BLANK if firstName and lastName else E) + lastName
-        group = G(user, N.groupRep) or UNAUTH
-        isAuth = group != UNAUTH
-        org = G(record, N.org) or E
-        orgRep = f""" ({org})""" if org else E
-        email = (G(record, N.email) or E) if isAuth else E
-        authority = (G(record, N.authority) or E) if isAuth else E
-        authorityRep = f"""{WHYPHEN}{authority}""" if authority else E
-        eppn = (G(record, N.eppn) or E) if isAuth else E
+        if user is None:
+            user = self.user
 
-        countryId = G(record, N.country)
+        countryId = G(user, N.country)
         countryInfo = G(country, countryId)
         iso = G(countryInfo, N.iso, default=E)
         flag = shiftRegional(iso) if iso else Qc
         countryShort = iso + flag
+        return countryShort
+
+    def groupRep(self, user=None):
+        if user is None:
+            user = self.user
+
+        return G(user, N.groupRep) or UNAUTH
+
+    def identity(self, user=None):
+        if user is None:
+            user = self.user
+
+        name = G(user, N.name) or E
+        if not name:
+            firstName = G(user, N.firstName) or E
+            lastName = G(user, N.lastName) or E
+            name = firstName + (BLANK if firstName and lastName else E) + lastName
+        group = self.groupRep(user=user)
+        isAuth = group != UNAUTH
+        org = G(user, N.org) or E
+        orgRep = f""" ({org})""" if org else E
+        email = (G(user, N.email) or E) if isAuth else E
+        authority = (G(user, N.authority) or E) if isAuth else E
+        authorityRep = f"""{WHYPHEN}{authority}""" if authority else E
+        eppn = (G(user, N.eppn) or E) if isAuth else E
+
+        countryShort = self.countryRep(user=user)
 
         identityRep = (
             (
@@ -217,10 +233,13 @@ class Auth:
     def credentials(self):
         db = self.db
         user = self.user
-        permissionGroupDesc = db.permissionGroupDesc
 
-        group = G(user, N.groupRep) or UNAUTH
+        group = self.groupRep()
+        permissionGroupDesc = db.permissionGroupDesc
         groupDesc = G(permissionGroupDesc, group) or Qg
+        if group == COORD:
+            country = self.countryRep()
+            groupDesc += f"-{country}"
 
         if group == UNAUTH:
             return (N.Guest, groupDesc)

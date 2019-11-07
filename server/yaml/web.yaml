@@ -56,6 +56,12 @@ icons:
   ok: ↩︎
   prov: ⌚︎
   refresh: ♺
+  adown: ▾
+  aup: ▴
+  addown: ⇟
+  adup: ⇞
+  cdown: ↓
+  cup: ↑
 
 landing: >-
   Welcome to the DARIAH contribution tool
@@ -116,10 +122,16 @@ elements:
   - div
   - dl
   - dt
+  - h
   - input
   - p
+  - script
   - span
   - summary
+  - table
+  - td
+  - th
+  - tr
   - textarea
 
 emptyElements:
@@ -142,6 +154,7 @@ attributeNames:
   - checked
   - cls
   - href
+  - hrefbase
   - title
   - type
   - value
@@ -202,6 +215,7 @@ names:
   - list
   - method
   - option
+  - overview
   - select
   - status
   - symbol

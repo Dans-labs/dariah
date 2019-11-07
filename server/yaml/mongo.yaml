@@ -3,10 +3,15 @@ unset: '$unset'
 lte: '$lte'
 gte: '$gte'
 ex: '$exists'
+match: '$match'
+project: '$project'
+lookup: '$lookup'
+elem: '$arrayElemAt'
 OR: '$or'
 IN: '$in'
 
 showArgs:
+  - aggregate
   - count
   - delete_many
   - delete_one
@@ -22,6 +27,7 @@ otherCommands:
   - insert_many
 
 labels:
+  - bulkContribWorkflow
   - collect
   - collectActualItems
   - clearWorkflow
@@ -40,6 +46,8 @@ labels:
   - insertUser
   - insertWorkflow
   - insertWorkflowMany
+  - localField
+  - foreignField
   - makeCrit
   - updateField
   - updateUser

@@ -92,9 +92,9 @@ class Field:
         tp = self.tp
         types = control.types
 
-        fieldTypeClass = getattr(types, tp, None)
-        self.fieldTypeClass = fieldTypeClass
-        self.widgetType = fieldTypeClass.widgetType
+        fieldTypeObj = getattr(types, tp, None)
+        self.fieldTypeObj = fieldTypeObj
+        self.widgetType = fieldTypeObj.widgetType
 
         readonly = self.readonly if readonly is None else readonly
 
@@ -123,8 +123,8 @@ class Field:
         require = self.require
 
         multiple = self.multiple
-        fieldTypeClass = self.fieldTypeClass
-        conversion = fieldTypeClass.fromStr if fieldTypeClass else None
+        fieldTypeObj = self.fieldTypeObj
+        conversion = fieldTypeObj.fromStr if fieldTypeObj else None
         args = dict(uid=uid, eppn=eppn, extensible=extensible) if extensible else {}
 
         if conversion is not None:
@@ -242,8 +242,8 @@ class Field:
         value = self.value
         multiple = self.multiple
 
-        fieldTypeClass = getattr(types, tp, None)
-        method = fieldTypeClass.toDisplay
+        fieldTypeObj = getattr(types, tp, None)
+        method = fieldTypeObj.toDisplay
 
         return (
             BLANK.join(method(val) for val in (value or []))
@@ -254,7 +254,7 @@ class Field:
     def wrapValue(self, editable, cls=E):
         control = self.control
         types = control.types
-        fieldTypeClass = self.fieldTypeClass
+        fieldTypeObj = self.fieldTypeObj
         value = self.value
         tp = self.tp
         multiple = self.multiple
@@ -277,7 +277,7 @@ class Field:
             args.append(multiple)
             args.append(extensible)
             args.append(constrain)
-        method = fieldTypeClass.widget if editable else fieldTypeClass.toDisplay
+        method = fieldTypeObj.widget if editable else fieldTypeObj.toDisplay
         extraCls = E if editable else cls
         atts = dict(wtype=widgetType)
 

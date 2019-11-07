@@ -129,6 +129,10 @@ class HtmlElements:
         return HtmlElement(N.dt).wrap(material, **atts)
 
     @staticmethod
+    def h(level, material, **atts):
+        return HtmlElement(f"{N.h}{level}").wrap(material, **atts)
+
+    @staticmethod
     def icon(icon, asChar=False, **atts):
         iconChar = G(ICONS, icon, default=ICONS[N.noicon])
         if asChar:
@@ -192,10 +196,34 @@ class HtmlElements:
         return HtmlElement(N.p).wrap(material, **atts)
 
     @staticmethod
+    def script(material, **atts):
+        return HtmlElement(N.script).wrap(material, **atts)
+
+    @staticmethod
     def span(material, **atts):
         return HtmlElement(N.span).wrap(material, **atts)
+
+    @staticmethod
+    def table(headers, rows, **atts):
+        th = HtmlElement(N.th).wrap
+        td = HtmlElement(N.td).wrap
+        headerMaterial = wrapTable(headers, th)
+        rowMaterial = wrapTable(rows, td)
+        material = HtmlElement(N.body).wrap(headerMaterial + rowMaterial)
+        return HtmlElement(N.table).wrap(material, **atts)
 
     @staticmethod
     def textarea(material, **atts):
         content = asString(material)
         return HtmlElement(N.textarea).wrap(content, **atts)
+
+
+def wrapTable(data, td):
+    tr = HtmlElement(N.tr).wrap
+    material = []
+    for (rowData, rowAtts) in data:
+        rowMaterial = []
+        for (cellData, cellAtts) in rowData:
+            rowMaterial.append(td(cellData, **cellAtts))
+        material.append(tr(rowMaterial, **rowAtts))
+    return material

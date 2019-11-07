@@ -324,6 +324,7 @@ class Record:
                 urlextra=urlExtra,
                 urltitle="""/title""",
                 fat=ONE,
+                open=True,
             )
             if expanded == 1
             else H.div(main + details)

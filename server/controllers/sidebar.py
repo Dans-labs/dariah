@@ -2,7 +2,7 @@ from flask import request
 
 from controllers.config import Config as C, Names as N
 from controllers.html import HtmlElements as H
-from controllers.utils import pick as G, E, Q, AMP, ZERO
+from controllers.utils import pick as G, cap1, E, Q, AMP, ZERO
 from controllers.types import Country
 
 from controllers.specific.factory_table import make as mkTable
@@ -21,6 +21,8 @@ USER_ENTRY_TABLES = set(CT.userEntryTables)
 VALUE_TABLES = CT.valueTables
 SYSTEM_TABLES = CT.systemTables
 OFFICE_TABLES = [t for t in VALUE_TABLES if t not in SYSTEM_TABLES]
+
+OVERVIEW = G(G(CW.urls, N.info), N.url)
 
 
 class Sidebar:
@@ -88,7 +90,14 @@ class Sidebar:
             optionSep = AMP if Q in path else Q
             optionsRep = optionSep + optionsRep
 
-        return (path, H.a(label, path + optionsRep, hrefbase=path, cls=navClass))
+        atts = dict(cls=navClass,)
+        if withOptions:
+            atts[N.hrefbase] = path
+
+        return (
+            path,
+            H.a(label, path + optionsRep, **atts),
+        )
 
     def tableEntry(
         self,
@@ -139,6 +148,8 @@ class Sidebar:
         # DARIAH contributions
 
         subEntries = []
+
+        subEntries.append(self.makeEntry(cap1(N.overview), path=OVERVIEW, command=True))
 
         subEntries.append(self.tableEntry(N.contrib, prefix="All", withOptions=True))
 

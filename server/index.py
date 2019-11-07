@@ -98,7 +98,7 @@ def factory():
 
     # OVERVIEW PAGE
 
-    @app.route(f"""/{OVERVIEW}""")
+    @app.route(f"""{OVERVIEW}""")
     def serveOverview():
         path = START
         control = getControl()
@@ -107,6 +107,12 @@ def factory():
         sidebar = Sidebar(control, path).wrap()
         overview = Overview(control).wrap()
         return render_template(INDEX, topbar=topbar, sidebar=sidebar, material=overview)
+
+    @app.route(f"""{OVERVIEW}.tsv""")
+    def serveOverviewTsv():
+        control = getControl()
+        auth.authenticate()
+        return Overview(control).wrap(asTsv=True)
 
     # INSERT RECORD IN TABLE
 

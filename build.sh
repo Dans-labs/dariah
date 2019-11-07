@@ -14,10 +14,10 @@ if [[ "$1" == "mongo" ]]; then
     mongod -f /usr/local/etc/mongod.conf
 elif [[ "$1" == "serve" ]]; then
 	cd server
-    export REGIME=devel FLASK_APP=index:factory FLASK_ENV=development FLASK_RUN_PORT=8001; python3 -m flask run
+    export PYTHONDONTWRITEBYTECODE=1 REGIME=devel FLASK_APP=index:factory FLASK_ENV=development FLASK_RUN_PORT=8001; python3 -m flask run
 elif [[ "$1" == "serveprod" ]]; then
 	cd server
-    export REGIME=devel FLASK_APP=index:factory FLASK_RUN_PORT=8001; python3 -m flask run
+    export PYTHONDONTWRITEBYTECODE=1 REGIME=devel FLASK_APP=index:factory FLASK_RUN_PORT=8001; python3 -m flask run
 elif [[ "$1" == "stats" ]]; then
     codestats
 else

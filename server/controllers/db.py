@@ -31,6 +31,10 @@ M_GTE = CM.gte
 M_OR = CM.OR
 M_IN = CM.IN
 M_EX = CM.ex
+M_MATCH = CM.match
+M_PROJ = CM.project
+M_LOOKUP = CM.lookup
+M_ELEM = CM.elem
 
 SHOW_ARGS = set(CM.showArgs)
 OTHER_COMMANDS = set(CM.otherCommands)
@@ -144,6 +148,34 @@ class Db:
                 self.typeCriteria.setdefault(tp, set()).add(_id)
 
         serverprint(f"""UPDATED {", ".join(ACTUAL_TABLES)}""")
+
+    def bulkContribWorkflow(self, country, fields, fieldsWf):
+        crit = {} if country is None else {"country": country}
+        project = {field: f"${fieldTrans}" for (field, fieldTrans) in fields.items()}
+        project.update(
+            {
+                field: {M_ELEM: [f"${N.workflow}.{fieldTrans}", 0]}
+                for (field, fieldTrans) in fieldsWf.items()
+            }
+        )
+        records = self.mongoCmd(
+            N.bulkContribWorkflow,
+            N.contrib,
+            N.aggregate,
+            [
+                {M_MATCH: crit},
+                {
+                    M_LOOKUP: {
+                        "from": N.workflow,
+                        N.localField: N._id,
+                        N.foreignField: N._id,
+                        "as": N.workflow,
+                    }
+                },
+                {M_PROJ: project},
+            ],
+        )
+        return records
 
     def makeCrit(self, mainTable, conditions):
         activeOptions = {

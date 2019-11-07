@@ -3,7 +3,6 @@ from itertools import chain
 from flask import request
 
 from controllers.config import Config as C, Names as N
-from controllers.perm import UNAUTH
 from controllers.html import HtmlElements as H
 from controllers.utils import pick as G, E, ELLIPS, NBSP, ONE
 from controllers.specific.factory_record import factory as recordFactory
@@ -44,7 +43,7 @@ class Table:
 
         self.uid = G(user, N._id)
         self.eppn = G(user, N.eppn)
-        self.group = G(user, N.groupRep) or UNAUTH
+        self.group = auth.groupRep()
         self.countryId = G(user, N.country)
 
         isUserTable = self.isUserTable

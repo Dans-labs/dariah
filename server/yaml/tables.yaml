@@ -144,6 +144,22 @@ withNow:
       - dateWithdrawn
   review:
     decision: dateDecided
+
+overviewFields:
+  country: country
+  cost: costTotal
+  vcc: vcc
+  year: year
+  title: title
+  type: typeContribution
+  selected: selected
+
+overviewFieldsWorkflow:
+  score: assessment.score.overall
+  cStage: stage
+  aStage: assessment.stage
+  rStage: assessment.reviews.final.stage
+
 names:
   - _id
   - active
