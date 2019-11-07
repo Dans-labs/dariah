@@ -198,7 +198,7 @@ const fetch = (url, task, destElem, data) => {
   }
 }
 
-const fetchDetail = (url, task, forceOpen, tag, destElem) => {
+const fetchDetail = (url, task, destElem, forceOpen, tag) => {
   $.ajax({
     type: 'GET',
     url,
@@ -240,7 +240,7 @@ const fetchDetailOpen = (el, tag) => {
   el.wrap('<div></div>')
   const parent = el.closest('div')
   el.remove()
-  fetchDetail(url, null, forceOpen, tag, parent)
+  fetchDetail(url, null, parent, forceOpen, tag)
 }
 
 const openCloseItems = destElem => {

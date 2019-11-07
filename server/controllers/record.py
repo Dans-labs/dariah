@@ -324,6 +324,7 @@ class Record:
                 urlextra=urlExtra,
                 urltitle="""/title""",
                 fat=ONE,
+                forceopen=ONE,
                 open=True,
             )
             if expanded == 1

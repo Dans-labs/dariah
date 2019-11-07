@@ -29,6 +29,7 @@ g.x {
   font-weight: bold;
   font-size: small;
   padding: 0.1em 0.2em;
+  margin: 0.2em 0.4em;
   border-radius: 0.4em;
   border: 0.1em solid #888888;
 }
@@ -141,6 +142,7 @@ a[select] {
   font-weight: normal;
   background-color: #ffffff;
   padding: 0.1em 0.2em;
+  margin: 0.2em 0.4em;
   border-radius: 0.2em;
 }
 .och {
