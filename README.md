@@ -2,16 +2,10 @@
 
 [![DOI](https://zenodo.org/badge/53429449.svg)](https://doi.org/10.5281/zenodo.1154040)
 
-DARIAH InKind Assessment Tool
+DARIAH InKind Assessment Tool (legacy)
 
-The tool is in beta and currently [live](https://dariah-beta.dans.knaw.nl/).
+This is a precursor of [dariah-contrib](https://github.com/Dans-labs/dariah-contrib])
 
-* General *about* information:
-  [live](https://dariah-beta.dans.knaw.nl/docs/about.md), 
-  [in this repo](https://github.com/Dans-labs/dariah/blob/master/static/docs/about.md)
-* Technical Documentation:
-  [live](https://dans-labs.github.io/dariah/), 
-  [in this repo](https://github.com/Dans-labs/dariah/blob/master/docs/)
-* Deployment:
-  [live](https://dans-labs.github.io/dariah/Deploy.html), 
-  [in this repo](https://github.com/Dans-labs/dariah/blob/master/docs/Deploy.md)
+The software in this repo is not currently live.
+
+**N.B. If this software is to be revived, make sure that all security alerts are properly addressed first**
