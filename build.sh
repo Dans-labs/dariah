@@ -1,4 +1,4 @@
-#!/bin/sh
+!/bin/sh
 
 # use the right python
 # source ~/local/python/dariah/bin/activate
